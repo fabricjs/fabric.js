@@ -284,6 +284,10 @@ export abstract class AbstractBaseFilter {
 
   abstract applyTo2d(options: T2DPipelineState): void;
 
+  getCacheKey() {
+    return this.type;
+  }
+
   /**
    * Retrieves the cached shader.
    * @param {Object} options
@@ -292,10 +296,11 @@ export abstract class AbstractBaseFilter {
    * @return {WebGLProgram} the compiled program shader
    */
   retrieveShader(options: TWebGLPipelineState): TWebGLProgramCacheItem {
-    if (!options.programCache[this.type]) {
-      options.programCache[this.type] = this.createProgram(options.context);
+    const key = this.getCacheKey();
+    if (!options.programCache[key]) {
+      options.programCache[key] = this.createProgram(options.context);
     }
-    return options.programCache[this.type];
+    return options.programCache[key];
   }
 
   /**
