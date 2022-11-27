@@ -14,7 +14,8 @@ import {
 } from './actions';
 import { Control } from './control.class';
 
-export const defaultControls = {
+// use this function if you want to generate new controls for every instance
+export const createObjectDefaultControls = () => ({
   ml: new Control({
     x: -0.5,
     y: 0,
@@ -84,10 +85,9 @@ export const defaultControls = {
     withConnection: true,
     actionName: 'rotate',
   }),
-};
+});
 
-export const textboxDefaultControls = {
-  ...defaultControls,
+export const createResizeControls = () => ({
   mr: new Control({
     x: 0.5,
     y: 0,
@@ -95,7 +95,6 @@ export const textboxDefaultControls = {
     cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionName: 'resizing',
   }),
-
   ml: new Control({
     x: -0.5,
     y: 0,
@@ -103,6 +102,19 @@ export const textboxDefaultControls = {
     cursorStyleHandler: scaleSkewCursorStyleHandler,
     actionName: 'resizing',
   }),
+});
+
+export const createTextboxDefaultControls = () => ({
+  ...createObjectDefaultControls(),
+  ...createResizeControls(),
+});
+
+export const defaultControls = createObjectDefaultControls();
+
+// shared with the default object on purpose
+export const textboxDefaultControls = {
+  ...defaultControls,
+  ...createResizeControls(),
 };
 
 FabricObject.prototype.controls = {

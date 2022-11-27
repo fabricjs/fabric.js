@@ -1,13 +1,13 @@
 //@ts-nocheck
 import { config } from './config';
 import { VERSION } from './constants';
-import { Observable } from './mixins/observable.mixin';
+import { createCollectionMixin } from './mixins/collection.mixin';
+import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
+import { FabricObject } from './shapes/fabricObject.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { pick } from './util/misc/pick';
-import { FabricObject } from './shapes/fabricObject.class';
-import { CommonMethods } from './mixins/shared_methods.mixin';
 (function (global) {
   // aliases for faster resolution
   var fabric = global.fabric,
@@ -23,7 +23,6 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
   /**
    * Static canvas class
    * @class fabric.StaticCanvas
-   * @mixes fabric.Collection
    * @mixes fabric.Observable
    * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
    * @see {@link fabric.StaticCanvas#initialize} for constructor definition
@@ -35,7 +34,48 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
    */
   // eslint-disable-next-line max-len
   fabric.StaticCanvas = fabric.util.createClass(
-    fabric.Collection,
+    class extends createCollectionMixin(CommonMethods) {
+      add(...objects: FabricObject[]) {
+        super.add(...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      insertAt(index: number, ...objects: FabricObject[]) {
+        super.insertAt(index, ...objects);
+        objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      remove(...objects: FabricObject[]) {
+        const removed = super.remove(...objects);
+        removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
+        return this;
+      }
+
+      protected _onObjectAdded(obj: FabricObject) {
+        this.stateful && obj.setupState();
+        if (obj.canvas && obj.canvas !== this) {
+          /* _DEV_MODE_START_ */
+          console.warn(
+            'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+              'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
+          );
+          /* _DEV_MODE_END_ */
+          obj.canvas.remove(obj);
+        }
+        obj._set('canvas', this);
+        obj.setCoords();
+        this.fire('object:added', { target: obj });
+        obj.fire('added', { target: this });
+      }
+
+      protected _onObjectRemoved(obj: FabricObject) {
+        obj._set('canvas', undefined);
+        this.fire('object:removed', { target: obj });
+        obj.fire('removed', { target: this });
+      }
+    },
     /** @lends fabric.StaticCanvas.prototype */ {
       /**
        * Constructor
@@ -101,7 +141,7 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
       stateful: false,
 
       /**
-       * Indicates whether {@link fabric.Collection.add}, {@link fabric.Collection.insertAt} and {@link fabric.Collection.remove},
+       * Indicates whether {@link add}, {@link insertAt} and {@link remove},
        * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
        * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
        * since the renders are quequed and executed one per frame.
@@ -583,87 +623,6 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
        */
       getElement: function () {
         return this.lowerCanvasEl;
-      },
-
-      /**
-       * @param {...fabric.Object} objects to add
-       * @return {Self} thisArg
-       * @chainable
-       */
-      add: function () {
-        fabric.Collection.add.call(this, arguments, this._onObjectAdded);
-        arguments.length > 0 &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * Inserts an object into collection at specified index, then renders canvas (if `renderOnAddRemove` is not `false`)
-       * An object should be an instance of (or inherit from) fabric.Object
-       * @param {fabric.Object|fabric.Object[]} objects Object(s) to insert
-       * @param {Number} index Index to insert object at
-       * @param {Boolean} nonSplicing When `true`, no splicing (shifting) of objects occurs
-       * @return {Self} thisArg
-       * @chainable
-       */
-      insertAt: function (objects, index) {
-        fabric.Collection.insertAt.call(
-          this,
-          objects,
-          index,
-          this._onObjectAdded
-        );
-        (Array.isArray(objects) ? objects.length > 0 : !!objects) &&
-          this.renderOnAddRemove &&
-          this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @param {...fabric.Object} objects to remove
-       * @return {Self} thisArg
-       * @chainable
-       */
-      remove: function () {
-        var removed = fabric.Collection.remove.call(
-          this,
-          arguments,
-          this._onObjectRemoved
-        );
-        removed.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
-        return this;
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} obj Object that was added
-       */
-      _onObjectAdded: function (obj) {
-        this.stateful && obj.setupState();
-        if (obj.canvas && obj.canvas !== this) {
-          /* _DEV_MODE_START_ */
-          console.warn(
-            'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
-              'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
-          );
-          /* _DEV_MODE_END_ */
-          obj.canvas.remove(obj);
-        }
-        obj._set('canvas', this);
-        obj.setCoords();
-        this.fire('object:added', { target: obj });
-        obj.fire('added', { target: this });
-      },
-
-      /**
-       * @private
-       * @param {fabric.Object} obj Object that was removed
-       */
-      _onObjectRemoved: function (obj) {
-        obj._set('canvas', undefined);
-        this.fire('object:removed', { target: obj });
-        obj.fire('removed', { target: this });
       },
 
       /**
@@ -1803,9 +1762,7 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
       destroy: function () {
         this.destroyed = true;
         this.cancelRequestedRender();
-        this.forEachObject(function (object) {
-          object.dispose && object.dispose();
-        });
+        this.forEachObject((object) => object.dispose());
         this._objects = [];
         if (this.backgroundImage && this.backgroundImage.dispose) {
           this.backgroundImage.dispose();
@@ -1847,21 +1804,6 @@ import { CommonMethods } from './mixins/shared_methods.mixin';
       },
     }
   );
-
-  // hack - class methods are not enumrable
-  // TODO remove when migrating to es6
-  Object.getOwnPropertyNames(Observable.prototype).forEach((key) => {
-    if (key === 'constructor') return;
-    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
-      value: Observable.prototype[key],
-    });
-  });
-  Object.getOwnPropertyNames(CommonMethods.prototype).forEach((key) => {
-    if (key === 'constructor') return;
-    Object.defineProperty(fabric.StaticCanvas.prototype, key, {
-      value: CommonMethods.prototype[key],
-    });
-  });
 
   extend(fabric.StaticCanvas.prototype, fabric.DataURLExporter);
 
