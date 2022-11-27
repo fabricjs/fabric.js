@@ -1,37 +1,20 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
- * Invert filter class
- * @class fabric.Image.Invert
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new fabric.Image.Invert();
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
-export class Invert extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
+export class Invert extends BaseFilter {
   /**
    * Invert also alpha.
    * @param {Boolean} alpha
    * @default
    **/
   alpha: boolean;
-
-  fragmentSource;
 
   /**
    * Filter invert. if false, does nothing
@@ -40,20 +23,14 @@ export class Invert extends filters.BaseFilter {
    */
   invert: boolean;
 
-  mainParameter: string;
-
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8Array to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      data = imageData.data,
-      i,
-      len = data.length;
-    for (i = 0; i < len; i += 4) {
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
+    for (let i = 0; i < data.length; i += 4) {
       data[i] = 255 - data[i];
       data[i + 1] = 255 - data[i + 1];
       data[i + 2] = 255 - data[i + 2];
@@ -80,7 +57,10 @@ export class Invert extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uInvert: gl.getUniformLocation(program, 'uInvert'),
       uAlpha: gl.getUniformLocation(program, 'uAlpha'),
@@ -93,9 +73,12 @@ export class Invert extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    gl.uniform1i(uniformLocations.uInvert, this.invert);
-    gl.uniform1i(uniformLocations.uAlpha, this.alpha);
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    gl.uniform1i(uniformLocations.uInvert, Number(this.invert));
+    gl.uniform1i(uniformLocations.uAlpha, Number(this.alpha));
   }
 }
 
@@ -125,11 +108,3 @@ export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
 };
 
 Object.assign(Invert.prototype, invertDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Invert>}
- */
-fabric.Image.Invert.fromObject = fabric.Image.filters.BaseFilter.fromObject;
