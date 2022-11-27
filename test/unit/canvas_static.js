@@ -385,7 +385,7 @@
     assert.strictEqual(objectsAdded[2], circle2);
 
     var circle3 = new fabric.Circle();
-    canvas.insertAt(circle3, 2);
+    canvas.insertAt(2, circle3);
 
     assert.strictEqual(objectsAdded[3], circle3);
   });
@@ -406,13 +406,13 @@
     canvas.renderOnAddRemove = true;
     assert.equal(renderAllCount, 0);
     var rect = makeRect();
-    canvas.insertAt(rect, 1);
+    canvas.insertAt(1, rect);
     assert.equal(renderAllCount, 1);
     assert.strictEqual(canvas.item(1), rect);
-    canvas.insertAt(rect, 2);
+    canvas.insertAt(2, rect);
     assert.equal(renderAllCount, 2);
     assert.strictEqual(canvas.item(2), rect);
-    assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
+    canvas.insertAt(2, rect)
     assert.equal(renderAllCount, 3);
   });
 
@@ -433,11 +433,11 @@
 
     var rect = makeRect();
 
-    canvas.insertAt(rect, 1);
+    canvas.insertAt(1, rect);
     assert.equal(renderAllCount, 0);
 
     assert.strictEqual(canvas.item(1), rect);
-    canvas.insertAt(rect, 2);
+    canvas.insertAt(2, rect);
     assert.equal(renderAllCount, 0);
   });
 

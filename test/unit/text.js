@@ -1,6 +1,13 @@
 (function() {
 
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function createTextObject(text) {
     return new fabric.Text(text || 'x');
@@ -75,7 +82,7 @@
   QUnit.test('toString', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
-    assert.equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+    assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
@@ -715,7 +722,8 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2).setSuperscript(2, 3);
+    text.setSuperscript(1, 2);
+    text.setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -737,7 +745,8 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1,2).setSubscript(2,3);
+    text.setSubscript(1, 2);
+    text.setSubscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
