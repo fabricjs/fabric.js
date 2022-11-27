@@ -10,7 +10,6 @@ export class FabricObject extends applyMixins(InteractiveFabricObject, [
   FabricObjectSVGExportMixin,
 ]) {}
 
-// @ts-expect-error applyMixins is not generic so EventSpec is different
 export interface FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   extends InteractiveFabricObject<EventSpec>,
     FabricObjectSVGExportMixin {}
