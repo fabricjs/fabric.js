@@ -1,5 +1,5 @@
-import { fabric } from '../../../HEADER';
-import { TObject } from '../../__types__';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import { Group } from '../../shapes/group.class';
 import { sendObjectToPlane } from './planeChange';
 
 /**
@@ -16,12 +16,8 @@ import { sendObjectToPlane } from './planeChange';
  * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
  * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
  *
- * @memberOf fabric.util
- * @param {fabric.Object} c1
- * @param {fabric.Object} c2
- * @returns {fabric.Object} merged clip path
  */
-export const mergeClipPaths = (...[c1, ...clipPaths]: TObject[]) => {
+export const mergeClipPaths = (...[c1, ...clipPaths]: FabricObject[]) => {
   return clipPaths.reduce((merged, curr) => {
     let a = merged,
       b = curr;
@@ -42,6 +38,6 @@ export const mergeClipPaths = (...[c1, ...clipPaths]: TObject[]) => {
       //  case (1)
       a.inverted = b.inverted = false;
     }
-    return new fabric.Group([a], { clipPath: b, inverted });
+    return new Group([a], { clipPath: b, inverted });
   }, c1);
 };

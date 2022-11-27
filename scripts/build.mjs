@@ -10,7 +10,7 @@ import { wd } from './dirname.mjs';
  * @see https://rollupjs.org/guide/en/#--watchonstart-cmd---watchonbundlestart-cmd---watchonbundleend-cmd---watchonend-cmd---watchonerror-cmd
  * @param {*} options
  */
-export function build({ watch, fast, input, output } = {}) {
+export function build({ watch, fast, input, output, stats = false } = {}) {
   const cmd = [
     'rollup',
     '-c',
@@ -30,7 +30,7 @@ export function build({ watch, fast, input, output } = {}) {
     env: {
       ...process.env,
       MINIFY: Number(!fast),
-      BUILD_INPUT: input,
+      BUILD_INPUT: Array.isArray(input) ? input.join(' ') : input,
       BUILD_OUTPUT: output,
       BUILD_MIN_OUTPUT:
         output && !fast
@@ -39,6 +39,7 @@ export function build({ watch, fast, input, output } = {}) {
               `${path.basename(output, '.js')}.min.js`
             )
           : undefined,
+      BUILD_STATS: Number(stats),
     },
   };
   if (watch) {

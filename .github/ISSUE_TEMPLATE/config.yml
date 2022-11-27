@@ -1,0 +1,19 @@
+# https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+
+blank_issues_enabled: false
+contact_links:
+  - name: Website
+    url: http://fabricjs.com/
+    about: Checkout the website.
+  - name: Docs
+    url: http://fabricjs.com/docs/
+    about: Checkout the docs.
+  - name: Discussions
+    url: https://github.com/fabricjs/fabric.js/discussions
+    about: Please ask and answer questions here.
+  - name: GOTCHAS
+    url: http://fabricjs.com/fabric-gotchas
+    about: Refer to the list of known pitfalls before assuming a bug.
+  - name: Security
+    url: ./Security.md
+    about: Please report security vulnerabilities here.

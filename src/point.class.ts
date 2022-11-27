@@ -1,7 +1,7 @@
 import { fabric } from '../HEADER';
 import { TMat2D, TRadian } from './typedefs';
-import { sin } from './util/misc/sin';
 import { cos } from './util/misc/cos';
+import { sin } from './util/misc/sin';
 
 export interface IPoint {
   x: number;
@@ -15,8 +15,6 @@ export class Point {
   x: number;
 
   y: number;
-
-  type = 'point';
 
   constructor();
   constructor(x: number, y: number);
