@@ -1,8 +1,11 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { Point } from '../point.class';
+import type { Point } from '../point.class';
+import { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../shadow.class';
 import { Canvas } from '../__types__';
+
+type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -76,6 +79,14 @@ export abstract class BaseBrush {
     this.canvas = canvas;
   }
 
+  abstract _render(): void;
+  abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
+  abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
+  /**
+   * @returns true if brush should continue blocking interaction
+   */
+  abstract onMouseUp(ev: TBrushEventData): boolean | void;
+
   /**
    * Sets brush styles
    * @private
@@ -101,6 +112,11 @@ export abstract class BaseBrush {
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
   }
 
+  protected needsFullRender() {
+    const color = new Color(this.color);
+    return color.getAlpha() < 1 || !!this.shadow;
+  }
+
   /**
    * Sets brush shadow styles
    * @private
@@ -119,11 +135,6 @@ export abstract class BaseBrush {
     ctx.shadowBlur = shadow.blur * zoom;
     ctx.shadowOffsetX = shadow.offsetX * zoom;
     ctx.shadowOffsetY = shadow.offsetY * zoom;
-  }
-
-  protected needsFullRender() {
-    const color = new Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
   }
 
   /**
