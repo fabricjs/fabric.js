@@ -1,18 +1,18 @@
 // @ts-nocheck
-
 import { Color } from '../color';
 import { config } from '../config';
-import { FabricObject } from '../shapes/fabricObject.class';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
+type SVGReviver = (markup: string) => string;
+
 /* _TO_SVG_START_ */
 
-function getSvgColorString(prop, value) {
+function getSvgColorString(prop: string, value?: any) {
   if (!value) {
-    return prop + ': none; ';
+    return `${prop}: none; `;
   } else if (value.toLive) {
-    return prop + ': url(#SVGID_' + value.id + '); ';
+    return `${prop}: url(#SVGID_${value.id}); `;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
@@ -33,7 +33,7 @@ export class FabricObjectSVGExportMixin {
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
-  getSvgStyles(skipShadow) {
+  getSvgStyles(skipShadow?: boolean) {
     const fillRule = this.fillRule ? this.fillRule : 'nonzero',
       strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
       strokeDashArray = this.strokeDashArray
@@ -87,36 +87,30 @@ export class FabricObjectSVGExportMixin {
    * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
    * @return {String}
    */
-  getSvgSpanStyles(style, useWhiteSpace) {
-    const term = '; ';
-    var fontFamily = style.fontFamily
-      ? 'font-family: ' +
-        (style.fontFamily.indexOf("'") === -1 &&
-        style.fontFamily.indexOf('"') === -1
-          ? "'" + style.fontFamily + "'"
-          : style.fontFamily) +
-        term
-      : '';
-    var strokeWidth = style.strokeWidth
-        ? 'stroke-width: ' + style.strokeWidth + term
+  getSvgSpanStyles(style, useWhiteSpace?: boolean) {
+    const term = '; ',
+      fontFamily = style.fontFamily
+        ? `font-family: ${
+            style.fontFamily.indexOf("'") === -1 &&
+            style.fontFamily.indexOf('"') === -1
+              ? `'${style.fontFamily}'`
+              : style.fontFamily
+          }${term}`
         : '',
-      fontFamily = fontFamily,
-      fontSize = style.fontSize
-        ? 'font-size: ' + style.fontSize + 'px' + term
+      strokeWidth = style.strokeWidth
+        ? `stroke-width: ${style.strokeWidth}${term}`
         : '',
+      fontSize = style.fontSize ? `font-size: ${style.fontSize}px${term}` : '',
       fontStyle = style.fontStyle
-        ? 'font-style: ' + style.fontStyle + term
+        ? `font-style: ${style.fontStyle}${term}`
         : '',
       fontWeight = style.fontWeight
-        ? 'font-weight: ' + style.fontWeight + term
+        ? `font-weight: ${style.fontWeight}${term}`
         : '',
       fill = style.fill ? getSvgColorString('fill', style.fill) : '',
       stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
       textDecoration = this.getSvgTextDecoration(style),
-      deltaY = style.deltaY ? 'baseline-shift: ' + -style.deltaY + '; ' : '';
-    if (textDecoration) {
-      textDecoration = 'text-decoration: ' + textDecoration + term;
-    }
+      deltaY = style.deltaY ? `baseline-shift: ${-style.deltaY}; ` : '';
 
     return [
       stroke,
@@ -125,7 +119,9 @@ export class FabricObjectSVGExportMixin {
       fontSize,
       fontStyle,
       fontWeight,
-      textDecoration,
+      textDecoration
+        ? `text-decoration: ${textDecoration}${term}`
+        : textDecoration,
       fill,
       deltaY,
       useWhiteSpace ? 'white-space: pre; ' : '',
@@ -139,9 +135,7 @@ export class FabricObjectSVGExportMixin {
    */
   getSvgTextDecoration(style) {
     return ['overline', 'underline', 'line-through']
-      .filter(function (decoration) {
-        return style[decoration.replace('-', '')];
-      })
+      .filter((decoration) => style[decoration.replace('-', '')])
       .join(' ');
   }
 
@@ -150,7 +144,7 @@ export class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgFilter() {
-    return this.shadow ? 'filter: url(#SVGID_' + this.shadow.id + ');' : '';
+    return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
   }
 
   /**
@@ -159,10 +153,8 @@ export class FabricObjectSVGExportMixin {
    */
   getSvgCommons() {
     return [
-      this.id ? 'id="' + this.id + '" ' : '',
-      this.clipPath
-        ? 'clip-path="url(#' + this.clipPath.clipPathId + ')" '
-        : '',
+      this.id ? `id="${this.id}" ` : '',
+      this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : '',
     ].join('');
   }
 
@@ -171,13 +163,13 @@ export class FabricObjectSVGExportMixin {
    * @param {Boolean} use the full transform or the single object one.
    * @return {String}
    */
-  getSvgTransform(full, additionalTransform) {
+  getSvgTransform(full?: boolean, additionalTransform = '') {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
       svgTransform = `transform="${matrixToSVG(transform)}`;
-    return `${svgTransform + (additionalTransform || '')}" `;
+    return `${svgTransform}${additionalTransform}" `;
   }
 
-  _setSVGBg(textBgRects) {
+  _setSVGBg(textBgRects: string[]) {
     if (this.backgroundColor) {
       const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
       textBgRects.push(
@@ -198,25 +190,25 @@ export class FabricObjectSVGExportMixin {
 
   /**
    * Returns svg representation of an instance
-   * @param {Function} [reviver] Method for further parsing of svg representation.
+   * @param {SVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toSVG(reviver) {
+  toSVG(reviver?: SVGReviver) {
     return this._createBaseSVGMarkup(this._toSVG(reviver), {
-      reviver: reviver,
+      reviver,
     });
   }
 
   /**
    * Returns svg clipPath representation of an instance
-   * @param {Function} [reviver] Method for further parsing of svg representation.
+   * @param {SVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver) {
+  toClipPathSVG(reviver?: SVGReviver) {
     return (
       '\t' +
       this._createBaseClipPathSVGMarkup(this._toSVG(reviver), {
-        reviver: reviver,
+        reviver,
       })
     );
   }
@@ -224,11 +216,14 @@ export class FabricObjectSVGExportMixin {
   /**
    * @private
    */
-  _createBaseClipPathSVGMarkup(objectMarkup, options) {
-    options = options || {};
-    const reviver = options.reviver,
-      additionalTransform = options.additionalTransform || '',
-      commonPieces = [
+  _createBaseClipPathSVGMarkup(
+    objectMarkup: string[],
+    {
+      reviver,
+      additionalTransform = '',
+    }: { reviver?: SVGReviver; additionalTransform?: string } = {}
+  ) {
+    const commonPieces = [
         this.getSvgTransform(true, additionalTransform),
         this.getSvgCommons(),
       ].join(''),
@@ -241,14 +236,22 @@ export class FabricObjectSVGExportMixin {
   /**
    * @private
    */
-  _createBaseSVGMarkup(objectMarkup, options) {
-    options = options || {};
-    let noStyle = options.noStyle,
-      reviver = options.reviver,
-      styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
-      shadowInfo = options.withShadow
-        ? 'style="' + this.getSvgFilter() + '" '
-        : '',
+  _createBaseSVGMarkup(
+    objectMarkup: string[],
+    {
+      noStyle,
+      reviver,
+      withShadow,
+      additionalTransform,
+    }: {
+      noStyle?: boolean;
+      reviver?: SVGReviver;
+      withShadow?: boolean;
+      additionalTransform?: string;
+    } = {}
+  ) {
+    const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
+      shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
       clipPath = this.clipPath,
       vectorEffect = this.strokeUniform
         ? 'vector-effect="non-scaling-stroke" '
@@ -257,20 +260,15 @@ export class FabricObjectSVGExportMixin {
       stroke = this.stroke,
       fill = this.fill,
       shadow = this.shadow,
-      commonPieces,
       markup = [],
-      clipPathMarkup,
       // insert commons in the markup, style and svgCommons
-      index = objectMarkup.indexOf('COMMON_PARTS'),
-      additionalTransform = options.additionalTransform;
+      index = objectMarkup.indexOf('COMMON_PARTS');
+    let clipPathMarkup;
     if (clipPath) {
-      clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
-      clipPathMarkup =
-        '<clipPath id="' +
-        clipPath.clipPathId +
-        '" >\n' +
-        clipPath.toClipPathSVG(reviver) +
-        '</clipPath>\n';
+      clipPath.clipPathId = `CLIPPATH_${FabricObject.__uid++}`;
+      clipPathMarkup = `<clipPath id="${
+        clipPath.clipPathId
+      }" >\n${clipPath.toClipPathSVG(reviver)}</clipPath>\n`;
     }
     if (absoluteClipPath) {
       markup.push('<g ', shadowInfo, this.getSvgCommons(), ' >\n');
@@ -281,12 +279,12 @@ export class FabricObjectSVGExportMixin {
       !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
       ' >\n'
     );
-    commonPieces = [
+    const commonPieces = [
       styleInfo,
       vectorEffect,
       noStyle ? '' : this.addPaintOrder(),
       ' ',
-      additionalTransform ? 'transform="' + additionalTransform + '" ' : '',
+      additionalTransform ? `transform="${additionalTransform}" ` : '',
     ].join('');
     objectMarkup[index] = commonPieces;
     if (fill && fill.toLive) {
@@ -309,7 +307,7 @@ export class FabricObjectSVGExportMixin {
 
   addPaintOrder() {
     return this.paintFirst !== 'fill'
-      ? ' paint-order="' + this.paintFirst + '" '
+      ? ` paint-order="${this.paintFirst}" `
       : '';
   }
 }
