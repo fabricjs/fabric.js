@@ -110,7 +110,7 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters: Record<string, BaseFilter>;
+  static filters: Record<string, typeof BaseFilter>;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
