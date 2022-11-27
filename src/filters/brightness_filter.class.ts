@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * Brightness filter class
  * @example
- * const filter = new fabric.Image.Brightness({
+ * const filter = new Brightness({
  *   brightness: 0.05
  * });
  * object.filters.push(filter);

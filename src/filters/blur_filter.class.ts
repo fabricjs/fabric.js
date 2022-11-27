@@ -11,7 +11,7 @@ import {
 /**
  * Blur filter class
  * @example
- * const filter = new fabric.Image.Blur({
+ * const filter = new Blur({
  *   blur: 0.5
  * });
  * object.filters.push(filter);

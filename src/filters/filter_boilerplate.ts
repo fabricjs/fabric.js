@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * MyFilter filter class
  * @example
- * var filter = new fabric.Image.MyFilter({
+ * var filter = new MyFilter({
  *   add here an example of how to use your filter
  * });
  * object.filters.push(filter);

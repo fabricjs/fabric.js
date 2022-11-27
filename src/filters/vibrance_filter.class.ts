@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * Vibrance filter class
  * @example
- * var filter = new fabric.Image.Vibrance({
+ * var filter = new Vibrance({
  *   vibrance: 1
  * });
  * object.filters.push(filter);
