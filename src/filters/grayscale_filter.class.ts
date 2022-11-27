@@ -1,39 +1,17 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { AbstractBaseFilter, BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Grayscale image filter class
- * @class fabric.Image.Grayscale
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
  * var filter = new fabric.Image.Grayscale();
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
-  fragmentSource;
-
-  /**
-   * Grayscale mode, between 'average', 'lightness', 'luminosity'
-   * @param {String} type
-   * @default
-   */
-  mode: string;
-
-  mainParameter: string;
+export class Grayscale extends AbstractBaseFilter {
+  mode: 'average' | 'lightness' | 'luminosity';
+  fragmentSource: Record<string, string>;
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -41,46 +19,35 @@ export class Grayscale extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8Array to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      data = imageData.data,
-      i,
-      len = data.length,
-      value,
-      mode = this.mode;
-    for (i = 0; i < len; i += 4) {
-      if (mode === 'average') {
-        value = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      } else if (mode === 'lightness') {
-        value =
-          (Math.min(data[i], data[i + 1], data[i + 2]) +
-            Math.max(data[i], data[i + 1], data[i + 2])) /
-          2;
-      } else if (mode === 'luminosity') {
-        value = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
+    for (let i = 0, value: number; i < data.length; i += 4) {
+      switch (this.mode) {
+        case 'average':
+          value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          break;
+        case 'lightness':
+          value =
+            (Math.min(data[i], data[i + 1], data[i + 2]) +
+              Math.max(data[i], data[i + 1], data[i + 2])) /
+            2;
+          break;
+        case 'luminosity':
+          value = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+          break;
       }
+
       data[i] = value;
       data[i + 1] = value;
       data[i + 2] = value;
     }
   }
 
-  /**
-   * Retrieves the cached shader.
-   * @param {Object} options
-   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-   */
-  retrieveShader(options) {
-    var cacheKey = this.type + '_' + this.mode;
-    if (!options.programCache.hasOwnProperty(cacheKey)) {
-      var shaderSource = this.fragmentSource[this.mode];
-      options.programCache[cacheKey] = this.createProgram(
-        options.context,
-        shaderSource
-      );
-    }
-    return options.programCache[cacheKey];
+  getCacheKey() {
+    return `${this.type}_${this.mode}`;
+  }
+
+  getFragmentSource() {
+    return this.fragmentSource[this.mode];
   }
 
   /**
@@ -89,7 +56,10 @@ export class Grayscale extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uMode: gl.getUniformLocation(program, 'uMode'),
     };
@@ -101,8 +71,11 @@ export class Grayscale extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var mode = 1;
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const mode = 1;
     gl.uniform1i(uniformLocations.uMode, mode);
   }
 
@@ -154,11 +127,3 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
 };
 
 Object.assign(Grayscale.prototype, grayscaleDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Grayscale>}
- */
-fabric.Image.Grayscale.fromObject = fabric.Image.filters.BaseFilter.fromObject;
