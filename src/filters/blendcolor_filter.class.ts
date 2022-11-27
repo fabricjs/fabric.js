@@ -1,25 +1,22 @@
-//@ts-nocheck
-
 import { Color } from '../color';
-
-('use strict');
-
-var fabric = global.fabric,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { AbstractBaseFilter } from './base_filter.class';
+import {
+  T2DPipelineState,
+  TWebGLPipelineState,
+  TWebGLProgramCacheItem,
+  TWebGLUniformLocationMap,
+} from './typedefs';
 
 /**
  * Color Blend filter class
- * @class fabric.Image.filter.BlendColor
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
  * @example
- * var filter = new fabric.Image.BlendColor({
+ * const filter = new BlendColor({
  *  color: '#000',
  *  mode: 'multiply'
  * });
  *
- * var filter = new fabric.Image.filters.BlendImage({
+ * const filter = new BlendImage({
  *  image: fabricImageObject,
  *  mode: 'multiply',
  *  alpha: 0.5
@@ -28,11 +25,7 @@ var fabric = global.fabric,
  * object.applyFilters();
  * canvas.renderAll();
  */
-
-export class BlendColor extends filters.BaseFilter {
-  /** @lends fabric.Image.filters.Blend.prototype */
-  type: string;
-
+export class BlendColor extends AbstractBaseFilter {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -59,7 +52,7 @@ export class BlendColor extends filters.BaseFilter {
   /**
    * Fragment source for the Multiply program
    */
-  fragmentSource;
+  fragmentSource: Record<string, string>;
 
   /**
    * build the fragment source for the filters, joining the common part with
@@ -68,20 +61,24 @@ export class BlendColor extends filters.BaseFilter {
    * @return {String} the source to be compiled
    * @private
    */
-  buildSource(mode) {
-    return (
-      'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform vec4 uColor;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-      'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-      'gl_FragColor = color;\n' +
-      'if (color.a > 0.0) {\n' +
-      this.fragmentSource[mode] +
-      '}\n' +
-      '}'
-    );
+  buildSource(mode: string) {
+    return `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec4 uColor;
+      varying vec2 vTexCoord;
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        gl_FragColor = color;
+        if (color.a > 0.0) {
+          ${this.fragmentSource[mode]}
+        }
+      }
+      `;
+  }
+
+  getFragmentSource(): string {
+    return this.buildSource(this.mode);
   }
 
   /**
@@ -90,15 +87,10 @@ export class BlendColor extends filters.BaseFilter {
    * @param {WebGLRenderingContext} options.context The GL context used for rendering.
    * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
    */
-  retrieveShader(options) {
-    var cacheKey = this.type + '_' + this.mode,
-      shaderSource;
-    if (!options.programCache.hasOwnProperty(cacheKey)) {
-      shaderSource = this.buildSource(this.mode);
-      options.programCache[cacheKey] = this.createProgram(
-        options.context,
-        shaderSource
-      );
+  retrieveShader(options: TWebGLPipelineState): TWebGLProgramCacheItem {
+    const cacheKey = `${this.type}_${this.mode}`;
+    if (!options.programCache[cacheKey]) {
+      options.programCache[cacheKey] = this.createProgram(options.context);
     }
     return options.programCache[cacheKey];
   }
@@ -109,28 +101,17 @@ export class BlendColor extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      data = imageData.data,
-      iLen = data.length,
-      tr,
-      tg,
-      tb,
-      r,
-      g,
-      b,
-      source,
-      alpha1 = 1 - this.alpha;
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
+    const source = new Color(this.color).getSource();
+    const tr = source[0] * this.alpha;
+    const tg = source[1] * this.alpha;
+    const tb = source[2] * this.alpha;
+    const alpha1 = 1 - this.alpha;
 
-    source = new Color(this.color).getSource();
-    tr = source[0] * this.alpha;
-    tg = source[1] * this.alpha;
-    tb = source[2] * this.alpha;
-
-    for (var i = 0; i < iLen; i += 4) {
-      r = data[i];
-      g = data[i + 1];
-      b = data[i + 2];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
 
       switch (this.mode) {
         case 'multiply':
@@ -202,7 +183,10 @@ export class BlendColor extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uColor: gl.getUniformLocation(program, 'uColor'),
     };
@@ -214,8 +198,11 @@ export class BlendColor extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var source = new Color(this.color).getSource();
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const source = new Color(this.color).getSource();
     source[0] = (this.alpha * source[0]) / 255;
     source[1] = (this.alpha * source[1]) / 255;
     source[2] = (this.alpha * source[2]) / 255;
@@ -253,34 +240,28 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
     darken: 'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n',
     exclusion:
       'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n',
-    overlay:
-      'if (uColor.r < 0.5) {\n' +
-      'gl_FragColor.r *= 2.0 * uColor.r;\n' +
-      '} else {\n' +
-      'gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n' +
-      '}\n' +
-      'if (uColor.g < 0.5) {\n' +
-      'gl_FragColor.g *= 2.0 * uColor.g;\n' +
-      '} else {\n' +
-      'gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n' +
-      '}\n' +
-      'if (uColor.b < 0.5) {\n' +
-      'gl_FragColor.b *= 2.0 * uColor.b;\n' +
-      '} else {\n' +
-      'gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n' +
-      '}\n',
-    tint:
-      'gl_FragColor.rgb *= (1.0 - uColor.a);\n' +
-      'gl_FragColor.rgb += uColor.rgb;\n',
+    overlay: `
+      if (uColor.r < 0.5) {
+        gl_FragColor.r *= 2.0 * uColor.r;
+      } else {
+        gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);
+      }
+      if (uColor.g < 0.5) {
+        gl_FragColor.g *= 2.0 * uColor.g;
+      } else {
+        gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);
+      }
+      if (uColor.b < 0.5) {
+        gl_FragColor.b *= 2.0 * uColor.b;
+      } else {
+        gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);
+      }
+      `,
+    tint: `
+      gl_FragColor.rgb *= (1.0 - uColor.a);
+      gl_FragColor.rgb += uColor.rgb;
+      `,
   },
 };
 
 Object.assign(BlendColor.prototype, blendColorDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.BlendColor>}
- */
-fabric.Image.BlendColor.fromObject = fabric.Image.filters.BaseFilter.fromObject;
