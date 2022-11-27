@@ -1,7 +1,12 @@
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './base_filter.class';
-import { TWebGLPipelineState, T2DPipelineState } from './typedefs';
+import {
+  TWebGLPipelineState,
+  T2DPipelineState,
+  TWebGLUniformLocationMap,
+  isWebGLPipelineState,
+} from './typedefs';
 
 /**
  * Blur filter class
@@ -27,7 +32,7 @@ export class Blur extends BaseFilter {
   aspectRatio: number;
 
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
-    if (options.webgl) {
+    if (isWebGLPipelineState(options)) {
       // this aspectRatio is used to give the same blur to vertical and horizontal
       this.aspectRatio = options.sourceWidth / options.sourceHeight;
       options.passes++;
@@ -48,34 +53,30 @@ export class Blur extends BaseFilter {
     options.imageData = this.simpleBlur(options);
   }
 
-  simpleBlur(options) {
-    var resources = options.filterBackend.resources,
-      canvas1,
-      canvas2,
-      width = options.imageData.width,
-      height = options.imageData.height;
-
+  simpleBlur({
+    ctx,
+    imageData,
+    filterBackend: { resources },
+  }: T2DPipelineState) {
+    const { width, height } = imageData;
     if (!resources.blurLayer1) {
       resources.blurLayer1 = createCanvasElement();
       resources.blurLayer2 = createCanvasElement();
     }
-    canvas1 = resources.blurLayer1;
-    canvas2 = resources.blurLayer2;
+    const canvas1 = resources.blurLayer1;
+    const canvas2 = resources.blurLayer2;
     if (canvas1.width !== width || canvas1.height !== height) {
       canvas2.width = canvas1.width = width;
       canvas2.height = canvas1.height = height;
     }
-    var ctx1 = canvas1.getContext('2d'),
+    const ctx1 = canvas1.getContext('2d'),
       ctx2 = canvas2.getContext('2d'),
       nSamples = 15,
-      random,
-      percent,
-      j,
-      i,
       blur = this.blur * 0.06 * 0.5;
+    let random, percent, j, i;
 
     // load first canvas
-    ctx1.putImageData(options.imageData, 0, 0);
+    ctx1.putImageData(imageData, 0, 0);
     ctx2.clearRect(0, 0, width, height);
 
     for (i = -nSamples; i <= nSamples; i++) {
@@ -98,13 +99,8 @@ export class Blur extends BaseFilter {
       ctx2.globalAlpha = 1;
       ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
     }
-    options.ctx.drawImage(canvas1, 0, 0);
-    var newImageData = options.ctx.getImageData(
-      0,
-      0,
-      canvas1.width,
-      canvas1.height
-    );
+    ctx.drawImage(canvas1, 0, 0);
+    const newImageData = ctx.getImageData(0, 0, canvas1.width, canvas1.height);
     ctx1.globalAlpha = 1;
     ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
     return newImageData;
@@ -116,7 +112,10 @@ export class Blur extends BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       delta: gl.getUniformLocation(program, 'uDelta'),
     };
@@ -128,8 +127,11 @@ export class Blur extends BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
-    var delta = this.chooseRightDelta();
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
+    const delta = this.chooseRightDelta();
     gl.uniform2fv(uniformLocations.delta, delta);
   }
 
@@ -138,9 +140,8 @@ export class Blur extends BaseFilter {
    * @returns {Array} a numeric array with delta values
    */
   chooseRightDelta() {
-    var blurScale = 1,
-      delta = [0, 0],
-      blur;
+    let blurScale = 1;
+    const delta = [0, 0];
     if (this.horizontal) {
       if (this.aspectRatio > 1) {
         // image is wide, i want to shrink radius horizontal
@@ -152,7 +153,7 @@ export class Blur extends BaseFilter {
         blurScale = this.aspectRatio;
       }
     }
-    blur = blurScale * this.blur * 0.12;
+    const blur = blurScale * this.blur * 0.12;
     if (this.horizontal) {
       delta[0] = blur;
     } else {
