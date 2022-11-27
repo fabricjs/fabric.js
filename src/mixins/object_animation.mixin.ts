@@ -44,6 +44,7 @@ export abstract class AnimatableObject<
    * As string — one property
    *
    * object.animate('left', ...);
+   * object.animate('left', ..., { duration: ... });
    *
    */
   animate<T>(key: string, toValue: T, options?: TAnimationOptions): void;
