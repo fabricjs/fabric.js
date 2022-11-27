@@ -4,7 +4,7 @@ import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
 
 (function (global) {
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     addListener = fabric.util.addListener,
     removeListener = fabric.util.removeListener,
     RIGHT_CLICK = 3,
@@ -48,7 +48,7 @@ import { fireEvent } from '../util/fireEvent';
       },
 
       addOrRemove: function (functor, eventjsFunctor) {
-        var canvasElement = this.upperCanvasEl,
+        const canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
         functor(fabric.window, 'resize', this._onResize);
         functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
@@ -100,7 +100,7 @@ import { fireEvent } from '../util/fireEvent';
       removeListeners: function () {
         this.addOrRemove(removeListener, 'remove');
         // if you dispose on a mouseDown, before mouse up, you need to clean document to...
-        var eventTypePrefix = this._getEventPrefix();
+        const eventTypePrefix = this._getEventPrefix();
         removeListener(
           fabric.document,
           eventTypePrefix + 'up',
@@ -191,7 +191,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mousedown
        */
       _onMouseOut: function (e) {
-        var target = this._hoveredTarget;
+        const target = this._hoveredTarget;
         this.fire('mouse:out', { target: target, e: e });
         this._hoveredTarget = null;
         target && target.fire('mouseout', { e: e });
@@ -254,14 +254,14 @@ import { fireEvent } from '../util/fireEvent';
        * @param {DragEvent} e
        */
       _onDragStart: function (e) {
-        var activeObject = this.getActiveObject();
+        const activeObject = this.getActiveObject();
         if (
           activeObject &&
           typeof activeObject.onDragStart === 'function' &&
           activeObject.onDragStart(e)
         ) {
           this._dragSource = activeObject;
-          var options = { e: e, target: activeObject };
+          const options = { e: e, target: activeObject };
           this.fire('dragstart', options);
           activeObject.fire('dragstart', options);
           addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
@@ -274,7 +274,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       _renderDragEffects: function (e, source, target) {
-        var ctx = this.contextTop;
+        const ctx = this.contextTop;
         if (source) {
           source.clearContextTop(true);
           source.renderDragSourceEffect(e);
@@ -297,7 +297,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {DragEvent} e
        */
       _onDragEnd: function (e) {
-        var didDrop = e.dataTransfer.dropEffect !== 'none',
+        const didDrop = e.dataTransfer.dropEffect !== 'none',
           dropTarget = didDrop ? this._activeObject : undefined,
           options = {
             e: e,
@@ -321,7 +321,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {DragEvent} e
        */
       _onDragProgress: function (e) {
-        var options = {
+        const options = {
           e: e,
           dragSource: this._dragSource,
           dropTarget: this._draggedoverTarget,
@@ -337,7 +337,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js shake
        */
       _onDragOver: function (e) {
-        var eventType = 'dragover',
+        let eventType = 'dragover',
           target = this.findTarget(e),
           targets = this.targets,
           options = {
@@ -362,7 +362,7 @@ import { fireEvent } from '../util/fireEvent';
           target.fire(eventType, options);
         }
         //  propagate the event to subtargets
-        for (var i = 0; i < targets.length; i++) {
+        for (let i = 0; i < targets.length; i++) {
           target = targets[i];
           //  accept event only if previous targets didn't
           if (!e.defaultPrevented && target.canDrop(e)) {
@@ -380,8 +380,8 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js shake
        */
       _onDragEnter: function (e) {
-        var target = this.findTarget(e);
-        var options = {
+        const target = this.findTarget(e);
+        const options = {
           e: e,
           target: target,
           subTargets: this.targets,
@@ -398,7 +398,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js shake
        */
       _onDragLeave: function (e) {
-        var options = {
+        const options = {
           e: e,
           target: this._draggedoverTarget,
           subTargets: this.targets,
@@ -421,7 +421,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e
        */
       _onDrop: function (e) {
-        var options = this._simpleEventHandler('drop:before', e, {
+        const options = this._simpleEventHandler('drop:before', e, {
           dragSource: this._dragSource,
           pointer: this.getPointer(e),
         });
@@ -442,7 +442,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mousedown
        */
       _onContextMenu: function (e) {
-        var options = this._simpleEventHandler('contextmenu:before', e);
+        const options = this._simpleEventHandler('contextmenu:before', e);
         if (this.stopContextMenu) {
           e.stopPropagation();
           e.preventDefault();
@@ -468,7 +468,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} evt Event object
        */
       getPointerId: function (evt) {
-        var changedTouches = evt.changedTouches;
+        const changedTouches = evt.changedTouches;
 
         if (changedTouches) {
           return changedTouches[0] && changedTouches[0].identifier;
@@ -513,7 +513,7 @@ import { fireEvent } from '../util/fireEvent';
         }
         this.__onMouseDown(e);
         this._resetTransformEventData();
-        var canvasElement = this.upperCanvasEl,
+        const canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
         addListener(
           fabric.document,
@@ -542,7 +542,7 @@ import { fireEvent } from '../util/fireEvent';
       _onMouseDown: function (e) {
         this.__onMouseDown(e);
         this._resetTransformEventData();
-        var canvasElement = this.upperCanvasEl,
+        const canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
         removeListener(
           canvasElement,
@@ -571,7 +571,7 @@ import { fireEvent } from '../util/fireEvent';
         this.__onMouseUp(e);
         this._resetTransformEventData();
         this.mainTouchId = null;
-        var eventTypePrefix = this._getEventPrefix();
+        const eventTypePrefix = this._getEventPrefix();
         removeListener(
           fabric.document,
           'touchend',
@@ -584,7 +584,7 @@ import { fireEvent } from '../util/fireEvent';
           this._onMouseMove,
           addEventOptions
         );
-        var _this = this;
+        const _this = this;
         if (this._willAddMouseDown) {
           clearTimeout(this._willAddMouseDown);
         }
@@ -607,7 +607,7 @@ import { fireEvent } from '../util/fireEvent';
       _onMouseUp: function (e) {
         this.__onMouseUp(e);
         this._resetTransformEventData();
-        var canvasElement = this.upperCanvasEl,
+        const canvasElement = this.upperCanvasEl,
           eventTypePrefix = this._getEventPrefix();
         if (this._isMainEvent(e)) {
           removeListener(
@@ -635,7 +635,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mousemove
        */
       _onMouseMove: function (e) {
-        var activeObject = this.getActiveObject();
+        const activeObject = this.getActiveObject();
         !this.allowTouchScrolling &&
           (!activeObject || !activeObject.__isDragging) &&
           e.preventDefault &&
@@ -657,7 +657,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Object} target
        */
       _shouldRender: function (target) {
-        var activeObject = this._activeObject;
+        const activeObject = this._activeObject;
 
         if (
           !!activeObject !== !!target ||
@@ -682,7 +682,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mouseup
        */
       __onMouseUp: function (e) {
-        var target,
+        let target,
           transform = this._currentTransform,
           groupSelector = this._groupSelector,
           shouldRender = false,
@@ -722,7 +722,7 @@ import { fireEvent } from '../util/fireEvent';
           shouldRender = transform.actionPerformed;
         }
         if (!isClick) {
-          var targetWasActive = target === this._activeObject;
+          const targetWasActive = target === this._activeObject;
           this._maybeGroupObjects(e);
           if (!shouldRender) {
             shouldRender =
@@ -730,7 +730,7 @@ import { fireEvent } from '../util/fireEvent';
               (!targetWasActive && target === this._activeObject);
           }
         }
-        var corner, pointer;
+        let corner, pointer;
         if (target) {
           corner = target._findTargetCorner(
             this.getPointer(e, true),
@@ -760,7 +760,7 @@ import { fireEvent } from '../util/fireEvent';
           transform &&
           (transform.target !== target || transform.corner !== corner)
         ) {
-          var originalControl =
+          const originalControl =
               transform.target && transform.target.controls[transform.corner],
             originalMouseUpHandler =
               originalControl &&
@@ -791,7 +791,7 @@ import { fireEvent } from '../util/fireEvent';
        * @return {object} options
        */
       _simpleEventHandler: function (eventType, e, data) {
-        var target = this.findTarget(e),
+        const target = this.findTarget(e),
           subTargets = this.targets || [];
         return this._basicEventHandler(
           eventType,
@@ -808,11 +808,11 @@ import { fireEvent } from '../util/fireEvent';
       },
 
       _basicEventHandler: function (eventType, options) {
-        var target = options.target,
+        const target = options.target,
           subTargets = options.subTargets;
         this.fire(eventType, options);
         target && target.fire(eventType, options);
-        for (var i = 0; i < subTargets.length; i++) {
+        for (let i = 0; i < subTargets.length; i++) {
           subTargets[i].fire(eventType, options);
         }
         return options;
@@ -828,7 +828,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
        */
       _handleEvent: function (e, eventType, button, isClick) {
-        var target = this._target,
+        const target = this._target,
           targets = this.targets || [],
           options = {
             e: e,
@@ -846,7 +846,7 @@ import { fireEvent } from '../util/fireEvent';
         }
         this.fire('mouse:' + eventType, options);
         target && target.fire('mouse' + eventType, options);
-        for (var i = 0; i < targets.length; i++) {
+        for (let i = 0; i < targets.length; i++) {
           targets[i].fire('mouse' + eventType, options);
         }
       },
@@ -858,7 +858,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
        */
       endCurrentTransform: function (e) {
-        var transform = this._currentTransform;
+        const transform = this._currentTransform;
         this._finalizeCurrentTransform(e);
         if (transform && transform.target) {
           // this could probably go inside _finalizeCurrentTransform
@@ -872,7 +872,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
        */
       _finalizeCurrentTransform: function (e) {
-        var transform = this._currentTransform,
+        const transform = this._currentTransform,
           target = transform.target,
           options = {
             e: e,
@@ -904,7 +904,7 @@ import { fireEvent } from '../util/fireEvent';
         if (this.getActiveObject()) {
           this.discardActiveObject(e).requestRenderAll();
         }
-        var pointer = this.getPointer(e);
+        const pointer = this.getPointer(e);
         this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
         this._handleEvent(e, 'down');
       },
@@ -915,7 +915,7 @@ import { fireEvent } from '../util/fireEvent';
        */
       _onMouseMoveInDrawingMode: function (e) {
         if (this._isCurrentlyDrawing) {
-          var pointer = this.getPointer(e);
+          const pointer = this.getPointer(e);
           this.freeDrawingBrush.onMouseMove(pointer, {
             e: e,
             pointer: pointer,
@@ -930,7 +930,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mouseup
        */
       _onMouseUpInDrawingMode: function (e) {
-        var pointer = this.getPointer(e);
+        const pointer = this.getPointer(e);
         this._isCurrentlyDrawing = this.freeDrawingBrush.onMouseUp({
           e: e,
           pointer: pointer,
@@ -949,7 +949,7 @@ import { fireEvent } from '../util/fireEvent';
       __onMouseDown: function (e) {
         this._cacheTransformEventData(e);
         this._handleEvent(e, 'down:before');
-        var target = this._target;
+        let target = this._target;
         // if right click just fire events
         if (checkClick(e, RIGHT_CLICK)) {
           if (this.fireRightClick) {
@@ -982,7 +982,7 @@ import { fireEvent } from '../util/fireEvent';
         var pointer = this._pointer;
         // save pointer for check in __onMouseUp event
         this._previousPointer = pointer;
-        var shouldRender = this._shouldRender(target),
+        const shouldRender = this._shouldRender(target),
           shouldGroup = this._shouldGroup(e, target);
         if (this._shouldClearSelection(e, target)) {
           this.discardActiveObject(e);
@@ -1007,11 +1007,11 @@ import { fireEvent } from '../util/fireEvent';
         }
 
         if (target) {
-          var alreadySelected = target === this._activeObject;
+          const alreadySelected = target === this._activeObject;
           if (target.selectable && target.activeOn === 'down') {
             this.setActiveObject(target, e);
           }
-          var corner = target._findTargetCorner(
+          const corner = target._findTargetCorner(
             this.getPointer(e, true),
             fabric.util.isTouchEvent(e)
           );
@@ -1027,7 +1027,7 @@ import { fireEvent } from '../util/fireEvent';
             }
           }
         }
-        var invalidate = shouldRender || shouldGroup;
+        const invalidate = shouldRender || shouldGroup;
         //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
         //  run before firing the `down` event to give the dev a chance to populate it themselves
         invalidate && (this._objectsToRender = undefined);
@@ -1065,7 +1065,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       _beforeTransform: function (e) {
-        var t = this._currentTransform;
+        const t = this._currentTransform;
         this.stateful && t.target.saveState();
         this.fire('before:transform', {
           e: e,
@@ -1085,7 +1085,7 @@ import { fireEvent } from '../util/fireEvent';
       __onMouseMove: function (e) {
         this._handleEvent(e, 'move:before');
         this._cacheTransformEventData(e);
-        var target, pointer;
+        let target, pointer;
 
         if (this.isDrawingMode) {
           this._onMouseMoveInDrawingMode(e);
@@ -1096,7 +1096,7 @@ import { fireEvent } from '../util/fireEvent';
           return;
         }
 
-        var groupSelector = this._groupSelector;
+        const groupSelector = this._groupSelector;
 
         // We initially clicked in an empty area, so we draw a box for multiple selection
         if (groupSelector) {
@@ -1124,7 +1124,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       _fireOverOutEvents: function (target, e) {
-        var _hoveredTarget = this._hoveredTarget,
+        const _hoveredTarget = this._hoveredTarget,
           _hoveredTargets = this._hoveredTargets,
           targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
@@ -1140,7 +1140,7 @@ import { fireEvent } from '../util/fireEvent';
             canvasEvtIn: 'mouse:over',
           }
         );
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
           this.fireSyntheticInOutEvents(
             targets[i],
             { e: e },
@@ -1162,7 +1162,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       _fireEnterLeaveEvents: function (target, data) {
-        var _draggedoverTarget = this._draggedoverTarget,
+        const _draggedoverTarget = this._draggedoverTarget,
           _hoveredTargets = this._hoveredTargets,
           targets = this.targets,
           length = Math.max(_hoveredTargets.length, targets.length);
@@ -1174,7 +1174,7 @@ import { fireEvent } from '../util/fireEvent';
           canvasEvtIn: 'drag:enter',
           canvasEvtOut: 'drag:leave',
         });
-        for (var i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
           this.fireSyntheticInOutEvents(targets[i], data, {
             oldTarget: _hoveredTargets[i],
             evtOut: 'dragleave',
@@ -1197,7 +1197,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       fireSyntheticInOutEvents: function (target, data, config) {
-        var inOpt,
+        let inOpt,
           outOpt,
           oldTarget = config.oldTarget,
           outFires,
@@ -1242,7 +1242,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event fired on mousemove
        */
       _transformObject: function (e) {
-        var pointer = this.getPointer(e),
+        const pointer = this.getPointer(e),
           transform = this._currentTransform,
           target = transform.target,
           //  transform pointer to target's containing coordinate plane
@@ -1267,7 +1267,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       _performTransformAction: function (e, transform, pointer) {
-        var x = pointer.x,
+        let x = pointer.x,
           y = pointer.y,
           action = transform.action,
           actionPerformed = false,
@@ -1303,7 +1303,7 @@ import { fireEvent } from '../util/fireEvent';
           this.setCursor(this.defaultCursor);
           return false;
         }
-        var hoverCursor = target.hoverCursor || this.hoverCursor,
+        let hoverCursor = target.hoverCursor || this.hoverCursor,
           activeSelection =
             this._activeObject && this._activeObject.type === 'activeSelection'
               ? this._activeObject
@@ -1337,7 +1337,7 @@ import { fireEvent } from '../util/fireEvent';
        * @private
        */
       getCornerCursor: function (corner, target, e) {
-        var control = target.controls[corner];
+        const control = target.controls[corner];
         return control.cursorStyleHandler(e, control, target);
       },
     }

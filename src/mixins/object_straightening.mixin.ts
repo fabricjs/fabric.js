@@ -2,7 +2,7 @@
 import { FabricObject } from '../shapes/fabricObject.class';
 
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     FabricObject.prototype,
     /** @lends FabricObject.prototype */ {
@@ -11,7 +11,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {Number} angle value
        */
       _getAngleValueForStraighten: function () {
-        var angle = this.angle % 360;
+        const angle = this.angle % 360;
         if (angle > 0) {
           return Math.round((angle - 1) / 90) * 90;
         }
@@ -37,7 +37,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
       fxStraighten: function (callbacks) {
         callbacks = callbacks || {};
 
-        var empty = function () {},
+        const empty = function () {},
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;

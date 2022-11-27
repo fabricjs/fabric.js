@@ -2,7 +2,7 @@
 import { FabricObject } from '../shapes/fabricObject.class';
 
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     FabricObject.prototype,
     /** @lends FabricObject.prototype */ {
@@ -96,7 +96,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
         if (this === other) {
           return undefined;
         }
-        var ancestorData = this.findCommonAncestors(other);
+        const ancestorData = this.findCommonAncestors(other);
         if (!ancestorData) {
           return undefined;
         }
@@ -106,11 +106,11 @@ import { FabricObject } from '../shapes/fabricObject.class';
         if (ancestorData.otherFork.includes(this)) {
           return false;
         }
-        var firstCommonAncestor = ancestorData.common[0];
+        const firstCommonAncestor = ancestorData.common[0];
         if (!firstCommonAncestor) {
           return undefined;
         }
-        var headOfFork = ancestorData.fork.pop(),
+        const headOfFork = ancestorData.fork.pop(),
           headOfOtherFork = ancestorData.otherFork.pop(),
           thisIndex = firstCommonAncestor._objects.indexOf(headOfFork),
           otherIndex = firstCommonAncestor._objects.indexOf(headOfOtherFork);

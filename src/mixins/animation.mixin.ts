@@ -2,7 +2,7 @@
 import { FabricObject } from '../shapes/fabricObject.class';
 
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     fabric.StaticCanvas.prototype,
     /** @lends fabric.StaticCanvas.prototype */ {
@@ -24,7 +24,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
       fxCenterObjectH: function (object, callbacks) {
         callbacks = callbacks || {};
 
-        var empty = function () {},
+        const empty = function () {},
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;
@@ -57,7 +57,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
       fxCenterObjectV: function (object, callbacks) {
         callbacks = callbacks || {};
 
-        var empty = function () {},
+        const empty = function () {},
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;
@@ -90,7 +90,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
       fxRemove: function (object, callbacks) {
         callbacks = callbacks || {};
 
-        var empty = function () {},
+        const empty = function () {},
           onComplete = callbacks.onComplete || empty,
           onChange = callbacks.onChange || empty,
           _this = this;
@@ -138,14 +138,14 @@ import { FabricObject } from '../shapes/fabricObject.class';
        */
       animate: function () {
         if (arguments[0] && typeof arguments[0] === 'object') {
-          var propsToAnimate = [],
+          let propsToAnimate = [],
             prop,
             skipCallbacks,
             out = [];
           for (prop in arguments[0]) {
             propsToAnimate.push(prop);
           }
-          for (var i = 0, len = propsToAnimate.length; i < len; i++) {
+          for (let i = 0, len = propsToAnimate.length; i < len; i++) {
             prop = propsToAnimate[i];
             skipCallbacks = i !== len - 1;
             out.push(
@@ -171,7 +171,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @param {Boolean} [skipCallbacks] When true, callbacks like onchange and oncomplete are not invoked
        */
       _animate: function (property, to, options, skipCallbacks) {
-        var _this = this,
+        let _this = this,
           propPair;
 
         to = to.toString();
@@ -182,11 +182,11 @@ import { FabricObject } from '../shapes/fabricObject.class';
           propPair = property.split('.');
         }
 
-        var propIsColor =
+        const propIsColor =
           _this.colorProperties.indexOf(property) > -1 ||
           (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
 
-        var currentValue = propPair
+        const currentValue = propPair
           ? this.get(propPair[0])[propPair[1]]
           : this.get(property);
 
@@ -202,7 +202,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
           }
         }
 
-        var _options = {
+        const _options = {
           target: this,
           startValue: options.from,
           endValue: to,

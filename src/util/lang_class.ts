@@ -2,7 +2,7 @@
 import { noop } from '../constants';
 
 function addMethods(klass, source, parent) {
-  for (var property in source) {
+  for (const property in source) {
     if (
       property in klass.prototype &&
       typeof klass.prototype[property] === 'function' &&
@@ -10,9 +10,9 @@ function addMethods(klass, source, parent) {
     ) {
       klass.prototype[property] = (function (property) {
         return function (...args) {
-          var superclass = this.constructor.superclass;
+          const superclass = this.constructor.superclass;
           this.constructor.superclass = parent;
-          var returnValue = source[property].call(this, ...args);
+          const returnValue = source[property].call(this, ...args);
           this.constructor.superclass = superclass;
 
           if (property !== 'initialize') {
@@ -29,12 +29,12 @@ function addMethods(klass, source, parent) {
 function Subclass() {}
 
 function callSuper(methodName, ...args) {
-  var parentMethod = null,
+  let parentMethod = null,
     _this = this;
 
   // climb prototype chain to find method not equal to callee's method
   while (_this.constructor.superclass) {
-    var superClassMethod = _this.constructor.superclass.prototype[methodName];
+    const superClassMethod = _this.constructor.superclass.prototype[methodName];
     if (_this[methodName] !== superClassMethod) {
       parentMethod = superClassMethod;
       break;
@@ -63,7 +63,7 @@ function callSuper(methodName, ...args) {
  *                  (be careful modifying objects defined here as this would affect all instances)
  */
 export function createClass(...args) {
-  var parent = null,
+  let parent = null,
     properties = [...args];
 
   if (typeof args[0] === 'function') {
@@ -79,7 +79,7 @@ export function createClass(...args) {
     Subclass.prototype = parent.prototype;
     klass.prototype = new Subclass();
   }
-  for (var i = 0, length = properties.length; i < length; i++) {
+  for (let i = 0, length = properties.length; i < length; i++) {
     addMethods(klass, properties[i], parent);
   }
   if (!klass.prototype.initialize) {

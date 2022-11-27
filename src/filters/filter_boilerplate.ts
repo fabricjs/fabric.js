@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -71,7 +71,7 @@
           // early return if the parameter value has a neutral value
           return;
         }
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           data = imageData.data,
           i,
           len = data.length;

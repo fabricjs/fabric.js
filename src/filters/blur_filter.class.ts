@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -107,7 +107,7 @@
       },
 
       simpleBlur: function (options) {
-        var resources = options.filterBackend.resources,
+        let resources = options.filterBackend.resources,
           canvas1,
           canvas2,
           width = options.imageData.width,
@@ -123,7 +123,7 @@
           canvas2.width = canvas1.width = width;
           canvas2.height = canvas1.height = height;
         }
-        var ctx1 = canvas1.getContext('2d'),
+        let ctx1 = canvas1.getContext('2d'),
           ctx2 = canvas2.getContext('2d'),
           nSamples = 15,
           random,
@@ -157,7 +157,7 @@
           ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
         }
         options.ctx.drawImage(canvas1, 0, 0);
-        var newImageData = options.ctx.getImageData(
+        const newImageData = options.ctx.getImageData(
           0,
           0,
           canvas1.width,
@@ -187,7 +187,7 @@
        * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
        */
       sendUniformData: function (gl, uniformLocations) {
-        var delta = this.chooseRightDelta();
+        const delta = this.chooseRightDelta();
         gl.uniform2fv(uniformLocations.delta, delta);
       },
 
@@ -196,7 +196,7 @@
        * @returns {Array} a numeric array with delta values
        */
       chooseRightDelta: function () {
-        var blurScale = 1,
+        let blurScale = 1,
           delta = [0, 0],
           blur;
         if (this.horizontal) {

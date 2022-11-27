@@ -1,6 +1,6 @@
 //@ts-nocheck
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     fabric.StaticCanvas.prototype,
     /** @lends fabric.StaticCanvas.prototype */ {
@@ -45,7 +45,7 @@
       toDataURL: function (options) {
         options || (options = {});
 
-        var format = options.format || 'png',
+        const format = options.format || 'png',
           quality = options.quality || 1,
           multiplier =
             (options.multiplier || 1) *
@@ -71,7 +71,7 @@
       toCanvasElement: function (multiplier, options) {
         multiplier = multiplier || 1;
         options = options || {};
-        var scaledWidth = (options.width || this.width) * multiplier,
+        const scaledWidth = (options.width || this.width) * multiplier,
           scaledHeight = (options.height || this.height) * multiplier,
           zoom = this.getZoom(),
           originalWidth = this.width,

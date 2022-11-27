@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     pow = Math.pow,
     floor = Math.floor,
     sqrt = Math.sqrt,
@@ -98,10 +98,10 @@
        * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
        */
       retrieveShader: function (options) {
-        var filterWindow = this.getFilterWindow(),
+        const filterWindow = this.getFilterWindow(),
           cacheKey = this.type + '_' + filterWindow;
         if (!options.programCache.hasOwnProperty(cacheKey)) {
-          var fragmentShader = this.generateShader(filterWindow);
+          const fragmentShader = this.generateShader(filterWindow);
           options.programCache[cacheKey] = this.createProgram(
             options.context,
             fragmentShader
@@ -111,16 +111,16 @@
       },
 
       getFilterWindow: function () {
-        var scale = this.tempScale;
+        const scale = this.tempScale;
         return Math.ceil(this.lanczosLobes / scale);
       },
 
       getTaps: function () {
-        var lobeFunction = this.lanczosCreate(this.lanczosLobes),
+        const lobeFunction = this.lanczosCreate(this.lanczosLobes),
           scale = this.tempScale,
           filterWindow = this.getFilterWindow(),
           taps = new Array(filterWindow);
-        for (var i = 1; i <= filterWindow; i++) {
+        for (let i = 1; i <= filterWindow; i++) {
           taps[i - 1] = lobeFunction(i * scale);
         }
         return taps;
@@ -135,7 +135,7 @@
           fragmentShader = this.fragmentSourceTOP,
           filterWindow;
 
-        for (var i = 1; i <= filterWindow; i++) {
+        for (let i = 1; i <= filterWindow; i++) {
           offsets[i - 1] = i + '.0 * uDelta';
         }
 
@@ -225,7 +225,7 @@
             return 1.0;
           }
           x *= Math.PI;
-          var xx = x / lobes;
+          const xx = x / lobes;
           return ((sin(x) / x) * sin(xx)) / xx;
         };
       },
@@ -238,14 +238,14 @@
        * @param {Number} scaleY
        */
       applyTo2d: function (options) {
-        var imageData = options.imageData,
+        const imageData = options.imageData,
           scaleX = this.scaleX,
           scaleY = this.scaleY;
 
         this.rcpScaleX = 1 / scaleX;
         this.rcpScaleY = 1 / scaleY;
 
-        var oW = imageData.width,
+        let oW = imageData.width,
           oH = imageData.height,
           dW = round(oW * scaleX),
           dH = round(oH * scaleY),
@@ -273,7 +273,7 @@
        * @returns {ImageData}
        */
       sliceByTwo: function (options, oW, oH, dW, dH) {
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           mult = 0.5,
           doneW = false,
           doneH = false,
@@ -335,7 +335,7 @@
        */
       lanczosResize: function (options, oW, oH, dW, dH) {
         function process(u) {
-          var v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
+          let v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
           center.x = (u + 0.5) * ratioX;
           icenter.x = floor(center.x);
           for (v = 0; v < dH; v++) {
@@ -354,7 +354,7 @@
               if (!cacheLanc[fX]) {
                 cacheLanc[fX] = {};
               }
-              for (var j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
+              for (let j = icenter.y - range2Y; j <= icenter.y + range2Y; j++) {
                 if (j < 0 || j >= oH) {
                   continue;
                 }
@@ -416,7 +416,7 @@
        * @returns {ImageData}
        */
       bilinearFiltering: function (options, oW, oH, dW, dH) {
-        var a,
+        let a,
           b,
           c,
           d,
@@ -472,7 +472,7 @@
        * @returns {ImageData}
        */
       hermiteFastResize: function (options, oW, oH, dW, dH) {
-        var ratioW = this.rcpScaleX,
+        const ratioW = this.rcpScaleX,
           ratioH = this.rcpScaleY,
           ratioWHalf = ceil(ratioW / 2),
           ratioHHalf = ceil(ratioH / 2),
@@ -480,9 +480,9 @@
           data = img.data,
           img2 = options.ctx.createImageData(dW, dH),
           data2 = img2.data;
-        for (var j = 0; j < dH; j++) {
-          for (var i = 0; i < dW; i++) {
-            var x2 = (i + j * dW) * 4,
+        for (let j = 0; j < dH; j++) {
+          for (let i = 0; i < dW; i++) {
+            let x2 = (i + j * dW) * 4,
               weight = 0,
               weights = 0,
               weightsAlpha = 0,
@@ -491,12 +491,12 @@
               gxB = 0,
               gxA = 0,
               centerY = (j + 0.5) * ratioH;
-            for (var yy = floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
-              var dy = abs(centerY - (yy + 0.5)) / ratioHHalf,
+            for (let yy = floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
+              const dy = abs(centerY - (yy + 0.5)) / ratioHHalf,
                 centerX = (i + 0.5) * ratioW,
                 w0 = dy * dy;
-              for (var xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
-                var dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
+              for (let xx = floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
+                let dx = abs(centerX - (xx + 0.5)) / ratioWHalf,
                   w = sqrt(w0 + dx * dx);
                 /* eslint-disable max-depth */
                 if (w > 1 && w < -1) {

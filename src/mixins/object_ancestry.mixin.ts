@@ -2,7 +2,7 @@
 import { FabricObject } from '../shapes/fabricObject.class';
 
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     FabricObject.prototype,
     /** @lends FabricObject.prototype */ {
@@ -13,7 +13,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @returns {boolean}
        */
       isDescendantOf: function (target) {
-        var parent = this.group || this.canvas;
+        let parent = this.group || this.canvas;
         while (parent) {
           if (target === parent) {
             return true;
@@ -34,8 +34,8 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @returns {Ancestors} ancestors from bottom to top
        */
       getAncestors: function (strict) {
-        var ancestors = [];
-        var parent = this.group || (strict ? undefined : this.canvas);
+        const ancestors = [];
+        let parent = this.group || (strict ? undefined : this.canvas);
         while (parent) {
           ancestors.push(parent);
           parent = parent.group || (strict ? undefined : parent.canvas);
@@ -68,8 +68,8 @@ import { FabricObject } from '../shapes/fabricObject.class';
           // the argument is NOT optional, we can't end up here.
           return undefined;
         }
-        var ancestors = this.getAncestors(strict);
-        var otherAncestors = other.getAncestors(strict);
+        const ancestors = this.getAncestors(strict);
+        const otherAncestors = other.getAncestors(strict);
         //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
         if (
           ancestors.length === 0 &&
@@ -94,7 +94,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
               common: ancestors.slice(i),
             };
           }
-          for (var j = 0; j < otherAncestors.length; j++) {
+          for (let j = 0; j < otherAncestors.length; j++) {
             if (this === otherAncestors[j]) {
               return {
                 fork: [],
@@ -126,7 +126,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @returns {boolean}
        */
       hasCommonAncestors: function (other, strict) {
-        var commonAncestors = this.findCommonAncestors(other, strict);
+        const commonAncestors = this.findCommonAncestors(other, strict);
         return commonAncestors && !!commonAncestors.ancestors.length;
       },
     }

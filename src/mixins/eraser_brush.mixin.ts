@@ -4,14 +4,14 @@ import { Point } from '../point.class';
 (function (global) {
   /** ERASER_START */
 
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     __drawClipPath = fabric.Object.prototype._drawClipPath;
-  var _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
-  var _toObject = fabric.Object.prototype.toObject;
-  var _getSvgCommons = fabric.Object.prototype.getSvgCommons;
-  var __createBaseClipPathSVGMarkup =
+  const _needsItsOwnCache = fabric.Object.prototype.needsItsOwnCache;
+  const _toObject = fabric.Object.prototype.toObject;
+  const _getSvgCommons = fabric.Object.prototype.getSvgCommons;
+  const __createBaseClipPathSVGMarkup =
     fabric.Object.prototype._createBaseClipPathSVGMarkup;
-  var __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
+  const __createBaseSVGMarkup = fabric.Object.prototype._createBaseSVGMarkup;
 
   fabric.Object.prototype.cacheProperties.push('eraser');
   fabric.Object.prototype.stateProperties.push('eraser');
@@ -57,7 +57,7 @@ import { Point } from '../point.class';
       __drawClipPath.call(this, ctx, clipPath);
       if (this.eraser) {
         //  update eraser size to match instance
-        var size = this._getNonTransformedDimensions();
+        const size = this._getNonTransformedDimensions();
         this.eraser.isType('eraser') &&
           this.eraser.set({
             width: size.x,
@@ -73,7 +73,7 @@ import { Point } from '../point.class';
      * @return {Object} Object representation of an instance
      */
     toObject: function (propertiesToInclude) {
-      var object = _toObject.call(
+      const object = _toObject.call(
         this,
         ['erasable'].concat(propertiesToInclude)
       );
@@ -164,18 +164,18 @@ import { Point } from '../point.class';
      * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
      */
     applyEraserToObjects: function () {
-      var _this = this,
+      const _this = this,
         eraser = this.eraser;
       return Promise.resolve().then(function () {
         if (eraser) {
           delete _this.eraser;
-          var transform = _this.calcTransformMatrix();
+          const transform = _this.calcTransformMatrix();
           return eraser.clone().then(function (eraser) {
-            var clipPath = _this.clipPath;
+            const clipPath = _this.clipPath;
             return Promise.all(
               eraser.getObjects('path').map(function (path) {
                 //  first we transform the path from the group's coordinate system to the canvas'
-                var originalTransform = fabric.util.multiplyTransformMatrices(
+                const originalTransform = fabric.util.multiplyTransformMatrices(
                   transform,
                   path.calcTransformMatrix()
                 );
@@ -183,7 +183,7 @@ import { Point } from '../point.class';
                 return clipPath
                   ? clipPath.clone().then(
                       function (_clipPath) {
-                        var eraserPath =
+                        const eraserPath =
                           fabric.EraserBrush.prototype.applyClipPathToPath.call(
                             fabric.EraserBrush.prototype,
                             path,
@@ -254,10 +254,10 @@ import { Point } from '../point.class';
      * @return {String} svg representation of an instance
      */
     _toSVG: function (reviver) {
-      var svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
-      var x = -this.width / 2,
+      const svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
+      const x = -this.width / 2,
         y = -this.height / 2;
-      var rectSvg = [
+      const rectSvg = [
         '<rect ',
         'fill="white" ',
         'x="',
@@ -271,7 +271,7 @@ import { Point } from '../point.class';
         '" />\n',
       ].join('');
       svgString.push('\t\t', rectSvg);
-      for (var i = 0, len = this._objects.length; i < len; i++) {
+      for (let i = 0, len = this._objects.length; i < len; i++) {
         svgString.push('\t\t', this._objects[i].toSVG(reviver));
       }
       svgString.push('</g>\n');
@@ -288,7 +288,7 @@ import { Point } from '../point.class';
    * @returns {Promise<fabric.Eraser>}
    */
   fabric.Eraser.fromObject = function (object) {
-    var objects = object.objects || [],
+    const objects = object.objects || [],
       options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
@@ -303,7 +303,7 @@ import { Point } from '../point.class';
     });
   };
 
-  var __renderOverlay = fabric.Canvas.prototype._renderOverlay;
+  const __renderOverlay = fabric.Canvas.prototype._renderOverlay;
   /**
    * @fires erasing:start
    * @fires erasing:end
@@ -406,7 +406,7 @@ import { Point } from '../point.class';
         restorationContext
       ) {
         objects.forEach(function (obj) {
-          var dirty = false;
+          let dirty = false;
           if (obj.forEachObject && obj.erasable === 'deep') {
             //  traverse
             this._prepareCollectionTraversal(
@@ -427,7 +427,7 @@ import { Point } from '../point.class';
             obj.visible
           ) {
             //  render all objects without eraser
-            var eraser = obj.eraser;
+            const eraser = obj.eraser;
             obj.eraser = undefined;
             obj.dirty = true;
             restorationContext.eraser.push([obj, eraser]);
@@ -451,17 +451,17 @@ import { Point } from '../point.class';
         if (!this._patternCanvas) {
           this._patternCanvas = fabric.util.createCanvasElement();
         }
-        var canvas = this._patternCanvas;
+        const canvas = this._patternCanvas;
         objects =
           objects || this.canvas._objectsToRender || this.canvas._objects;
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
-        var patternCtx = canvas.getContext('2d');
+        const patternCtx = canvas.getContext('2d');
         if (this.canvas._isRetinaScaling()) {
-          var retinaScaling = this.canvas.getRetinaScaling();
+          const retinaScaling = this.canvas.getRetinaScaling();
           this.canvas.__initRetinaScaling(retinaScaling, canvas, patternCtx);
         }
-        var backgroundImage = this.canvas.backgroundImage,
+        const backgroundImage = this.canvas.backgroundImage,
           bgErasable = backgroundImage && this._isErasable(backgroundImage),
           overlayImage = this.canvas.overlayImage,
           overlayErasable = overlayImage && this._isErasable(overlayImage);
@@ -490,7 +490,11 @@ import { Point } from '../point.class';
         }
         patternCtx.save();
         patternCtx.transform.apply(patternCtx, this.canvas.viewportTransform);
-        var restorationContext = { visibility: [], eraser: [], collection: [] };
+        const restorationContext = {
+          visibility: [],
+          eraser: [],
+          collection: [],
+        };
         this._prepareCollectionTraversal(
           this.canvas,
           objects,
@@ -502,7 +506,7 @@ import { Point } from '../point.class';
           obj.visible = true;
         });
         restorationContext.eraser.forEach(function (entry) {
-          var obj = entry[0],
+          const obj = entry[0],
             eraser = entry[1];
           obj.eraser = eraser;
           obj.dirty = true;
@@ -607,9 +611,9 @@ import { Point } from '../point.class';
        * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
        */
       _render: function () {
-        var ctx,
+        let ctx,
           lineWidth = this.width;
-        var t = this.canvas.getRetinaScaling(),
+        const t = this.canvas.getRetinaScaling(),
           s = 1 / t;
         //  clip canvas
         ctx = this.canvas.getContext();
@@ -639,7 +643,7 @@ import { Point } from '../point.class';
        * @returns
        */
       createPath: function (pathData) {
-        var path = this.callSuper('createPath', pathData);
+        const path = this.callSuper('createPath', pathData);
         path.globalCompositeOperation = this.inverted
           ? 'source-over'
           : 'destination-out';
@@ -661,7 +665,7 @@ import { Point } from '../point.class';
         clipPath,
         clipPathContainerTransformMatrix
       ) {
-        var pathInvTransform = fabric.util.invertTransform(
+        const pathInvTransform = fabric.util.invertTransform(
             path.calcTransformMatrix()
           ),
           clipPathTransform = clipPath.calcTransformMatrix(),
@@ -697,9 +701,9 @@ import { Point } from '../point.class';
        * @returns {Promise<fabric.Path>}
        */
       clonePathWithClipPath: function (path, object) {
-        var objTransform = object.calcTransformMatrix();
-        var clipPath = object.clipPath;
-        var _this = this;
+        const objTransform = object.calcTransformMatrix();
+        const clipPath = object.clipPath;
+        const _this = this;
         return Promise.all([
           path.clone(),
           clipPath.clone(['absolutePositioned', 'inverted']),
@@ -719,10 +723,10 @@ import { Point } from '../point.class';
        * @returns {Promise<fabric.Path | fabric.Path[]>}
        */
       _addPathToObjectEraser: function (obj, path, context) {
-        var _this = this;
+        const _this = this;
         //  object is collection, i.e group
         if (obj.forEachObject && obj.erasable === 'deep') {
-          var targets = obj._objects.filter(function (_obj) {
+          const targets = obj._objects.filter(function (_obj) {
             return _obj.erasable;
           });
           if (targets.length > 0 && obj.clipPath) {
@@ -743,7 +747,7 @@ import { Point } from '../point.class';
           return;
         }
         //  prepare eraser
-        var eraser = obj.eraser;
+        let eraser = obj.eraser;
         if (!eraser) {
           eraser = new fabric.Eraser();
           obj.eraser = eraser;
@@ -751,7 +755,7 @@ import { Point } from '../point.class';
         //  clone and add path
         return path.clone().then(function (path) {
           // http://fabricjs.com/using-transformations
-          var desiredTransform = fabric.util.multiplyTransformMatrices(
+          const desiredTransform = fabric.util.multiplyTransformMatrices(
             fabric.util.invertTransform(obj.calcTransformMatrix()),
             path.calcTransformMatrix()
           );
@@ -778,10 +782,10 @@ import { Point } from '../point.class';
        * @returns {Promise<fabric.Path[]|void>} eraser paths
        */
       applyEraserToCanvas: function (path, context) {
-        var canvas = this.canvas;
+        const canvas = this.canvas;
         return Promise.all(
           ['backgroundImage', 'overlayImage'].map(function (prop) {
-            var drawable = canvas[prop];
+            const drawable = canvas[prop];
             return (
               drawable &&
               drawable.erasable &&
@@ -803,7 +807,7 @@ import { Point } from '../point.class';
        * and add it to every intersected erasable object.
        */
       _finalizeAndAddPath: function () {
-        var ctx = this.canvas.contextTop,
+        const ctx = this.canvas.contextTop,
           canvas = this.canvas;
         ctx.closePath();
         if (this.decimate) {
@@ -814,7 +818,7 @@ import { Point } from '../point.class';
         canvas.clearContext(canvas.contextTop);
         this._isErasing = false;
 
-        var pathData =
+        const pathData =
           this._points && this._points.length > 1
             ? this.convertPointsToSVGPath(this._points)
             : null;
@@ -828,21 +832,21 @@ import { Point } from '../point.class';
           return;
         }
 
-        var path = this.createPath(pathData);
+        const path = this.createPath(pathData);
         //  needed for `intersectsWithObject`
         path.setCoords();
         //  commense event sequence
         canvas.fire('before:path:created', { path: path });
 
         // finalize erasing
-        var _this = this;
-        var context = {
+        const _this = this;
+        const context = {
           targets: [],
           subTargets: [],
           //paths: new Map(),
           drawables: {},
         };
-        var tasks = canvas._objects.map(function (obj) {
+        const tasks = canvas._objects.map(function (obj) {
           return (
             obj.erasable &&
             obj.intersectsWithObject(path, true, true) &&

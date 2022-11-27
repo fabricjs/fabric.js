@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 

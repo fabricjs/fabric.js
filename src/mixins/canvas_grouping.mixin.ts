@@ -2,7 +2,7 @@
 import { Point } from '../point.class';
 
 (function (global) {
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     min = Math.min,
     max = Math.max;
 
@@ -16,7 +16,7 @@ import { Point } from '../point.class';
        * @return {Boolean}
        */
       _shouldGroup: function (e, target) {
-        var activeObject = this._activeObject;
+        const activeObject = this._activeObject;
         // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
         return (
           !!activeObject &&
@@ -45,7 +45,7 @@ import { Point } from '../point.class';
        * @param {fabric.Object} target
        */
       _handleGrouping: function (e, target) {
-        var activeObject = this._activeObject;
+        const activeObject = this._activeObject;
         // avoid multi select when shift click on a corner
         if (activeObject.__corner) {
           return;
@@ -69,7 +69,7 @@ import { Point } from '../point.class';
        * @private
        */
       _updateActiveSelection: function (target, e) {
-        var activeSelection = this._activeObject,
+        const activeSelection = this._activeObject,
           currentActiveObjects = activeSelection._objects.slice(0);
         if (target.group === activeSelection) {
           activeSelection.remove(target);
@@ -91,7 +91,7 @@ import { Point } from '../point.class';
        * @private
        */
       _createActiveSelection: function (target, e) {
-        var currentActives = this.getActiveObjects(),
+        const currentActives = this.getActiveObjects(),
           group = this._createGroup(target);
         this._hoveredTarget = group;
         // ISSUE 4115: should we consider subTargets here?
@@ -107,8 +107,8 @@ import { Point } from '../point.class';
        * @returns {fabric.ActiveSelection}
        */
       _createGroup: function (target) {
-        var activeObject = this._activeObject;
-        var groupObjects = target.isInFrontOf(activeObject)
+        const activeObject = this._activeObject;
+        const groupObjects = target.isInFrontOf(activeObject)
           ? [activeObject, target]
           : [target, activeObject];
         activeObject.isEditing && activeObject.exitEditing();
@@ -123,7 +123,7 @@ import { Point } from '../point.class';
        * @param {Event} e mouse event
        */
       _groupSelectedObjects: function (e) {
-        var group = this._collectObjects(e),
+        let group = this._collectObjects(e),
           aGroup;
 
         // do not create group for 1 element only
@@ -141,7 +141,7 @@ import { Point } from '../point.class';
        * @private
        */
       _collectObjects: function (e) {
-        var group = [],
+        let group = [],
           currentObject,
           x1 = this._groupSelector.ex,
           y1 = this._groupSelector.ey,
@@ -152,7 +152,7 @@ import { Point } from '../point.class';
           allowIntersect = !this.selectionFullyContained,
           isClick = x1 === x2 && y1 === y2;
         // we iterate reverse order to collect top first in case of click.
-        for (var i = this._objects.length; i--; ) {
+        for (let i = this._objects.length; i--; ) {
           currentObject = this._objects[i];
 
           if (

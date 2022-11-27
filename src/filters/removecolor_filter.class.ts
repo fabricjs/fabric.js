@@ -5,7 +5,7 @@ import { Color } from '../color';
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     extend = fabric.util.object.extend,
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
@@ -83,7 +83,7 @@ import { Color } from '../color';
        * @param {Object} canvasEl Canvas element to apply filter to
        */
       applyTo2d: function (options) {
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           data = imageData.data,
           i,
           distance = this.distance * 255,
@@ -140,7 +140,7 @@ import { Color } from '../color';
        * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
        */
       sendUniformData: function (gl, uniformLocations) {
-        var source = new Color(this.color).getSource(),
+        const source = new Color(this.color).getSource(),
           distance = parseFloat(this.distance),
           lowC = [
             0 + source[0] / 255 - distance,

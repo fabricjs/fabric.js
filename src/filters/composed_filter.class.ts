@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -72,7 +72,7 @@
    * @returns {Promise<fabric.Image.filters.Composed>}
    */
   fabric.Image.filters.Composed.fromObject = function (object, options) {
-    var filters = object.subFilters || [];
+    const filters = object.subFilters || [];
     return Promise.all(
       filters.map(function (filter) {
         return fabric.Image.filters[filter.type].fromObject(filter, options);

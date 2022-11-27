@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -46,7 +46,7 @@
       mainParameter: 'rotation',
 
       calculateMatrix: function () {
-        var rad = this.rotation * Math.PI,
+        const rad = this.rotation * Math.PI,
           cos = fabric.util.cos(rad),
           sin = fabric.util.sin(rad),
           aThird = 1 / 3,

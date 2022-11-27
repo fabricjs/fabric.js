@@ -1,6 +1,6 @@
 //@ts-nocheck
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   fabric.util.object.extend(
     fabric.StaticCanvas.prototype,
     /** @lends fabric.StaticCanvas.prototype */ {
@@ -35,10 +35,10 @@
         }
 
         // serialize if it wasn't already
-        var serialized =
+        const serialized =
           typeof json === 'string' ? JSON.parse(json) : Object.assign({}, json);
 
-        var _this = this,
+        const _this = this,
           renderOnAddRemove = this.renderOnAddRemove;
         this.renderOnAddRemove = false;
 
@@ -58,7 +58,7 @@
             { signal: options && options.signal }
           ),
         ]).then(function (res) {
-          var enlived = res[0],
+          const enlived = res[0],
             enlivedMap = res[1];
           _this.clear();
           _this.__setupCanvas(serialized, enlived);
@@ -98,7 +98,7 @@
        * @returns {Promise<fabric.Canvas>}
        */
       clone: function (properties) {
-        var data = JSON.stringify(this.toJSON(properties));
+        const data = JSON.stringify(this.toJSON(properties));
         return this.cloneWithoutData().then(function (clone) {
           return clone.loadFromJSON(data);
         });
@@ -111,13 +111,13 @@
        * @returns {Promise<fabric.Canvas>}
        */
       cloneWithoutData: function () {
-        var el = fabric.util.createCanvasElement();
+        const el = fabric.util.createCanvasElement();
 
         el.width = this.width;
         el.height = this.height;
         // this seems wrong. either Canvas or StaticCanvas
-        var clone = new fabric.Canvas(el);
-        var data = {};
+        const clone = new fabric.Canvas(el);
+        const data = {};
         if (this.backgroundImage) {
           data.backgroundImage = this.backgroundImage.toObject();
         }

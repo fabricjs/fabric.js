@@ -1,6 +1,6 @@
 //@ts-nocheck
 (function (global) {
-  var fabric = global.fabric;
+  const fabric = global.fabric;
   /**
    * Creates accessors (getXXX, setXXX) for a "class", based on "stateProperties" array
    * @static
@@ -8,7 +8,7 @@
    * @param {Object} klass "Class" to create accessors for
    */
   fabric.util.createAccessors = function (klass) {
-    var proto = klass.prototype,
+    let proto = klass.prototype,
       i,
       propName,
       capitalizedPropName,

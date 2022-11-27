@@ -5,7 +5,7 @@ import { Color } from '../color';
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -123,7 +123,7 @@ import { Color } from '../color';
        * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
        */
       retrieveShader: function (options) {
-        var cacheKey = this.type + '_' + this.mode,
+        let cacheKey = this.type + '_' + this.mode,
           shaderSource;
         if (!options.programCache.hasOwnProperty(cacheKey)) {
           shaderSource = this.buildSource(this.mode);
@@ -142,7 +142,7 @@ import { Color } from '../color';
        * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
        */
       applyTo2d: function (options) {
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           data = imageData.data,
           iLen = data.length,
           tr,
@@ -159,7 +159,7 @@ import { Color } from '../color';
         tg = source[1] * this.alpha;
         tb = source[2] * this.alpha;
 
-        for (var i = 0; i < iLen; i += 4) {
+        for (let i = 0; i < iLen; i += 4) {
           r = data[i];
           g = data[i + 1];
           b = data[i + 2];
@@ -247,7 +247,7 @@ import { Color } from '../color';
        * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
        */
       sendUniformData: function (gl, uniformLocations) {
-        var source = new Color(this.color).getSource();
+        const source = new Color(this.color).getSource();
         source[0] = (this.alpha * source[0]) / 255;
         source[1] = (this.alpha * source[1]) / 255;
         source[2] = (this.alpha * source[2]) / 255;

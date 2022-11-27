@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -70,7 +70,7 @@
         if (this.brightness === 0) {
           return;
         }
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           data = imageData.data,
           i,
           len = data.length,

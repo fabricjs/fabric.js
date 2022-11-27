@@ -2,11 +2,11 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
-  var matrices = {
+  const matrices = {
     Brownie: [
       0.5997, 0.34553, -0.27082, 0, 0.186, -0.0377, 0.86095, 0.15059, 0,
       -0.1449, 0.24113, -0.07441, 0.44972, 0, -0.02965, 0, 0, 0, 1, 0,
@@ -37,7 +37,7 @@
     ],
   };
 
-  for (var key in matrices) {
+  for (const key in matrices) {
     filters[key] = createClass(
       filters.ColorMatrix,
       /** @lends fabric.Image.filters.Sepia.prototype */ {

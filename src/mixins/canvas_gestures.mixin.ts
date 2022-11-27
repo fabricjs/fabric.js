@@ -3,7 +3,7 @@
 import { scalingEqually } from '../controls/actions';
 
 (function (global) {
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     degreesToRadians = fabric.util.degreesToRadians,
     radiansToDegrees = fabric.util.radiansToDegrees;
 
@@ -35,7 +35,7 @@ import { scalingEqually } from '../controls/actions';
           return;
         }
 
-        var target = this.findTarget(e);
+        const target = this.findTarget(e);
         if ('undefined' !== typeof target) {
           this.__gesturesParams = {
             e: e,
@@ -58,7 +58,7 @@ import { scalingEqually } from '../controls/actions';
           return;
         }
 
-        var self = this.__gesturesParams.self,
+        const self = this.__gesturesParams.self,
           t = this._currentTransform,
           e = this.__gesturesParams.e;
 
@@ -135,7 +135,7 @@ import { scalingEqually } from '../controls/actions';
        * @param {Event} e Event object by Event.js
        */
       _scaleObjectBy: function (s, e) {
-        var t = this._currentTransform,
+        const t = this._currentTransform,
           target = t.target;
         t.gestureScale = s;
         target._scaling = true;
@@ -148,7 +148,7 @@ import { scalingEqually } from '../controls/actions';
        * @param {Event} e Event object by Event.js
        */
       _rotateObjectByAngle: function (curAngle, e) {
-        var t = this._currentTransform;
+        const t = this._currentTransform;
 
         if (t.target.get('lockRotation')) {
           return;

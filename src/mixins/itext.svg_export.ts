@@ -6,7 +6,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
 
 /* _TO_SVG_START_ */
 (function (global) {
-  var fabric = global.fabric,
+  const fabric = global.fabric,
     toFixed = fabric.util.toFixed,
     multipleSpacesRegex = /  +/g;
 
@@ -19,7 +19,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String} svg representation of an instance
        */
       _toSVG: function () {
-        var offsets = this._getSVGLeftTopOffsets(),
+        const offsets = this._getSVGLeftTopOffsets(),
           textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
         return this._wrapSVGTextAndBg(textAndBg);
       },
@@ -52,7 +52,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @private
        */
       _wrapSVGTextAndBg: function (textAndBg) {
-        var noShadow = true,
+        const noShadow = true,
           textDecoration = this.getSvgTextDecoration(this);
         return [
           textAndBg.textBgRects.join(''),
@@ -82,7 +82,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {Object}
        */
       _getSVGTextAndBg: function (textTopOffset, textLeftOffset) {
-        var textSpans = [],
+        let textSpans = [],
           textBgRects = [],
           height = textTopOffset,
           lineOffset;
@@ -90,7 +90,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
         this._setSVGBg(textBgRects);
 
         // text and text-background
-        for (var i = 0, len = this._textLines.length; i < len; i++) {
+        for (let i = 0, len = this._textLines.length; i < len; i++) {
           lineOffset = this._getLineLeftOffset(i);
           if (this.direction === 'rtl') {
             lineOffset += this.width;
@@ -125,7 +125,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @private
        */
       _createTextCharSpan: function (_char, styleDecl, left, top) {
-        var shouldUseWhitespace =
+        let shouldUseWhitespace =
             _char !== _char.trim() || _char.match(multipleSpacesRegex),
           styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
@@ -156,7 +156,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
         textTopOffset
       ) {
         // set proper line offset
-        var lineHeight = this.getHeightOfLine(lineIndex),
+        let lineHeight = this.getHeightOfLine(lineIndex),
           isJustify = this.textAlign.indexOf('justify') !== -1,
           actualStyle,
           nextStyle,
@@ -169,7 +169,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
 
         textTopOffset +=
           (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
-        for (var i = 0, len = line.length - 1; i <= len; i++) {
+        for (let i = 0, len = line.length - 1; i <= len; i++) {
           timeToRender = i === len || this.charSpacing;
           charsToRender += line[i];
           charBox = this.__charBounds[lineIndex][i];
@@ -218,7 +218,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
       },
 
       _pushTextBgRect: function (textBgRects, color, left, top, width, height) {
-        var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
+        const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
         textBgRects.push(
           '\t\t<rect ',
           this._getFillAttributes(color),
@@ -235,14 +235,14 @@ import { FabricObject } from '../shapes/fabricObject.class';
       },
 
       _setSVGTextLineBg: function (textBgRects, i, leftOffset, textTopOffset) {
-        var line = this._textLines[i],
+        let line = this._textLines[i],
           heightOfLine = this.getHeightOfLine(i) / this.lineHeight,
           boxWidth = 0,
           boxStart = 0,
           charBox,
           currentColor,
           lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
-        for (var j = 0, jlen = line.length; j < jlen; j++) {
+        for (let j = 0, jlen = line.length; j < jlen; j++) {
           charBox = this.__charBounds[i][j];
           currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
           if (currentColor !== lastColor) {
@@ -282,7 +282,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String}
        */
       _getFillAttributes: function (value) {
-        var fillColor =
+        const fillColor =
           value && typeof value === 'string' ? new Color(value) : '';
         if (
           !fillColor ||
@@ -304,7 +304,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @private
        */
       _getSVGLineTopOffset: function (lineIndex) {
-        var lineTopOffset = 0,
+        let lineTopOffset = 0,
           lastHeight = 0;
         for (var j = 0; j < lineIndex; j++) {
           lineTopOffset += this.getHeightOfLine(j);
@@ -324,7 +324,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String}
        */
       getSvgStyles: function (skipShadow) {
-        var svgStyle = FabricObject.prototype.getSvgStyles.call(
+        const svgStyle = FabricObject.prototype.getSvgStyles.call(
           this,
           skipShadow
         );

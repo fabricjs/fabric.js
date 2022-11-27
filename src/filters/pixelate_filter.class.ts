@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = {}),
+  const fabric = global.fabric || (global.fabric = {}),
     filters = fabric.Image.filters,
     createClass = fabric.util.createClass;
 
@@ -63,7 +63,7 @@
        * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
        */
       applyTo2d: function (options) {
-        var imageData = options.imageData,
+        let imageData = options.imageData,
           data = imageData.data,
           iLen = imageData.height,
           jLen = imageData.width,

@@ -6,14 +6,14 @@ import { FabricObject } from '../shapes/fabricObject.class';
 
 /* _TO_SVG_START_ */
 (function (global) {
-  var fabric = global.fabric;
+  let fabric = global.fabric;
   function getSvgColorString(prop, value) {
     if (!value) {
       return prop + ': none; ';
     } else if (value.toLive) {
       return prop + ': url(#SVGID_' + value.id + '); ';
     } else {
-      var color = new Color(value),
+      let color = new Color(value),
         str = prop + ': ' + color.toRgb() + '; ',
         opacity = color.getAlpha();
       if (opacity !== 1) {
@@ -36,7 +36,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String}
        */
       getSvgStyles: function (skipShadow) {
-        var fillRule = this.fillRule ? this.fillRule : 'nonzero',
+        const fillRule = this.fillRule ? this.fillRule : 'nonzero',
           strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
           strokeDashArray = this.strokeDashArray
             ? this.strokeDashArray.join(' ')
@@ -94,7 +94,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String}
        */
       getSvgSpanStyles: function (style, useWhiteSpace) {
-        var term = '; ';
+        const term = '; ';
         var fontFamily = style.fontFamily
           ? 'font-family: ' +
             (style.fontFamily.indexOf("'") === -1 &&
@@ -182,7 +182,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        * @return {String}
        */
       getSvgTransform: function (full, additionalTransform) {
-        var transform = full
+        const transform = full
             ? this.calcTransformMatrix()
             : this.calcOwnMatrix(),
           svgTransform = 'transform="' + fabric.util.matrixToSVG(transform);
@@ -191,7 +191,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
 
       _setSVGBg: function (textBgRects) {
         if (this.backgroundColor) {
-          var NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
+          const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
           textBgRects.push(
             '\t\t<rect ',
             this._getFillAttributes(this.backgroundColor),
@@ -238,7 +238,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        */
       _createBaseClipPathSVGMarkup: function (objectMarkup, options) {
         options = options || {};
-        var reviver = options.reviver,
+        const reviver = options.reviver,
           additionalTransform = options.additionalTransform || '',
           commonPieces = [
             this.getSvgTransform(true, additionalTransform),
@@ -255,7 +255,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
        */
       _createBaseSVGMarkup: function (objectMarkup, options) {
         options = options || {};
-        var noStyle = options.noStyle,
+        let noStyle = options.noStyle,
           reviver = options.reviver,
           styleInfo = noStyle ? '' : 'style="' + this.getSvgStyles() + '" ',
           shadowInfo = options.withShadow
