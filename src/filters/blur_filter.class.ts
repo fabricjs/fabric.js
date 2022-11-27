@@ -1,32 +1,19 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { createCanvasElement } from '../util/misc/dom';
+import { BaseFilter } from './base_filter.class';
+import { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 
 /**
  * Blur filter class
- * @class fabric.Image.Blur
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Blur#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.Blur({
+ * const filter = new fabric.Image.Blur({
  *   blur: 0.5
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Blur extends filters.BaseFilter {
-  /** @lends fabric.Image.Blur.prototype */
-  type: string;
-
-  /* eslint-disable max-len */
-  fragmentSource;
-
+export class Blur extends BaseFilter {
   /**
    * blur value, in percentage of image dimensions.
    * specific to keep the image blur constant at different resolutions
@@ -38,7 +25,7 @@ export class Blur extends filters.BaseFilter {
 
   mainParameter: string;
 
-  applyTo(options) {
+  applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     if (options.webgl) {
       // this aspectRatio is used to give the same blur to vertical and horizontal
       this.aspectRatio = options.sourceWidth / options.sourceHeight;
@@ -56,7 +43,7 @@ export class Blur extends filters.BaseFilter {
     }
   }
 
-  applyTo2d(options) {
+  applyTo2d(options: T2DPipelineState) {
     options.imageData = this.simpleBlur(options);
   }
 
@@ -172,14 +159,6 @@ export class Blur extends filters.BaseFilter {
     }
     return delta;
   }
-
-  /**
-   * Create filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Image.Blur>}
-   */
-  static fromObject = fabric.Image.filters.BaseFilter.fromObject;
 }
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
