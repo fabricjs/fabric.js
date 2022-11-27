@@ -277,14 +277,12 @@
     assert.equal(group.item(9999), undefined);
   });
 
-  QUnit.test('moveTo', function(assert) {
+  QUnit.test('moveObjectTo', function(assert) {
     var group = makeGroupWith4Objects(),
         groupEl1 = group.getObjects()[0],
         groupEl2 = group.getObjects()[1],
         groupEl3 = group.getObjects()[2],
         groupEl4 = group.getObjects()[3];
-
-    assert.ok(typeof group.item(0).moveTo === 'function');
 
     // [ 1, 2, 3, 4 ]
     assert.equal(group.item(0), groupEl1);
@@ -293,7 +291,7 @@
     assert.equal(group.item(3), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(3);
+    group.moveObjectTo(group.item(0), 3);
 
     // moved 1 to level 3 — [2, 3, 4, 1]
     assert.equal(group.item(3), groupEl1);
@@ -302,7 +300,7 @@
     assert.equal(group.item(2), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(2);
+    group.moveObjectTo(group.item(0), 2);
 
     // moved 2 to level 2 — [3, 4, 2, 1]
     assert.equal(group.item(3), groupEl1);
@@ -545,12 +543,12 @@
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
 
     group.dirty = false;
-    textBg.bringToFront();
+    group.bringObjectToFront(textBg);
     assert.deepEqual(group.getObjects(), [text, obj, textBg]);
     assert.ok(group.dirty, 'should invalidate group');
 
     group.dirty = false;
-    textBg.sendToBack();
+    group.sendObjectToBack(textBg);
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
     assert.ok(group.dirty, 'should invalidate group');
 

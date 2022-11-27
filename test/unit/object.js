@@ -736,52 +736,6 @@
     assert.equal(object.left, oldX, 'object left did not change');
   });
 
-
-  QUnit.test('sendToBack', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.sendToBack === 'function');
-
-    canvas.add(object);
-    assert.equal(object.sendToBack(), object, 'should be chainable');
-  });
-
-  QUnit.test('bringToFront', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.bringToFront === 'function');
-
-    canvas.add(object);
-    assert.equal(object.bringToFront(), object, 'should be chainable');
-  });
-
-  QUnit.test('sendBackwards', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.sendBackwards === 'function');
-
-    canvas.add(object);
-    assert.equal(object.sendBackwards(), object, 'should be chainable');
-  });
-
-  QUnit.test('bringForward', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.bringForward === 'function');
-
-    canvas.add(object);
-    assert.equal(object.bringForward(), object, 'should be chainable');
-  });
-
-  QUnit.test('moveTo', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.moveTo === 'function');
-
-    canvas.add(object);
-    assert.equal(object.moveTo(), object, 'should be chainable');
-  });
-
   QUnit.test('isDescendantOf', function (assert) {
     var object = new fabric.Object();
     var parent = new fabric.Object();
