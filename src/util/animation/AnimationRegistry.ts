@@ -1,5 +1,6 @@
 import { fabric } from '../../../HEADER';
-import { Canvas, TObject } from '../../__types__';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import { Canvas } from '../../__types__';
 import { AnimationBase } from './AnimationBase';
 
 /**
@@ -30,7 +31,7 @@ class AnimationRegistry extends Array<AnimationBase> {
     const animations = this.filter(
       (animation) =>
         typeof animation.target === 'object' &&
-        (animation.target as TObject)?.canvas === canvas
+        (animation.target as FabricObject)?.canvas === canvas
     );
     animations.forEach((animation) => animation.abort());
     return animations;
