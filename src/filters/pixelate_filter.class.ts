@@ -1,40 +1,18 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { BaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Pixelate filter class
- * @class fabric.Image.Pixelate
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Pixelate#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example
- * var filter = new fabric.Image.Pixelate({
+ * const filter = new Pixelate({
  *   blocksize: 8
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Pixelate extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
+export class Pixelate extends BaseFilter {
   blocksize: number;
-
-  mainParameter: string;
-
-  /**
-   * Fragment source for the Pixelate program
-   */
-  fragmentSource;
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
@@ -42,37 +20,18 @@ export class Pixelate extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
-      data = imageData.data,
-      iLen = imageData.height,
-      jLen = imageData.width,
-      index,
-      i,
-      j,
-      r,
-      g,
-      b,
-      a,
-      _i,
-      _j,
-      _iLen,
-      _jLen;
+  applyTo2d({ imageData: { data, width, height } }: T2DPipelineState) {
+    for (let i = 0; i < height; i += this.blocksize) {
+      for (let j = 0; j < width; j += this.blocksize) {
+        const index = i * 4 * width + j * 4;
+        const r = data[index];
+        const g = data[index + 1];
+        const b = data[index + 2];
+        const a = data[index + 3];
 
-    for (i = 0; i < iLen; i += this.blocksize) {
-      for (j = 0; j < jLen; j += this.blocksize) {
-        index = i * 4 * jLen + j * 4;
-
-        r = data[index];
-        g = data[index + 1];
-        b = data[index + 2];
-        a = data[index + 3];
-
-        _iLen = Math.min(i + this.blocksize, iLen);
-        _jLen = Math.min(j + this.blocksize, jLen);
-        for (_i = i; _i < _iLen; _i++) {
-          for (_j = j; _j < _jLen; _j++) {
-            index = _i * 4 * jLen + _j * 4;
+        for (let _i = i; _i < Math.min(i + this.blocksize, height); _i++) {
+          for (let _j = j; _j < Math.min(j + this.blocksize, width); _j++) {
+            const index = _i * 4 * width + _j * 4;
             data[index] = r;
             data[index + 1] = g;
             data[index + 2] = b;
@@ -96,7 +55,10 @@ export class Pixelate extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
       uStepW: gl.getUniformLocation(program, 'uStepW'),
@@ -110,7 +72,10 @@ export class Pixelate extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
   }
 }
@@ -140,11 +105,3 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
 };
 
 Object.assign(Pixelate.prototype, pixelateDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Pixelate>}
- */
-fabric.Image.Pixelate.fromObject = fabric.Image.filters.BaseFilter.fromObject;
