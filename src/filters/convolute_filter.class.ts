@@ -1,20 +1,11 @@
-//@ts-nocheck
-'use strict';
-
-var fabric = global.fabric || (global.fabric = {}),
-  extend = object.extend,
-  filters = fabric.Image.filters,
-  createClass = createClass;
+import { TClassProperties } from '../typedefs';
+import { AbstractBaseFilter } from './base_filter.class';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
- * @class fabric.Image.Convolute
- * @memberOf fabric.Image.filters
- * @extends fabric.Image.filters.BaseFilter
- * @see {@link fabric.Image.Convolute#initialize} for constructor definition
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
  * @example <caption>Sharpen filter</caption>
- * var filter = new fabric.Image.Convolute({
+ * const filter = new Convolute({
  *   matrix: [ 0, -1,  0,
  *            -1,  5, -1,
  *             0, -1,  0 ]
@@ -23,7 +14,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.applyFilters();
  * canvas.renderAll();
  * @example <caption>Blur filter</caption>
- * var filter = new fabric.Image.Convolute({
+ * const filter = new Convolute({
  *   matrix: [ 1/9, 1/9, 1/9,
  *             1/9, 1/9, 1/9,
  *             1/9, 1/9, 1/9 ]
@@ -32,7 +23,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.applyFilters();
  * canvas.renderAll();
  * @example <caption>Emboss filter</caption>
- * var filter = new fabric.Image.Convolute({
+ * const filter = new Convolute({
  *   matrix: [ 1,   1,  1,
  *             1, 0.7, -1,
  *            -1,  -1, -1 ]
@@ -41,7 +32,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.applyFilters();
  * canvas.renderAll();
  * @example <caption>Emboss filter with opaqueness</caption>
- * var filter = new fabric.Image.Convolute({
+ * const filter = new Convolute({
  *   opaque: true,
  *   matrix: [ 1,   1,  1,
  *             1, 0.7, -1,
@@ -51,14 +42,7 @@ var fabric = global.fabric || (global.fabric = {}),
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends filters.BaseFilter {
-  /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  type: string;
-
+export class Convolute extends AbstractBaseFilter {
   /*
    * Opaque value (true/false)
    */
@@ -67,30 +51,21 @@ export class Convolute extends filters.BaseFilter {
   /*
    * matrix for the filter, max 9x9
    */
-  matrix;
+  matrix: number[];
 
   /**
    * Fragment source for the brightness program
    */
-  fragmentSource;
+  fragmentSource: Record<string, string>;
 
-  /**
-   * Retrieves the cached shader.
-   * @param {Object} options
-   * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-   * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-   */
-  retrieveShader(options) {
-    var size = Math.sqrt(this.matrix.length);
-    var cacheKey = this.type + '_' + size + '_' + (this.opaque ? 1 : 0);
-    var shaderSource = this.fragmentSource[cacheKey];
-    if (!options.programCache.hasOwnProperty(cacheKey)) {
-      options.programCache[cacheKey] = this.createProgram(
-        options.context,
-        shaderSource
-      );
-    }
-    return options.programCache[cacheKey];
+  getCacheKey() {
+    return `${this.type}_${Math.sqrt(this.matrix.length)}_${
+      this.opaque ? 1 : 0
+    }`;
+  }
+
+  getFragmentSource() {
+    return this.fragmentSource[this.getCacheKey()];
   }
 
   /**
@@ -99,8 +74,8 @@ export class Convolute extends filters.BaseFilter {
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options) {
-    var imageData = options.imageData,
+  applyTo2d(options: T2DPipelineState) {
+    const imageData = options.imageData,
       data = imageData.data,
       weights = this.matrix,
       side = Math.round(Math.sqrt(weights.length)),
@@ -110,20 +85,8 @@ export class Convolute extends filters.BaseFilter {
       output = options.ctx.createImageData(sw, sh),
       dst = output.data,
       // go through the destination image pixels
-      alphaFac = this.opaque ? 1 : 0,
-      r,
-      g,
-      b,
-      a,
-      dstOff,
-      scx,
-      scy,
-      srcOff,
-      wt,
-      x,
-      y,
-      cx,
-      cy;
+      alphaFac = this.opaque ? 1 : 0;
+    let r, g, b, a, dstOff, scx, scy, srcOff, wt, x, y, cx, cy;
 
     for (y = 0; y < sh; y++) {
       for (x = 0; x < sw; x++) {
@@ -176,7 +139,10 @@ export class Convolute extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {WebGLShaderProgram} program This filter's compiled shader program.
    */
-  getUniformLocations(gl, program) {
+  getUniformLocations(
+    gl: WebGLRenderingContext,
+    program: WebGLProgram
+  ): TWebGLUniformLocationMap {
     return {
       uMatrix: gl.getUniformLocation(program, 'uMatrix'),
       uOpaque: gl.getUniformLocation(program, 'uOpaque'),
@@ -191,7 +157,10 @@ export class Convolute extends filters.BaseFilter {
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
    * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
-  sendUniformData(gl, uniformLocations) {
+  sendUniformData(
+    gl: WebGLRenderingContext,
+    uniformLocations: TWebGLUniformLocationMap
+  ) {
     gl.uniform1fv(uniformLocations.uMatrix, this.matrix);
   }
 
@@ -200,10 +169,11 @@ export class Convolute extends filters.BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return extend(super.toObject(), {
+    return {
+      ...super.toObject(),
       opaque: this.opaque,
-      matrix: this.matrix,
-    });
+      matrix: [...this.matrix],
+    };
   }
 }
 
@@ -360,11 +330,3 @@ export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
 };
 
 Object.assign(Convolute.prototype, convoluteDefaultValues);
-
-/**
- * Create filter instance from an object representation
- * @static
- * @param {Object} object Object to create an instance from
- * @returns {Promise<fabric.Image.Convolute>}
- */
-fabric.Image.Convolute.fromObject = fabric.Image.filters.BaseFilter.fromObject;
