@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING dep(): `Point.swap` [#8373](https://github.com/fabricjs/fabric.js/pull/8373)
 - chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)
 - feat(): Add `createObjectDefaultControls` and `createTextboxDefaultControls` to create copies of control sets. [#8415](https://github.com/fabricjs/fabric.js/pull/8415)
 - fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)
