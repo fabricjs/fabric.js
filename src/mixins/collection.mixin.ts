@@ -209,7 +209,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
       const idx = this._objects.indexOf(object);
       if (idx !== 0) {
         // if object is not on the bottom of stack
-        const newIdx = this.#findNewLowerIndex(object, idx, intersecting);
+        const newIdx = this.findNewLowerIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this._onStackOrderChanged(object);
@@ -235,7 +235,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
       const idx = this._objects.indexOf(object);
       if (idx !== this._objects.length - 1) {
         // if object is not on top of stack (last item in an array)
-        const newIdx = this.#findNewUpperIndex(object, idx, intersecting);
+        const newIdx = this.findNewUpperIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
         this._onStackOrderChanged(object);
@@ -260,7 +260,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
       return true;
     }
 
-    #findNewLowerIndex(
+    findNewLowerIndex(
       object: FabricObject,
       idx: number,
       intersecting?: boolean
@@ -283,7 +283,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
       return newIdx;
     }
 
-    #findNewUpperIndex(
+    findNewUpperIndex(
       object: FabricObject,
       idx: number,
       intersecting?: boolean
