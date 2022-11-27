@@ -1861,8 +1861,6 @@ export class FabricObject<
     if (shouldCenterOrigin) {
       this._resetOrigin();
     }
-
-    return this;
   }
 
   /**

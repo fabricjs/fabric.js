@@ -29,7 +29,7 @@ export class FabricObjectObjectStraighteningMixin {
    * @chainable
    */
   straighten(this: FabricObject & this) {
-    return this.rotate(this._getAngleValueForStraighten());
+    this.rotate(this._getAngleValueForStraighten());
   }
 
   /**

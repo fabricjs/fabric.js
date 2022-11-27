@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import type { Group } from '../shapes/group.class';
-import type { StaticCanvas } from '../__types__';
+import type { Canvas, StaticCanvas } from '../__types__';
 
 type TAncestor = FabricObject | StaticCanvas;
 
@@ -34,7 +34,7 @@ export type AncestryComparison<Strict> = {
 
 export class FabricObjectAncestryMixin {
   group?: Group;
-  canvas?: StaticCanvas;
+  canvas?: StaticCanvas | Canvas;
 
   /**
    * Checks if object is descendant of target

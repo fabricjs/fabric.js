@@ -8,20 +8,22 @@ import { applyMixins } from '../util/applyMixins';
 
 // TODO somehow we have to make a tree-shakeable import
 
-applyMixins(InteractiveFabricObject, [
+const FabricObject = applyMixins(InteractiveFabricObject, [
   FabricObjectObjectStackingMixin,
   FabricObjectObjectStraighteningMixin,
   FabricObjectSVGExportMixin,
   FabricObjectObjectAnimationMixin,
 ]);
 
-// export interface InteractiveFabricObject
-//   extends FabricObjectAncestryMixin,
-//     FabricObjectObjectStackingMixin,
-//     FabricObjectObjectStraighteningMixin,
-//     FabricObjectSVGExportMixin,FabricObjectObjectAnimationMixin {}
+// TS should merge all these types on top of FabricObject but it doesn't
+export interface FabricObject
+  extends InteractiveFabricObject,
+    FabricObjectObjectStackingMixin,
+    FabricObjectObjectStraighteningMixin,
+    FabricObjectSVGExportMixin,
+    FabricObjectObjectAnimationMixin {}
 
 export { fabricObjectDefaultValues } from './object.class';
-export { InteractiveFabricObject as FabricObject };
+export { FabricObject };
 
-fabric.Object = InteractiveFabricObject;
+fabric.Object = FabricObject;
