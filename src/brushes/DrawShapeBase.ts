@@ -1,10 +1,7 @@
-import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
-
-// TODO: remove transient
-const { Shadow } = fabric;
 
 /**
  * Declarative shape drawing using pointer events
