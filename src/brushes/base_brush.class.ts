@@ -118,11 +118,6 @@ export abstract class BaseBrush {
     return color.getAlpha() < 1 || !!this.shadow;
   }
 
-  protected needsFullRender() {
-    const color = new Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
-  }
-
   /**
    * Sets brush shadow styles
    * @private
