@@ -10,13 +10,6 @@ import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 import { isWebGLPipelineState } from './typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 
-/**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#image_filters}
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
- */
-
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
 export type AbstractBaseFilterOptions = {
@@ -28,11 +21,6 @@ export type BaseFilterOptions = AbstractBaseFilterOptions & {
   fragmentSource: string;
 };
 
-/**
- * Root filter class from which all filter classes inherit from
- * @class fabric.Image.filters.BaseFilter
- * @memberOf fabric.Image.filters
- */
 export abstract class AbstractBaseFilter {
   /**
    * Filter type
