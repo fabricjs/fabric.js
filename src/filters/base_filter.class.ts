@@ -1,4 +1,3 @@
-import { Image } from '../shapes/image.class';
 import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
@@ -27,7 +26,7 @@ export abstract class AbstractBaseFilter {
    * @param {String} type
    * @default
    */
-  type = 'BaseFilter';
+  type: string;
 
   /**
    * Array of attributes to send with buffers. do not modify
