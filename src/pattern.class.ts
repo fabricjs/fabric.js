@@ -143,7 +143,7 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: 'pattern',

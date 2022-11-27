@@ -2,6 +2,7 @@
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
+import { ObjectEvents } from '../EventTypeDefs';
 import { TextStyle, TextStyleMixin } from '../mixins/text_style.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
@@ -57,7 +58,9 @@ const additionalProps = [
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  * @see {@link Text#initialize} for constructor definition
  */
-export class Text extends TextStyleMixin {
+export class Text<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends TextStyleMixin<EventSpec> {
   /**
    * Properties which when set cause object to change dimensions
    * @type Array

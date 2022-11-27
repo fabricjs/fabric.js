@@ -2,12 +2,15 @@
 
 import { fabric } from '../../HEADER';
 import { config } from '../config';
+import { ObjectEvents } from '../EventTypeDefs';
 import { TPointerEvent } from '../typedefs';
 import { capValue } from '../util/misc/capValue';
 import { ITextBehaviorMixin } from './itext_behavior.mixin';
 import type { TKeyMapIText } from './itext_key_const';
 
-export abstract class ITextKeyBehaviorMixin extends ITextBehaviorMixin {
+export abstract class ITextKeyBehaviorMixin<
+  EventSpec extends ObjectEvents
+> extends ITextBehaviorMixin<EventSpec> {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype

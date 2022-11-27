@@ -130,11 +130,11 @@ export const enlivenObjects = (
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
  */
-export const enlivenObjectEnlivables = (
+export const enlivenObjectEnlivables = <R = unknown>(
   serializedObject: any,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
-  new Promise<Record<string, unknown>>((resolve, reject) => {
+  new Promise<R>((resolve, reject) => {
     const instances: any[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property

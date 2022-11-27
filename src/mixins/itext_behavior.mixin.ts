@@ -1,9 +1,10 @@
 // @ts-nocheck
 
 import { fabric } from '../../HEADER';
+import { ObjectEvents, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
-import { TEvent, TPointerEvent } from '../typedefs';
+import { TPointerEvent } from '../typedefs';
 import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
@@ -14,7 +15,9 @@ import { TextStyleDeclaration } from './text_style.mixin';
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
-export abstract class ITextBehaviorMixin extends Text {
+export abstract class ITextBehaviorMixin<
+  EventSpec extends ObjectEvents
+> extends Text<EventSpec> {
   abstract isEditing: boolean;
   abstract cursorDelay: number;
   abstract selectionStart: number;
@@ -555,7 +558,7 @@ export abstract class ITextBehaviorMixin extends Text {
     const pointer = this.canvas.getPointer(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = this.canvas._isRetinaScaling();
-    const retinaScaling = this.canvas.getRetinaScaling();
+    const retinaScaling = this.getCanvasRetinaScaling();
     const bbox = this.getBoundingRect(true);
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
     const offset = correction.add(diff).scalarMultiply(retinaScaling);
@@ -949,7 +952,7 @@ export abstract class ITextBehaviorMixin extends Text {
         this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
         this.lineHeight,
       leftOffset = boundaries.leftOffset,
-      retinaScaling = this.canvas.getRetinaScaling(),
+      retinaScaling = this.getCanvasRetinaScaling(),
       upperCanvas = this.canvas.upperCanvasEl,
       upperCanvasWidth = upperCanvas.width / retinaScaling,
       upperCanvasHeight = upperCanvas.height / retinaScaling,
