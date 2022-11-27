@@ -1,4 +1,3 @@
-import { ControlCursorCallback, TransformActionHandler } from '../typedefs';
 import {
   ControlCursorCallback,
   TransformActionHandler,
