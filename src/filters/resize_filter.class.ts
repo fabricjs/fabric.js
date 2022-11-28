@@ -16,10 +16,9 @@ export class Resize extends BaseFilter {
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:
    * bilinear, hermite, sliceHack, lanczos.
-   * @param {String} resizeType
    * @default
    */
-  resizeType: string;
+  resizeType: 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
   /**
    * Scale factor for resizing, x axis
@@ -103,29 +102,26 @@ export class Resize extends BaseFilter {
    */
   generateShader(filterWindow: number) {
     const offsets = new Array(filterWindow);
-    let fragmentShader = this.fragmentSourceTOP;
-
     for (let i = 1; i <= filterWindow; i++) {
-      offsets[i - 1] = i + '.0 * uDelta';
+      offsets[i - 1] = `${i}.0 * uDelta`;
     }
-
-    fragmentShader += `
+    return `
+      ${this.fragmentSourceTOP}
       uniform float uTaps[${filterWindow}];
       void main() {
         vec4 color = texture2D(uTexture, vTexCoord);
         float sum = 1.0;
+      ${offsets
+        .map(
+          (offset, i) => `
+            color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
+            sum += 2.0 * uTaps[${i}];
+          `
+        )
+        .join('\n')}
+        gl_FragColor = color / sum;
       }
     `;
-
-    offsets.forEach((offset, i) => {
-      fragmentShader += `
-        color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
-        sum += 2.0 * uTaps[${i}];
-      `;
-    });
-    fragmentShader += '  gl_FragColor = color / sum;\n';
-    fragmentShader += '}';
-    return fragmentShader;
   }
 
   /**
