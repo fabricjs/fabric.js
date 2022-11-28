@@ -17,31 +17,33 @@
         });
         hooks.afterEach(() => canvas.off());
 
-        function runShapeBrushTest(brush, assert, e = {}) {
-          var fired = false;
-          var added = null;
-          canvas.on('interaction:completed', ({ result }) => {
-            fired = true;
-            added = result;
+        async function runShapeBrushTest(brush, assert, e = {}) {
+          let fired = false;
+          const result = await new Promise(resolve => {
+            canvas.on('interaction:completed', ({ result }) => {
+              fired = true;
+              resolve(result);
+            });
+            var pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
+            var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
+            var pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
+            brush.onMouseDown(pointer, { e });
+            brush.onMouseMove(pointer2, { e });
+            brush.onMouseMove(pointer3, { e });
+            brush.onMouseMove(pointer2, { e });
+            brush.onMouseMove(pointer3, { e });
+            brush.onMouseUp({ e, pointer: pointer3 });
           });
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
-          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
-          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
-          brush.onMouseDown(pointer, { e });
-          brush.onMouseMove(pointer2, { e });
-          brush.onMouseMove(pointer3, { e });
-          brush.onMouseMove(pointer2, { e });
-          brush.onMouseMove(pointer3, { e });
-          brush.onMouseUp({ e, pointer: pointer3 });
           assert.equal(fired, true, 'interaction:completed event should have fired');
-          return added;
+          return result;
         }
 
-        QUnit.test('Draw Shape', function (assert) {
+        QUnit.test('Draw Shape', async function (assert) {
+          const done = assert.async();
           const brush = new fabric.DrawShape(canvas);
           brush.width = 5;
-          const shape = runShapeBrushTest(brush, assert);
-          assert.ok(shape instanceof fabric.Rect, 'a rect is added');
+          const shape = await runShapeBrushTest(brush, assert);
+          assert.ok(shape instanceof fabric.Rect, 'a rect is drawn');
           assert.equal(shape.strokeWidth, 5, 'should set width');
           assert.equal(shape.width, 10, 'should set width');
           assert.equal(shape.height, 15, 'should set height');
@@ -49,10 +51,12 @@
             shape.translateToOriginPoint(shape.getCenterPoint(), 'left', 'top'),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Shape + symmetric', function (assert) {
-          const shape = runShapeBrushTest(new fabric.DrawShape(canvas), assert, {
+        QUnit.test('Draw Shape + symmetric', async function (assert) {
+          const done = assert.async();
+          const shape = await runShapeBrushTest(new fabric.DrawShape(canvas), assert, {
             shiftKey: true
           });
           assert.equal(Math.round(shape.width), 13, 'should set width to height value');
@@ -61,30 +65,36 @@
             shape.translateToOriginPoint(shape.getCenterPoint(), 'left', 'top'),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Shape + centered', function (assert) {
+        QUnit.test('Draw Shape + centered', async function (assert) {
+          const done = assert.async();
           const brush = new fabric.DrawShape(canvas);
           brush.centered = true;
-          const shape = runShapeBrushTest(brush, assert);
+          const shape = await runShapeBrushTest(brush, assert);
           assert.equal(shape.width, 10, 'should set width');
           assert.equal(shape.height, 15, 'should set height');
           assert.deepEqual(shape.getCenterPoint(), new fabric.Point(10, 10), 'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Shape + symmetric + centered', function (assert) {
+        QUnit.test('Draw Shape + symmetric + centered', async function (assert) {
+          const done = assert.async();
           const brush = new fabric.DrawShape(canvas);
           brush.centered = true;
-          const shape = runShapeBrushTest(brush, assert, {
+          const shape = await runShapeBrushTest(brush, assert, {
             shiftKey: true
           });
           assert.equal(Math.round(shape.width), 25, 'should set width');
           assert.equal(Math.round(shape.width), 25, 'should set height');
           assert.deepEqual(shape.getCenterPoint(), new fabric.Point(10, 10), 'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Oval', function (assert) {
-          const shape = runShapeBrushTest(new fabric.DrawOval(canvas), assert);
+        QUnit.test('Draw Oval', async function (assert) {
+          const done = assert.async();
+          const shape = await runShapeBrushTest(new fabric.DrawOval(canvas), assert);
           assert.equal(shape.rx, 5, 'should set rx');
           assert.equal(shape.ry, 7.5, 'should set ry');
           assert.equal(shape.width, 10, 'should set width');
@@ -93,12 +103,14 @@
             shape.translateToOriginPoint(shape.getCenterPoint(), 'left', 'top'),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Oval + centered', function (assert) {
+        QUnit.test('Draw Oval + centered', async function (assert) {
+          const done = assert.async();
           const brush = new fabric.DrawOval(canvas);
           brush.centered = true;
-          const shape = runShapeBrushTest(brush, assert);
+          const shape = await runShapeBrushTest(brush, assert);
           assert.equal(shape.rx, 10, 'should set rx');
           assert.equal(shape.ry, 15, 'should set ry');
           assert.equal(shape.width, 20, 'should set width');
@@ -107,10 +119,12 @@
             shape.getCenterPoint(),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Oval + symmetric', function (assert) {
-          const shape = runShapeBrushTest(new fabric.DrawOval(canvas), assert, {
+        QUnit.test('Draw Oval + symmetric', async function (assert) {
+          const done = assert.async();
+          const shape = await runShapeBrushTest(new fabric.DrawOval(canvas), assert, {
             shiftKey: true
           });
           assert.equal(shape.rx, 7.5, 'should set rx');
@@ -121,12 +135,14 @@
             shape.translateToOriginPoint(shape.getCenterPoint(), 'left', 'top'),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
-        QUnit.test('Draw Oval + centered + symmetric', function (assert) {
+        QUnit.test('Draw Oval + centered + symmetric', async function (assert) {
+          const done = assert.async();
           const brush = new fabric.DrawOval(canvas);
           brush.centered = true;
-          const shape = runShapeBrushTest(brush, assert, {
+          const shape = await runShapeBrushTest(brush, assert, {
             shiftKey: true
           });
           assert.equal(Math.round(shape.rx), 18, 'should set rx');
@@ -137,18 +153,24 @@
             shape.getCenterPoint(),
             new fabric.Point(10, 10),
             'should preserve position from mousedown');
+          done();
         });
 
         [fabric.Polygon, fabric.Polyline].forEach(builder => {
           QUnit.test(`Draw ${builder.name}`, function (assert) {
+            const done = assert.async();
             const brush = new fabric.DrawPoly(canvas);
             brush.builder = builder;
             const e = {};
-            let firePathCreatedEvent = false;
-            let poly = null;
-            canvas.on('interaction:completed', ({ result }) => {
-              firePathCreatedEvent = true;
-              poly = result;
+            assert.expect(3);
+            canvas.on('interaction:completed', ({ result: poly }) => {
+              assert.ok(poly instanceof builder, `should create poly of type ${builder.name}`);
+              assert.deepEqual(poly.points, [pointer, pointer2, pointer3], 'should set points');
+              assert.deepEqual(
+                poly.translateToOriginPoint(poly.getCenterPoint(), 'left', 'top'),
+                new fabric.Point(10, 10),
+                'should preserve position from mousedown');
+              done();
             });
             const pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             const pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
@@ -158,13 +180,6 @@
             brush.onMouseUp({ e, pointer: pointer2 });
             brush.onMouseMove(pointer2, { e });
             brush.onDoubleClick(pointer3);
-            assert.equal(firePathCreatedEvent, true, 'interaction:completed event should have fired');
-            assert.ok(poly instanceof builder, `should create poly of type ${builder.name}`);
-            assert.deepEqual(poly.points, [pointer, pointer2, pointer3], 'should set points');
-            assert.deepEqual(
-              poly.translateToOriginPoint(poly.getCenterPoint(), 'left', 'top'),
-              new fabric.Point(10, 10),
-              'should preserve position from mousedown');
           });
         });
       });
