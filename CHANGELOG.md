@@ -2,13 +2,11 @@
 
 ## [next]
 
-- chore(TS): migrate Polyline/Polygon [#8417](https://github.com/fabricjs/fabric.js/pull/8417)
 - feat(Brush): `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
   BREAKING:
   - brush doesn't add result to canvas anymore
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
-- ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)
 - feat(): Add `createObjectDefaultControls` and `createTextboxDefaultControls` to create copies of control sets. [#8415](https://github.com/fabricjs/fabric.js/pull/8415)
 - fix(PatternBrush): `getPatternSrc`, rm `getPatternSrcFunction` [#8468](https://github.com/fabricjs/fabric.js/pull/8468)
