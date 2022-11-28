@@ -15,9 +15,6 @@
       brush.onMouseUp(options);
     }
   }
-  function fireMouseUp(brush) {
-    brush.onMouseUp(options);
-  }
 
   // function eraserDrawer(points, brush, fireUp = false) {
   //   brush.canvas.calcViewportBoundaries();
@@ -2063,16 +2060,12 @@ QUnit.module('Free Drawing', hooks => {
     /**
      * render top and main context before mouseup
      */
-    mesh: true,
-    /**
-     * render canvas after mouseup
-     */
-    result: true,
-    /**
-     * compare visuals between `mesh` and `result`
-     */
-    compare: true
-  }
+    mesh: false,
+
+    fabricClass: 'Canvas',
+
+    disabled: fabric.isLikelyNode
+  };
 
   function freedrawing(canvas) {
     // eslint-disable-next-line
@@ -2087,11 +2080,10 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Simple free drawing',
     build: freedrawing,
-    golden: 'freedrawing1.png',
+    name: 'simple',
     percentage: 0.09,
     width: 100,
     height: 100,
-    fabricClass: 'Canvas'
   });
 
   function noOffset(canvas) {
@@ -2104,11 +2096,10 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Simple free drawing, large brush no offset',
     build: noOffset,
-    golden: 'freedrawing2.png',
+    name: 'largeNoOffset',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas'
   });
 
   function withShadow(canvas) {
@@ -2125,11 +2116,10 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Simple free drawing, with shadow',
     build: withShadow,
-    golden: 'freedrawing3.png',
+    name: 'shadow',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas'
   });
 
   function withOpacity(canvas) {
@@ -2140,20 +2130,16 @@ QUnit.module('Free Drawing', hooks => {
       color: 'green',
     });
     brush.width = 6;
-    pointDrawer(points, brush, false);
+    pointDrawer(points, brush);
   }
 
   tests.push({
     test: 'Simple free drawing, with opacity',
     build: withOpacity,
-    golden: 'freedrawing4.png',
+    name: 'opacity',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
-    targets: {
-      compare: false
-    }
   });
 
   function freedrawingWithDecimateToPoint(canvas) {
@@ -2170,14 +2156,10 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Simple free drawing to dot',
     build: freedrawingWithDecimateToPoint,
-    golden: 'freedrawing5.png',
+    name: 'dot',
     percentage: 0.09,
     width: 50,
     height: 50,
-    fabricClass: 'Canvas',
-    targets: {
-      compare: false
-    }
   });
 
   function withDecimation(canvas) {
@@ -2194,14 +2176,13 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Simple free drawing, with high decimation',
     build: withDecimation,
-    golden: 'freedrawing6.png',
+    name: 'decimation',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
     targets: {
       main: true,
-      compare: false
+      mesh: true
     }
   });
 
@@ -2219,14 +2200,13 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Pattern src from `getPatternSrc`',
     build: pattern,
-    golden: 'freedrawingPattern.png',
+    name: 'pattern',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
     targets: {
       main: true,
-      compare: false
+      mesh: true
     }
   });
 
@@ -2244,71 +2224,61 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'Pattern src from `source`',
     build: patternFromSource,
-    golden: 'freedrawingPatternSource.png',
+    name: 'patternSource',
     percentage: 0.09,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
     targets: {
       main: true,
-      compare: false
+      mesh: true
     }
   });
 
-  tests.forEach(function (test) {
-    const options = Object.assign({}, freeDrawingTestDefaults, test.targets);
-    QUnit.module(test.test, () => {
-      if (options.top) {
-        visualTester(Object.assign({}, test, {
-          test: 'top context',
-          golden: `top_ctx_${test.golden}`,
-          code: async function (canvas, callback) {
-            await test.build(canvas);
-            callback(canvas.upperCanvasEl);
-          },
-          disabled: fabric.isLikelyNode
-        }));
-      }
-      options.main && visualTester(Object.assign({}, test, {
+  tests.forEach(({ name, targets, test: testName, ...test }) => {
+    const { top, main, mesh, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
+    QUnit.module(testName, () => {
+      top && visualTester({
+        ...options,
+        test: 'top context',
+        golden: `freedrawing/${name}_top_ctx.png`,
+        code: async function (canvas, callback) {
+          canvas.on('interaction:completed', ({ result }) => {
+            canvas.cancelRequestedRender();
+          });
+          await test.build(canvas);
+          callback(canvas.upperCanvasEl);
+        }
+      });
+      main && visualTester({
+        ...options, 
         test: 'main context',
-        golden: `main_ctx_${test.golden}`,
+        golden: `freedrawing/${name}_main_ctx.png`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
             canvas.add(result);
+            canvas.cancelRequestedRender();
           });
           await test.build(canvas);
-          canvas.renderAll();
-          callback(canvas.lowerCanvasEl);
-        },
-        disabled: fabric.isLikelyNode
-      }));
-      options.mesh && visualTester(Object.assign({}, test, {
-        test: 'context mesh',
-        golden: `mesh_${test.golden}`,
-        code: async function (canvas, callback) {
-          canvas.on('interaction:completed', ({ result }) => {
-            canvas.add(result);
-          });
-          await test.build(canvas);
-          canvas.renderAll();
-          canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
-          callback(canvas.lowerCanvasEl);
-        },
-        disabled: fabric.isLikelyNode
-      }));
-      options.result && visualTester(Object.assign({}, test, {
-        test: 'result',
-        code: async function (canvas, callback) {
-          canvas.on('interaction:completed', ({ result }) => {
-            canvas.add(result);
-          });
-          await test.build(canvas);
-          fireMouseUp(canvas.freeDrawingBrush);
           canvas.renderAll();
           callback(canvas.lowerCanvasEl);
         }
-      }));
-      //options.compare && compareGoldens('mesh <> result', test.golden, `mesh_${test.golden}`, test.percentage);
+      });
+      mesh && visualTester({
+        ...options, 
+        test: 'context mesh',
+        golden: `freedrawing/${name}_mesh.png`,
+        code: async function (canvas, callback) {
+          canvas.on('interaction:completed', ({ result }) => {
+            canvas.add(result);
+            canvas.cancelRequestedRender();
+          });
+          await test.build(canvas);
+          const top = fabric.util.copyCanvasElement(canvas.upperCanvasEl);
+          canvas.renderAll();
+          canvas.contextContainer.drawImage(top, 0, 0);
+          callback(canvas.lowerCanvasEl);
+        }
+      });
     });
   });
 
