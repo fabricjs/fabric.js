@@ -119,6 +119,7 @@ export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
     }
   `,
   mainParameter: 'gamma',
+  gamma: [1, 1, 1],
 };
 
 Object.assign(Gamma.prototype, gammaDefaultValues);
