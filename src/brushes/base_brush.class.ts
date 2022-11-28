@@ -245,9 +245,11 @@ export abstract class BaseBrush<T extends FabricObject> {
       shape.setCoords();
       this.canvas.fire('interaction:completed', { result: shape });
     }
-    // in case 'interaction:completed' changes canvas visuals (which is what will happen in 99% of the time)
-    // we request rendering so there won't be a visual gap (flickering) between clearing the top context and the updated main context
-    this.canvas.contextTopDirty = true;
+    // in case 'interaction:completed' changes canvas visuals (which is likely to happen in 99% of the time)
+    // we request rendering so that there won't be a visual gap (flickering) between clearing the top context and the updated main context
+    this.canvas.once('before:render', () => {
+      this.canvas.clearContext(this.canvas.contextTop);
+    });
     this.canvas.requestRenderAll();
     return shape;
   }
