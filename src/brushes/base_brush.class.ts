@@ -125,11 +125,6 @@ export abstract class BaseBrush<T extends FabricObject> {
     );
   }
 
-  protected needsFullRender() {
-    const color = new Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
-  }
-
   /**
    * Sets brush shadow styles
    * @private
