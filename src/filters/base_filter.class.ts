@@ -19,7 +19,7 @@ export type AbstractBaseFilterOptions<T> = {
 
 export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
 
-export abstract class AbstractBaseFilter {
+export abstract class AbstractBaseFilter<T> {
   /**
    * Filter type
    * @param {String} type
@@ -33,6 +33,8 @@ export abstract class AbstractBaseFilter {
    */
   vertexSource: string;
 
+  fragmentSource: T;
+
   /**
    * Name of the parameter that can be changed in the filter.
    * Some filters have more than one parameter and there is no
@@ -45,7 +47,7 @@ export abstract class AbstractBaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Partial<AbstractBaseFilterOptions> = {}) {
+  constructor(options: Partial<AbstractBaseFilterOptions<T>> = {}) {
     this.setOptions(options);
   }
 
@@ -395,25 +397,9 @@ export abstract class AbstractBaseFilter {
   }
 }
 
-export abstract class BaseFilter extends AbstractBaseFilter {
-  fragmentSource: string;
-
-  constructor(options?: Partial<BaseFilterOptions>) {
-    super(options);
-  }
-
+export abstract class BaseFilter extends AbstractBaseFilter<string> {
   getFragmentSource() {
     return this.fragmentSource;
-  }
-}
-
-export abstract class BaseFilterFragmentMap extends AbstractBaseFilter {
-  fragmentSource: Record<string, string>;
-
-  constructor(
-    options?: Partial<AbstractBaseFilterOptions<Record<string, string>>>
-  ) {
-    super(options);
   }
 }
 

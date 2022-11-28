@@ -1,6 +1,6 @@
 import { Color } from '../color';
 import { TClassProperties } from '../typedefs';
-import { BaseFilterFragmentMap } from './base_filter.class';
+import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -20,7 +20,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends BaseFilterFragmentMap {
+export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.

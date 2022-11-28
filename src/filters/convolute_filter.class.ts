@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { BaseFilterFragmentMap } from './base_filter.class';
+import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -42,7 +42,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends BaseFilterFragmentMap {
+export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   /*
    * Opaque value (true/false)
    */

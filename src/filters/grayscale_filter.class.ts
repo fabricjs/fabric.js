@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { BaseFilterFragmentMap } from './base_filter.class';
+import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -9,7 +9,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends BaseFilterFragmentMap {
+export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   mode: 'average' | 'lightness' | 'luminosity';
 
   /**

@@ -2,7 +2,7 @@
 import { Image } from '../shapes/image.class';
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { BaseFilterFragmentMap } from './base_filter.class';
+import { AbstractBaseFilter } from './base_filter.class';
 import {
   T2DPipelineState,
   TWebGLPipelineState,
@@ -27,7 +27,7 @@ import { WebGLFilterBackend } from './webgl_backend.class';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendImage extends BaseFilterFragmentMap {
+export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
