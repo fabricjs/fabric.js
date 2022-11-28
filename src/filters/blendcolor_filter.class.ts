@@ -1,12 +1,7 @@
 import { Color } from '../color';
 import { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
-import {
-  T2DPipelineState,
-  TWebGLPipelineState,
-  TWebGLProgramCacheItem,
-  TWebGLUniformLocationMap,
-} from './typedefs';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Color Blend filter class
@@ -34,13 +29,17 @@ export class BlendColor extends AbstractBaseFilter {
    **/
   color: string;
 
-  /**
-   * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
-   * darken, lighten, overlay, exclusion, tint.
-   * @type String
-   * @default
-   **/
-  mode: string;
+  mode:
+    | 'multiply'
+    | 'add'
+    | 'diff'
+    | 'screen'
+    | 'subtract'
+    | 'darken'
+    | 'lighten'
+    | 'overlay'
+    | 'exclusion'
+    | 'tint';
 
   /**
    * alpha value. represent the strength of the blend color operation.
