@@ -205,7 +205,7 @@ export type CanvasEvents = StaticCanvasEvents &
   CanvasModifiedEvents &
   CanvasSelectionEvents & {
     // brushes
-    'interaction:completed': { result: FabricObject };
+    'interaction:completed': { result?: FabricObject };
 
     // erasing
     'erasing:start': never;

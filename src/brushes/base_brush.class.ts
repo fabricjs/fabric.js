@@ -243,7 +243,6 @@ export abstract class BaseBrush<T extends FabricObject> {
         clipPath: await this.createClipPath(shape),
       });
       shape.setCoords();
-      this.canvas.fire('interaction:completed', { result: shape });
     }
     // in case 'interaction:completed' changes canvas visuals (which is likely to happen in 99% of the time)
     // we request rendering so that there won't be a visual gap (flickering) between clearing the top context and the updated main context
@@ -251,6 +250,7 @@ export abstract class BaseBrush<T extends FabricObject> {
       this.canvas.clearContext(this.canvas.contextTop);
     });
     this.canvas.requestRenderAll();
+    this.canvas.fire('interaction:completed', { result: shape });
     return shape;
   }
 }
