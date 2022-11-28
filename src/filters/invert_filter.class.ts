@@ -4,7 +4,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * @example
- * var filter = new Invert();
+ * const filter = new Invert();
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
