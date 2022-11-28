@@ -2,7 +2,11 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { isWebGLPipelineState, T2DPipelineState } from './typedefs';
+import {
+  isWebGLPipelineState,
+  T2DPipelineState,
+  TWebGLPipelineState,
+} from './typedefs';
 
 /**
  * Resize image filter class
