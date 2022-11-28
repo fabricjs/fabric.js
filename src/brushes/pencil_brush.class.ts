@@ -285,7 +285,7 @@ export class PencilBrush extends BaseBrush<Path> {
 
   protected async finalize() {
     this.finalizePath();
-    super.finalize();
+    return super.finalize();
   }
 }
 

@@ -796,24 +796,12 @@ import { Point } from '../point.class';
        */
       finalize: async function () {
         this._isErasing = false;
-        this.finalizePath();
-        this._resetShadow();
-        const shape = this.finalizeShape();
-        if (shape) {
-          shape.set({
-            canvas: this.canvas,
-            shadow: this.shadow ? new Shadow(this.shadow) : undefined,
-            clipPath: await this.createClipPath(shape),
-          });
-          shape.setCoords();
-          this.canvas.fire('interaction:completed', { result: shape });
-          this.canvas.fire('before:path:created', { path: shape });
-          canvas.fire('erasing:end', await this.finalizeErasing(shape));
-          this.canvas.fire('path:created', { path: shape });
-        } else {
-          canvas.fire('erasing:end');
-        }
-        this.canvas.requestRenderAll();
+        const shape = await this.callSuper('finalize');
+        canvas.fire(
+          'erasing:end',
+          shape ? await this.finalizeErasing(shape) : undefined
+        );
+        return shape;
       },
     }
   );

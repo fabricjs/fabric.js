@@ -37,7 +37,7 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
   protected async finalize() {
     // release interaction
     this.canvas._isCurrentlyDrawing = false;
-    super.finalize();
+    return super.finalize();
   }
 
   onMouseDown(pointer: Point) {

@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
-import type { Shadow } from '../shadow.class';
+import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
@@ -244,16 +244,10 @@ export abstract class BaseBrush<T extends FabricObject> {
       });
       shape.setCoords();
       this.canvas.fire('interaction:completed', { result: shape });
-      // TODO: don't add to canvas by default
-      this.canvas.fire('before:path:created', { path: shape });
-      const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-      this.canvas.renderOnAddRemove = false;
-      this.canvas.add(shape);
-      this.canvas.fire('path:created', { path: shape });
-      this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
     }
     this.canvas.contextTopDirty = true;
     this.canvas.requestRenderAll();
+    return shape;
   }
 }
 

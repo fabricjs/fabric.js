@@ -205,8 +205,7 @@ export type CanvasEvents = StaticCanvasEvents &
   CanvasModifiedEvents &
   CanvasSelectionEvents & {
     // brushes
-    'before:path:created': { path: FabricObject };
-    'path:created': { path: FabricObject };
+    'interaction:completed': { result: FabricObject };
 
     // erasing
     'erasing:start': never;

@@ -18,15 +18,11 @@
         hooks.afterEach(() => canvas.off());
 
         function runShapeBrushTest(brush, assert, e = {}) {
-          var fireBeforePathCreatedEvent = false;
-          var firePathCreatedEvent = false;
+          var fired = false;
           var added = null;
-          canvas.on('before:path:created', function () {
-            fireBeforePathCreatedEvent = true;
-          });
-          canvas.on('path:created', function (opt) {
-            firePathCreatedEvent = true;
-            added = opt.path;
+          canvas.on('interaction:completed', ({ result }) => {
+            fired = true;
+            added = result;
           });
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
@@ -37,8 +33,7 @@
           brush.onMouseMove(pointer2, { e });
           brush.onMouseMove(pointer3, { e });
           brush.onMouseUp({ e, pointer: pointer3 });
-          assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
-          assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
+          assert.equal(fired, true, 'interaction:completed event should have fired');
           return added;
         }
 
@@ -149,15 +144,11 @@
             const brush = new fabric.DrawPoly(canvas);
             brush.builder = builder;
             const e = {};
-            let fireBeforePathCreatedEvent = false;
             let firePathCreatedEvent = false;
             let poly = null;
-            canvas.on('before:path:created', function () {
-              fireBeforePathCreatedEvent = true;
-            });
-            canvas.on('path:created', function (opt) {
+            canvas.on('interaction:completed', ({ result }) => {
               firePathCreatedEvent = true;
-              poly = opt.path;
+              poly = result;
             });
             const pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             const pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
@@ -167,8 +158,7 @@
             brush.onMouseUp({ e, pointer: pointer2 });
             brush.onMouseMove(pointer2, { e });
             brush.onDoubleClick(pointer3);
-            assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
-            assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
+            assert.equal(firePathCreatedEvent, true, 'interaction:completed event should have fired');
             assert.ok(poly instanceof builder, `should create poly of type ${builder.name}`);
             assert.deepEqual(poly.points, [pointer, pointer2, pointer3], 'should set points');
             assert.deepEqual(
