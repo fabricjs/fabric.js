@@ -1,6 +1,6 @@
 import { Color } from '../color';
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './base_filter.class';
+import { BaseFilterFragmentMap } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -20,7 +20,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends AbstractBaseFilter {
+export class BlendColor extends BaseFilterFragmentMap {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -48,11 +48,6 @@ export class BlendColor extends AbstractBaseFilter {
    * @default
    **/
   alpha: number;
-
-  /**
-   * Fragment source for the Multiply program
-   */
-  fragmentSource: Record<string, string>;
 
   /**
    * build the fragment source for the filters, joining the common part with

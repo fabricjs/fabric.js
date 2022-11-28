@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './base_filter.class';
+import { BaseFilterFragmentMap } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -9,9 +9,8 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends AbstractBaseFilter {
+export class Grayscale extends BaseFilterFragmentMap {
   mode: 'average' | 'lightness' | 'luminosity';
-  fragmentSource: Record<string, string>;
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.

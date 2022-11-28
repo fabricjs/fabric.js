@@ -11,14 +11,13 @@ import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
-export type AbstractBaseFilterOptions = {
+export type AbstractBaseFilterOptions<T> = {
   mainParameter: string;
   vertexSource: string;
+  fragmentSource: T;
 };
 
-export type BaseFilterOptions = AbstractBaseFilterOptions & {
-  fragmentSource: string;
-};
+export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
 
 export abstract class AbstractBaseFilter {
   /**
@@ -405,6 +404,16 @@ export abstract class BaseFilter extends AbstractBaseFilter {
 
   getFragmentSource() {
     return this.fragmentSource;
+  }
+}
+
+export abstract class BaseFilterFragmentMap extends AbstractBaseFilter {
+  fragmentSource: Record<string, string>;
+
+  constructor(
+    options?: Partial<AbstractBaseFilterOptions<Record<string, string>>>
+  ) {
+    super(options);
   }
 }
 

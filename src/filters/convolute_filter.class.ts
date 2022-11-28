@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './base_filter.class';
+import { BaseFilterFragmentMap } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
@@ -42,7 +42,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends AbstractBaseFilter {
+export class Convolute extends BaseFilterFragmentMap {
   /*
    * Opaque value (true/false)
    */
@@ -52,11 +52,6 @@ export class Convolute extends AbstractBaseFilter {
    * matrix for the filter, max 9x9
    */
   matrix: number[];
-
-  /**
-   * Fragment source for the brightness program
-   */
-  fragmentSource: Record<string, string>;
 
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
