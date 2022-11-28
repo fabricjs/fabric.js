@@ -1,18 +1,14 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
+import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
+import type { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/fabricObject.class';
-import { TEvent } from '../typedefs';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
-import type { Canvas, Shadow } from '../__types__';
+import { Canvas } from '../__types__';
 
-export type TBrushEventData = TEvent & { pointer: Point };
-
-/**
- * @todo remove transient
- */
-const { Shadow } = fabric;
+type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -127,6 +123,11 @@ export abstract class BaseBrush<T extends FabricObject> {
       !!this.shadow ||
       (this.clipPath && this.clipPath.isCacheDirty())
     );
+  }
+
+  protected needsFullRender() {
+    const color = new Color(this.color);
+    return color.getAlpha() < 1 || !!this.shadow;
   }
 
   /**

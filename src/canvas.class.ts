@@ -2,7 +2,7 @@
 import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
-import { Transform } from './typedefs';
+import { Transform } from './EventTypeDefs';
 import { saveObjectTransform } from './util/misc/objectTransforms';
 
 (function (global) {
@@ -441,10 +441,12 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
         this._objectsToRender = undefined;
         // removing active object should fire "selection:cleared" events
         if (obj === this._activeObject) {
-          this.fire('before:selection:cleared', { target: obj });
+          this.fire('before:selection:cleared', { deselected: [obj] });
           this._discardActiveObject();
-          this.fire('selection:cleared', { target: obj });
-          obj.fire('deselected');
+          this.fire('selection:cleared', { deselected: [obj] });
+          obj.fire('deselected', {
+            target: obj,
+          });
         }
         if (obj === this._hoveredTarget) {
           this._hoveredTarget = null;
@@ -548,7 +550,7 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
         var ctx = this.contextTop;
         this.clearContext(ctx);
         this.renderTopLayer(ctx);
-        this.fire('after:render');
+        this.fire('after:render', { ctx });
         return this;
       },
 
@@ -1363,7 +1365,10 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
         var currentActives = this.getActiveObjects(),
           activeObject = this.getActiveObject();
         if (currentActives.length) {
-          this.fire('before:selection:cleared', { target: activeObject, e: e });
+          this.fire('before:selection:cleared', {
+            e,
+            deselected: [activeObject],
+          });
         }
         this._discardActiveObject(e);
         this._fireSelectionEvents(currentActives, e);

@@ -1,15 +1,12 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { Point } from '../point.class';
+import { Circle } from '../shapes/circle.class';
 import { FabricObject } from '../shapes/fabricObject.class';
+import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
-
-/**
- * @todo remove transient
- */
-const { Circle, Group } = fabric;
 
 export type CircleBrushPoint = {
   x: number;

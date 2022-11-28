@@ -230,7 +230,8 @@ export abstract class BaseFilter {
    * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
    * @param {Object} options
    **/
-  isNeutralState(/* options */): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isNeutralState(options?: any): boolean {
     const main = this.mainParameter,
       // @ts-ignore ts you are lying
       proto = this.__proto__;
