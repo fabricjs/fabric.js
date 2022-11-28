@@ -2272,6 +2272,9 @@ QUnit.module('Free Drawing', hooks => {
       test: `${test.test} (main context)`,
       golden: `main_ctx_${test.golden}`,
       code: async function (canvas, callback) {
+        canvas.on('interaction:completed', ({ result }) => {
+          canvas.add(result);
+        });
         await test.build(canvas);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
@@ -2282,6 +2285,9 @@ QUnit.module('Free Drawing', hooks => {
       test: `${test.test} (context mesh)`,
       golden: `mesh_${test.golden}`,
       code: async function (canvas, callback) {
+        canvas.on('interaction:completed', ({ result }) => {
+          canvas.add(result);
+        });
         await test.build(canvas);
         canvas.renderAll();
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
@@ -2292,6 +2298,9 @@ QUnit.module('Free Drawing', hooks => {
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,
       code: async function (canvas, callback) {
+        canvas.on('interaction:completed', ({ result }) => {
+          canvas.add(result);
+        });
         await test.build(canvas);
         fireMouseUp(canvas.freeDrawingBrush);
         canvas.renderAll();
