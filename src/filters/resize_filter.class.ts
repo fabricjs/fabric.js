@@ -111,14 +111,14 @@ export class Resize extends BaseFilter {
       void main() {
         vec4 color = texture2D(uTexture, vTexCoord);
         float sum = 1.0;
-      ${offsets
-        .map(
-          (offset, i) => `
-            color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
-            sum += 2.0 * uTaps[${i}];
-          `
-        )
-        .join('\n')}
+        ${offsets
+          .map(
+            (offset, i) => `
+              color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
+              sum += 2.0 * uTaps[${i}];
+            `
+          )
+          .join('\n')}
         gl_FragColor = color / sum;
       }
     `;
