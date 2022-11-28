@@ -34,12 +34,7 @@ export class BlendImage extends AbstractBaseFilter {
    **/
   image: Image;
 
-  /**
-   * Blend mode for the filter (one of "multiply", "mask")
-   * @type String
-   * @default
-   **/
-  mode: string;
+  mode: 'multiply' | 'mask';
 
   /**
    * alpha value. represent the strength of the blend image operation.
