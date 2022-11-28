@@ -14,14 +14,16 @@ export class Composed extends BaseFilter {
   /**
    * A non sparse array of filters to apply
    */
-  subFilters: BaseFilter[];
+  subFilters: AbstractBaseFilter[];
 
-  setOptions({ subFilters, ...options }: Record<string, any>) {
-    if (subFilters) {
-      // safeguard against mutation
-      this.subFilters = [...subFilters];
-    }
-    super.setOptions(options);
+  constructor({
+    subFilters = [],
+    ...options
+  }: Partial<
+    filters.BaseFilterOptions & { subFilters: AbstractBaseFilter[] }
+  > = {}) {
+    super(options);
+    this.subFilters = subFilters;
   }
 
   /**
@@ -76,7 +78,6 @@ export class Composed extends BaseFilter {
 
 export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
   type: 'Composed',
-  subFilters: [],
 };
 
 Object.assign(Composed.prototype, composedDefaultValues);
