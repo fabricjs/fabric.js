@@ -1,7 +1,11 @@
 // @ts-nocheck
 import * as filters from '.';
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter, BaseFilter } from './base_filter.class';
+import {
+  AbstractBaseFilter,
+  BaseFilter,
+  BaseFilterOptions,
+} from './base_filter.class';
 import {
   isWebGLPipelineState,
   T2DPipelineState,
@@ -19,9 +23,7 @@ export class Composed extends BaseFilter {
   constructor({
     subFilters = [],
     ...options
-  }: Partial<
-    filters.BaseFilterOptions & { subFilters: AbstractBaseFilter[] }
-  > = {}) {
+  }: Partial<BaseFilterOptions & { subFilters: AbstractBaseFilter[] }> = {}) {
     super(options);
     this.subFilters = subFilters;
   }
