@@ -2256,58 +2256,60 @@ QUnit.module('Free Drawing', hooks => {
   });
 
   tests.forEach(function (test) {
-    var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
-    if (options.top) {
-      visualTester(Object.assign({}, test, {
-        test: `${test.test} (top context)`,
-        golden: `top_ctx_${test.golden}`,
+    const options = Object.assign({}, freeDrawingTestDefaults, test.targets);
+    QUnit.module(test.test, () => {
+      if (options.top) {
+        visualTester(Object.assign({}, test, {
+          test: 'top context',
+          golden: `top_ctx_${test.golden}`,
+          code: async function (canvas, callback) {
+            await test.build(canvas);
+            callback(canvas.upperCanvasEl);
+          },
+          disabled: fabric.isLikelyNode
+        }));
+      }
+      options.main && visualTester(Object.assign({}, test, {
+        test: 'main context',
+        golden: `main_ctx_${test.golden}`,
         code: async function (canvas, callback) {
+          canvas.on('interaction:completed', ({ result }) => {
+            canvas.add(result);
+          });
           await test.build(canvas);
-          callback(canvas.upperCanvasEl);
+          canvas.renderAll();
+          callback(canvas.lowerCanvasEl);
         },
         disabled: fabric.isLikelyNode
       }));
-    }
-    options.main && visualTester(Object.assign({}, test, {
-      test: `${test.test} (main context)`,
-      golden: `main_ctx_${test.golden}`,
-      code: async function (canvas, callback) {
-        canvas.on('interaction:completed', ({ result }) => {
-          canvas.add(result);
-        });
-        await test.build(canvas);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-      },
-      disabled: fabric.isLikelyNode
-    }));
-    options.mesh && visualTester(Object.assign({}, test, {
-      test: `${test.test} (context mesh)`,
-      golden: `mesh_${test.golden}`,
-      code: async function (canvas, callback) {
-        canvas.on('interaction:completed', ({ result }) => {
-          canvas.add(result);
-        });
-        await test.build(canvas);
-        canvas.renderAll();
-        canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
-        callback(canvas.lowerCanvasEl);
-      },
-      disabled: fabric.isLikelyNode
-    }));
-    options.result && visualTester(Object.assign({}, test, {
-      test: `${test.test} (result)`,
-      code: async function (canvas, callback) {
-        canvas.on('interaction:completed', ({ result }) => {
-          canvas.add(result);
-        });
-        await test.build(canvas);
-        fireMouseUp(canvas.freeDrawingBrush);
-        canvas.renderAll();
-        callback(canvas.lowerCanvasEl);
-      }
-    }));
-    //options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
+      options.mesh && visualTester(Object.assign({}, test, {
+        test: 'context mesh',
+        golden: `mesh_${test.golden}`,
+        code: async function (canvas, callback) {
+          canvas.on('interaction:completed', ({ result }) => {
+            canvas.add(result);
+          });
+          await test.build(canvas);
+          canvas.renderAll();
+          canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
+          callback(canvas.lowerCanvasEl);
+        },
+        disabled: fabric.isLikelyNode
+      }));
+      options.result && visualTester(Object.assign({}, test, {
+        test: 'result',
+        code: async function (canvas, callback) {
+          canvas.on('interaction:completed', ({ result }) => {
+            canvas.add(result);
+          });
+          await test.build(canvas);
+          fireMouseUp(canvas.freeDrawingBrush);
+          canvas.renderAll();
+          callback(canvas.lowerCanvasEl);
+        }
+      }));
+      //options.compare && compareGoldens('mesh <> result', test.golden, `mesh_${test.golden}`, test.percentage);
+    });
   });
 
 });
