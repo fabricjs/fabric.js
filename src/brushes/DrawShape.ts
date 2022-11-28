@@ -1,13 +1,13 @@
 import { fabric } from '../../HEADER';
+import { ModifierKey } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
-import { ModifierKey } from '../typedefs';
 import { TBrushEventData } from './base_brush.class';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawShape<
-  T extends typeof FabricObject = typeof Rect
+  T extends typeof FabricObject<any> = typeof Rect
 > extends DrawShapeBase<InstanceType<T>> {
   /**
    * class to build shape from

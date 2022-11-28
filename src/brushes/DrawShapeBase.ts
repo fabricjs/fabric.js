@@ -1,4 +1,5 @@
 import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { BaseBrush } from './base_brush.class';
 
@@ -29,6 +30,7 @@ export abstract class DrawShapeBase<
       strokeMiterLimit: this.strokeMiterLimit,
       strokeLineJoin: this.strokeLineJoin,
       strokeDashArray: this.strokeDashArray,
+      shadow: this.shadow ? new Shadow(this.shadow) : undefined,
     });
   }
 
