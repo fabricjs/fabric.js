@@ -33,6 +33,7 @@ export class BlendColor extends AbstractBaseFilter {
     | 'multiply'
     | 'add'
     | 'diff'
+    | 'difference'
     | 'screen'
     | 'subtract'
     | 'darken'
