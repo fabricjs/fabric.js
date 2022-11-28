@@ -509,12 +509,19 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
           return;
         }
         if (
-          this.contextTopDirty &&
-          !this._groupSelector &&
-          !this.isDrawingMode
+          (this.contextTopDirty &&
+            !this._groupSelector &&
+            !this.isDrawingMode) ||
+          this.shouldClearContextTop
         ) {
           this.clearContext(this.contextTop);
           this.contextTopDirty = false;
+          if (this.shouldClearContextTop) {
+            // in case we are rendering a requested render state might have changed
+            // so we render top layer to sync visuals
+            this.hasLostContext = true;
+            this.shouldClearContextTop = false;
+          }
         }
         if (this.hasLostContext) {
           this.renderTopLayer(this.contextTop);
