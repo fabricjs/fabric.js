@@ -5,7 +5,7 @@ import { Group } from '../shapes/group.class';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export type SprayBrushPoint = {
   x: number;
@@ -127,7 +127,8 @@ export class SprayBrush extends BaseBrush<FabricObject> {
    * Invoked on mouse down
    * @param {Point} pointer
    */
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    super.onMouseDown(pointer, ev);
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setBrushStyles();

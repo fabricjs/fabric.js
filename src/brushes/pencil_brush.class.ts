@@ -5,7 +5,7 @@ import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import { Canvas } from '../__types__';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 /**
  * @private
@@ -64,11 +64,13 @@ export class PencilBrush extends BaseBrush<Path> {
    * Invoked on mouse down
    * @param {Point} pointer
    */
-  onMouseDown(pointer: Point, { e }: TEvent) {
-    if (!this.canvas._isMainEvent(e)) {
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    super.onMouseDown(pointer, ev);
+    if (!this.canvas._isMainEvent(ev.e)) {
       return;
     }
-    this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
+    this.drawStraightLine =
+      !!this.straightLineKey && ev.e[this.straightLineKey];
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
@@ -108,7 +110,6 @@ export class PencilBrush extends BaseBrush<Path> {
     this.drawStraightLine = false;
     this.oldEnd = undefined;
     this.finalize();
-    return false;
   }
 
   /**

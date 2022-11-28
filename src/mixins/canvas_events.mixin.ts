@@ -902,12 +902,14 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} e Event object fired on mousedown
        */
       _onMouseDownInDrawingMode: function (e) {
-        this._isCurrentlyDrawing = true;
+        let dirty = false;
         if (this.getActiveObject()) {
-          this.discardActiveObject(e).requestRenderAll();
+          this.discardActiveObject(e);
+          dirty = true;
         }
-        var pointer = this.getPointer(e);
-        this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
+        const pointer = this.getPointer(e);
+        this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
+        dirty && this.requestRenderAll();
         this._handleEvent(e, 'down');
       },
 
@@ -933,7 +935,7 @@ import { fireEvent } from '../util/fireEvent';
        */
       _onMouseUpInDrawingMode: function (e) {
         var pointer = this.getPointer(e);
-        this._isCurrentlyDrawing = this.freeDrawingBrush.onMouseUp({
+        this.freeDrawingBrush.onMouseUp({
           e: e,
           pointer: pointer,
         });

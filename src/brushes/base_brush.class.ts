@@ -90,12 +90,19 @@ export abstract class BaseBrush<T extends FabricObject> {
   }
 
   protected abstract _render(ctx: CanvasRenderingContext2D): void;
-  abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    this.canvas._isCurrentlyDrawing = true;
+  }
+
   abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
+
   /**
    * @returns true if brush should continue blocking interaction
    */
-  abstract onMouseUp(ev: TBrushEventData): boolean | void;
+  abstract onMouseUp(ev: TBrushEventData): void;
+
   protected abstract finalizeShape(): T | undefined;
 
   /**
@@ -234,6 +241,8 @@ export abstract class BaseBrush<T extends FabricObject> {
   }
 
   protected async finalize() {
+    // release interaction
+    this.canvas._isCurrentlyDrawing = false;
     this._resetShadow();
     const shape = this.finalizeShape();
     if (shape) {

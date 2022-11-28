@@ -60,7 +60,8 @@ export class DrawShape<
     }
   }
 
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    super.onMouseDown(pointer, ev);
     this.build();
     this.start = pointer;
   }

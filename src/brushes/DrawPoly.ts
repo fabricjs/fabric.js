@@ -2,6 +2,7 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
+import { TBrushEventData } from './base_brush.class';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawPoly extends DrawShapeBase<Polyline> {
@@ -34,13 +35,8 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
     return shape;
   }
 
-  protected async finalize() {
-    // release interaction
-    this.canvas._isCurrentlyDrawing = false;
-    return super.finalize();
-  }
-
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    super.onMouseDown(pointer, ev);
     if (this.shape) {
       this.addPoint(pointer);
     } else {

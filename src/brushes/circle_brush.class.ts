@@ -6,7 +6,7 @@ import { FabricObject } from '../shapes/fabricObject.class';
 import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export type CircleBrushPoint = {
   x: number;
@@ -90,7 +90,8 @@ export class CircleBrush extends BaseBrush<FabricObject> {
   /**
    * Invoked on mouse down
    */
-  onMouseDown(pointer: Point) {
+  onMouseDown(pointer: Point, ev: TBrushEventData) {
+    super.onMouseDown(pointer, ev);
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
