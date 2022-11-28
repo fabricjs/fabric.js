@@ -530,11 +530,12 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
   scaleX: 1,
   scaleY: 1,
   lanczosLobes: 3,
-  fragmentSourceTOP:
-    'precision highp float;\n' +
-    'uniform sampler2D uTexture;\n' +
-    'uniform vec2 uDelta;\n' +
-    'varying vec2 vTexCoord;\n',
+  fragmentSourceTOP: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform vec2 uDelta;
+    varying vec2 vTexCoord;
+  `,
 };
 
 Object.assign(Resize.prototype, resizeDefaultValues);

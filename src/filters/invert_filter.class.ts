@@ -89,24 +89,25 @@ export class Invert extends BaseFilter {
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
   type: 'Invert',
   alpha: false,
-  fragmentSource:
-    'precision highp float;\n' +
-    'uniform sampler2D uTexture;\n' +
-    'uniform int uInvert;\n' +
-    'uniform int uAlpha;\n' +
-    'varying vec2 vTexCoord;\n' +
-    'void main() {\n' +
-    'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-    'if (uInvert == 1) {\n' +
-    'if (uAlpha == 1) {\n' +
-    'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n' +
-    '} else {\n' +
-    'gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n' +
-    '}\n' +
-    '} else {\n' +
-    'gl_FragColor = color;\n' +
-    '}\n' +
-    '}',
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform int uInvert;
+    uniform int uAlpha;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      if (uInvert == 1) {
+        if (uAlpha == 1) {
+          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);
+        } else {
+          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);
+        }
+      } else {
+        gl_FragColor = color;
+      }
+    }
+    `,
   invert: true,
   mainParameter: 'invert',
 };
