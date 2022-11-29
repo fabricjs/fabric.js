@@ -56,7 +56,7 @@ jobs:
             console.log(context.payload.pull_request);
             const releaseLabels = context.payload.pull_request.labels
               .map((label) => label.name)
-              .filter((label) => label.startsWidth(LABEL_PREFIX));
+              .filter((label) => label.startsWith(LABEL_PREFIX));
             if (releaseLabels.length > 1) {
               setFailed(`Found more than one release label: ${releaseLabels.join(', ')}`);
               return;
