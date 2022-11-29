@@ -28,18 +28,21 @@ jobs:
             const v = semver.inc(version, 'prerelease', 'rc')
             const tag = `v${v}`;
             const { owner, repo } = context.repo;
+            console.log({owner, repo,tag})
             try {
               const { id } = await github.rest.repos.getReleaseByTag({
                 owner,
                 repo,
                 tag,
               });
+              console.log(id)
               return github.rest.repos.updateRelease({
                 owner,
                 repo,
                 release_id: id,
               });
             } catch(error) {
+              console.log('p')
               return github.rest.repos.createRelease({
                 owner,
                 repo,
