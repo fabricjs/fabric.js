@@ -52,7 +52,7 @@ jobs:
               return;
             }
             // increment version
-            const nextVersion = semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease');
+            const nextVersion = semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', 'rc');
 
             // write file
             fs.writeFileSync('./package.json', JSON.stringify({ 
