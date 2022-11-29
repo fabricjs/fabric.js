@@ -55,7 +55,7 @@ jobs:
               ...JSON.parse(fs.readFileSync('./package.json')), 
               version: nextVersion
             }, null, 2));
-            execSync('prettier --write package.json');
+            execSync('npx prettier --write package.json');
 
             return nextVersion;
       - name: Commit & Push
