@@ -36,6 +36,12 @@ jobs:
                 tag,
               });
               console.log(res)
+              const res1 = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag:'v5.2.4',
+              });
+              console.log(res1)
               return
               return github.rest.repos.updateRelease({
                 owner,
