@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [master, ci-prerelease]
+    branches: [master]
 
 jobs:
   release-on-push:
@@ -25,8 +25,7 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            const v = semver.inc(version, 'prerelease', 'rc')
-            const tag = `v${v}`;
+            const tag = `v${version}`;
             const { owner, repo } = context.repo;
             let res;
             try {
@@ -48,8 +47,8 @@ jobs:
                 repo,
                 tag_name: tag,
                 generate_release_notes: true,
-                prerelease: !!semver.prerelease(v)
+                prerelease: !!semver.prerelease(version)
               });
             }
-            console.log(`View ${tag}: ${res.data.html_url}`);
+            console.log(`View ${tag} at ${res.data.html_url}`);
             return res;
