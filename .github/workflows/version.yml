@@ -3,6 +3,8 @@ name: '🏷️'
 on:
   pull_request:
     branches: [master]
+  pull_request_review:
+    types: [submitted, dismissed]
 
 jobs:
   master-version:
