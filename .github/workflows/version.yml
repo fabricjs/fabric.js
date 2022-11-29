@@ -58,8 +58,7 @@ jobs:
               .map((label) => label.name)
               .filter((label) => label.startsWith(LABEL_PREFIX));
             if (releaseLabels.length > 1) {
-              setFailed(`Found more than one release label: ${releaseLabels.join(', ')}`);
-              return;
+              throw new Error(`Found more than one release label: ${releaseLabels.join(', ')}`);
             }
             // increment version
             const nextVersion = semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', 'rc');
