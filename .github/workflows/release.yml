@@ -20,7 +20,7 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            const tag = `v${version}`;
+            const tag = `v${semver.inc(version, 'prerelease', 'rc')}`;
             const { owner, repo } = context.repo;
             try {
               const { id } = await github.rest.repos.getReleaseByTag({
