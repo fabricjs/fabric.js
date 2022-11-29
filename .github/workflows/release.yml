@@ -28,6 +28,7 @@ jobs:
             const v = semver.inc(version, 'prerelease', 'rc')
             const tag = `v${v}`;
             const { owner, repo } = context.repo;
+            let res;
             try {
               const { data: { id } } = await github.rest.repos.getReleaseByTag({
                 owner,
@@ -35,14 +36,14 @@ jobs:
                 tag,
               });
               console.log(`Updating release ${tag}`);
-              return github.rest.repos.updateRelease({
+              res = await github.rest.repos.updateRelease({
                 owner,
                 repo,
                 release_id: id,
               });
             } catch(error) {
               console.log(`Releasing ${tag}`);
-              return github.rest.repos.createRelease({
+              res = await github.rest.repos.createRelease({
                 owner,
                 repo,
                 tag_name: tag,
@@ -50,3 +51,5 @@ jobs:
                 prerelease: !!semver.prerelease(v)
               });
             }
+            console.log(`View ${tag}: ${res.data.html_url}`);
+            return res;
