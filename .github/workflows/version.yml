@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          ref: ${{ github.head_ref }}
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
@@ -74,7 +75,7 @@ jobs:
           git config user.email github-actions[bot]@users.noreply.github.com
           git add package.json
           git commit -m "v${{ steps.inc-version.outputs.result }}"
-          git push HEAD:${{ github.head_ref  }}
+          git push
   release-on-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
