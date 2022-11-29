@@ -2,17 +2,10 @@ name: '🏷️'
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    type:
-      - labeled
-      - unlabeled
-      - opened
-      - edited
-      - reopened
-    branches:
-      - master
+    type: [labeled, unlabeled, opened, edited reopened]
+    branches: [master]
 
 jobs:
   increment-version:
