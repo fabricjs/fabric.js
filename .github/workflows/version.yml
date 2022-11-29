@@ -53,7 +53,6 @@ jobs:
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
-            console.log(context.payload.pull_request);
             const releaseLabels = context.payload.pull_request.labels
               .map((label) => label.name)
               .filter((label) => label.startsWith(LABEL_PREFIX));
