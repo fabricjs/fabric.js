@@ -6,7 +6,7 @@ on:
 
 jobs:
   master-version:
-    if: ${{ github.sender.type == 'User' }}
+    if: github.sender.type == 'User'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ env.BASE_VERSION }}
