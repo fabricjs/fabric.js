@@ -2,6 +2,7 @@ import { iMatrix } from '../../constants';
 import type { Point } from '../../point.class';
 import type { FabricObject } from '../../shapes/fabricObject.class';
 import type { TMat2D } from '../../typedefs';
+import { StaticCanvas } from '../../__types__';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
@@ -71,7 +72,7 @@ export const sendPointToPlane = (
  */
 export const transformPointRelativeToCanvas = (
   point: Point,
-  canvas: any,
+  canvas: StaticCanvas,
   relationBefore: ObjectRelation,
   relationAfter: ObjectRelation
 ): Point => {
