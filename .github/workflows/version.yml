@@ -86,12 +86,11 @@ jobs:
   release-on-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: master-version
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      - name: Get version
+      - name: Release
         id: version
         uses: actions/github-script@v6
         with:
