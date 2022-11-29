@@ -2,36 +2,36 @@ name: '🏷️'
 
 on:
   push:
-    branches: [master]
+    branches: [master, ci-prerelease]
   pull_request:
     branches: [master]
 
 jobs:
-  increment-version:
+  master-version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.BASE_VERSION }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: base version
+        run: echo "BASE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+  increment-version:
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: master-version
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
-          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: npm
       - run: npm ci
-      - run: git checkout origin/master package.json
-      - name: Get Current Version
-        id: version
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const fs = require('fs');
-            return JSON.parse(fs.readFileSync('./package.json')).version;
-      - run: git restore package.json -s ${{ github.head_ref }}
       - name: Increment Version
         id: inc-version
         uses: actions/github-script@v6
@@ -40,6 +40,7 @@ jobs:
             norelease
             CI/CD
             docs
+          BASE_VERSION: ${{ needs.master-version.outputs.version }}
         with:
           result-encoding: string
           script: |
@@ -47,7 +48,7 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
 
-            const version = '${{ steps.version.outputs.result }}';
+            const version = process.env.BASE_VERSION;
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
             const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
             const shouldInc = !context.payload.pull_request.labels
@@ -85,6 +86,7 @@ jobs:
   release-on-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    needs: master-version
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -96,9 +98,27 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
+            const semver = require('semver');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            return version;
-      - name: Release on Push
-        uses: rymndhng/release-on-push-action@v0.27.0
-        with:
-          release_name: v${{ steps.version.outputs.result }}
+            const tag = `v${version}`;
+            const { owner, repo } = context.repo;
+            try {
+              const { id } = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag,
+              });
+              return github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: id,
+              });
+            } catch(error) {
+              return github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: tag,
+                generate_release_notes: true
+                prerelease: semver.prerelease(version)
+              });
+            }
