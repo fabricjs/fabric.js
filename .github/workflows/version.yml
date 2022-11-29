@@ -4,13 +4,12 @@ on:
   push:
     branches:
       - master
-      - ci-prerelease
   pull_request:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   increment-version:
-    id: versioning
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
