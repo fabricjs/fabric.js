@@ -44,6 +44,7 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
             const version = '${{ steps.version.outputs.result }}';
+            const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
             const releaseLabels = context.payload.pull_request.labels
@@ -63,7 +64,7 @@ jobs:
             }, null, 2));
             execSync('npx prettier --write package.json');
 
-            return nextVersion !== version ? nextVersion: '';
+            return nextVersion !== headVersion ? nextVersion: '';
       - name: Commit & Push
         if: steps.inc-version.outputs.result
         run: |
