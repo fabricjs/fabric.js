@@ -15,4 +15,4 @@ jobs:
       - name: Release on Push
         uses: rymndhng/release-on-push-action@v0.27.0
         with:
-          bump_version_scheme: minor
+          bump_version_scheme: norelease
