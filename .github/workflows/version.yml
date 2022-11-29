@@ -24,9 +24,9 @@ jobs:
         with:
           result-encoding: string
           script: |
-            import { execSync } from 'child_process';
-            import fs from 'fs';
-            import semver from 'semver';
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const semver = require('semver');
 
             // get version from master
             execSync('git checkout master package.json');
@@ -83,7 +83,7 @@ jobs:
         with:
           result-encoding: string
           script: |
-            import fs from 'fs';
+            const fs = require('fs');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             return version;
       - name: Release on Push
