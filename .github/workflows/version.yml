@@ -5,14 +5,89 @@ on:
     branches:
       - master
       - ci-prerelease
+  pull_request:
+    branches: [master]
 
 jobs:
-  release-on-push:
+  increment-version:
+    id: versioning
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Increment Version
+        id: version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import semver from 'semver';
+
+            // get version from master
+            execSync('git checkout master package.json');
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            // restore file in case we commit
+            execSync('git restore package.json');
+
+            // get version level from PR label
+            const { labels } = await github.rest.pulls.get({
+              pull_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const LABEL_PREFIX = 'release:';
+            const releaseLabels = labels.filter((label) =>
+              label.startsWidth(LABEL_PREFIX)
+            );
+            if (releaseLabels.length > 1) {
+              setFailed(`Found more than one release label: ${releaseLabels.join(', ')}`);
+              return;
+            }
+            // increment version
+            const nextVersion = semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease');
+
+            // write file
+            fs.writeFileSync('./package.json', JSON.stringify({ 
+              ...JSON.parse(fs.readFileSync('./package.json')), 
+              version: nextVersion
+            }, null, 2));
+            execSync('prettier --write package.json');
+
+            return nextVersion;
+      - name: Commit & Push
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add package.json
+          git commit -m "v${{ steps.version.outputs.result }}"
+          git push
+      - name: finalize
+        if: always()
+        run: |
+          echo "DONE"
+  release-on-push:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get version
+        id: version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            import fs from 'fs';
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            return version;
       - name: Release on Push
         uses: rymndhng/release-on-push-action@v0.27.0
         with:
-          bump_version_scheme: norelease
+          release_name: v${{ steps.version.outputs.result }}
