@@ -39,13 +39,8 @@ jobs:
             execSync('git restore package.json');
 
             // get version level from PR label
-            const { labels } = await github.rest.pulls.get({
-              pull_number: context.pull_request.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
             const LABEL_PREFIX = 'release:';
-            const releaseLabels = labels.filter((label) =>
+            const releaseLabels = context.pull_request.filter((label) =>
               label.startsWidth(LABEL_PREFIX)
             );
             if (releaseLabels.length > 1) {
