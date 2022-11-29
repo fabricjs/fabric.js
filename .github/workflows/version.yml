@@ -64,7 +64,7 @@ jobs:
             }
             // increment version
             const nextVersion = shouldInc ?
-              semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', 'rc'):
+              semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', 'rc') :
               version;
 
             // write file
