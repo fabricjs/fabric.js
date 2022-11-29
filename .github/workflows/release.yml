@@ -25,7 +25,8 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            const tag = `v${semver.inc(version, 'prerelease', 'rc')}`;
+            const v = semver.inc(version, 'prerelease', 'rc')
+            const tag = `v${v}`;
             const { owner, repo } = context.repo;
             try {
               const { id } = await github.rest.repos.getReleaseByTag({
@@ -44,6 +45,6 @@ jobs:
                 repo,
                 tag_name: tag,
                 generate_release_notes: true,
-                prerelease: !!semver.prerelease(version)
+                prerelease: !!semver.prerelease(v)
               });
             }
