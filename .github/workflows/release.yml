@@ -41,7 +41,7 @@ jobs:
                 repo,
                 tag:'v5.2.4',
               });
-              console.log(res1)
+              console.log(res1);
               return
               return github.rest.repos.updateRelease({
                 owner,
