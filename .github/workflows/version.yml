@@ -37,7 +37,7 @@ jobs:
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             // restore file in case we commit
             execSync('git restore package.json');
-console.log(context)
+            console.log(context)
             // get version level from PR label
             const { labels } = await github.rest.pulls.get({
               pull_number: context.number,
