@@ -23,21 +23,15 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
+      - run: git checkout origin/master package.json
       - name: Get Current Version
         id: version
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-
-            // get version from master
-            execSync('git checkout origin/master package.json');
-            const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            // restore file in case we commit
-            execSync('git restore package.json');
-            return version;
+            return (await import('${{ github.workspace }}/package.json')).version;
+      - run: git restore package.json
       - name: Increment Version
         id: inc-version
         uses: actions/github-script@v6
