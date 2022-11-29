@@ -32,7 +32,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.parse(fs.readFileSync('./package.json')).version;
-      - run: git restore package.json
+      - run: git restore package.json --staged
       - name: Increment Version
         id: inc-version
         uses: actions/github-script@v6
