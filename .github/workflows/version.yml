@@ -50,7 +50,7 @@ jobs:
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
             const releaseLabels = context.payload.pull_request.labels
-              .map(label => label.name)
+              .map((label) => label.name)
               .filter((label) => label.startsWidth(LABEL_PREFIX));
             if (releaseLabels.length > 1) {
               setFailed(`Found more than one release label: ${releaseLabels.join(', ')}`);
@@ -74,7 +74,7 @@ jobs:
           git config user.email github-actions[bot]@users.noreply.github.com
           git add package.json
           git commit -m "v${{ steps.inc-version.outputs.result }}"
-          git push HEAD:${{ github.event.pull_request.head.ref }}
+          git push HEAD:${{ github.head_ref  }}
   release-on-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
