@@ -6,6 +6,7 @@ on:
 
 jobs:
   master-version:
+    if: ${{ github.sender.type == 'User' }}
     runs-on: ubuntu-latest
     outputs:
       version: ${{ env.BASE_VERSION }}
@@ -44,7 +45,6 @@ jobs:
             const { execSync } = require('child_process');
             const fs = require('fs');
             const semver = require('semver');
-            console.log(context.payload.sender.type);
             const version = process.env.BASE_VERSION;
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
             const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
