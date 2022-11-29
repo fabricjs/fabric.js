@@ -33,7 +33,7 @@ jobs:
             const semver = require('semver');
 
             // get version from master
-            execSync('git checkout master package.json');
+            execSync('git checkout upstream/master package.json');
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             // restore file in case we commit
             execSync('git restore package.json');
