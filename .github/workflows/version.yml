@@ -4,36 +4,12 @@ on:
   push:
     branches: [master]
   pull_request:
-    type: [labeled, unlabeled, opened, edited, reopened]
     branches: [master]
 
 jobs:
-  should-increment:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    outputs:
-      result: ${{ steps.labeled.outputs.result }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Query PR Labels
-        id: labeled
-        uses: actions/github-script@v6
-        env:
-          NO_RELEASE_TAGS: |
-            norelease
-            CI/CD
-            docs
-        with:
-          result-encoding: string
-          script: |
-            const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
-            return !context.payload.pull_request.labels
-              .some((label) => blockingTags.includes(label.name));
   increment-version:
     runs-on: ubuntu-latest
-    needs: should-increment
-    if: github.event_name == 'pull_request' && fromJSON(needs.should-increment.outputs.result)
+    if: github.event_name == 'pull_request'
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -59,14 +35,24 @@ jobs:
       - name: Increment Version
         id: inc-version
         uses: actions/github-script@v6
+        env:
+          NO_RELEASE_TAGS: |
+            norelease
+            CI/CD
+            docs
         with:
           result-encoding: string
           script: |
             const { execSync } = require('child_process');
             const fs = require('fs');
             const semver = require('semver');
+
             const version = '${{ steps.version.outputs.result }}';
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
+            const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
+            const shouldInc = !context.payload.pull_request.labels
+              .some((label) => blockingTags.includes(label.name));
+
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
             const releaseLabels = context.payload.pull_request.labels
@@ -85,7 +71,9 @@ jobs:
             }, null, 2));
             execSync('npx prettier --write package.json');
 
-            return nextVersion !== headVersion ? nextVersion: '';
+            return nextVersion !== headVersion ? 
+              shouldInc ? nextVersion : version
+              : '';
       - name: Commit & Push
         if: steps.inc-version.outputs.result
         run: |
