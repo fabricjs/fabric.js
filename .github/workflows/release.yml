@@ -6,6 +6,7 @@ on:
 
 jobs:
   release-on-push:
+    name: Release a Version
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,20 +30,18 @@ jobs:
             const tag = `v${v}`;
             const { owner, repo } = context.repo;
             console.log({owner, repo,tag})
-            try {
-              const { id } = await github.rest.repos.getReleaseByTag({
-                owner,
-                repo,
-                tag,
-              });
-              console.log(id)
+            const { id } = await github.rest.repos.getReleaseByTag({
+              owner,
+              repo,
+              tag,
+            });
+            if (id) {
               return github.rest.repos.updateRelease({
                 owner,
                 repo,
                 release_id: id,
               });
-            } catch(error) {
-              console.log('p')
+            } else {
               return github.rest.repos.createRelease({
                 owner,
                 repo,
