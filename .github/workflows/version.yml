@@ -16,16 +16,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
-          cache: npm
-      - run: npm ci
-      - run: git checkout origin/master package.json
       - name: Query PR Labels
         id: labeled
         uses: actions/github-script@v6
@@ -38,7 +28,6 @@ jobs:
           result-encoding: string
           script: |
             const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
-            console.log(blockingTags)
             return !context.payload.pull_request.labels
               .some((label) => blockingTags.includes(label.name));
   increment-version:
