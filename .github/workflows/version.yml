@@ -5,6 +5,12 @@ on:
     branches:
       - master
   pull_request:
+    type:
+      - labeled
+      - unlabeled
+      - opened
+      - edited
+      - reopened
     branches:
       - master
 
