@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    branches: [master, ci-prerelease]
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Release
+        id: version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const semver = require('semver');
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            const tag = `v${version}`;
+            const { owner, repo } = context.repo;
+            try {
+              const { id } = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag,
+              });
+              return github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: id,
+              });
+            } catch(error) {
+              return github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: tag,
+                generate_release_notes: true
+                prerelease: semver.prerelease(version)
+              });
+            }
