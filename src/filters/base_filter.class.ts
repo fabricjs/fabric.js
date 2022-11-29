@@ -1,47 +1,43 @@
-import { fabric } from '../../HEADER';
-import type {
-  TWebGLPipelineState,
-  T2DPipelineState,
-  TWebGLUniformLocationMap,
-  TWebGLAttributeLocationMap,
-  TWebGLProgramCacheItem,
-} from './typedefs';
-import { WebGLPrecision, webGLProbe } from './WebGLProbe';
-import { isWebGLPipelineState } from './typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-
-/**
- * @namespace fabric.Image.filters
- * @memberOf fabric.Image
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#image_filters}
- * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
- */
+import type {
+  T2DPipelineState,
+  TWebGLAttributeLocationMap,
+  TWebGLPipelineState,
+  TWebGLProgramCacheItem,
+  TWebGLUniformLocationMap,
+} from './typedefs';
+import { isWebGLPipelineState } from './typedefs';
+import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
-/**
- * Root filter class from which all filter classes inherit from
- * @class fabric.Image.filters.BaseFilter
- * @memberOf fabric.Image.filters
- */
-export abstract class BaseFilter {
+export type AbstractBaseFilterOptions<T> = {
+  mainParameter: string;
+  vertexSource: string;
+  fragmentSource: T;
+};
+
+export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
+
+export abstract class AbstractBaseFilter<T> {
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  type = 'BaseFilter';
+  type: string;
 
   /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
   vertexSource: string;
-  fragmentSource: string;
+
+  fragmentSource: T;
 
   /**
    * Name of the parameter that can be changed in the filter.
-   * Some filters have more than one paramenter and there is no
+   * Some filters have more than one parameter and there is no
    * mainParameter
    * @private
    */
@@ -51,7 +47,7 @@ export abstract class BaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options = {}) {
+  constructor(options: Partial<AbstractBaseFilterOptions<T>> = {}) {
     this.setOptions(options);
   }
 
@@ -71,6 +67,8 @@ export abstract class BaseFilter {
     Object.assign(this, options);
   }
 
+  abstract getFragmentSource(): string;
+
   /**
    * Compile this filter's shader program.
    *
@@ -80,7 +78,7 @@ export abstract class BaseFilter {
    */
   createProgram(
     gl: WebGLRenderingContext,
-    fragmentSource: string = this.fragmentSource,
+    fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
     if (
@@ -274,6 +272,10 @@ export abstract class BaseFilter {
 
   abstract applyTo2d(options: T2DPipelineState): void;
 
+  getCacheKey() {
+    return this.type;
+  }
+
   /**
    * Retrieves the cached shader.
    * @param {Object} options
@@ -282,10 +284,11 @@ export abstract class BaseFilter {
    * @return {WebGLProgram} the compiled program shader
    */
   retrieveShader(options: TWebGLPipelineState): TWebGLProgramCacheItem {
-    if (!options.programCache[this.type]) {
-      options.programCache[this.type] = this.createProgram(options.context);
+    const key = this.getCacheKey();
+    if (!options.programCache[key]) {
+      options.programCache[key] = this.createProgram(options.context);
     }
-    return options.programCache[this.type];
+    return options.programCache[key];
   }
 
   /**
@@ -392,19 +395,15 @@ export abstract class BaseFilter {
     // delegate, not alias
     return this.toObject();
   }
-  /**
-   * Create filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Image.filters.BaseFilter>}
-   */
-  static fromObject = function (object: any) {
-    // todo: the class registry her
-    return Promise.resolve(new fabric.Image.filters[object.type](object));
-  };
 }
 
-Object.assign(BaseFilter.prototype, {
+export abstract class BaseFilter extends AbstractBaseFilter<string> {
+  getFragmentSource() {
+    return this.fragmentSource;
+  }
+}
+
+Object.assign(AbstractBaseFilter.prototype, {
   vertexSource: `
     attribute vec2 aPosition;
     varying vec2 vTexCoord;
@@ -412,7 +411,9 @@ Object.assign(BaseFilter.prototype, {
       vTexCoord = aPosition;
       gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
     }`,
+});
 
+Object.assign(BaseFilter.prototype, {
   fragmentSource: `
     ${highPsourceCode};
     varying vec2 vTexCoord;
@@ -421,7 +422,3 @@ Object.assign(BaseFilter.prototype, {
       gl_FragColor = texture2D(uTexture, vTexCoord);
     }`,
 });
-
-fabric.Image.filters = {
-  BaseFilter,
-};
