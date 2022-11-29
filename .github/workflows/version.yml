@@ -8,9 +8,43 @@ on:
     branches: [master]
 
 jobs:
-  increment-version:
-    if: github.event_name == 'pull_request' && !contains(github.event.issue.labels.*.name, 'norelease')
+  should-increment:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.labeled.outputs.result }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+      - run: npm ci
+      - run: git checkout origin/master package.json
+      - name: Query PR Labels
+        id: labeled
+        uses: actions/github-script@v6
+        env:
+          NO_RELEASE_TAGS: |
+            norelease
+            CI/CD
+            docs
+        with:
+          result-encoding: string
+          script: |
+            const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
+            console.log(blockingTags)
+            return !context.payload.pull_request.labels
+              .some((label) => blockingTags.includes(label.name));
+  increment-version:
+    runs-on: ubuntu-latest
+    needs: should-increment
+    if: github.event_name == 'pull_request' && fromJSON(needs.should-increment.outputs.result)
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
