@@ -30,7 +30,8 @@ jobs:
         with:
           result-encoding: string
           script: |
-            return (await import('${{ github.workspace }}/package.json')).version;
+            const fs = require('fs');
+            return JSON.parse(fs.readFileSync('./package.json')).version;
       - run: git restore package.json
       - name: Increment Version
         id: inc-version
