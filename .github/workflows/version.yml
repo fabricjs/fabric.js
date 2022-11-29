@@ -1,8 +1,6 @@
 name: '🏷️'
 
 on:
-  push:
-    branches: [master, ci-prerelease]
   pull_request:
     branches: [master]
 
