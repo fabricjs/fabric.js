@@ -305,7 +305,7 @@
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.rotate === 'function');
     assert.equal(cObj.get('angle'), 0);
-    assert.equal(cObj.rotate(45), cObj, 'chainable');
+    cObj.rotate(45);
     assert.equal(cObj.get('angle'), 45);
   });
 

@@ -16,6 +16,7 @@ import {
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import * as filters from '../filters';
 
 export type ImageSource =
   | HTMLImageElement
@@ -110,7 +111,7 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters: Record<string, BaseFilter>;
+  static filters = filters;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
@@ -720,14 +721,14 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters, resizeFilter, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
     const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: Image.filters };
+      filterOptions = { ...options, namespace: filters };
     return Promise.all([
       loadImage(src, imageOptions),
-      filters && enlivenObjects(filters, filterOptions),
+      f && enlivenObjects(f, filterOptions),
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
