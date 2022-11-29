@@ -44,6 +44,6 @@ jobs:
                 repo,
                 tag_name: tag,
                 generate_release_notes: true,
-                prerelease: semver.prerelease(version)
+                prerelease: !!semver.prerelease(version)
               });
             }

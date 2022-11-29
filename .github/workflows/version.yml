@@ -16,7 +16,6 @@ jobs:
       - name: base version
         run: echo "BASE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
   increment-version:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs: master-version
     env:
