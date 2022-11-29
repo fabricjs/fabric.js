@@ -22,8 +22,23 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - name: Increment Version
+      - name: Get Current Version
         id: version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+
+            // get version from master
+            execSync('git checkout origin/master package.json');
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            // restore file in case we commit
+            execSync('git restore package.json');
+            return version;
+      - name: Increment Version
+        id: inc-version
         uses: actions/github-script@v6
         with:
           result-encoding: string
@@ -32,15 +47,9 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
 
-            // get version from master
-            execSync('git checkout origin/master package.json');
-            const { version } = JSON.parse(fs.readFileSync('./package.json'));
-            // restore file in case we commit
-            execSync('git restore package.json');
-
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
-            const releaseLabels = context.payload.pull_request
+            const releaseLabels = context.payload.pull_request.labels
               .map(label => label.name)
               .filter((label) => label.startsWidth(LABEL_PREFIX));
             if (releaseLabels.length > 1) {
@@ -48,7 +57,7 @@ jobs:
               return;
             }
             // increment version
-            const nextVersion = semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease');
+            const nextVersion = semver.inc(${{ steps.version.outputs.result }}, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease');
 
             // write file
             fs.writeFileSync('./package.json', JSON.stringify({ 
@@ -59,16 +68,13 @@ jobs:
 
             return nextVersion;
       - name: Commit & Push
+        if: steps.version.outputs.result != steps.inc-version.outputs.result
         run: |
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
           git add package.json
-          git commit -m "v${{ steps.version.outputs.result }}"
+          git commit -m "v${{ steps.inc-version.outputs.result }}"
           git push HEAD:${{ github.event.pull_request.head.ref }}
-      - name: finalize
-        if: always()
-        run: |
-          echo "DONE"
   release-on-push:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
