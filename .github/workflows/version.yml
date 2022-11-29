@@ -45,7 +45,7 @@ jobs:
             const fs = require('fs');
             const semver = require('semver');
             console.log(context);
-            console.log(${{ github.sender }});
+            console.log(JSON.parse('${{ github.sender }}'));
             const version = process.env.BASE_VERSION;
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
             const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
