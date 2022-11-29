@@ -40,7 +40,7 @@ jobs:
 
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
-            const releaseLabels = context.pull_request.filter((label) =>
+            const releaseLabels = context.pull_request.labels.filter((label) =>
               label.startsWidth(LABEL_PREFIX)
             );
             if (releaseLabels.length > 1) {
