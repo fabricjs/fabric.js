@@ -244,6 +244,20 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
         gl_FragColor = color;
       }
       `,
+      svgmask: `
+        precision highp float;
+        uniform sampler2D uTexture;
+        uniform sampler2D uImage;
+        uniform vec4 uColor;
+        varying vec2 vTexCoord;
+        varying vec2 vTexCoord2;
+        void main() {
+          vec4 color = texture2D(uTexture, vTexCoord);
+          vec4 color2 = texture2D(uImage, vTexCoord2);
+          color.a =  (0.2125 * color2.r + 0.7154 * color2.g + 0.0721 * color2.b) * color2.a;
+          gl_FragColor = color;
+        }
+      `,
   },
 };
 
