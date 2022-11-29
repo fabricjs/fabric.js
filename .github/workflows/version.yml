@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ci-prerelease
 
 jobs:
   release-on-push:
