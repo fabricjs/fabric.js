@@ -84,6 +84,7 @@ jobs:
               return nextVersion;
             } else {
               console.log(`Version is up to date (${version})`);
+              return '';
             }
       - name: Commit & Push
         if: steps.inc-version.outputs.result
