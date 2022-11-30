@@ -17,7 +17,8 @@ jobs:
           ref: master
       - name: base version
         run: echo "BASE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
-  increment-version:
+  bump-version:
+    name: bump version
     runs-on: ubuntu-latest
     needs: master-version
     env:
