@@ -16,12 +16,12 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm install
+      - run: npm ci
       - run: npm run build
-      - run: node publish.js
+      - name: publish
+        run: npm publish ${{ (github.event.release.prerelease && '--tag beta') || '' }}
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-          PRE_RELEASE: ${{github.event.release.prerelease}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
   update-bug-report:
     runs-on: ubuntu-latest
     # wait for publishing to complete
