@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [master, ci-prerelease]
+    branches: [master]
 
 jobs:
   release-on-push:
