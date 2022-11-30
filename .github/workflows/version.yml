@@ -32,7 +32,7 @@ jobs:
           node-version: 16.x
           cache: npm
       - run: npm ci
-      - name: Increment Version
+      - name: Bump Version
         id: inc-version
         uses: actions/github-script@v6
         env:
