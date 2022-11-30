@@ -45,6 +45,7 @@ jobs:
             CI/CD
             docs
           BASE_VERSION: ${{ needs.master-version.outputs.version }}
+          PRERELEASE_TAG: beta
         with:
           result-encoding: string
           script: |
@@ -72,7 +73,7 @@ jobs:
             }
             // increment version
             const nextVersion = shouldInc ?
-              semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', 'rc') :
+              semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', process.env.PRERELEASE_TAG) :
               version;
 
             // write file

@@ -40,7 +40,7 @@ jobs:
         id: semver-range
         uses: actions/github-script@v6
         env:
-          PRERELEASE_TAG: rc
+          PRERELEASE_TAG: beta
           MAJOR_DIFF: 2
         with:
           result-encoding: string
