@@ -83,7 +83,7 @@ jobs:
               console.log(`Bumping version from ${version} to ${nextVersion}, current head version is ${headVersion}`);
               return nextVersion;
             } else {
-              console.log(`Version is up to date (${version})`);
+              console.log(`Version is up to date (${headVersion})`);
               return '';
             }
       - name: Commit & Push
