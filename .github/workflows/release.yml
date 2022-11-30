@@ -27,6 +27,7 @@ jobs:
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             const tag = `v${version}`;
             const { owner, repo } = context.repo;
+            const body = `**View the [CHANGELOG](CHANGELOG.md)**\n`;
             let res;
             if(context.payload.commits.some(commit => commit.message.includes('norelease'))) {
               console.log('Aborting release');
@@ -43,6 +44,7 @@ jobs:
                 owner,
                 repo,
                 release_id: id,
+                body
               });
             } catch(error) {
               console.log(`Releasing ${tag}`);
@@ -50,6 +52,7 @@ jobs:
                 owner,
                 repo,
                 tag_name: tag,
+                body,
                 generate_release_notes: true,
                 prerelease: !!semver.prerelease(version)
               });
