@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - 5.x
+      - ci-prerelease
     types: [published]
 
 jobs:
