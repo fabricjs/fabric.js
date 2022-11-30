@@ -79,7 +79,12 @@ jobs:
             }, null, 2));
             execSync('npx prettier --write package.json');
 
-            return nextVersion !== headVersion ? nextVersion : '';
+            if (nextVersion !== headVersion) {
+              console.log(`Bumping version from ${version} to ${nextVersion}, current head version is ${headVersion}`);
+              return nextVersion;
+            } else {
+              console.log(`Version is up to date (${version})`);
+            }
       - name: Commit & Push
         if: steps.inc-version.outputs.result
         run: |
