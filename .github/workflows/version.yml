@@ -36,8 +36,11 @@ jobs:
         id: inc-version
         uses: actions/github-script@v6
         env:
+          # list of labels that block bumping the version
           STRICT_NO_RELEASE_TAGS: |
             norelease
+          # list of labels that shouldn't bump the version by default
+          # adding a release label overrides this configuration
           NO_RELEASE_TAGS: |
             CI/CD
             docs
