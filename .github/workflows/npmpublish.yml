@@ -31,10 +31,25 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: master
+      - name: semver range
+        id: semver-range
+        uses: actions/github-script@v6
+        env:
+          PRERELEASE_TAG: rc
+          MAJOR_DIFF: 2
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const semver = require('semver');
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            const latestMajor = semver.major(version);
+            const fromMajor = latestMajor - parseInt(process.env.MAJOR_DIFF);
+            return `>=${fromMajor}.0.0 || >=${latestMajor}.0.0-${process.env.PRERELEASE_TAG}`;
       - name: Update bug report version
         uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
-          semver: '>=4.0.0 || >=6.0.0-rc'
+          semver: ${{ steps.semver-range.outputs.result }}
           dry_run: no-push
       - name: Update bug report node version
         uses: ShaMan123/gha-populate-form-version@v2.0.1
