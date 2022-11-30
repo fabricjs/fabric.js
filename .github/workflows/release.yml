@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    branches: [master]
+    branches: [master, ci-prerelease]
 
 jobs:
   release-on-push:
@@ -28,6 +28,10 @@ jobs:
             const tag = `v${version}`;
             const { owner, repo } = context.repo;
             let res;
+            if(context.payload.commits.some(commit => commit.message.includes('norelease'))) {
+              console.log('Aborting release');
+              return;
+            }
             try {
               const { data: { id } } = await github.rest.repos.getReleaseByTag({
                 owner,
