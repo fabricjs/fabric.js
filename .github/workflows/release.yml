@@ -27,7 +27,6 @@ jobs:
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             const tag = `v${version}`;
             const { owner, repo } = context.repo;
-            const body = `**View the [CHANGELOG](CHANGELOG.md)**\n`;
             let res;
             if(context.payload.commits.some(commit => commit.message.includes('norelease'))) {
               console.log('Aborting release');
@@ -43,11 +42,11 @@ jobs:
               res = await github.rest.repos.updateRelease({
                 owner,
                 repo,
-                release_id: id,
-                body
+                release_id: id
               });
             } catch(error) {
               console.log(`Releasing ${tag}`);
+              const body = `**View the [CHANGELOG](CHANGELOG.md)**\n`;
               res = await github.rest.repos.createRelease({
                 owner,
                 repo,
