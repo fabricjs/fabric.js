@@ -2,7 +2,7 @@ name: '🏷️'
 
 on:
   pull_request:
-    branches: [master, ci-prerelease]
+    branches: [master]
   pull_request_review:
     types: [submitted, dismissed]
 
