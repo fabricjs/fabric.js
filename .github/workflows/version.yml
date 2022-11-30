@@ -36,8 +36,9 @@ jobs:
         id: inc-version
         uses: actions/github-script@v6
         env:
-          NO_RELEASE_TAGS: |
+          STRICT_NO_RELEASE_TAGS: |
             norelease
+          NO_RELEASE_TAGS: |
             CI/CD
             docs
           BASE_VERSION: ${{ needs.master-version.outputs.version }}
@@ -49,17 +50,22 @@ jobs:
             const semver = require('semver');
             const version = process.env.BASE_VERSION;
             const { version: headVersion } = JSON.parse(fs.readFileSync('./package.json'));
-            const blockingTags = process.env.NO_RELEASE_TAGS.split('\n');
-            const shouldInc = !context.payload.pull_request.labels
-              .some((label) => blockingTags.includes(label.name));
+            const blockingTags = process.env.STRICT_NO_RELEASE_TAGS.split('\n');
+            const nonBlockingTags = process.env.NO_RELEASE_TAGS.split('\n');
+            const { labels } = context.payload.pull_request;
 
             // get version level from PR label
             const LABEL_PREFIX = 'release:';
-            const releaseLabels = context.payload.pull_request.labels
+            const releaseLabels = labels
               .map((label) => label.name)
               .filter((label) => label.startsWith(LABEL_PREFIX));
             if (releaseLabels.length > 1) {
               throw new Error(`Found more than one release label: ${releaseLabels.join(', ')}`);
+            }
+            const releaseLevel = releaseLabels[0]?.replace(LABEL_PREFIX, '');
+            let shouldInc = !labels.some((label) => blockingTags.includes(label.name));
+            if (!releaseLevel && shouldInc) {
+              shouldInc = !labels.some((label) => nonBlockingTags.includes(label.name));
             }
             // increment version
             const nextVersion = shouldInc ?
