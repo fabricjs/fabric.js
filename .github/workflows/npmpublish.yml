@@ -20,7 +20,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: publish
-        run: npm publish ${{ (github.event.release.prerelease && '--tag beta') || '' }}
+        run: npm publish --tag ${{ github.event.release.tag_name }} ${{ (github.event.release.prerelease && '--tag beta') || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
   update-bug-report:
