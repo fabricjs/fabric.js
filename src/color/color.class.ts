@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';
@@ -27,29 +26,26 @@ export class Color {
       const [r, g, b, a = 1] = color;
       this.setSource([r, g, b, a]);
     } else {
-      this._tryParsingColor(color);
+      this.setSource(this._tryParsingColor(color));
     }
   }
 
   /**
    * @private
    * @param {string} [color] Color value to parse
+   * @returns {TColorAlphaSource}
    */
-  _tryParsingColor(color?: string) {
-    if (color in ColorNameMap) {
-      color = ColorNameMap[color];
+  protected _tryParsingColor(color: string) {
+    if (color && color in ColorNameMap) {
+      color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
-
-    const source =
-      color === 'transparent'
-        ? [255, 255, 255, 0]
-        : Color.sourceFromHex(color) ||
+    return color === 'transparent'
+      ? ([255, 255, 255, 0] as TColorAlphaSource)
+      : Color.sourceFromHex(color) ||
           Color.sourceFromRgb(color) ||
-          Color.sourceFromHsl(color) || [0, 0, 0, 1]; // color is not recognize let's default to black as canvas does
-
-    if (source) {
-      this.setSource(source);
-    }
+          Color.sourceFromHsl(color) ||
+          // color is not recognize let's default to black as canvas does
+          ([0, 0, 0, 1] as TColorAlphaSource);
   }
 
   /**
@@ -67,7 +63,7 @@ export class Color {
     const maxValue = Math.max(r, g, b),
       minValue = Math.min(r, g, b);
 
-    let h, s;
+    let h!: number, s: number;
     const l = (maxValue + minValue) / 2;
 
     if (maxValue === minValue) {
@@ -228,20 +224,14 @@ export class Color {
       otherColor = new Color(otherColor);
     }
 
-    const result = [],
-      alpha = this.getAlpha(),
+    const [r, g, b, alpha] = this.getSource(),
       otherAlpha = 0.5,
-      source = this.getSource(),
-      otherSource = otherColor.getSource();
-
-    for (let i = 0; i < 3; i++) {
-      result.push(
-        Math.round(source[i] * (1 - otherAlpha) + otherSource[i] * otherAlpha)
+      otherSource = otherColor.getSource(),
+      [R, G, B] = [r, g, b].map((value, index) =>
+        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha)
       );
-    }
 
-    result[3] = alpha;
-    this.setSource(result);
+    this.setSource([R, G, B, alpha]);
     return this;
   }
 
@@ -264,7 +254,7 @@ export class Color {
    * @return {Color}
    */
   static fromRgba(color: string): Color {
-    return Color.fromSource(Color.sourceFromRgb(color));
+    return new Color(Color.sourceFromRgb(color));
   }
 
   /**
@@ -286,12 +276,7 @@ export class Color {
           (parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1)) *
           (/%$/.test(match[3]) ? 255 : 1);
 
-      return [
-        parseInt(r, 10),
-        parseInt(g, 10),
-        parseInt(b, 10),
-        match[4] ? parseFloat(match[4]) : 1,
-      ];
+      return [r, g, b, match[4] ? parseFloat(match[4]) : 1];
     }
   }
 
@@ -314,7 +299,7 @@ export class Color {
    * @return {Color}
    */
   static fromHsla(color: string): Color {
-    return Color.fromSource(Color.sourceFromHsl(color));
+    return new Color(Color.sourceFromHsl(color));
   }
 
   /**
@@ -334,7 +319,7 @@ export class Color {
     const h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
       l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1);
-    let r, g, b;
+    let r: number, g: number, b: number;
 
     if (s === 0) {
       r = g = b = l;
@@ -363,7 +348,7 @@ export class Color {
    * @return {Color}
    */
   static fromHex(color: string): Color {
-    return Color.fromSource(Color.sourceFromHex(color));
+    return new Color(Color.sourceFromHex(color));
   }
 
   /**
@@ -409,9 +394,9 @@ export class Color {
    * @param {TColorSource | TColorAlphaSource} source
    * @return {Color}
    */
-  static fromSource(source: TColorSource | TColorAlphaSource): Color {
-    const oColor = new Color();
-    oColor.setSource(source);
-    return oColor;
+  static fromSource([r, b, g, a = 1]: TColorSource | TColorAlphaSource): Color {
+    const color = new Color();
+    color.setSource([r, b, g, a]);
+    return color;
   }
 }
