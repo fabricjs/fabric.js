@@ -108,24 +108,6 @@
     return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
   }
 
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    expected = expected || REFERENCE_IMG_OBJECT;
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
-  }
-
   QUnit.module('fabric.Image');
 
   QUnit.test('constructor', function(assert) {
