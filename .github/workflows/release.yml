@@ -19,6 +19,10 @@ jobs:
       - name: Release
         id: version
         uses: actions/github-script@v6
+        env:
+          # list of labels that block bumping the version
+          STRICT_NO_RELEASE_LABELS: |
+            norelease
         with:
           result-encoding: string
           script: |
@@ -27,10 +31,20 @@ jobs:
             const { version } = JSON.parse(fs.readFileSync('./package.json'));
             const tag = `v${version}`;
             const { owner, repo } = context.repo;
+            const blockingLabels = process.env.STRICT_NO_RELEASE_LABELS.split('\n');
             let res;
-            if(context.payload.commits.some(commit => commit.message.includes('norelease'))) {
-              console.log('Aborting release');
-              return;
+            const labels = [];
+            (await Promise.all(context.payload.commits.map(commit => github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: commit.id,
+            })))).forEach(({ data }) => {
+              data.forEach(pr => labels.push(...pr.labels.map(label => label.name)));
+            });
+            if(blockingLabels.some(label => labels.includes(label)) 
+              || context.payload.commits.some(commit => commit.message.includes('norelease'))) {
+                console.log('Aborting release');
+                return;
             }
             try {
               const { data: { id } } = await github.rest.repos.getReleaseByTag({
@@ -47,6 +61,27 @@ jobs:
             } catch(error) {
               console.log(`Releasing ${tag}`);
               const body = `**View the [CHANGELOG](CHANGELOG.md)**\n`;
+              /*
+                const { name, email } = context.payload.pusher;
+                await github.rest.git.createTag({
+                  owner,
+                  repo,
+                  tag,
+                  message: tag,
+                  object: context.payload.after,
+                  type: 'commit',
+                  tagger:{
+                    name,
+                    email
+                  }
+                });
+                await github.rest.git.createRef({
+                  owner,
+                  repo,
+                  ref: `refs/tags/${tag}`,
+                  sha: context.payload.after,
+                });
+              */
               res = await github.rest.repos.createRelease({
                 owner,
                 repo,
