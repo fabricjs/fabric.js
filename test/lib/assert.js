@@ -2,7 +2,7 @@ const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
 
 function basename(link) {
-    return link.split(/\\|\//).pop().replaceAll('"', '');
+    return link.split(/\\|\//).pop().replace(/"/gm, '');
 }
 
 function replaceLinks(value) {
