@@ -97,13 +97,10 @@ export abstract class AnimatableObject<
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
     const currentValue = path.reduce((deep: any, key) => deep[key], this);
 
-    to = to.toString();
-    if (!propIsColor) {
-      if (~to.indexOf('=')) {
-        to = currentValue + parseFloat(to.replace('=', ''));
-      } else {
-        to = parseFloat(to);
-      }
+    if (!propIsColor && typeof to === 'string') {
+      to = to.includes('=')
+        ? currentValue + parseFloat(to.replace('=', ''))
+        : parseFloat(to);
     }
 
     const animationOptions = {
