@@ -12,7 +12,7 @@ import {
   AnimationState,
 } from './types';
 
-export const defaultAbort = () => false;
+const defaultAbort = () => false;
 
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
