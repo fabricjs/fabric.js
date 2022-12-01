@@ -26,13 +26,15 @@ QUnit.assert.equalSVG = function (actual, expected, message) {
 }
 
 QUnit.assert.sameImageObject = function (actual, expected, message = 'image object should equal to ref') {
-    var a = {}, b = {};
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-        result: QUnit.equiv(a, b),
-        actual,
-        expected,
+    QUnit.assert.deepEqual(
+        {
+            ...actual,
+            src: basename(actual.src)
+        },
+        {
+            ...expected,
+            src: basename(expected.src)
+        },
         message
-    });
+    );
 }
