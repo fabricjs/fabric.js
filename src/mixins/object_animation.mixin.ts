@@ -1,15 +1,18 @@
-// @ts-nocheck
+import { TColorArg } from '../color/color.class';
 import { noop } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TDegree } from '../typedefs';
-import { animate } from '../util/animate';
-import { animateColor } from '../util/animate_color';
+import {
+  animate,
+  animateColor,
+  AnimationOptions,
+  ColorAnimationOptions,
+} from '../util/animation';
 import { StackedObject } from './object_ancestry.mixin';
 
-/**
- * TODO remove transient
- */
-type TAnimationOptions = Record<string, any>;
+type TAnimationOptions<T extends number | TColorArg> = T extends number
+  ? AnimationOptions
+  : ColorAnimationOptions;
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -34,7 +37,7 @@ export abstract class AnimatableObject<
    * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
    * @param {Number|Object} value Value to animate property to (if string was given first) or options object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {AnimationContext | AnimationContext[]} animation context (or an array if passed multiple properties)
+   * @return {(ColorAnimation | Animation)[]} animation context (or an array if passed multiple properties)
    *
    * As object — multiple properties
    *
@@ -47,21 +50,28 @@ export abstract class AnimatableObject<
    * object.animate('left', ..., { duration: ... });
    *
    */
-  animate<T>(key: string, toValue: T, options?: TAnimationOptions): void;
-  animate<T>(animatable: Record<string, T>, options?: TAnimationOptions): void;
-  animate<T, S extends string | Record<string, T>>(
+  animate<T extends number | TColorArg>(
+    key: string,
+    toValue: T,
+    options?: Partial<TAnimationOptions<T>>
+  ): void;
+  animate<T extends number | TColorArg>(
+    animatable: Record<string, T>,
+    options?: Partial<TAnimationOptions<T>>
+  ): void;
+  animate<T extends number | TColorArg, S extends string | Record<string, T>>(
     arg0: S,
-    arg1: S extends string ? T : TAnimationOptions,
-    arg2?: S extends string ? TAnimationOptions : never
+    arg1: S extends string ? T : Partial<TAnimationOptions<T>>,
+    arg2?: S extends string ? Partial<TAnimationOptions<T>> : never
   ) {
     const animatable = (
       typeof arg0 === 'string' ? { [arg0]: arg1 } : arg0
     ) as Record<string, T>;
     const keys = Object.keys(animatable);
-    const options = (
-      typeof arg0 === 'string' ? arg2 : arg1
-    ) as TAnimationOptions;
-    keys.map((key, index) =>
+    const options = (typeof arg0 === 'string' ? arg2 : arg1) as Partial<
+      TAnimationOptions<T>
+    >;
+    return keys.map((key, index) =>
       this._animate(
         key,
         animatable[key],
@@ -78,7 +88,11 @@ export abstract class AnimatableObject<
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
    */
-  _animate<T>(key: string, to: T, options: TAnimationOptions = {}) {
+  _animate<T extends number | TColorArg>(
+    key: string,
+    to: T,
+    options: Partial<TAnimationOptions<T>> = {}
+  ) {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
     const currentValue = path.reduce((deep: any, key) => deep[key], this);
@@ -94,42 +108,50 @@ export abstract class AnimatableObject<
 
     const animationOptions = {
       target: this,
-      startValue: options.from ?? currentValue,
+      startValue:
+        options.startValue ??
+        // backward compat
+        (options as any).from ??
+        currentValue,
       endValue: to,
-      byValue: options.by,
+      // `byValue` takes precedence over `endValue`
+      byValue:
+        options.byValue ??
+        // backward compat
+        (options as any).by,
       easing: options.easing,
       duration: options.duration,
-      abort:
-        options.abort &&
-        ((value, valueProgress, timeProgress) => {
-          return options.abort.call(this, value, valueProgress, timeProgress);
-        }),
-      onChange: (value, valueProgress, timeProgress) => {
+      onChange: (
+        value: string | number,
+        valueRatio: number,
+        durationRatio: number
+      ) => {
         path.reduce((deep: any, key, index) => {
           if (index === path.length - 1) {
             deep[key] = value;
           }
           return deep[key];
-        }, this);
+        });
         options.onChange &&
-          options.onChange(value, valueProgress, timeProgress);
+          // @ts-expect-error generic callback arg0 is wrong
+          options.onChange(value, valueRatio, durationRatio);
       },
-      onComplete: (value, valueProgress, timeProgress) => {
+      onComplete: (
+        value: string | number,
+        valueRatio: number,
+        durationRatio: number
+      ) => {
         this.setCoords();
         options.onComplete &&
-          options.onComplete(value, valueProgress, timeProgress);
+          // @ts-expect-error generic callback arg0 is wrong
+          options.onComplete(value, valueRatio, durationRatio);
       },
-    };
+    } as TAnimationOptions<T>;
 
     if (propIsColor) {
-      return animateColor(
-        animationOptions.startValue,
-        animationOptions.endValue,
-        animationOptions.duration,
-        animationOptions
-      );
+      return animateColor(animationOptions as ColorAnimationOptions);
     } else {
-      return animate(animationOptions);
+      return animate(animationOptions as AnimationOptions);
     }
   }
 
