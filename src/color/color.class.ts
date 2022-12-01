@@ -36,7 +36,7 @@ export class Color {
    * @returns {TColorAlphaSource}
    */
   protected _tryParsingColor(color: string) {
-    if (color && color in ColorNameMap) {
+    if (color in ColorNameMap) {
       color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
     return color === 'transparent'
