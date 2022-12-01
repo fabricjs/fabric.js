@@ -11,6 +11,5 @@ jobs:
   run-publishing:
     uses: ./.github/workflows/publish.yml
     with:
-      tag: ${{ github.event.release.tag_name }}
       prerelease: ${{ github.event.release.prerelease }}
     secrets: inherit
