@@ -10,10 +10,6 @@ on:
       - reopened
       - labeled
       - unlabeled
-  pull_request_review:
-    types:
-      - submitted
-      - dismissed
 
 jobs:
   master-version:
