@@ -28,6 +28,16 @@ jobs:
     needs: master-version
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # list of labels that block bumping the version
+      STRICT_NO_RELEASE_LABELS: |
+        norelease
+      # list of labels that shouldn't bump the version by default
+      # adding a release label overrides this configuration
+      NO_RELEASE_LABELS: |
+        CI/CD
+        docs
+      BASE_VERSION: ${{ needs.master-version.outputs.version }}
+      PRERELEASE_TAG: beta
     steps:
       - uses: actions/checkout@v3
         with:
@@ -40,17 +50,6 @@ jobs:
       - name: Bump Version
         id: inc-version
         uses: actions/github-script@v6
-        env:
-          # list of labels that block bumping the version
-          STRICT_NO_RELEASE_LABELS: |
-            norelease
-          # list of labels that shouldn't bump the version by default
-          # adding a release label overrides this configuration
-          NO_RELEASE_LABELS: |
-            CI/CD
-            docs
-          BASE_VERSION: ${{ needs.master-version.outputs.version }}
-          PRERELEASE_TAG: beta
         with:
           result-encoding: string
           script: |
