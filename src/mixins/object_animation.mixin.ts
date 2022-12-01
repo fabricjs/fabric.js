@@ -118,6 +118,7 @@ export abstract class AnimatableObject<
         (options as any).by,
       easing: options.easing,
       duration: options.duration,
+      abort: options.abort?.bind(this),
       onChange: (
         value: string | number,
         valueRatio: number,
