@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * Vibrance filter class
  * @example
- * var filter = new Vibrance({
+ * const filter = new Vibrance({
  *   vibrance: 1
  * });
  * object.filters.push(filter);
@@ -70,25 +70,30 @@ export class Vibrance extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }
+
+  static async fromObject(object: any) {
+    return new Vibrance(object);
+  }
 }
 
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
   type: 'Vibrance',
-  fragmentSource:
-    'precision highp float;\n' +
-    'uniform sampler2D uTexture;\n' +
-    'uniform float uVibrance;\n' +
-    'varying vec2 vTexCoord;\n' +
-    'void main() {\n' +
-    'vec4 color = texture2D(uTexture, vTexCoord);\n' +
-    'float max = max(color.r, max(color.g, color.b));\n' +
-    'float avg = (color.r + color.g + color.b) / 3.0;\n' +
-    'float amt = (abs(max - avg) * 2.0) * uVibrance;\n' +
-    'color.r += max != color.r ? (max - color.r) * amt : 0.00;\n' +
-    'color.g += max != color.g ? (max - color.g) * amt : 0.00;\n' +
-    'color.b += max != color.b ? (max - color.b) * amt : 0.00;\n' +
-    'gl_FragColor = color;\n' +
-    '}',
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uVibrance;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      float max = max(color.r, max(color.g, color.b));
+      float avg = (color.r + color.g + color.b) / 3.0;
+      float amt = (abs(max - avg) * 2.0) * uVibrance;
+      color.r += max != color.r ? (max - color.r) * amt : 0.00;
+      color.g += max != color.g ? (max - color.g) * amt : 0.00;
+      color.b += max != color.b ? (max - color.b) * amt : 0.00;
+      gl_FragColor = color;
+    }
+  `,
   vibrance: 0,
   mainParameter: 'vibrance',
 };

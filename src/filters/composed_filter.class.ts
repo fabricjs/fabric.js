@@ -1,29 +1,31 @@
 // @ts-nocheck
-import { Image } from '../shapes/image.class';
-import { AbstractBaseFilter, BaseFilter } from './base_filter.class';
+import * as filters from '.';
+import { TClassProperties } from '../typedefs';
+import {
+  AbstractBaseFilter,
+  BaseFilter,
+  BaseFilterOptions,
+} from './base_filter.class';
 import {
   isWebGLPipelineState,
   T2DPipelineState,
   TWebGLPipelineState,
 } from './typedefs';
-
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
 export class Composed extends BaseFilter {
-  type = 'Composed';
-
   /**
    * A non sparse array of filters to apply
    */
-  subFilters: BaseFilter[] = [];
+  subFilters: AbstractBaseFilter[];
 
-  setOptions({ subFilters, ...options }: Record<string, any>) {
-    if (subFilters) {
-      // safeguard against mutation
-      this.subFilters = [...subFilters];
-    }
-    super.setOptions(options);
+  constructor({
+    subFilters = [],
+    ...options
+  }: Partial<BaseFilterOptions & { subFilters: AbstractBaseFilter[] }> = {}) {
+    super(options);
+    this.subFilters = subFilters;
   }
 
   /**
@@ -68,8 +70,16 @@ export class Composed extends BaseFilter {
   static fromObject(object, options) {
     return Promise.all(
       ((object.subFilters || []) as AbstractBaseFilter[]).map((filter) =>
-        Image.filters[filter.type].fromObject(filter, options)
+        Object.values(filters)
+          .find((klass) => klass.prototype?.type === filter.type)!
+          .fromObject(filter, options)
       )
     ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
   }
 }
+
+export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
+  type: 'Composed',
+};
+
+Object.assign(Composed.prototype, composedDefaultValues);

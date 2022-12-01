@@ -116,24 +116,29 @@ export class RemoveColor extends BaseFilter {
   toObject() {
     return { ...super.toObject(), color: this.color, distance: this.distance };
   }
+
+  static async fromObject(object: any) {
+    return new RemoveColor(object);
+  }
 }
 
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
     type: 'RemoveColor',
     color: '#FFFFFF',
-    fragmentSource:
-      'precision highp float;\n' +
-      'uniform sampler2D uTexture;\n' +
-      'uniform vec4 uLow;\n' +
-      'uniform vec4 uHigh;\n' +
-      'varying vec2 vTexCoord;\n' +
-      'void main() {\n' +
-      'gl_FragColor = texture2D(uTexture, vTexCoord);\n' +
-      'if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {\n' +
-      'gl_FragColor.a = 0.0;\n' +
-      '}\n' +
-      '}',
+    fragmentSource: `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec4 uLow;
+      uniform vec4 uHigh;
+      varying vec2 vTexCoord;
+      void main() {
+        gl_FragColor = texture2D(uTexture, vTexCoord);
+        if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {
+          gl_FragColor.a = 0.0;
+        }
+      }
+      `,
     distance: 0.02,
     useAlpha: false,
   };

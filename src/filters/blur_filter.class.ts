@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './base_filter.class';
@@ -160,6 +161,10 @@ export class Blur extends BaseFilter {
       delta[1] = blur;
     }
     return delta;
+  }
+
+  static async fromObject(object: any) {
+    return new Blur(object);
   }
 }
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Image } from '../shapes/image.class';
 import { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
@@ -26,27 +27,20 @@ import { WebGLFilterBackend } from './webgl_backend.class';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendImage extends AbstractBaseFilter {
+export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    **/
   image: Image;
 
-  /**
-   * Blend mode for the filter (one of "multiply", "mask")
-   * @type String
-   * @default
-   **/
-  mode: string;
+  mode: 'multiply' | 'mask';
 
   /**
    * alpha value. represent the strength of the blend image operation.
    * not implemented.
    **/
   alpha: number;
-
-  fragmentSource: Record<string, string>;
 
   getCacheKey() {
     return `${this.type}_${this.mode}`;

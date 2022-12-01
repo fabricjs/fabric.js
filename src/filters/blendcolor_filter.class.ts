@@ -1,12 +1,7 @@
 import { Color } from '../color';
 import { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
-import {
-  T2DPipelineState,
-  TWebGLPipelineState,
-  TWebGLProgramCacheItem,
-  TWebGLUniformLocationMap,
-} from './typedefs';
+import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 /**
  * Color Blend filter class
@@ -25,7 +20,7 @@ import {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends AbstractBaseFilter {
+export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -34,13 +29,18 @@ export class BlendColor extends AbstractBaseFilter {
    **/
   color: string;
 
-  /**
-   * Blend mode for the filter: one of multiply, add, diff, screen, subtract,
-   * darken, lighten, overlay, exclusion, tint.
-   * @type String
-   * @default
-   **/
-  mode: string;
+  mode:
+    | 'multiply'
+    | 'add'
+    | 'diff'
+    | 'difference'
+    | 'screen'
+    | 'subtract'
+    | 'darken'
+    | 'lighten'
+    | 'overlay'
+    | 'exclusion'
+    | 'tint';
 
   /**
    * alpha value. represent the strength of the blend color operation.
@@ -48,11 +48,6 @@ export class BlendColor extends AbstractBaseFilter {
    * @default
    **/
   alpha: number;
-
-  /**
-   * Fragment source for the Multiply program
-   */
-  fragmentSource: Record<string, string>;
 
   /**
    * build the fragment source for the filters, joining the common part with
@@ -211,6 +206,10 @@ export class BlendColor extends AbstractBaseFilter {
       mode: this.mode,
       alpha: this.alpha,
     };
+  }
+
+  static async fromObject(object: any) {
+    return new BlendColor(object);
   }
 }
 

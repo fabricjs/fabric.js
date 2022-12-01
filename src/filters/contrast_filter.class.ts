@@ -66,6 +66,10 @@ export class Contrast extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uContrast, this.contrast);
   }
+
+  static async fromObject(object: any) {
+    return new Contrast(object);
+  }
 }
 
 export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {

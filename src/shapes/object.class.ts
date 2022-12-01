@@ -3,7 +3,8 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
-import { ObjectGeometry } from '../mixins/object_geometry.mixin';
+import { ObjectEvents } from '../EventTypeDefs';
+import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
@@ -16,9 +17,6 @@ import { qrDecompose, transformPoint } from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
-import { Shadow } from '../__types__';
-import { Canvas, StaticCanvas } from '../__types__';
-import { ObjectEvents } from '../EventTypeDefs';
 import type { Group } from './group.class';
 
 // temporary hack for unfinished migration
@@ -56,7 +54,7 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
  */
 export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectGeometry<EventSpec> {
+> extends AnimatableObject<EventSpec> {
   type: string;
 
   /**
@@ -469,12 +467,6 @@ export class FabricObject<
    * @type Array
    */
   cacheProperties: string[];
-
-  /**
-   * List of properties to consider for animating colors.
-   * @type String[]
-   */
-  colorProperties: string[];
 
   /**
    * a fabricObject that, without stroke define a clipping area with their shape. filled in black
@@ -1845,9 +1837,7 @@ export class FabricObject<
 
   /**
    * Sets "angle" of an instance with centered rotation
-   * @param {Number} angle Angle value (in degrees)
-   * @return {fabric.Object} thisArg
-   * @chainable
+   * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
     const shouldCenterOrigin =
@@ -1863,8 +1853,6 @@ export class FabricObject<
     if (shouldCenterOrigin) {
       this._resetOrigin();
     }
-
-    return this;
   }
 
   /**
@@ -2137,6 +2125,7 @@ export const fabricObjectDefaultValues = {
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
+  FX_DURATION: 500,
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);

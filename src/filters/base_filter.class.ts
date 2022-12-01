@@ -1,4 +1,3 @@
-import { Image } from '../shapes/image.class';
 import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
@@ -12,28 +11,29 @@ import { WebGLPrecision, webGLProbe } from './WebGLProbe';
 
 const highPsourceCode = `precision ${WebGLPrecision.high} float`;
 
-export type AbstractBaseFilterOptions = {
+export type AbstractBaseFilterOptions<T> = {
   mainParameter: string;
   vertexSource: string;
+  fragmentSource: T;
 };
 
-export type BaseFilterOptions = AbstractBaseFilterOptions & {
-  fragmentSource: string;
-};
+export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
 
-export abstract class AbstractBaseFilter {
+export abstract class AbstractBaseFilter<T> {
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  type = 'BaseFilter';
+  type: string;
 
   /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
   vertexSource: string;
+
+  fragmentSource: T;
 
   /**
    * Name of the parameter that can be changed in the filter.
@@ -47,7 +47,7 @@ export abstract class AbstractBaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Partial<AbstractBaseFilterOptions> = {}) {
+  constructor(options: Partial<AbstractBaseFilterOptions<T>> = {}) {
     this.setOptions(options);
   }
 
@@ -395,27 +395,9 @@ export abstract class AbstractBaseFilter {
     // delegate, not alias
     return this.toObject();
   }
-
-  /**
-   * Create filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   */
-  static fromObject(object: any) {
-    // todo: the class registry her
-    return Promise.resolve<AbstractBaseFilter>(
-      new Image.filters[object.type](object)
-    );
-  }
 }
 
-export abstract class BaseFilter extends AbstractBaseFilter {
-  fragmentSource: string;
-
-  constructor(options?: Partial<BaseFilterOptions>) {
-    super(options);
-  }
-
+export abstract class BaseFilter extends AbstractBaseFilter<string> {
   getFragmentSource() {
     return this.fragmentSource;
   }

@@ -7,7 +7,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
    * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
    * @example <caption>Kodachrome filter</caption>
-   * var filter = new ColorMatrix({
+   * const filter = new ColorMatrix({
    *  matrix: [
        1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
        -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
@@ -125,6 +125,10 @@ export class ColorMatrix extends BaseFilter {
       constants = [m[4], m[9], m[14], m[19]];
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
     gl.uniform4fv(uniformLocations.uConstants, constants);
+  }
+
+  static async fromObject(object: any) {
+    return new ColorMatrix(object);
   }
 }
 

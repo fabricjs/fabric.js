@@ -5,7 +5,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 /**
  * MyFilter filter class
  * @example
- * var filter = new MyFilter({
+ * const filter = new MyFilter({
  *   add here an example of how to use your filter
  * });
  * object.filters.push(filter);
@@ -64,6 +64,10 @@ export class MyFilter extends BaseFilter {
     uniformLocations: TWebGLUniformLocationMap
   ) {
     gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
+  }
+
+  static async fromObject(object: any) {
+    return new MyFilter(object);
   }
 }
 

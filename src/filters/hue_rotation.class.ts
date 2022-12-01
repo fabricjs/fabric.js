@@ -13,6 +13,7 @@ import { TWebGLPipelineState, T2DPipelineState } from './typedefs';
  * object.filters.push(filter);
  * object.applyFilters();
  */
+// @ts-expect-error fromObject
 export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.
@@ -46,6 +47,10 @@ export class HueRotation extends ColorMatrix {
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     this.calculateMatrix();
     super.applyTo(options);
+  }
+
+  static async fromObject(object: any) {
+    return new HueRotation(object);
   }
 }
 

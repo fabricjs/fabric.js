@@ -2,7 +2,11 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { isWebGLPipelineState, T2DPipelineState } from './typedefs';
+import {
+  isWebGLPipelineState,
+  T2DPipelineState,
+  TWebGLPipelineState,
+} from './typedefs';
 
 /**
  * Resize image filter class
@@ -16,10 +20,9 @@ export class Resize extends BaseFilter {
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:
    * bilinear, hermite, sliceHack, lanczos.
-   * @param {String} resizeType
    * @default
    */
-  resizeType: string;
+  resizeType: 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
   /**
    * Scale factor for resizing, x axis
@@ -103,29 +106,26 @@ export class Resize extends BaseFilter {
    */
   generateShader(filterWindow: number) {
     const offsets = new Array(filterWindow);
-    let fragmentShader = this.fragmentSourceTOP;
-
     for (let i = 1; i <= filterWindow; i++) {
-      offsets[i - 1] = i + '.0 * uDelta';
+      offsets[i - 1] = `${i}.0 * uDelta`;
     }
-
-    fragmentShader += `
+    return `
+      ${this.fragmentSourceTOP}
       uniform float uTaps[${filterWindow}];
       void main() {
         vec4 color = texture2D(uTexture, vTexCoord);
         float sum = 1.0;
+        ${offsets
+          .map(
+            (offset, i) => `
+              color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
+              sum += 2.0 * uTaps[${i}];
+            `
+          )
+          .join('\n')}
+        gl_FragColor = color / sum;
       }
     `;
-
-    offsets.forEach((offset, i) => {
-      fragmentShader += `
-        color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
-        sum += 2.0 * uTaps[${i}];
-      `;
-    });
-    fragmentShader += '  gl_FragColor = color / sum;\n';
-    fragmentShader += '}';
-    return fragmentShader;
   }
 
   /**
@@ -518,6 +518,10 @@ export class Resize extends BaseFilter {
       lanczosLobes: this.lanczosLobes,
     };
   }
+
+  static async fromObject(object: any) {
+    return new Resize(object);
+  }
 }
 
 export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
@@ -526,11 +530,12 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
   scaleX: 1,
   scaleY: 1,
   lanczosLobes: 3,
-  fragmentSourceTOP:
-    'precision highp float;\n' +
-    'uniform sampler2D uTexture;\n' +
-    'uniform vec2 uDelta;\n' +
-    'varying vec2 vTexCoord;\n',
+  fragmentSourceTOP: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform vec2 uDelta;
+    varying vec2 vTexCoord;
+  `,
 };
 
 Object.assign(Resize.prototype, resizeDefaultValues);
