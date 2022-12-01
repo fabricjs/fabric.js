@@ -2,9 +2,18 @@ name: '🏷️'
 
 on:
   pull_request:
-    branches: [master]
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
   pull_request_review:
-    types: [submitted, dismissed]
+    types:
+      - submitted
+      - dismissed
 
 jobs:
   master-version:
