@@ -131,7 +131,7 @@ export abstract class AnimatableObject<
             deep[key] = value;
           }
           return deep[key];
-        });
+        }, this);
         options.onChange &&
           // @ts-expect-error generic callback arg0 is wrong
           options.onChange(value, valueRatio, durationRatio);
