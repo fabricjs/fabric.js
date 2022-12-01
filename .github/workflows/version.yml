@@ -1,0 +1,77 @@
+name: '🏷️'
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+
+jobs:
+  master-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ env.BASE_VERSION }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - name: base version
+        run: echo "BASE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+  bump-version:
+    name: bump version
+    runs-on: ubuntu-latest
+    needs: master-version
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # list of labels that block bumping the version
+      STRICT_NO_RELEASE_LABELS: |
+        norelease
+      # list of labels that shouldn't bump the version by default
+      # adding a release label overrides this configuration
+      NO_RELEASE_LABELS: |
+        CI/CD
+        docs
+      BASE_VERSION: ${{ needs.master-version.outputs.version }}
+      PRERELEASE_TAG: beta
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+      - run: npm ci
+      - name: Bump Version
+        id: bump-version
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { bumpPRVersion } = await import('${{ github.workspace }}/scripts/versioning.mjs');
+            const {
+              STRICT_NO_RELEASE_LABELS: strictNoReleaseLabels,
+              NO_RELEASE_LABELS: noReleaseLabels,
+              BASE_VERSION: baseVersion,
+              PRERELEASE_TAG: prereleaseTag
+            } = process.env;
+            return bumpPRVersion({
+              labels: context.payload.pull_request.labels,
+              strictNoReleaseLabels: strictNoReleaseLabels.split('\n'),
+              noReleaseLabels: noReleaseLabels.split('\n'),
+              baseVersion,
+              prereleaseTag
+            });
+      - name: Commit & Push
+        if: steps.bump-version.outputs.result
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add package.json
+          git commit -m "v${{ steps.bump-version.outputs.result }}"
+          git push
