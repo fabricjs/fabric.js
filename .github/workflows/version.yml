@@ -72,16 +72,16 @@ jobs:
             const releaseLabels = labels
               .map((label) => label.name)
               .filter((label) => label.startsWith(LABEL_PREFIX));
-            if (releaseLabels.length > 1) {
+            let shouldBump = !labels.some((label) => blockingTags.includes(label.name));
+            if (releaseLabels.length > 1 && shouldBump) {
               throw new Error(`Found more than one release label: ${releaseLabels.join(', ')}`);
             }
             const releaseLevel = releaseLabels[0]?.replace(LABEL_PREFIX, '');
-            let shouldInc = !labels.some((label) => blockingTags.includes(label.name));
-            if (!releaseLevel && shouldInc) {
-              shouldInc = !labels.some((label) => nonBlockingTags.includes(label.name));
+            if (!releaseLevel && shouldBump) {
+              shouldBump = !labels.some((label) => nonBlockingTags.includes(label.name));
             }
             // increment version
-            const nextVersion = shouldInc ?
+            const nextVersion = shouldBump ?
               semver.inc(version, releaseLabels[0]?.replace(LABEL_PREFIX, '') || 'prerelease', process.env.PRERELEASE_TAG) :
               version;
 
