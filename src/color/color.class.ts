@@ -389,14 +389,11 @@ export class Color {
 
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
-   * @static
-   * @memberOf Color
+   * @deprecated use `new Color(source)` instead
    * @param {TColorSource | TColorAlphaSource} source
    * @return {Color}
    */
-  static fromSource([r, b, g, a = 1]: TColorSource | TColorAlphaSource): Color {
-    const color = new Color();
-    color.setSource([r, b, g, a]);
-    return color;
+  static fromSource(source: TColorSource | TColorAlphaSource) {
+    return new Color(source);
   }
 }
