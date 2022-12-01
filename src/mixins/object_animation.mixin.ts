@@ -126,7 +126,7 @@ export abstract class AnimatableObject<
         valueRatio: number,
         durationRatio: number
       ) => {
-        path.reduce((deep: any, key, index) => {
+        path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
             deep[key] = value;
           }
