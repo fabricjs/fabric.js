@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PRERELEASE_TAG: beta
+    outputs:
+      tag: ${{ fromJSON(steps.release.outputs.result) && fromJSON(steps.release.outputs.result).tag_name }}
+      prerelease: ${{ fromJSON(steps.release.outputs.result) && fromJSON(steps.release.outputs.result).prerelease }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -17,7 +21,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Release
-        id: version
+        id: release
         uses: actions/github-script@v6
         env:
           # list of labels that block bumping the version
@@ -32,7 +36,6 @@ jobs:
             const tag = `v${version}`;
             const { owner, repo } = context.repo;
             const blockingLabels = process.env.STRICT_NO_RELEASE_LABELS.split('\n');
-            let res;
             const labels = [];
             (await Promise.all(context.payload.commits.map(commit => github.rest.repos.listPullRequestsAssociatedWithCommit({
               owner,
@@ -53,11 +56,13 @@ jobs:
                 tag,
               });
               console.log(`Updating release ${tag}`);
-              res = await github.rest.repos.updateRelease({
+              const res = await github.rest.repos.updateRelease({
                 owner,
                 repo,
                 release_id: id
               });
+              console.log(`View ${tag} at ${res.data.html_url}`);
+              return;
             } catch(error) {
               console.log(`Releasing ${tag}`);
               const body = `**View the [CHANGELOG](CHANGELOG.md)**\n`;
@@ -82,7 +87,7 @@ jobs:
                   sha: context.payload.after,
                 });
               */
-              res = await github.rest.repos.createRelease({
+              const res = await github.rest.repos.createRelease({
                 owner,
                 repo,
                 tag_name: tag,
@@ -90,6 +95,15 @@ jobs:
                 generate_release_notes: true,
                 prerelease: !!semver.prerelease(version)
               });
+              console.log(`View ${tag} at ${res.data.html_url}`);
+              return JSON.stringify(res.data);
             }
-            console.log(`View ${tag} at ${res.data.html_url}`);
-            return res;
+  publish:
+    needs: release-on-push
+    if: needs.release-on-push.outputs.tag
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ needs.release-on-push.outputs.tag }}
+      prerelease: ${{ fromJSON(needs.release-on-push.outputs.prerelease) }}
+      preid: beta
+    secrets: inherit

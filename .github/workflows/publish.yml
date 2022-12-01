@@ -1,0 +1,92 @@
+name: Publish
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      prerelease:
+        required: true
+        type: boolean
+      preid:
+        type: string
+        default: beta
+      bug-report-major-diff:
+        type: number
+        default: 2
+    secrets:
+      npm_token:
+        required: true
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: publish
+        run: npm publish --dry-run --tag ${{ inputs.tag }} ${{ (inputs.prerelease && format('--tag {0}', inputs.preid)) || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+  update-bug-report:
+    runs-on: ubuntu-latest
+    # wait for publishing to complete
+    needs: publish-npm
+    if: always()
+    env:
+      NODE_MIN_VERSION: 14.0.0
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: npm
+      - run: npm ci
+      - name: semver range
+        id: semver-range
+        uses: actions/github-script@v6
+        env:
+          PRERELEASE_TAG: ${{ inputs.preid }}
+          MAJOR_DIFF: ${{ inputs.bug-report-major-diff }}
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const semver = require('semver');
+            const { version } = JSON.parse(fs.readFileSync('./package.json'));
+            const latestMajor = semver.major(version);
+            const fromMajor = Math.max(latestMajor - parseInt(process.env.MAJOR_DIFF), 0);
+            return `>=${fromMajor}.0.0 || >=${latestMajor}.0.0-${process.env.PRERELEASE_TAG}`;
+      - name: Update bug report version
+        uses: ShaMan123/gha-populate-form-version@v2.0.2
+        with:
+          semver: ${{ steps.semver-range.outputs.result }}
+          dry_run: no-push
+      - name: Update bug report node version
+        uses: ShaMan123/gha-populate-form-version@v2.0.2
+        with:
+          dropdown: _node_version
+          package: node
+          semver: '>=${{ env.NODE_MIN_VERSION }}'
+          dry_run: no-push
+      - name: Commit & PR
+        uses: peter-evans/create-pull-request@v4.1.3
+        with:
+          add-paths: .github/ISSUE_TEMPLATE/bug_report.yml
+          branch: ci-update-bug-report
+          base: master
+          delete-branch: true
+          labels: CI/CD, bot, task
+          title: 'chore(): Update bug report'
+          body: |
+            Automated update to `.github/ISSUE_TEMPLATE/bug_report.yml`
+            Triggered by job [`${{ github.job }}`](../actions/runs/${{ github.run_id }})
