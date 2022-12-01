@@ -6,18 +6,23 @@ on:
       tag:
         type: string
         default: ''
+        description: tag value to pass to npm that will be used as follows `npm i fabric@tag`
       preid:
         type: string
-        default: 'beta'
+        default: beta
+        description: tag value in case `tag` input is empty and the `prerelease` input is true
       prerelease:
         type: boolean
         default: false
+        description: flag `true` to set `tag` to `preid`
       dry-run:
         type: boolean
         default: false
+        description: dry runs `npm publish`
       bug-report-major-diff:
         type: number
         default: 2
+        description: The major diff from latest that filters which versions appear in the bug report dropdown
     secrets:
       npm_token:
         required: true
