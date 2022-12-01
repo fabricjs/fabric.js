@@ -29,7 +29,7 @@ export type TPatternHydrationOptions = {
    * handle aborting
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
-  signal: AbortSignal;
+  signal?: AbortSignal;
 };
 
 type TImageSource = { source: HTMLImageElement };
