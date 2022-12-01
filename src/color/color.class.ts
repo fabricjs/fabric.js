@@ -21,6 +21,7 @@ export class Color {
    */
   constructor(color?: TColorArg) {
     if (!color) {
+      // we default to black as canvas does
       this.setSource([0, 0, 0, 1]);
     } else if (Array.isArray(color)) {
       const [r, g, b, a = 1] = color;
@@ -44,7 +45,8 @@ export class Color {
       : Color.sourceFromHex(color) ||
           Color.sourceFromRgb(color) ||
           Color.sourceFromHsl(color) ||
-          // color is not recognize let's default to black as canvas does
+          // color is not recognized
+          // we default to black as canvas does
           ([0, 0, 0, 1] as TColorAlphaSource);
   }
 
