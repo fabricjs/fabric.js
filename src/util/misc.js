@@ -1235,6 +1235,7 @@
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.deltaY !== thisStyle.deltaY) ||
               (forTextSpans &&
                 (prevStyle.overline !== thisStyle.overline ||
