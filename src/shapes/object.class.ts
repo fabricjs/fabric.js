@@ -596,6 +596,15 @@ export class FabricObject<
    */
   ownCaching?: boolean;
 
+  /**
+   * Private. indicates if the object inside a group is on a transformed context or not
+   * or is part of a larger cache for many object ( a group for example)
+   * @type boolean
+   * @default undefined
+   * @private
+   */
+  _transformDone?: boolean;
+
   callSuper?: TCallSuper;
 
   /**
