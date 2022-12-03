@@ -3,7 +3,9 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
+import type { FabricObject } from '../shapes/fabricObject.class';
 import { TMat2D } from '../typedefs';
+import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
@@ -21,7 +23,6 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { FabricObject } from '../shapes/fabricObject.class';
 
 /**
  * Gradient class
@@ -90,8 +91,7 @@ export class Gradient<
     gradientTransform,
     id,
   }: GradientOptions<T>) {
-    const uid = FabricObject.__uid++;
-    this.id = id ? `${id}_${uid}` : uid;
+    this.id = id ? `${id}_${uid()}` : uid();
     this.type = type;
     this.gradientUnits = gradientUnits;
     this.gradientTransform = gradientTransform || null;
