@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { config } from '../config';
-import { IText } from '../shapes/itext.class';
+import { Text } from '../shapes/text.class';
 import { applyMixins } from '../util/applyMixins';
 import { escapeXml } from '../util/lang_string';
 import { hasStyleChanged } from '../util/misc/textStyles';
@@ -11,7 +11,7 @@ import {
   getSvgColorString,
   SVGReviver,
 } from './object.svg_export';
-import { TextStyleDeclaration } from './text_style.mixin';
+import type { TextStyleDeclaration } from './text_style.mixin';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -33,7 +33,7 @@ function createSVGRect(
   )}" height="${toFixed(height, rounding)}"></rect>\n`;
 }
 
-export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
+export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   _toSVG() {
     const offsets = this._getSVGLeftTopOffsets(),
       textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
@@ -300,4 +300,4 @@ export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
 }
 
 // TODO: handle differently?
-applyMixins(IText, [ITextSVGExportMixin]);
+applyMixins(Text, [TextSVGExportMixin]);
