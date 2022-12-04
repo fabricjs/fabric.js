@@ -17,6 +17,11 @@ export function initFilterBackend(): FilterBackend {
   }
 }
 
+/**
+ *
+ * @param [strict] pass `true` to create the backend if it wasn't created yet (default behavior),
+ * pass `false` to get the backend ref without mutating it
+ */
 export function getFilterBackend(strict = true): FilterBackend {
   if (!filterBackend && strict) {
     filterBackend = initFilterBackend();
