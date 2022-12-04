@@ -7,7 +7,7 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
+import type { TClassProperties, TDegree, TFiller, TSize, TCacheCanvasDimensions } from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
 import { clone } from '../util/lang_object';
 import { capitalize } from '../util/lang_string';
@@ -705,7 +705,7 @@ export class FabricObject<
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _getCacheCanvasDimensions() {
+  _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
       // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
