@@ -1,4 +1,4 @@
-//// @ts-nocheck
+// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
