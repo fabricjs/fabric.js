@@ -294,7 +294,7 @@ export class ObjectGeometry<
   intersectsWithObject(
     other: ObjectGeometry,
     absolute = false,
-    calculate = false,
+    calculate = false
   ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),

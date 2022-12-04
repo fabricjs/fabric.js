@@ -21,7 +21,13 @@ import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
 import { fabric } from '../HEADER';
 import { invertTransform, transformPoint } from './util/misc/matrix';
 import { TCachedFabricObject } from './shapes/object.class';
-import { isActiveSelection, isCollection, isFiller, isPattern, isTextObject } from './util/types';
+import {
+  isActiveSelection,
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from './util/types';
 import { Gradient } from './gradient';
 import { Pattern } from './pattern.class';
 import { toFixed } from './util/misc/toFixed';
@@ -1492,11 +1498,15 @@ export class StaticCanvas extends createCollectionMixin(
           finalHeight / 2
         })" x="${filler.offsetX - finalWidth / 2}" y="${
           filler.offsetY - finalHeight / 2
-        }" width="${repeat === 'repeat-y' || repeat === 'no-repeat'
-          ? filler.source.width
-          : finalWidth}" height="${repeat === 'repeat-x' || repeat === 'no-repeat'
-          ? filler.source.height
-          : finalHeight}" fill="url(#SVGID_' + filler.id + ')"></rect>\n`
+        }" width="${
+          repeat === 'repeat-y' || repeat === 'no-repeat'
+            ? filler.source.width
+            : finalWidth
+        }" height="${
+          repeat === 'repeat-x' || repeat === 'no-repeat'
+            ? filler.source.height
+            : finalHeight
+        }" fill="url(#SVGID_' + filler.id + ')"></rect>\n`
       );
     } else {
       markup.push(
@@ -1601,7 +1611,11 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * @private
    */
-  _findNewLowerIndex(object: FabricObject, idx: number, intersecting: boolean): number {
+  _findNewLowerIndex(
+    object: FabricObject,
+    idx: number,
+    intersecting: boolean
+  ): number {
     if (intersecting) {
       // traverse down the stack looking for the nearest intersecting object
       for (let i = idx - 1; i >= 0; --i) {
@@ -1784,25 +1798,29 @@ export class StaticCanvas extends createCollectionMixin(
   }
 }
 
-Object.assign(StaticCanvas.prototype, {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  stateful: false,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: fabric.iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-}, fabric.DataURLExporter);
+Object.assign(
+  StaticCanvas.prototype,
+  {
+    backgroundColor: '',
+    backgroundImage: null,
+    overlayColor: '',
+    overlayImage: null,
+    includeDefaultValues: true,
+    stateful: false,
+    renderOnAddRemove: true,
+    controlsAboveOverlay: false,
+    allowTouchScrolling: false,
+    imageSmoothingEnabled: true,
+    viewportTransform: fabric.iMatrix.concat(),
+    backgroundVpt: true,
+    overlayVpt: true,
+    enableRetinaScaling: true,
+    svgViewportTransformation: true,
+    skipOffscreen: true,
+    clipPath: undefined,
+  },
+  fabric.DataURLExporter
+);
 
 if (fabric.isLikelyNode) {
   StaticCanvas.prototype.createPNGStream = function () {
