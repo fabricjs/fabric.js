@@ -21,7 +21,7 @@ import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
 import { fabric } from '../HEADER';
 import { invertTransform, transformPoint } from './util/misc/matrix';
 import { TCachedFabricObject } from './shapes/object.class';
-import { isCollection, isFiller, isPattern, isTextObject } from './util/types';
+import { isActiveSelection, isCollection, isFiller, isPattern, isTextObject } from './util/types';
 import { Gradient } from './gradient';
 import { Pattern } from './pattern.class';
 import { toFixed } from './util/misc/toFixed';
@@ -245,6 +245,13 @@ export class StaticCanvas extends createCollectionMixin(
    * @type boolean
    */
   destroyed?: boolean;
+
+  /**
+   * Started the process of disposing but not done yet.
+   * WIll likely complete the render cycle already scheduled but stopping adding more.
+   * @type boolean
+   */
+  disposed?: boolean;
 
   add(...objects: FabricObject[]) {
     const size = super.add(...objects);
@@ -1513,7 +1520,7 @@ export class StaticCanvas extends createCollectionMixin(
   sendToBack(object: FabricObject) {
     const activeSelection = this._activeObject;
     // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
-    if (object === activeSelection && object.type === 'activeSelection') {
+    if (object === activeSelection && isActiveSelection(object)) {
       const objs = activeSelection._objects;
       for (let i = objs.length; i--; ) {
         const obj = objs[i];
@@ -1538,7 +1545,7 @@ export class StaticCanvas extends createCollectionMixin(
   bringToFront(object: FabricObject) {
     const activeSelection = this._activeObject;
     // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
-    if (object === activeSelection && object.type === 'activeSelection') {
+    if (object === activeSelection && isActiveSelection(object)) {
       const objs = activeSelection._objects;
       for (let i = 0; i < objs.length; i++) {
         const obj = objs[i];
@@ -1566,7 +1573,7 @@ export class StaticCanvas extends createCollectionMixin(
    */
   sendBackwards(object: FabricObject, intersecting: boolean) {
     const activeSelection = this._activeObject;
-    if (object === activeSelection && object.type === 'activeSelection') {
+    if (object === activeSelection && isActiveSelection(object)) {
       let objsMoved = 0;
       const objs = activeSelection._objects;
       for (let i = 0; i < objs.length; i++) {
@@ -1582,8 +1589,9 @@ export class StaticCanvas extends createCollectionMixin(
       const idx: number = this._objects.indexOf(object);
       if (idx !== 0) {
         // if object is not on the bottom of stack
+        const newIdx = this._findNewLowerIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
-        this._objects.splice(this._findNewLowerIndex(object, idx, intersecting), 0, object);
+        this._objects.splice(newIdx, 0, object);
       }
     }
     this.renderOnAddRemove && this.requestRenderAll();
@@ -1601,7 +1609,6 @@ export class StaticCanvas extends createCollectionMixin(
           object.intersectsWithObject(this._objects[i]) ||
           object.isContainedWithinObject(this._objects[i]) ||
           this._objects[i].isContainedWithinObject(object);
-
         if (isIntersecting) {
           return i;
         }
@@ -1621,35 +1628,26 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  bringForward(object, intersecting) {
-    if (!object) {
-      return this;
-    }
-    var activeSelection = this._activeObject,
-      i,
-      obj,
-      idx,
-      newIdx,
-      objs,
-      objsMoved = 0;
+  bringForward(object: FabricObject, intersecting: boolean) {
+    const activeSelection = this._activeObject;
+    let objsMoved = 0;
 
-    if (object === activeSelection && object.type === 'activeSelection') {
-      objs = activeSelection._objects;
-      for (i = objs.length; i--; ) {
-        obj = objs[i];
-        idx = this._objects.indexOf(obj);
+    if (object === activeSelection && isActiveSelection(object)) {
+      const objs = activeSelection._objects;
+      for (let i = objs.length; i--; ) {
+        const obj = objs[i];
+        const idx = this._objects.indexOf(obj);
         if (idx < this._objects.length - 1 - objsMoved) {
-          newIdx = idx + 1;
           removeFromArray(this._objects, obj);
-          this._objects.splice(newIdx, 0, obj);
+          this._objects.splice(idx + 1, 0, obj);
         }
         objsMoved++;
       }
     } else {
-      idx = this._objects.indexOf(object);
+      const idx = this._objects.indexOf(object);
       if (idx !== this._objects.length - 1) {
         // if object is not on top of stack (last item in an array)
-        newIdx = this._findNewUpperIndex(object, idx, intersecting);
+        const newIdx = this._findNewUpperIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
         this._objects.splice(newIdx, 0, object);
       }
@@ -1661,15 +1659,15 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * @private
    */
-  _findNewUpperIndex(object, idx, intersecting) {
-    var newIdx, i, len;
+  _findNewUpperIndex(object: FabricObject, idx: number, intersecting: boolean) {
+    let newIdx;
 
     if (intersecting) {
       newIdx = idx;
-
+      const len = this._objects.length;
       // traverse up the stack looking for the nearest intersecting object
-      for (i = idx + 1, len = this._objects.length; i < len; ++i) {
-        var isIntersecting =
+      for (let i = idx + 1; i < len; ++i) {
+        const isIntersecting =
           object.intersectsWithObject(this._objects[i]) ||
           object.isContainedWithinObject(this._objects[i]) ||
           this._objects[i].isContainedWithinObject(object);
@@ -1693,7 +1691,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  moveTo(object, index) {
+  moveTo(object: FabricObject, index: number) {
     removeFromArray(this._objects, object);
     this._objects.splice(index, 0, object);
     return this.renderOnAddRemove && this.requestRenderAll();
@@ -1754,7 +1752,8 @@ export class StaticCanvas extends createCollectionMixin(
     this._iTextInstances = null;
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl;
-    delete this.lowerCanvasEl;
+    // @ts-ignore
+    this.lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');

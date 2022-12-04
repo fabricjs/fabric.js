@@ -1,6 +1,6 @@
 import type { ActiveSelection } from '../shapes/active_selection.class';
 import type { Group } from '../shapes/group.class';
-import type { FabricObject } from '../shapes/object.class';
+import { FabricObject } from '../shapes/object.class';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
@@ -18,6 +18,10 @@ export const isCollection = (
 ): fabricObject is Group | ActiveSelection => {
   return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
+
+export const isActiveSelection = (fabricObject: FabricObject): fabricObject is ActiveSelection => {
+  return !!fabricObject && fabricObject.type === 'activeSelection';
+}
 
 export const isTextObject = (
   fabricObject: FabricObject
