@@ -8,13 +8,17 @@ import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { uid } from './util/internals/uid';
 import { pick } from './util/misc/pick';
-import type { TFiller, TMat2D, TCornerPoint, TSize } from './typedefs';
+import type { TFiller, TMat2D, TCornerPoint, TSize, TValidToObjectMethod } from './typedefs';
 import type { StaticCanvasEvents } from './EventTypeDefs';
 import { getElementOffset } from './util/dom_misc';
 import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
 import { fabric } from '../HEADER';
 import { type } from 'os';
 import { invertTransform, transformPoint } from './util/misc/matrix';
+import { TCachedFabricObject } from './shapes/object.class';
+import { isFiller } from './util/types';
+import { Gradient } from './gradient';
+import { Pattern } from './pattern.class';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -256,6 +260,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
+    this.calcViewportBoundaries();
   }
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
@@ -263,6 +268,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
+    this.calcViewportBoundaries();
   }
 
   /**
@@ -556,7 +562,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       len = this._objects.length;
 
     this.viewportTransform = vpt;
-    for (let i = 0, ; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       const object = this._objects[i];
       object.group || object.setCoords();
     }
@@ -591,7 +597,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     const newPoint = transformPoint(point, invertTransform(vpt));
     vpt[0] = value;
     vpt[3] = value;
-    var after = transformPoint(newPoint, vpt);
+    const after = transformPoint(newPoint, vpt);
     vpt[4] += before.x - after.x;
     vpt[5] += before.y - after.y;
     return this.setViewportTransform(vpt);
@@ -668,7 +674,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @chainable
    */
   clear(): StaticCanvas {
-    this.remove.apply(this, this.getObjects());
+    this.remove(...this.getObjects());
     this.backgroundImage = null;
     this.overlayImage = null;
     this.backgroundColor = '';
@@ -791,7 +797,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       path.shouldCache();
       path._transformDone = true;
       path.renderCache({ forClipping: true });
-      this.drawClipPathOnCanvas(ctx);
+      this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
     if (this.controlsAboveOverlay && this.interactive) {
@@ -809,20 +815,19 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * Paint the cached clipPath on the lowerCanvasEl
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawClipPathOnCanvas(ctx: CanvasRenderingContext2D) {
-    const v = this.viewportTransform,
-      path = this.clipPath;
+  drawClipPathOnCanvas(ctx: CanvasRenderingContext2D, clipPath: TCachedFabricObject) {
+    const v = this.viewportTransform;
     ctx.save();
     ctx.transform(...v);
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4;
     ctx.globalCompositeOperation = 'destination-in';
-    path.transform(ctx);
-    ctx.scale(1 / path.zoomX, 1 / path.zoomY);
+    clipPath.transform(ctx);
+    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
     ctx.drawImage(
-      path._cacheCanvas,
-      -path.cacheTranslationX,
-      -path.cacheTranslationY
+      clipPath._cacheCanvas,
+      -clipPath.cacheTranslationX,
+      -clipPath.cacheTranslationY
     );
     ctx.restore();
   }
@@ -844,13 +849,14 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {string} property 'background' or 'overlay'
    */
   _renderBackgroundOrOverlay(ctx: CanvasRenderingContext2D, property: 'background' | 'overlay') {
-    const fill = this[property + 'Color'],
-      object = this[property + 'Image'],
+    const fill: TFiller | string = this[property + 'Color'],
+      object: FabricObject = this[property + 'Image'],
       v = this.viewportTransform,
       needsVpt = this[property + 'Vpt'];
     if (!fill && !object) {
       return;
     }
+    const isAFiller = isFiller(fill);
     if (fill) {
       ctx.save();
       ctx.beginPath();
@@ -859,13 +865,15 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = fill.toLive ? fill.toLive(ctx, this) : fill;
+      ctx.fillStyle = isAFiller ? fill.toLive(ctx, /* this */) : fill;
       if (needsVpt) {
         ctx.transform(...v);
       }
-      ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-      const m = fill.gradientTransform || fill.patternTransform;
-      m && ctx.transform(...m);
+      if (isAFiller) {
+        ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
+        const m = ((fill as Gradient<'linear'>).gradientTransform || (fill as Pattern).patternTransform) as TMat2D;
+        m && ctx.transform(...m);
+      }
       ctx.fill();
       ctx.restore();
     }
@@ -921,7 +929,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {fabric.Object} object Object to center horizontally
    * @return {fabric.Canvas} thisArg
    */
-  centerObjectH(object) {
+  centerObjectH(object: FabricObject) {
     return this._centerObject(
       object,
       new Point(this.getCenterPoint().x, object.getCenterPoint().y)
@@ -934,7 +942,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  centerObjectV(object) {
+  centerObjectV(object: FabricObject) {
     return this._centerObject(
       object,
       new Point(object.getCenterPoint().x, this.getCenterPoint().y)
@@ -947,9 +955,8 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  centerObject(object) {
-    var center = this.getCenterPoint();
-    return this._centerObject(object, center);
+  centerObject(object: FabricObject) {
+    return this._centerObject(object, this.getCenterPoint());
   }
 
   /**
@@ -958,9 +965,8 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  viewportCenterObject(object) {
-    var vpCenter = this.getVpCenter();
-    return this._centerObject(object, vpCenter);
+  viewportCenterObject(object: FabricObject) {
+    return this._centerObject(object, this.getVpCenter());
   }
 
   /**
@@ -969,11 +975,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  viewportCenterObjectH(object) {
-    var vpCenter = this.getVpCenter();
+  viewportCenterObjectH(object: FabricObject) {
     this._centerObject(
       object,
-      new Point(vpCenter.x, object.getCenterPoint().y)
+      this.getVpCenter()
     );
     return this;
   }
@@ -984,12 +989,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  viewportCenterObjectV(object) {
-    var vpCenter = this.getVpCenter();
-
+  viewportCenterObjectV(object: FabricObject) {
     return this._centerObject(
       object,
-      new Point(object.getCenterPoint().x, vpCenter.y)
+      this.getVpCenter()
     );
   }
 
@@ -998,10 +1001,8 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {Point} vpCenter, viewport center
    * @chainable
    */
-  getVpCenter() {
-    var center = this.getCenterPoint(),
-      iVpt = invertTransform(this.viewportTransform);
-    return transformPoint(center, iVpt);
+  getVpCenter(): Point {
+    return transformPoint(this.getCenterPoint(), invertTransform(this.viewportTransform));
   }
 
   /**
@@ -1011,7 +1012,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  _centerObject(object, center) {
+  _centerObject(object: FabricObject, center: Point) {
     object.setXY(center, 'center', 'center');
     object.setCoords();
     this.renderOnAddRemove && this.requestRenderAll();
@@ -1023,7 +1024,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {String} json string
    */
-  toDatalessJSON(propertiesToInclude) {
+  toDatalessJSON(propertiesToInclude?: string[]) {
     return this.toDatalessObject(propertiesToInclude);
   }
 
@@ -1032,7 +1033,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude) {
+  toObject(propertiesToInclude?: string[]) {
     return this._toObjectMethod('toObject', propertiesToInclude);
   }
 
@@ -1060,14 +1061,14 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject(propertiesToInclude) {
+  toDatalessObject(propertiesToInclude?: string[]) {
     return this._toObjectMethod('toDatalessObject', propertiesToInclude);
   }
 
   /**
    * @private
    */
-  _toObjectMethod(methodName, propertiesToInclude) {
+  _toObjectMethod(methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
     const clipPath = this.clipPath;
     const clipPathData =
       clipPath && !clipPath.excludeFromExport
@@ -1089,17 +1090,17 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   /**
    * @private
    */
-  _toObject(instance, methodName, propertiesToInclude) {
-    var originalValue;
+  _toObject(instance: FabricObject, methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
+    let originalValue;
 
     if (!this.includeDefaultValues) {
       originalValue = instance.includeDefaultValues;
       instance.includeDefaultValues = false;
     }
 
-    var object = instance[methodName](propertiesToInclude);
+    const object = instance[methodName](propertiesToInclude);
     if (!this.includeDefaultValues) {
-      instance.includeDefaultValues = originalValue;
+      instance.includeDefaultValues = !!originalValue;
     }
     return object;
   }
@@ -1107,14 +1108,14 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   /**
    * @private
    */
-  __serializeBgOverlay(methodName, propertiesToInclude) {
-    var data = {},
+  __serializeBgOverlay(methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
+    const data: any = {},
       bgImage = this.backgroundImage,
       overlayImage = this.overlayImage,
       bgColor = this.backgroundColor,
       overlayColor = this.overlayColor;
 
-    if (bgColor && bgColor.toObject) {
+    if (isFiller(bgColor)) {
       if (!bgColor.excludeFromExport) {
         data.background = bgColor.toObject(propertiesToInclude);
       }
@@ -1122,7 +1123,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       data.background = bgColor;
     }
 
-    if (overlayColor && overlayColor.toObject) {
+    if (isFiller(overlayColor)) {
       if (!overlayColor.excludeFromExport) {
         data.overlay = overlayColor.toObject(propertiesToInclude);
       }
@@ -1155,7 +1156,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @type Boolean
    * @default
    */
-  svgViewportTransformation: true,
+  svgViewportTransformation: boolean;
 
   /**
    * Returns SVG representation of canvas
@@ -1818,7 +1819,6 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
 }
 
 Object.assign(StaticCanvas.prototype, {
-
   backgroundColor: '',
   backgroundImage: null,
   overlayColor: '',
@@ -1833,7 +1833,7 @@ Object.assign(StaticCanvas.prototype, {
   backgroundVpt: true,
   overlayVpt: true,
   enableRetinaScaling: true,
-  vptCoords: {}
+  svgViewportTransformation: true,
   skipOffscreen: true,
   clipPath: undefined,
 })

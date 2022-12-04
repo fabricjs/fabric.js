@@ -19,6 +19,8 @@ import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
 
+export type TCachedFabricObject = FabricObject & Required<Pick<FabricObject, 'zoomX' | 'zoomY' | '_cacheCanvas' | 'cacheTranslationX' | 'cacheTranslationY'>>;
+
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
 
@@ -835,7 +837,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]): Record<string, any> {
+  toObject(propertiesToInclude?: (keyof this | string)[]): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -900,7 +902,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude: (keyof this)[]) {
+  toDatalessObject(propertiesToInclude?: (keyof this | string)[]) {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
