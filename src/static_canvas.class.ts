@@ -1491,7 +1491,8 @@ export class StaticCanvas extends createCollectionMixin(
       return;
     }
     if (isFiller(filler)) {
-      const repeat = filler.repeat,
+      // @ts-ignore TS is so stubbordn that i can't even check if a property exists.
+      const repeat = filler.repeat || '',
         finalWidth = this.width,
         finalHeight = this.height,
         shouldInvert = this[property + 'Vpt'],
@@ -1505,10 +1506,12 @@ export class StaticCanvas extends createCollectionMixin(
           filler.offsetY - finalHeight / 2
         }" width="${
           repeat === 'repeat-y' || repeat === 'no-repeat'
+          // @ts-ignore
             ? filler.source.width
             : finalWidth
         }" height="${
           repeat === 'repeat-x' || repeat === 'no-repeat'
+          // @ts-ignore
             ? filler.source.height
             : finalHeight
         }" fill="url(#SVGID_' + filler.id + ')"></rect>\n`
