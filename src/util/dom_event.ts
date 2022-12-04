@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { getScrollLeftTop } from './dom_misc';
 
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
@@ -37,7 +38,7 @@ function getTouchInfo(event) {
 
 export const getPointer = (event) => {
   const element = event.target,
-    scroll = fabric.util.getScrollLeftTop(element),
+    scroll = getScrollLeftTop(element),
     _evt = getTouchInfo(event);
   return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
 };
