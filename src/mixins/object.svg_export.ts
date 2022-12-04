@@ -5,7 +5,7 @@ import { uid } from '../util/internals/uid';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
-type SVGReviver = (markup: string) => string;
+export type SVGReviver = (markup: string) => string;
 
 /* _TO_SVG_START_ */
 
@@ -170,21 +170,57 @@ export class FabricObjectSVGExportMixin {
     return `${svgTransform}${additionalTransform}" `;
   }
 
+  /**
+   * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+   * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+   *
+   * @param {*} value
+   * @return {String}
+   */
+  protected _getFillAttributes(value?: string) {
+    const fillColor =
+      value && typeof value === 'string' ? new Color(value) : '';
+    if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
+      return `fill="${value}"`;
+    }
+    return `opacity="${fillColor.getAlpha()}" fill="${fillColor
+      .setAlpha(1)
+      .toRgb()}"`;
+  }
+
+  protected _createBgRect(
+    color: string,
+    left: number,
+    top: number,
+    width: number,
+    height: number
+  ) {
+    const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
+    return [
+      '\t\t<rect ',
+      this._getFillAttributes(color),
+      ' x="',
+      toFixed(left, NUM_FRACTION_DIGITS),
+      '" y="',
+      toFixed(top, NUM_FRACTION_DIGITS),
+      '" width="',
+      toFixed(width, NUM_FRACTION_DIGITS),
+      '" height="',
+      toFixed(height, NUM_FRACTION_DIGITS),
+      '"></rect>\n',
+    ];
+  }
+
   _setSVGBg(textBgRects: string[]) {
     if (this.backgroundColor) {
-      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
       textBgRects.push(
-        '\t\t<rect ',
-        this._getFillAttributes(this.backgroundColor),
-        ' x="',
-        toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
-        '" y="',
-        toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
-        '" width="',
-        toFixed(this.width, NUM_FRACTION_DIGITS),
-        '" height="',
-        toFixed(this.height, NUM_FRACTION_DIGITS),
-        '"></rect>\n'
+        ...this._createBgRect(
+          this.backgroundColor,
+          -this.width / 2,
+          -this.height / 2,
+          this.width,
+          this.height
+        )
       );
     }
   }
