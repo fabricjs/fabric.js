@@ -199,6 +199,7 @@ function parseMixin(raw) {
           const lastNode = ast.body[ast.body.length - 1];
           if (
             lastNode.type === 'ExpressionStatement' &&
+            lastNode.expression.callee?.params &&
             lastNode.expression.callee.params[0].name === 'global'
           ) {
             // fs.writeFileSync(
@@ -330,6 +331,7 @@ function transformClass(type, raw, options = {}) {
     const methodAST = acorn.parse(value, {
       ecmaVersion: 2022,
       allowReturnOutsideFunction: true,
+      allowAwaitOutsideFunction: true,
     });
     const superTransforms = [];
     walk.simple(methodAST, {
@@ -433,6 +435,7 @@ function transformClass(type, raw, options = {}) {
   const lastNode = ast.body[ast.body.length - 1];
   if (
     lastNode.type === 'ExpressionStatement' &&
+    lastNode.expression.callee?.params &&
     lastNode.expression.callee.params[0].name === 'global'
   ) {
     const bodyNodes = lastNode.expression.callee.body.body;
