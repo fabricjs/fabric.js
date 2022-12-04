@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Color } from '../color';
 import { config } from '../config';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { uid } from '../util/internals/uid';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
@@ -266,7 +266,7 @@ export class FabricObjectSVGExportMixin {
       index = objectMarkup.indexOf('COMMON_PARTS');
     let clipPathMarkup;
     if (clipPath) {
-      clipPath.clipPathId = `CLIPPATH_${FabricObject.__uid++}`;
+      clipPath.clipPathId = `CLIPPATH_${uid()}`;
       clipPathMarkup = `<clipPath id="${
         clipPath.clipPathId
       }" >\n${clipPath.toClipPathSVG(reviver)}</clipPath>\n`;

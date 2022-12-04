@@ -4,9 +4,10 @@ import { VERSION } from './constants';
 import { createCollectionMixin } from './mixins/collection.mixin';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Point } from './point.class';
-import { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/fabricObject.class';
 import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
+import { uid } from './util/internals/uid';
 import { pick } from './util/misc/pick';
 (function (global) {
   // aliases for faster resolution
@@ -1287,7 +1288,7 @@ import { pick } from './util/misc/pick';
       createSVGClipPathMarkup: function (options) {
         var clipPath = this.clipPath;
         if (clipPath) {
-          clipPath.clipPathId = 'CLIPPATH_' + FabricObject.__uid++;
+          clipPath.clipPathId = 'CLIPPATH_' + uid();
           return (
             '<clipPath id="' +
             clipPath.clipPathId +
