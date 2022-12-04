@@ -901,10 +901,10 @@ export class StaticCanvas extends createCollectionMixin(
     ctx: CanvasRenderingContext2D,
     property: 'background' | 'overlay'
   ) {
-    const fill: TFiller | string = this[property + 'Color'],
-      object: FabricObject = this[property + 'Image'],
+    const fill = this[`${property}Color`],
+      object = this[`${property}Image`],
       v = this.viewportTransform,
-      needsVpt = this[property + 'Vpt'];
+      needsVpt = this[`${property}Vpt`];
     if (!fill && !object) {
       return;
     }
@@ -1369,9 +1369,9 @@ export class StaticCanvas extends createCollectionMixin(
   createSVGRefElementsMarkup(): string {
     return ['background', 'overlay']
       .map((prop) => {
-        const fill = this[prop + 'Color'];
+        const fill = this[`${prop}Color`];
         if (isFiller(fill)) {
-          const shouldTransform = this[prop + 'Vpt'],
+          const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
               width: this.width / (shouldTransform ? vpt[0] : 1),
@@ -1482,7 +1482,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @private
    */
   _setSVGBgOverlayColor(markup: string[], property: 'background' | 'overlay') {
-    const filler = this[property + 'Color'];
+    const filler = this[`${property}Color`];
     if (!filler) {
       return;
     }
@@ -1491,7 +1491,7 @@ export class StaticCanvas extends createCollectionMixin(
       const repeat = filler.repeat || '',
         finalWidth = this.width,
         finalHeight = this.height,
-        shouldInvert = this[property + 'Vpt'],
+        shouldInvert = this[`${property}Vpt`],
         additionalTransform = shouldInvert
           ? matrixToSVG(invertTransform(this.viewportTransform))
           : '';
@@ -1792,14 +1792,9 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {String} string representation of an instance
    */
   toString() {
-    return (
-      '#<fabric.Canvas (' +
-      this.complexity() +
-      '): ' +
-      '{ objects: ' +
-      this._objects.length +
-      ' }>'
-    );
+    return `#<fabric.Canvas (${this.complexity()}): { objects: ${
+      this._objects.length
+    } }>`;
   }
 }
 
