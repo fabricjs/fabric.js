@@ -1,3 +1,4 @@
+import { fabric } from '../../../HEADER';
 import { Color } from '../../color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
