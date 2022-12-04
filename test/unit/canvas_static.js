@@ -159,31 +159,8 @@
     return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
-  function basename(path) {
-    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
-  }
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    expected = expected || REFERENCE_IMG_OBJECT;
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
-  }
-
   QUnit.module('fabric.StaticCanvas', {
     beforeEach: function() {
-      fabric.Object.__uid = 0;
       canvas.clear();
       canvas.setDimensions({ width: 200, heigth: 200 });
       canvas2.setDimensions({ width: 200, heigth: 200 });
@@ -839,7 +816,7 @@
     canvas.clear();
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     var svg = canvas.toSVG();
-    assert.equal(svg, CANVAS_SVG);
+    assert.equalSVG(svg, CANVAS_SVG);
   });
 
   QUnit.test('toSVG with different encoding (ISO-8859-1)', function(assert) {
@@ -849,7 +826,7 @@
     var svg = canvas.toSVG({encoding: 'ISO-8859-1'});
     var svgDefaultEncoding = canvas.toSVG();
     assert.ok(svg != svgDefaultEncoding);
-    assert.equal(svg, CANVAS_SVG.replace('encoding="UTF-8"', 'encoding="ISO-8859-1"'));
+    assert.equalSVG(svg, CANVAS_SVG.replace('encoding="UTF-8"', 'encoding="ISO-8859-1"'));
   });
 
   QUnit.test('toSVG without preamble', function(assert) {
@@ -865,7 +842,7 @@
     canvas.clear();
 
     var svg = canvas.toSVG({viewBox: {x: 100, y: 100, width: 300, height: 300}});
-    assert.equal(svg, CANVAS_SVG_VIEWBOX);
+    assert.equalSVG(svg, CANVAS_SVG_VIEWBOX);
   });
 
   QUnit.test('toSVG with reviver', function(assert) {
@@ -983,7 +960,7 @@
     canvasClip.add(new fabric.Circle({ radius: 200 }));
     var svg = canvasClip.toSVG();
     var expectedSVG = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"400\" height=\"400\" viewBox=\"0 0 400 400\" xml:space=\"preserve\">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 100.5 100.5)\" x=\"-100\" y=\"-100\" rx=\"0\" ry=\"0\" width=\"200\" height=\"200\" />\n</clipPath>\n</defs>\n<g clip-path=\"url(#CLIPPATH_0)\" >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<circle style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  cx=\"0\" cy=\"0\" r=\"200\" />\n</g>\n</g>\n</svg>';
-    assert.equal(svg, expectedSVG, 'SVG with clipPath should match');
+    assert.equalSVG(svg, expectedSVG, 'SVG with clipPath should match');
   });
 
   QUnit.test('toSVG with exclude from export background', function(assert) {
@@ -993,12 +970,12 @@
     canvas.overlayImage = imageOL;
     var expectedSVG = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"200\" height=\"200\" viewBox=\"0 0 200 200\" xml:space=\"preserve\">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n<g transform=\"matrix(1 0 0 1 0 0)\"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"\" x=\"0\" y=\"0\" width=\"0\" height=\"0\"></image>\n</g>\n<g transform=\"matrix(1 0 0 1 0 0)\"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"\" x=\"0\" y=\"0\" width=\"0\" height=\"0\"></image>\n</g>\n</svg>';
     var svg1 = canvas.toSVG();
-    assert.equal(svg1, expectedSVG, 'svg with bg and overlay do not match');
+    assert.equalSVG(svg1, expectedSVG, 'svg with bg and overlay do not match');
     imageBG.excludeFromExport = true;
     imageOL.excludeFromExport = true;
     var expectedSVG2 = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="200" height="200" viewBox="0 0 200 200" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n</svg>';
     var svg2 = canvas.toSVG();
-    assert.equal(svg2, expectedSVG2, 'svg without bg and overlay do not match');
+    assert.equalSVG(svg2, expectedSVG2, 'svg without bg and overlay do not match');
     canvas.backgroundImage = null;
     canvas.overlayImage = null;
     canvas.renderOnAddRemove = true;
@@ -1917,7 +1894,7 @@
     canvas2.backgroundColor = 'red';
     var svg = canvas2.toSVG();
     var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n<rect x="0" y="0" width="100%" height="100%" fill="red"></rect>\n</svg>';
-    assert.equal(svg, expectedSVG, 'svg is as expected');
+    assert.equalSVG(svg, expectedSVG, 'svg is as expected');
   });
 
   QUnit.test('toSVG with background and zoom and svgViewportTransformation', function(assert) {
@@ -1927,11 +1904,10 @@
     canvas2.viewportTransform = [3, 0, 0, 3, 60, 30];
     var svg = canvas2.toSVG();
     var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="-20 -10 100 50" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n</defs>\n<rect x="0" y="0" width="100%" height="100%" fill="blue"></rect>\n</svg>';
-    assert.equal(svg, expectedSVG, 'svg is as expected');
+    assert.equalSVG(svg, expectedSVG, 'svg is as expected');
   });
 
   QUnit.test('toSVG with background gradient', function(assert) {
-    fabric.Object.__uid = 0;
     var canvas2 = new fabric.StaticCanvas();
     canvas2.backgroundColor = new fabric.Gradient({
       type: 'linear',
@@ -1948,11 +1924,10 @@
     });
     var svg = canvas2.toSVG();
     var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 0 0 1 0 0) matrix(1 0 0 1 -150 -75)\"  x1=\"0\" y1=\"0\" x2=\"300\" y2=\"0\">\n<stop offset="0%" style="stop-color:black;"/>\n<stop offset="100%" style="stop-color:white;"/>\n</linearGradient>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
-    assert.equal(svg, expectedSVG, 'svg is as expected');
+    assert.equalSVG(svg, expectedSVG, 'svg is as expected');
   });
 
   QUnit.test('toSVG with background gradient and transforms', function(assert) {
-    fabric.Object.__uid = 0;
     var canvas2 = new fabric.StaticCanvas();
     canvas2.viewportTransform = [1, 2, 3, 4, 5, 6];
     canvas2.backgroundColor = new fabric.Gradient({
@@ -1971,11 +1946,10 @@
     });
     var svg = canvas2.toSVG();
     var expectedSVG = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.1\" width=\"300\" height=\"150\" viewBox=\"-5 -1.5 300 37.5\" xml:space=\"preserve\">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<linearGradient id=\"SVGID_0\" gradientUnits=\"userSpaceOnUse\" gradientTransform=\"matrix(1 2 3 4 5 6) matrix(0.2 0.3 0.4 0.5 -153 -23.75)\"  x1=\"0\" y1=\"0\" x2=\"300\" y2=\"0\">\n<stop offset=\"0%\" style=\"stop-color:black;\"/>\n<stop offset=\"100%\" style=\"stop-color:white;\"/>\n</linearGradient>\n</defs>\n<rect transform=\"matrix(-2 1 1.5 -0.5 1 -2) translate(150,75)\" x=\"-150\" y=\"-75\" width=\"300\" height=\"150\" fill=\"url(#SVGID_0)\"></rect>\n</svg>';
-    assert.equal(svg, expectedSVG, 'svg is as expected');
+    assert.equalSVG(svg, expectedSVG, 'svg is as expected');
   });
 
   QUnit.test('toSVG with background pattern', function(assert) {
-    fabric.Object.__uid = 0;
     var canvas2 = new fabric.StaticCanvas();
 
     var img = fabric.document.createElement('img');
@@ -1986,7 +1960,7 @@
     });
     var svg = canvas2.toSVG();
     var expectedSVG = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="300" height="150" viewBox="0 0 300 150" xml:space="preserve">\n<desc>Created with Fabric.js ' + fabric.version + '</desc>\n<defs>\n<pattern id="SVGID_0" x="0" y="0" width="0" height="0">\n<image x="0" y="0" width="0" height="0" xlink:href="' + img.src + '"></image>\n</pattern>\n</defs>\n<rect transform="matrix(1 0 0 1 0 0) translate(150,75)" x="-150" y="-75" width="300" height="150" fill="url(#SVGID_0)"></rect>\n</svg>';
-    assert.equal(svg, expectedSVG, 'svg is as expected');
+    assert.equalSVG(svg, expectedSVG, 'svg is as expected');
   });
 
   QUnit.test('requestRenderAll and cancelRequestedRender', function(assert) {
