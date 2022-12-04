@@ -281,6 +281,8 @@ export class Text<
    */
   pathAlign: string;
 
+  private pathSegmentsInfo: ReturnType<typeof getPathSegmentsInfo>;
+
   /**
    * @private
    */
@@ -389,7 +391,7 @@ export class Text<
   setPathInfo() {
     const path = this.path;
     if (path) {
-      path.segmentsInfo = getPathSegmentsInfo(path.path);
+      this.pathSegmentsInfo = getPathSegmentsInfo(path.path);
     }
   }
 
@@ -858,8 +860,8 @@ export class Text<
     if (path) {
       let positionInPath = 0;
       const totalPathLength =
-        path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
+        this.pathSegmentsInfo[this.pathSegmentsInfo.length - 1].length;
+      const startingPoint = getPointOnPath(path.path, 0, this.pathSegmentsInfo);
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
@@ -912,7 +914,11 @@ export class Text<
       path = this.path;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
-    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
+    const info = getPointOnPath(
+      path.path,
+      centerPosition,
+      this.pathSegmentsInfo
+    );
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
     graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
