@@ -31,7 +31,7 @@ export type LoadImageOptions = {
  * Loads image element from given url and resolve it, or catch.
  * @param {String} url URL representing an image
  * @param {LoadImageOptions} [options] image loading options
- * @returns {Promise<Image>} the loaded image.
+ * @returns {Promise<HTMLImageElement>} the loaded image.
  */
 export const loadImage = (
   url: string,
@@ -137,7 +137,7 @@ export const enlivenObjects = (
  * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
  * @param {object} [options]
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<{[key:string]:FabricObject|Pattern|Gradient|null}>} the input object with enlived values
+ * @returns {Promise<Record<string, FabricObject | TFiller | null>>} the input object with enlived values
  */
 export const enlivenObjectEnlivables = <
   R = Record<string, FabricObject | TFiller | null>
@@ -182,7 +182,7 @@ export const enlivenObjectEnlivables = <
         }, {});
       })
       .then(resolve)
-      .catch(function (error) {
+      .catch((error) => {
         // cleanup
         instances.forEach((instance: any) => {
           instance.dispose && instance.dispose();
