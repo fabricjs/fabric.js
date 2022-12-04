@@ -2,8 +2,6 @@ import { fabric } from '../../../HEADER';
 import { ImageFormat } from '../../typedefs';
 /**
  * Creates canvas element
- * @static
- * @memberOf fabric.util
  * @return {CanvasElement} initialized canvas element
  */
 export const createCanvasElement = (): HTMLCanvasElement =>
@@ -11,8 +9,6 @@ export const createCanvasElement = (): HTMLCanvasElement =>
 
 /**
  * Creates image element (works on client and node)
- * @static
- * @memberOf fabric.util
  * @return {HTMLImageElement} HTML image element
  */
 export const createImage = (): HTMLImageElement =>
@@ -21,8 +17,6 @@ export const createImage = (): HTMLImageElement =>
 /**
  * Creates a canvas element that is a copy of another and is also painted
  * @param {CanvasElement} canvas to copy size and content of
- * @static
- * @memberOf fabric.util
  * @return {CanvasElement} initialized canvas element
  */
 export const copyCanvasElement = (
@@ -41,8 +35,6 @@ export const copyCanvasElement = (
  * @param {CanvasElement} canvasEl to copy size and content of
  * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
  * @param {Number} quality <= 1 and > 0
- * @static
- * @memberOf fabric.util
  * @return {String} data url
  */
 export const toDataURL = (

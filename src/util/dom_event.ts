@@ -6,9 +6,7 @@ const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
 /**
  * Adds an event listener to an element
- * @function
  * @deprecated
- * @memberOf fabric.util
  * @param {HTMLElement} element
  * @param {String} eventName
  * @param {Function} handler
@@ -18,9 +16,7 @@ export const addListener = (element, eventName, handler, options) =>
 
 /**
  * Removes an event listener from an element
- * @function
  * @deprecated
- * @memberOf fabric.util
  * @param {HTMLElement} element
  * @param {String} eventName
  * @param {Function} handler
