@@ -266,11 +266,11 @@
     canvas.renderOnAddRemove = true;
     canvas.requestRenderAll = countRenderAll;
     assert.ok(typeof canvas.add === 'function');
-    assert.equal(canvas.add(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.add(rect1), 1, 'should return the length of objects array');
     assert.strictEqual(canvas.item(0), rect1);
     assert.equal(renderAllCount, 1);
 
-    canvas.add(rect2, rect3, rect4);
+    assert.equal(canvas.add(rect2, rect3, rect4), 4, 'should return the length of objects array');
     assert.equal(canvas.getObjects().length, 4, 'should support multiple arguments');
     assert.equal(renderAllCount, 2);
 
@@ -331,7 +331,6 @@
     canvas.renderOnAddRemove = false;
     canvas.requestRenderAll = countRenderAll;
 
-    assert.equal(canvas.add(rect), canvas, 'should be chainable');
     assert.equal(renderAllCount, 0);
 
     assert.equal(canvas.item(0), rect);
@@ -434,7 +433,7 @@
     canvas.renderOnAddRemove = true;
     assert.ok(typeof canvas.remove === 'function');
     assert.equal(renderAllCount, 0);
-    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.remove(rect1), 1, 'should return the number of removed objects');
     assert.strictEqual(canvas.item(0), rect2, 'should be second object');
 
     canvas.remove(rect2, rect3);
@@ -460,7 +459,6 @@
     canvas.add(rect1, rect2);
     assert.equal(renderAllCount, 0);
 
-    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
     assert.equal(renderAllCount, 0);
     assert.strictEqual(canvas.item(0), rect2, 'only second object should be left');
   });

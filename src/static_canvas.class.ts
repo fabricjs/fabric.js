@@ -1029,8 +1029,10 @@ export class StaticCanvas extends createCollectionMixin(
    * @chainable
    */
   viewportCenterObjectH(object: FabricObject) {
-    this._centerObject(object, this.getVpCenter());
-    return this;
+    return this._centerObject(
+      object,
+      new Point(this.getVpCenter().x, object.getCenterPoint().y)
+    );
   }
 
   /**
@@ -1040,7 +1042,10 @@ export class StaticCanvas extends createCollectionMixin(
    * @chainable
    */
   viewportCenterObjectV(object: FabricObject) {
-    return this._centerObject(object, this.getVpCenter());
+    return this._centerObject(
+      object,
+      new Point(object.getCenterPoint().x, this.getVpCenter().y)
+    );
   }
 
   /**
@@ -1485,7 +1490,7 @@ export class StaticCanvas extends createCollectionMixin(
     if (!filler) {
       return;
     }
-    if (isPattern(filler)) {
+    if (isFiller(filler)) {
       const repeat = filler.repeat,
         finalWidth = this.width,
         finalHeight = this.height,
