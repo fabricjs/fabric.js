@@ -1,11 +1,13 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
+import * as filters from '../filters';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
 import { cleanUpJsdomNode } from '../util/dom_misc';
+import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import {
@@ -16,7 +18,6 @@ import {
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
-import * as filters from '../filters';
 
 export type ImageSource =
   | HTMLImageElement
@@ -134,7 +135,7 @@ export class Image extends FabricObject {
   constructor(arg0: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];
-    this.cacheKey = `texture${FabricObject.__uid++}`;
+    this.cacheKey = `texture${uid()}`;
     this.set(options);
     this.setElement(
       (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
@@ -301,7 +302,7 @@ export class Image extends FabricObject {
       return [];
     }
     if (this.hasCrop()) {
-      const clipPathId = FabricObject.__uid++;
+      const clipPathId = uid();
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' +

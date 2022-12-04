@@ -8,6 +8,7 @@
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
 - chore(TS): migrate Polyline/Polygon [#8417](https://github.com/fabricjs/fabric.js/pull/8417)
+- chore(): refactor `Object.__uid++` => `uid()` [#8482](https://github.com/fabricjs/fabric.js/pull/8482)
 - chore(TS): migrate object mixins to TS [#8414](https://github.com/fabricjs/fabric.js/pull/8414)
 - chore(TS): migrate filters [#8474](https://github.com/fabricjs/fabric.js/pull/8474)
 - chore(TS): BaseBrush abstract methods [#8428](https://github.com/fabricjs/fabric.js/pull/8428)

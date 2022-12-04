@@ -596,14 +596,6 @@ export class FabricObject<
    */
   ownCaching?: boolean;
 
-  /**
-   * translation of the cacheCanvas away from the center, for subpixel accuracy and crispness
-   * @static
-   * @memberOf fabric.Object
-   * @type Number
-   */
-  static __uid = 0;
-
   callSuper?: TCallSuper;
 
   /**
