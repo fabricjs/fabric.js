@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): migrate text SVG export mixin [#8486](https://github.com/fabricjs/fabric.js/pull/8486)
 - chore(): refactor `Object.__uid++` => `uid()` [#8482](https://github.com/fabricjs/fabric.js/pull/8482)
 - chore(TS): migrate object mixins to TS [#8414](https://github.com/fabricjs/fabric.js/pull/8414)
 - chore(TS): migrate filters [#8474](https://github.com/fabricjs/fabric.js/pull/8474)
