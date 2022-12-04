@@ -2,14 +2,13 @@
 
 import { cache } from '../cache';
 import { config } from '../config';
-import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from '../constants';
 import { commaWsp, rePathCommand } from '../parser/constants';
-import { IPoint, Point } from '../point.class';
-import { cos } from './misc/cos';
-import { sin } from './misc/sin';
-import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
+import { Point } from '../point.class';
 import { PathData, TMat2D } from '../typedefs';
+import { cos } from './misc/cos';
+import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
+import { sin } from './misc/sin';
 
 const commandLengths = {
   m: 2,
@@ -845,17 +844,15 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
  * Transform a path by transforming each segment.
  * it has to be a simplified path or it won't work.
  * WARNING: this depends from pathOffset for correct operation
- * @param {Array} path fabricJS parsed and simplified path commands
- * @param {Array} transform matrix that represent the transformation
- * @param {Object} [pathOffset] `Path.pathOffset`
- * @param {Number} pathOffset.x
- * @param {Number} pathOffset.y
+ * @param {PathData} path fabricJS parsed and simplified path commands
+ * @param {TMat2D} transform matrix that represent the transformation
+ * @param {Point} [pathOffset] `Path.pathOffset`
  * @returns {Array} the transformed path
  */
 export const transformPath = (
   path: PathData,
   transform: TMat2D,
-  pathOffset: IPoint
+  pathOffset: Point
 ) => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
