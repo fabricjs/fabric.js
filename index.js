@@ -55,7 +55,7 @@ import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
 import './src/shapes/text.class'; // optional text
-import './src/mixins/itext.svg_export'; // optional svg
+import './src/mixins/text.svg_export'; // optional svg
 import './src/shapes/itext.class'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction
