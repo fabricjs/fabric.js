@@ -38,15 +38,15 @@ export type TCanvasSizeOptions = {
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
-  viewBox: {
+  viewBox?: {
     x: number;
     y: number;
     width: number;
     height: number;
   };
-  encoding: 'UTF-8'; // test Econding type and see what happens
-  width: string;
-  height: string;
+  encoding?: 'UTF-8'; // test Econding type and see what happens
+  width?: string;
+  height?: string;
   reviver?: TSVGReviver;
 };
 
@@ -1249,7 +1249,7 @@ export class StaticCanvas extends createCollectionMixin(
    *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
    * });
    */
-  toSVG(options: TSVGExportOptions, reviver: TSVGReviver) {
+  toSVG(options: TSVGExportOptions = {}, reviver: TSVGReviver) {
     options.reviver = reviver;
     const markup: string[] = [];
 
@@ -1802,16 +1802,14 @@ Object.assign(StaticCanvas.prototype, {
   svgViewportTransformation: true,
   skipOffscreen: true,
   clipPath: undefined,
-});
-
-Object.assign(StaticCanvas.prototype, fabric.DataURLExporter);
+}, fabric.DataURLExporter);
 
 if (fabric.isLikelyNode) {
-  fabric.StaticCanvas.prototype.createPNGStream = function () {
+  StaticCanvas.prototype.createPNGStream = function () {
     const impl = getNodeCanvas(this.lowerCanvasEl);
     return impl && impl.createPNGStream();
   };
-  fabric.StaticCanvas.prototype.createJPEGStream = function (opts: any) {
+  StaticCanvas.prototype.createJPEGStream = function (opts: any) {
     const impl = getNodeCanvas(this.lowerCanvasEl);
     return impl && impl.createJPEGStream(opts);
   };
