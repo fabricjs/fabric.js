@@ -29,6 +29,7 @@ export function getFilterBackend(strict = true): FilterBackend {
   return filterBackend;
 }
 
+fabric.getFilterBackend = getFilterBackend;
 fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
 fabric.WebglFilterBackend = WebGLFilterBackend;
 fabric.initFilterBackend = initFilterBackend;
