@@ -229,7 +229,7 @@ export class Text<
 
   protected _styleProperties: string[];
 
-  styles: TextStyle | null;
+  styles: TextStyle;
 
   /**
    * Path that the text should follow.

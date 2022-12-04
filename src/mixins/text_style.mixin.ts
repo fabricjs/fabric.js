@@ -10,7 +10,7 @@ export type TextStyle = {
 export abstract class TextStyleMixin<
   EventSpec extends ObjectEvents
 > extends FabricObject<EventSpec> {
-  abstract styles: TextStyle | null;
+  abstract styles: TextStyle;
   protected abstract _textLines: string[][];
   protected abstract _forceClearCache: boolean;
   protected abstract _styleProperties: string[];
