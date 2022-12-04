@@ -2,38 +2,12 @@
 import { Color } from '../color';
 import { config } from '../config';
 import { uid } from '../util/internals/uid';
-import { matrixToSVG } from '../util/misc/svgParsing';
+import { colorPropToSVG, matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
 export type SVGReviver = (markup: string) => string;
 
 /* _TO_SVG_START_ */
-
-/**
- * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
- * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
- * @param prop
- * @param value
- * @returns
- */
-export function getSvgColorString(prop: string, value?: any) {
-  if (!value) {
-    return `${prop}: none; `;
-  } else if (value.toLive) {
-    return `${prop}: url(#SVGID_${value.id}); `;
-  } else {
-    const color = new Color(value),
-      opacity = color.getAlpha();
-
-    let str = `${prop}: ${color.toRgb()}; `;
-
-    if (opacity !== 1) {
-      //change the color in rgb + opacity
-      str += `${prop}-opacity: ${opacity.toString()}; `;
-    }
-    return str;
-  }
-}
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -54,8 +28,8 @@ export class FabricObjectSVGExportMixin {
       opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
       visibility = this.visible ? '' : ' visibility: hidden;',
       filter = skipShadow ? '' : this.getSvgFilter(),
-      fill = getSvgColorString('fill', this.fill),
-      stroke = getSvgColorString('stroke', this.stroke);
+      fill = colorPropToSVG('fill', this.fill),
+      stroke = colorPropToSVG('stroke', this.stroke);
 
     return [
       stroke,
@@ -115,8 +89,8 @@ export class FabricObjectSVGExportMixin {
       fontWeight = style.fontWeight
         ? `font-weight: ${style.fontWeight}${term}`
         : '',
-      fill = style.fill ? getSvgColorString('fill', style.fill) : '',
-      stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+      fill = style.fill ? colorPropToSVG('fill', style.fill) : '',
+      stroke = style.stroke ? colorPropToSVG('stroke', style.stroke) : '',
       textDecoration = this.getSvgTextDecoration(style),
       deltaY = style.deltaY ? `baseline-shift: ${-style.deltaY}; ` : '';
 

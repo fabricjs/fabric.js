@@ -1,11 +1,17 @@
-import { fabric } from '../../../HEADER';
-import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { toFixed } from './toFixed';
+import { Color } from '../../color';
 import { config } from '../../config';
+import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { Group } from '../../shapes/group.class';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import {
+  SupportedSVGUnit,
+  SVGElementName,
+  TBBox,
+  TMat2D,
+} from '../../typedefs';
+import { toFixed } from './toFixed';
 /**
  * Returns array of attributes for given svg that fabric parses
- * @memberOf fabric.util
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
  * @return {Array} string names of supported attributes
  */
@@ -79,15 +85,14 @@ export const parseUnit = (value: string, fontSize: number) => {
 /**
  * Groups SVG elements (usually those retrieved from SVG document)
  * @static
- * @memberOf fabric.util
- * @param {Array} elements fabric.Object(s) parsed from svg, to group
- * @return {fabric.Object|fabric.Group}
+ * @param {Array} elements FabricObject(s) parsed from svg, to group
+ * @return {FabricObject | Group}
  */
-export const groupSVGElements = (elements: any[]) => {
+export const groupSVGElements = (elements: FabricObject[]) => {
   if (elements && elements.length === 1) {
     return elements[0];
   }
-  return new fabric.Group(elements);
+  return new Group(elements);
 };
 
 const enum MeetOrSlice {
@@ -142,7 +147,6 @@ export const parsePreserveAspectRatioAttribute = (
 
 /**
  * given an array of 6 number returns something like `"matrix(...numbers)"`
- * @memberOf fabric.util
  * @param {TMat2D} transform an array with 6 numbers
  * @return {String} transform matrix for svg
  */
@@ -152,3 +156,41 @@ export const matrixToSVG = (transform: TMat2D) =>
     .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
     .join(' ') +
   ')';
+
+/**
+ * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+ * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+ * @param prop
+ * @param value
+ * @returns
+ */
+export const colorPropToSVG = (prop: string, value?: any) => {
+  if (!value) {
+    return `${prop}: none; `;
+  } else if (value.toLive) {
+    return `${prop}: url(#SVGID_${value.id}); `;
+  } else {
+    const color = new Color(value),
+      opacity = color.getAlpha();
+
+    let str = `${prop}: ${color.toRgb()}; `;
+
+    if (opacity !== 1) {
+      //change the color in rgb + opacity
+      str += `${prop}-opacity: ${opacity.toString()}; `;
+    }
+    return str;
+  }
+};
+
+export const createSVGRect = (
+  color: string,
+  { left, top, width, height }: TBBox,
+  precision = config.NUM_FRACTION_DIGITS
+) => {
+  const svgColor = colorPropToSVG('fill', color);
+  const [x, y, w, h] = [left, top, width, height].map((value) =>
+    toFixed(value, precision)
+  );
+  return `<rect ${svgColor} x="${x}" y="${y}" width="${w}" height="${h}"></rect>`;
+};
