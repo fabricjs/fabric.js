@@ -1,8 +1,6 @@
 import { Color } from '../../color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { Group } from '../../shapes/group.class';
-import type { FabricObject } from '../../shapes/fabricObject.class';
 import {
   SupportedSVGUnit,
   SVGElementName,
@@ -85,14 +83,15 @@ export const parseUnit = (value: string, fontSize: number) => {
 /**
  * Groups SVG elements (usually those retrieved from SVG document)
  * @static
- * @param {Array} elements FabricObject(s) parsed from svg, to group
- * @return {FabricObject | Group}
+ * @memberOf fabric.util
+ * @param {Array} elements fabric.Object(s) parsed from svg, to group
+ * @return {fabric.Object|fabric.Group}
  */
-export const groupSVGElements = (elements: FabricObject[]) => {
+export const groupSVGElements = (elements: any[]) => {
   if (elements && elements.length === 1) {
     return elements[0];
   }
-  return new Group(elements);
+  return new fabric.Group(elements);
 };
 
 const enum MeetOrSlice {
