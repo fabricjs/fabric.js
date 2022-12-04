@@ -1,39 +1,42 @@
+import { fabric } from '../HEADER';
 import { config } from './config';
-import { VERSION } from './constants';
+import { iMatrix, VERSION } from './constants';
+import type { StaticCanvasEvents } from './EventTypeDefs';
+import { Gradient } from './gradient';
 import { createCollectionMixin } from './mixins/collection.mixin';
+import { TSVGReviver } from './mixins/object.svg_export';
 import { CommonMethods } from './mixins/shared_methods.mixin';
+import { Pattern } from './pattern.class';
 import { Point } from './point.class';
 import type { FabricObject } from './shapes/fabricObject.class';
-import { requestAnimFrame } from './util/animate';
-import { removeFromArray } from './util/internals';
-import { uid } from './util/internals/uid';
-import { pick } from './util/misc/pick';
+import { TCachedFabricObject } from './shapes/object.class';
+import { Rect } from './shapes/rect.class';
 import type {
+  TCornerPoint,
   TFiller,
   TMat2D,
-  TCornerPoint,
   TSize,
   TValidToObjectMethod,
 } from './typedefs';
-import type { StaticCanvasEvents } from './EventTypeDefs';
-import { getElementOffset, getNodeCanvas } from './util/dom_misc';
+import { cancelAnimFrame, requestAnimFrame } from './util/animate';
+import {
+  cleanUpJsdomNode,
+  getElementOffset,
+  getNodeCanvas,
+} from './util/dom_misc';
+import { removeFromArray } from './util/internals';
+import { uid } from './util/internals/uid';
 import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
-import { fabric } from '../HEADER';
 import { invertTransform, transformPoint } from './util/misc/matrix';
-import { TCachedFabricObject } from './shapes/object.class';
+import { pick } from './util/misc/pick';
+import { matrixToSVG } from './util/misc/svgParsing';
+import { toFixed } from './util/misc/toFixed';
 import {
   isActiveSelection,
   isCollection,
   isFiller,
-  isPattern,
   isTextObject,
 } from './util/types';
-import { Gradient } from './gradient';
-import { Pattern } from './pattern.class';
-import { toFixed } from './util/misc/toFixed';
-import { matrixToSVG } from './util/misc/svgParsing';
-import { Rect } from './shapes/rect.class';
-import { TSVGReviver } from './mixins/object.svg_export';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -58,10 +61,7 @@ export type TSVGExportOptions = {
 
 /**
  * Static canvas class
- * @class fabric.StaticCanvas
- * @mixes fabric.Observable
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
- * @see {@link fabric.StaticCanvas#initialize} for constructor definition
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -84,7 +84,7 @@ export class StaticCanvas extends createCollectionMixin(
    * since 2.4.0 image caching is active, please when putting an image as background, add to the
    * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
    * vale. As an alternative you can disable image objectCaching
-   * @type fabric.Image
+   * @type FabricObject
    * @default
    */
   backgroundImage: FabricObject | null;
@@ -102,7 +102,7 @@ export class StaticCanvas extends createCollectionMixin(
    * since 2.4.0 image caching is active, please when putting an image as overlay, add to the
    * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
    * vale. As an alternative you can disable image objectCaching
-   * @type fabric.Image
+   * @type FabricObject
    * @default
    */
   overlayImage: FabricObject | null;
@@ -125,7 +125,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Indicates whether {@link add}, {@link insertAt} and {@link remove},
-   * {@link fabric.StaticCanvas.moveTo}, {@link fabric.StaticCanvas.clear} and many more, should also re-render canvas.
+   * {@link moveTo}, {@link clear} and many more, should also re-render canvas.
    * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
    * since the renders are quequed and executed one per frame.
    * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
@@ -199,7 +199,6 @@ export class StaticCanvas extends createCollectionMixin(
    * if canvas is viewportTransformed you those points indicate the extension
    * of canvas element in plain untrasformed coordinates
    * The coordinates get updated with @method calcViewportBoundaries.
-   * @memberOf fabric.StaticCanvas.prototype
    */
   vptCoords: TCornerPoint;
 
@@ -209,7 +208,6 @@ export class StaticCanvas extends createCollectionMixin(
    * May greatly help in applications with crowded canvas and use of zoom/pan
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
-   * @memberOf fabric.StaticCanvas.prototype
    * @type Boolean
    * @default
    */
@@ -662,8 +660,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Pan viewport so as to place point at top left corner of canvas
    * @param {Point} point to move to
-   * @return {fabric.StaticCanvas} instance
-   * @chainable true
    */
   absolutePan(point: Point) {
     const vpt: TMat2D = [...this.viewportTransform];
@@ -675,8 +671,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Pans viewpoint relatively
    * @param {Point} point (position vector) to move by
-   * @return {fabric.StaticCanvas} instance
-   * @chainable true
    */
   relativePan(point: Point) {
     return this.absolutePan(
@@ -801,7 +795,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   cancelRequestedRender() {
     if (this.nextRenderHandle) {
-      fabric.util.cancelAnimFrame(this.nextRenderHandle);
+      cancelAnimFrame(this.nextRenderHandle);
       this.nextRenderHandle = 0;
     }
   }
@@ -1784,7 +1778,7 @@ export class StaticCanvas extends createCollectionMixin(
     // restore canvas size to original size in case retina scaling was applied
     canvasElement.setAttribute('width', `${this.width}`);
     canvasElement.setAttribute('height', `${this.height}`);
-    fabric.util.cleanUpJsdomNode(canvasElement);
+    cleanUpJsdomNode(canvasElement);
   }
 
   /**
@@ -1811,7 +1805,7 @@ Object.assign(
     controlsAboveOverlay: false,
     allowTouchScrolling: false,
     imageSmoothingEnabled: true,
-    viewportTransform: fabric.iMatrix.concat(),
+    viewportTransform: iMatrix.concat(),
     backgroundVpt: true,
     overlayVpt: true,
     enableRetinaScaling: true,
