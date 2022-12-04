@@ -10,7 +10,7 @@ export type TextStyle = {
 export abstract class TextStyleMixin<
   EventSpec extends ObjectEvents
 > extends FabricObject<EventSpec> {
-  abstract styles: TextStyle;
+  abstract styles: TextStyle | null;
   protected abstract _textLines: string[][];
   protected abstract _forceClearCache: boolean;
   protected abstract _styleProperties: string[];
@@ -24,7 +24,7 @@ export abstract class TextStyleMixin<
    * @param {Number} lineIndex , lineIndex is on wrapped lines.
    * @return {Boolean}
    */
-  isEmptyStyles(lineIndex: number): boolean {
+  isEmptyStyles(lineIndex?: number): boolean {
     if (!this.styles) {
       return true;
     }
@@ -53,7 +53,7 @@ export abstract class TextStyleMixin<
    * @param {Number} lineIndex to check the style on
    * @return {Boolean}
    */
-  styleHas(property: string, lineIndex: number): boolean {
+  styleHas(property: string, lineIndex?: number): boolean {
     if (!this.styles || !property || property === '') {
       return false;
     }
