@@ -79,7 +79,7 @@ export const parseUnit = (value: string, fontSize: number) => {
 /**
  * Groups SVG elements (usually those retrieved from SVG document)
  * @static
- * @param {Array} elements FabricObject(s) parsed from svg, to group
+ * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
  * @return {FabricObject | Group}
  */
 export const groupSVGElements = (elements: FabricObject[]) => {
