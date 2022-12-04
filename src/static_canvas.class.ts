@@ -1472,11 +1472,7 @@ export class StaticCanvas extends createCollectionMixin(
     reviver: TSVGReviver
   ) {
     const bgOrOverlay = this[property];
-    if (
-      bgOrOverlay !== null &&
-      !bgOrOverlay.excludeFromExport &&
-      bgOrOverlay.toSVG
-    ) {
+    if (bgOrOverlay && !bgOrOverlay.excludeFromExport && bgOrOverlay.toSVG) {
       markup.push(bgOrOverlay.toSVG(reviver));
     }
   }
@@ -1506,15 +1502,15 @@ export class StaticCanvas extends createCollectionMixin(
           filler.offsetY - finalHeight / 2
         }" width="${
           repeat === 'repeat-y' || repeat === 'no-repeat'
-          // @ts-ignore
-            ? filler.source.width
+            ? // @ts-ignore
+              filler.source.width
             : finalWidth
         }" height="${
           repeat === 'repeat-x' || repeat === 'no-repeat'
+            ? // @ts-ignore
+              filler.source.height
+            : finalHeight
           // @ts-ignore
-            ? filler.source.height
-          : finalHeight
-        // @ts-ignore
         }" fill="url(#SVGID_${filler.id})"></rect>\n`
       );
     } else {

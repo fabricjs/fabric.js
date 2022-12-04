@@ -331,8 +331,9 @@
     canvas.renderOnAddRemove = false;
     canvas.requestRenderAll = countRenderAll;
 
-    assert.equal(renderAllCount, 0);
     canvas.add(rect)
+    assert.equal(renderAllCount, 0);
+
     assert.equal(canvas.item(0), rect);
 
     canvas.add(makeRect(), makeRect(), makeRect());
