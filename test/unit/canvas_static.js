@@ -332,7 +332,7 @@
     canvas.requestRenderAll = countRenderAll;
 
     assert.equal(renderAllCount, 0);
-
+    canvas.add(rect)
     assert.equal(canvas.item(0), rect);
 
     canvas.add(makeRect(), makeRect(), makeRect());
@@ -433,7 +433,7 @@
     canvas.renderOnAddRemove = true;
     assert.ok(typeof canvas.remove === 'function');
     assert.equal(renderAllCount, 0);
-    assert.equal(canvas.remove(rect1), 1, 'should return the number of removed objects');
+    assert.equal(canvas.remove(rect1)[0], rect1, 'should return the number of removed objects');
     assert.strictEqual(canvas.item(0), rect2, 'should be second object');
 
     canvas.remove(rect2, rect3);
@@ -458,7 +458,7 @@
 
     canvas.add(rect1, rect2);
     assert.equal(renderAllCount, 0);
-
+    assert.equal(canvas.remove(rect1)[0], rect1, 'will return an array with removed objects');
     assert.equal(renderAllCount, 0);
     assert.strictEqual(canvas.item(0), rect2, 'only second object should be left');
   });
@@ -872,7 +872,7 @@
       return svg;
     }
 
-    canvas.toSVG(null, reviver);
+    canvas.toSVG(undefined, reviver);
     assert.equal(reviverCount, 14);
 
     canvas.renderOnAddRemove = true;
@@ -911,7 +911,7 @@
       return svg;
     }
 
-    canvas.toSVG(null, reviver);
+    canvas.toSVG(undefined, reviver);
     assert.equal(reviverCount, len + 2, 'reviver should include background and overlay image');
     canvas.backgroundImage = null;
     canvas.overlayImage  = null;
@@ -947,7 +947,7 @@
       return svg;
     }
 
-    canvas.toSVG(null, reviver);
+    canvas.toSVG(undefined, reviver);
     assert.equal(reviverCount, len - 2, 'reviver should not include objects with excludeFromExport');
     canvas.renderOnAddRemove = true;
   });

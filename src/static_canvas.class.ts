@@ -1500,7 +1500,7 @@ export class StaticCanvas extends createCollectionMixin(
           ? matrixToSVG(invertTransform(this.viewportTransform))
           : '';
       markup.push(
-        `<rect transform="${additionalTransform} translate(${finalWidth / 2}, ${
+        `<rect transform="${additionalTransform} translate(${finalWidth / 2},${
           finalHeight / 2
         })" x="${filler.offsetX - finalWidth / 2}" y="${
           filler.offsetY - finalHeight / 2
@@ -1513,8 +1513,9 @@ export class StaticCanvas extends createCollectionMixin(
           repeat === 'repeat-x' || repeat === 'no-repeat'
           // @ts-ignore
             ? filler.source.height
-            : finalHeight
-        }" fill="url(#SVGID_' + filler.id + ')"></rect>\n`
+          : finalHeight
+        // @ts-ignore
+        }" fill="url(#SVGID_${filler.id})"></rect>\n`
       );
     } else {
       markup.push(
