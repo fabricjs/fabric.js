@@ -41,6 +41,9 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
    * @fires mouse:out
    * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
    *
+   * @fires erasing:start
+   * @fires erasing:end
+   *
    * @fires dragover
    * @fires dragenter
    * @fires dragleave
@@ -496,6 +499,19 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
           objsToRender = this._objects;
         }
         return objsToRender;
+      },
+
+      /**
+       * Used by {@link #renderAll}
+       * @returns boolean
+       */
+      isErasing() {
+        return (
+          this.isDrawingMode &&
+          this.freeDrawingBrush &&
+          this.freeDrawingBrush.type === 'eraser' &&
+          this.freeDrawingBrush._isErasing
+        );
       },
 
       /**

@@ -781,6 +781,9 @@ import { pick } from './util/misc/pick';
           this.drawClipPathOnCanvas(ctx);
         }
         this._renderOverlay(ctx);
+        // While erasing the brush clips out the erasing path from canvas
+        // so we need to render it on top of canvas every render
+        this.isErasing() && this.freeDrawingBrush.render(ctx);
         if (this.controlsAboveOverlay && this.interactive) {
           this.drawControls(ctx);
         }
