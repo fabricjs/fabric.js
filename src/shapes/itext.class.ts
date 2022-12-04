@@ -153,7 +153,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
-   * @return {IText} thisArg
    */
   constructor(text: string, options: object) {
     super(text, options);

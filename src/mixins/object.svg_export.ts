@@ -9,7 +9,14 @@ export type SVGReviver = (markup: string) => string;
 
 /* _TO_SVG_START_ */
 
-function getSvgColorString(prop: string, value?: any) {
+/**
+ * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+ * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+ * @param prop
+ * @param value
+ * @returns
+ */
+export function getSvgColorString(prop: string, value?: any) {
   if (!value) {
     return `${prop}: none; `;
   } else if (value.toLive) {
@@ -168,61 +175,6 @@ export class FabricObjectSVGExportMixin {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
       svgTransform = `transform="${matrixToSVG(transform)}`;
     return `${svgTransform}${additionalTransform}" `;
-  }
-
-  /**
-   * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
-   * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
-   *
-   * @param {*} value
-   * @return {String}
-   */
-  protected _getFillAttributes(value?: string) {
-    const fillColor =
-      value && typeof value === 'string' ? new Color(value) : '';
-    if (!fillColor || !fillColor.getSource() || fillColor.getAlpha() === 1) {
-      return `fill="${value}"`;
-    }
-    return `opacity="${fillColor.getAlpha()}" fill="${fillColor
-      .setAlpha(1)
-      .toRgb()}"`;
-  }
-
-  protected _createBgRect(
-    color: string,
-    left: number,
-    top: number,
-    width: number,
-    height: number
-  ) {
-    const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
-    return [
-      '\t\t<rect ',
-      this._getFillAttributes(color),
-      ' x="',
-      toFixed(left, NUM_FRACTION_DIGITS),
-      '" y="',
-      toFixed(top, NUM_FRACTION_DIGITS),
-      '" width="',
-      toFixed(width, NUM_FRACTION_DIGITS),
-      '" height="',
-      toFixed(height, NUM_FRACTION_DIGITS),
-      '"></rect>\n',
-    ];
-  }
-
-  _setSVGBg(textBgRects: string[]) {
-    if (this.backgroundColor) {
-      textBgRects.push(
-        ...this._createBgRect(
-          this.backgroundColor,
-          -this.width / 2,
-          -this.height / 2,
-          this.width,
-          this.height
-        )
-      );
-    }
   }
 
   /**

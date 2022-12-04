@@ -6,11 +6,32 @@ import { applyMixins } from '../util/applyMixins';
 import { escapeXml } from '../util/lang_string';
 import { hasStyleChanged } from '../util/misc/textStyles';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObjectSVGExportMixin, SVGReviver } from './object.svg_export';
+import {
+  FabricObjectSVGExportMixin,
+  getSvgColorString,
+  SVGReviver,
+} from './object.svg_export';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
+
+function createSVGRect(
+  color: string,
+  left: number,
+  top: number,
+  width: number,
+  height: number
+) {
+  const rounding = config.NUM_FRACTION_DIGITS;
+  return `\t\t<rect ${getSvgColorString('fill', color)} x="${toFixed(
+    left,
+    rounding
+  )}" y="${toFixed(top, rounding)}" width="${toFixed(
+    width,
+    rounding
+  )}" height="${toFixed(height, rounding)}"></rect>\n`;
+}
 
 export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
   _toSVG() {
@@ -76,8 +97,18 @@ export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
       textBgRects: string[] = [];
     let height = textTopOffset,
       lineOffset;
+
     // bounding-box background
-    this._setSVGBg(textBgRects);
+    this.backgroundColor &&
+      textBgRects.push(
+        ...createSVGRect(
+          this.backgroundColor,
+          -this.width / 2,
+          -this.height / 2,
+          this.width,
+          this.height
+        )
+      );
 
     // text and text-background
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -213,7 +244,7 @@ export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
       if (currentColor !== lastColor) {
         lastColor &&
           textBgRects.push(
-            ...this._createBgRect(
+            ...createSVGRect(
               lastColor,
               leftOffset + boxStart,
               textTopOffset,
@@ -230,7 +261,7 @@ export class ITextSVGExportMixin extends FabricObjectSVGExportMixin {
     }
     currentColor &&
       textBgRects.push(
-        ...this._createBgRect(
+        ...createSVGRect(
           lastColor,
           leftOffset + boxStart,
           textTopOffset,
