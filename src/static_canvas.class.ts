@@ -21,7 +21,7 @@ import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
 import { fabric } from '../HEADER';
 import { invertTransform, transformPoint } from './util/misc/matrix';
 import { TCachedFabricObject } from './shapes/object.class';
-import { isCollection, isFiller, isTextObject } from './util/types';
+import { isCollection, isFiller, isPattern, isTextObject } from './util/types';
 import { Gradient } from './gradient';
 import { Pattern } from './pattern.class';
 import { toFixed } from './util/misc/toFixed';
@@ -1472,7 +1472,7 @@ export class StaticCanvas extends createCollectionMixin(
     if (!filler) {
       return;
     }
-    if (isFiller(filler)) {
+    if (isPattern(filler)) {
       const repeat = filler.repeat,
         finalWidth = this.width,
         finalHeight = this.height,
@@ -1485,17 +1485,11 @@ export class StaticCanvas extends createCollectionMixin(
           finalHeight / 2
         })" x="${filler.offsetX - finalWidth / 2}" y="${
           filler.offsetY - finalHeight / 2
-        }" `,
-        'width="',
-        repeat === 'repeat-y' || repeat === 'no-repeat'
+        }" width="${repeat === 'repeat-y' || repeat === 'no-repeat'
           ? filler.source.width
-          : finalWidth,
-        '" height="',
-        repeat === 'repeat-x' || repeat === 'no-repeat'
+          : finalWidth}" height="${repeat === 'repeat-x' || repeat === 'no-repeat'
           ? filler.source.height
-          : finalHeight,
-        '" fill="url(#SVGID_' + filler.id + ')"',
-        '></rect>\n'
+          : finalHeight}" fill="url(#SVGID_' + filler.id + ')"></rect>\n`
       );
     } else {
       markup.push(
@@ -1516,18 +1510,13 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  sendToBack(object) {
-    if (!object) {
-      return this;
-    }
-    var activeSelection = this._activeObject,
-      i,
-      obj,
-      objs;
+  sendToBack(object: FabricObject) {
+    const activeSelection = this._activeObject;
+    // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
     if (object === activeSelection && object.type === 'activeSelection') {
-      objs = activeSelection._objects;
-      for (i = objs.length; i--; ) {
-        obj = objs[i];
+      const objs = activeSelection._objects;
+      for (let i = objs.length; i--; ) {
+        const obj = objs[i];
         removeFromArray(this._objects, obj);
         this._objects.unshift(obj);
       }
@@ -1546,18 +1535,13 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  bringToFront(object) {
-    if (!object) {
-      return this;
-    }
-    var activeSelection = this._activeObject,
-      i,
-      obj,
-      objs;
+  bringToFront(object: FabricObject) {
+    const activeSelection = this._activeObject;
+    // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
     if (object === activeSelection && object.type === 'activeSelection') {
-      objs = activeSelection._objects;
-      for (i = 0; i < objs.length; i++) {
-        obj = objs[i];
+      const objs = activeSelection._objects;
+      for (let i = 0; i < objs.length; i++) {
+        const obj = objs[i];
         removeFromArray(this._objects, obj);
         this._objects.push(obj);
       }
@@ -1575,42 +1559,31 @@ export class StaticCanvas extends createCollectionMixin(
    * the first intersecting object. Where intersection is calculated with
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
-   * @param {fabric.Object} object Object to send
-   * @param {Boolean} [intersecting] If `true`, send object behind next lower intersecting object
+   * @param {FabricObject} object Object to send
+   * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  sendBackwards(object, intersecting) {
-    if (!object) {
-      return this;
-    }
-    var activeSelection = this._activeObject,
-      i,
-      obj,
-      idx,
-      newIdx,
-      objs,
-      objsMoved = 0;
-
+  sendBackwards(object: FabricObject, intersecting: boolean) {
+    const activeSelection = this._activeObject;
     if (object === activeSelection && object.type === 'activeSelection') {
-      objs = activeSelection._objects;
-      for (i = 0; i < objs.length; i++) {
-        obj = objs[i];
-        idx = this._objects.indexOf(obj);
+      let objsMoved = 0;
+      const objs = activeSelection._objects;
+      for (let i = 0; i < objs.length; i++) {
+        const obj = objs[i];
+        const idx = this._objects.indexOf(obj);
         if (idx > 0 + objsMoved) {
-          newIdx = idx - 1;
           removeFromArray(this._objects, obj);
-          this._objects.splice(newIdx, 0, obj);
+          this._objects.splice(idx - 1, 0, obj);
         }
         objsMoved++;
       }
     } else {
-      idx = this._objects.indexOf(object);
+      const idx: number = this._objects.indexOf(object);
       if (idx !== 0) {
         // if object is not on the bottom of stack
-        newIdx = this._findNewLowerIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
-        this._objects.splice(newIdx, 0, object);
+        this._objects.splice(this._findNewLowerIndex(object, idx, intersecting), 0, object);
       }
     }
     this.renderOnAddRemove && this.requestRenderAll();
@@ -1620,29 +1593,21 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * @private
    */
-  _findNewLowerIndex(object, idx, intersecting) {
-    var newIdx, i;
-
+  _findNewLowerIndex(object: FabricObject, idx: number, intersecting: boolean): number {
     if (intersecting) {
-      newIdx = idx;
-
       // traverse down the stack looking for the nearest intersecting object
-      for (i = idx - 1; i >= 0; --i) {
-        var isIntersecting =
+      for (let i = idx - 1; i >= 0; --i) {
+        const isIntersecting =
           object.intersectsWithObject(this._objects[i]) ||
           object.isContainedWithinObject(this._objects[i]) ||
           this._objects[i].isContainedWithinObject(object);
 
         if (isIntersecting) {
-          newIdx = i;
-          break;
+          return i;
         }
       }
-    } else {
-      newIdx = idx - 1;
     }
-
-    return newIdx;
+    return idx - 1;
   }
 
   /**
