@@ -1195,8 +1195,6 @@ export class FabricObject<
    * Execute the drawing operation for an object clipPath
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {FabricObject} clipPath
-   * todo while converting things, we need a type that is a union of classes that
-   * represent the fabricObjects. Rect, Circle...
    */
   drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
     ctx.save();
