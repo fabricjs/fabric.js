@@ -156,6 +156,7 @@ export class FabricObjectSVGExportMixin {
     return [
       this.id ? `id="${this.id}" ` : '',
       this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : '',
+      this.eraser ? `mask="url(#${this.eraser.clipPathId})" ` : '',
     ].join('');
   }
 
@@ -231,6 +232,7 @@ export class FabricObjectSVGExportMixin {
       // insert commons in the markup, style and svgCommons
       index = objectMarkup.indexOf('COMMON_PARTS');
     objectMarkup[index] = commonPieces;
+    objectMarkup.unshift(this._createEraserSVGMarkup(reviver));
     return reviver ? reviver(objectMarkup.join('')) : objectMarkup.join('');
   }
 
@@ -261,7 +263,7 @@ export class FabricObjectSVGExportMixin {
       stroke = this.stroke,
       fill = this.fill,
       shadow = this.shadow,
-      markup = [],
+      markup = [this._createEraserSVGMarkup(reviver)],
       // insert commons in the markup, style and svgCommons
       index = objectMarkup.indexOf('COMMON_PARTS');
     let clipPathMarkup;
@@ -304,6 +306,21 @@ export class FabricObjectSVGExportMixin {
     markup.push('</g>\n');
     absoluteClipPath && markup.push('</g>\n');
     return reviver ? reviver(markup.join('')) : markup.join('');
+  }
+
+  /**
+   * create svg markup for eraser
+   * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
+   * must be called before object markup creation as it relies on the `clipPathId` property of the mask
+   */
+  _createEraserSVGMarkup(reviver: SVGReviver) {
+    if (this.eraser) {
+      this.eraser.clipPathId = `MASK_${uid()}`;
+      return `<mask id="${this.eraser.clipPathId}" >${this.eraser.toSVG(
+        reviver
+      )}</mask>\n`;
+    }
+    return '';
   }
 
   addPaintOrder() {

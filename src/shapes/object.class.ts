@@ -51,6 +51,8 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
  * @fires dragenter
  * @fires dragleave
  * @fires drop
+ *
+ * @fires erasing:end
  */
 export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -253,6 +255,25 @@ export class FabricObject<
    * @default null
    */
   shadow: Shadow | null;
+
+  clipPath?: FabricObject;
+
+  /**
+   * Indicates whether this object can be erased by {@link EraserBrush}
+   * The `deep` option introduces fine grained control over a group's `erasable` property.
+   * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
+   * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
+   * When set to `false` the eraser will leave all objects including the group untouched.
+   * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
+   * @type boolean | 'deep'
+   * @default true
+   */
+  erasable: boolean | 'deep';
+
+  /**
+   * @tutorial {@link http://fabricjs.com/erasing#eraser}
+   */
+  eraser?: FabricObject;
 
   /**
    * Opacity of object's controlling borders when object is active and moving
@@ -836,6 +857,10 @@ export class FabricObject<
               absolutePositioned: this.clipPath.absolutePositioned,
             }
           : null,
+      eraserData =
+        this.eraser && !this.clipPath.eraser
+          ? this.eraser.toObject(propertiesToInclude)
+          : null,
       object = {
         ...pick(this, propertiesToInclude),
         type: this.type,
@@ -879,6 +904,8 @@ export class FabricObject<
         skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
         skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
         ...(clipPathData ? { clipPath: clipPathData } : null),
+        erasable: this.erasable,
+        ...(eraserData ? { eraser: eraserData } : null),
       };
 
     return !this.includeDefaultValues
@@ -1152,7 +1179,7 @@ export class FabricObject<
     ) {
       return true;
     }
-    if (this.clipPath) {
+    if (this.clipPath || this.eraser) {
       return true;
     }
     return false;
@@ -1234,6 +1261,17 @@ export class FabricObject<
     }
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath);
+    if (this.eraser) {
+      //  update eraser size to match instance
+      // TODO: rethink this approach
+      const size = this._getNonTransformedDimensions();
+      this.eraser.isType('eraser') &&
+        this.eraser.set({
+          width: size.x,
+          height: size.y,
+        });
+      this._drawClipPath(ctx, this.eraser);
+    }
     this.fill = originalFill;
     this.stroke = originalStroke;
   }
@@ -2095,6 +2133,7 @@ export const fabricObjectDefaultValues = {
     'fillRule',
     'paintFirst',
     'clipPath',
+    'eraser',
     'strokeUniform',
   ],
   cacheProperties: [
@@ -2112,9 +2151,11 @@ export const fabricObjectDefaultValues = {
     'strokeMiterLimit',
     'backgroundColor',
     'clipPath',
+    'eraser',
   ],
   colorProperties: ['fill', 'stroke', 'backgroundColor'],
   clipPath: undefined,
+  erasable: true,
   inverted: false,
   absolutePositioned: false,
   FX_DURATION: 500,
