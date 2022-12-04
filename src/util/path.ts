@@ -540,7 +540,7 @@ const pathIterator = (
   x1: number,
   y1: number
 ) => {
-  let tempP = new Point(x1, x2),
+  let tempP = new Point(x1, y1),
     tmpLen = 0;
   for (let perc = 1; perc <= 100; perc += 1) {
     const p = iterator(perc / 100);
