@@ -220,7 +220,7 @@ export class StaticCanvas extends createCollectionMixin(
    * the clipPath object gets used when the canvas has rendered, and the context is placed in the
    * top left corner of the canvas.
    * clipPath will clip away controls, if you do not want this to happen use controlsAboveOverlay = true
-   * @type fabric.Object
+   * @type FabricObject
    */
   clipPath: FabricObject;
 
@@ -979,7 +979,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object horizontally in the canvas
-   * @param {fabric.Object} object Object to center horizontally
+   * @param {FabricObject} object Object to center horizontally
    * @return {fabric.Canvas} thisArg
    */
   centerObjectH(object: FabricObject) {
@@ -991,7 +991,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object vertically in the canvas
-   * @param {fabric.Object} object Object to center vertically
+   * @param {FabricObject} object Object to center vertically
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1004,7 +1004,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object vertically and horizontally in the canvas
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1014,7 +1014,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object vertically and horizontally in the viewport
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1024,7 +1024,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object horizontally in the viewport, object.top is unchanged
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1037,7 +1037,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object Vertically in the viewport, object.top is unchanged
-   * @param {fabric.Object} object Object to center vertically and horizontally
+   * @param {FabricObject} object Object to center vertically and horizontally
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1062,7 +1062,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * @private
-   * @param {fabric.Object} object Object to center
+   * @param {FabricObject} object Object to center
    * @param {Point} center Center point
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -1528,7 +1528,7 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Moves an object or the objects of a multiple selection
    * to the bottom of the stack of drawn objects
-   * @param {fabric.Object} object Object to send to back
+   * @param {FabricObject} object Object to send to back
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1553,7 +1553,7 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Moves an object or the objects of a multiple selection
    * to the top of the stack of drawn objects
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
@@ -1642,7 +1642,7 @@ export class StaticCanvas extends createCollectionMixin(
    * of the first intersecting object. Where intersection is calculated with
    * bounding box. If no intersection is found, there will not be change in the
    * stack.
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
    * @return {fabric.Canvas} thisArg
    * @chainable
@@ -1705,7 +1705,7 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Moves an object to specified level in stack of drawn objects
-   * @param {fabric.Object} object Object to send
+   * @param {FabricObject} object Object to send
    * @param {Number} index Position to move to
    * @return {fabric.Canvas} thisArg
    * @chainable
