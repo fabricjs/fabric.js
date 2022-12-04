@@ -1,13 +1,7 @@
 // @ts-nocheck
-import { Color } from '../color';
-import { config } from '../config';
+import { SVGReviver } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../util/misc/svgParsing';
-import { toFixed } from '../util/misc/toFixed';
-
-export type SVGReviver = (markup: string) => string;
-
-/* _TO_SVG_START_ */
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -274,5 +268,3 @@ export class FabricObjectSVGExportMixin {
       : '';
   }
 }
-
-/* _TO_SVG_END_ */

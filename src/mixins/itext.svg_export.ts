@@ -2,12 +2,13 @@
 
 import { config } from '../config';
 import { Text } from '../shapes/text.class';
+import { SVGReviver } from '../typedefs';
 import { applyMixins } from '../util/applyMixins';
 import { escapeXml } from '../util/lang_string';
 import { createSVGRect } from '../util/misc/svgParsing';
 import { hasStyleChanged } from '../util/misc/textStyles';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObjectSVGExportMixin, SVGReviver } from './object.svg_export';
+import { FabricObjectSVGExportMixin } from './object.svg_export';
 import type { TextStyleDeclaration } from './text_style.mixin';
 
 const multipleSpacesRegex = /  +/g;

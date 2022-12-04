@@ -82,3 +82,5 @@ export type TCornerPoint = {
   bl: Point;
   br: Point;
 };
+
+export type SVGReviver = (markup: string) => string;
