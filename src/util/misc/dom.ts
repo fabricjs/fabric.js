@@ -51,7 +51,8 @@ export const toDataURL = (
   quality: number
 ) => canvasEl.toDataURL(`image/${format}`, quality);
 
-
-export const isHTMLCanvas = (canvas: HTMLCanvasElement | string): canvas is HTMLCanvasElement => {
+export const isHTMLCanvas = (
+  canvas: HTMLCanvasElement | string
+): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
-}
+};

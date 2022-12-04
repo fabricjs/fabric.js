@@ -1,4 +1,3 @@
-// @ts-ignore
 import { config } from './config';
 import { VERSION } from './constants';
 import { createCollectionMixin } from './mixins/collection.mixin';
@@ -9,7 +8,13 @@ import { requestAnimFrame } from './util/animate';
 import { removeFromArray } from './util/internals';
 import { uid } from './util/internals/uid';
 import { pick } from './util/misc/pick';
-import type { TFiller, TMat2D, TCornerPoint, TSize, TValidToObjectMethod } from './typedefs';
+import type {
+  TFiller,
+  TMat2D,
+  TCornerPoint,
+  TSize,
+  TValidToObjectMethod,
+} from './typedefs';
 import type { StaticCanvasEvents } from './EventTypeDefs';
 import { getElementOffset, getNodeCanvas } from './util/dom_misc';
 import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
@@ -29,7 +34,7 @@ const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
   cssOnly?: boolean;
-}
+};
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -38,12 +43,12 @@ export type TSVGExportOptions = {
     y: number;
     width: number;
     height: number;
-  },
+  };
   encoding: 'UTF-8'; // test Econding type and see what happens
   width: string;
   height: string;
   reviver?: TSVGReviver;
-}
+};
 
 /**
  * Static canvas class
@@ -58,7 +63,9 @@ export type TSVGExportOptions = {
  * @fires object:removed
  */
 // eslint-disable-next-line max-len
-export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanvasEvents>) {
+export class StaticCanvas extends createCollectionMixin(
+  CommonMethods<StaticCanvasEvents>
+) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
@@ -232,6 +239,13 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    */
   height: number;
 
+  /**
+   * If true the Canvas is in the process or has been disposed/destroyed.
+   * No more rendering operation will be executed on this canvas.
+   * @type boolean
+   */
+  destroyed?: boolean;
+
   add(...objects: FabricObject[]) {
     const size = super.add(...objects);
     objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
@@ -250,7 +264,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     return removed;
   }
 
-  protected _onObjectAdded(obj: FabricObject) {
+  _onObjectAdded(obj: FabricObject) {
     // @ts-ignore;
     this.stateful && obj.setupState();
     if (obj.canvas && obj.canvas !== this) {
@@ -268,7 +282,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     obj.fire('added', { target: this });
   }
 
-  protected _onObjectRemoved(obj: FabricObject) {
+  _onObjectRemoved(obj: FabricObject) {
     obj._set('canvas', undefined);
     this.fire('object:removed', { target: obj });
     obj.fire('removed', { target: this });
@@ -317,9 +331,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling()
-      ? Math.max(1, config.devicePixelRatio)
-      : 1;
+    return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
   /**
@@ -336,15 +348,15 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       this.contextContainer
     );
     if (this.upperCanvasEl) {
-      this.__initRetinaScaling(
-        scaleRatio,
-        this.upperCanvasEl,
-        this.contextTop
-      );
+      this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
     }
   }
 
-  __initRetinaScaling(scaleRatio: number, canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+  __initRetinaScaling(
+    scaleRatio: number,
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D
+  ) {
     canvas.setAttribute('width', (this.width * scaleRatio).toString());
     canvas.setAttribute('height', (this.height * scaleRatio).toString());
     context.scale(scaleRatio, scaleRatio);
@@ -482,7 +494,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {fabric.Canvas} thisArg
    * @chainable
    */
-  setDimensions(dimensions: Partial<TSize>, { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}) {
+  setDimensions(
+    dimensions: Partial<TSize>,
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+  ) {
     Object.entries(dimensions).forEach(([prop, value]) => {
       let cssValue = `${value}`;
 
@@ -833,7 +848,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * Paint the cached clipPath on the lowerCanvasEl
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawClipPathOnCanvas(ctx: CanvasRenderingContext2D, clipPath: TCachedFabricObject) {
+  drawClipPathOnCanvas(
+    ctx: CanvasRenderingContext2D,
+    clipPath: TCachedFabricObject
+  ) {
     const v = this.viewportTransform;
     ctx.save();
     ctx.transform(...v);
@@ -866,7 +884,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {string} property 'background' or 'overlay'
    */
-  _renderBackgroundOrOverlay(ctx: CanvasRenderingContext2D, property: 'background' | 'overlay') {
+  _renderBackgroundOrOverlay(
+    ctx: CanvasRenderingContext2D,
+    property: 'background' | 'overlay'
+  ) {
     const fill: TFiller | string = this[property + 'Color'],
       object: FabricObject = this[property + 'Image'],
       v = this.viewportTransform,
@@ -883,13 +904,14 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = isAFiller ? fill.toLive(ctx, /* this */) : fill;
+      ctx.fillStyle = isAFiller ? fill.toLive(ctx /* this */) : fill;
       if (needsVpt) {
         ctx.transform(...v);
       }
       if (isAFiller) {
         ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-        const m = ((fill as Gradient<'linear'>).gradientTransform || (fill as Pattern).patternTransform) as TMat2D;
+        const m = ((fill as Gradient<'linear'>).gradientTransform ||
+          (fill as Pattern).patternTransform) as TMat2D;
         m && ctx.transform(...m);
       }
       ctx.fill();
@@ -994,10 +1016,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @chainable
    */
   viewportCenterObjectH(object: FabricObject) {
-    this._centerObject(
-      object,
-      this.getVpCenter()
-    );
+    this._centerObject(object, this.getVpCenter());
     return this;
   }
 
@@ -1008,10 +1027,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @chainable
    */
   viewportCenterObjectV(object: FabricObject) {
-    return this._centerObject(
-      object,
-      this.getVpCenter()
-    );
+    return this._centerObject(object, this.getVpCenter());
   }
 
   /**
@@ -1020,7 +1036,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @chainable
    */
   getVpCenter(): Point {
-    return transformPoint(this.getCenterPoint(), invertTransform(this.viewportTransform));
+    return transformPoint(
+      this.getCenterPoint(),
+      invertTransform(this.viewportTransform)
+    );
   }
 
   /**
@@ -1086,7 +1105,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   /**
    * @private
    */
-  _toObjectMethod(methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
+  _toObjectMethod(
+    methodName: TValidToObjectMethod,
+    propertiesToInclude?: string[]
+  ) {
     const clipPath = this.clipPath;
     const clipPathData =
       clipPath && !clipPath.excludeFromExport
@@ -1108,7 +1130,11 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   /**
    * @private
    */
-  _toObject(instance: FabricObject, methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
+  _toObject(
+    instance: FabricObject,
+    methodName: TValidToObjectMethod,
+    propertiesToInclude?: string[]
+  ) {
     let originalValue;
 
     if (!this.includeDefaultValues) {
@@ -1126,7 +1152,10 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   /**
    * @private
    */
-  __serializeBgOverlay(methodName: TValidToObjectMethod, propertiesToInclude?: string[]) {
+  __serializeBgOverlay(
+    methodName: TValidToObjectMethod,
+    propertiesToInclude?: string[]
+  ) {
     const data: any = {},
       bgImage = this.backgroundImage,
       overlayImage = this.overlayImage,
@@ -1220,9 +1249,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     this._setSVGPreamble(markup, options);
     this._setSVGHeader(markup, options);
     if (this.clipPath) {
-      markup.push(
-        `<g clip-path="url(#${this.clipPath.clipPathId})" >\n`
-      );
+      markup.push(`<g clip-path="url(#${this.clipPath.clipPathId})" >\n`);
     }
     this._setSVGBgOverlayColor(markup, 'background');
     this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
@@ -1267,7 +1294,13 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
       viewBox = `viewBox="${optViewBox.x} ${optViewBox.y} ${optViewBox.width} ${optViewBox.height}" `;
     } else if (this.svgViewportTransformation) {
       const vpt = this.viewportTransform;
-      viewBox = `viewBox="${toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS)} ${toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS)} ${toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS)} ${toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS)}" `;
+      viewBox = `viewBox="${toFixed(
+        -vpt[4] / vpt[0],
+        NUM_FRACTION_DIGITS
+      )} ${toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS)} ${toFixed(
+        this.width / vpt[0],
+        NUM_FRACTION_DIGITS
+      )} ${toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS)}" `;
     } else {
       viewBox = `viewBox="0 0 ${this.width} ${this.height}" `;
     }
@@ -1316,22 +1349,22 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
    * @return {String}
    */
   createSVGRefElementsMarkup(): string {
-    return ['background', 'overlay'].map((prop) => {
-      const fill = this[prop + 'Color'];
-      if (isFiller(fill)) {
-        const shouldTransform = this[prop + 'Vpt'],
-          vpt = this.viewportTransform,
-          object = {
-            width: this.width / (shouldTransform ? vpt[0] : 1),
-            height: this.height / (shouldTransform ? vpt[3] : 1),
-          };
-        return fill.toSVG(object as Rect, {
-          additionalTransform: shouldTransform
-            ? matrixToSVG(vpt)
-            : '',
-        });
-      }
-    }).join('');
+    return ['background', 'overlay']
+      .map((prop) => {
+        const fill = this[prop + 'Color'];
+        if (isFiller(fill)) {
+          const shouldTransform = this[prop + 'Vpt'],
+            vpt = this.viewportTransform,
+            object = {
+              width: this.width / (shouldTransform ? vpt[0] : 1),
+              height: this.height / (shouldTransform ? vpt[3] : 1),
+            };
+          return fill.toSVG(object as Rect, {
+            additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
+          });
+        }
+      })
+      .join('');
   }
 
   /**
@@ -1358,7 +1391,7 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
         return;
       }
       let fontFamily = obj.fontFamily;
-      if(fontList[fontFamily] || !fontPaths[fontFamily]) {
+      if (fontList[fontFamily] || !fontPaths[fontFamily]) {
         return;
       }
       fontList[fontFamily] = true;
@@ -1373,9 +1406,14 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
           }
         });
       });
-    })
+    });
 
-    const fontListMarkup = Object.keys(fontList).map((fontFamily) => `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`).join('');
+    const fontListMarkup = Object.keys(fontList)
+      .map(
+        (fontFamily) =>
+          `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+      )
+      .join('');
 
     if (fontListMarkup) {
       return `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`;
@@ -1392,23 +1430,32 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
         return;
       }
       this._setSVGObject(markup, fabricObject, reviver);
-    })
+    });
   }
 
   /**
    * This is its own function because the Canvas ( non static ) requires extra code here
    * @private
    */
-  _setSVGObject(markup: string[], instance: FabricObject, reviver: TSVGReviver) {
+  _setSVGObject(
+    markup: string[],
+    instance: FabricObject,
+    reviver: TSVGReviver
+  ) {
     markup.push(instance.toSVG(reviver));
   }
 
   /**
    * @private
    */
-  _setSVGBgOverlayImage(markup: string[], property: 'overlayImage' | 'backgroundImage', reviver: TSVGReviver) {
+  _setSVGBgOverlayImage(
+    markup: string[],
+    property: 'overlayImage' | 'backgroundImage',
+    reviver: TSVGReviver
+  ) {
     const bgOrOverlay = this[property];
-    if (bgOrOverlay !== null &&
+    if (
+      bgOrOverlay !== null &&
       !bgOrOverlay.excludeFromExport &&
       bgOrOverlay.toSVG
     ) {
@@ -1417,34 +1464,28 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
   }
 
   /**
+   * @TODO this seems to handle patterns but fail at gradients.
    * @private
    */
-  _setSVGBgOverlayColor(markup, property) {
-    var filler = this[property + 'Color'],
-      vpt = this.viewportTransform,
-      finalWidth = this.width,
-      finalHeight = this.height;
+  _setSVGBgOverlayColor(markup: string[], property: 'background' | 'overlay') {
+    const filler = this[property + 'Color'];
     if (!filler) {
       return;
     }
-    if (filler.toLive) {
-      var repeat = filler.repeat,
-        iVpt = fabric.util.invertTransform(vpt),
+    if (isFiller(filler)) {
+      const repeat = filler.repeat,
+        finalWidth = this.width,
+        finalHeight = this.height,
         shouldInvert = this[property + 'Vpt'],
         additionalTransform = shouldInvert
-          ? fabric.util.matrixToSVG(iVpt)
+          ? matrixToSVG(invertTransform(this.viewportTransform))
           : '';
       markup.push(
-        '<rect transform="' + additionalTransform + ' translate(',
-        finalWidth / 2,
-        ',',
-        finalHeight / 2,
-        ')"',
-        ' x="',
-        filler.offsetX - finalWidth / 2,
-        '" y="',
-        filler.offsetY - finalHeight / 2,
-        '" ',
+        `<rect transform="${additionalTransform} translate(${finalWidth / 2}, ${
+          finalHeight / 2
+        })" x="${filler.offsetX - finalWidth / 2}" y="${
+          filler.offsetY - finalHeight / 2
+        }" `,
         'width="',
         repeat === 'repeat-y' || repeat === 'no-repeat'
           ? filler.source.width
@@ -1747,18 +1788,20 @@ export class StaticCanvas extends createCollectionMixin(CommonMethods<StaticCanv
     this.overlayImage = null;
     this._iTextInstances = null;
     this.contextContainer = null;
+    const canvasElement = this.lowerCanvasEl;
+    delete this.lowerCanvasEl;
     // restore canvas style and attributes
-    this.lowerCanvasEl.classList.remove('lower-canvas');
-    this.lowerCanvasEl.removeAttribute('data-fabric');
+    canvasElement.classList.remove('lower-canvas');
+    canvasElement.removeAttribute('data-fabric');
+    // needs to be moved into Canvas class
     if (this.interactive) {
-      this.lowerCanvasEl.style.cssText = this._originalCanvasStyle;
+      canvasElement.style.cssText = this._originalCanvasStyle;
       delete this._originalCanvasStyle;
     }
     // restore canvas size to original size in case retina scaling was applied
-    this.lowerCanvasEl.setAttribute('width', this.width);
-    this.lowerCanvasEl.setAttribute('height', this.height);
-    fabric.util.cleanUpJsdomNode(this.lowerCanvasEl);
-    this.lowerCanvasEl = undefined;
+    canvasElement.setAttribute('width', `${this.width}`);
+    canvasElement.setAttribute('height', `${this.height}`);
+    fabric.util.cleanUpJsdomNode(canvasElement);
   }
 
   /**
@@ -1795,7 +1838,7 @@ Object.assign(StaticCanvas.prototype, {
   svgViewportTransformation: true,
   skipOffscreen: true,
   clipPath: undefined,
-})
+});
 
 Object.assign(StaticCanvas.prototype, fabric.DataURLExporter);
 
@@ -1804,9 +1847,10 @@ if (fabric.isLikelyNode) {
     const impl = getNodeCanvas(this.lowerCanvasEl);
     return impl && impl.createPNGStream();
   };
-  fabric.StaticCanvas.prototype.createJPEGStream = function (opts) {
+  fabric.StaticCanvas.prototype.createJPEGStream = function (opts: any) {
     const impl = getNodeCanvas(this.lowerCanvasEl);
     return impl && impl.createJPEGStream(opts);
   };
 }
 
+fabric.StaticCanvas = StaticCanvas;

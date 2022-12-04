@@ -7,7 +7,13 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import type { TClassProperties, TDegree, TFiller, TSize, TCacheCanvasDimensions } from '../typedefs';
+import type {
+  TClassProperties,
+  TDegree,
+  TFiller,
+  TSize,
+  TCacheCanvasDimensions,
+} from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
 import { clone } from '../util/lang_object';
 import { capitalize } from '../util/lang_string';
@@ -19,7 +25,17 @@ import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
 
-export type TCachedFabricObject = FabricObject & Required<Pick<FabricObject, 'zoomX' | 'zoomY' | '_cacheCanvas' | 'cacheTranslationX' | 'cacheTranslationY'>>;
+export type TCachedFabricObject = FabricObject &
+  Required<
+    Pick<
+      FabricObject,
+      | 'zoomX'
+      | 'zoomY'
+      | '_cacheCanvas'
+      | 'cacheTranslationX'
+      | 'cacheTranslationY'
+    >
+  >;
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;

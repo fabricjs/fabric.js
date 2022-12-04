@@ -29,7 +29,6 @@ function getSvgColorString(prop: string, value?: any) {
 }
 
 export class FabricObjectSVGExportMixin {
-
   /**
    * When an object is being exported as SVG as a clippath, a reference inside the SVG is needed.
    * This reference is a UID in the fabric namespace and is temporary stored here.

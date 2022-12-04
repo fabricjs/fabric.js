@@ -153,7 +153,7 @@ type CanvasSelectionEvents = {
 type CollectionEvents = {
   'object:added': { target: FabricObject };
   'object:removed': { target: FabricObject };
-}
+};
 
 type BeforeSuffix<T extends string> = `${T}:before`;
 type WithBeforeSuffix<T extends string> = T | BeforeSuffix<T>;

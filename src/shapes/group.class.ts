@@ -44,13 +44,14 @@ export type LayoutResult = {
   height: number;
 };
 
-export type GroupEvents = ObjectEvents & CollectionEvents & {
-  layout: {
-    context: LayoutContext;
-    result: LayoutResult;
-    diff: Point;
+export type GroupEvents = ObjectEvents &
+  CollectionEvents & {
+    layout: {
+      context: LayoutContext;
+      result: LayoutResult;
+      diff: Point;
+    };
   };
-};
 
 export type LayoutStrategy =
   | 'fit-content'
