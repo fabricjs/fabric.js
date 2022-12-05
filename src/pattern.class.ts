@@ -4,10 +4,10 @@ import { fabric } from '../HEADER';
 import { config } from './config';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
+import { uid } from './util/internals/uid';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { FabricObject } from './shapes/fabricObject.class';
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =
@@ -75,7 +75,16 @@ export class Pattern {
    */
   patternTransform: TMat2D | null = null;
 
+  /**
+   * The actual pixel source of the pattern
+   */
   source!: CanvasImageSource;
+
+  /**
+   * If true, this object will not be exported during the serialization of a canvas
+   * @type boolean
+   */
+  excludeFromExport?: boolean;
 
   readonly id: number;
 
@@ -85,7 +94,7 @@ export class Pattern {
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
   constructor(options: TPatternOptions = {}) {
-    this.id = FabricObject.__uid++;
+    this.id = uid();
     this.setOptions(options);
   }
 
@@ -122,7 +131,7 @@ export class Pattern {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
+  toLive(ctx: CanvasRenderingContext2D): CanvasPattern | string {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -143,7 +152,7 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: 'pattern',

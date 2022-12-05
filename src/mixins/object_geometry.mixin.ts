@@ -291,10 +291,10 @@ export class ObjectGeometry<
    * @param {Boolean} [calculate] use coordinates of current position instead of calculating them
    * @return {Boolean} true if object intersects with another object
    */
-  intersectsWithObject<T extends ObjectGeometry>(
-    other: T,
-    absolute?: boolean,
-    calculate?: boolean
+  intersectsWithObject(
+    other: ObjectGeometry,
+    absolute = false,
+    calculate = false
   ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),
@@ -316,10 +316,10 @@ export class ObjectGeometry<
    * @param {Boolean} [calculate] use coordinates of current position instead of store ones
    * @return {Boolean} true if object is fully contained within area of another object
    */
-  isContainedWithinObject<T extends ObjectGeometry>(
-    other: T,
-    absolute?: boolean,
-    calculate?: boolean
+  isContainedWithinObject(
+    other: ObjectGeometry,
+    absolute = false,
+    calculate = false
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,

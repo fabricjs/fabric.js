@@ -94,27 +94,6 @@
     return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
-  function basename(path) {
-    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
-  }
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
-  }
-
   let ORIGINAL_DPR;
 
   QUnit.module('fabric.Canvas', {
@@ -261,7 +240,7 @@
         rect4 = makeRect();
 
     assert.ok(typeof canvas.add === 'function');
-    assert.equal(canvas.add(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.add(rect1), 1, 'should return the new length of objects array');
     assert.strictEqual(canvas.item(0), rect1);
 
     canvas.add(rect2, rect3, rect4);
@@ -296,7 +275,7 @@
     canvas.add(rect1, rect2, rect3, rect4);
 
     assert.ok(typeof canvas.remove === 'function');
-    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.remove(rect1)[0], rect1, 'should return the number of objects removed');
     assert.strictEqual(canvas.item(0), rect2, 'should be second object');
 
     canvas.remove(rect2, rect3);
