@@ -263,25 +263,59 @@
       );
       wrapped(eventData, transform, x, y);
     });
-    ['X', 'Y'].forEach(axis => {
-      const signKey = `sign${axis}`;
-      const scaleKey = `scale${axis}`;
-      const isX = signKey === 'signX';
-      QUnit.test(`scaling ${axis} keeps the same sign when scale = 0`, function (assert) {
-        transform = prepareTransform(transform.target, isX ? 'mr' : 'mb');
-        const fn = fabric.controlsUtils[`scaling${axis}`];
-        const point = new fabric.Point(
-          isX ? 0 : 10,
-          isX ? 10 : 0
-        );
-        transform[signKey] = 1;
-        fn(eventData, transform, point.x, point.y);
+    ['ml', 'mt', 'mr', 'mb'].forEach(controlKey => {
+      const axis = {
+        ml: 'x',
+        mt: 'y',
+        mr: 'x',
+        mb: 'y',
+      }[controlKey]
+      const AXIS = axis.toUpperCase();
+      const signKey = `sign${AXIS}`;
+      const scaleKey = `scale${AXIS}`;
+      const flipKey = `flip${AXIS}`;
+      const isX = axis === 'x';
+      QUnit.test(`scaling ${AXIS} from ${controlKey} keeps the same sign when scale = 0`, function (assert) {
+        transform = prepareTransform(transform.target, controlKey);
+        const size = transform.target._getTransformedDimensions()[axis];
+        const factor = 0.5;
+        const fn = fabric.controlsUtils[`scaling${AXIS}`];
+        const exec = point => {
+          const { target } = transform;
+          const origin = target.translateToGivenOrigin(
+            target.getRelativeCenterPoint(),
+            'center',
+            'center',
+            transform.originX,
+            transform.originY
+          );
+          const pointer = point.add(origin);
+          fn(eventData, transform, pointer.x, pointer.y);
+        };
+        const deltaFromControl = new fabric.Point(
+          Number(isX),
+          Number(!isX)
+        ).scalarMultiply(size * factor);
+        exec(new fabric.Point());
         assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
-        assert.equal(transform.target[`${scaleKey}`], 0.0001, `${scaleKey} value after scaling`);
-        transform[signKey] = -1;
-        fn(eventData, transform, point.x, point.y);
-        assert.equal(transform.target[`${scaleKey}`], 0.0001, `${scaleKey} value after scaling`);
-        assert.equal(transform[signKey], -1);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
+        exec(deltaFromControl);
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.equal(transform.target[scaleKey], factor, `${scaleKey} value after scaling`);
+        exec(new fabric.Point());
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
+        exec(deltaFromControl.scalarMultiply(-1));
+        assert.equal(transform[signKey], -1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], true, `${flipKey} value after scaling`);
+        assert.equal(transform.target[scaleKey], factor, `${scaleKey} value after scaling`);
+        exec(new fabric.Point());
+        assert.equal(transform[signKey], -1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], true, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
       });
     });
   });
