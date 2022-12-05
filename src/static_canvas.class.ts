@@ -24,19 +24,13 @@ import {
   getElementOffset,
   getNodeCanvas,
 } from './util/dom_misc';
-import { removeFromArray } from './util/internals';
 import { uid } from './util/internals/uid';
 import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
 import { invertTransform, transformPoint } from './util/misc/matrix';
 import { pick } from './util/misc/pick';
 import { matrixToSVG } from './util/misc/svgParsing';
 import { toFixed } from './util/misc/toFixed';
-import {
-  isActiveSelection,
-  isCollection,
-  isFiller,
-  isTextObject,
-} from './util/types';
+import { isCollection, isFiller, isTextObject } from './util/types';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -299,7 +293,7 @@ export class StaticCanvas extends createCollectionMixin(
     obj.fire('removed', { target: this });
   }
 
-  protected _onStackOrderChanged() {
+  _onStackOrderChanged() {
     this.renderOnAddRemove && this.requestRenderAll();
   }
 

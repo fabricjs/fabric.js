@@ -23,12 +23,6 @@ export const isCollection = (
   return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
 
-export const isActiveSelection = (
-  fabricObject: FabricObject
-): fabricObject is ActiveSelection => {
-  return !!fabricObject && fabricObject.type === 'activeSelection';
-};
-
 export const isTextObject = (
   fabricObject: FabricObject
 ): fabricObject is Text => {
