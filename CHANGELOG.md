@@ -3,6 +3,8 @@
 ## [next]
 
 - ci(): patch TS transformer [#8409](https://github.com/fabricjs/fabric.js/pull/8409)
+- fix(scaleObject): handle when scale is 0 to not bug flip [#8490](https://github.com/fabricjs/fabric.js/pull/8490)
+- chore(TS): migrate StatiCanvas to TS [#8485](https://github.com/fabricjs/fabric.js/pull/8485)
 - chore(): refactor `Object.__uid++` => `uid()` [#8482](https://github.com/fabricjs/fabric.js/pull/8482)
 - chore(TS): migrate object mixins to TS [#8414](https://github.com/fabricjs/fabric.js/pull/8414)
 - chore(TS): migrate filters [#8474](https://github.com/fabricjs/fabric.js/pull/8474)
