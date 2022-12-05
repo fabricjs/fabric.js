@@ -4,7 +4,7 @@ import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TextStyle, TextStyleMixin } from '../mixins/text_style.mixin';
-import { TClassProperties, TFiller } from '../typedefs';
+import { TClassProperties, TFiller, TCacheCanvasDimensions } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -556,7 +556,7 @@ export class Text<
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _getCacheCanvasDimensions(): object {
+  _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const dims = super._getCacheCanvasDimensions();
     const fontSize = this.fontSize;
     dims.width += fontSize * dims.zoomX;
