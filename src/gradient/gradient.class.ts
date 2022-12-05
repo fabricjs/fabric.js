@@ -75,9 +75,24 @@ export class Gradient<
    */
   type: T;
 
+  /**
+   * Defines how the gradient is located in space and spread
+   * @type GradientCoords
+   */
   coords: GradientCoords<T>;
 
+  /**
+   * Defines how many colors a gradient has and how they are located on the axis
+   * defined by coords
+   * @type GradientCoords
+   */
   colorStops: ColorStop[];
+
+  /**
+   * If true, this object will not be exported during the serialization of a canvas
+   * @type boolean
+   */
+  excludeFromExport?: boolean;
 
   private id: string | number;
 
@@ -130,7 +145,7 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: this.type,
@@ -276,11 +291,7 @@ export class Gradient<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.type) {
-      return;
-    }
-
+  toLive(ctx: CanvasRenderingContext2D): CanvasGradient {
     const coords = this.coords as GradientCoords<'radial'>;
     const gradient =
       this.type === 'linear'

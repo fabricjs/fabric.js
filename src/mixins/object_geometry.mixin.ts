@@ -291,8 +291,8 @@ export class ObjectGeometry<
    */
   intersectsWithObject(
     other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+    absolute = false,
+    calculate = false
   ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),
@@ -316,8 +316,8 @@ export class ObjectGeometry<
    */
   isContainedWithinObject(
     other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+    absolute = false,
+    calculate = false
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
