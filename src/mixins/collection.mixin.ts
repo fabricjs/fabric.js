@@ -26,7 +26,7 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
      * @param {...FabricObject[]} objects to add
      * @returns {number} new array length
      */
-    add(...objects: FabricObject[]) {
+    add(...objects: FabricObject[]): number {
       const size = this._objects.push(...objects);
       objects.forEach((object) => this._onObjectAdded(object));
       return size;
