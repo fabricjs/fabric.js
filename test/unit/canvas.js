@@ -94,27 +94,6 @@
     return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
   }
 
-  function basename(path) {
-    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
-  }
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
-  }
-
   let ORIGINAL_DPR;
 
   QUnit.module('fabric.Canvas', {

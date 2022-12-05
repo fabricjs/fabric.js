@@ -4,10 +4,10 @@ import { fabric } from '../HEADER';
 import { config } from './config';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
+import { uid } from './util/internals/uid';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { FabricObject } from './shapes/fabricObject.class';
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =
@@ -85,7 +85,7 @@ export class Pattern {
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
   constructor(options: TPatternOptions = {}) {
-    this.id = FabricObject.__uid++;
+    this.id = uid();
     this.setOptions(options);
   }
 
