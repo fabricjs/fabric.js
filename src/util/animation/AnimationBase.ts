@@ -15,42 +15,66 @@ import {
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
+  /**
+   * @see TAnimationBaseOptions
+   */
   readonly startValue: T;
   readonly byValue: T;
   readonly endValue: T;
   readonly duration: number;
   readonly delay: number;
   protected readonly easing: TEasingFunction<T>;
+  /**
+   * @private
+   * @see TAnimationCallbacks
+   */
   private readonly _onStart: VoidFunction;
   private readonly _onChange: TOnAnimationChangeCallback<T, void>;
   private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
   private readonly _abort: TAbortCallback<T>;
   /**
-   * used to register the animation to a target object so it can be cancelled within hte object context
+   * Used to register the animation to a target object
+   * so that it can be cancelled within the object context
    */
   readonly target?: unknown;
 
   private _state: AnimationState = 'pending';
   /**
-   * time %
+   * Time %, or the ratio of `timeElapsed / duration`
+   * @see tick
    */
   durationRatio = 0;
   /**
-   * value %
+   * Value %, of the ratio of `(currentValue - startValue) / (endValue - startValue)`
    */
   valueRatio = 0;
   /**
-   * current value
+   * Current value
    */
   value: T;
   /**
-   * animation start time ms
+   * Animation start time ms
    */
   private startTime!: number;
 
   /**
-   * since both `byValue` and `endValue` are accepted in subclass options and are populated with defaults if missing,
-   * we defer to `byValue` and ignore `endValue` to avoid conflict
+   * Constructor
+   * Since both `byValue` and `endValue` are accepted in subclass options
+   * and are populated with defaults if missing, we defer to `byValue` and
+   * ignore `endValue` to avoid conflict
+   * @see TAnimationBaseOptions
+   * @see TAnimationValues
+   * @see TAnimationCallbacks
+   * @param startValue
+   * @param byValue
+   * @param duration
+   * @param delay
+   * @param easing
+   * @param onStart
+   * @param onChange
+   * @param onComplete
+   * @param abort
+   * @param target
    */
   constructor({
     startValue,
@@ -84,6 +108,11 @@ export abstract class AnimationBase<
     return this._state;
   }
 
+  /**
+   * Calculate the current value based on the easing parameters
+   * @param timeElapsed in ms
+   * @protected
+   */
   protected abstract calculate(timeElapsed: number): {
     value: T;
     changeRatio: number;

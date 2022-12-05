@@ -6,13 +6,6 @@
 import { twoMathPi, halfPI } from '../../constants';
 import { TEasingFunction } from './types';
 
-/**
- * TODO: ask about docs for this, I don't understand it
- * @param a
- * @param c
- * @param p
- * @param s
- */
 const normalize = (a: number, c: number, p: number, s: number) => {
   if (a < Math.abs(c)) {
     a = c;
@@ -28,6 +21,9 @@ const normalize = (a: number, c: number, p: number, s: number) => {
   return { a, c, p, s };
 };
 
+/**
+ * Bounce ease
+ */
 const elastic = (
   a: number,
   s: number,

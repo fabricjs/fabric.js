@@ -7,13 +7,17 @@ import { AnimationBase } from './AnimationBase';
  * Array holding all running animations
  */
 class AnimationRegistry extends Array<AnimationBase> {
+  /**
+   * Remove a single animation using an animation context
+   * @param {AnimationBase} context
+   */
   remove(context: AnimationBase) {
     const index = this.indexOf(context);
     index > -1 && this.splice(index, 1);
   }
 
   /**
-   * cancel all running animations at the next requestAnimFrame
+   * Cancel all running animations at the next requestAnimFrame
    */
   cancelAll() {
     const animations = this.splice(0);
@@ -22,7 +26,8 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * cancel all running animations attached to canvas at the next requestAnimFrame
+   * Cancel all running animations attached to a Canvas at the next requestAnimFrame
+   * @param {Canvas} canvas
    */
   cancelByCanvas(canvas: Canvas) {
     if (!canvas) {
@@ -38,7 +43,8 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * cancel all running animations for target at the next requestAnimFrame
+   * Cancel all running animations for target at the next requestAnimFrame
+   * @param target
    */
   cancelByTarget(target: AnimationBase['target']) {
     if (!target) {

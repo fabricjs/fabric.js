@@ -3,8 +3,14 @@ import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';
 
+/**
+ * RGB format
+ */
 export type TColorSource = [number, number, number];
 
+/**
+ * RGBA format
+ */
 export type TColorAlphaSource = [number, number, number, number];
 
 export type TColorArg = string | TColorSource | TColorAlphaSource;
