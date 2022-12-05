@@ -6,8 +6,5 @@ lib/*.png
 coverage/
 test/
 test*
-dist/all.min.js
-dist/all.min.js.gz
-dist/fabric.require.js
-dist/fabric.min.js.gz
+!dist/
 .DS_Store
