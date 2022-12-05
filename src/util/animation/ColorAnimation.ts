@@ -1,14 +1,15 @@
 import { Color } from '../../color';
 import { TColorAlphaSource } from '../../color/color.class';
-import { noop } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
 import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
 
-const wrapColorCallback =
-  <R>(callback: TOnAnimationChangeCallback<string, R>) =>
-  (rgba: TColorAlphaSource, valueRatio: number, durationRatio: number) =>
-    callback(new Color(rgba).toRgba(), valueRatio, durationRatio);
+const wrapColorCallback = <R>(
+  callback?: TOnAnimationChangeCallback<string, R>
+) =>
+  callback &&
+  ((rgba: TColorAlphaSource, valueRatio: number, durationRatio: number) =>
+    callback(new Color(rgba).toRgba(), valueRatio, durationRatio));
 
 export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
   constructor({
@@ -20,9 +21,9 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
         1 - Math.cos((timeElapsed / duration) * (Math.PI / 2));
       return startValue + byValue * durationRatio;
     },
-    onChange = noop,
-    onComplete = noop,
-    abort = noop,
+    onChange,
+    onComplete,
+    abort,
     ...options
   }: ColorAnimationOptions) {
     const startColor = new Color(startValue).getSource();

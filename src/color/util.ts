@@ -1,5 +1,4 @@
 /**
- * @private
  * @param {Number} p
  * @param {Number} q
  * @param {Number} t
@@ -25,9 +24,7 @@ export function hue2rgb(p: number, q: number, t: number): number {
 }
 
 /**
- * Convert a [0, 255] value to hex
- * @param value
- * @returns
+ * Convert a value ∈ [0, 255] to hex
  */
 export function hexify(value: number) {
   const hexValue = value.toString(16).toUpperCase();

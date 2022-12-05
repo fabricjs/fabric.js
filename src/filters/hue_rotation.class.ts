@@ -1,108 +1,64 @@
-//@ts-nocheck
-(function (global) {
-  'use strict';
+import { TClassProperties } from '../typedefs';
+import { cos } from '../util/misc/cos';
+import { sin } from '../util/misc/sin';
+import { ColorMatrix } from './colormatrix_filter.class';
+import { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 
-  var fabric = global.fabric || (global.fabric = {}),
-    filters = fabric.Image.filters,
-    createClass = fabric.util.createClass;
-
+/**
+ * HueRotation filter class
+ * @example
+ * const filter = new HueRotation({
+ *   rotation: -0.5
+ * });
+ * object.filters.push(filter);
+ * object.applyFilters();
+ */
+// @ts-expect-error fromObject
+export class HueRotation extends ColorMatrix {
   /**
-   * HueRotation filter class
-   * @class fabric.Image.filters.HueRotation
-   * @memberOf fabric.Image.filters
-   * @extends fabric.Image.filters.BaseFilter
-   * @see {@link fabric.Image.filters.HueRotation#initialize} for constructor definition
-   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @example
-   * var filter = new fabric.Image.filters.HueRotation({
-   *   rotation: -0.5
-   * });
-   * object.filters.push(filter);
-   * object.applyFilters();
+   * HueRotation value, from -1 to 1.
    */
-  filters.HueRotation = createClass(
-    filters.ColorMatrix,
-    /** @lends fabric.Image.filters.HueRotation.prototype */ {
-      /**
-       * Filter type
-       * @param {String} type
-       * @default
-       */
-      type: 'HueRotation',
+  rotation: number;
 
-      /**
-       * HueRotation value, from -1 to 1.
-       * the unit is radians
-       * @param {Number} myParameter
-       * @default
-       */
-      rotation: 0,
+  calculateMatrix() {
+    const rad = this.rotation * Math.PI,
+      cosine = cos(rad),
+      sine = sin(rad),
+      aThird = 1 / 3,
+      aThirdSqtSin = Math.sqrt(aThird) * sine,
+      OneMinusCos = 1 - cosine;
+    this.matrix = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
+    this.matrix[0] = cosine + OneMinusCos / 3;
+    this.matrix[1] = aThird * OneMinusCos - aThirdSqtSin;
+    this.matrix[2] = aThird * OneMinusCos + aThirdSqtSin;
+    this.matrix[5] = aThird * OneMinusCos + aThirdSqtSin;
+    this.matrix[6] = cosine + aThird * OneMinusCos;
+    this.matrix[7] = aThird * OneMinusCos - aThirdSqtSin;
+    this.matrix[10] = aThird * OneMinusCos - aThirdSqtSin;
+    this.matrix[11] = aThird * OneMinusCos + aThirdSqtSin;
+    this.matrix[12] = cosine + aThird * OneMinusCos;
+  }
 
-      /**
-       * Describe the property that is the filter parameter
-       * @param {String} m
-       * @default
-       */
-      mainParameter: 'rotation',
+  isNeutralState() {
+    this.calculateMatrix();
+    return super.isNeutralState();
+  }
 
-      calculateMatrix: function () {
-        var rad = this.rotation * Math.PI,
-          cos = fabric.util.cos(rad),
-          sin = fabric.util.sin(rad),
-          aThird = 1 / 3,
-          aThirdSqtSin = Math.sqrt(aThird) * sin,
-          OneMinusCos = 1 - cos;
-        this.matrix = [
-          1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
-        ];
-        this.matrix[0] = cos + OneMinusCos / 3;
-        this.matrix[1] = aThird * OneMinusCos - aThirdSqtSin;
-        this.matrix[2] = aThird * OneMinusCos + aThirdSqtSin;
-        this.matrix[5] = aThird * OneMinusCos + aThirdSqtSin;
-        this.matrix[6] = cos + aThird * OneMinusCos;
-        this.matrix[7] = aThird * OneMinusCos - aThirdSqtSin;
-        this.matrix[10] = aThird * OneMinusCos - aThirdSqtSin;
-        this.matrix[11] = aThird * OneMinusCos + aThirdSqtSin;
-        this.matrix[12] = cos + aThird * OneMinusCos;
-      },
+  applyTo(options: TWebGLPipelineState | T2DPipelineState) {
+    this.calculateMatrix();
+    super.applyTo(options);
+  }
 
-      /**
-       * HueRotation isNeutralState implementation
-       * Used only in image applyFilters to discard filters that will not have an effect
-       * on the image
-       * @param {Object} options
-       **/
-      isNeutralState: function (options) {
-        this.calculateMatrix();
-        return filters.BaseFilter.prototype.isNeutralState.call(this, options);
-      },
+  static async fromObject(object: any) {
+    return new HueRotation(object);
+  }
+}
 
-      /**
-       * Apply this filter to the input image data provided.
-       *
-       * Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
-       *
-       * @param {Object} options
-       * @param {Number} options.passes The number of filters remaining to be executed
-       * @param {Boolean} options.webgl Whether to use webgl to render the filter.
-       * @param {WebGLTexture} options.sourceTexture The texture setup as the source to be filtered.
-       * @param {WebGLTexture} options.targetTexture The texture where filtered output should be drawn.
-       * @param {WebGLRenderingContext} options.context The GL context used for rendering.
-       * @param {Object} options.programCache A map of compiled shader programs, keyed by filter type.
-       */
-      applyTo: function (options) {
-        this.calculateMatrix();
-        filters.BaseFilter.prototype.applyTo.call(this, options);
-      },
-    }
-  );
+export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
+  {
+    type: 'HueRotation',
+    rotation: 0,
+    mainParameter: 'rotation',
+  };
 
-  /**
-   * Create filter instance from an object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<fabric.Image.filters.HueRotation>}
-   */
-  fabric.Image.filters.HueRotation.fromObject =
-    fabric.Image.filters.BaseFilter.fromObject;
-})(typeof exports !== 'undefined' ? exports : window);
+Object.assign(HueRotation.prototype, hueRotationDefaultValues);

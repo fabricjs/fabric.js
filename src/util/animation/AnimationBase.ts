@@ -12,6 +12,8 @@ import {
   AnimationState,
 } from './types';
 
+const defaultAbort = () => false;
+
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
@@ -85,7 +87,7 @@ export abstract class AnimationBase<
     onStart = noop,
     onChange = noop,
     onComplete = noop,
-    abort = noop,
+    abort = defaultAbort,
     target,
   }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
     Required<Omit<TAnimationValues<T>, 'endValue'>>) {
