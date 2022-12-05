@@ -83,4 +83,15 @@ export type TCornerPoint = {
   br: Point;
 };
 
-export type SVGReviver = (markup: string) => string;
+export type TSVGReviver = (markup: string) => string;
+
+export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
+
+export type TCacheCanvasDimensions = {
+  width: number;
+  height: number;
+  zoomX: number;
+  zoomY: number;
+  x: number;
+  y: number;
+};

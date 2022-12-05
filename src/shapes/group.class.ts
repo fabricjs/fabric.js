@@ -1,10 +1,10 @@
 //@ts-nocheck
-import { ObjectEvents } from '../EventTypeDefs';
+import type { ObjectEvents, CollectionEvents } from '../EventTypeDefs';
 import { fabric } from '../../HEADER';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import {
   invertTransform,
@@ -44,15 +44,14 @@ export type LayoutResult = {
   height: number;
 };
 
-export type GroupEvents = ObjectEvents & {
-  layout: {
-    context: LayoutContext;
-    result: LayoutResult;
-    diff: Point;
+export type GroupEvents = ObjectEvents &
+  CollectionEvents & {
+    layout: {
+      context: LayoutContext;
+      result: LayoutResult;
+      diff: Point;
+    };
   };
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
-};
 
 export type LayoutStrategy =
   | 'fit-content'
