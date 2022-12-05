@@ -82,3 +82,14 @@ export type TCornerPoint = {
   bl: Point;
   br: Point;
 };
+
+export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
+
+export type TCacheCanvasDimensions = {
+  width: number;
+  height: number;
+  zoomX: number;
+  zoomY: number;
+  x: number;
+  y: number;
+};

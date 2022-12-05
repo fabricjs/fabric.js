@@ -1441,6 +1441,11 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
         // this.discardActiveGroup();
         this.discardActiveObject();
         this.clearContext(this.contextTop);
+        if (this._hasITextHandlers) {
+          this.off('mouse:up', this._mouseUpITextHandler);
+          this._iTextInstances = null;
+          this._hasITextHandlers = false;
+        }
         return this.callSuper('clear');
       },
 

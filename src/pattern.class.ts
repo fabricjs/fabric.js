@@ -75,7 +75,16 @@ export class Pattern {
    */
   patternTransform: TMat2D | null = null;
 
+  /**
+   * The actual pixel source of the pattern
+   */
   source!: CanvasImageSource;
+
+  /**
+   * If true, this object will not be exported during the serialization of a canvas
+   * @type boolean
+   */
+  excludeFromExport?: boolean;
 
   readonly id: number;
 
@@ -122,7 +131,7 @@ export class Pattern {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
+  toLive(ctx: CanvasRenderingContext2D): CanvasPattern | string {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -143,7 +152,7 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: 'pattern',
