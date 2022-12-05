@@ -8,7 +8,8 @@
       eventData = {};
       transform = prepareTransform(target, 'mr');
     });
-    hooks.afterEach(function() {
+    hooks.afterEach(function () {
+      canvas.off();
       canvas.clear();
     });
     function prepareTransform(target, corner) {
@@ -262,21 +263,26 @@
       );
       wrapped(eventData, transform, x, y);
     });
-    QUnit.test.only('scaling X or Y keeps the same sign when scale = 0', function(assert) {
-      ['signX', 'signY'].forEach(sign => {
-        const isX = sign === 'signX',
-          fn = isX ? fabric.controlsUtils.scalingX : fabric.controlsUtils.scalingY,
-          point = new fabric.Point(
-            isX ? 0 : 10,
-            isX? 10 : 0
-          );
-        transform[sign] = 1;
+    ['X', 'Y'].forEach(axis => {
+      const signKey = `sign${axis}`;
+      const scaleKey = `scale${axis}`;
+      const isX = signKey === 'signX';
+      QUnit.test(`scaling ${axis} keeps the same sign when scale = 0`, function (assert) {
+        transform = prepareTransform(transform.target, isX ? 'mr' : 'mb');
+        const fn = fabric.controlsUtils[`scaling${axis}`];
+        const point = new fabric.Point(
+          isX ? 0 : 10,
+          isX ? 10 : 0
+        );
+        transform[signKey] = 1;
         fn(eventData, transform, point.x, point.y);
-        assert.equal(transform[sign], 1);
-        transform[sign] = -1;
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[`${scaleKey}`], 0.0001, `${scaleKey} value after scaling`);
+        transform[signKey] = -1;
         fn(eventData, transform, point.x, point.y);
-        assert.equal(transform[sign], -1);
-      })
+        assert.equal(transform.target[`${scaleKey}`], 0.0001, `${scaleKey} value after scaling`);
+        assert.equal(transform[signKey], -1);
+      });
     });
   });
 })();
