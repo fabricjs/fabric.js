@@ -145,8 +145,8 @@ function scaleObject(
     // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
     // cross many time the origin point and flip the object. so we need a way to filter out the noise.
     // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
-    signX = by !== 'y' ? Math.sign(newPoint.x) : 1;
-    signY = by !== 'x' ? Math.sign(newPoint.y) : 1;
+    signX = by !== 'y' ? Math.sign(newPoint.x || transform.signX || 1) : 1;
+    signY = by !== 'x' ? Math.sign(newPoint.y || transform.signY || 1) : 1;
     if (!transform.signX) {
       transform.signX = signX;
     }
