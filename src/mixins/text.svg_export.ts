@@ -2,7 +2,7 @@
 
 import { config } from '../config';
 import { Text } from '../shapes/text.class';
-import { SVGReviver } from '../typedefs';
+import { TSVGReviver } from '../typedefs';
 import { applyMixins } from '../util/applyMixins';
 import { escapeXml } from '../util/lang_string';
 import { createSVGRect } from '../util/misc/svgParsing';
@@ -31,7 +31,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(reviver: SVGReviver) {
+  toSVG(reviver: TSVGReviver) {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
