@@ -525,6 +525,7 @@ export class StaticCanvas extends createCollectionMixin(
       }
     });
 
+    // @TODO: move to Canvas
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
         this.freeDrawingBrush._setBrushStyles(this.contextTop);
