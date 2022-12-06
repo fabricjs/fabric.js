@@ -1,7 +1,6 @@
 import { fabric } from '../../HEADER';
 import { FabricObject } from '../shapes/fabricObject.class';
-
-type Constructor<T = object> = new (...args: any[]) => T;
+import { Constructor } from '../typedefs';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
@@ -155,6 +154,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     }
   }
 
+  // https://github.com/microsoft/TypeScript/issues/32080
   return Collection as typeof Collection & TBase;
 }
 
