@@ -1,10 +1,10 @@
 import { fabric } from '../../HEADER';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 
-export function createCollectionMixin<T extends { new (...args: any[]): any }>(
-  Klass: T
-) {
-  return class Collection extends Klass {
+type Constructor<T = object> = new (...args: any[]) => T;
+
+export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
+  class Collection extends Base {
     /**
      * @type {FabricObject[]}
      */
@@ -153,7 +153,9 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
         return memo;
       }, 0);
     }
-  };
+  }
+
+  return Collection as typeof Collection & TBase;
 }
 
 fabric.createCollectionMixin = createCollectionMixin;
