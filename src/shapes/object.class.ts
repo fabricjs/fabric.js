@@ -15,6 +15,7 @@ import type {
   TCacheCanvasDimensions,
 } from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
+import { classRegistry } from '../util/class_registry';
 import { clone } from '../util/lang_object';
 import { capitalize } from '../util/lang_string';
 import { capValue } from '../util/misc/capValue';
@@ -928,7 +929,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = fabric.util.getKlass(object.type).prototype;
+    const prototype = classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;

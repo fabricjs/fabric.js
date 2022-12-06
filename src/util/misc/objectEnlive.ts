@@ -2,19 +2,8 @@ import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
 import type { FabricObject } from '../../shapes/fabricObject.class';
 import { TCrossOrigin } from '../../typedefs';
-import { camelize, capitalize } from '../lang_string';
 import { createImage } from './dom';
-
-/**
- * Returns klass "Class" object of given namespace
- * @memberOf fabric.util
- * @param {String} type Type of object (eg. 'circle')
- * @param {object} namespace Namespace to get klass "Class" object from
- * @return {Object} klass "Class"
- */
-export const getKlass = (type: string, namespace = fabric): any =>
-  namespace[capitalize(camelize(type), true)];
-
+import { classRegistry  } from '../class_registry';
 export type LoadImageOptions = {
   /**
    * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -95,7 +84,8 @@ export const enlivenObjects = (
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
-        getKlass(obj.type, namespace)
+        classRegistry.getClass(obj.type)
+          // @ts-ignore
           .fromObject(obj, {
             signal,
             reviver,

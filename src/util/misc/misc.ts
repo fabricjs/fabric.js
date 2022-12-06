@@ -54,9 +54,8 @@ import {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './planeChange';
-import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
+import { escapeXml, graphemeSplit } from '../lang_string';
 import {
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -154,12 +153,9 @@ fabric.util = {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
   string: {
-    camelize,
-    capitalize,
     escapeXml,
     graphemeSplit,
   },
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,

@@ -1,17 +1,3 @@
-//@ts-nocheck
-import { fabric } from '../../HEADER';
-
-/**
- * Camelizes a string
- * @memberOf fabric.util.string
- * @param {String} string String to camelize
- * @return {String} Camelized version of a string
- */
-export const camelize = (string: string): string =>
-  string.replace(/-+(.)?/g, function (match, character) {
-    return character ? character.toUpperCase() : '';
-  });
-
 /**
  * Capitalizes a string
  * @memberOf fabric.util.string
@@ -52,13 +38,13 @@ export const graphemeSplit = (textstring: string): string[] => {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
-    graphemes.push(chr);
+    graphemes.push(chr as string);
   }
   return graphemes;
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string => {
+const getWholeChar = (str: string, i: number): string | boolean => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found

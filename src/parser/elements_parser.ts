@@ -1,7 +1,6 @@
 //@ts-nocheck
 
 import { fabric } from '../../HEADER';
-import { capitalize } from '../util/lang_string';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -41,7 +40,7 @@ const ElementsParser = function (
   };
 
   proto.findTag = function (el) {
-    return fabric[capitalize(el.tagName.replace('svg:', ''))];
+    return classRegistry.getSVGClass(el.tagName);
   };
 
   proto.createObject = function (el, index) {

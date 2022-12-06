@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './fabricObject.class';
 
 export class Triangle extends FabricObject {
@@ -43,6 +44,8 @@ export class Triangle extends FabricObject {
     return FabricObject._fromObject(Triangle, object);
   }
 }
+
+classRegistry.setClass('triangle', Triangle);
 
 export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
   type: 'triangle',
