@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { fabric } from '../HEADER';
+import type { BaseBrush } from './brushes';
 import { config } from './config';
 import { iMatrix, VERSION } from './constants';
 import type { StaticCanvasEvents } from './EventTypeDefs';
@@ -229,6 +231,8 @@ export class StaticCanvas extends createCollectionMixin(
    */
   lowerCanvasEl: HTMLCanvasElement;
 
+  contextContainer: CanvasRenderingContext2D;
+
   /**
    * Width in virtual/logical pixels of the canvas.
    * The canvas can be larger than width if retina scaling is active
@@ -256,6 +260,28 @@ export class StaticCanvas extends createCollectionMixin(
    * @type boolean
    */
   disposed?: boolean;
+
+  renderAndResetBound: () => void;
+  requestRenderAllBound: () => StaticCanvas;
+
+  // TODO: move to canvas
+  interactive: boolean;
+  upperCanvasEl: HTMLCanvasElement;
+  contextTop: CanvasRenderingContext2D;
+  wrapperEl: HTMLDivElement;
+  cacheCanvasEl: HTMLCanvasElement;
+  protected _isCurrentlyDrawing: boolean;
+  freeDrawingBrush: BaseBrush;
+  _activeObject: FabricObject;
+
+  _offset: { left: number; top: number };
+  protected _originalCanvasStyle?: string;
+  protected hasLostContext: boolean;
+  protected nextRenderHandle: number;
+  protected __cleanupTask: {
+    (): void;
+    kill: (reason?: any) => void;
+  };
 
   add(...objects: FabricObject[]) {
     const size = super.add(...objects);
@@ -453,6 +479,9 @@ export class StaticCanvas extends createCollectionMixin(
 
     this.contextContainer = this.lowerCanvasEl.getContext('2d');
   }
+  _applyCanvasStyle(lowerCanvasEl: HTMLCanvasElement) {
+    throw new Error('Method not implemented.');
+  }
 
   /**
    * Returns canvas width (in px)
@@ -554,6 +583,7 @@ export class StaticCanvas extends createCollectionMixin(
       this.upperCanvasEl[prop] = value;
     }
 
+    // TODO: move to canvas
     if (this.cacheCanvasEl) {
       this.cacheCanvasEl[prop] = value;
     }
@@ -850,6 +880,9 @@ export class StaticCanvas extends createCollectionMixin(
       this.__cleanupTask();
       this.__cleanupTask = undefined;
     }
+  }
+  drawControls(ctx: CanvasRenderingContext2D) {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -1764,16 +1797,17 @@ export class StaticCanvas extends createCollectionMixin(
     }
     this.overlayImage = null;
     this._iTextInstances = null;
+    // @ts-expect-error disposing
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl;
-    // @ts-ignore
+    // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
     // needs to be moved into Canvas class
     if (this.interactive) {
-      canvasElement.style.cssText = this._originalCanvasStyle;
+      canvasElement.style.cssText = this._originalCanvasStyle || '';
       delete this._originalCanvasStyle;
     }
     // restore canvas size to original size in case retina scaling was applied
