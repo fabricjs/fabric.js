@@ -479,9 +479,6 @@ export class StaticCanvas extends createCollectionMixin(
 
     this.contextContainer = this.lowerCanvasEl.getContext('2d');
   }
-  _applyCanvasStyle(lowerCanvasEl: HTMLCanvasElement) {
-    throw new Error('Method not implemented.');
-  }
 
   /**
    * Returns canvas width (in px)
@@ -880,9 +877,6 @@ export class StaticCanvas extends createCollectionMixin(
       this.__cleanupTask();
       this.__cleanupTask = undefined;
     }
-  }
-  drawControls(ctx: CanvasRenderingContext2D) {
-    throw new Error('Method not implemented.');
   }
 
   /**
