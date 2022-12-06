@@ -6,6 +6,7 @@ import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './__types__';
 import type { IText } from './shapes/itext.class';
+import type { StaticCanvas } from './static_canvas.class';
 
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
@@ -149,6 +150,11 @@ type CanvasSelectionEvents = {
   };
 };
 
+type CollectionEvents = {
+  'object:added': { target: FabricObject };
+  'object:removed': { target: FabricObject };
+};
+
 type BeforeSuffix<T extends string> = `${T}:before`;
 type WithBeforeSuffix<T extends string> = T | BeforeSuffix<T>;
 
@@ -181,17 +187,15 @@ export type ObjectEvents = ObjectPointerEvents &
     };
 
     // tree
-    added: { target: Group | Canvas };
-    removed: { target: Group | Canvas };
+    added: { target: Group | Canvas | StaticCanvas };
+    removed: { target: Group | Canvas | StaticCanvas };
 
     // erasing
     'erasing:end': { path: FabricObject };
   };
 
-export type StaticCanvasEvents = {
+export type StaticCanvasEvents = CollectionEvents & {
   // tree
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
   'canvas:cleared': never;
 
   // rendering

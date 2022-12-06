@@ -7,7 +7,13 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import type { TClassProperties, TDegree, TFiller, TSize } from '../typedefs';
+import type {
+  TClassProperties,
+  TDegree,
+  TFiller,
+  TSize,
+  TCacheCanvasDimensions,
+} from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
 import { clone } from '../util/lang_object';
 import { capitalize } from '../util/lang_string';
@@ -18,6 +24,18 @@ import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
+
+export type TCachedFabricObject = FabricObject &
+  Required<
+    Pick<
+      FabricObject,
+      | 'zoomX'
+      | 'zoomY'
+      | '_cacheCanvas'
+      | 'cacheTranslationX'
+      | 'cacheTranslationY'
+    >
+  >;
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -596,6 +614,15 @@ export class FabricObject<
    */
   ownCaching?: boolean;
 
+  /**
+   * Private. indicates if the object inside a group is on a transformed context or not
+   * or is part of a larger cache for many object ( a group for example)
+   * @type boolean
+   * @default undefined
+   * @private
+   */
+  _transformDone?: boolean;
+
   callSuper?: TCallSuper;
 
   /**
@@ -694,7 +721,7 @@ export class FabricObject<
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _getCacheCanvasDimensions() {
+  _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
       // calculate dimensions without skewing
       dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
@@ -826,7 +853,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]): Record<string, any> {
+  toObject(propertiesToInclude?: (keyof this | string)[]): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -891,7 +918,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude: (keyof this)[]) {
+  toDatalessObject(propertiesToInclude?: (keyof this | string)[]) {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
