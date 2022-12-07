@@ -1,25 +1,15 @@
-import { fabric } from '../../HEADER';
-import { Point } from '../point.class';
-import { FabricObject } from '../shapes/fabricObject.class';
-import { Group } from '../shapes/group.class';
-import type { Path } from '../shapes/path.class';
-import { TMat2D } from '../typedefs';
-import { createCanvasElement } from '../util/misc/dom';
-import {
-  invertTransform,
-  multiplyTransformMatrices,
-} from '../util/misc/matrix';
-import { mergeClipPaths } from '../util/misc/mergeClipPaths';
-import { applyTransformToObject } from '../util/misc/objectTransforms';
-import { isCollection } from '../util/types';
-import { Canvas } from '../__types__';
-import { TBrushEventData } from './base_brush.class';
-import { Eraser } from './Eraser';
-import { PencilBrush } from './pencil_brush.class';
-
-function isObjectErasable(object: FabricObject) {
-  return object.erasable !== false;
-}
+import type { Point } from '../../point.class';
+import type { Group } from '../../shapes/group.class';
+import { FabricObject } from '../../shapes/object.class';
+import type { Path } from '../../shapes/path.class';
+import { createCanvasElement } from '../../util/misc/dom';
+import { isCollection } from '../../util/types';
+import type { Canvas } from '../../__types__';
+import { TBrushEventData } from '../base_brush.class';
+import { PencilBrush } from '../pencil_brush.class';
+import type { Eraser } from './Eraser';
+import { isObjectErasable } from './EraserUtil';
+import { ErasingEventContext, ErasingEventContextData } from './types';
 
 type RestorationContext = {
   visibility: FabricObject[];
@@ -27,21 +17,7 @@ type RestorationContext = {
   collection: FabricObject[];
 };
 
-export type ErasingEventContextData = {
-  targets: FabricObject[];
-  subTargets: FabricObject[];
-  paths: Map<FabricObject, Path>;
-};
-
-export type ErasingEventContext = ErasingEventContextData & {
-  drawables: Partial<
-    Record<'backgroundImage' | 'overlayImage', ErasingEventContextData>
-  >;
-  path: Path;
-};
-
 /**
- * EraserBrush class
  * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
  * Supports **inverted** erasing meaning that the brush can "undo" erasing.
  *
@@ -70,12 +46,11 @@ export class EraserBrush extends PencilBrush {
    */
   erasingWidthAliasing = 4;
 
-  private _isErasing = false;
+  protected _isErasing = false;
 
-  private _patternCanvas: HTMLCanvasElement;
+  protected patternCanvas: HTMLCanvasElement;
 
   /**
-   * @private
    * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
    * Iterates over collections to allow nested selective erasing.\
    * Prepares objects before rendering the pattern brush.\
@@ -88,7 +63,7 @@ export class EraserBrush extends PencilBrush {
    * @param {CanvasRenderingContext2D} ctx
    * @param {RestorationContext} restorationContext
    */
-  _prepareCollectionTraversal(
+  protected prepareCollectionTraversal(
     collection: Canvas | Group,
     objects: FabricObject[],
     ctx: CanvasRenderingContext2D,
@@ -98,7 +73,7 @@ export class EraserBrush extends PencilBrush {
       let dirty = false;
       if (isCollection(object) && object.erasable === 'deep') {
         //  traverse
-        this._prepareCollectionTraversal(
+        this.prepareCollectionTraversal(
           object,
           object._objects,
           ctx,
@@ -139,10 +114,10 @@ export class EraserBrush extends PencilBrush {
     objects: FabricObject[] = this.canvas._objectsToRender ||
       this.canvas._objects
   ) {
-    if (!this._patternCanvas) {
-      this._patternCanvas = createCanvasElement();
+    if (!this.patternCanvas) {
+      this.patternCanvas = createCanvasElement();
     }
-    const canvas = this._patternCanvas;
+    const canvas = this.patternCanvas;
     canvas.width = this.canvas.width;
     canvas.height = this.canvas.height;
     const patternCtx = canvas.getContext('2d')!;
@@ -187,7 +162,7 @@ export class EraserBrush extends PencilBrush {
       eraser: [],
       collection: [],
     };
-    this._prepareCollectionTraversal(
+    this.prepareCollectionTraversal(
       this.canvas,
       objects,
       patternCtx,
@@ -231,9 +206,7 @@ export class EraserBrush extends PencilBrush {
   }
 
   /**
-   * Sets brush styles
-   * @private
-   * @param {CanvasRenderingContext2D} ctx
+   * @override
    */
   _setBrushStyles(ctx: CanvasRenderingContext2D) {
     super._setBrushStyles(ctx);
@@ -243,19 +216,12 @@ export class EraserBrush extends PencilBrush {
   }
 
   /**
-   * We indicate {@link fabric.PencilBrush} to repaint itself if necessary
-   * @returns
+   * @override We indicate {@link PencilBrush} to repaint itself if necessary
    */
   needsFullRender() {
     return true;
   }
 
-  /**
-   *
-   * @param {Point} pointer
-   * @param {fabric.IEvent} ev
-   * @returns
-   */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
     if (this.canvas._isMainEvent(ev.e)) {
       //  prepare for erasing
@@ -289,7 +255,7 @@ export class EraserBrush extends PencilBrush {
     this.canvas.clearContext(ctx);
     ctx.save();
     ctx.scale(s, s);
-    ctx.drawImage(this._patternCanvas, 0, 0);
+    ctx.drawImage(this.patternCanvas, 0, 0);
     ctx.restore();
     super.render(ctx);
   }
@@ -303,119 +269,6 @@ export class EraserBrush extends PencilBrush {
       stroke: this.inverted ? 'white' : 'black',
     });
     return path;
-  }
-
-  /**
-   * Utility to apply a clip path to a path.
-   * Used to preserve clipping on eraser paths in nested objects.
-   * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-   * @param {Path} path The eraser path in canvas coordinate plane
-   * @param {FabricObject} clipPath The clipPath to apply to the path
-   * @param {TMat2D} clipPathContainerTransformMatrix The transform matrix of the object that the clip path belongs to
-   * @returns {Path} path with clip path
-   */
-  static applyClipPathToPath(
-    path: Path,
-    clipPath: FabricObject,
-    clipPathContainerTransformMatrix: TMat2D
-  ) {
-    const pathInvTransform = invertTransform(path.calcTransformMatrix()),
-      clipPathTransform = clipPath.calcTransformMatrix(),
-      transform = clipPath.absolutePositioned
-        ? pathInvTransform
-        : multiplyTransformMatrices(
-            pathInvTransform,
-            clipPathContainerTransformMatrix
-          );
-    //  when passing down a clip path it becomes relative to the parent
-    //  so we transform it accordingly and set `absolutePositioned` to false
-    clipPath.absolutePositioned = false;
-    applyTransformToObject(
-      clipPath,
-      multiplyTransformMatrices(transform, clipPathTransform)
-    );
-    //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
-    //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
-    //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
-    //  so we can't assign one to the other's clip path property.
-    path.clipPath = path.clipPath
-      ? mergeClipPaths(clipPath, path.clipPath)
-      : clipPath;
-    return path;
-  }
-
-  /**
-   * Utility to apply a clip path to a path.
-   * Used to preserve clipping on eraser paths in nested objects.
-   * Called when a group has a clip path that should be applied to the path before applying erasing on the group's objects.
-   * @param {Path} path The eraser path
-   * @param {FabricObject} object The clipPath to apply to path belongs to object
-   * @returns {Promise<Path>}
-   */
-  static clonePathWithClipPath(
-    path: Path,
-    object: FabricObject & Required<Pick<FabricObject, 'clipPath'>>
-  ) {
-    const objTransform = object.calcTransformMatrix();
-    return Promise.all([
-      path.clone(),
-      object.clipPath.clone(['absolutePositioned', 'inverted']),
-    ]).then(([clonedPath, clonedClipPath]) =>
-      EraserBrush.applyClipPathToPath(clonedPath, clonedClipPath, objTransform)
-    );
-  }
-
-  /**
-   * Adds path to object's eraser, walks down object's descendants if necessary
-   *
-   * @public
-   * @fires erasing:end on object
-   * @param {FabricObject} object
-   * @param {Path} path
-   * @param {ErasingEventContextData} [context] context to assign erased objects to
-   */
-  static async addPathToObjectEraser<T extends FabricObject>(
-    object: T,
-    path: Path,
-    context?: ErasingEventContextData
-  ): Promise<void> {
-    if (isCollection(object) && object.erasable === 'deep') {
-      const targets = object._objects.filter((obj) => obj.erasable);
-      if (targets.length > 0 && object.clipPath) {
-        path = await EraserBrush.clonePathWithClipPath(
-          path,
-          object as FabricObject & Required<Pick<FabricObject, 'clipPath'>>
-        );
-      }
-      if (targets.length > 0) {
-        await Promise.all(
-          targets.map((obj) =>
-            EraserBrush.addPathToObjectEraser(obj, path, context)
-          )
-        );
-      }
-      return;
-    }
-    //  prepare eraser
-    if (!object.eraser) {
-      object.eraser = new Eraser();
-    }
-    const eraser = object.eraser;
-    //  clone and add path
-    const clone = await path.clone();
-    // http://fabricjs.com/using-transformations
-    const desiredTransform = multiplyTransformMatrices(
-      invertTransform(object.calcTransformMatrix()),
-      clone.calcTransformMatrix()
-    );
-    applyTransformToObject(clone, desiredTransform);
-    eraser.add(clone);
-    object.set('dirty', true);
-    object.fire('erasing:end', { path: clone });
-    if (context) {
-      (object.group ? context.subTargets : context.targets).push(object);
-      context.paths.set(object, clone);
-    }
   }
 
   /**

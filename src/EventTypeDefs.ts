@@ -1,13 +1,13 @@
+import type { ErasingEventContext } from './brushes/Eraser';
 import type { Control } from './controls/control.class';
 import type { Point } from './point.class';
 import type { FabricObject } from './shapes/fabricObject.class';
 import type { Group } from './shapes/group.class';
+import type { IText } from './shapes/itext.class';
+import type { StaticCanvas } from './static_canvas.class';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './__types__';
-import type { IText } from './shapes/itext.class';
-import type { StaticCanvas } from './static_canvas.class';
-import type { ErasingEventContext } from './brushes/EraserBrush';
 
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
