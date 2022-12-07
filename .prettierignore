@@ -14,3 +14,5 @@ before_commit
 /dist/
 /lib/
 /test/
+.next/
+.parcel-cache/
