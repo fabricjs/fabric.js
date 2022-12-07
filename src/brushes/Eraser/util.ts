@@ -162,10 +162,14 @@ export function cloneFromObject(
 /**
  * Propagates eraser from group to its descendants,
  * use when switching the `erasable` property from `true` to `deep` and/or when removing objects from group
- * @param group
- * @returns
  */
-export function propagateToGroupDescendants(group: Group) {
+export function propagateToGroupDescendants(
+  group: Group,
+  {
+    filter,
+    unset = true,
+  }: { filter?: (object: FabricObject) => boolean; unset?: boolean } = {}
+) {
   if (group.eraser) {
     return cloneFromObject(
       group as FabricObject & Required<Pick<FabricObject, 'eraser'>>
@@ -178,14 +182,14 @@ export function propagateToGroupDescendants(group: Group) {
             paths: new Map(),
             path,
           };
-          group.forEachObject((object) =>
-            addPathToObjectEraser(object, path, context)
+          (filter ? group._objects.filter(filter) : group._objects).forEach(
+            (object) => addPathToObjectEraser(object, path, context)
           );
           return context;
         })
       )
       .then((context) => {
-        group.set('eraser', undefined);
+        unset && group.set('eraser', undefined);
         return context;
       });
   }
