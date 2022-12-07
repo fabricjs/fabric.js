@@ -2234,6 +2234,53 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
+  function generatePointsToCover(width, height, step) {
+    const out = [];
+    for (let y = -height, side = 0; y < height; y = y + step) {
+      side++;
+      out.push(new fabric.Point(side % 2 ? -width : width, y));
+    }
+    return out;
+  }
+
+  const pointsToCover = generatePointsToCover(500, 500, 30);
+
+  [fabric.PencilBrush, fabric.PatternBrush, /*fabric.CircleBrush, fabric.SprayBrush*/].forEach(builder => {
+    [true, false].forEach(vpt => {
+      [true, false].forEach(absolutePositioned => {
+        [true, false].forEach(inverted => {
+          tests.push({
+            test: `clipping ${builder.name}${vpt ? ' vpt' : ''}${absolutePositioned ? ' absolutePositioned' : ''}${inverted ? ' inverted' : ''}`,
+            build: canvas => {
+              const brush = new builder(canvas);
+              brush.width = 30;
+              brush.color = 'red';
+              const clipPath = new fabric.Circle({
+                radius: 50,
+                absolutePositioned,
+                inverted,
+                canvas
+              });
+              clipPath.viewportCenter();
+              brush.clipPath = clipPath;
+              canvas.freeDrawingBrush = brush;
+              canvas.isDrawingMode = true;
+              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
+              pointDrawer(pointsToCover, brush);
+            },
+            name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
+            percentage: 0.09,
+            width: 200,
+            height: 200,
+            targets: {
+              mesh: true
+            }
+          });
+        });
+      });
+    });
+  });
+
   tests.forEach(({ name, targets, test: testName, ...test }) => {
     const { top, main, mesh, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
     QUnit.module(testName, () => {
