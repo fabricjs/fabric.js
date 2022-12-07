@@ -145,7 +145,7 @@ export class PencilBrush extends BaseBrush<Path> {
    * Clear points array and set contextTop canvas style.
    * @private
    */
-  _reset() {
+  protected _reset() {
     this._points = [];
     this._setBrushStyles(this.canvas.contextTop);
     this._setShadow();
