@@ -13,7 +13,9 @@ export class FabricObject extends applyMixins(InteractiveFabricObject, [
 // @ts-expect-error type conflict of generic EventSpec
 export interface FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   extends InteractiveFabricObject<EventSpec>,
-    FabricObjectSVGExportMixin {}
+    FabricObjectSVGExportMixin {
+  clipPath: FabricObject;
+}
 
 export { fabricObjectDefaultValues } from './object.class';
 
