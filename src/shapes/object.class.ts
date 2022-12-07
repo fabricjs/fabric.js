@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
+import type { Eraser } from '../brushes/Eraser';
 import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
@@ -291,7 +292,7 @@ export class FabricObject<
   /**
    * @tutorial {@link http://fabricjs.com/erasing#eraser}
    */
-  eraser?: FabricObject;
+  eraser?: Eraser;
 
   /**
    * Opacity of object's controlling borders when object is active and moving
@@ -1722,7 +1723,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<fabric.Object>}
    */
-  clone(propertiesToInclude: (keyof this)[]): Promise<this> {
+  clone(propertiesToInclude?: (keyof this)[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     // todo ok understand this. is static or it isn't?
     return this.constructor.fromObject(objectForm);
