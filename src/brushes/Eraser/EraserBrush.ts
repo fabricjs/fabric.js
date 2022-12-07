@@ -8,7 +8,7 @@ import type { Canvas } from '../../__types__';
 import { TBrushEventData } from '../base_brush.class';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
-import { isObjectErasable } from './EraserUtil';
+import { isObjectErasable } from './util';
 import { ErasingEventContext, ErasingEventContextData } from './types';
 
 type RestorationContext = {
