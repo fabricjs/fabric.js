@@ -30,7 +30,7 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
    * @fires selection:updated
    * @fires selection:created
    *
-   * @fires interaction:completed after a drawing operation ends and the path is added
+   * @fires interaction:completed after a drawing operation ends
    * @fires mouse:down
    * @fires mouse:move
    * @fires mouse:up
