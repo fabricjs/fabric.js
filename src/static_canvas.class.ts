@@ -68,7 +68,6 @@ export type TSVGExportOptions = {
  * @fires object:added
  * @fires object:removed
  */
-// eslint-disable-next-line max-len
 export class StaticCanvas extends createCollectionMixin(
   CommonMethods<StaticCanvasEvents>
 ) {
@@ -843,6 +842,7 @@ export class StaticCanvas extends createCollectionMixin(
     this._renderOverlay(ctx);
     // While erasing the brush clips out the erasing path from canvas
     // so we need to render it on top of canvas every render
+    // TODO: move to canvas
     this.isErasing() && this.freeDrawingBrush.render(ctx);
     if (this.controlsAboveOverlay && this.interactive) {
       this.drawControls(ctx);
