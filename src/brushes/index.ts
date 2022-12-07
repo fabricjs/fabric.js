@@ -3,6 +3,7 @@ export * from './circle_brush.class';
 export * from './DrawOval';
 export * from './DrawPoly';
 export * from './DrawShape';
+export * from './Eraser';
 export * from './pattern_brush.class';
 export * from './pencil_brush.class';
 export * from './spray_brush.class';
