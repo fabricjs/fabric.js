@@ -885,7 +885,7 @@ export class FabricObject<
             }
           : null,
       eraserData =
-        this.eraser && !this.clipPath.eraser
+        this.eraser && !this.eraser.excludeFromExport
           ? this.eraser.toObject(propertiesToInclude)
           : null,
       object = {
