@@ -7,6 +7,7 @@ import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './__types__';
 import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './static_canvas.class';
+import type { ErasingEventContext } from './brushes/EraserBrush';
 
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
@@ -213,17 +214,7 @@ export type CanvasEvents = StaticCanvasEvents &
 
     // erasing
     'erasing:start': never;
-    'erasing:end':
-      | never
-      | {
-          path: FabricObject;
-          targets: FabricObject[];
-          subTargets: FabricObject[];
-          drawables: {
-            backgroundImage?: FabricObject;
-            overlayImage?: FabricObject;
-          };
-        };
+    'erasing:end': never | ErasingEventContext;
 
     // IText
     'text:selection:changed': { target: IText };
