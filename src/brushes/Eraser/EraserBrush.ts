@@ -8,7 +8,7 @@ import type { Canvas } from '../../__types__';
 import { TBrushEventData } from '../base_brush.class';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
-import { isObjectErasable } from './util';
+import { addPathToObjectEraser, isObjectErasable } from './util';
 import { ErasingEventContext, ErasingEventContextData } from './types';
 
 type RestorationContext = {
@@ -44,7 +44,7 @@ export class EraserBrush extends PencilBrush {
    * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
    * @type number
    */
-  erasingWidthAliasing = 4;
+  erasingWidthAliasing = 0;
 
   protected _isErasing = false;
 
@@ -222,6 +222,11 @@ export class EraserBrush extends PencilBrush {
     return true;
   }
 
+  protected _reset() {
+    super._reset();
+    this._setBrushStyles(this.canvas.getContext());
+  }
+
   onMouseDown(pointer: Point, ev: TBrushEventData) {
     if (this.canvas._isMainEvent(ev.e)) {
       //  prepare for erasing
@@ -239,16 +244,15 @@ export class EraserBrush extends PencilBrush {
    *
    * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
    */
-  render(ctx: CanvasRenderingContext2D) {
+  render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     const lineWidth = this.width;
-    const t = this.canvas.getRetinaScaling(),
-      s = 1 / t;
+    const s = 1 / this.canvas.getRetinaScaling();
     //  clip canvas
     //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
     //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
     if (lineWidth - this.erasingWidthAliasing > 0) {
       this.width = lineWidth - this.erasingWidthAliasing;
-      super.render(this.canvas.getContext());
+      super.render(this.canvas.getContext(), false);
       this.width = lineWidth;
     }
     //  render brush and mask it with pattern
@@ -257,7 +261,7 @@ export class EraserBrush extends PencilBrush {
     ctx.scale(s, s);
     ctx.drawImage(this.patternCanvas, 0, 0);
     ctx.restore();
-    super.render(ctx);
+    super.render(ctx, false);
   }
 
   finalizeShape() {
@@ -292,13 +296,13 @@ export class EraserBrush extends PencilBrush {
     return (
       drawable &&
       drawable.erasable &&
-      EraserBrush.addPathToObjectEraser(drawable, path, dContext).then(() => {
+      addPathToObjectEraser(drawable, path, dContext).then(() => {
         context.drawables[key] = dContext;
       })
     );
   }
 
-  async finalizeErasing(path: Path) {
+  protected async finalizeErasing(path: Path) {
     const context: ErasingEventContext = {
       targets: [],
       subTargets: [],
@@ -310,7 +314,7 @@ export class EraserBrush extends PencilBrush {
       (obj) =>
         obj.erasable &&
         obj.intersectsWithObject(path, true, true) &&
-        EraserBrush.addPathToObjectEraser(obj, path, context)
+        addPathToObjectEraser(obj, path, context)
     );
     tasks.push(
       this.applyEraserToDrawable('backgroundImage', path, context),
