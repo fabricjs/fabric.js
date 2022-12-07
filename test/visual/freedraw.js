@@ -2250,7 +2250,7 @@ QUnit.module('Free Drawing', hooks => {
       [true, false].forEach(absolutePositioned => {
         [true, false].forEach(inverted => {
           tests.push({
-            test: `clipping ${builder.name}${absolutePositioned ? ' absolutePositioned' : ''}${inverted ? ' inverted' : ''}`,
+            test: `clipping ${builder.name}${vpt ? ' vpt' : ''}${absolutePositioned ? ' absolutePositioned' : ''}${inverted ? ' inverted' : ''}`,
             build: canvas => {
               const brush = new builder(canvas);
               brush.width = 30;
