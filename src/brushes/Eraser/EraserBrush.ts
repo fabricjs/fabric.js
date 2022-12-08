@@ -77,7 +77,7 @@ export class EraserBrush extends PencilBrush {
     const alpha = 1 - new Color(this.color).getAlpha();
     objects.forEach((object) => {
       let dirty = false;
-      if (isCollection(object) && object.erasable === 'deep') {
+      if (isCollection(object) && (object as Group).erasable === 'deep') {
         //  traverse
         this.prepareCollectionTraversal(
           object,
