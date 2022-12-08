@@ -42,7 +42,7 @@ export class PencilBrush extends BaseBrush<Path> {
 
   private _points: Point[];
   private _hasStraightLine: boolean;
-  private oldEnd?: Point;
+  protected oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -116,7 +116,7 @@ export class PencilBrush extends BaseBrush<Path> {
    * @private
    * @param {Point} pointer Actual mouse position related to the canvas.
    */
-  _prepareForDrawing(pointer: Point) {
+  protected _prepareForDrawing(pointer: Point) {
     this._reset();
     this._addPoint(pointer);
     this.canvas.contextTop.moveTo(pointer.x, pointer.y);
