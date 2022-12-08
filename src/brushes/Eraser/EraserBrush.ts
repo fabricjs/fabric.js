@@ -1,3 +1,4 @@
+import { Color } from '../../color';
 import type { Point } from '../../point.class';
 import type { Group } from '../../shapes/group.class';
 import { FabricObject } from '../../shapes/object.class';
@@ -12,14 +13,15 @@ import { ErasingEventContext, ErasingEventContextData } from './types';
 import { addPathToObjectEraser, isObjectErasable } from './util';
 
 type RestorationContext = {
-  visibility: FabricObject[];
+  visibility: [FabricObject, number][];
   eraser: [FabricObject, Eraser][];
   collection: FabricObject[];
 };
 
 /**
- * Supports selective erasing meaning that only erasable objects are affected by the eraser brush.
- * Supports **inverted** erasing meaning that the brush can "undo" erasing.
+ * Supports **selective** erasing: only erasable objects are affected by the eraser brush.
+ * Supports **inverted** erasing: the brush can "undo" erasing.
+ * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity
  *
  * In order to support selective erasing, the brush clips the entire canvas
  * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
@@ -44,7 +46,7 @@ export class EraserBrush extends PencilBrush {
    * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
    * @type number
    */
-  erasingWidthAliasing = 1;
+  erasingWidthAliasing = 4;
 
   protected _isErasing = false;
 
@@ -69,6 +71,7 @@ export class EraserBrush extends PencilBrush {
     ctx: CanvasRenderingContext2D,
     restorationContext: RestorationContext
   ) {
+    const alpha = 1 - new Color(this.color).getAlpha();
     objects.forEach((object) => {
       let dirty = false;
       if (isCollection(object) && object.erasable === 'deep') {
@@ -81,8 +84,9 @@ export class EraserBrush extends PencilBrush {
         );
       } else if (!this.inverted && object.erasable && object.visible) {
         //  render only non-erasable objects
-        object.visible = false;
-        restorationContext.visibility.push(object);
+        const opacity = object.opacity;
+        object.opacity *= alpha;
+        restorationContext.visibility.push([object, opacity]);
         dirty = true;
       } else if (
         this.inverted &&
@@ -169,8 +173,8 @@ export class EraserBrush extends PencilBrush {
       restorationContext
     );
     this.canvas._renderObjects(patternCtx, objects);
-    restorationContext.visibility.forEach(function (obj) {
-      obj.visible = true;
+    restorationContext.visibility.forEach(([obj, opacity]) => {
+      obj.opacity = opacity;
     });
     restorationContext.eraser.forEach(([obj, eraser]) => {
       obj.eraser = eraser;
@@ -285,7 +289,10 @@ export class EraserBrush extends PencilBrush {
       globalCompositeOperation: this.inverted
         ? 'source-over'
         : 'destination-out',
-      stroke: this.inverted ? 'white' : 'black',
+      stroke: this.inverted
+        ? 'white'
+        : // black with opacity
+          new Color().setAlpha(new Color(this.color).getAlpha()).toRgba(),
     });
     return path;
   }
