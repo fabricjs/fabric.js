@@ -3,6 +3,7 @@ import type { Point } from '../../point.class';
 import type { Group } from '../../shapes/group.class';
 import { FabricObject } from '../../shapes/object.class';
 import type { Path } from '../../shapes/path.class';
+import { capitalize } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
 import { isCollection } from '../../util/types';
 import type { Canvas } from '../../__types__';
@@ -110,6 +111,39 @@ export class EraserBrush extends PencilBrush {
     });
   }
 
+  protected renderDrawableOnPattern(
+    ctx: CanvasRenderingContext2D,
+    key: 'background' | 'overlay'
+  ) {
+    const drawableKey = `${key}Image`;
+    const method = `_render${capitalize(key)}`;
+    const drawable = this.canvas[drawableKey],
+      bgErasable = drawable && isObjectErasable(drawable);
+    if (
+      !this.inverted &&
+      ((drawable && !bgErasable) || !!this.canvas[`${key}Color`])
+    ) {
+      if (bgErasable) {
+        this.canvas[drawableKey] = undefined;
+      }
+      this.canvas[method](ctx);
+      if (bgErasable) {
+        this.canvas[drawableKey] = drawable;
+      }
+    } else if (this.inverted) {
+      const eraser = drawable && drawable.eraser;
+      if (eraser) {
+        drawable.eraser = undefined;
+        drawable.dirty = true;
+      }
+      this.canvas[method](ctx);
+      if (eraser) {
+        drawable.eraser = eraser;
+        drawable.dirty = true;
+      }
+    }
+  }
+
   /**
    * Prepare the pattern for the erasing brush
    * This pattern will be drawn on the top context after clipping the main context,
@@ -134,33 +168,7 @@ export class EraserBrush extends PencilBrush {
         patternCtx
       );
     }
-    const backgroundImage = this.canvas.backgroundImage,
-      bgErasable = backgroundImage && isObjectErasable(backgroundImage),
-      overlayImage = this.canvas.overlayImage,
-      overlayErasable = overlayImage && isObjectErasable(overlayImage);
-    if (
-      !this.inverted &&
-      ((backgroundImage && !bgErasable) || !!this.canvas.backgroundColor)
-    ) {
-      if (bgErasable) {
-        this.canvas.backgroundImage = undefined;
-      }
-      this.canvas._renderBackground(patternCtx);
-      if (bgErasable) {
-        this.canvas.backgroundImage = backgroundImage;
-      }
-    } else if (this.inverted) {
-      const eraser = backgroundImage && backgroundImage.eraser;
-      if (eraser) {
-        backgroundImage.eraser = undefined;
-        backgroundImage.dirty = true;
-      }
-      this.canvas._renderBackground(patternCtx);
-      if (eraser) {
-        backgroundImage.eraser = eraser;
-        backgroundImage.dirty = true;
-      }
-    }
+    this.renderDrawableOnPattern(patternCtx, 'background');
     patternCtx.save();
     patternCtx.transform(...this.canvas.viewportTransform);
     const restorationContext: RestorationContext = {
@@ -186,29 +194,7 @@ export class EraserBrush extends PencilBrush {
       obj.dirty = true;
     });
     patternCtx.restore();
-    if (
-      !this.inverted &&
-      ((overlayImage && !overlayErasable) || !!this.canvas.overlayColor)
-    ) {
-      if (overlayErasable) {
-        this.canvas.overlayImage = undefined;
-      }
-      this.canvas._renderOverlay(patternCtx);
-      if (overlayErasable) {
-        this.canvas.overlayImage = overlayImage;
-      }
-    } else if (this.inverted) {
-      const eraser = overlayImage && overlayImage.eraser;
-      if (eraser) {
-        overlayImage.eraser = undefined;
-        overlayImage.dirty = true;
-      }
-      this.canvas._renderOverlay(patternCtx);
-      if (eraser) {
-        overlayImage.eraser = eraser;
-        overlayImage.dirty = true;
-      }
-    }
+    this.renderDrawableOnPattern(patternCtx, 'overlay');
   }
 
   protected renderPattern(ctx: CanvasRenderingContext2D) {
