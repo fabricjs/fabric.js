@@ -1,6 +1,9 @@
 //@ts-nocheck
-
 import { fabric } from '../../HEADER';
+import { Gradient } from '../gradient';
+import { Group } from '../shapes/group.class';
+import { Image } from '../shapes/image.class';
+
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -57,19 +60,18 @@ const ElementsParser = function (
   };
 
   proto.createCallback = function (index, el) {
-    const _this = this;
-    return function (obj) {
+    return (obj) => {
       let _options;
-      _this.resolveGradient(obj, el, 'fill');
-      _this.resolveGradient(obj, el, 'stroke');
-      if (obj instanceof fabric.Image && obj._originalElement) {
+      this.resolveGradient(obj, el, 'fill');
+      this.resolveGradient(obj, el, 'stroke');
+      if (obj instanceof Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, el);
-      _this.reviver && _this.reviver(el, obj);
-      _this.instances[index] = obj;
-      _this.checkIfDone();
+      this.resolveClipPath(obj, el);
+      this.reviver && this.reviver(el, obj);
+      this.instances[index] = obj;
+      this.checkIfDone();
     };
   };
 
@@ -93,7 +95,7 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = fabric.Gradient.fromElement(gradientDef, obj, {
+      const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
       });
@@ -142,7 +144,7 @@ const ElementsParser = function (
       if (container.length === 1) {
         clipPath = container[0];
       } else {
-        clipPath = new fabric.Group(container);
+        clipPath = new Group(container);
       }
       gTransform = multiplyTransformMatrices(
         objTransformInv,

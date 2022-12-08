@@ -1,6 +1,5 @@
 /**
- * Capitalizes a string
- * @memberOf fabric.util.string
+ *  * Capitalizes a string
  * @param {String} string String to capitalize
  * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
  * and other letters stay untouched, if false first letter is capitalized
@@ -14,7 +13,6 @@ export const capitalize = (string: string, firstLetterOnly = false): string =>
 
 /**
  * Escapes XML in a string
- * @memberOf fabric.util.string
  * @param {String} string String to escape
  * @return {String} Escaped version of a string
  */
@@ -28,7 +26,6 @@ export const escapeXml = (string: string): string =>
 
 /**
  * Divide a string in the user perceived single units
- * @memberOf fabric.util.string
  * @param {String} textstring String to escape
  * @return {Array} array containing the graphemes
  */
