@@ -82,7 +82,7 @@ export class EraserBrush extends PencilBrush {
           ctx,
           restorationContext
         );
-      } else if (!this.inverted && object.erasable && object.visible) {
+      } else if (!this.inverted && object.erasable && !object.isNotVisible()) {
         //  render only non-erasable objects
         const opacity = object.opacity;
         object.opacity *= alpha;
@@ -92,7 +92,7 @@ export class EraserBrush extends PencilBrush {
         this.inverted &&
         object.erasable &&
         object.eraser &&
-        object.visible
+        !object.isNotVisible()
       ) {
         //  render all objects without eraser
         const eraser = object.eraser;
