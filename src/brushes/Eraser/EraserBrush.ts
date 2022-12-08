@@ -45,7 +45,7 @@ export class EraserBrush extends PencilBrush {
   inverted = false;
 
   /**
-   * Used to fix https://github.com/fabricjs/fabric.js/issues/7984
+   * Used to fix #7984
    * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
    * @type number
    */
@@ -221,7 +221,7 @@ export class EraserBrush extends PencilBrush {
     ctx.strokeStyle = 'black';
     if (ctx === this.canvas.getContext()) {
       ctx.globalCompositeOperation = 'destination-out';
-      //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
+      //  a hack that fixes #7984 by reducing path width
       //  the case seems to be aliasing of paths
       ctx.lineWidth = Math.max(
         this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(),
