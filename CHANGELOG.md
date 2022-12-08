@@ -7,6 +7,7 @@
   - brush doesn't add result to canvas anymore
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
+- chore(): rm dead code [#8493](https://github.com/fabricjs/fabric.js/pull/8493)
 - fix(scaleObject): handle when scale is 0 to not bug flip [#8490](https://github.com/fabricjs/fabric.js/pull/8490)
 - chore(TS): migrate StatiCanvas to TS [#8485](https://github.com/fabricjs/fabric.js/pull/8485)
 - chore(): refactor `Object.__uid++` => `uid()` [#8482](https://github.com/fabricjs/fabric.js/pull/8482)
