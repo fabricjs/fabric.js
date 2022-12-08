@@ -111,12 +111,43 @@ export class EraserBrush extends PencilBrush {
     });
   }
 
+  protected renderObjectsOnPattern(
+    ctx: CanvasRenderingContext2D,
+    objects: FabricObject[]
+  ) {
+    ctx.save();
+    ctx.transform(...this.canvas.viewportTransform);
+    const restorationContext: RestorationContext = {
+      visibility: [],
+      eraser: [],
+      collection: [],
+    };
+    this.prepareCollectionTraversal(
+      this.canvas,
+      objects,
+      ctx,
+      restorationContext
+    );
+    this.canvas._renderObjects(ctx, objects);
+    restorationContext.visibility.forEach(([obj, opacity]) => {
+      obj.opacity = opacity;
+    });
+    restorationContext.eraser.forEach(([obj, eraser]) => {
+      obj.eraser = eraser;
+      obj.dirty = true;
+    });
+    restorationContext.collection.forEach((obj) => {
+      obj.dirty = true;
+    });
+    ctx.restore();
+  }
+
   protected renderDrawableOnPattern(
     ctx: CanvasRenderingContext2D,
     key: 'background' | 'overlay'
   ) {
-    const drawableKey = `${key}Image`;
-    const method = `_render${capitalize(key)}`;
+    const drawableKey = `${key}Image` as const;
+    const method = `_render${capitalize(key)}` as const;
     const drawable = this.canvas[drawableKey],
       bgErasable = drawable && isObjectErasable(drawable);
     if (
@@ -169,31 +200,7 @@ export class EraserBrush extends PencilBrush {
       );
     }
     this.renderDrawableOnPattern(patternCtx, 'background');
-    patternCtx.save();
-    patternCtx.transform(...this.canvas.viewportTransform);
-    const restorationContext: RestorationContext = {
-      visibility: [],
-      eraser: [],
-      collection: [],
-    };
-    this.prepareCollectionTraversal(
-      this.canvas,
-      objects,
-      patternCtx,
-      restorationContext
-    );
-    this.canvas._renderObjects(patternCtx, objects);
-    restorationContext.visibility.forEach(([obj, opacity]) => {
-      obj.opacity = opacity;
-    });
-    restorationContext.eraser.forEach(([obj, eraser]) => {
-      obj.eraser = eraser;
-      obj.dirty = true;
-    });
-    restorationContext.collection.forEach((obj) => {
-      obj.dirty = true;
-    });
-    patternCtx.restore();
+    this.renderObjectsOnPattern(patternCtx, objects);
     this.renderDrawableOnPattern(patternCtx, 'overlay');
   }
 
@@ -292,12 +299,13 @@ export class EraserBrush extends PencilBrush {
    * @param {ErasingEventContext} [context] context to assign erased objects to
    * @returns {Promise<Path[]|void>} eraser paths
    */
-  protected applyEraserToDrawable(
-    key: 'backgroundImage' | 'overlayImage',
+  protected addPathToDrawableEraser(
+    key: 'background' | 'overlay',
     path: Path,
     context: ErasingEventContext
   ) {
-    const drawable = this.canvas[key];
+    const drawableKey = `${key}Image` as const;
+    const drawable = this.canvas[drawableKey];
     const dContext: ErasingEventContextData = {
       targets: [],
       subTargets: [],
@@ -307,7 +315,7 @@ export class EraserBrush extends PencilBrush {
       drawable &&
       drawable.erasable &&
       addPathToObjectEraser(drawable, path, dContext).then(() => {
-        context.drawables[key] = dContext;
+        context.drawables[drawableKey] = dContext;
       })
     );
   }
@@ -327,8 +335,8 @@ export class EraserBrush extends PencilBrush {
         addPathToObjectEraser(obj, path, context)
     );
     tasks.push(
-      this.applyEraserToDrawable('backgroundImage', path, context),
-      this.applyEraserToDrawable('overlayImage', path, context)
+      this.addPathToDrawableEraser('background', path, context),
+      this.addPathToDrawableEraser('overlay', path, context)
     );
     await Promise.all(tasks);
     return context;
