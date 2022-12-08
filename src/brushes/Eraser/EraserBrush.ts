@@ -256,19 +256,17 @@ export class EraserBrush extends PencilBrush {
     const oldEnd = this.oldEnd;
     // clip main context
     super._renderCurve(this.canvas.getContext());
-    // render brush and mask it with pattern
     // restore the value for rendering to occur
     this.oldEnd = oldEnd;
+    // render brush and mask it with pattern
     super._renderCurve(ctx);
     this.renderPattern(ctx);
   }
 
   /**
    * Rendering Logic:
-   * 1. Use brush to clip canvas by rendering it on top of canvas (unnecessary if `inverted === true`)
+   * 1. Use brush to clip canvas by rendering it on top of canvas
    * 2. Render brush with canvas pattern on top context
-   *
-   * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
    */
   render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     //  clip main context
@@ -280,15 +278,18 @@ export class EraserBrush extends PencilBrush {
 
   finalizeShape() {
     const path = super.finalizeShape();
-    path?.set({
-      globalCompositeOperation: this.inverted
-        ? 'source-over'
-        : 'destination-out',
-      stroke: this.inverted
-        ? 'white'
-        : // black with opacity
-          new Color().setAlpha(new Color(this.color).getAlpha()).toRgba(),
-    });
+    path?.set(
+      this.inverted
+        ? {
+            globalCompositeOperation: 'source-over',
+            stroke: 'white',
+          }
+        : {
+            globalCompositeOperation: 'destination-out',
+            stroke: 'black',
+            opacity: new Color(this.color).getAlpha(),
+          }
+    );
     return path;
   }
 
