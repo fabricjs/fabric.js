@@ -9,7 +9,7 @@ export type ErasingEventContextData = {
 
 export type ErasingEventContext = ErasingEventContextData & {
   drawables: Partial<
-    Record<'backgroundImage' | 'overlayImage', ErasingEventContextData>
+    Record<`${'background' | 'overlay'}Image`, ErasingEventContextData>
   >;
   path: Path;
 };

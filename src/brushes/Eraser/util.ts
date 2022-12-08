@@ -90,7 +90,7 @@ export async function addPathToObjectEraser(
   context?: ErasingEventContextData,
   fireEvent = true
 ): Promise<void> {
-  if (isCollection(object) && object.erasable === 'deep') {
+  if (isCollection(object) && (object as Group).erasable === 'deep') {
     const targets = object._objects.filter((obj) => obj.erasable);
     if (targets.length > 0 && object.clipPath) {
       path = await clonePathWithClipPath(
@@ -130,18 +130,18 @@ export async function addPathToObjectEraser(
 /**
  * Clones an object's eraser paths into the canvas plane
  * @param object the owner of the eraser that you want to clone
- * @param [applyClipPath] controls whether the cloned eraser's paths should be clipped by the object's clip path
+ * @param [applyObjectClipPath] controls whether the cloned eraser's paths should be clipped by the object's clip path
  * @returns
  */
-export function cloneFromObject(
+export function cloneEraserFromObject(
   object: FabricObject & Required<Pick<FabricObject, 'eraser'>>,
-  applyClipPath = true
+  applyObjectClipPath = true
 ) {
   const { clipPath, eraser } = object;
   const transform = object.calcTransformMatrix();
   return Promise.all([
     eraser.clone(),
-    applyClipPath && clipPath?.clone(['absolutePositioned', 'inverted']),
+    applyObjectClipPath && clipPath?.clone(['absolutePositioned', 'inverted']),
   ]).then(([eraser, clipPath]) => {
     return Promise.all(
       (
@@ -160,37 +160,30 @@ export function cloneFromObject(
 }
 
 /**
- * Propagates eraser from group to its descendants,
- * use when switching the `erasable` property from `true` to `deep` and/or when removing objects from group
+ * Use when:
+ * 1. switching the {@link Group#erasable} property from `true` to `deep` if you wish descendants to be erased by existing paths
+ * 2. when removing objects from group with {@link Group#erasable} set to `true`
  */
-export function propagateToGroupDescendants(
-  group: Group,
-  {
-    filter,
-    unset = true,
-  }: { filter?: (object: FabricObject) => boolean; unset?: boolean } = {}
+export function applyEraser(
+  from: FabricObject & Required<Pick<FabricObject, 'eraser'>>,
+  to: FabricObject[],
+  { unset = false }: { unset: boolean }
 ) {
-  if (group.eraser) {
-    return cloneFromObject(
-      group as FabricObject & Required<Pick<FabricObject, 'eraser'>>
-    )
-      .then((paths) =>
-        paths.map((path) => {
-          const context: ErasingEventContextData & { path: Path } = {
-            targets: [],
-            subTargets: [],
-            paths: new Map(),
-            path,
-          };
-          (filter ? group._objects.filter(filter) : group._objects).forEach(
-            (object) => addPathToObjectEraser(object, path, context)
-          );
-          return context;
-        })
-      )
-      .then((context) => {
-        unset && group.set('eraser', undefined);
+  return cloneEraserFromObject(from)
+    .then((paths) =>
+      paths.map((path) => {
+        const context: ErasingEventContextData & { path: Path } = {
+          targets: [],
+          subTargets: [],
+          paths: new Map(),
+          path,
+        };
+        to.forEach((object) => addPathToObjectEraser(object, path, context));
         return context;
-      });
-  }
+      })
+    )
+    .then((contexts) => {
+      unset && from.set('eraser', undefined);
+      return contexts;
+    });
 }
