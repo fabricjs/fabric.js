@@ -15,6 +15,9 @@ type TNonFunctionPropertyNames<T> = {
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
 
+// https://github.com/microsoft/TypeScript/issues/32080
+export type Constructor<T = object> = new (...args: any[]) => T;
+
 const enum Degree {}
 const enum Radian {}
 

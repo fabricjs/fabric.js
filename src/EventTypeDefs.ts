@@ -151,7 +151,7 @@ type CanvasSelectionEvents = {
   };
 };
 
-type CollectionEvents = {
+export type CollectionEvents = {
   'object:added': { target: FabricObject };
   'object:removed': { target: FabricObject };
 };

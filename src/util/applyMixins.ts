@@ -1,9 +1,9 @@
-type TClass = { new (...args: any[]): any };
+import { Constructor } from '../typedefs';
 
 /***
  * https://www.typescriptlang.org/docs/handbook/mixins.html#alternative-pattern
  */
-export function applyMixins<T extends TClass, S extends TClass>(
+export function applyMixins<T extends Constructor, S extends Constructor>(
   derivedCtor: T,
   constructors: S[]
 ) {
@@ -18,5 +18,5 @@ export function applyMixins<T extends TClass, S extends TClass>(
         );
     });
   });
-  return derivedCtor;
+  return derivedCtor as T & { prototype: InstanceType<T & S> };
 }

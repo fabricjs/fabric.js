@@ -1,6 +1,6 @@
-//@ts-nocheck
-import type { ObjectEvents, CollectionEvents } from '../EventTypeDefs';
+// @ts-nocheck
 import { fabric } from '../../HEADER';
+import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
@@ -35,13 +35,6 @@ export type LayoutContext = {
    */
   path?: Group[];
   [key: string]: any;
-};
-
-export type LayoutResult = {
-  centerX: number;
-  centerY: number;
-  width: number;
-  height: number;
 };
 
 export type GroupEvents = ObjectEvents &
