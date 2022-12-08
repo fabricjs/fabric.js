@@ -1,6 +1,3 @@
-//@ts-nocheck
-import { fabric } from '../../HEADER';
-
 /**
  * Camelizes a string
  * @memberOf fabric.util.string
@@ -21,10 +18,13 @@ export const camelize = (string: string): string =>
  * and other letters are converted to lowercase.
  * @return {String} Capitalized version of a string
  */
-export const capitalize = (string: string, firstLetterOnly = false): string =>
+export const capitalize = <S extends string, FirstOnly extends boolean = false>(
+  string: S,
+  firstLetterOnly: FirstOnly = false as FirstOnly
+): Capitalize<FirstOnly extends true ? S : Lowercase<S>> =>
   `${string.charAt(0).toUpperCase()}${
     firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()
-  }`;
+  }` as any;
 
 /**
  * Escapes XML in a string
@@ -58,7 +58,7 @@ export const graphemeSplit = (textstring: string): string[] => {
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string => {
+const getWholeChar = (str: string, i: number): string | false => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found
