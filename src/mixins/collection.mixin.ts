@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
-import { FabricObject } from '../shapes/fabricObject.class';
-import { Constructor } from '../typedefs';
+import type { FabricObject } from '../shapes/fabricObject.class';
+import type { Constructor } from '../typedefs';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
