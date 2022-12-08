@@ -19,6 +19,7 @@ import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { Rect } from './rect.class';
 
 export type LayoutContextType =
   | 'initialization'
@@ -985,7 +986,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     if (!this.backgroundColor) {
       return '';
     }
-    const fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+    const fillStroke = Rect.prototype._toSVG.call(this, reviver);
     const commons = fillStroke.indexOf('COMMON_PARTS');
     fillStroke[commons] = 'for="group" ';
     return fillStroke.join('');
