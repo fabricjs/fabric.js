@@ -20,19 +20,21 @@ type RestorationContext = {
 
 /**
  * Supports **selective** erasing: only erasable objects are affected by the eraser brush.
+ *
  * Supports **inverted** erasing: the brush can "undo" erasing.
- * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity
+ *
+ * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity.
  *
  * In order to support selective erasing, the brush clips the entire canvas
  * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
- * If brush is **inverted** there is no need to clip canvas. The brush draws all erasable objects without their eraser.
+ * If brush is **inverted** it draws all erasable objects without their eraser over the erased path.
  * This achieves the desired effect of seeming to erase or uneraser only erasable objects.
  * After erasing is done the created path is added to all intersected objects' `eraser` property.
  *
- * In order to update the EraserBrush call `preparePattern`.
+ * In order to update the EraserBrush's pattern while drawing call `preparePattern`.
  * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes (performance may suffer).
  *
- * @tutorial {@link http://fabricjs.com/erasing}
+ * @tutorial http://fabricjs.com/erasing
  */
 export class EraserBrush extends PencilBrush {
   /**
