@@ -278,16 +278,12 @@ export class FabricObject<
   clipPath?: FabricObject;
 
   /**
-   * Indicates whether this object can be erased by {@link EraserBrush}
-   * The `deep` option introduces fine grained control over a group's `erasable` property.
-   * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
-   * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
-   * When set to `false` the eraser will leave all objects including the group untouched.
+   * Indicates whether this object can be erased by the {@link EraserBrush}
    * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
-   * @type boolean | 'deep'
+   * @type boolean
    * @default true
    */
-  erasable: boolean | 'deep';
+  erasable: boolean;
 
   /**
    * @tutorial {@link http://fabricjs.com/erasing#eraser}
