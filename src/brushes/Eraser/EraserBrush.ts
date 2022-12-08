@@ -8,8 +8,8 @@ import type { Canvas } from '../../__types__';
 import { TBrushEventData } from '../base_brush.class';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
-import { addPathToObjectEraser, isObjectErasable } from './util';
 import { ErasingEventContext, ErasingEventContextData } from './types';
+import { addPathToObjectEraser, isObjectErasable } from './util';
 
 type RestorationContext = {
   visibility: FabricObject[];
@@ -44,7 +44,7 @@ export class EraserBrush extends PencilBrush {
    * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
    * @type number
    */
-  erasingWidthAliasing = 0;
+  erasingWidthAliasing = 1;
 
   protected _isErasing = false;
 
@@ -205,14 +205,30 @@ export class EraserBrush extends PencilBrush {
     }
   }
 
+  protected renderPattern(ctx: CanvasRenderingContext2D) {
+    const s = 1 / this.canvas.getRetinaScaling();
+    ctx.save();
+    ctx.scale(s, s);
+    ctx.globalCompositeOperation = 'source-in';
+    ctx.drawImage(this.patternCanvas, 0, 0);
+    ctx.restore();
+  }
+
   /**
    * @override
    */
   _setBrushStyles(ctx: CanvasRenderingContext2D) {
     super._setBrushStyles(ctx);
     ctx.strokeStyle = 'black';
-    ctx.globalCompositeOperation =
-      ctx === this.canvas.getContext() ? 'destination-out' : 'destination-in';
+    if (ctx === this.canvas.getContext()) {
+      ctx.globalCompositeOperation = 'destination-out';
+      //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
+      //  the case seems to be aliasing of paths
+      ctx.lineWidth = Math.max(
+        this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(),
+        0
+      );
+    }
   }
 
   /**
@@ -245,23 +261,11 @@ export class EraserBrush extends PencilBrush {
    * @todo provide a better solution to https://github.com/fabricjs/fabric.js/issues/7984
    */
   render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
-    const lineWidth = this.width;
-    const s = 1 / this.canvas.getRetinaScaling();
-    //  clip canvas
-    //  a hack that fixes https://github.com/fabricjs/fabric.js/issues/7984 by reducing path width
-    //  the issue's cause is unknown at time of writing (@ShaMan123 06/2022)
-    if (lineWidth - this.erasingWidthAliasing > 0) {
-      this.width = lineWidth - this.erasingWidthAliasing;
-      super.render(this.canvas.getContext(), false);
-      this.width = lineWidth;
-    }
+    //  clip main context
+    super.render(this.canvas.getContext(), false);
     //  render brush and mask it with pattern
-    this.canvas.clearContext(ctx);
-    ctx.save();
-    ctx.scale(s, s);
-    ctx.drawImage(this.patternCanvas, 0, 0);
-    ctx.restore();
-    super.render(ctx, false);
+    super.render(ctx);
+    this.renderPattern(ctx);
   }
 
   finalizeShape() {
