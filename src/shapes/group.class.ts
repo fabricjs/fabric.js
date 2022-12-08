@@ -116,6 +116,18 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   interactive: boolean;
 
   /**
+   * Indicates whether this object can be erased by the {@link EraserBrush}
+   * The `deep` option introduces fine grained control over a group's `erasable` property.
+   * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
+   * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
+   * When set to `false` the eraser will leave all objects including the group untouched.
+   * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
+   * @type boolean | 'deep'
+   * @default true
+   */
+  erasable: boolean | 'deep';
+
+  /**
    * Used internally to optimize performance
    * Once an object is selected, instance is rendered without the selected object.
    * This way instance is cached only once for the entire interaction with the selected object.
