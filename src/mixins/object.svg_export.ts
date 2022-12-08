@@ -5,7 +5,7 @@ import { uid } from '../util/internals/uid';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 
-type SVGReviver = (markup: string) => string;
+export type TSVGReviver = (markup: string) => string;
 
 /* _TO_SVG_START_ */
 
@@ -29,6 +29,13 @@ function getSvgColorString(prop: string, value?: any) {
 }
 
 export class FabricObjectSVGExportMixin {
+  /**
+   * When an object is being exported as SVG as a clippath, a reference inside the SVG is needed.
+   * This reference is a UID in the fabric namespace and is temporary stored here.
+   * @type {String}
+   */
+  clipPathId?: string;
+
   /**
    * Returns styles-string for svg-export
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
@@ -191,10 +198,10 @@ export class FabricObjectSVGExportMixin {
 
   /**
    * Returns svg representation of an instance
-   * @param {SVGReviver} [reviver] Method for further parsing of svg representation.
+   * @param {TSVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toSVG(reviver?: SVGReviver) {
+  toSVG(reviver?: TSVGReviver) {
     return this._createBaseSVGMarkup(this._toSVG(reviver), {
       reviver,
     });
@@ -202,10 +209,10 @@ export class FabricObjectSVGExportMixin {
 
   /**
    * Returns svg clipPath representation of an instance
-   * @param {SVGReviver} [reviver] Method for further parsing of svg representation.
+   * @param {TSVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: SVGReviver) {
+  toClipPathSVG(reviver?: TSVGReviver) {
     return (
       '\t' +
       this._createBaseClipPathSVGMarkup(this._toSVG(reviver), {
@@ -222,7 +229,7 @@ export class FabricObjectSVGExportMixin {
     {
       reviver,
       additionalTransform = '',
-    }: { reviver?: SVGReviver; additionalTransform?: string } = {}
+    }: { reviver?: TSVGReviver; additionalTransform?: string } = {}
   ) {
     const commonPieces = [
         this.getSvgTransform(true, additionalTransform),
@@ -246,7 +253,7 @@ export class FabricObjectSVGExportMixin {
       additionalTransform,
     }: {
       noStyle?: boolean;
-      reviver?: SVGReviver;
+      reviver?: TSVGReviver;
       withShadow?: boolean;
       additionalTransform?: string;
     } = {}

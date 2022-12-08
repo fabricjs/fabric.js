@@ -11,7 +11,7 @@ import {
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Point } from '../point.class';
-import { TClassProperties, TFiller } from '../typedefs';
+import type { TClassProperties, TFiller, TCacheCanvasDimensions } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -540,7 +540,7 @@ export class Text<
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _getCacheCanvasDimensions() {
+  _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const dims = super._getCacheCanvasDimensions();
     const fontSize = this.fontSize;
     dims.width += fontSize * dims.zoomX;
