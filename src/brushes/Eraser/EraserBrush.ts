@@ -231,16 +231,14 @@ export class EraserBrush extends PencilBrush {
     }
   }
 
-  /**
-   * @override We indicate {@link PencilBrush} to repaint itself if necessary
-   */
-  needsFullRender() {
-    return true;
-  }
-
   protected _reset() {
     super._reset();
     this._setBrushStyles(this.canvas.getContext());
+  }
+
+  protected _prepareForDrawing(pointer: Point) {
+    super._prepareForDrawing(pointer);
+    this.canvas.getContext().moveTo(pointer.x, pointer.y);
   }
 
   onMouseDown(pointer: Point, ev: TBrushEventData) {
@@ -251,6 +249,19 @@ export class EraserBrush extends PencilBrush {
       this.canvas.fire('erasing:start');
     }
     super.onMouseDown(pointer, ev);
+  }
+
+  protected _renderCurve(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
+    const oldEnd = this.oldEnd;
+    // clip main context
+    super._renderCurve(this.canvas.getContext());
+    // render brush and mask it with pattern
+    // restore the value for rendering to occur
+    this.oldEnd = oldEnd;
+    super._renderCurve(ctx);
+    this.renderPattern(ctx);
   }
 
   /**
