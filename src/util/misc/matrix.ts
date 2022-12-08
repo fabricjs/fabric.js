@@ -32,8 +32,6 @@ export type TQrDecomposeOut = Required<
 >;
 /**
  * Apply transform t to point p
- * @static
- * @memberOf fabric.util
  * @param  {Point | IPoint} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
@@ -47,8 +45,6 @@ export const transformPoint = (
 
 /**
  * Invert transformation t
- * @static
- * @memberOf fabric.util
  * @param {Array} t The transform
  * @return {Array} The inverted transform
  */
@@ -63,8 +59,6 @@ export const invertTransform = (t: TMat2D): TMat2D => {
 
 /**
  * Multiply matrix A by matrix B to nest transformations
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a First transformMatrix
  * @param  {TMat2D} b Second transformMatrix
  * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
@@ -86,8 +80,6 @@ export const multiplyTransformMatrices = (
 
 /**
  * Decomposes standard 2x3 matrix into transform components
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
@@ -112,13 +104,10 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle] angle in degrees
  * @return {TMat2D} transform matrix
  */
-
 export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
   if (!angle) {
     return iMatrix;
@@ -135,8 +124,6 @@ export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
  * transformations from an object that is not enlived yet.
  * is called DimensionsTransformMatrix because those properties are the one that influence
  * the size of the resulting box of the object.
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.scaleX]
  * @param  {Number} [options.scaleY]
@@ -186,8 +173,6 @@ export const calcDimensionsMatrix = ({
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle]
  * @param  {Number} [options.scaleX]
@@ -200,7 +185,6 @@ export const calcDimensionsMatrix = ({
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-
 export const composeMatrix = ({
   translateX = 0,
   translateY = 0,

@@ -3,7 +3,6 @@ import { noop } from '../constants';
 
 /**
  * Cross-browser abstraction for sending XMLHttpRequest
- * @memberOf fabric.util
  * @deprecated this has to go away, we can use a modern browser method to do the same.
  * @param {String} url URL to send XMLHttpRequest to
  * @param {Object} [options] Options object

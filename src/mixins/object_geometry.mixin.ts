@@ -78,7 +78,6 @@ export class ObjectGeometry<
    * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
-   * @memberOf fabric.Object.prototype
    */
   aCoords: TACoords;
 
@@ -88,7 +87,6 @@ export class ObjectGeometry<
    * set and refreshed with setCoords.
    * Those could go away
    * @todo investigate how to get rid of those
-   * @memberOf fabric.Object.prototype
    */
   lineCoords: TCornerPoint;
 
@@ -111,67 +109,67 @@ export class ObjectGeometry<
   canvas?: StaticCanvas | Canvas;
 
   /**
-   * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
    */
   getX(): number {
     return this.getXY().x;
   }
 
   /**
-   * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
    */
   setX(value: number) {
     this.setXY(this.getXY().setX(value));
   }
 
   /**
-   * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
    */
   getY(): number {
     return this.getXY().y;
   }
 
   /**
-   * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
    */
   setY(value: number) {
     this.setXY(this.getXY().setY(value));
   }
 
   /**
-   * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+   * @returns {number} x position according to object's {@link originX} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link getX}
    */
   getRelativeX(): number {
     return this.left;
   }
 
   /**
-   * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-   * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+   * @param {number} value x position according to object's {@link originX} property in parent's coordinate plane\
+   * if parent is canvas then this method is identical to {@link setX}
    */
   setRelativeX(value: number) {
     this.left = value;
   }
 
   /**
-   * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+   * @returns {number} y position according to object's {@link originY} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link getY}
    */
   getRelativeY(): number {
     return this.top;
   }
 
   /**
-   * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+   * @param {number} value y position according to object's {@link originY} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link setY}
    */
   setRelativeY(value: number) {
     this.top = value;
   }
 
   /**
-   * @returns {Point} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
    */
   getXY(): Point {
     const relativePosition = this.getRelativeXY();
@@ -182,7 +180,7 @@ export class ObjectGeometry<
 
   /**
    * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+   * You can specify {@link originX} and {@link originY} values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
@@ -201,15 +199,15 @@ export class ObjectGeometry<
   }
 
   /**
-   * @returns {Point} x,y position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    */
   getRelativeXY(): Point {
     return new Point(this.left, this.top);
   }
 
   /**
-   * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
-   * @param {Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+   * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
+   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */

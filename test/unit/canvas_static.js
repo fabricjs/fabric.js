@@ -250,7 +250,7 @@
 
   QUnit.test('calcOffset', function(assert) {
     assert.ok(typeof canvas.calcOffset === 'function', 'should respond to `calcOffset`');
-    assert.equal(canvas.calcOffset(), canvas, 'should be chainable');
+    assert.deepEqual(canvas.calcOffset(), { left: 0, top: 0 }, 'should retrun offset');
   });
 
   QUnit.test('add', function(assert) {
@@ -496,7 +496,7 @@
 
   QUnit.test('clearContext', function(assert) {
     assert.ok(typeof canvas.clearContext === 'function');
-    assert.equal(canvas.clearContext(canvas.contextContainer), canvas, 'should be chainable');
+    canvas.clearContext(canvas.contextContainer)
   });
 
   QUnit.test('clear', function(assert) {
@@ -516,7 +516,7 @@
         rect3 = makeRect();
     canvas.add(rect1, rect2, rect3);
 
-    assert.equal(canvas.clear(), canvas, 'should be chainable');
+    canvas.clear();
     assert.equal(canvas.getObjects().length, 0, 'clear remove all objects');
     assert.strictEqual(objectsRemoved[0], rect1, 'clear should fire remove on previously added object');
     assert.strictEqual(objectsRemoved[1], rect2, 'clear should fire remove on previously added object');
@@ -529,7 +529,7 @@
 
   QUnit.test('renderAll', function(assert) {
     assert.ok(typeof canvas.renderAll === 'function');
-    assert.equal(canvas, canvas.renderAll());
+    canvas.renderAll();
   });
 
   // QUnit.test('setDimensions', function(assert) {
@@ -1581,10 +1581,10 @@
   QUnit.test('toString', function(assert) {
     assert.ok(typeof canvas.toString === 'function');
 
-    assert.equal(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
+    assert.equal(canvas.toString(), '#<Canvas (0): { objects: 0 }>');
 
     canvas.add(makeRect());
-    assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
+    assert.equal(canvas.toString(), '#<Canvas (1): { objects: 1 }>');
   });
 
   QUnit.test('clone', function(assert) {
@@ -1623,7 +1623,7 @@
   QUnit.test('getSetWidth', function(assert) {
     assert.ok(typeof canvas.getWidth === 'function');
     assert.equal(canvas.getWidth(), 200);
-    assert.equal(canvas.setWidth(444), canvas, 'should be chainable');
+    canvas.setWidth(444)
     assert.equal(canvas.getWidth(), 444);
     assert.equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
   });
@@ -1631,7 +1631,7 @@
   QUnit.test('getSetHeight', function(assert) {
     assert.ok(typeof canvas.getHeight === 'function');
     assert.equal(canvas.getHeight(), 200);
-    assert.equal(canvas.setHeight(765), canvas, 'should be chainable');
+    canvas.setHeight(765)
     assert.equal(canvas.getHeight(), 765);
     assert.equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
   });

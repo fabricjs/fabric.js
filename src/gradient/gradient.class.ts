@@ -163,7 +163,7 @@ export class Gradient<
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of an gradient
-   * @param {fabric.Object} object Object to create a gradient for
+   * @param {FabricObject} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
   toSVG(

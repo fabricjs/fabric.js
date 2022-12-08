@@ -230,7 +230,7 @@
 
   QUnit.test('calcOffset', function(assert) {
     assert.ok(typeof canvas.calcOffset === 'function', 'should respond to `calcOffset`');
-    assert.equal(canvas.calcOffset(), canvas, 'should be chainable');
+    assert.deepEqual(canvas.calcOffset(), { left: 0, top: 0 }, 'should retrun offset');
   });
 
   QUnit.test('add', function(assert) {
@@ -744,13 +744,13 @@
 
   QUnit.test('clearContext', function(assert) {
     assert.ok(typeof canvas.clearContext === 'function');
-    assert.equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
+    canvas.clearContext(canvas.getContext());
   });
 
   QUnit.test('clear', function(assert) {
     assert.ok(typeof canvas.clear === 'function');
 
-    assert.equal(canvas.clear(), canvas, 'should be chainable');
+    canvas.clear();
     assert.equal(canvas.getObjects().length, 0);
   });
 
@@ -1927,7 +1927,7 @@
       makeRect({ left: 20, top: 20 })
     ]);
 
-    assert.equal(canvas.setActiveObject(group), canvas, 'should be chainable');
+    canvas.setActiveObject(group);
     assert.equal(canvas.getActiveObject(), group);
   });
 
@@ -1950,7 +1950,7 @@
   QUnit.test('discardActiveObject on ActiveSelection', function(assert) {
     var group = new fabric.ActiveSelection([makeRect(), makeRect()]);
     canvas.setActiveObject(group);
-    assert.equal(canvas.discardActiveObject(), canvas, 'should be chainable');
+    canvas.discardActiveObject();
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
   });
 
@@ -2021,10 +2021,10 @@
   QUnit.test('toString', function(assert) {
     assert.ok(typeof canvas.toString === 'function');
 
-    assert.equal(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
+    assert.equal(canvas.toString(), '#<Canvas (0): { objects: 0 }>');
 
     canvas.add(makeRect());
-    assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
+    assert.equal(canvas.toString(), '#<Canvas (1): { objects: 1 }>');
   });
 
   QUnit.test('toSVG with active group', function(assert) {
@@ -2135,7 +2135,7 @@
   QUnit.test('getSetWidth', function(assert) {
     assert.ok(typeof canvas.getWidth === 'function');
     assert.equal(canvas.getWidth(), 600);
-    assert.equal(canvas.setWidth(444), canvas, 'should be chainable');
+    canvas.setWidth(444);
     assert.equal(canvas.getWidth(), 444);
     assert.equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
   });
@@ -2143,7 +2143,7 @@
   QUnit.test('getSetHeight', function(assert) {
     assert.ok(typeof canvas.getHeight === 'function');
     assert.equal(canvas.getHeight(), 600);
-    assert.equal(canvas.setHeight(765), canvas, 'should be chainable');
+    canvas.setHeight(765);
     assert.equal(canvas.getHeight(), 765);
     assert.equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
   });

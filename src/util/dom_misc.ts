@@ -4,7 +4,6 @@ import { fabric } from '../../HEADER';
 
 /**
  * Wraps element with another element
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to wrap
  * @param {HTMLElement|String} wrapper Element to wrap with
  * @param {Object} [attributes] Attributes to set on a wrapper
@@ -20,7 +19,6 @@ export function wrapElement(element, wrapper) {
 
 /**
  * Returns element scroll offsets
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to operate on
  * @return {Object} Object with left/top values
  */
@@ -59,8 +57,6 @@ export function getScrollLeftTop(element) {
 
 /**
  * Returns offset for a given element
- * @function
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to get offset for
  * @return {Object} Object with "left" and "top" properties
  */
@@ -99,7 +95,6 @@ export function getElementOffset(element) {
 
 /**
  * Makes element unselectable
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to make unselectable
  * @return {HTMLElement} Element that was passed in
  */
@@ -113,7 +108,6 @@ export function makeElementUnselectable(element) {
 
 /**
  * Makes element selectable
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to make selectable
  * @return {HTMLElement} Element that was passed in
  */

@@ -5,10 +5,9 @@ import { fabric } from '../../HEADER';
 /**
  * Copies all enumerable properties of one js object to another
  * this does not and cannot compete with generic utils.
- * Does not clone or extend fabric.Object subclasses.
+ * Does not clone or extend FabricObject subclasses.
  * This is mostly for internal use and has extra handling for fabricJS objects
  * it skips the canvas and group properties in deep cloning.
- * @memberOf fabric.util.object
  * @param {Object} destination Where to copy to
  * @param {Object} source Where to copy from
  * @param {Boolean} [deep] Whether to extend nested objects
@@ -52,7 +51,6 @@ export const extend = (destination, source, deep) => {
 /**
  * Creates an empty object and copies all enumerable properties of another object to it
  * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
- * @memberOf fabric.util.object
  * @param {Object} object Object to clone
  * @param {Boolean} [deep] Whether to clone nested objects
  * @return {Object}

@@ -1,17 +1,15 @@
 /**
  * Camelizes a string
- * @memberOf fabric.util.string
  * @param {String} string String to camelize
  * @return {String} Camelized version of a string
  */
 export const camelize = (string: string): string =>
-  string.replace(/-+(.)?/g, function (match, character) {
-    return character ? character.toUpperCase() : '';
-  });
+  string.replace(/-+(.)?/g, (match, character) =>
+    character ? character.toUpperCase() : ''
+  );
 
 /**
  * Capitalizes a string
- * @memberOf fabric.util.string
  * @param {String} string String to capitalize
  * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
  * and other letters stay untouched, if false first letter is capitalized
@@ -28,7 +26,6 @@ export const capitalize = <S extends string, FirstOnly extends boolean = false>(
 
 /**
  * Escapes XML in a string
- * @memberOf fabric.util.string
  * @param {String} string String to escape
  * @return {String} Escaped version of a string
  */
@@ -42,7 +39,6 @@ export const escapeXml = (string: string): string =>
 
 /**
  * Divide a string in the user perceived single units
- * @memberOf fabric.util.string
  * @param {String} textstring String to escape
  * @return {Array} array containing the graphemes
  */

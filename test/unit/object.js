@@ -291,9 +291,9 @@
 
   QUnit.test('toString', function(assert) {
     var cObj = new fabric.Object();
-    assert.equal(cObj.toString(), '#<fabric.Object>');
+    assert.equal(cObj.toString(), '#<Object>');
     cObj.type = 'moo';
-    assert.equal(cObj.toString(), '#<fabric.Moo>');
+    assert.equal(cObj.toString(), '#<Moo>');
   });
 
   QUnit.test('render', function(assert) {
