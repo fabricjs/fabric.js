@@ -46,7 +46,7 @@ export class ClassRegistry {
   }
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {
-    this[JSON].set(SVGTagName ?? classConstructor.prototype.type, classConstructor);
+    this[SVG].set(SVGTagName ?? classConstructor.prototype.type, classConstructor);
   }
 }
 
