@@ -3,7 +3,6 @@
 
 /**
  * wrapper for setting element's style
- * @memberOf fabric.util
  * @param {HTMLElement} element
  * @param {Object | string} styles
  */

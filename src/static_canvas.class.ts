@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { fabric } from '../HEADER';
+import type { BaseBrush } from './brushes';
 import { config } from './config';
 import { iMatrix, VERSION } from './constants';
 import type { StaticCanvasEvents } from './EventTypeDefs';
@@ -228,6 +230,8 @@ export class StaticCanvas extends createCollectionMixin(
    */
   lowerCanvasEl: HTMLCanvasElement;
 
+  contextContainer: CanvasRenderingContext2D;
+
   /**
    * Width in virtual/logical pixels of the canvas.
    * The canvas can be larger than width if retina scaling is active
@@ -255,6 +259,28 @@ export class StaticCanvas extends createCollectionMixin(
    * @type boolean
    */
   disposed?: boolean;
+
+  renderAndResetBound: () => void;
+  requestRenderAllBound: () => StaticCanvas;
+
+  // TODO: move to canvas
+  interactive: boolean;
+  upperCanvasEl: HTMLCanvasElement;
+  contextTop: CanvasRenderingContext2D;
+  wrapperEl: HTMLDivElement;
+  cacheCanvasEl: HTMLCanvasElement;
+  protected _isCurrentlyDrawing: boolean;
+  freeDrawingBrush: BaseBrush;
+  _activeObject: FabricObject;
+
+  _offset: { left: number; top: number };
+  protected _originalCanvasStyle?: string;
+  protected hasLostContext: boolean;
+  protected nextRenderHandle: number;
+  protected __cleanupTask: {
+    (): void;
+    kill: (reason?: any) => void;
+  };
 
   add(...objects: FabricObject[]) {
     const size = super.add(...objects);
@@ -375,12 +401,9 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Calculates canvas element offset relative to the document
    * This method is also attached as "resize" event handler of window
-   * @return {fabric.Canvas} instance
-   * @chainable
    */
   calcOffset() {
-    this._offset = getElementOffset(this.lowerCanvasEl);
-    return this;
+    return (this._offset = getElementOffset(this.lowerCanvasEl));
   }
 
   /**
@@ -501,8 +524,6 @@ export class StaticCanvas extends createCollectionMixin(
    * @param {Object}        [options]                     Options object
    * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   setDimensions(
     dimensions: Partial<TSize>,
@@ -533,8 +554,6 @@ export class StaticCanvas extends createCollectionMixin(
     if (!cssOnly) {
       this.requestRenderAll();
     }
-
-    return this;
   }
 
   /**
@@ -542,9 +561,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @private
    * @param {String} prop property (width|height)
    * @param {Number} value value to set property to
-   * @return {fabric.Canvas} instance
    * @todo subclass in canvas and handle upperCanvasEl there.
-   * @chainable true
    */
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     this.lowerCanvasEl[prop] = value;
@@ -553,13 +570,12 @@ export class StaticCanvas extends createCollectionMixin(
       this.upperCanvasEl[prop] = value;
     }
 
+    // TODO: move to canvas
     if (this.cacheCanvasEl) {
       this.cacheCanvasEl[prop] = value;
     }
 
     this[prop] = value;
-
-    return this;
   }
 
   /**
@@ -567,9 +583,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @private
    * @param {String} prop property (width|height)
    * @param {String} value value to set property to
-   * @return {fabric.Canvas} instance
    * @todo subclass in canvas and handle upperCanvasEl there.
-   * @chainable true
    */
   _setCssDimension(prop: keyof TSize, value: string) {
     this.lowerCanvasEl.style[prop] = value;
@@ -581,8 +595,6 @@ export class StaticCanvas extends createCollectionMixin(
     if (this.wrapperEl) {
       this.wrapperEl.style[prop] = value;
     }
-
-    return this;
   }
 
   /**
@@ -596,8 +608,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Sets viewport transformation of this canvas instance
    * @param {Array} vpt a Canvas 2D API transform matrix
-   * @return {fabric.Canvas} instance
-   * @chainable true
    */
   setViewportTransform(vpt: TMat2D) {
     const activeObject = this._activeObject,
@@ -621,7 +631,6 @@ export class StaticCanvas extends createCollectionMixin(
     }
     this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
-    return this;
   }
 
   /**
@@ -631,8 +640,6 @@ export class StaticCanvas extends createCollectionMixin(
    * It has nothing to do with canvas center or visual center of the viewport.
    * @param {Point} point to zoom with respect to
    * @param {Number} value to set zoom to, less than 1 zooms out
-   * @return {fabric.Canvas} instance
-   * @chainable true
    */
   zoomToPoint(point: Point, value: number) {
     // TODO: just change the scale, preserve other transformations
@@ -644,17 +651,15 @@ export class StaticCanvas extends createCollectionMixin(
     const after = transformPoint(newPoint, vpt);
     vpt[4] += before.x - after.x;
     vpt[5] += before.y - after.y;
-    return this.setViewportTransform(vpt);
+    this.setViewportTransform(vpt);
   }
 
   /**
    * Sets zoom level of this canvas instance
    * @param {Number} value to set zoom to, less than 1 zooms out
-   * @return {fabric.Canvas} instance
-   * @chainable true
    */
   setZoom(value: number) {
-    return this.zoomToPoint(new Point(0, 0), value);
+    this.zoomToPoint(new Point(0, 0), value);
   }
 
   /**
@@ -692,12 +697,9 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Clears specified context of canvas element
    * @param {CanvasRenderingContext2D} ctx Context to clear
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
-  clearContext(ctx: CanvasRenderingContext2D): StaticCanvas {
+  clearContext(ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, this.width, this.height);
-    return this;
   }
 
   /**
@@ -710,10 +712,8 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Clears all contexts (background, main, top) of an instance
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
-  clear(): StaticCanvas {
+  clear() {
     this.remove(...this.getObjects());
     this.backgroundImage = null;
     this.overlayImage = null;
@@ -722,21 +722,17 @@ export class StaticCanvas extends createCollectionMixin(
     this.clearContext(this.contextContainer);
     this.fire('canvas:cleared');
     this.renderOnAddRemove && this.requestRenderAll();
-    return this;
   }
 
   /**
    * Renders the canvas
-   * @return {fabric.Canvas} instance
-   * @chainable
    */
-  renderAll(): StaticCanvas {
+  renderAll() {
     this.cancelRequestedRender();
     if (this.destroyed) {
-      return this;
+      return;
     }
     this.renderCanvas(this.contextContainer, this._objects);
-    return this;
   }
 
   /**
@@ -746,8 +742,6 @@ export class StaticCanvas extends createCollectionMixin(
    * animationFrame stacking on to of each other
    * for an imperative rendering, use canvas.renderAll
    * @private
-   * @return {fabric.Canvas} instance
-   * @chainable
    */
   renderAndReset() {
     this.nextRenderHandle = 0;
@@ -758,14 +752,11 @@ export class StaticCanvas extends createCollectionMixin(
    * Append a renderAll request to next animation frame.
    * unless one is already in progress, in that case nothing is done
    * a boolean flag will avoid appending more.
-   * @return {fabric.Canvas} instance
-   * @chainable
    */
-  requestRenderAll(): StaticCanvas {
+  requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
       this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
     }
-    return this;
   }
 
   /**
@@ -804,8 +795,6 @@ export class StaticCanvas extends createCollectionMixin(
    * Renders background, objects, overlay and controls.
    * @param {CanvasRenderingContext2D} ctx
    * @param {Array} objects to render
-   * @return {fabric.Canvas} instance
-   * @chainable
    */
   renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
     if (this.destroyed) {
@@ -977,8 +966,6 @@ export class StaticCanvas extends createCollectionMixin(
 
   /**
    * Centers object horizontally in the canvas
-   * @param {FabricObject} object Object to center horizontally
-   * @return {fabric.Canvas} thisArg
    */
   centerObjectH(object: FabricObject) {
     return this._centerObject(
@@ -990,8 +977,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Centers object vertically in the canvas
    * @param {FabricObject} object Object to center vertically
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   centerObjectV(object: FabricObject) {
     return this._centerObject(
@@ -1003,8 +988,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Centers object vertically and horizontally in the canvas
    * @param {FabricObject} object Object to center vertically and horizontally
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   centerObject(object: FabricObject) {
     return this._centerObject(object, this.getCenterPoint());
@@ -1013,8 +996,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Centers object vertically and horizontally in the viewport
    * @param {FabricObject} object Object to center vertically and horizontally
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   viewportCenterObject(object: FabricObject) {
     return this._centerObject(object, this.getVpCenter());
@@ -1023,8 +1004,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Centers object horizontally in the viewport, object.top is unchanged
    * @param {FabricObject} object Object to center vertically and horizontally
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   viewportCenterObjectH(object: FabricObject) {
     return this._centerObject(
@@ -1036,8 +1015,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Centers object Vertically in the viewport, object.top is unchanged
    * @param {FabricObject} object Object to center vertically and horizontally
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   viewportCenterObjectV(object: FabricObject) {
     return this._centerObject(
@@ -1049,7 +1026,6 @@ export class StaticCanvas extends createCollectionMixin(
   /**
    * Calculate the point in canvas that correspond to the center of actual viewport.
    * @return {Point} vpCenter, viewport center
-   * @chainable
    */
   getVpCenter(): Point {
     return transformPoint(
@@ -1062,14 +1038,11 @@ export class StaticCanvas extends createCollectionMixin(
    * @private
    * @param {FabricObject} object Object to center
    * @param {Point} center Center point
-   * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   _centerObject(object: FabricObject, center: Point) {
     object.setXY(center, 'center', 'center');
     object.setCoords();
     this.renderOnAddRemove && this.requestRenderAll();
-    return this;
   }
 
   /**
@@ -1767,16 +1740,17 @@ export class StaticCanvas extends createCollectionMixin(
     }
     this.overlayImage = null;
     this._iTextInstances = null;
+    // @ts-expect-error disposing
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl;
-    // @ts-ignore
+    // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
     // needs to be moved into Canvas class
     if (this.interactive) {
-      canvasElement.style.cssText = this._originalCanvasStyle;
+      canvasElement.style.cssText = this._originalCanvasStyle || '';
       delete this._originalCanvasStyle;
     }
     // restore canvas size to original size in case retina scaling was applied
@@ -1790,7 +1764,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {String} string representation of an instance
    */
   toString() {
-    return `#<fabric.Canvas (${this.complexity()}): { objects: ${
+    return `#<Canvas (${this.complexity()}): { objects: ${
       this._objects.length
     } }>`;
   }
