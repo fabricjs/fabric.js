@@ -7,6 +7,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './fabricObject.class';
 import { fabricObjectDefaultValues } from './object.class';
+import { classRegistry } from '../util/class_registry';
 
 export class Circle extends FabricObject {
   /**
@@ -219,5 +220,8 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 };
 
 Object.assign(Circle.prototype, circleDefaultValues);
+
+classRegistry.setClass(Circle);
+classRegistry.setSVGClass(Circle);
 
 fabric.Circle = Circle;

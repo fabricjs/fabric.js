@@ -18,6 +18,7 @@ import {
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { classRegistry } from '../util/class_registry';
 
 export type ImageSource =
   | HTMLImageElement
@@ -795,5 +796,8 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 };
 
 Object.assign(Image.prototype, imageDefaultValues);
+
+classRegistry.setClass(Image);
+classRegistry.setSVGClass(Image);
 
 fabric.Image = Image;

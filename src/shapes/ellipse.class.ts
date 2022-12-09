@@ -5,6 +5,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './fabricObject.class';
 import { fabricObjectDefaultValues } from './object.class';
+import { classRegistry } from '../util/class_registry';
 
 export class Ellipse extends FabricObject {
   /**
@@ -161,5 +162,8 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
 };
 
 Object.assign(Ellipse.prototype, ellipseDefaultValues);
+
+classRegistry.setClass(Ellipse);
+classRegistry.setSVGClass(Ellipse);
 
 fabric.Ellipse = Ellipse;

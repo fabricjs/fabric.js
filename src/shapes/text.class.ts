@@ -15,6 +15,7 @@ import {
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { FabricObject } from './fabricObject.class';
 import { fabricObjectDefaultValues } from './object.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Measure and return the info of a single grapheme.
@@ -1948,5 +1949,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 };
 
 Object.assign(Text.prototype, textDefaultValues);
+
+classRegistry.setClass(Text);
+classRegistry.setSVGClass(Text);
 
 fabric.Text = Text;

@@ -45,14 +45,17 @@ export class Triangle extends FabricObject {
   }
 }
 
-classRegistry.setClass('triangle', Triangle);
-
 export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
   type: 'triangle',
   width: 100,
   height: 100,
 };
 
+
+
 Object.assign(Triangle.prototype, triangleDefaultValues);
+
+classRegistry.setClass(Triangle);
+classRegistry.setSVGClass(Triangle);
 
 fabric.Triangle = Triangle;
