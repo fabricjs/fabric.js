@@ -95,6 +95,8 @@ import * as ease from '../anim_ease';
 import { animateColor } from '../animate_color';
 import { animate, requestAnimFrame, cancelAnimFrame } from '../animate';
 import { createClass } from '../lang_class';
+import { classRegistry } from '../class_registry';
+
 /**
  * @namespace fabric.util
  */
@@ -191,4 +193,5 @@ fabric.util = {
   requestAnimFrame,
   cancelAnimFrame,
   createClass,
+  classRegistry,
 };
