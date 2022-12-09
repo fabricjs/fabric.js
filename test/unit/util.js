@@ -130,22 +130,6 @@
     assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
   });
 
-  QUnit.test('fabric.util.string.camelize', function(assert) {
-    var camelize = fabric.util.string.camelize;
-
-    assert.ok(typeof camelize === 'function');
-
-    assert.equal(camelize('foo'), 'foo');
-    assert.equal(camelize('foo-bar'), 'fooBar');
-    assert.equal(camelize('Foo-bar-Baz'), 'FooBarBaz');
-    assert.equal(camelize('FooBarBaz'), 'FooBarBaz');
-    assert.equal(camelize('-bar'), 'Bar');
-    assert.equal(camelize(''), '');
-    assert.equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
-    assert.equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
-    assert.equal(camelize('--double'), 'Double');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
