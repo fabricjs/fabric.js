@@ -17,13 +17,10 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
   );
 };
 
-export const isCollection = <
-  T extends FabricObject,
-  C extends Group | ActiveSelection
->(
-  fabricObject: T | C
-): fabricObject is C => {
-  return !!fabricObject && Array.isArray((fabricObject as C)._objects);
+export const isCollection = (
+  fabricObject: FabricObject
+): fabricObject is Group | ActiveSelection => {
+  return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
 
 export const isActiveSelection = (
