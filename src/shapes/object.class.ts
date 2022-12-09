@@ -283,7 +283,7 @@ export class FabricObject<
    * @type boolean
    * @default true
    */
-  erasable: boolean;
+  erasable: boolean | 'deep';
 
   /**
    * @tutorial {@link http://fabricjs.com/erasing#eraser}

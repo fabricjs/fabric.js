@@ -167,7 +167,14 @@ export function cloneEraserFromObject(
 export function applyEraser(
   from: FabricObject & Required<Pick<FabricObject, 'eraser'>>,
   to: FabricObject[],
-  { unset = false }: { unset: boolean }
+  {
+    unset = false,
+  }: {
+    /**
+     * remove `from`'s eraser when done
+     */
+    unset: boolean;
+  }
 ) {
   return cloneEraserFromObject(from)
     .then((paths) =>
