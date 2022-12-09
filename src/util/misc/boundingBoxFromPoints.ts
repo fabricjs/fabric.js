@@ -3,8 +3,6 @@ import { TBBox } from '../../typedefs';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`
- * @static
- * @memberOf fabric.util
  * @param {IPoint[]} points
  * @return {Object} Object with left, top, width, height properties
  */

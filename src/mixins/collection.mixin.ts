@@ -1,10 +1,9 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/fabricObject.class';
+import type { Constructor } from '../typedefs';
 
-export function createCollectionMixin<T extends { new (...args: any[]): any }>(
-  Klass: T
-) {
-  return class Collection extends Klass {
+export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
+  class Collection extends Base {
     /**
      * @type {FabricObject[]}
      */
@@ -153,7 +152,10 @@ export function createCollectionMixin<T extends { new (...args: any[]): any }>(
         return memo;
       }, 0);
     }
-  };
+  }
+
+  // https://github.com/microsoft/TypeScript/issues/32080
+  return Collection as typeof Collection & TBase;
 }
 
 fabric.createCollectionMixin = createCollectionMixin;
