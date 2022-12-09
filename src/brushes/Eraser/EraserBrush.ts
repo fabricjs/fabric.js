@@ -270,7 +270,10 @@ export class EraserBrush extends PencilBrush {
    */
   render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     //  clip main context
-    super.render(this.canvas.getContext(), false);
+    this._hasStraightLine
+      ? // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
+        this.canvas.renderAll()
+      : super.render(this.canvas.getContext(), false);
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
