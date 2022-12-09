@@ -1,5 +1,4 @@
 import { fabric } from '../../HEADER';
-import { Color } from '../color';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
@@ -126,12 +125,7 @@ export abstract class BaseBrush<T extends FabricObject> {
   }
 
   protected needsFullRender() {
-    const color = new Color(this.color);
-    return (
-      color.getAlpha() < 1 ||
-      !!this.shadow ||
-      (this.clipPath && this.clipPath.isCacheDirty())
-    );
+    return !!this.shadow || (this.clipPath && this.clipPath.isCacheDirty());
   }
 
   /**
