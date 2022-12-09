@@ -936,10 +936,6 @@
     assert.equal(element.naturalWidth, 0);
   });
 
-  // QUnit.test('createAccessors', function(assert) {
-  //   assert.ok(typeof fabric.util.createAccessors === 'function');
-  // });
-
   QUnit.test('qrDecompose with identity matrix', function(assert) {
     assert.ok(typeof fabric.util.qrDecompose === 'function');
     var options = fabric.util.qrDecompose(fabric.iMatrix);
