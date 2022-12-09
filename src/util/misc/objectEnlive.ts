@@ -90,7 +90,7 @@ type EnlivenObjectOptions = {
  */
 export const enlivenObjects = (
   objects: any[],
-  { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
   new Promise<FabricObject[]>((resolve, reject) => {
     const instances: FabricObject[] = [];
@@ -102,7 +102,6 @@ export const enlivenObjects = (
           .fromObject(obj, {
             signal,
             reviver,
-            namespace,
           })
           .then((fabricInstance: FabricObject) => {
             reviver(obj, fabricInstance);

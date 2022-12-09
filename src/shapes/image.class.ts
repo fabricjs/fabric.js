@@ -727,7 +727,7 @@ export class Image extends FabricObject {
     options: { signal: AbortSignal }
   ): Promise<Image> {
     const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: filters };
+      filterOptions = { ...options };
     return Promise.all([
       loadImage(src, imageOptions),
       f && enlivenObjects(f, filterOptions),
