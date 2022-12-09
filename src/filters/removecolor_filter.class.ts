@@ -15,7 +15,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  */
 export class RemoveColor extends BaseFilter {
   /**
-   * Color to remove, in any format understood by fabric.Color.
+   * Color to remove, in any format understood by {@link Color}.
    * @param {String} type
    * @default
    */
