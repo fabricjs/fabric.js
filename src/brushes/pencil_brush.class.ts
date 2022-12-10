@@ -42,23 +42,24 @@ export class PencilBrush extends BaseBrush<Path> {
   straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
   private _points: Point[];
-  protected _hasStraightLine: boolean;
   protected oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);
     this._points = [];
-    this._hasStraightLine = false;
   }
 
-  needsFullRender() {
+  protected needsFullRender(alphaShouldRedraw = true) {
     return (
       super.needsFullRender() ||
-      new Color(this.color).getAlpha() < 1 ||
-      this._hasStraightLine
+      (alphaShouldRedraw && new Color(this.color).getAlpha() < 1) ||
+      (this.drawStraightLine && this._points.length > 1)
     );
   }
 
+  /**
+   * we pick the point between p1 & p2 as the end point and p1 as our control point.
+   */
   static drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
     const midPoint = p1.midPointFrom(p2);
     ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
@@ -92,17 +93,11 @@ export class PencilBrush extends BaseBrush<Path> {
       return;
     }
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
+    this.drawStraightLine && (this.oldEnd = undefined);
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
-    if (this._addPoint(pointer) && this._points.length > 1) {
-      if (this.needsFullRender()) {
-        // redraw curve
-        this.render();
-      } else {
-        this._renderCurve();
-      }
-    }
+    this._addPoint(pointer) && this._points.length > 1 && this.onPointAdded();
   }
 
   /**
@@ -128,10 +123,9 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * @private
    * @param {Point} point Point to be added to points array
    */
-  _addPoint(point: Point) {
+  protected _addPoint(point: Point) {
     if (
       this._points.length > 1 &&
       point.eq(this._points[this._points.length - 1])
@@ -139,22 +133,27 @@ export class PencilBrush extends BaseBrush<Path> {
       return false;
     }
     if (this.drawStraightLine && this._points.length > 1) {
-      this._hasStraightLine = true;
       this._points.pop();
     }
     this._points.push(point);
     return true;
   }
 
+  protected onPointAdded() {
+    if (this.needsFullRender()) {
+      this.render();
+    } else {
+      this._renderCurve();
+    }
+  }
+
   /**
    * Clear points array and set contextTop canvas style.
-   * @private
    */
   protected _reset() {
     this._points = [];
     this._setBrushStyles(this.canvas.contextTop);
     this._setShadow();
-    this._hasStraightLine = false;
   }
 
   /**
@@ -202,8 +201,6 @@ export class PencilBrush extends BaseBrush<Path> {
     ctx.moveTo(p1.x, p1.y);
 
     for (let i = 1; i < this._points.length; i++) {
-      // we pick the point between pi + 1 & pi + 2 as the
-      // end point and p1 as our control point.
       PencilBrush.drawSegment(ctx, p1, p2);
       p1 = this._points[i];
       p2 = this._points[i + 1];
