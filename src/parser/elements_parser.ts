@@ -43,7 +43,7 @@ const ElementsParser = function (
   };
 
   proto.findTag = function (el) {
-    return classRegistry.getSVGClass(el.tagName);
+    return classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
   };
 
   proto.createObject = function (el, index) {

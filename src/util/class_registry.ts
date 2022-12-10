@@ -24,12 +24,11 @@ export class ClassRegistry {
   }
 
   getClass(classType: string): any {
-    const classConstructor = this[JSON].get(classType);
-    if (classConstructor) {
-      return classConstructor;
-    } else {
+    const constructor = this[JSON].get(classType);
+    if (!constructor) {
       throw new Error(`No class registered for ${classType}`);
     }
+    return constructor;
   }
 
   setClass(classConstructor: any, classType?: string) {
@@ -37,12 +36,7 @@ export class ClassRegistry {
   }
 
   getSVGClass(SVGTagName: string): any {
-    const classConstructor = this[SVG].get(SVGTagName);
-    if (classConstructor) {
-      return classConstructor;
-    } else {
-      throw new Error(`No class registered for SVG tag ${SVGTagName}`);
-    }
+    return this[SVG].get(SVGTagName);
   }
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {

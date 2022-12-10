@@ -33,6 +33,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
+import { classRegistry } from '../util/class_registry';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -2136,3 +2137,5 @@ export const fabricObjectDefaultValues = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
+
+classRegistry.setClass(FabricObject);
