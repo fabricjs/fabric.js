@@ -230,8 +230,8 @@ export class EraserBrush extends PencilBrush {
     }
   }
 
-  needsFullRender() {
-    return super.needsFullRender() || this._hasStraightLine;
+  protected needsFullRender() {
+    return super.needsFullRender(false);
   }
 
   protected _reset() {
@@ -254,6 +254,16 @@ export class EraserBrush extends PencilBrush {
     super.onMouseDown(pointer, ev);
   }
 
+  protected onPointAdded() {
+    if (this.needsFullRender()) {
+      // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
+      this.drawStraightLine && this.canvas.renderAll();
+      this.render();
+    } else {
+      this._renderCurve();
+    }
+  }
+
   protected _renderCurve(
     ctx: CanvasRenderingContext2D = this.canvas.contextTop
   ) {
@@ -274,10 +284,7 @@ export class EraserBrush extends PencilBrush {
    */
   render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     //  clip main context
-    this._hasStraightLine
-      ? // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
-        this.canvas.renderAll()
-      : super.render(this.canvas.getContext(), false);
+    super.render(this.canvas.getContext(), false);
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
