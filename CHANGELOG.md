@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): replace getKlass utility with a registry that doesn't require full fabricJS to work [#8500](https://github.com/fabricjs/fabric.js/pull/8500)
 - chore(TS): polish files [#8488](https://github.com/fabricjs/fabric.js/pull/8488)
 - fix(TS): `EventSpec` recognition [#8497](https://github.com/fabricjs/fabric.js/pull/8497)
 - chore(): rm dead code [#8493](https://github.com/fabricjs/fabric.js/pull/8493)

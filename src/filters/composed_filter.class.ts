@@ -5,10 +5,7 @@ import {
   BaseFilter,
   BaseFilterOptions,
 } from './base_filter.class';
-import type {
-  T2DPipelineState,
-  TWebGLPipelineState,
-} from './typedefs';
+import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../util/class_registry';
 

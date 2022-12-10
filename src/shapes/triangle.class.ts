@@ -51,8 +51,6 @@ export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
   height: 100,
 };
 
-
-
 Object.assign(Triangle.prototype, triangleDefaultValues);
 
 classRegistry.setClass(Triangle);

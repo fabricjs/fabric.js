@@ -5,7 +5,7 @@ import { Pattern } from '../../pattern.class';
 import type { FabricObject } from '../../shapes/fabricObject.class';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
-import { classRegistry  } from '../class_registry';
+import { classRegistry } from '../class_registry';
 
 export type LoadImageOptions = {
   /**
@@ -97,7 +97,8 @@ export const enlivenObjects = (
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
-        classRegistry.getClass(obj.type)
+        classRegistry
+          .getClass(obj.type)
           // @ts-ignore
           .fromObject(obj, {
             signal,

@@ -91,4 +91,4 @@ export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
 };
 
 Object.assign(Contrast.prototype, contrastDefaultValues);
-classRegistry.setClass(Contrast)
+classRegistry.setClass(Contrast);

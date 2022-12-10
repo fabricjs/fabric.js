@@ -14,7 +14,6 @@ export const JSON = 'json';
 export const SVG = 'svg';
 
 export class ClassRegistry {
-
   [JSON]: Map<string, any>;
   [SVG]: Map<string, any>;
 
@@ -32,7 +31,10 @@ export class ClassRegistry {
   }
 
   setClass(classConstructor: any, classType?: string) {
-    this[JSON].set(classType ?? classConstructor.prototype.type, classConstructor);
+    this[JSON].set(
+      classType ?? classConstructor.prototype.type,
+      classConstructor
+    );
   }
 
   getSVGClass(SVGTagName: string): any {
@@ -40,7 +42,10 @@ export class ClassRegistry {
   }
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {
-    this[SVG].set(SVGTagName ?? classConstructor.prototype.type, classConstructor);
+    this[SVG].set(
+      SVGTagName ?? classConstructor.prototype.type,
+      classConstructor
+    );
   }
 }
 
