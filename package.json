@@ -71,7 +71,7 @@
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write ."
   },
-  "optionalDependencies": {
+  "peerDependencies": {
     "canvas": "^2.8.0",
     "jsdom": "^19.0.0"
   },
