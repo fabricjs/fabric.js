@@ -6,6 +6,11 @@
   BREAKING:
   - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
   - change `animateColor` signature to match `animate`, removed `colorEasing`
+- chore(TS): polish files [#8488](https://github.com/fabricjs/fabric.js/pull/8488)
+- fix(TS): `EventSpec` recognition [#8497](https://github.com/fabricjs/fabric.js/pull/8497)
+- chore(): rm dead code [#8493](https://github.com/fabricjs/fabric.js/pull/8493)
+- fix(scaleObject): handle when scale is 0 to not bug flip [#8490](https://github.com/fabricjs/fabric.js/pull/8490)
+- chore(TS): migrate StatiCanvas to TS [#8485](https://github.com/fabricjs/fabric.js/pull/8485)
 - chore(): refactor `Object.__uid++` => `uid()` [#8482](https://github.com/fabricjs/fabric.js/pull/8482)
 - chore(TS): migrate object mixins to TS [#8414](https://github.com/fabricjs/fabric.js/pull/8414)
 - chore(TS): migrate filters [#8474](https://github.com/fabricjs/fabric.js/pull/8474)
