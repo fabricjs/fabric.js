@@ -8,7 +8,7 @@ import type {
 } from '../typedefs';
 import { iMatrix } from '../constants';
 import { Intersection } from '../intersection.class';
-import { IPoint, Point } from '../point.class';
+import { Point } from '../point.class';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { cos } from '../util/misc/cos';
 import {
@@ -23,6 +23,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { Canvas, StaticCanvas } from '../__types__';
 import { ObjectOrigin } from './object_origin.mixin';
+import { ObjectEvents } from '../EventTypeDefs';
 
 type TLineDescriptor = {
   o: Point;
@@ -43,7 +44,9 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry extends ObjectOrigin {
+export class ObjectGeometry<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends ObjectOrigin<EventSpec> {
   /**
    * When true, an object is rendered as flipped horizontally
    * @type Boolean
@@ -75,7 +78,6 @@ export class ObjectGeometry extends ObjectOrigin {
    * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
-   * @memberOf fabric.Object.prototype
    */
   aCoords: TACoords;
 
@@ -85,7 +87,6 @@ export class ObjectGeometry extends ObjectOrigin {
    * set and refreshed with setCoords.
    * Those could go away
    * @todo investigate how to get rid of those
-   * @memberOf fabric.Object.prototype
    */
   lineCoords: TCornerPoint;
 
@@ -108,67 +109,67 @@ export class ObjectGeometry extends ObjectOrigin {
   canvas?: StaticCanvas | Canvas;
 
   /**
-   * @returns {number} x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
    */
   getX(): number {
     return this.getXY().x;
   }
 
   /**
-   * @param {number} value x position according to object's {@link fabric.Object#originX} property in canvas coordinate plane
+   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
    */
   setX(value: number) {
     this.setXY(this.getXY().setX(value));
   }
 
   /**
-   * @returns {number} y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
    */
   getY(): number {
     return this.getXY().y;
   }
 
   /**
-   * @param {number} value y position according to object's {@link fabric.Object#originY} property in canvas coordinate plane
+   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
    */
   setY(value: number) {
     this.setXY(this.getXY().setY(value));
   }
 
   /**
-   * @returns {number} x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#getX}
+   * @returns {number} x position according to object's {@link originX} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link getX}
    */
   getRelativeX(): number {
     return this.left;
   }
 
   /**
-   * @param {number} value x position according to object's {@link fabric.Object#originX} property in parent's coordinate plane\
-   * if parent is canvas then this method is identical to {@link fabric.Object#setX}
+   * @param {number} value x position according to object's {@link originX} property in parent's coordinate plane\
+   * if parent is canvas then this method is identical to {@link setX}
    */
   setRelativeX(value: number) {
     this.left = value;
   }
 
   /**
-   * @returns {number} y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#getY}
+   * @returns {number} y position according to object's {@link originY} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link getY}
    */
   getRelativeY(): number {
     return this.top;
   }
 
   /**
-   * @param {number} value y position according to object's {@link fabric.Object#originY} property in parent's coordinate plane\
-   * if parent is canvas then this property is identical to {@link fabric.Object#setY}
+   * @param {number} value y position according to object's {@link originY} property in parent's coordinate plane\
+   * if parent is canvas then this property is identical to {@link setY}
    */
   setRelativeY(value: number) {
     this.top = value;
   }
 
   /**
-   * @returns {Point} x position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in canvas coordinate plane
+   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
    */
   getXY(): Point {
     const relativePosition = this.getRelativeXY();
@@ -179,7 +180,7 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify {@link fabric.Object#originX} and {@link fabric.Object#originY} values,
+   * You can specify {@link originX} and {@link originY} values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
@@ -187,7 +188,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setXY(point: IPoint, originX?: TOriginX, originY?: TOriginY) {
+  setXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
     if (this.group) {
       point = transformPoint(
         point,
@@ -198,19 +199,19 @@ export class ObjectGeometry extends ObjectOrigin {
   }
 
   /**
-   * @returns {Point} x,y position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    */
   getRelativeXY(): Point {
     return new Point(this.left, this.top);
   }
 
   /**
-   * As {@link fabric.Object#setXY}, but in current parent's coordinate plane ( the current group if any or the canvas)
-   * @param {Point} point position according to object's {@link fabric.Object#originX} {@link fabric.Object#originY} properties in parent's coordinate plane
+   * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
+   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setRelativeXY(point: IPoint, originX?: TOriginX, originY?: TOriginY) {
+  setRelativeXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
     this.setPositionByOrigin(
       point,
       originX || this.originX,
@@ -290,8 +291,8 @@ export class ObjectGeometry extends ObjectOrigin {
    */
   intersectsWithObject(
     other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+    absolute = false,
+    calculate = false
   ): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(absolute, calculate),
@@ -315,8 +316,8 @@ export class ObjectGeometry extends ObjectOrigin {
    */
   isContainedWithinObject(
     other: ObjectGeometry,
-    absolute: boolean,
-    calculate: boolean
+    absolute = false,
+    calculate = false
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
@@ -331,15 +332,15 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Checks if object is fully contained within area formed by 2 points
-   * @param {IPoint} pointTL top-left point of area
-   * @param {IPoint} pointBR bottom-right point of area
+   * @param {Object} pointTL top-left point of area
+   * @param {Object} pointBR bottom-right point of area
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
   isContainedWithinRect(
-    pointTL: IPoint,
-    pointBR: IPoint,
+    pointTL: Point,
+    pointBR: Point,
     absolute: boolean,
     calculate: boolean
   ): boolean {
@@ -354,14 +355,14 @@ export class ObjectGeometry extends ObjectOrigin {
 
   /**
    * Checks if point is inside the object
-   * @param {IPoint} point Point to check against
+   * @param {Point} point Point to check against
    * @param {Object} [lines] object returned from @method _getImageLines
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(
-    point: IPoint,
+    point: Point,
     lines: TBBoxLines | undefined,
     absolute = false,
     calculate = false
@@ -497,7 +498,7 @@ export class ObjectGeometry extends ObjectOrigin {
    * @param {Object} lines Coordinates of the object being evaluated
    * @return {number} number of crossPoint
    */
-  _findCrossPoints(point: IPoint, lines: TBBoxLines): number {
+  _findCrossPoints(point: Point, lines: TBBoxLines): number {
     let xcount = 0;
 
     for (const lineKey in lines) {
@@ -600,6 +601,10 @@ export class ObjectGeometry extends ObjectOrigin {
     const boundingRectFactor =
       this.getBoundingRect(absolute).height / this.getScaledHeight();
     return this.scale(value / this.height / boundingRectFactor);
+  }
+
+  getCanvasRetinaScaling() {
+    return this.canvas?.getRetinaScaling() || 1;
   }
 
   /**

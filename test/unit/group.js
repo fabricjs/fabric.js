@@ -33,7 +33,6 @@
 
   QUnit.module('fabric.Group', {
     afterEach: function() {
-      fabric.Object.__uid = 0;
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.calcOffset();
@@ -49,7 +48,7 @@
 
   QUnit.test('toString', function(assert) {
     var group = makeGroupWith2Objects();
-    assert.equal(group.toString(), '#<fabric.Group: (2)>', 'should return proper representation');
+    assert.equal(group.toString(), '#<Group: (2)>', 'should return proper representation');
   });
 
   QUnit.test('getObjects', function(assert) {
@@ -464,14 +463,14 @@
     var group = makeGroupWith2Objects();
     assert.ok(typeof group.toSVG === 'function');
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
     var group = makeGroupWith2Objects();
     group.clipPath = new fabric.Rect({ width: 100, height: 100 });
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath absolutePositioned', function(assert) {
@@ -479,14 +478,14 @@
     group.clipPath = new fabric.Rect({ width: 100, height: 100 });
     group.clipPath.absolutePositioned = true;
     var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a group as a clipPath', function(assert) {
     var group = makeGroupWith2Objects();
     group.clipPath = makeGroupWith2Objects();
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t<rect transform=\"matrix(1 0 0 1 115 105)\" x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n\t\t<rect transform=\"matrix(1 0 0 1 55 140)\" x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('cloning group with 2 objects', function(assert) {
@@ -595,23 +594,23 @@
       });
     });
 
-    group.insertAt(rect3, 1);
+    group.insertAt(1, rect3);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
     equalsControl('rect3');
-    group.insertAt(rect4, 0);
+    group.insertAt(0, rect4);
     control.splice(0, 0, rect4);
     firingControl.push(rect4);
     equalsControl('rect4');
-    group.insertAt(rect5, 2);
+    group.insertAt(2, rect5);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
     equalsControl('rect5');
-    group.insertAt([rect6], 2);
+    group.insertAt(2, rect6);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
     equalsControl('rect6');
-    group.insertAt([rect7, rect8], 3);
+    group.insertAt(3, rect7, rect8);
     control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
     equalsControl('rect7');
@@ -723,7 +722,7 @@
     assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
     //  adding self
     assert.notOk(group.canEnterGroup(group));
-    group.insertAt(group, 0);
+    group.insertAt(0, group);
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
     //  nested object should be removed from group
     var nestedGroup = new fabric.Group([rect1]);

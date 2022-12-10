@@ -1,11 +1,11 @@
-import { fabric } from '../../../HEADER';
-import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { toFixed } from './toFixed';
 import { config } from '../../config';
+import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import { Group } from '../../shapes/group.class';
+import { SupportedSVGUnit, SVGElementName, TMat2D } from '../../typedefs';
+import { toFixed } from './toFixed';
 /**
  * Returns array of attributes for given svg that fabric parses
- * @memberOf fabric.util
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
  * @return {Array} string names of supported attributes
  */
@@ -79,15 +79,14 @@ export const parseUnit = (value: string, fontSize: number) => {
 /**
  * Groups SVG elements (usually those retrieved from SVG document)
  * @static
- * @memberOf fabric.util
- * @param {Array} elements fabric.Object(s) parsed from svg, to group
- * @return {fabric.Object|fabric.Group}
+ * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
+ * @return {FabricObject | Group}
  */
-export const groupSVGElements = (elements: any[]) => {
+export const groupSVGElements = (elements: FabricObject[]) => {
   if (elements && elements.length === 1) {
     return elements[0];
   }
-  return new fabric.Group(elements);
+  return new Group(elements);
 };
 
 const enum MeetOrSlice {
@@ -142,7 +141,6 @@ export const parsePreserveAspectRatioAttribute = (
 
 /**
  * given an array of 6 number returns something like `"matrix(...numbers)"`
- * @memberOf fabric.util
  * @param {TMat2D} transform an array with 6 numbers
  * @return {String} transform matrix for svg
  */

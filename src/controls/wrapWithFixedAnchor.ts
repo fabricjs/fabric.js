@@ -1,4 +1,4 @@
-import { Transform, TransformActionHandler } from '../typedefs';
+import { Transform, TransformActionHandler } from '../EventTypeDefs';
 
 /**
  * Wrap an action handler with saving/restoring object position on the transform.

@@ -11,6 +11,7 @@ import {
 import { ObjectGeometry } from './object_geometry.mixin';
 import type { Control } from '../controls/control.class';
 import { sizeAfterTransform } from '../util/misc/objectTransforms';
+import { ObjectEvents } from '../EventTypeDefs';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -19,7 +20,9 @@ type TOCoord = IPoint & {
 
 type TControlSet = Record<string, Control>;
 
-export class InteractiveFabricObject extends FabricObject {
+export class InteractiveFabricObject<
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<EventSpec> {
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -28,7 +31,6 @@ export class InteractiveFabricObject extends FabricObject {
    * interactive area of the corner.
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
-   * @memberOf fabric.Object.prototype
    */
   oCoords: Record<string, TOCoord> = {};
 
@@ -79,7 +81,7 @@ export class InteractiveFabricObject extends FabricObject {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Record<string, unknown>) {
     super(options);
   }
 
@@ -426,7 +428,7 @@ export class InteractiveFabricObject extends FabricObject {
    */
   drawControls(ctx: CanvasRenderingContext2D, styleOverride = {}) {
     ctx.save();
-    const retinaScaling = this.canvas ? this.canvas.getRetinaScaling() : 1;
+    const retinaScaling = this.getCanvasRetinaScaling();
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
     const options = {
       cornerStrokeColor,
@@ -500,7 +502,7 @@ export class InteractiveFabricObject extends FabricObject {
    * with the object transformMatrix, or restored to neutral transform
    */
   clearContextTop(
-    restoreManually: boolean
+    restoreManually?: boolean
   ): CanvasRenderingContext2D | undefined {
     if (!this.canvas) {
       return;
