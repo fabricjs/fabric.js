@@ -217,6 +217,7 @@ export abstract class BaseBrush<T extends FabricObject> {
     const clipPath = await this.clipPath.clone(['inverted']);
     sendObjectToPlane(
       clipPath,
+      undefined,
       this.clipPath.absolutePositioned
         ? multiplyTransformMatrices(this.calcTransformMatrix(), t)
         : t
