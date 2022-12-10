@@ -57,6 +57,9 @@ export class PencilBrush extends BaseBrush<Path> {
     );
   }
 
+  /**
+   * we pick the point between p1 & p2 as the end point and p1 as our control point.
+   */
   static drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {
     const midPoint = p1.midPointFrom(p2);
     ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
@@ -90,12 +93,11 @@ export class PencilBrush extends BaseBrush<Path> {
       return;
     }
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
+    this.drawStraightLine && (this.oldEnd = undefined);
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
-    if (this._addPoint(pointer) && this._points.length > 1) {
-      this.onPointAdded();
-    }
+    this._addPoint(pointer) && this._points.length > 1 && this.onPointAdded();
   }
 
   /**
@@ -199,8 +201,6 @@ export class PencilBrush extends BaseBrush<Path> {
     ctx.moveTo(p1.x, p1.y);
 
     for (let i = 1; i < this._points.length; i++) {
-      // we pick the point between pi + 1 & pi + 2 as the
-      // end point and p1 as our control point.
       PencilBrush.drawSegment(ctx, p1, p2);
       p1 = this._points[i];
       p2 = this._points[i + 1];
