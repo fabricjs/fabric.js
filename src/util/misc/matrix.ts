@@ -38,7 +38,7 @@ export type TQrDecomposeOut = Required<
  * @return {Point} The transformed point
  */
 export const transformPoint = (
-  p: Point | IPoint,
+  p: IPoint,
   t: TMat2D,
   ignoreOffset?: boolean
 ): Point => new Point(p).transform(t, ignoreOffset);
