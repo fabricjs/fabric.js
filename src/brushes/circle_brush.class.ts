@@ -1,19 +1,19 @@
 import { fabric } from '../../HEADER';
 import { Color } from '../color';
-import { IPoint, Point } from '../point.class';
+import { Point } from '../point.class';
+import { Shadow } from '../shadow.class';
+import { Circle } from '../shapes/circle.class';
+import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
 
-/**
- * @todo remove transient
- */
-const { Circle, Group, Shadow } = fabric;
-
 export type CircleBrushPoint = {
+  x: number;
+  y: number;
   radius: number;
   fill: string;
-} & IPoint;
+};
 
 export class CircleBrush extends BaseBrush {
   /**
@@ -32,9 +32,9 @@ export class CircleBrush extends BaseBrush {
 
   /**
    * Invoked inside on mouse down and mouse move
-   * @param {IPoint} pointer
+   * @param {Point} pointer
    */
-  drawDot(pointer: IPoint) {
+  drawDot(pointer: Point) {
     const point = this.addPoint(pointer),
       ctx = this.canvas.contextTop;
     this._saveAndTransform(ctx);
@@ -53,7 +53,7 @@ export class CircleBrush extends BaseBrush {
   /**
    * Invoked on mouse down
    */
-  onMouseDown(pointer: IPoint) {
+  onMouseDown(pointer: Point) {
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
@@ -76,9 +76,9 @@ export class CircleBrush extends BaseBrush {
 
   /**
    * Invoked on mouse move
-   * @param {IPoint} pointer
+   * @param {Point} pointer
    */
-  onMouseMove(pointer: IPoint) {
+  onMouseMove(pointer: Point) {
     if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
       return;
     }
@@ -128,10 +128,10 @@ export class CircleBrush extends BaseBrush {
   }
 
   /**
-   * @param {IPoint} pointer
-   * @return {CircleBrushPoint} Just added pointer point
+   * @param {Object} pointer
+   * @return {Point} Just added pointer point
    */
-  addPoint({ x, y }: IPoint): CircleBrushPoint {
+  addPoint({ x, y }: Point) {
     const pointerPoint: CircleBrushPoint = {
       x,
       y,
