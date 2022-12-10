@@ -17,7 +17,7 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * Cancel all running animations at the next requestAnimFrame
+   * Cancel all running animations on the next frame
    */
   cancelAll() {
     const animations = this.splice(0);
@@ -26,7 +26,7 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * Cancel all running animations attached to a Canvas at the next requestAnimFrame
+   * Cancel all running animations attached to a Canvas on the next frame
    * @param {Canvas} canvas
    */
   cancelByCanvas(canvas: Canvas) {
@@ -43,7 +43,7 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * Cancel all running animations for target at the next requestAnimFrame
+   * Cancel all running animations for target on the next frame
    * @param target
    */
   cancelByTarget(target: AnimationBase['target']) {

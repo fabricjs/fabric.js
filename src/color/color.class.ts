@@ -5,21 +5,26 @@ import { hue2rgb, hexify } from './util';
 /**
  * RGB format
  */
-export type TColorSource = [number, number, number];
+export type TRGBColorSource = [red: number, green: number, blue: number];
 
 /**
  * RGBA format
  */
-export type TColorAlphaSource = [number, number, number, number];
+export type TRGBAColorSource = [
+  red: number,
+  green: number,
+  blue: number,
+  alpha: number
+];
 
-export type TColorArg = string | TColorSource | TColorAlphaSource;
+export type TColorArg = string | TRGBColorSource | TRGBAColorSource;
 
 /**
  * @class Color common color operations
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
-  private _source: TColorAlphaSource;
+  private _source: TRGBAColorSource;
 
   /**
    *
@@ -40,20 +45,20 @@ export class Color {
   /**
    * @private
    * @param {string} [color] Color value to parse
-   * @returns {TColorAlphaSource}
+   * @returns {TRGBAColorSource}
    */
   protected _tryParsingColor(color: string) {
     if (color in ColorNameMap) {
       color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
     return color === 'transparent'
-      ? ([255, 255, 255, 0] as TColorAlphaSource)
+      ? ([255, 255, 255, 0] as TRGBAColorSource)
       : Color.sourceFromHex(color) ||
           Color.sourceFromRgb(color) ||
           Color.sourceFromHsl(color) ||
           // color is not recognized
           // we default to black as canvas does
-          ([0, 0, 0, 1] as TColorAlphaSource);
+          ([0, 0, 0, 1] as TRGBAColorSource);
   }
 
   /**
@@ -62,9 +67,9 @@ export class Color {
    * @param {Number} r Red color value
    * @param {Number} g Green color value
    * @param {Number} b Blue color value
-   * @return {TColorSource} Hsl color
+   * @return {TRGBColorSource} Hsl color
    */
-  _rgbToHsl(r: number, g: number, b: number): TColorSource {
+  _rgbToHsl(r: number, g: number, b: number): TRGBColorSource {
     r /= 255;
     g /= 255;
     b /= 255;
@@ -98,7 +103,7 @@ export class Color {
 
   /**
    * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @return {TColorAlphaSource}
+   * @return {TRGBAColorSource}
    */
   getSource() {
     return this._source;
@@ -106,9 +111,9 @@ export class Color {
 
   /**
    * Sets source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @param {TColorAlphaSource} source
+   * @param {TRGBAColorSource} source
    */
-  setSource(source: TColorAlphaSource) {
+  setSource(source: TRGBAColorSource) {
     this._source = source;
   }
 
@@ -269,9 +274,9 @@ export class Color {
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    */
-  static sourceFromRgb(color: string): TColorAlphaSource | undefined {
+  static sourceFromRgb(color: string): TRGBAColorSource | undefined {
     const match = color.match(reRGBa);
     if (match) {
       const r =
@@ -315,10 +320,10 @@ export class Color {
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
-  static sourceFromHsl(color: string): TColorAlphaSource | undefined {
+  static sourceFromHsl(color: string): TRGBAColorSource | undefined {
     const match = color.match(reHSLa);
     if (!match) {
       return;
@@ -364,9 +369,9 @@ export class Color {
    * @static
    * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    */
-  static sourceFromHex(color: string): TColorAlphaSource | undefined {
+  static sourceFromHex(color: string): TRGBAColorSource | undefined {
     if (color.match(reHex)) {
       const value = color.slice(color.indexOf('#') + 1),
         isShortNotation = value.length === 3 || value.length === 4,
@@ -398,10 +403,10 @@ export class Color {
   /**
    * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
    * @deprecated use `new Color(source)` instead
-   * @param {TColorSource | TColorAlphaSource} source
+   * @param {TRGBColorSource | TRGBAColorSource} source
    * @return {Color}
    */
-  static fromSource(source: TColorSource | TColorAlphaSource) {
+  static fromSource(source: TRGBColorSource | TRGBAColorSource) {
     return new Color(source);
   }
 }

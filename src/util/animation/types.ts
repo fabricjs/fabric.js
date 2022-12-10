@@ -50,19 +50,19 @@ export type TAnimationBaseOptions<T> = {
    * Duration of the animation in ms
    * @default 500
    */
-  duration: number;
+  duration?: number;
 
   /**
    * Delay to start the animation in ms
    * @default 0
    */
-  delay: number;
+  delay?: number;
 
   /**
    * Easing function
    * @default {defaultEasing}
    */
-  easing: TEasingFunction<T>;
+  easing?: TEasingFunction<T>;
 
   /**
    * The object this animation is being performed on

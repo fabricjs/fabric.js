@@ -47,7 +47,7 @@ export abstract class AnimationBase<
    */
   durationRatio = 0;
   /**
-   * Value %, of the ratio of `(currentValue - startValue) / (endValue - startValue)`
+   * Value %, or the ratio of `(currentValue - startValue) / (endValue - startValue)`
    */
   valueRatio = 0;
   /**

@@ -1,5 +1,5 @@
 import { Color } from '../../color';
-import { TColorAlphaSource } from '../../color/color.class';
+import { TRGBAColorSource } from '../../color/color.class';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
 import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
@@ -8,10 +8,10 @@ const wrapColorCallback = <R>(
   callback?: TOnAnimationChangeCallback<string, R>
 ) =>
   callback &&
-  ((rgba: TColorAlphaSource, valueRatio: number, durationRatio: number) =>
+  ((rgba: TRGBAColorSource, valueRatio: number, durationRatio: number) =>
     callback(new Color(rgba).toRgba(), valueRatio, durationRatio));
 
-export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
+export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
   constructor({
     startValue,
     endValue,
@@ -37,7 +37,7 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
             .getSource()
         : (endColor.map(
             (value, i) => value - startColor[i]
-          ) as TColorAlphaSource),
+          ) as TRGBAColorSource),
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
@@ -47,10 +47,10 @@ export class ColorAnimation extends AnimationBase<TColorAlphaSource> {
   protected calculate(timeElapsed: number) {
     const [r, g, b, a] = this.startValue.map((value, i) =>
       this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
-    ) as TColorAlphaSource;
+    ) as TRGBAColorSource;
     const rgb = [r, g, b].map(Math.round);
     return {
-      value: [...rgb, capValue(0, a, 1)] as TColorAlphaSource,
+      value: [...rgb, capValue(0, a, 1)] as TRGBAColorSource,
       changeRatio:
         // to correctly calculate the change ratio we must find a changed value
         rgb

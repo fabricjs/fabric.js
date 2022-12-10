@@ -3,7 +3,7 @@
  * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
  */
 
-import { twoMathPi, halfPI } from '../constants';
+import { twoMathPi, halfPI } from '../../constants';
 
 type TEasingFunction = (
   currentTime: number,
@@ -26,6 +26,12 @@ const normalize = (a: number, c: number, p: number, s: number) => {
   }
   return { a, c, p, s };
 };
+
+/**
+ * Default sinusoidal easing
+ */
+export const defaultEasing: TEasingFunction = (t, b, c, d) =>
+  -c * Math.cos((t / d) * halfPI) + c + b;
 
 const elastic = (
   a: number,
