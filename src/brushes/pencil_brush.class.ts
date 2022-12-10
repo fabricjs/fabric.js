@@ -42,20 +42,18 @@ export class PencilBrush extends BaseBrush<Path> {
   straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
   private _points: Point[];
-  protected _hasStraightLine: boolean;
   protected oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);
     this._points = [];
-    this._hasStraightLine = false;
   }
 
-  needsFullRender() {
+  protected needsFullRender(alphaShouldRedraw = true) {
     return (
       super.needsFullRender() ||
-      new Color(this.color).getAlpha() < 1 ||
-      this._hasStraightLine
+      (alphaShouldRedraw && new Color(this.color).getAlpha() < 1) ||
+      (this.drawStraightLine && this._points.length > 1)
     );
   }
 
@@ -96,12 +94,7 @@ export class PencilBrush extends BaseBrush<Path> {
       return;
     }
     if (this._addPoint(pointer) && this._points.length > 1) {
-      if (this.needsFullRender()) {
-        // redraw curve
-        this.render();
-      } else {
-        this._renderCurve();
-      }
+      this.onPointAdded();
     }
   }
 
@@ -128,10 +121,9 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * @private
    * @param {Point} point Point to be added to points array
    */
-  _addPoint(point: Point) {
+  protected _addPoint(point: Point) {
     if (
       this._points.length > 1 &&
       point.eq(this._points[this._points.length - 1])
@@ -139,22 +131,27 @@ export class PencilBrush extends BaseBrush<Path> {
       return false;
     }
     if (this.drawStraightLine && this._points.length > 1) {
-      this._hasStraightLine = true;
       this._points.pop();
     }
     this._points.push(point);
     return true;
   }
 
+  protected onPointAdded() {
+    if (this.needsFullRender()) {
+      this.render();
+    } else {
+      this._renderCurve();
+    }
+  }
+
   /**
    * Clear points array and set contextTop canvas style.
-   * @private
    */
   protected _reset() {
     this._points = [];
     this._setBrushStyles(this.canvas.contextTop);
     this._setShadow();
-    this._hasStraightLine = false;
   }
 
   /**
