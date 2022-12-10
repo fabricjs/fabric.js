@@ -72,7 +72,11 @@ export function clonePathWithClipPath(
     path.clone(),
     object.clipPath.clone(['absolutePositioned', 'inverted']),
   ]).then(([clonedPath, clonedClipPath]) =>
-    applyClipPathToPath(clonedPath, clonedClipPath, objTransform)
+    applyClipPathToPath(
+      clonedPath,
+      clonedClipPath as FabricObject,
+      objTransform
+    )
   );
 }
 
@@ -153,7 +157,9 @@ export function cloneEraserFromObject(
           path.calcTransformMatrix()
         );
         applyTransformToObject(path, originalTransform);
-        return clipPath ? applyClipPathToPath(path, clipPath, transform) : path;
+        return clipPath
+          ? applyClipPathToPath(path, clipPath as FabricObject, transform)
+          : path;
       })
     );
   });

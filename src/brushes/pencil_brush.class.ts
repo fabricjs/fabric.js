@@ -1,4 +1,5 @@
 import { fabric } from '../../HEADER';
+import { Color } from '../color';
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Path } from '../shapes/path.class';
@@ -51,7 +52,11 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   needsFullRender() {
-    return super.needsFullRender() || this._hasStraightLine;
+    return (
+      super.needsFullRender() ||
+      new Color(this.color).getAlpha() < 1 ||
+      this._hasStraightLine
+    );
   }
 
   static drawSegment(ctx: CanvasRenderingContext2D, p1: Point, p2: Point) {

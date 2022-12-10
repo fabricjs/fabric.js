@@ -230,6 +230,10 @@ export class EraserBrush extends PencilBrush {
     }
   }
 
+  needsFullRender() {
+    return super.needsFullRender() || this._hasStraightLine;
+  }
+
   protected _reset() {
     super._reset();
     this._setBrushStyles(this.canvas.getContext());
