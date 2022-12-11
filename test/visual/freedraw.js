@@ -2304,6 +2304,7 @@ QUnit.module('Free Drawing', hooks => {
           clipPath: new fabric.Circle({ radius: 50, left: -25, top: -25, originX: 'center', originY: 'center' })
         })
       ], {
+        erasable: !group || group,
         clipPath: new fabric.Circle({ radius: 50, left: 25, top: 25, originX: 'center', originY: 'center' })
       }),
     ];
