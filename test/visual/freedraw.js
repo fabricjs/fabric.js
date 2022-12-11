@@ -2318,7 +2318,7 @@ QUnit.module('Free Drawing', hooks => {
       main: true,
       mesh: true
     },
-    onComplete: false
+    onComplete: undefined
   });
 
   tests.push({
@@ -2332,7 +2332,7 @@ QUnit.module('Free Drawing', hooks => {
       main: true,
       mesh: true
     },
-    onComplete: false
+    onComplete: undefined
   });
 
   tests.forEach(({ name, targets, test: testName, ...test }) => {
