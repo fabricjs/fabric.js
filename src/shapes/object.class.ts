@@ -1288,19 +1288,20 @@ export class FabricObject<
     }
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath);
-    if (this.eraser) {
-      //  update eraser size to match instance
-      // TODO: rethink this approach
-      const size = this._getNonTransformedDimensions();
-      this.eraser.isType('eraser') &&
-        this.eraser.set({
-          width: size.x,
-          height: size.y,
-        });
-      this._drawClipPath(ctx, this.eraser);
-    }
+    this.drawEraser(ctx);
     this.fill = originalFill;
     this.stroke = originalStroke;
+  }
+
+  protected drawEraser(ctx: CanvasRenderingContext2D) {
+    //  update eraser size to match instance
+    // TODO: rethink this approach
+    const size = this._getNonTransformedDimensions();
+    this.eraser?.set({
+      width: size.x,
+      height: size.y,
+    });
+    this._drawClipPath(ctx, this.eraser);
   }
 
   /**
