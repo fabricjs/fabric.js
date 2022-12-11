@@ -5,6 +5,7 @@
   var options = { e: { pointerId: 1 } };
   function pointDrawer(points, brush, onComplete = false) {
     const canvas = brush.canvas;
+    canvas.calcViewportBoundaries();
     setBrush(canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
@@ -23,11 +24,6 @@
   function fireBrushUp(canvas) {
     canvas.freeDrawingBrush.onMouseUp(options);
   }
-
-  // function eraserDrawer(points, brush, fireUp = false) {
-  //   brush.canvas.calcViewportBoundaries();
-  //   pointDrawer(points, brush, fireUp);
-  // }
 
   var points = [
     {
@@ -2295,6 +2291,46 @@ QUnit.module('Free Drawing', hooks => {
         });
       });
     });
+  });
+
+  function eraser(canvas, reverse = false) {
+    const brush = new fabric.EraserBrush(canvas);
+    canvas.add(
+      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
+      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
+      new fabric.Circle({ radius: 200 }),
+      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false, opacity: 0.8 }),
+      new fabric.Circle({ radius: 50, left: 100, top: 100, fill: 'cyan' }),
+    );
+    brush.width = 8;
+    reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Eraser brush',
+    build: eraser,
+    name: 'eraser',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
+  });
+
+  tests.push({
+    test: 'Eraser brush - custom stack ordering',
+    build: canvas => eraser(canvas, true),
+    name: 'eraser_custom_stack',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
   });
 
   tests.forEach(({ name, targets, test: testName, ...test }) => {
