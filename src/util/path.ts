@@ -801,7 +801,7 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
     p2 = new Point(points[1]),
     multSignX = 1,
     multSignY = 0;
-  const path = [],
+  const path: PathData = [],
     len = points.length,
     manyPoints = len > 2;
 
