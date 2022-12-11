@@ -1,11 +1,13 @@
 import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
 import { createCanvasElement } from '../util/misc/dom';
+import { invertTransform } from '../util/misc/matrix';
 import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
 
 export class PatternBrush extends PencilBrush {
   source?: CanvasImageSource;
+  applyViewportTransform = true;
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -40,7 +42,15 @@ export class PatternBrush extends PencilBrush {
    * @param {CanvasRenderingContext2D} ctx
    */
   getPattern(ctx: CanvasRenderingContext2D) {
-    return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
+    const pattern = ctx.createPattern(
+      this.source || this.getPatternSrc(),
+      'repeat'
+    );
+    !this.applyViewportTransform &&
+      pattern?.setTransform(
+        new DOMMatrix(invertTransform(this.calcTransformMatrix()))
+      );
+    return pattern;
   }
 
   /**
@@ -64,6 +74,9 @@ export class PatternBrush extends PencilBrush {
         source: this.source || this.getPatternSrc(),
         offsetX: -topLeft.x,
         offsetY: -topLeft.y,
+        patternTransform: !this.applyViewportTransform
+          ? invertTransform(this.calcTransformMatrix())
+          : undefined,
       });
     }
     return path;
