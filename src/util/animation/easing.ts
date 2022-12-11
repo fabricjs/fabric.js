@@ -1,6 +1,6 @@
 /**
  * Easing functions
- * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
+ * @see {@link http://gizma.com/easing/ Easing Equations by Robert Penner}
  */
 
 import { twoMathPi, halfPI } from '../../constants';
