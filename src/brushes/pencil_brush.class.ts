@@ -100,9 +100,6 @@ export class PencilBrush extends BaseBrush<Path> {
     }
   }
 
-  /**
-   * Invoked on mouse up
-   */
   onMouseUp({ e }: TEvent) {
     if (!this.canvas._isMainEvent(e)) {
       return true;
@@ -113,10 +110,9 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * @private
    * @param {Point} pointer Actual mouse position related to the canvas.
    */
-  _prepareForDrawing(pointer: Point) {
+  protected _prepareForDrawing(pointer: Point) {
     this._reset();
     this._addPoint(pointer);
     this.canvas.contextTop.moveTo(pointer.x, pointer.y);
@@ -126,7 +122,7 @@ export class PencilBrush extends BaseBrush<Path> {
    * @private
    * @param {Point} point Point to be added to points array
    */
-  _addPoint(point: Point) {
+  protected _addPoint(point: Point) {
     if (
       this._points.length > 1 &&
       point.eq(this._points[this._points.length - 1])
@@ -212,40 +208,6 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * Converts points to SVG path
-   * @param {Array} points Array of points
-   * @return {PathData} SVG path commands
-   */
-  convertPointsToSVGPath(points: Point[]): PathData {
-    const correction = this.width / 1000;
-    return getSmoothPathFromPoints(points, correction);
-  }
-
-  /**
-   * Creates a Path object to add on canvas
-   * @return {Path} Path to add on canvas
-   */
-  protected finalizeShape() {
-    const pathData = this.convertPointsToSVGPath(this._points);
-    if (isEmptySVGPath(pathData)) {
-      // do not create 0 width/height paths, as they are
-      // rendered inconsistently across browsers
-      // Firefox 4, for example, renders a dot,
-      // whereas Chrome 10 renders nothing
-      return;
-    }
-    return new Path(pathData, {
-      fill: null,
-      stroke: this.color,
-      strokeWidth: this.width,
-      strokeLineCap: this.strokeLineCap,
-      strokeMiterLimit: this.strokeMiterLimit,
-      strokeLineJoin: this.strokeLineJoin,
-      strokeDashArray: this.strokeDashArray,
-    });
-  }
-
-  /**
    * Decimate points array with the decimate value
    */
   decimatePoints(points: Point[], distance: number) {
@@ -273,19 +235,50 @@ export class PencilBrush extends BaseBrush<Path> {
     return newPoints;
   }
 
-  protected finalizePath() {
-    const ctx = this.canvas.contextTop;
-    ctx.closePath();
-    if (this.decimate) {
-      this._points = this.decimatePoints(this._points, this.decimate);
+  /**
+   * Converts points to SVG path
+   * @param {Array} points Array of points
+   * @return {PathData} SVG path commands
+   */
+  convertPointsToSVGPath(points: Point[]): PathData {
+    const correction = this.width / 1000;
+    return getSmoothPathFromPoints(points, correction);
+  }
+
+  /**
+   * Creates a Path object to add on canvas
+   * @return {Path} Path to add on canvas
+   */
+  protected finalizeShape() {
+    const pathData = this.convertPointsToSVGPath(
+      this.decimate
+        ? this.decimatePoints(this._points, this.decimate)
+        : this._points
+    );
+    if (isEmptySVGPath(pathData)) {
+      // do not create 0 width/height paths, as they are
+      // rendered inconsistently across browsers
+      // Firefox 4, for example, renders a dot,
+      // whereas Chrome 10 renders nothing
+      return;
     }
-    if (this.shadow) {
-      this.shadow.affectStroke = true;
-    }
+    return new Path(pathData, {
+      fill: null,
+      stroke: this.color,
+      strokeWidth: this.width,
+      strokeLineCap: this.strokeLineCap,
+      strokeMiterLimit: this.strokeMiterLimit,
+      strokeLineJoin: this.strokeLineJoin,
+      strokeDashArray: this.strokeDashArray,
+    });
   }
 
   protected async finalize() {
-    this.finalizePath();
+    const ctx = this.canvas.contextTop;
+    ctx.closePath();
+    if (this.shadow) {
+      this.shadow.affectStroke = true;
+    }
     return super.finalize();
   }
 }

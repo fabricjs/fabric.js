@@ -243,6 +243,14 @@ export abstract class BaseBrush<T extends FabricObject> {
     ctx.restore();
   }
 
+  protected onEnd(result?: T) {
+    // in case 'interaction:completed' changes canvas visuals (which is likely to happen in 99% of the time)
+    // we request rendering so that there won't be a visual gap (flickering) between clearing the top context and the updated main context
+    this.canvas.shouldClearContextTop = true;
+    this.canvas.requestRenderAll();
+    this.canvas.fire('interaction:completed', { result });
+  }
+
   protected async finalize() {
     // TODO: once canvas is migrated refactor `_isCurrentlyDrawing` to a method
     this.canvas._isCurrentlyDrawing = this.active = false;
@@ -256,12 +264,7 @@ export abstract class BaseBrush<T extends FabricObject> {
       });
       shape.setCoords();
     }
-    // in case 'interaction:completed' changes canvas visuals (which is likely to happen in 99% of the time)
-    // we request rendering so that there won't be a visual gap (flickering) between clearing the top context and the updated main context
-    this.canvas.shouldClearContextTop = true;
-    this.canvas.requestRenderAll();
-    this.canvas.fire('interaction:completed', { result: shape });
-    return shape;
+    this.onEnd(shape);
   }
 }
 
