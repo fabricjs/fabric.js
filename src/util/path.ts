@@ -10,6 +10,29 @@ import { cos } from './misc/cos';
 import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
 import { sin } from './misc/sin';
 
+type PathSegmentInfoCommon = {
+  x: number;
+  y: number;
+  command: string;
+  length: number;
+};
+
+type CurveInfo = PathSegmentInfoCommon & {
+  iterator: (pct: number) => Point;
+  angleFinder: (pct: number) => number;
+  length: number;
+};
+
+export type PathSegmentInfo = {
+  M: PathSegmentInfoCommon;
+  L: PathSegmentInfoCommon;
+  C: CurveInfo;
+  Q: CurveInfo;
+  Z: PathSegmentInfoCommon & { destX: number; destY: number };
+};
+
+export type TPathSegmentsInfo = PathSegmentInfo[keyof PathSegmentInfo];
+
 const commandLengths = {
   m: 2,
   l: 2,
@@ -467,23 +490,23 @@ const calcLineLength = (x1, y1, x2, y2) =>
   Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 const getPointOnCubicBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
     const c1 = CB1(pct),
       c2 = CB2(pct),
       c3 = CB3(pct),
       c4 = CB4(pct);
-    return {
-      x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-      y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4,
-    };
+    return new Point(
+      p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+      p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+    );
   };
 
-const QB1 = (t) => t ** 2;
-const QB2 = (t) => 2 * t * (1 - t);
-const QB3 = (t) => (1 - t) ** 2;
+const QB1 = (t: number) => t ** 2;
+const QB2 = (t: number) => 2 * t * (1 - t);
+const QB3 = (t: number) => (1 - t) ** 2;
 
 const getTangentCubicIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
     const qb1 = QB1(pct),
       qb2 = QB2(pct),
       qb3 = QB3(pct),
@@ -495,14 +518,14 @@ const getTangentCubicIterator =
   };
 
 const getPointOnQuadraticBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct: number) => {
     const c1 = QB1(pct),
       c2 = QB2(pct),
       c3 = QB3(pct);
-    return {
-      x: p3x * c1 + p2x * c2 + p1x * c3,
-      y: p3y * c1 + p2y * c2 + p1y * c3,
-    };
+    return new Point(
+      p3x * c1 + p2x * c2 + p1x * c3,
+      p3y * c1 + p2y * c2 + p1y * c3
+    );
   };
 
 const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
@@ -512,10 +535,14 @@ const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
   return Math.atan2(tangentY, tangentX);
 };
 
-// this will run over a path segment ( a cubic or quadratic segment) and approximate it
-// with 100 segemnts. This will good enough to calculate the length of the curve
-const pathIterator = (iterator, x1, y1) => {
-  let tempP = { x: x1, y: y1 },
+// this will run over a path segment (a cubic or quadratic segment) and approximate it
+// with 100 segments. This will good enough to calculate the length of the curve
+const pathIterator = (
+  iterator: (pct: number) => Point,
+  x1: number,
+  y1: number
+) => {
+  let tempP = new Point(x1, y1),
     tmpLen = 0;
   for (let perc = 1; perc <= 100; perc += 1) {
     const p = iterator(perc / 100);
@@ -533,7 +560,7 @@ const pathIterator = (iterator, x1, y1) => {
  * @param {Number} distance from starting point, in pixels.
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
-const findPercentageForDistance = (segInfo, distance) => {
+const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
   let perc = 0,
     tmpLen = 0,
     tempP = { x: segInfo.x, y: segInfo.y },
@@ -565,12 +592,11 @@ const findPercentageForDistance = (segInfo, distance) => {
 };
 
 /**
- * Run over a parsed and simplifed path and extract some informations.
- * informations are length of each command and starting point
- * @param {Array} path fabricJS parsed path commands
- * @return {Array} path commands informations
+ * Run over a parsed and simplified path and extract some information (length of each command and starting point)
+ * @param {PathData} path parsed path commands
+ * @return {Array} path commands information
  */
-export const getPathSegmentsInfo = (path) => {
+export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
   let totalLength = 0,
     current,
     //x2 and y2 are the coords of segment start
@@ -589,7 +615,7 @@ export const getPathSegmentsInfo = (path) => {
     tempInfo = {
       x: x1,
       y: y1,
-      command: current[0],
+      command: current[0] as string,
     };
     switch (
       current[0] //first letter
@@ -671,10 +697,11 @@ export const getPathSegmentsInfo = (path) => {
   return info;
 };
 
-export const getPointOnPath = (path, distance, infos) => {
-  if (!infos) {
-    infos = getPathSegmentsInfo(path);
-  }
+export const getPointOnPath = (
+  path: PathData,
+  distance: number,
+  infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
+) => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;

@@ -635,12 +635,16 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @returns {Promise<IText>}
    */
   static fromObject(object: object): Promise<IText> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(IText, objCopy, {
-      extraParam: 'text',
-    });
+    return FabricObject._fromObject(
+      IText,
+      {
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   }
 }
 

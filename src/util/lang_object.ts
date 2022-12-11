@@ -55,7 +55,6 @@ export const extend = (destination, source, deep) => {
  * @param {Boolean} [deep] Whether to clone nested objects
  * @return {Object}
  */
-
 //TODO: this function return an empty object if you try to clone null
-export const clone = (object: any, deep: boolean) =>
+export const clone = <T>(object: T, deep: boolean): T =>
   deep ? extend({}, object, deep) : { ...object };
