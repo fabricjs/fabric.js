@@ -2344,7 +2344,7 @@ QUnit.module('Free Drawing', hooks => {
       });
       result && visualTester({
         ...options,
-        test: 'result (should equal mesh)',
+        test: `result ${mesh ? '(should equal mesh)' : ''}`,
         golden: `freedrawing/${name}_result.png`,
         code: async function (canvas, callback) {
           await test.build(canvas);
