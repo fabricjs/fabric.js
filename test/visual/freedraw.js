@@ -2349,12 +2349,12 @@ QUnit.module('Free Drawing', hooks => {
         code: async function (canvas, callback) {
           await test.build(canvas);
           await new Promise(resolve => {
-            fireBrushUp(canvas);
             canvas.on('interaction:completed', ({ result }) => {
               onComplete(canvas, result);
               canvas.cancelRequestedRender();
               resolve();
             });
+            fireBrushUp(canvas);
           });
           canvas.renderAll();
           callback(canvas.lowerCanvasEl);
