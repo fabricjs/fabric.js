@@ -494,6 +494,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       this._objects[i].render(ctx);
     }
     this._drawClipPath(ctx, this.clipPath);
+    this.drawEraser(ctx);
   }
 
   /**
