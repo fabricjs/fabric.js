@@ -2317,7 +2317,8 @@ QUnit.module('Free Drawing', hooks => {
     targets: {
       main: true,
       mesh: true
-    }
+    },
+    onComplete: false
   });
 
   tests.push({
@@ -2330,7 +2331,8 @@ QUnit.module('Free Drawing', hooks => {
     targets: {
       main: true,
       mesh: true
-    }
+    },
+    onComplete: false
   });
 
   tests.forEach(({ name, targets, test: testName, ...test }) => {
@@ -2374,6 +2376,7 @@ QUnit.module('Free Drawing', hooks => {
           await test.build(canvas);
           const top = fabric.util.copyCanvasElement(canvas.upperCanvasEl);
           canvas.renderAll();
+          canvas.contextContainer.globalCompositeOperation = 'source-over';
           canvas.contextContainer.drawImage(top, 0, 0);
           callback(canvas.lowerCanvasEl);
         }
