@@ -3,15 +3,19 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false) {
-    setBrush(brush.canvas, brush);
+  function pointDrawer(points, brush, onComplete = false) {
+    const canvas = brush.canvas;
+    setBrush(canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
     }
-    if (fireUp) {
+    if (onComplete) {
+      canvas.once('interaction:completed', ({ result }) => {
+        typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
+      });
       brush.onMouseUp(options);
     }
   }
