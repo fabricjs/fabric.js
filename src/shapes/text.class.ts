@@ -285,8 +285,6 @@ export class Text<
    */
   pathAlign: string;
 
-  private pathSegmentsInfo: ReturnType<typeof getPathSegmentsInfo>;
-
   /**
    * @private
    */
@@ -385,6 +383,7 @@ export class Text<
     }
     this.initDimensions();
     this.setCoords();
+    // @ts-ignore
     this.setupState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -395,7 +394,7 @@ export class Text<
   setPathInfo() {
     const path = this.path;
     if (path) {
-      this.pathSegmentsInfo = getPathSegmentsInfo(path.path);
+      path.segmentsInfo = getPathSegmentsInfo(path.path);
     }
   }
 
@@ -432,6 +431,7 @@ export class Text<
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
+    // @ts-ignore
     this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -593,7 +593,7 @@ export class Text<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle: any,
+    charStyle?: any,
     forMeasuring?: boolean
   ) {
     ctx.textBaseline = 'alphabetic';
@@ -861,11 +861,11 @@ export class Text<
       kernedWidth: 0,
       height: this.fontSize,
     };
-    if (path) {
+    if (path && path.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =
-        this.pathSegmentsInfo[this.pathSegmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, this.pathSegmentsInfo);
+        path.segmentsInfo[path.segmentsInfo.length - 1].length;
+      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
@@ -921,7 +921,7 @@ export class Text<
     const info = getPointOnPath(
       path.path,
       centerPosition,
-      this.pathSegmentsInfo
+      path.segmentsInfo
     );
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
@@ -1602,7 +1602,7 @@ export class Text<
    * @returns {String} font declaration formatted for canvas context.
    */
   _getFontDeclaration(
-    styleObject: TextStyleDeclaration,
+    styleObject?: TextStyleDeclaration,
     forMeasuring?: boolean
   ): string {
     const style = styleObject || this,

@@ -31,6 +31,8 @@ export type PathSegmentInfo = {
   Z: PathSegmentInfoCommon & { destX: number; destY: number };
 };
 
+export type TPathSegmentsInfo = PathSegmentInfo[keyof PathSegmentInfo];
+
 const commandLengths = {
   m: 2,
   l: 2,
@@ -596,7 +598,7 @@ const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
  */
 export const getPathSegmentsInfo = (
   path: PathData
-): PathSegmentInfo[keyof PathSegmentInfo][] => {
+): TPathSegmentsInfo[] => {
   let totalLength = 0,
     current,
     //x2 and y2 are the coords of segment start
