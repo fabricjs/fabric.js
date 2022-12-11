@@ -11,7 +11,11 @@ import {
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Point } from '../point.class';
-import type { TClassProperties, TFiller, TCacheCanvasDimensions } from '../typedefs';
+import type {
+  TClassProperties,
+  TFiller,
+  TCacheCanvasDimensions,
+} from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -1868,7 +1872,6 @@ export class Text<
     return FabricObject._fromObject(
       Text,
       {
-        // spread object to prevent mutation
         ...object,
         styles: stylesFromArray(object.styles, object.text),
       },
