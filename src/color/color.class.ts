@@ -399,14 +399,4 @@ export class Color {
       ];
     }
   }
-
-  /**
-   * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
-   * @deprecated use `new Color(source)` instead
-   * @param {TRGBColorSource | TRGBAColorSource} source
-   * @return {Color}
-   */
-  static fromSource(source: TRGBColorSource | TRGBAColorSource) {
-    return new Color(source);
-  }
 }

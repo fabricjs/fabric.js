@@ -45,10 +45,14 @@ export abstract class AnimatableObject<
    * object.animate({ left: ..., top: ... }, { duration: ... });
    *
    * As string — one property
+   * Supports +=N and -=N for animating N units in a given direction
    *
    * object.animate('left', ...);
    * object.animate('left', ..., { duration: ... });
    *
+   * Example of +=/-=
+   * object.animate('right', '-=50');
+   * object.animate('top', '+=50', { duration: ... });
    */
   animate<T extends number | TColorArg>(
     key: string,
@@ -98,6 +102,8 @@ export abstract class AnimatableObject<
     const currentValue = path.reduce((deep: any, key) => deep[key], this);
 
     if (!propIsColor && typeof to === 'string') {
+      // check for things like +=50
+      // which should animate so that the thing moves by 50 units in the positive direction
       to = to.includes('=')
         ? currentValue + parseFloat(to.replace('=', ''))
         : parseFloat(to);
