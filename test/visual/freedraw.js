@@ -2202,10 +2202,12 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-  function pattern(canvas) {
-    var brush = new fabric.PatternBrush(canvas);
+  function pattern(canvas, { applyViewportTransform = true, vpt = false } = {}) {
+    const brush = new fabric.PatternBrush(canvas);
     brush.color = 'red';
-    brush.width = 20;
+    brush.width = 20;    
+    vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
+    brush.applyViewportTransform = applyViewportTransform;
     pointDrawer(points, brush, true);
     brush.color = 'blue';
     brush.width = 15;
@@ -2226,11 +2228,39 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-  async function patternFromSource(canvas) {
-    var brush = new fabric.PatternBrush(canvas);
+  tests.push({
+    test: 'Pattern src from `getPatternSrc` w/o viewport transform has no effect',
+    build: canvas => pattern(canvas, { applyViewportTransform: false, vpt: true }),
+    name: 'pattern',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
+  });
+
+  tests.push({
+    test: 'Pattern src from `getPatternSrc` with viewport transform',
+    build: canvas => pattern(canvas, { applyViewportTransform: true, vpt: true }),
+    name: 'pattern_vpt',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
+  });
+
+  async function patternFromSource(canvas, { applyViewportTransform = true, vpt = false } = {}) {
+    const brush = new fabric.PatternBrush(canvas);
     brush.source = await new Promise(resolve => getFixture('greyfloral.png', false, resolve));
     brush.color = 'red';
-    brush.width = 25;
+    brush.width = 25;    
+    vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
+    brush.applyViewportTransform = applyViewportTransform;
     pointDrawer(points, brush, true);
     brush.source = await new Promise(resolve => getFixture('parrot.png', false, resolve));
     brush.width = 7;
@@ -2241,6 +2271,32 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Pattern src from `source`',
     build: patternFromSource,
     name: 'patternSource',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
+  });
+  
+  tests.push({
+    test: 'Pattern src from `source` w/o viewport transform has no effect',
+    build: canvas => patternFromSource(canvas, { applyViewportTransform: false, vpt: true }),
+    name: 'patternSource',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      mesh: true
+    }
+  });  
+
+  tests.push({
+    test: 'Pattern src from `source` with viewport transform',
+    build: canvas => patternFromSource(canvas, { applyViewportTransform: true, vpt: true }),
+    name: 'patternSource_vpt',
     percentage: 0.09,
     width: 200,
     height: 250,
