@@ -10,6 +10,7 @@ import {
   TOnAnimationChangeCallback,
   TAnimationCallbacks,
   AnimationState,
+  TAnimationOptions,
 } from './types';
 
 const defaultAbort = () => false;
@@ -17,23 +18,18 @@ const defaultAbort = () => false;
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
-  /**
-   * @see TAnimationBaseOptions
-   */
   readonly startValue: T;
   readonly byValue: T;
   readonly endValue: T;
   readonly duration: number;
   readonly delay: number;
   protected readonly easing: TEasingFunction<T>;
-  /**
-   * @private
-   * @see TAnimationCallbacks
-   */
+
   private readonly _onStart: VoidFunction;
   private readonly _onChange: TOnAnimationChangeCallback<T, void>;
   private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
   private readonly _abort: TAbortCallback<T>;
+
   /**
    * Used to register the animation to a target object
    * so that it can be cancelled within the object context
@@ -67,16 +63,6 @@ export abstract class AnimationBase<
    * @see TAnimationBaseOptions
    * @see TAnimationValues
    * @see TAnimationCallbacks
-   * @param startValue
-   * @param byValue
-   * @param duration
-   * @param delay
-   * @param easing
-   * @param onStart
-   * @param onChange
-   * @param onComplete
-   * @param abort
-   * @param target
    */
   constructor({
     startValue,
