@@ -105,6 +105,7 @@ export class PencilBrush extends BaseBrush<Path> {
     }
     this.drawStraightLine = false;
     this.oldEnd = undefined;
+    this.canvas.contextTop.closePath();
     this.finalize();
   }
 
@@ -275,8 +276,6 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   protected async finalize() {
-    const ctx = this.canvas.contextTop;
-    ctx.closePath();
     if (this.shadow) {
       this.shadow.affectStroke = true;
     }
