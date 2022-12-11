@@ -8,11 +8,10 @@ import { Canvas } from '../__types__';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 /**
- * @private
- * @param {PathData} pathData SVG path commands
+ * @param {PathData} pathData
  * @returns {boolean}
  */
-function isEmptySVGPath(pathData: PathData): boolean {
+function isEmptyPath(pathData: PathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
@@ -236,11 +235,11 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * Converts points to SVG path
-   * @param {Array} points Array of points
-   * @return {PathData} SVG path commands
+   * Converts points to path
+   * @param {Point[]} points Array of points
+   * @return {PathData} path commands
    */
-  convertPointsToSVGPath(points: Point[]): PathData {
+  getPathFromPoints(points: Point[]): PathData {
     const correction = this.width / 1000;
     return getSmoothPathFromPoints(points, correction);
   }
@@ -250,12 +249,12 @@ export class PencilBrush extends BaseBrush<Path> {
    * @return {Path} Path to add on canvas
    */
   protected finalizeShape() {
-    const pathData = this.convertPointsToSVGPath(
+    const pathData = this.getPathFromPoints(
       this.decimate
         ? this.decimatePoints(this._points, this.decimate)
         : this._points
     );
-    if (isEmptySVGPath(pathData)) {
+    if (isEmptyPath(pathData)) {
       // do not create 0 width/height paths, as they are
       // rendered inconsistently across browsers
       // Firefox 4, for example, renders a dot,
