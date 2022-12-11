@@ -2076,7 +2076,9 @@ QUnit.module('Free Drawing', hooks => {
 
     fabricClass: 'Canvas',
 
-    disabled: fabric.isLikelyNode
+    disabled: fabric.isLikelyNode,
+
+    percentage: 0.02
   };
 
   function freedrawing(canvas) {
@@ -2093,7 +2095,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing',
     build: freedrawing,
     name: 'simple',
-    percentage: 0.09,
     width: 100,
     height: 100,
   });
@@ -2109,7 +2110,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing, large brush no offset',
     build: noOffset,
     name: 'largeNoOffset',
-    percentage: 0.09,
     width: 200,
     height: 250,
   });
@@ -2129,7 +2129,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing, with shadow',
     build: withShadow,
     name: 'shadow',
-    percentage: 0.09,
     width: 200,
     height: 250,
   });
@@ -2149,7 +2148,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing, with opacity',
     build: withOpacity,
     name: 'opacity',
-    percentage: 0.09,
     width: 200,
     height: 250,
   });
@@ -2169,7 +2167,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing to dot',
     build: freedrawingWithDecimateToPoint,
     name: 'dot',
-    percentage: 0.09,
     width: 50,
     height: 50,
   });
@@ -2189,7 +2186,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Simple free drawing, with high decimation',
     build: withDecimation,
     name: 'decimation',
-    percentage: 0.09,
     width: 200,
     height: 250,
     targets: {
@@ -2213,7 +2209,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Pattern src from `getPatternSrc`',
     build: pattern,
     name: 'pattern',
-    percentage: 0.09,
     width: 200,
     height: 250,
     targets: {
@@ -2237,7 +2232,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Pattern src from `source`',
     build: patternFromSource,
     name: 'patternSource',
-    percentage: 0.09,
     width: 200,
     height: 250,
     targets: {
@@ -2281,7 +2275,6 @@ QUnit.module('Free Drawing', hooks => {
               pointDrawer(pointsToCover, brush);
             },
             name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
-            percentage: 0.09,
             width: 200,
             height: 200,
             targets: {
@@ -2293,15 +2286,28 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
-  function eraser(canvas, reverse = false) {
+  function eraser(canvas, { reverse = false, group = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
-    canvas.add(
+    const objects = [
       new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
       new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
       new fabric.Circle({ radius: 200 }),
       new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false, opacity: 0.8 }),
+      new fabric.Rect({ width: 100, height: 100, left: 0, top: 100, fill: 'red', erasable: false }),
       new fabric.Circle({ radius: 50, left: 100, top: 100, fill: 'cyan' }),
-    );
+      new fabric.Group([
+        new fabric.Circle({
+          radius: 50,
+          left: 0,
+          top: 100,
+          fill: 'cyan',
+          clipPath: new fabric.Circle({ radius: 50, left: -25, top: -25, originX: 'center', originY: 'center' })
+        })
+      ], {
+        clipPath: new fabric.Circle({ radius: 50, left: 25, top: 25, originX: 'center', originY: 'center' })
+      }),
+    ];
+    canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
     brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     pointDrawer(points, brush);
@@ -2311,7 +2317,6 @@ QUnit.module('Free Drawing', hooks => {
     test: 'Eraser brush',
     build: eraser,
     name: 'eraser',
-    percentage: 0.09,
     width: 200,
     height: 250,
     targets: {
@@ -2322,9 +2327,32 @@ QUnit.module('Free Drawing', hooks => {
 
   tests.push({
     test: 'Eraser brush - custom stack ordering',
-    build: canvas => eraser(canvas, true),
+    build: canvas => eraser(canvas, { reverse: true }),
     name: 'eraser_custom_stack',
-    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+    },
+    onComplete: undefined
+  });
+
+  tests.push({
+    test: 'Eraser brush - group with `erasable = true`',
+    build: canvas => eraser(canvas, { group: true }),
+    name: 'eraser_group',
+    width: 200,
+    height: 250,
+    targets: {
+      top: false,
+    },
+    onComplete: undefined
+  });
+
+  tests.push({
+    test: 'Eraser brush - group with `erasable = deep` should propagate eraser',
+    build: canvas => eraser(canvas, { group: 'deep' }),
+    name: 'eraser',
     width: 200,
     height: 250,
     targets: {
