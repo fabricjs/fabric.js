@@ -3,7 +3,7 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, onComplete = false) {
+  async function pointDrawer(points, brush, onComplete = false) {
     const canvas = brush.canvas;
     canvas.calcViewportBoundaries();
     setBrush(canvas, brush);
@@ -14,10 +14,13 @@
       brush.onMouseMove(points[i], options);
     }
     if (onComplete) {
-      canvas.once('interaction:completed', ({ result }) => {
-        typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
-      });
-      brush.onMouseUp(options);
+      await new Promise(resolve => {
+        canvas.once('interaction:completed', ({ result }) => {
+          typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
+          resolve()
+        });
+        brush.onMouseUp(options);
+      });    
     }
   }
   
@@ -2078,7 +2081,7 @@ QUnit.module('Free Drawing', hooks => {
 
     disabled: fabric.isLikelyNode,
 
-    percentage: 0.02
+    percentage: 0.06
   };
 
   function freedrawing(canvas) {
@@ -2088,7 +2091,7 @@ QUnit.module('Free Drawing', hooks => {
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
     brush.width = 2;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2103,7 +2106,7 @@ QUnit.module('Free Drawing', hooks => {
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'green';
     brush.width = 16;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2122,7 +2125,7 @@ QUnit.module('Free Drawing', hooks => {
       color: 'red',
     });
     brush.width = 6;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2141,7 +2144,7 @@ QUnit.module('Free Drawing', hooks => {
       color: 'green',
     });
     brush.width = 6;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2160,7 +2163,7 @@ QUnit.module('Free Drawing', hooks => {
     brush.color = 'red';
     brush.width = 15;
     brush.decimate = 1;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2171,15 +2174,15 @@ QUnit.module('Free Drawing', hooks => {
     height: 50,
   });
 
-  function withDecimation(canvas) {
+  async function withDecimation(canvas) {
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
     brush.width = 8;
-    pointDrawer(points, brush, true);
+    await pointDrawer(points, brush, true);
     brush.color = 'blue';
     brush.width = 2;
     brush.decimate = 7;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2194,15 +2197,15 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-  function pattern(canvas) {
+  async function pattern(canvas) {
     var brush = new fabric.PatternBrush(canvas);
     brush.color = 'red';
     brush.width = 20;
-    pointDrawer(points, brush, true);
+    await pointDrawer(points, brush, true);
     brush.color = 'blue';
     brush.width = 15;
     brush.decimate = 7;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2222,10 +2225,10 @@ QUnit.module('Free Drawing', hooks => {
     brush.source = await new Promise(resolve => getFixture('greyfloral.png', false, resolve));
     brush.color = 'red';
     brush.width = 25;
-    pointDrawer(points, brush, true);
+    await pointDrawer(points, brush, true);
     brush.source = await new Promise(resolve => getFixture('parrot.png', false, resolve));
     brush.width = 7;
-    pointDrawer(points, brush);
+    return pointDrawer(points, brush);
   }
 
   tests.push({
@@ -2272,7 +2275,7 @@ QUnit.module('Free Drawing', hooks => {
               canvas.freeDrawingBrush = brush;
               canvas.isDrawingMode = true;
               vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
-              pointDrawer(pointsToCover, brush);
+              return pointDrawer(pointsToCover, brush);
             },
             name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
             width: 200,
@@ -2286,8 +2289,9 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
-  function eraser(canvas, { reverse = false, group = false } = {}) {
+  async function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
+    alpha && (brush.color = 'rgba(0,0,0,0.7)');
     const objects = [
       new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
       new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
@@ -2311,55 +2315,64 @@ QUnit.module('Free Drawing', hooks => {
     canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
     brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
-    pointDrawer(points, brush);
+    if (inverted) {
+      await pointDrawer(pointsToCover, brush, true);
+      brush.inverted = true;
+    }
+    return pointDrawer(points, brush);
   }
 
-  tests.push({
-    test: 'Eraser brush',
-    build: eraser,
-    name: 'eraser',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
-  });
+  [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
+    const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}`;
+    const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
+    const main = !alpha && !inverted;
+    tests.push({
+      test: getTestName('Eraser brush'),
+      build: canvas => eraser(canvas, { alpha, inverted }),
+      name: getName('eraser'),
+      width: 200,
+      height: 250,
+      targets: {
+        main
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - custom stack ordering',
-    build: canvas => eraser(canvas, { reverse: true }),
-    name: 'eraser_custom_stack',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
-  });
+    tests.push({
+      test: getTestName('Eraser brush - custom stack ordering'),
+      build: canvas => eraser(canvas, { alpha, inverted, reverse: true }),
+      name: getName('eraser_custom_stack'),
+      width: 200,
+      height: 250,
+      targets: {
+        main
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - group with `erasable = true`',
-    build: canvas => eraser(canvas, { group: true }),
-    name: 'eraser_group',
-    width: 200,
-    height: 250,
-    targets: {
-      top: false,
-    },
-    onComplete: undefined
-  });
+    tests.push({
+      test: getTestName('Eraser brush - group with `erasable = true`'),
+      build: canvas => eraser(canvas, { alpha, inverted, group: true }),
+      name: getName('eraser_group'),
+      width: 200,
+      height: 250,
+      targets: {
+        top: false,
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - group with `erasable = deep` should propagate eraser',
-    build: canvas => eraser(canvas, { group: 'deep' }),
-    name: 'eraser',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
+    tests.push({
+      test: getTestName('Eraser brush - group with `erasable = deep` should propagate eraser'),
+      build: canvas => eraser(canvas, { alpha, inverted, group: 'deep' }),
+      name: getName('eraser'),
+      width: 200,
+      height: 250,
+      targets: {
+        main
+      },
+      onComplete: undefined
+    });
   });
 
   tests.forEach(({ name, targets, test: testName, ...test }) => {
