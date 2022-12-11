@@ -41,7 +41,7 @@
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           brush.onMouseDown(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
@@ -52,7 +52,7 @@
           brush.onMouseMove(pointer, { e: {} });
           brush.onMouseMove(pointer, { e: {} });
           brush.onMouseMove(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
         });
@@ -66,7 +66,7 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer2, { e: {} });
           brush.onMouseMove(pointer3, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 12.5 Q 15 15 17.5 17.5 Q 20 20 17.5 17.5 Q 15 15 17.5 17.5 L 20.001 20.001'),
@@ -86,7 +86,7 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer4, { e: {} });
           brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 17.5 130 Q 20 160 170 130 Q 320 100 210 100 L 99.999 100'),
@@ -107,7 +107,7 @@
           brush.onMouseMove(pointer3, { e: {} });
           brush.onMouseMove(pointer4, { e: {} });
           brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 57.5 100 L 100.001 100'),
