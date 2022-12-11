@@ -2325,7 +2325,7 @@ QUnit.module('Free Drawing', hooks => {
       mesh && visualTester({
         ...options, 
         test: 'context mesh',
-        golden: `freedrawing/${name}_mesh.png`,
+        golden: `freedrawing/${name}_result.png`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
             onComplete(canvas, result);
