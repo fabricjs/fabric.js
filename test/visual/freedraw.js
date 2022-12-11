@@ -2078,7 +2078,7 @@ QUnit.module('Free Drawing', hooks => {
 
     disabled: fabric.isLikelyNode,
 
-    percentage: 0.02
+    percentage: 0.06
   };
 
   function freedrawing(canvas) {
