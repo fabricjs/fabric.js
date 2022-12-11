@@ -3,23 +3,27 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false) {
-    setBrush(brush.canvas, brush);
+  function pointDrawer(points, brush, onComplete = false) {
+    const canvas = brush.canvas;
+    canvas.calcViewportBoundaries();
+    setBrush(canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
     }
-    if (fireUp) {
+    if (onComplete) {
+      canvas.once('interaction:completed', ({ result }) => {
+        typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
+      });
       brush.onMouseUp(options);
     }
   }
-
-  // function eraserDrawer(points, brush, fireUp = false) {
-  //   brush.canvas.calcViewportBoundaries();
-  //   pointDrawer(points, brush, fireUp);
-  // }
+  
+  function fireBrushUp(canvas) {
+    canvas.freeDrawingBrush.onMouseUp(options);
+  }
 
   var points = [
     {
@@ -2061,6 +2065,14 @@ QUnit.module('Free Drawing', hooks => {
      * render top and main context before mouseup
      */
     mesh: false,
+    /**
+     * render main context after interaction has completed
+     */
+    result: true,
+    /**
+     * runs during the test from the completed event
+     */
+    onComplete: (canvas, result) => canvas.add(result),
 
     fabricClass: 'Canvas',
 
@@ -2281,8 +2293,48 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
+  function eraser(canvas, reverse = false) {
+    const brush = new fabric.EraserBrush(canvas);
+    canvas.add(
+      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
+      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
+      new fabric.Circle({ radius: 200 }),
+      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false, opacity: 0.8 }),
+      new fabric.Circle({ radius: 50, left: 100, top: 100, fill: 'cyan', erasable: false }),
+    );
+    brush.width = 8;
+    reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Eraser brush',
+    build: eraser,
+    name: 'eraser',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      // mesh: true
+    }
+  });
+
+  tests.push({
+    test: 'Eraser brush - custom stack ordering',
+    build: canvas => eraser(canvas, true),
+    name: 'eraser_custom_stack',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    targets: {
+      main: true,
+      // mesh: true
+    }
+  });
+
   tests.forEach(({ name, targets, test: testName, ...test }) => {
-    const { top, main, mesh, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
+    const { top, main, mesh, result, onComplete = () => { }, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
     QUnit.module(testName, () => {
       top && visualTester({
         ...options,
@@ -2302,7 +2354,7 @@ QUnit.module('Free Drawing', hooks => {
         golden: `freedrawing/${name}_main_ctx.png`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
-            canvas.add(result);
+            onComplete(canvas, result);
             canvas.cancelRequestedRender();
           });
           await test.build(canvas);
@@ -2313,16 +2365,34 @@ QUnit.module('Free Drawing', hooks => {
       mesh && visualTester({
         ...options, 
         test: 'context mesh',
-        golden: `freedrawing/${name}_mesh.png`,
+        golden: `freedrawing/${name}_result.png`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
-            canvas.add(result);
+            onComplete(canvas, result);
             canvas.cancelRequestedRender();
           });
           await test.build(canvas);
           const top = fabric.util.copyCanvasElement(canvas.upperCanvasEl);
           canvas.renderAll();
           canvas.contextContainer.drawImage(top, 0, 0);
+          callback(canvas.lowerCanvasEl);
+        }
+      });
+      result && visualTester({
+        ...options,
+        test: 'result (should equal mesh)',
+        golden: `freedrawing/${name}_result.png`,
+        code: async function (canvas, callback) {
+          await test.build(canvas);
+          await new Promise(resolve => {
+            fireBrushUp(canvas);
+            canvas.on('interaction:completed', ({ result }) => {
+              onComplete(canvas, result);
+              canvas.cancelRequestedRender();
+              resolve();
+            });
+          });
+          canvas.renderAll();
           callback(canvas.lowerCanvasEl);
         }
       });

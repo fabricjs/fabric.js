@@ -502,19 +502,6 @@ import { saveObjectTransform } from './util/misc/objectTransforms';
       },
 
       /**
-       * Used by {@link #renderAll}
-       * @returns boolean
-       */
-      isErasing() {
-        return (
-          this.isDrawingMode &&
-          this.freeDrawingBrush &&
-          this.freeDrawingBrush.type === 'eraser' &&
-          this.freeDrawingBrush._isErasing
-        );
-      },
-
-      /**
        * Renders both the top canvas and the secondary container canvas.
        * @return {fabric.Canvas} instance
        * @chainable
