@@ -2286,8 +2286,9 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
-  function eraser(canvas, { reverse = false, group = false } = {}) {
+  function eraser(canvas, { reverse = false, group = false, alpha = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
+    alpha && (brush.color = 'rgba(0,0,0,0.7)');
     const objects = [
       new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
       new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
@@ -2314,52 +2315,55 @@ QUnit.module('Free Drawing', hooks => {
     pointDrawer(points, brush);
   }
 
-  tests.push({
-    test: 'Eraser brush',
-    build: eraser,
-    name: 'eraser',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
-  });
+  [true, false].forEach(alpha => {
+    const getName = name => `${name}${alpha ? '_alpha' : ''}`;
+    tests.push({
+      test: 'Eraser brush',
+      build: canvas => eraser(canvas, { alpha }),
+      name: getName('eraser'),
+      width: 200,
+      height: 250,
+      targets: {
+        main: !alpha,
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - custom stack ordering',
-    build: canvas => eraser(canvas, { reverse: true }),
-    name: 'eraser_custom_stack',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
-  });
+    tests.push({
+      test: 'Eraser brush - custom stack ordering',
+      build: canvas => eraser(canvas, { alpha, reverse: true }),
+      name: getName('eraser_custom_stack'),
+      width: 200,
+      height: 250,
+      targets: {
+        main: !alpha,
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - group with `erasable = true`',
-    build: canvas => eraser(canvas, { group: true }),
-    name: 'eraser_group',
-    width: 200,
-    height: 250,
-    targets: {
-      top: false,
-    },
-    onComplete: undefined
-  });
+    tests.push({
+      test: 'Eraser brush - group with `erasable = true`',
+      build: canvas => eraser(canvas, { alpha, group: true }),
+      name: getName('eraser_group'),
+      width: 200,
+      height: 250,
+      targets: {
+        top: false,
+      },
+      onComplete: undefined
+    });
 
-  tests.push({
-    test: 'Eraser brush - group with `erasable = deep` should propagate eraser',
-    build: canvas => eraser(canvas, { group: 'deep' }),
-    name: 'eraser',
-    width: 200,
-    height: 250,
-    targets: {
-      main: true,
-    },
-    onComplete: undefined
+    tests.push({
+      test: 'Eraser brush - group with `erasable = deep` should propagate eraser',
+      build: canvas => eraser(canvas, { alpha, group: 'deep' }),
+      name: getName('eraser'),
+      width: 200,
+      height: 250,
+      targets: {
+        main: !alpha,
+      },
+      onComplete: undefined
+    });
   });
 
   tests.forEach(({ name, targets, test: testName, ...test }) => {
