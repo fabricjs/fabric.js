@@ -1,7 +1,7 @@
 import { Color } from '../../color';
 import type { Point } from '../../point.class';
+import { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
-import { FabricObject } from '../../shapes/object.class';
 import type { Path } from '../../shapes/path.class';
 import { capitalize } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
@@ -357,18 +357,11 @@ export class EraserBrush extends PencilBrush {
     return context;
   }
 
-  /**
-   * On mouseup after drawing the path on contextTop canvas
-   * we use the points captured to create an new fabric path object
-   * and add it to every intersected erasable object.
-   */
-  async finalize() {
-    this._isErasing = false;
-    const shape = await super.finalize();
+  protected async onEnd(result?: Path) {
     this.canvas.fire(
       'erasing:end',
-      shape ? await this.finalizeErasing(shape) : undefined
+      result ? await this.finalizeErasing(result) : undefined
     );
-    return shape;
+    super.onEnd(result);
   }
 }
