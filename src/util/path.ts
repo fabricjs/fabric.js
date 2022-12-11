@@ -596,9 +596,7 @@ const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
  * @param {PathData} path parsed path commands
  * @return {Array} path commands information
  */
-export const getPathSegmentsInfo = (
-  path: PathData
-): TPathSegmentsInfo[] => {
+export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
   let totalLength = 0,
     current,
     //x2 and y2 are the coords of segment start

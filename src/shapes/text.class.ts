@@ -918,11 +918,7 @@ export class Text<
       path = this.path;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
-    const info = getPointOnPath(
-      path.path,
-      centerPosition,
-      path.segmentsInfo
-    );
+    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
     graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
