@@ -5,6 +5,7 @@ import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import { TMat2D } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -317,6 +318,10 @@ export class Gradient<
     return gradient;
   }
 
+  static fromObject({ ...rest }: GradientOptions) {
+    return new Gradient(rest);
+  }
+
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
@@ -395,3 +400,6 @@ export class Gradient<
 }
 
 fabric.Gradient = Gradient;
+
+classRegistry.setClass(Gradient, 'gradient');
+classRegistry.setSVGClass(Gradient, 'gradient');

@@ -10,8 +10,25 @@
  * differnet sources you will need to import all fabric because you may need all classes.
  */
 
+import { Constructor } from '../typedefs';
+
 export const JSON = 'json';
 export const SVG = 'svg';
+
+export type TJSONResolver<T extends Constructor> = {
+  fromObject(
+    data: unknown,
+    options?: unknown
+  ): InstanceType<T> | Promise<InstanceType<T>>;
+};
+
+export type TSVGResolver<T extends Constructor> = {
+  fromElement(
+    svgEl: SVGElement,
+    instance: InstanceType<T>,
+    options: unknown
+  ): InstanceType<T> | Promise<InstanceType<T>>;
+};
 
 export class ClassRegistry {
   [JSON]: Map<string, any>;
@@ -22,10 +39,21 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  getClass(classType: string): any {
-    const constructor = this[JSON].get(classType);
+  getClass<T extends Constructor = any>(classType: string): TJSONResolver<T>;
+  getClass<T extends Constructor = any>(
+    data: Record<string, any>
+  ): TJSONResolver<T>;
+  getClass<T extends Constructor = any>(
+    arg0: string | Record<string, any>
+  ): TJSONResolver<T> {
+    if (typeof arg0 === 'object' && arg0.colorStops) {
+      arg0 = 'gradient';
+    }
+    const constructor = this[JSON].get(
+      typeof arg0 === 'string' ? arg0 : arg0.type
+    );
     if (!constructor) {
-      throw new Error(`No class registered for ${classType}`);
+      throw new Error(`No class registered for ${arg0}`);
     }
     return constructor;
   }
@@ -37,8 +65,15 @@ export class ClassRegistry {
     );
   }
 
-  getSVGClass(SVGTagName: string): any {
-    return this[SVG].get(SVGTagName);
+  getSVGClass<T extends Constructor = any>(
+    SVGTagName: string
+  ): TSVGResolver<T> {
+    const classConstructor = this[SVG].get(SVGTagName);
+    if (classConstructor) {
+      return classConstructor;
+    } else {
+      throw new Error(`No class registered for SVG tag ${SVGTagName}`);
+    }
   }
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {

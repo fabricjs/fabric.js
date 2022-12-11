@@ -1,11 +1,9 @@
-import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
-import { Gradient } from '../../gradient';
-import { Pattern } from '../../pattern.class';
-import type { FabricObject } from '../../shapes/fabricObject.class';
+import type { BaseFilter } from '../../filters';
+import { FabricObject } from '../../shapes/fabricObject.class';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
-import { createImage } from './dom';
 import { classRegistry } from '../class_registry';
+import { createImage } from './dom';
 
 export type LoadImageOptions = {
   /**
@@ -68,53 +66,39 @@ type EnlivenObjectOptions = {
    * Method for further parsing of object elements,
    * called after each fabric object created.
    */
-  reviver?: (
-    serializedObj: Record<string, any>,
-    instance: FabricObject
-  ) => void;
-  /**
-   * Namespace to get klass "Class" object from
-   */
-  namespace?: any;
+  reviver?: <T>(serializedObj: Record<string, any>, instance: T) => void;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
- * @param {object} [options.namespace] Namespace to get klass "Class" object from
- * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
- * called after each fabric object created.
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = (
+export const enlivenObjects = <T>(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
-  new Promise<FabricObject[]>((resolve, reject) => {
-    const instances: FabricObject[] = [];
+  new Promise<T[]>((resolve, reject) => {
+    const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
-      objects.map((obj) =>
-        classRegistry
+      objects.map(async (obj) => {
+        const fabricInstance = await classRegistry
           .getClass(obj.type)
-          // @ts-ignore
           .fromObject(obj, {
             signal,
             reviver,
-          })
-          .then((fabricInstance: FabricObject) => {
-            reviver(obj, fabricInstance);
-            instances.push(fabricInstance);
-            return fabricInstance;
-          })
-      )
+          });
+        reviver(obj, fabricInstance);
+        instances.push(fabricInstance);
+        return fabricInstance;
+      })
     )
       .then(resolve)
       .catch((error) => {
         // cleanup
-        instances.forEach(function (instance) {
+        instances.forEach((instance: any) => {
           instance.dispose && instance.dispose();
         });
         reject(error);
@@ -129,49 +113,32 @@ export const enlivenObjects = (
  * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
  * @param {object} [options]
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<Record<string, FabricObject | TFiller | null>>} the input object with enlived values
+ * @returns {Promise<Record<string, FabricObject | TFiller | BaseFilter | null>>} the input object with enlived values
  */
 export const enlivenObjectEnlivables = <
-  R = Record<string, FabricObject | TFiller | null>
+  D extends Record<string, Record<string, unknown>>,
+  T extends FabricObject | TFiller | BaseFilter,
+  R extends Record<keyof D, T>
 >(
-  serializedObject: any,
+  serializedObject: D,
   { signal }: { signal?: AbortSignal } = {}
 ) =>
   new Promise<R>((resolve, reject) => {
-    const instances: (FabricObject | TFiller)[] = [];
+    const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
-    // enlive every possible property
-    const promises = Object.values(serializedObject).map((value: any) => {
-      if (!value) {
-        return value;
-      }
-      // gradient
-      if (value.colorStops) {
-        return new Gradient(value);
-      }
-      // clipPath
-      if (value.type) {
-        return enlivenObjects([value], { signal }).then(([enlived]) => {
-          instances.push(enlived);
-          return enlived;
-        });
-      }
-      // pattern
-      if (value.source) {
-        return Pattern.fromObject(value, { signal }).then((pattern) => {
-          instances.push(pattern);
-          return pattern;
-        });
-      }
-      return value;
+    const promises = Object.values(serializedObject).map(async (value) => {
+      const klass = classRegistry.getClass(value);
+      const instance = (await klass.fromObject(value, { signal })) as T;
+      instances.push(instance);
+      return instance;
     });
-    const keys = Object.keys(serializedObject);
+    const keys = Object.keys(serializedObject) as (keyof D)[];
     Promise.all(promises)
       .then((enlived) => {
         return enlived.reduce((acc, instance, index) => {
-          acc[keys[index]] = instance;
+          instance && (acc[keys[index]] = instance as R[keyof D]);
           return acc;
-        }, {});
+        }, {} as R);
       })
       .then(resolve)
       .catch((error) => {

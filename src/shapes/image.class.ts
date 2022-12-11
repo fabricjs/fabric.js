@@ -728,7 +728,7 @@ export class Image extends FabricObject {
   ): Promise<Image> {
     return Promise.all([
       loadImage(src, { ...options, crossOrigin }),
-      f && enlivenObjects(f, options),
+      f && enlivenObjects<BaseFilter>(f, options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], hydratedProps = {}]) => {
       return new Image(el, {
