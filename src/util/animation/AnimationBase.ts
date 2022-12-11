@@ -3,14 +3,13 @@ import { requestAnimFrame } from './AnimationFrameProvider';
 import { runningAnimations } from './AnimationRegistry';
 import { defaultEasing } from './easing';
 import {
-  TAnimationBaseOptions,
-  TAnimationValues,
+  AnimationState,
   TAbortCallback,
+  TAnimationBaseOptions,
+  TAnimationCallbacks,
+  TAnimationValues,
   TEasingFunction,
   TOnAnimationChangeCallback,
-  TAnimationCallbacks,
-  AnimationState,
-  TAnimationOptions,
 } from './types';
 
 const defaultAbort = () => false;
@@ -60,9 +59,6 @@ export abstract class AnimationBase<
    * Since both `byValue` and `endValue` are accepted in subclass options
    * and are populated with defaults if missing, we defer to `byValue` and
    * ignore `endValue` to avoid conflict
-   * @see TAnimationBaseOptions
-   * @see TAnimationValues
-   * @see TAnimationCallbacks
    */
   constructor({
     startValue,
