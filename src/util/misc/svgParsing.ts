@@ -1,10 +1,7 @@
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import type { FabricObject } from '../../shapes/fabricObject.class';
-import { Group } from '../../shapes/group.class';
 import { SupportedSVGUnit, SVGElementName, TMat2D } from '../../typedefs';
 import { toFixed } from './toFixed';
-
 /**
  * Returns array of attributes for given svg that fabric parses
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
@@ -77,18 +74,6 @@ export const parseUnit = (value: string, fontSize: number) => {
   }
 };
 
-/**
- * Groups SVG elements (usually those retrieved from SVG document)
- * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
- * @return {FabricObject | Group}
- */
-export const groupSVGElements = (elements: FabricObject[]) => {
-  if (elements && elements.length === 1) {
-    return elements[0];
-  }
-  return new Group(elements);
-};
-
 const enum MeetOrSlice {
   meet = 'meet',
   slice = 'slice',
@@ -145,6 +130,8 @@ export const parsePreserveAspectRatioAttribute = (
  * @return {String} transform matrix for svg
  */
 export const matrixToSVG = (transform: TMat2D) =>
-  `matrix(${transform
+  'matrix(' +
+  transform
     .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
-    .join(' ')})`;
+    .join(' ') +
+  ')';
