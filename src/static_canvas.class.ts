@@ -71,8 +71,10 @@ export type TSVGExportOptions = {
  * @fires object:removed
  */
 // eslint-disable-next-line max-len
-export class StaticCanvas extends createCollectionMixin(
-  CommonMethods<StaticCanvasEvents>
+export class StaticCanvas<
+  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+  > extends createCollectionMixin(
+  CommonMethods<EventSpec>
 ) {
   /**
    * Background color of canvas instance.

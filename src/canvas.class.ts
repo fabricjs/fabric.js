@@ -2,7 +2,7 @@ import { fabric } from '../HEADER';
 import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
-import { TOptionalModifierKey, Transform } from './EventTypeDefs';
+import { CanvasEvents, TOptionalModifierKey, Transform } from './EventTypeDefs';
 import { saveObjectTransform } from './util/misc/objectTransforms';
 import { StaticCanvas } from './static_canvas.class';
 
@@ -101,7 +101,9 @@ import { StaticCanvas } from './static_canvas.class';
  * });
  *
  */
-export class Canvas extends StaticCanvas {
+export class Canvas<
+  EventSpec extends CanvasEvents = CanvasEvents
+> extends StaticCanvas<EventSpec> {
 
   /**
    * When true, objects can be transformed by one side (unproportionally)
@@ -369,7 +371,7 @@ export class Canvas extends StaticCanvas {
    * @type fabric.Object
    * @private
    */
-  _hoveredTarget?: FabricObject;
+  _hoveredTarget: FabricObject | null = null;
 
   /**
    * hold the list of nested targets hovered
@@ -448,7 +450,7 @@ export class Canvas extends StaticCanvas {
    * @private
    * @param {fabric.Object} obj Object that was removed
    */
-  _onObjectRemoved(obj) {
+  _onObjectRemoved(obj: FabricObject) {
     this._objectsToRender = undefined;
     // removing active object should fire "selection:cleared" events
     if (obj === this._activeObject) {
@@ -463,7 +465,7 @@ export class Canvas extends StaticCanvas {
       this._hoveredTarget = null;
       this._hoveredTargets = [];
     }
-    this.callSuper('_onObjectRemoved', obj);
+    super._onObjectRemoved(obj);
   }
 
   /**
@@ -472,16 +474,15 @@ export class Canvas extends StaticCanvas {
    * @return {Array} objects to render immediately and pushes the other in the activeGroup.
    */
   _chooseObjectsToRender() {
-    var activeObjects = this.getActiveObjects(),
-      object,
-      objsToRender,
+    const activeObjects = this.getActiveObjects();
+    let objsToRender,
       activeGroupObjects;
 
     if (!this.preserveObjectStacking && activeObjects.length > 1) {
       objsToRender = [];
       activeGroupObjects = [];
-      for (var i = 0, length = this._objects.length; i < length; i++) {
-        object = this._objects[i];
+      for (let i = 0, length = this._objects.length; i < length; i++) {
+        const object = this._objects[i];
         if (activeObjects.indexOf(object) === -1) {
           objsToRender.push(object);
         } else {
@@ -1348,7 +1349,7 @@ export class Canvas extends StaticCanvas {
    * @return {Boolean} true if the selection happened
    * @private
    */
-  _discardActiveObject(e, object) {
+  _discardActiveObject(e?: MouseEvent, object?: FabricObject) {
     var obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
