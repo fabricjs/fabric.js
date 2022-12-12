@@ -18,9 +18,17 @@ import { runningAnimations } from '../util/animation_registry';
 import { clone } from '../util/lang_object';
 import { capitalize } from '../util/lang_string';
 import { capValue } from '../util/misc/capValue';
-import { createCanvasElement } from '../util/misc/dom';
-import { qrDecompose, transformPoint } from '../util/misc/matrix';
+import { createCanvasElement, toDataURL } from '../util/misc/dom';
+import {
+  invertTransform,
+  qrDecompose,
+  transformPoint,
+} from '../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+import {
+  resetObjectTransform,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
@@ -42,9 +50,7 @@ type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
 
 /**
  * Root object class from which all 2d shape classes inherit from
- * @class fabric.Object
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
- * @see {@link fabric.Object#initialize} for constructor definition
  *
  * @fires added
  * @fires removed
@@ -201,7 +207,7 @@ export class FabricObject<
   /**
    * Fill rule used to fill an object
    * accepted values are nonzero, evenodd
-   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `fabric.Object#globalCompositeOperation` instead)
+   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `globalCompositeOperation` instead)
    * @type String
    * @default nonzero
    */
@@ -471,7 +477,7 @@ export class FabricObject<
 
   /**
    * List of properties to consider when checking if state
-   * of an object is changed (fabric.Object#hasStateChanged)
+   * of an object is changed (hasStateChanged)
    * as well as for history (undo/redo) purposes
    * @type Array
    */
@@ -491,7 +497,7 @@ export class FabricObject<
    * the clipPath object gets used when the object has rendered, and the context is placed in the center
    * of the object cacheCanvas.
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
-   * @type fabric.Object
+   * @type FabricObject
    */
   clipPath?: FabricObject;
 
@@ -955,7 +961,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return '#<fabric.' + capitalize(this.type) + '>';
+    return `#<${capitalize(this.type)}>`;
   }
 
   /**
@@ -1025,7 +1031,6 @@ export class FabricObject<
    * @private
    * @param {String} key
    * @param {*} value
-   * @return {fabric.Object} thisArg
    */
   _set(key: string, value: any) {
     const isChanged = this[key] !== value;
@@ -1216,9 +1221,7 @@ export class FabricObject<
   /**
    * Execute the drawing operation for an object clipPath
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {fabric.Object} clipPath
-   * todo while converting things, we need a type that is a union of classes that
-   * represent the fabricObjects. Rect, Circle...
+   * @param {FabricObject} clipPath
    */
   drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
     ctx.save();
@@ -1231,7 +1234,7 @@ export class FabricObject<
     }
     //ctx.scale(1 / 2, 1 / 2);
     if (clipPath.absolutePositioned) {
-      const m = fabric.util.invertTransform(this.calcTransformMatrix());
+      const m = invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
     clipPath.transform(ctx);
@@ -1268,7 +1271,7 @@ export class FabricObject<
   /**
    * Prepare clipPath state and cache and draw it on instance's cache
    * @param {CanvasRenderingContext2D} ctx
-   * @param {fabric.Object} clipPath
+   * @param {FabricObject} clipPath
    */
   _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
     if (!clipPath) {
@@ -1480,9 +1483,7 @@ export class FabricObject<
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} filler fabric.Pattern or fabric.Gradient
-   * @return {Object} offset.offsetX offset for text rendering
-   * @return {Object} offset.offsetY offset for text rendering
+   * @param {TFiller} filler {@link Pattern} or {@link Gradient}
    */
   _applyPatternGradientTransform(
     ctx: CanvasRenderingContext2D,
@@ -1583,14 +1584,14 @@ export class FabricObject<
    * is limited.
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {fabric.Gradient} filler a fabric gradient instance
+   * @param {Gradient} filler
    */
   _applyPatternForTransformedGradient(
     ctx: CanvasRenderingContext2D,
     filler: TFiller
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = fabric.util.createCanvasElement(),
+      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
@@ -1682,7 +1683,7 @@ export class FabricObject<
   /**
    * Clones an instance.
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
   clone(propertiesToInclude: (keyof this)[]) {
     const objectForm = this.toObject(propertiesToInclude);
@@ -1691,7 +1692,7 @@ export class FabricObject<
   }
 
   /**
-   * Creates an instance of fabric.Image out of an object
+   * Creates an instance of Image out of an object
    * makes use of toCanvasElement.
    * Once this method was based on toDataUrl and loadImage, so it also had a quality
    * and format option. toCanvasElement is faster and produce no loss of quality.
@@ -1706,10 +1707,11 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {fabric.Image} Object cloned as image.
+   * @return {Image} Object cloned as image.
    */
   cloneAsImage(options: any) {
     const canvasEl = this.toCanvasElement(options);
+    // TODO: how to import Image w/o an import cycle?
     return new fabric.Image(canvasEl);
   }
 
@@ -1724,13 +1726,12 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {HTMLCanvasElement} Returns DOM element <canvas> with the fabric.Object
+   * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options: any) {
     options || (options = {});
 
-    const utils = fabric.util,
-      origParams = utils.saveObjectTransform(this),
+    const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
@@ -1740,13 +1741,13 @@ export class FabricObject<
       multiplier = (options.multiplier || 1) * retinaScaling;
     delete this.group;
     if (options.withoutTransform) {
-      utils.resetObjectTransform(this);
+      resetObjectTransform(this);
     }
     if (options.withoutShadow) {
       this.shadow = null;
     }
 
-    const el = fabric.util.createCanvasElement(),
+    const el = createCanvasElement(),
       // skip canvas zoom and calculate with setCoords now.
       boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow,
@@ -1821,7 +1822,7 @@ export class FabricObject<
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
   toDataURL(options: any = {}) {
-    return fabric.util.toDataURL(
+    return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
       options.quality || 1
@@ -1877,8 +1878,6 @@ export class FabricObject<
   /**
    * Centers object horizontally on canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   centerH() {
     this.canvas && this.canvas.centerObjectH(this);
@@ -1888,8 +1887,6 @@ export class FabricObject<
   /**
    * Centers object horizontally on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   viewportCenterH() {
     this.canvas && this.canvas.viewportCenterObjectH(this);
@@ -1899,8 +1896,6 @@ export class FabricObject<
   /**
    * Centers object vertically on canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   centerV() {
     this.canvas && this.canvas.centerObjectV(this);
@@ -1910,8 +1905,6 @@ export class FabricObject<
   /**
    * Centers object vertically on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   viewportCenterV() {
     this.canvas && this.canvas.viewportCenterObjectV(this);
@@ -1921,8 +1914,6 @@ export class FabricObject<
   /**
    * Centers object vertically and horizontally on canvas to which is was added last
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   center() {
     this.canvas && this.canvas.centerObject(this);
@@ -1932,8 +1923,6 @@ export class FabricObject<
   /**
    * Centers object on current viewport of canvas to which it was added last.
    * You might need to call `setCoords` on an object after centering, to update controls area.
-   * @return {fabric.Object} thisArg
-   * @chainable
    */
   viewportCenter() {
     this.canvas && this.canvas.viewportCenterObject(this);
@@ -1980,7 +1969,7 @@ export class FabricObject<
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
   static _fromObject<
     T extends FabricObject,
@@ -2006,12 +1995,10 @@ export class FabricObject<
 
   /**
    *
-   * @static
-   * @memberOf fabric.Object
    * @param {object} object
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Object>}
+   * @returns {Promise<FabricObject>}
    */
   static fromObject(
     object: Record<string, unknown>,
