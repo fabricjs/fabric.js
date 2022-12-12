@@ -1,4 +1,3 @@
-import { fabric } from '../../../HEADER';
 import { Color } from '../../color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
@@ -79,20 +78,6 @@ export const parseUnit = (value: string, fontSize: number) => {
     default:
       return number;
   }
-};
-
-/**
- * Groups SVG elements (usually those retrieved from SVG document)
- * @static
- * @memberOf fabric.util
- * @param {Array} elements fabric.Object(s) parsed from svg, to group
- * @return {fabric.Object|fabric.Group}
- */
-export const groupSVGElements = (elements: any[]) => {
-  if (elements && elements.length === 1) {
-    return elements[0];
-  }
-  return new fabric.Group(elements);
 };
 
 const enum MeetOrSlice {

@@ -24,7 +24,7 @@ export abstract class TextStyleMixin<
    * @param {Number} lineIndex , lineIndex is on wrapped lines.
    * @return {Boolean}
    */
-  isEmptyStyles(lineIndex: number): boolean {
+  isEmptyStyles(lineIndex?: number): boolean {
     if (!this.styles) {
       return true;
     }
@@ -53,7 +53,7 @@ export abstract class TextStyleMixin<
    * @param {Number} lineIndex to check the style on
    * @return {Boolean}
    */
-  styleHas(property: string, lineIndex: number): boolean {
+  styleHas(property: string, lineIndex?: number): boolean {
     if (!this.styles || !property || property === '') {
       return false;
     }
