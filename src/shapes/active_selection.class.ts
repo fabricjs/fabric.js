@@ -154,7 +154,7 @@ export class ActiveSelection extends Group {
    * @returns {Promise<ActiveSelection>}
    */
   static fromObject({ objects = [], ...options }) {
-    return enlivenObjects<FabricObject>(objects).then(
+    return enlivenObjects(objects).then(
       (enlivenedObjects) => new ActiveSelection(enlivenedObjects, options, true)
     );
   }

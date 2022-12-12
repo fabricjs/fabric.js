@@ -8,11 +8,11 @@ import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import type {
+  TCacheCanvasDimensions,
   TClassProperties,
   TDegree,
   TFiller,
   TSize,
-  TCacheCanvasDimensions,
 } from '../typedefs';
 import { runningAnimations } from '../util/animation_registry';
 import { classRegistry } from '../util/class_registry';
@@ -33,7 +33,6 @@ import {
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import type { Group } from './group.class';
-import { classRegistry } from '../util/class_registry';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -936,7 +935,9 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    const prototype = classRegistry.getClass<FabricObject>(
+      object.type
+    ).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -1975,24 +1976,29 @@ export class FabricObject<
    */
   static _fromObject<
     T extends FabricObject,
-    X,
+    X extends string,
     K extends X extends keyof T
-      ? { new (arg0: T[X], ...args: any[]): T }
-      : { new (...args: any[]): T }
+      ? new (arg0: T[X], ...args: any[]) => T
+      : new (...args: any[]) => T
   >(
     klass: K,
     object: Record<string, unknown>,
     { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
-  ) {
-    return enlivenObjectEnlivables<InstanceType<K>>(
-      clone(object, true),
-      options
-    ).then((enlivedMap) => {
-      // from the resulting enlived options, extract options.extraParam to arg0
-      // to avoid accidental overrides later
-      const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
-      return extraParam ? new klass(arg0, rest) : new klass(rest);
-    });
+  ): Promise<InstanceType<K>> {
+    return enlivenObjectEnlivables(clone(object, true), options).then(
+      (enlivedMap) => {
+        // from the resulting enlived options, extract options.extraParam to arg0
+        // to avoid accidental overrides later
+        const { [extraParam || '']: arg0, ...rest } = {
+          ...options,
+          ...object,
+          ...enlivedMap,
+        };
+        return (
+          extraParam ? new klass(arg0, rest) : new klass(rest)
+        ) as InstanceType<K>;
+      }
+    );
   }
 
   /**

@@ -1049,7 +1049,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   static fromObject({ objects = [], ...options }) {
     return Promise.all([
-      enlivenObjects<FabricObject>(objects),
+      enlivenObjects(objects),
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>

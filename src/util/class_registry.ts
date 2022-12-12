@@ -7,7 +7,7 @@
  * You can customize which classes get enlived from SVG parsing using this classRegistry.
  * The Registry start empty and gets filled in depending which files you import.
  * If you want to be able to parse arbitrary SVGs or JSON representation of canvases, coming from
- * differnet sources you will need to import all fabric because you may need all classes.
+ * different sources you will need to import all fabric because you may need all classes.
  */
 
 import { Constructor } from '../typedefs';
@@ -15,68 +15,97 @@ import { Constructor } from '../typedefs';
 export const JSON = 'json';
 export const SVG = 'svg';
 
-export type TJSONResolver<T extends Constructor> = {
-  fromObject(
-    data: unknown,
-    options?: unknown
-  ): InstanceType<T> | Promise<InstanceType<T>>;
+export type TJSONResolver<T extends object = any> = Constructor<T> & {
+  fromObject(data: unknown, options?: unknown): T | Promise<T>;
 };
 
-export type TSVGResolver<T extends Constructor> = {
+export type TSVGResolver<T extends object = any> = Constructor<T> & {
   fromElement(
     svgEl: SVGElement,
-    instance: InstanceType<T>,
+    callback: (instance: T | null) => any,
     options: unknown
-  ): InstanceType<T> | Promise<InstanceType<T>>;
+  ): void;
 };
 
+type ResolverReturnValue<T extends object, S = true> = S extends true
+  ? T
+  : T | undefined;
+
 export class ClassRegistry {
-  [JSON]: Map<string, any>;
-  [SVG]: Map<string, any>;
+  [JSON]: Map<string, TJSONResolver>;
+  [SVG]: Map<string, TSVGResolver>;
 
   constructor() {
     this[JSON] = new Map();
     this[SVG] = new Map();
   }
 
-  getClass<T extends Constructor = any>(classType: string): TJSONResolver<T>;
-  getClass<T extends Constructor = any>(
-    data: Record<string, any>
-  ): TJSONResolver<T>;
-  getClass<T extends Constructor = any>(
-    arg0: string | Record<string, any>
-  ): TJSONResolver<T> {
+  // hasClass(classType: string): boolean;
+  // hasClass(data: Record<string, any>): boolean;
+  // hasClass(arg0: string | Record<string, any>): boolean {
+  //   if (typeof arg0 === 'object' && arg0.colorStops) {
+  //     arg0 = 'gradient';
+  //   }
+  //   return this[JSON].has(typeof arg0 === 'string' ? arg0 : arg0.type);
+  // }
+
+  getClass<T extends object>(
+    classType: string,
+    strict?: true
+  ): ResolverReturnValue<TJSONResolver<T>>;
+  getClass<T extends object>(
+    classType: string,
+    strict: false
+  ): ResolverReturnValue<TJSONResolver<T>, false>;
+  getClass<T extends object>(
+    data: Record<string, any>,
+    strict?: true
+  ): ResolverReturnValue<TJSONResolver<T>>;
+  getClass<T extends object>(
+    data: Record<string, any>,
+    strict: false
+  ): ResolverReturnValue<TJSONResolver<T>, false>;
+  getClass<T extends object, S extends boolean = true>(
+    arg0: string | Record<string, any>,
+    strict: S = true as S
+  ): ResolverReturnValue<TJSONResolver<T>, S> {
     if (typeof arg0 === 'object' && arg0.colorStops) {
       arg0 = 'gradient';
     }
     const constructor = this[JSON].get(
       typeof arg0 === 'string' ? arg0 : arg0.type
     );
-    if (!constructor) {
+    if (!constructor && strict) {
       throw new Error(`No class registered for ${arg0}`);
     }
-    return constructor;
+    return constructor as ResolverReturnValue<TJSONResolver<T>, S>;
   }
 
-  setClass(classConstructor: any, classType?: string) {
+  setClass<T extends object>(
+    classConstructor: TJSONResolver<T>,
+    classType?: string
+  ) {
     this[JSON].set(
       classType ?? classConstructor.prototype.type,
       classConstructor
     );
   }
 
-  getSVGClass<T extends Constructor = any>(
-    SVGTagName: string
-  ): TSVGResolver<T> {
-    const classConstructor = this[SVG].get(SVGTagName);
-    if (classConstructor) {
-      return classConstructor;
-    } else {
+  getSVGClass<T extends object, S extends boolean = true>(
+    SVGTagName: string,
+    strict: S = true as S
+  ): ResolverReturnValue<TSVGResolver<T>, S> {
+    const constructor = this[SVG].get(SVGTagName);
+    if (!constructor && strict) {
       throw new Error(`No class registered for SVG tag ${SVGTagName}`);
     }
+    return constructor as ResolverReturnValue<TSVGResolver<T>, S>;
   }
 
-  setSVGClass(classConstructor: any, SVGTagName?: string) {
+  setSVGClass<T extends object>(
+    classConstructor: TSVGResolver<T>,
+    SVGTagName?: string
+  ) {
     this[SVG].set(
       SVGTagName ?? classConstructor.prototype.type,
       classConstructor

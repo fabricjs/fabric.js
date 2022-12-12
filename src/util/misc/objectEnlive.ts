@@ -1,7 +1,7 @@
 import { noop } from '../../constants';
 import type { BaseFilter } from '../../filters';
-import { FabricObject } from '../../shapes/fabricObject.class';
-import type { TCrossOrigin, TFiller } from '../../typedefs';
+import type { FabricObject } from '../../shapes/fabricObject.class';
+import type { Constructor, TCrossOrigin, TFiller } from '../../typedefs';
 import { classRegistry } from '../class_registry';
 import { createImage } from './dom';
 
@@ -57,7 +57,7 @@ export const loadImage = (
     img.src = url;
   });
 
-type EnlivenObjectOptions = {
+export type EnlivenObjectOptions = {
   /**
    * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
@@ -75,7 +75,7 @@ type EnlivenObjectOptions = {
  * @param {EnlivenObjectOptions} [options]
  * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = <T>(
+export const enlivenObjects = <T extends object = FabricObject>(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
@@ -85,7 +85,7 @@ export const enlivenObjects = <T>(
     Promise.all(
       objects.map(async (obj) => {
         const fabricInstance = await classRegistry
-          .getClass(obj.type)
+          .getClass<T>(obj.type)
           .fromObject(obj, {
             signal,
             reviver,
@@ -116,9 +116,12 @@ export const enlivenObjects = <T>(
  * @returns {Promise<Record<string, FabricObject | TFiller | BaseFilter | null>>} the input object with enlived values
  */
 export const enlivenObjectEnlivables = <
-  D extends Record<string, Record<string, unknown>>,
   T extends FabricObject | TFiller | BaseFilter,
-  R extends Record<keyof D, T>
+  D extends Record<string, Record<string, unknown>> = Record<
+    string,
+    Record<string, unknown>
+  >,
+  R extends Record<keyof D, T> = Record<keyof D, T>
 >(
   serializedObject: D,
   { signal }: { signal?: AbortSignal } = {}
@@ -127,7 +130,11 @@ export const enlivenObjectEnlivables = <
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     const promises = Object.values(serializedObject).map(async (value) => {
-      const klass = classRegistry.getClass(value);
+      const klass =
+        value &&
+        typeof value === 'object' &&
+        classRegistry.getClass(value, false);
+      if (!klass) return;
       const instance = (await klass.fromObject(value, { signal })) as T;
       instances.push(instance);
       return instance;
