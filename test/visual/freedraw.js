@@ -2322,7 +2322,7 @@ QUnit.module('Free Drawing', hooks => {
     return pointDrawer(points, brush);
   }
 
-  [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
+  [{ alpha: true }, { alpha: false }, /*{ inverted: true }*/].forEach(({ alpha, inverted }) => {
     const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}`;
     const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
     const main = !alpha && !inverted;
