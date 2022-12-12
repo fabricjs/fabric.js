@@ -10,6 +10,8 @@ import type { StaticCanvas } from './static_canvas.class';
 
 export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
 
+export type TOptionalModifierKey = ModifierKey | null | undefined;
+
 export type TPointerEvent = MouseEvent | TouchEvent;
 
 export type TransformAction<T extends Transform = Transform, R = void> = (

@@ -262,7 +262,7 @@ export class StaticCanvas extends createCollectionMixin(
   disposed?: boolean;
 
   renderAndResetBound: () => void;
-  requestRenderAllBound: () => StaticCanvas;
+  requestRenderAllBound: () => void;
 
   // TODO: move to canvas
   interactive: boolean;
