@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
-import { Gradient } from '../gradient';
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
 import { classRegistry } from '../util/class_registry';
@@ -98,10 +97,12 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = Gradient.fromElement(gradientDef, obj, {
-        ...this.options,
-        opacity: opacityAttr,
-      });
+      const gradient = classRegistry
+        .getSVGClass('gradient')
+        .fromElement(gradientDef, obj, {
+          ...this.options,
+          opacity: opacityAttr,
+        });
       obj.set(property, gradient);
     }
   };
