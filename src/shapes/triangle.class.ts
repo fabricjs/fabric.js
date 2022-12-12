@@ -54,6 +54,5 @@ export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
 Object.assign(Triangle.prototype, triangleDefaultValues);
 
 classRegistry.setClass(Triangle);
-classRegistry.setSVGClass(Triangle);
 
 fabric.Triangle = Triangle;
