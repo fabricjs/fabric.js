@@ -40,15 +40,6 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  // hasClass(classType: string): boolean;
-  // hasClass(data: Record<string, any>): boolean;
-  // hasClass(arg0: string | Record<string, any>): boolean {
-  //   if (typeof arg0 === 'object' && arg0.colorStops) {
-  //     arg0 = 'gradient';
-  //   }
-  //   return this[JSON].has(typeof arg0 === 'string' ? arg0 : arg0.type);
-  // }
-
   getClass<T extends object>(
     classType: string,
     strict?: true
