@@ -396,7 +396,6 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 Object.assign(Path.prototype, pathDefaultValues);
 
 classRegistry.setClass(Path);
-classRegistry.setSVGClass(Path);
 
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Path = Path;

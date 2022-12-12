@@ -1960,6 +1960,5 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 Object.assign(Text.prototype, textDefaultValues);
 
 classRegistry.setClass(Text);
-classRegistry.setSVGClass(Text);
 
 fabric.Text = Text;

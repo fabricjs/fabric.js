@@ -402,4 +402,3 @@ export class Gradient<
 fabric.Gradient = Gradient;
 
 classRegistry.setClass(Gradient, 'gradient');
-classRegistry.setSVGClass(Gradient, 'gradient');

@@ -55,7 +55,6 @@ export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
 Object.assign(Polygon.prototype, polygonDefaultValues);
 
 classRegistry.setClass(Polygon);
-classRegistry.setSVGClass(Polygon);
 
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Polygon = Polygon;

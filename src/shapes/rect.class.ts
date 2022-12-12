@@ -208,6 +208,5 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
 Object.assign(Rect.prototype, rectDefaultValues);
 
 classRegistry.setClass(Rect);
-classRegistry.setSVGClass(Rect);
 
 fabric.Rect = Rect;

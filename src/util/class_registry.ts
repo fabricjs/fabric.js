@@ -40,23 +40,36 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  getClass<T extends object>(
+  setClass<T extends object>(
+    classConstructor: Partial<
+      Pick<TJSONResolver<T> & TSVGResolver<T>, 'fromObject' | 'fromElement'>
+    > &
+      Constructor<T>,
+    key?: string
+  ) {
+    classConstructor.fromObject &&
+      this.setJSONClass(classConstructor as TJSONResolver<T>, key);
+    classConstructor.fromElement &&
+      this.setSVGClass(classConstructor as TSVGResolver<T>, key);
+  }
+
+  getJSONClass<T extends object>(
     classType: string,
     strict?: true
   ): ResolverReturnValue<TJSONResolver<T>>;
-  getClass<T extends object>(
+  getJSONClass<T extends object>(
     classType: string,
     strict: false
   ): ResolverReturnValue<TJSONResolver<T>, false>;
-  getClass<T extends object>(
+  getJSONClass<T extends object>(
     data: Record<string, any>,
     strict?: true
   ): ResolverReturnValue<TJSONResolver<T>>;
-  getClass<T extends object>(
+  getJSONClass<T extends object>(
     data: Record<string, any>,
     strict: false
   ): ResolverReturnValue<TJSONResolver<T>, false>;
-  getClass<T extends object, S extends boolean = true>(
+  getJSONClass<T extends object, S extends boolean = true>(
     arg0: string | Record<string, any>,
     strict: S = true as S
   ): ResolverReturnValue<TJSONResolver<T>, S> {
@@ -72,7 +85,7 @@ export class ClassRegistry {
     return constructor as ResolverReturnValue<TJSONResolver<T>, S>;
   }
 
-  setClass<T extends object>(
+  setJSONClass<T extends object>(
     classConstructor: TJSONResolver<T>,
     classType?: string
   ) {
@@ -104,6 +117,4 @@ export class ClassRegistry {
   }
 }
 
-const classRegistry = new ClassRegistry();
-
-export { classRegistry };
+export const classRegistry = new ClassRegistry();

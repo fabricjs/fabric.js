@@ -935,7 +935,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass<FabricObject>(
+    const prototype = classRegistry.getJSONClass<FabricObject>(
       object.type
     ).prototype;
     Object.keys(object).forEach(function (prop) {

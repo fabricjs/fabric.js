@@ -325,7 +325,6 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
 Object.assign(Line.prototype, lineDefaultValues);
 
 classRegistry.setClass(Line);
-classRegistry.setSVGClass(Line);
 
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Line = Line;

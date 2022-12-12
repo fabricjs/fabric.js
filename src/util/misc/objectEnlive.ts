@@ -85,7 +85,7 @@ export const enlivenObjects = <T extends object = FabricObject>(
     Promise.all(
       objects.map(async (obj) => {
         const fabricInstance = await classRegistry
-          .getClass<T>(obj.type)
+          .getJSONClass<T>(obj.type)
           .fromObject(obj, {
             signal,
             reviver,
@@ -133,7 +133,7 @@ export const enlivenObjectEnlivables = <
       const klass =
         value &&
         typeof value === 'object' &&
-        classRegistry.getClass(value, false);
+        classRegistry.getJSONClass(value, false);
       if (!klass) return;
       const instance = (await klass.fromObject(value, { signal })) as T;
       instances.push(instance);
