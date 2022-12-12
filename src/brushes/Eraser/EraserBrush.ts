@@ -28,11 +28,12 @@ type RestorationContext = {
  *
  * In order to support selective erasing, the brush clips the entire canvas
  * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
- * If brush is **inverted** it draws all erasable objects without their eraser over the erased path.
- * This achieves the desired effect of seeming to erase or uneraser only erasable objects.
+ * If brush is **inverted** it draws all objects, erasable objects without their eraser, over the erased path.
+ * This achieves the desired effect of seeming to erase or undo erasing only on erasable objects.
  * After erasing is done the created path is added to all intersected objects' `eraser` property.
  *
  * In order to update the EraserBrush's pattern while drawing call `preparePattern`.
+ * You will need to redraw the brush for it to properly update visuals, refer to {@link needsFullRender}.
  * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes (performance may suffer).
  *
  * @tutorial http://fabricjs.com/erasing
