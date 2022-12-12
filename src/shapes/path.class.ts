@@ -13,6 +13,7 @@ import {
   joinPath,
   makePathSimpler,
   parsePath,
+  type TPathSegmentsInfo,
 } from '../util/path';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
 
@@ -29,6 +30,8 @@ export class Path extends FabricObject {
   fromSVG?: boolean;
 
   sourcePath?: string;
+
+  segmentsInfo?: TPathSegmentsInfo[];
 
   /**
    * Constructor

@@ -31,7 +31,6 @@ export class InteractiveFabricObject<
    * interactive area of the corner.
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
-   * @memberOf fabric.Object.prototype
    */
   oCoords: Record<string, TOCoord> = {};
 
