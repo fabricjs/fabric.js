@@ -1,5 +1,6 @@
 //@ts-nocheck
 
+import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
   clipPaths,
@@ -13,7 +14,6 @@ import { getGradientDefs } from './getGradientDefs';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
 import { parseElements } from './parseElements';
 import { parseUseDirectives } from './parseUseDirectives';
-import { FabricObject } from '../shapes/fabricObject.class';
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -41,7 +41,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  let svgUid = FabricObject.__uid++,
+  let svgUid = uid(),
     i,
     len,
     options = applyViewboxTransform(doc),

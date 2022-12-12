@@ -1,11 +1,13 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
+import * as filters from '../filters';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
 import { cleanUpJsdomNode } from '../util/dom_misc';
+import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import {
@@ -110,7 +112,7 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters: Record<string, BaseFilter>;
+  static filters = filters;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
@@ -133,7 +135,7 @@ export class Image extends FabricObject {
   constructor(arg0: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];
-    this.cacheKey = `texture${FabricObject.__uid++}`;
+    this.cacheKey = `texture${uid()}`;
     this.set(options);
     this.setElement(
       (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
@@ -300,7 +302,7 @@ export class Image extends FabricObject {
       return [];
     }
     if (this.hasCrop()) {
-      const clipPathId = FabricObject.__uid++;
+      const clipPathId = uid();
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' +
@@ -720,14 +722,14 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters, resizeFilter, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
     const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: Image.filters };
+      filterOptions = { ...options, namespace: filters };
     return Promise.all([
       loadImage(src, imageOptions),
-      filters && enlivenObjects(filters, filterOptions),
+      f && enlivenObjects(f, filterOptions),
       resizeFilter && enlivenObjects([resizeFilter], filterOptions),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {

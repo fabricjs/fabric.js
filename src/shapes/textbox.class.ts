@@ -522,7 +522,6 @@ export class Textbox extends IText {
     return FabricObject._fromObject(
       Textbox,
       {
-        // spread object to prevent mutation
         ...object,
         styles: stylesFromArray(object.styles, object.text),
       },

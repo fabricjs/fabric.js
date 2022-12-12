@@ -1,10 +1,10 @@
-//@ts-nocheck
-import { ObjectEvents } from '../EventTypeDefs';
+// @ts-nocheck
 import { fabric } from '../../HEADER';
+import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { Point } from '../point.class';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import {
   invertTransform,
@@ -19,6 +19,7 @@ import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { Rect } from './rect.class';
 
 export type LayoutContextType =
   | 'initialization'
@@ -37,22 +38,14 @@ export type LayoutContext = {
   [key: string]: any;
 };
 
-export type LayoutResult = {
-  centerX: number;
-  centerY: number;
-  width: number;
-  height: number;
-};
-
-export type GroupEvents = ObjectEvents & {
-  layout: {
-    context: LayoutContext;
-    result: LayoutResult;
-    diff: Point;
+export type GroupEvents = ObjectEvents &
+  CollectionEvents & {
+    layout: {
+      context: LayoutContext;
+      result: LayoutResult;
+      diff: Point;
+    };
   };
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
-};
 
 export type LayoutStrategy =
   | 'fit-content'
@@ -993,7 +986,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     if (!this.backgroundColor) {
       return '';
     }
-    const fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+    const fillStroke = Rect.prototype._toSVG.call(this, reviver);
     const commons = fillStroke.indexOf('COMMON_PARTS');
     fillStroke[commons] = 'for="group" ';
     return fillStroke.join('');
