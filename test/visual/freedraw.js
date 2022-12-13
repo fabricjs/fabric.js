@@ -2274,7 +2274,7 @@ QUnit.module('Free Drawing', hooks => {
               brush.clipPath = clipPath;
               canvas.freeDrawingBrush = brush;
               canvas.isDrawingMode = true;
-              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
+              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
               return pointDrawer(pointsToCover, brush);
             },
             name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
@@ -2289,7 +2289,7 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
-  async function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false } = {}) {
+  async function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false, clip = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
     alpha && (brush.color = 'rgba(0,0,0,0.7)');
     const objects = [
@@ -2316,62 +2316,119 @@ QUnit.module('Free Drawing', hooks => {
     brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     if (inverted) {
-      await pointDrawer(pointsToCover, brush, true);
+      await pointDrawer(pointsToCover, brush, () => {
+        // run mouse up but don't add the path to canvas
+      });
+      brush.inverted = true;
+    }
+    if (clip) {
+      const clipPath = new fabric.Circle({
+        radius: 50,
+        inverted,
+        canvas
+      });
+      clipPath.center();
+      brush.clipPath = clipPath;
+    }
+    return pointDrawer(points, brush);
+  }
+
+  async function eraseBackground(canvas, { alpha = false, inverted = false, vpt = false, clip = false } = {}) {
+    const brush = new fabric.EraserBrush(canvas);
+    alpha && (brush.color = 'rgba(0,0,0,0.7)');
+    canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
+    canvas.backgroundImage = new fabric.Rect({
+      width: canvas.width,
+      height: canvas.height,
+      fill: 'blue'
+    });
+    canvas.backgroundVpt = vpt;
+    if (clip) {
+      const clipPath = new fabric.Circle({
+        radius: 50,
+        inverted,
+        canvas
+      });
+      clipPath.center();
+      brush.clipPath = clipPath;
+    }
+    brush.width = 8;
+    if (inverted) {
+      await pointDrawer(pointsToCover, brush, () => {
+        // run mouse up but don't add the path to canvas
+      });
       brush.inverted = true;
     }
     return pointDrawer(points, brush);
   }
 
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
-    const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}`;
-    const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
-    const main = !alpha && !inverted;
-    tests.push({
-      test: getTestName('Eraser brush'),
-      build: canvas => eraser(canvas, { alpha, inverted }),
-      name: getName('eraser'),
-      width: 200,
-      height: 250,
-      targets: {
-        main
-      },
-      onComplete: undefined
-    });
+    [true, false].forEach(clip => {
+      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}`;
+      const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
+      const main = !alpha && !inverted;
+      tests.push({
+        test: getTestName('Eraser brush'),
+        build: canvas => eraser(canvas, { alpha, inverted, clip }),
+        name: getName('eraser'),
+        width: 200,
+        height: 250,
+        targets: {
+          main
+        },
+        onComplete: undefined
+      });
 
-    tests.push({
-      test: getTestName('Eraser brush - custom stack ordering'),
-      build: canvas => eraser(canvas, { alpha, inverted, reverse: true }),
-      name: getName('eraser_custom_stack'),
-      width: 200,
-      height: 250,
-      targets: {
-        main
-      },
-      onComplete: undefined
-    });
+      tests.push({
+        test: getTestName('Eraser brush - custom stack ordering'),
+        build: canvas => eraser(canvas, { alpha, inverted, clip, reverse: true }),
+        name: getName('eraser_custom_stack'),
+        width: 200,
+        height: 250,
+        targets: {
+          main
+        },
+        onComplete: undefined
+      });
 
-    tests.push({
-      test: getTestName('Eraser brush - group with `erasable = true`'),
-      build: canvas => eraser(canvas, { alpha, inverted, group: true }),
-      name: getName('eraser_group'),
-      width: 200,
-      height: 250,
-      targets: {
-        top: false,
-      },
-      onComplete: undefined
-    });
+      tests.push({
+        test: getTestName('Eraser brush - group with `erasable = true`'),
+        build: canvas => eraser(canvas, { alpha, inverted, clip, group: true }),
+        name: getName('eraser_group'),
+        width: 200,
+        height: 250,
+        targets: {
+          top: false,
+        },
+        onComplete: undefined
+      });
 
-    tests.push({
-      test: getTestName('Eraser brush - group with `erasable = deep` should propagate eraser'),
-      build: canvas => eraser(canvas, { alpha, inverted, group: 'deep' }),
-      name: getName('eraser'),
-      width: 200,
-      height: 250,
-      targets: {
-        main
-      },
-      onComplete: undefined
+      tests.push({
+        test: getTestName('Eraser brush - group with `erasable = deep` should propagate eraser'),
+        build: canvas => eraser(canvas, { alpha, inverted, clip, group: 'deep' }),
+        name: getName('eraser'),
+        width: 200,
+        height: 250,
+        targets: {
+          main
+        },
+        onComplete: undefined
+      });
+
+      [true, false].forEach(vpt =>
+        tests.push({
+          test: getTestName('Eraser brush - backgroundVpt'),
+          build: async canvas => eraseBackground(canvas, { alpha, inverted, clip, vpt }),
+          name: `${getName('eraser_background')}${vpt ? '_vpt' : ''}`,
+          width: 200,
+          height: 250,
+          targets: {
+            main: false,
+            top: inverted && !vpt
+          },
+          onComplete: undefined
+        })      
+      );
     });
   });
 
