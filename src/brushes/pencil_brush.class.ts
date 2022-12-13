@@ -64,10 +64,10 @@ export class PencilBrush extends BaseBrush<Path> {
    * @param {Point} pointer
    */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
-    super.onMouseDown(pointer, ev);
     if (!this.canvas._isMainEvent(ev.e)) {
       return;
     }
+    super.onMouseDown(pointer, ev);
     this.drawStraightLine =
       !!this.straightLineKey && ev.e[this.straightLineKey];
     this._prepareForDrawing(pointer);
@@ -101,7 +101,7 @@ export class PencilBrush extends BaseBrush<Path> {
 
   onMouseUp({ e }: TEvent) {
     if (!this.canvas._isMainEvent(e)) {
-      return true;
+      return;
     }
     this.drawStraightLine = false;
     this.oldEnd = undefined;
