@@ -315,10 +315,6 @@ export class EraserBrush extends PencilBrush {
   }
 
   /**
-   * Rendering Logic:
-   * 1. Render brush with canvas pattern on top context
-   * 2. Use the top context to clip canvas
-   *
    * @override mask brush with pattern and clip main context
    */
   render(ctx?: CanvasRenderingContext2D) {
