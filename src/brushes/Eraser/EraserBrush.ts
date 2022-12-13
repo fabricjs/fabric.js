@@ -60,7 +60,7 @@ export class EraserBrush extends PencilBrush {
 
   private __disposer?: VoidFunction;
   private blockUpdating = false;
-  private shouldFullyRender: boolean;
+  private dirty: boolean;
 
   protected setImageSmoothing(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = true;
@@ -203,7 +203,7 @@ export class EraserBrush extends PencilBrush {
         (this.canvas[`${key as 'background' | 'overlay'}Image`] = drawable)
     );
     // mark as dirty
-    this.shouldFullyRender = true;
+    this.dirty = true;
   }
 
   /**
@@ -218,7 +218,7 @@ export class EraserBrush extends PencilBrush {
    * @override eraser isn't degraded by the alpha channel of {@link color}
    */
   protected needsFullRender() {
-    return this.shouldFullyRender || super.needsFullRender(false);
+    return this.dirty || super.needsFullRender(false);
   }
 
   /**
@@ -319,7 +319,7 @@ export class EraserBrush extends PencilBrush {
    * @override mask brush with pattern and clip main context
    */
   render(ctx?: CanvasRenderingContext2D) {
-    this.shouldFullyRender = false;
+    this.dirty = false;
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
