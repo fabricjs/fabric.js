@@ -2316,8 +2316,11 @@ QUnit.module('Free Drawing', hooks => {
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     if (inverted) {
       brush.width = 8;
-      await pointDrawer(pointsToCover, brush, () => {
-        // run mouse up but don't add the path to canvas
+      await new Promise(resolve => {
+        canvas.once('after:render', resolve);
+        pointDrawer(pointsToCover, brush, () => {
+          // run mouse up but don't add the path to canvas
+        });
       });
       brush.inverted = true;
     }
@@ -2355,8 +2358,11 @@ QUnit.module('Free Drawing', hooks => {
     }
     brush.width = 16;
     if (inverted) {
-      await pointDrawer(pointsToCover, brush, () => {
-        // run mouse up but don't add the path to canvas
+      await new Promise(resolve => {
+        canvas.once('after:render', resolve);
+        pointDrawer(pointsToCover, brush, () => {
+          // run mouse up but don't add the path to canvas
+        });
       });
       brush.inverted = true;
     }
@@ -2366,7 +2372,7 @@ QUnit.module('Free Drawing', hooks => {
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
     [true, false, 'inverted'].forEach(clip => {
       const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
-      const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
+      const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted, clip }, null, 2)})`;
       const main = !alpha && !inverted;
       tests.push({
         test: getTestName('Eraser brush'),
@@ -2424,7 +2430,7 @@ QUnit.module('Free Drawing', hooks => {
           width: 200,
           height: 250,
           targets: {
-            main,
+            main: (inverted || alpha) && !vpt,
             top: inverted && !vpt
           },
           onComplete: undefined
