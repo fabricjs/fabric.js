@@ -2316,13 +2316,15 @@ QUnit.module('Free Drawing', hooks => {
     brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     if (inverted) {
-      await pointDrawer(pointsToCover, brush, true);
+      await pointDrawer(pointsToCover, brush, () => {
+        // run mouse up but don't add the path to canvas
+      });
       brush.inverted = true;
     }
     return pointDrawer(points, brush);
   }
 
-  [{ alpha: true }, { alpha: false }, /*{ inverted: true }*/].forEach(({ alpha, inverted }) => {
+  [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
     const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}`;
     const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
     const main = !alpha && !inverted;
