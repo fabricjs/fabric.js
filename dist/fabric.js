@@ -26269,7 +26269,6 @@ class PencilBrush extends BaseBrush {
         // the bezier control point
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
-        ctx.restore();
     }
     /**
      * Decimate points array with the decimate value
@@ -26586,19 +26585,19 @@ class EraserBrush extends PencilBrush {
     _setBrushStyles(ctx) {
         super._setBrushStyles(ctx);
         ctx.strokeStyle = 'black';
-        if (ctx === this.canvas.getContext()) {
-            ctx.globalCompositeOperation = 'destination-out';
-            //  a hack that fixes #7984 by reducing path width
-            //  the case seems to be aliasing of paths
-            ctx.lineWidth = Math.max(this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(), 0);
-        }
+    }
+    prepareClippingContext() {
+        const ctx = this.canvas.getContext();
+        ctx.save();
+        this._setBrushStyles(ctx);
+        ctx.globalCompositeOperation = 'destination-out';
+        //  a hack that fixes #7984 by reducing path width
+        //  the case seems to be aliasing of paths
+        ctx.lineWidth = Math.max(this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(), 0);
+        return ctx;
     }
     needsFullRender() {
         return super.needsFullRender(false);
-    }
-    _reset() {
-        super._reset();
-        this._setBrushStyles(this.canvas.getContext());
     }
     _prepareForDrawing(pointer) {
         super._prepareForDrawing(pointer);
@@ -26626,7 +26625,9 @@ class EraserBrush extends PencilBrush {
     _renderCurve(ctx = this.canvas.contextTop) {
         const oldEnd = this.oldEnd;
         // clip main context
-        super._renderCurve(this.canvas.getContext());
+        const clip = this.prepareClippingContext();
+        super._renderCurve(clip);
+        clip.restore();
         // restore the value for rendering to occur
         this.oldEnd = oldEnd;
         // render brush and mask it with pattern
@@ -26640,7 +26641,9 @@ class EraserBrush extends PencilBrush {
      */
     render(ctx = this.canvas.contextTop) {
         //  clip main context
-        super.render(this.canvas.getContext(), false);
+        const clip = this.prepareClippingContext();
+        super.render(clip, false);
+        clip.restore();
         //  render brush and mask it with pattern
         super.render(ctx);
         this.renderPattern(ctx);
@@ -26912,7 +26915,6 @@ class SprayBrush extends BaseBrush {
         for (let i = 0; i < this.sprayChunks.length; i++) {
             this.drawChunk(ctx, this.sprayChunks[i]);
         }
-        ctx.restore();
     }
     /**
      * @param {Point} pointer
