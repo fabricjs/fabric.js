@@ -1565,7 +1565,8 @@ const stylesToArray = (styles, text) => {
  */
 const stylesFromArray = (styles, text) => {
     if (!Array.isArray(styles)) {
-        return styles;
+        // clone to prevent mutation
+        return clone(styles, true);
     }
     const textLines = text.split('\n'), stylesObject = {};
     let charIndex = -1, styleIndex = 0;
@@ -1635,6 +1636,106 @@ const isHTMLCanvas = (canvas) => {
  * @return {number}
  */
 const toFixed = (number, fractionDigits) => parseFloat(Number(number).toFixed(fractionDigits));
+
+/**
+ * Returns array of attributes for given svg that fabric parses
+ * @param {SVGElementName} type Type of svg element (eg. 'circle')
+ * @return {Array} string names of supported attributes
+ */
+const getSvgAttributes = (type) => {
+    const commonAttributes = ['instantiated_by_use', 'style', 'id', 'class'];
+    switch (type) {
+        case "linearGradient" /* SVGElementName.linearGradient */:
+            return commonAttributes.concat([
+                'x1',
+                'y1',
+                'x2',
+                'y2',
+                'gradientUnits',
+                'gradientTransform',
+            ]);
+        case 'radialGradient':
+            return commonAttributes.concat([
+                'gradientUnits',
+                'gradientTransform',
+                'cx',
+                'cy',
+                'r',
+                'fx',
+                'fy',
+                'fr',
+            ]);
+        case 'stop':
+            return commonAttributes.concat(['offset', 'stop-color', 'stop-opacity']);
+    }
+    return commonAttributes;
+};
+/**
+ * Converts from attribute value to pixel value if applicable.
+ * Returns converted pixels or original value not converted.
+ * @param {string} value number to operate on
+ * @param {number} fontSize
+ * @return {number}
+ */
+const parseUnit = (value, fontSize) => {
+    const unit = /\D{0,2}$/.exec(value), number = parseFloat(value);
+    if (!fontSize) {
+        fontSize = DEFAULT_SVG_FONT_SIZE;
+    }
+    const dpi = config.DPI;
+    switch (unit === null || unit === void 0 ? void 0 : unit[0]) {
+        case "mm" /* SupportedSVGUnit.mm */:
+            return (number * dpi) / 25.4;
+        case "cm" /* SupportedSVGUnit.cm */:
+            return (number * dpi) / 2.54;
+        case "in" /* SupportedSVGUnit.in */:
+            return number * dpi;
+        case "pt" /* SupportedSVGUnit.pt */:
+            return (number * dpi) / 72; // or * 4 / 3
+        case "pc" /* SupportedSVGUnit.pc */:
+            return ((number * dpi) / 72) * 12; // or * 16
+        case "em" /* SupportedSVGUnit.em */:
+            return number * fontSize;
+        default:
+            return number;
+    }
+};
+// align can be either none or undefined or a combination of mid/max
+const parseAlign = (align) => {
+    //divide align in alignX and alignY
+    if (align && align !== "none" /* MinMidMax.none */) {
+        return [align.slice(1, 4), align.slice(5, 8)];
+    }
+    else if (align === "none" /* MinMidMax.none */) {
+        return [align, align];
+    }
+    return ["Mid" /* MinMidMax.mid */, "Mid" /* MinMidMax.mid */];
+};
+/**
+ * Parse preserveAspectRatio attribute from element
+ * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio
+ * @param {string} attribute to be parsed
+ * @return {Object} an object containing align and meetOrSlice attribute
+ */
+const parsePreserveAspectRatioAttribute = (attribute) => {
+    const [firstPart, secondPart] = attribute.trim().split(' ');
+    const [alignX, alignY] = parseAlign(firstPart);
+    return {
+        meetOrSlice: secondPart || "meet" /* MeetOrSlice.meet */,
+        alignX,
+        alignY,
+    };
+};
+/**
+ * given an array of 6 number returns something like `"matrix(...numbers)"`
+ * @param {TMat2D} transform an array with 6 numbers
+ * @return {String} transform matrix for svg
+ */
+const matrixToSVG = (transform) => 'matrix(' +
+    transform
+        .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
+        .join(' ') +
+    ')';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`
@@ -8248,69 +8349,6 @@ Object.assign(Group.prototype, groupDefaultValues);
 fabric$1.Group = Group;
 
 /**
- * Returns array of attributes for given svg that fabric parses
- * @param {SVGElementName} type Type of svg element (eg. 'circle')
- * @return {Array} string names of supported attributes
- */
-const getSvgAttributes = (type) => {
-    const commonAttributes = ['instantiated_by_use', 'style', 'id', 'class'];
-    switch (type) {
-        case "linearGradient" /* SVGElementName.linearGradient */:
-            return commonAttributes.concat([
-                'x1',
-                'y1',
-                'x2',
-                'y2',
-                'gradientUnits',
-                'gradientTransform',
-            ]);
-        case 'radialGradient':
-            return commonAttributes.concat([
-                'gradientUnits',
-                'gradientTransform',
-                'cx',
-                'cy',
-                'r',
-                'fx',
-                'fy',
-                'fr',
-            ]);
-        case 'stop':
-            return commonAttributes.concat(['offset', 'stop-color', 'stop-opacity']);
-    }
-    return commonAttributes;
-};
-/**
- * Converts from attribute value to pixel value if applicable.
- * Returns converted pixels or original value not converted.
- * @param {string} value number to operate on
- * @param {number} fontSize
- * @return {number}
- */
-const parseUnit = (value, fontSize) => {
-    const unit = /\D{0,2}$/.exec(value), number = parseFloat(value);
-    if (!fontSize) {
-        fontSize = DEFAULT_SVG_FONT_SIZE;
-    }
-    const dpi = config.DPI;
-    switch (unit === null || unit === void 0 ? void 0 : unit[0]) {
-        case "mm" /* SupportedSVGUnit.mm */:
-            return (number * dpi) / 25.4;
-        case "cm" /* SupportedSVGUnit.cm */:
-            return (number * dpi) / 2.54;
-        case "in" /* SupportedSVGUnit.in */:
-            return number * dpi;
-        case "pt" /* SupportedSVGUnit.pt */:
-            return (number * dpi) / 72; // or * 4 / 3
-        case "pc" /* SupportedSVGUnit.pc */:
-            return ((number * dpi) / 72) * 12; // or * 16
-        case "em" /* SupportedSVGUnit.em */:
-            return number * fontSize;
-        default:
-            return number;
-    }
-};
-/**
  * Groups SVG elements (usually those retrieved from SVG document)
  * @static
  * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
@@ -8322,42 +8360,6 @@ const groupSVGElements = (elements) => {
     }
     return new Group(elements);
 };
-// align can be either none or undefined or a combination of mid/max
-const parseAlign = (align) => {
-    //divide align in alignX and alignY
-    if (align && align !== "none" /* MinMidMax.none */) {
-        return [align.slice(1, 4), align.slice(5, 8)];
-    }
-    else if (align === "none" /* MinMidMax.none */) {
-        return [align, align];
-    }
-    return ["Mid" /* MinMidMax.mid */, "Mid" /* MinMidMax.mid */];
-};
-/**
- * Parse preserveAspectRatio attribute from element
- * https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio
- * @param {string} attribute to be parsed
- * @return {Object} an object containing align and meetOrSlice attribute
- */
-const parsePreserveAspectRatioAttribute = (attribute) => {
-    const [firstPart, secondPart] = attribute.trim().split(' ');
-    const [alignX, alignY] = parseAlign(firstPart);
-    return {
-        meetOrSlice: secondPart || "meet" /* MeetOrSlice.meet */,
-        alignX,
-        alignY,
-    };
-};
-/**
- * given an array of 6 number returns something like `"matrix(...numbers)"`
- * @param {TMat2D} transform an array with 6 numbers
- * @return {String} transform matrix for svg
- */
-const matrixToSVG = (transform) => 'matrix(' +
-    transform
-        .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
-        .join(' ') +
-    ')';
 
 /**
  * Finds the scale for the object source to fit inside the object destination,
@@ -8834,10 +8836,7 @@ const makePathSimpler = (path) => {
 const calcLineLength = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 const getPointOnCubicBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
     const c1 = CB1(pct), c2 = CB2(pct), c3 = CB3(pct), c4 = CB4(pct);
-    return {
-        x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-        y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4,
-    };
+    return new Point(p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4, p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4);
 };
 const QB1 = (t) => t ** 2;
 const QB2 = (t) => 2 * t * (1 - t);
@@ -8848,19 +8847,16 @@ const getTangentCubicIterator = (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct
 };
 const getPointOnQuadraticBezierIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
     const c1 = QB1(pct), c2 = QB2(pct), c3 = QB3(pct);
-    return {
-        x: p3x * c1 + p2x * c2 + p1x * c3,
-        y: p3y * c1 + p2y * c2 + p1y * c3,
-    };
+    return new Point(p3x * c1 + p2x * c2 + p1x * c3, p3y * c1 + p2y * c2 + p1y * c3);
 };
 const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
     const invT = 1 - pct, tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)), tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
     return Math.atan2(tangentY, tangentX);
 };
-// this will run over a path segment ( a cubic or quadratic segment) and approximate it
-// with 100 segemnts. This will good enough to calculate the length of the curve
+// this will run over a path segment (a cubic or quadratic segment) and approximate it
+// with 100 segments. This will good enough to calculate the length of the curve
 const pathIterator = (iterator, x1, y1) => {
-    let tempP = { x: x1, y: y1 }, tmpLen = 0;
+    let tempP = new Point(x1, y1), tmpLen = 0;
     for (let perc = 1; perc <= 100; perc += 1) {
         const p = iterator(perc / 100);
         tmpLen += calcLineLength(tempP.x, tempP.y, p.x, p.y);
@@ -8901,10 +8897,9 @@ const findPercentageForDistance = (segInfo, distance) => {
     return p;
 };
 /**
- * Run over a parsed and simplifed path and extract some informations.
- * informations are length of each command and starting point
- * @param {Array} path fabricJS parsed path commands
- * @return {Array} path commands informations
+ * Run over a parsed and simplified path and extract some information (length of each command and starting point)
+ * @param {PathData} path parsed path commands
+ * @return {Array} path commands information
  */
 const getPathSegmentsInfo = (path) => {
     let totalLength = 0, current, 
@@ -8965,10 +8960,7 @@ const getPathSegmentsInfo = (path) => {
     info.push({ length: totalLength, x: x1, y: y1 });
     return info;
 };
-const getPointOnPath = (path, distance, infos) => {
-    if (!infos) {
-        infos = getPathSegmentsInfo(path);
-    }
+const getPointOnPath = (path, distance, infos = getPathSegmentsInfo(path)) => {
     let i = 0;
     while (distance - infos[i].length > 0 && i < infos.length - 2) {
         distance -= infos[i].length;
@@ -14669,7 +14661,7 @@ class StaticCanvas extends createCollectionMixin((CommonMethods)) {
      * @param {CanvasRenderingContext2D} ctx
      * @param {Array} objects to render
      */
-    renderCanvas(ctx, objects) {
+    renderCanvas(ctx, objects, { fireEvents = true, drawControls: controls = this.interactive, } = {}) {
         if (this.destroyed) {
             return;
         }
@@ -14680,14 +14672,14 @@ class StaticCanvas extends createCollectionMixin((CommonMethods)) {
         // node-canvas
         // @ts-ignore
         ctx.patternQuality = 'best';
-        this.fire('before:render', { ctx: ctx });
+        fireEvents && this.fire('before:render', { ctx: ctx });
         this._renderBackground(ctx);
         ctx.save();
         //apply viewport transform once for all rendering process
         ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         this._renderObjects(ctx, objects);
         ctx.restore();
-        if (!this.controlsAboveOverlay && this.interactive) {
+        if (!this.controlsAboveOverlay && controls) {
             this.drawControls(ctx);
         }
         if (path) {
@@ -14699,10 +14691,10 @@ class StaticCanvas extends createCollectionMixin((CommonMethods)) {
             this.drawClipPathOnCanvas(ctx, path);
         }
         this._renderOverlay(ctx);
-        if (this.controlsAboveOverlay && this.interactive) {
+        if (this.controlsAboveOverlay && controls) {
             this.drawControls(ctx);
         }
-        this.fire('after:render', { ctx: ctx });
+        fireEvents && this.fire('after:render', { ctx: ctx });
         if (this.__cleanupTask) {
             this.__cleanupTask();
             this.__cleanupTask = undefined;
@@ -20815,6 +20807,17 @@ class TextStyleMixin extends FabricObject {
 }
 
 // @ts-nocheck
+let measuringContext;
+/**
+ * Return a context for measurement of text string.
+ * if created it gets stored for reuse
+ */
+function getMeasuringContext() {
+    if (!measuringContext) {
+        measuringContext = createCanvasElement().getContext('2d');
+    }
+    return measuringContext;
+}
 const additionalProps = [
     'fontFamily',
     'fontWeight',
@@ -20847,15 +20850,6 @@ class Text extends TextStyleMixin {
     constructor(text, options) {
         super(Object.assign(Object.assign({}, options), { text, styles: (options === null || options === void 0 ? void 0 : options.styles) || {} }));
         /**
-         * Reference to a context to measure text char or couple of chars
-         * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
-         * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
-         * text object created.
-         * @type {CanvasRenderingContext2D}
-         * @default
-         */
-        this._measuringContext = null;
-        /**
          * contains characters bounding boxes
          */
         this.__charBounds = [];
@@ -20865,6 +20859,7 @@ class Text extends TextStyleMixin {
         }
         this.initDimensions();
         this.setCoords();
+        // @ts-ignore
         this.setupState({ propertySet: '_dimensionAffectingProps' });
     }
     /**
@@ -20876,22 +20871,6 @@ class Text extends TextStyleMixin {
         if (path) {
             path.segmentsInfo = getPathSegmentsInfo(path.path);
         }
-    }
-    /**
-     * Return a context for measurement of text string.
-     * if created it gets stored for reuse
-     * this is for internal use, please do not use it
-     * @private
-     * @param {String} text Text string
-     * @param {Object} [options] Options object
-     */
-    getMeasuringContext() {
-        if (!fabric$1._measuringContext) {
-            fabric$1._measuringContext =
-                (this.canvas && this.canvas.contextCache) ||
-                    createCanvasElement().getContext('2d');
-        }
-        return fabric$1._measuringContext;
     }
     /**
      * @private
@@ -20911,9 +20890,6 @@ class Text extends TextStyleMixin {
      * Does not return dimensions.
      */
     initDimensions() {
-        if (this.__skipDimension) {
-            return;
-        }
         this._splitText();
         this._clearCache();
         if (this.path) {
@@ -20929,6 +20905,7 @@ class Text extends TextStyleMixin {
             // once text is measured we need to make space fatter to make justified text.
             this.enlargeSpaces();
         }
+        // @ts-ignore
         this.saveState({ propertySet: '_dimensionAffectingProps' });
     }
     /**
@@ -20948,7 +20925,7 @@ class Text extends TextStyleMixin {
                 (spaces = this.textLines[i].match(this._reSpacesAndTabs))) {
                 numberOfSpaces = spaces.length;
                 diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
-                for (let j = 0, jlen = line.length; j <= jlen; j++) {
+                for (let j = 0; j <= line.length; j++) {
                     charBound = this.__charBounds[i][j];
                     if (this._reSpaceAndTab.test(line[j])) {
                         charBound.width += diffSpace;
@@ -21010,13 +20987,7 @@ class Text extends TextStyleMixin {
      * @return {String} String representation of text object
      */
     toString() {
-        return ('#<Text (' +
-            this.complexity() +
-            '): { "text": "' +
-            this.text +
-            '", "fontFamily": "' +
-            this.fontFamily +
-            '" }>');
+        return `#<Text (${this.complexity()}): { "text": "${this.text}", "fontFamily": "${this.fontFamily}" }>`;
     }
     /**
      * Return the dimension and the zoom level needed to create a cache canvas
@@ -21075,7 +21046,7 @@ class Text extends TextStyleMixin {
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
     _setTextStyles(ctx, charStyle, forMeasuring) {
-        ctx.textBaseline = 'alphabetical';
+        ctx.textBaseline = 'alphabetic';
         if (this.path) {
             switch (this.pathAlign) {
                 case 'center':
@@ -21199,7 +21170,7 @@ class Text extends TextStyleMixin {
      */
     _measureChar(_char, charStyle, previousChar, prevCharStyle) {
         const fontCache = cache.getFontCache(charStyle), fontDeclaration = this._getFontDeclaration(charStyle), previousFontDeclaration = this._getFontDeclaration(prevCharStyle), couple = previousChar + _char, stylesAreEqual = fontDeclaration === previousFontDeclaration, fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
-        let width, coupleWidth, previousWidth, kernedWidth, ctx;
+        let width, coupleWidth, previousWidth, kernedWidth;
         if (previousChar && fontCache[previousChar] !== undefined) {
             previousWidth = fontCache[previousChar];
         }
@@ -21213,7 +21184,7 @@ class Text extends TextStyleMixin {
         if (width === undefined ||
             previousWidth === undefined ||
             coupleWidth === undefined) {
-            ctx = this.getMeasuringContext();
+            const ctx = getMeasuringContext();
             // send a TRUE to specify measuring font size CACHE_FONT_SIZE
             this._setTextStyles(ctx, charStyle, true);
             if (width === undefined) {
@@ -21248,7 +21219,6 @@ class Text extends TextStyleMixin {
     /**
      * measure a text line measuring all characters.
      * @param {Number} lineIndex line number
-     * @return {Number} Line width
      */
     measureLine(lineIndex) {
         const lineInfo = this._measureLine(lineIndex);
@@ -21285,7 +21255,7 @@ class Text extends TextStyleMixin {
             kernedWidth: 0,
             height: this.fontSize,
         };
-        if (path) {
+        if (path && path.segmentsInfo) {
             let positionInPath = 0;
             const totalPathLength = path.segmentsInfo[path.segmentsInfo.length - 1].length;
             const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
@@ -21355,10 +21325,10 @@ class Text extends TextStyleMixin {
             kernedWidth += charSpacing;
         }
         const box = {
-            width: width,
+            width,
             left: 0,
             height: style.fontSize,
-            kernedWidth: kernedWidth,
+            kernedWidth,
             deltaY: style.deltaY,
         };
         if (charIndex > 0 && !skipLeft) {
@@ -21377,7 +21347,7 @@ class Text extends TextStyleMixin {
         if (this.__lineHeights[lineIndex]) {
             return this.__lineHeights[lineIndex];
         }
-        // char 0 is measured before the line cycle because it nneds to char
+        // char 0 is measured before the line cycle because it needs to char
         // emptylines
         let maxHeight = this.getHeightOfChar(lineIndex, 0);
         for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
@@ -21483,7 +21453,7 @@ class Text extends TextStyleMixin {
         if (shortCut) {
             // render all the line in one pass without checking
             // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
-            this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top, lineHeight);
+            this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top);
             ctx.restore();
             return;
         }
@@ -21515,12 +21485,12 @@ class Text extends TextStyleMixin {
                     ctx.save();
                     ctx.translate(charBox.renderLeft, charBox.renderTop);
                     ctx.rotate(charBox.angle);
-                    this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0, lineHeight);
+                    this._renderChar(method, ctx, lineIndex, i, charsToRender, -boxWidth / 2, 0);
                     ctx.restore();
                 }
                 else {
                     drawingLeft = left;
-                    this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top, lineHeight);
+                    this._renderChar(method, ctx, lineIndex, i, charsToRender, drawingLeft, top);
                 }
                 charsToRender = '';
                 actualStyle = nextStyle;
@@ -21554,7 +21524,7 @@ class Text extends TextStyleMixin {
         pCtx.lineTo(0, height);
         pCtx.closePath();
         pCtx.translate(width / 2, height / 2);
-        pCtx.fillStyle = filler.toLive(pCtx);
+        pCtx.fillStyle = filler.toLive(pCtx) || '';
         this._applyPatternGradientTransform(pCtx, filler);
         pCtx.fill();
         return pCtx.createPattern(pCanvas, 'no-repeat');
@@ -21577,7 +21547,7 @@ class Text extends TextStyleMixin {
             }
             else {
                 // is a simple gradient or pattern
-                ctx[property] = filler.toLive(ctx, this);
+                ctx[property] = filler.toLive(ctx, this) || '';
                 return this._applyPatternGradientTransform(ctx, filler);
             }
         }
@@ -21587,16 +21557,16 @@ class Text extends TextStyleMixin {
         }
         return { offsetX: 0, offsetY: 0 };
     }
-    _setStrokeStyles(ctx, decl) {
-        ctx.lineWidth = decl.strokeWidth;
+    _setStrokeStyles(ctx, { stroke, strokeWidth }) {
+        ctx.lineWidth = strokeWidth;
         ctx.lineCap = this.strokeLineCap;
         ctx.lineDashOffset = this.strokeDashOffset;
         ctx.lineJoin = this.strokeLineJoin;
         ctx.miterLimit = this.strokeMiterLimit;
-        return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
+        return this.handleFiller(ctx, 'strokeStyle', stroke);
     }
-    _setFillStyles(ctx, decl) {
-        return this.handleFiller(ctx, 'fillStyle', decl.fill);
+    _setFillStyles(ctx, { fill }) {
+        return this.handleFiller(ctx, 'fillStyle', fill);
     }
     /**
      * @private
@@ -21734,8 +21704,7 @@ class Text extends TextStyleMixin {
         if (this.__lineWidths[lineIndex] !== undefined) {
             return this.__lineWidths[lineIndex];
         }
-        const lineInfo = this.measureLine(lineIndex);
-        const width = lineInfo.width;
+        const { width } = this.measureLine(lineIndex);
         this.__lineWidths[lineIndex] = width;
         return width;
     }
@@ -21852,7 +21821,7 @@ class Text extends TextStyleMixin {
             family.indexOf('"') > -1 ||
             fontIsGeneric
             ? style.fontFamily
-            : '"' + style.fontFamily + '"';
+            : `"${style.fontFamily}"`;
         return [
             // node-canvas needs "weight style", while browsers need "style weight"
             // verify if this can be fixed in JSDOM
@@ -21917,14 +21886,8 @@ class Text extends TextStyleMixin {
      * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
      * @return {Object} Object representation of an instance
      */
-    toObject(propertiesToInclude) {
-        const allProperties = additionalProps.concat(propertiesToInclude);
-        const obj = super.toObject(allProperties);
-        obj.styles = stylesToArray(this.styles, this.text);
-        if (obj.path) {
-            obj.path = this.path.toObject();
-        }
-        return obj;
+    toObject(propertiesToInclude = []) {
+        return Object.assign(Object.assign(Object.assign({}, super.toObject([...additionalProps, ...propertiesToInclude])), { styles: stylesToArray(this.styles, this.text) }), (this.path ? { path: this.path.toObject() } : {}));
     }
     set(key, value) {
         super.set(key, value);
@@ -21972,7 +21935,7 @@ class Text extends TextStyleMixin {
         if (!element) {
             return callback(null);
         }
-        const parsedAttributes = fabric$1.parseAttributes(element, Text.ATTRIBUTE_NAMES), parsedAnchor = parsedAttributes.textAnchor || 'left';
+        const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES), parsedAnchor = parsedAttributes.textAnchor || 'left';
         options = Object.assign({}, options, parsedAttributes);
         options.top = options.top || 0;
         options.left = options.left || 0;
@@ -22048,10 +22011,7 @@ class Text extends TextStyleMixin {
      * @returns {Promise<Text>}
      */
     static fromObject(object) {
-        const styles = stylesFromArray(object.styles, object.text);
-        //copy object to prevent mutation
-        const objCopy = Object.assign({}, object, { styles: styles });
-        return FabricObject._fromObject(Text, objCopy, {
+        return FabricObject._fromObject(Text, Object.assign(Object.assign({}, object), { styles: stylesFromArray(object.styles, object.text) }), {
             extraParam: 'text',
         });
     }
@@ -22070,7 +22030,7 @@ Text.genericFonts = [
  * @memberOf Text
  * @see: http://www.w3.org/TR/SVG/text.html#TextElement
  */
-Text.ATTRIBUTE_NAMES = fabric$1.SHARED_ATTRIBUTES.concat('x y dx dy font-family font-style font-weight font-size letter-spacing text-decoration text-anchor'.split(' '));
+Text.ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat('x', 'y', 'dx', 'dy', 'font-family', 'font-style', 'font-weight', 'font-size', 'letter-spacing', 'text-decoration', 'text-anchor');
 const textDefaultValues = {
     _dimensionAffectingProps: [
         'fontSize',
@@ -24559,10 +24519,7 @@ class IText extends ITextClickBehaviorMixin {
      * @returns {Promise<IText>}
      */
     static fromObject(object) {
-        const styles = stylesFromArray(object.styles, object.text);
-        //copy object to prevent mutation
-        const objCopy = Object.assign({}, object, { styles: styles });
-        return FabricObject._fromObject(IText, objCopy, {
+        return FabricObject._fromObject(IText, Object.assign(Object.assign({}, object), { styles: stylesFromArray(object.styles, object.text) }), {
             extraParam: 'text',
         });
     }
@@ -25193,10 +25150,7 @@ class Textbox extends IText {
      * @returns {Promise<Textbox>}
      */
     static fromObject(object) {
-        const styles = stylesFromArray(object.styles, object.text);
-        //copy object to prevent mutation
-        const objCopy = Object.assign({}, object, { styles: styles });
-        return FabricObject$1._fromObject(Textbox, objCopy, {
+        return FabricObject$1._fromObject(Textbox, Object.assign(Object.assign({}, object), { styles: stylesFromArray(object.styles, object.text) }), {
             extraParam: 'text',
         });
     }
@@ -26151,10 +26105,10 @@ class PencilBrush extends BaseBrush {
      * @param {Point} pointer
      */
     onMouseDown(pointer, ev) {
-        super.onMouseDown(pointer, ev);
         if (!this.canvas._isMainEvent(ev.e)) {
             return;
         }
+        super.onMouseDown(pointer, ev);
         this.drawStraightLine =
             !!this.straightLineKey && ev.e[this.straightLineKey];
         this._prepareForDrawing(pointer);
@@ -26180,7 +26134,7 @@ class PencilBrush extends BaseBrush {
     }
     onMouseUp({ e }) {
         if (!this.canvas._isMainEvent(e)) {
-            return true;
+            return;
         }
         this.drawStraightLine = false;
         this.oldEnd = undefined;
@@ -26428,14 +26382,18 @@ async function addPathToObjectEraser(object, path, context, applyTransform, fire
  * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity.
  *
  * In order to support selective erasing, the brush clips the entire canvas
- * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
- * If brush is **inverted** it draws all objects, erasable objects without their eraser, over the erased path.
- * This achieves the desired effect of seeming to erase or undo erasing only on erasable objects.
- * After erasing is done the created path is added to all intersected objects' `eraser` property.
+ * after drawing all non-erasable objects over the erased path using a pattern {@link preparePattern} brush so to speak (masking).
+ * Rendering Logic:
+ * 1. Render brush with pattern on top context
+ * 2. Use the top context to clip the main context
  *
- * In order to update the EraserBrush's pattern while drawing call `preparePattern`.
- * You will need to redraw the brush for it to properly update visuals, refer to {@link needsFullRender}.
- * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes (performance may suffer).
+ * If **{@link inverted}** draws all objects, erasable objects without their eraser, over the erased path.
+ * This achieves the desired effect of seeming to erase or undo erasing only on erasable objects.
+ *
+ * After erasing is done the created path is added to all intersected objects' `eraser` property {@link finalizeErasing}.
+ *
+ * The {@link updating} flag controls whether the pattern updates while drawing (performance may suffer).
+ * It is crucial in order to reflect visual changes made to canvas after erasing started (i.e animations).
  *
  * @tutorial http://fabricjs.com/erasing
  */
@@ -26444,16 +26402,18 @@ class EraserBrush extends PencilBrush {
         super(...arguments);
         /**
          * When set to `true` the brush will create a visual effect of undoing erasing
-         * @type boolean
          */
         this.inverted = false;
         /**
-         * Used to fix #7984
-         * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
-         * @type number
+         * Indicates whether the eraser updates continuously on canvas rendering
+         * Performance may suffer, handle manually if so
          */
-        this.erasingWidthAliasing = 4;
-        this._isErasing = false;
+        this.updating = true;
+        this.blockUpdating = false;
+    }
+    setImageSmoothing(ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
     }
     /**
      * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
@@ -26468,13 +26428,13 @@ class EraserBrush extends PencilBrush {
      * @param {CanvasRenderingContext2D} ctx
      * @param {RestorationContext} restorationContext
      */
-    prepareCollectionTraversal(collection, objects, ctx, restorationContext) {
+    prepareCollectionTraversal(collection, objects, restorationContext) {
         const alpha = 1 - new Color(this.color).getAlpha();
         objects.forEach((object) => {
             let dirty = false;
             if (isCollection(object) && object.erasable === 'deep') {
                 //  traverse
-                this.prepareCollectionTraversal(object, object._objects, ctx, restorationContext);
+                this.prepareCollectionTraversal(object, object._objects, restorationContext);
             }
             else if (!this.inverted && object.erasable && !object.isNotVisible()) {
                 //  render only non-erasable objects
@@ -26500,40 +26460,15 @@ class EraserBrush extends PencilBrush {
             }
         });
     }
-    renderObjectsOnPattern(ctx, objects) {
-        ctx.save();
-        ctx.transform(...this.canvas.viewportTransform);
-        const restorationContext = {
-            visibility: [],
-            eraser: [],
-            collection: [],
-        };
-        this.prepareCollectionTraversal(this.canvas, objects, ctx, restorationContext);
-        this.canvas._renderObjects(ctx, objects);
-        restorationContext.visibility.forEach(([obj, opacity]) => {
-            obj.opacity = opacity;
-        });
-        restorationContext.eraser.forEach(([obj, eraser]) => {
-            obj.eraser = eraser;
-            obj.dirty = true;
-        });
-        restorationContext.collection.forEach((obj) => {
-            obj.dirty = true;
-        });
-        ctx.restore();
-    }
-    renderDrawableOnPattern(ctx, key) {
+    prepareCanvasDrawable(key, restorationContext) {
         const drawableKey = `${key}Image`;
-        const method = `_render${capitalize(key)}`;
-        const drawable = this.canvas[drawableKey], bgErasable = drawable && isObjectErasable(drawable);
+        const drawable = this.canvas[drawableKey];
+        const isErasable = drawable && isObjectErasable(drawable);
         if (!this.inverted &&
-            ((drawable && !bgErasable) || !!this.canvas[`${key}Color`])) {
-            if (bgErasable) {
+            ((drawable && !isErasable) || !!this.canvas[`${key}Color`])) {
+            if (isErasable) {
                 this.canvas[drawableKey] = undefined;
-            }
-            this.canvas[method](ctx);
-            if (bgErasable) {
-                this.canvas[drawableKey] = drawable;
+                restorationContext.drawables[key] = drawable;
             }
         }
         else if (this.inverted) {
@@ -26541,11 +26476,7 @@ class EraserBrush extends PencilBrush {
             if (eraser) {
                 drawable.eraser = undefined;
                 drawable.dirty = true;
-            }
-            this.canvas[method](ctx);
-            if (eraser) {
-                drawable.eraser = eraser;
-                drawable.dirty = true;
+                restorationContext.eraser.push([drawable, eraser]);
             }
         }
     }
@@ -26564,20 +26495,40 @@ class EraserBrush extends PencilBrush {
         canvas.width = this.canvas.width;
         canvas.height = this.canvas.height;
         const patternCtx = canvas.getContext('2d');
+        this.setImageSmoothing(patternCtx);
+        // retina
         if (this.canvas._isRetinaScaling()) {
             this.canvas.__initRetinaScaling(this.canvas.getRetinaScaling(), canvas, patternCtx);
         }
-        this.renderDrawableOnPattern(patternCtx, 'background');
-        this.renderObjectsOnPattern(patternCtx, objects);
-        this.renderDrawableOnPattern(patternCtx, 'overlay');
-    }
-    renderPattern(ctx) {
-        const s = 1 / this.canvas.getRetinaScaling();
-        ctx.save();
-        ctx.scale(s, s);
-        ctx.globalCompositeOperation = 'source-in';
-        ctx.drawImage(this.patternCanvas, 0, 0);
-        ctx.restore();
+        // prepare tree
+        const restorationContext = {
+            visibility: [],
+            eraser: [],
+            collection: [],
+            drawables: {},
+        };
+        this.prepareCollectionTraversal(this.canvas, objects, restorationContext);
+        this.prepareCanvasDrawable('background', restorationContext);
+        this.prepareCanvasDrawable('overlay', restorationContext);
+        // render
+        this.canvas.renderCanvas(patternCtx, objects, {
+            fireEvents: false,
+            drawControls: false,
+        });
+        // restore
+        restorationContext.visibility.forEach(([obj, opacity]) => {
+            obj.opacity = opacity;
+        });
+        restorationContext.eraser.forEach(([obj, eraser]) => {
+            obj.eraser = eraser;
+            obj.dirty = true;
+        });
+        restorationContext.collection.forEach((obj) => {
+            obj.dirty = true;
+        });
+        Object.entries(restorationContext.drawables).forEach(([key, drawable]) => (this.canvas[`${key}Image`] = drawable));
+        // mark as dirty
+        this.dirty = true;
     }
     /**
      * @override
@@ -26586,67 +26537,102 @@ class EraserBrush extends PencilBrush {
         super._setBrushStyles(ctx);
         ctx.strokeStyle = 'black';
     }
-    prepareClippingContext() {
-        const ctx = this.canvas.getContext();
-        ctx.save();
-        this._setBrushStyles(ctx);
-        ctx.globalCompositeOperation = 'destination-out';
-        //  a hack that fixes #7984 by reducing path width
-        //  the case seems to be aliasing of paths
-        ctx.lineWidth = Math.max(this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(), 0);
-        return ctx;
-    }
+    /**
+     * @override eraser isn't degraded by the alpha channel of {@link color}
+     */
     needsFullRender() {
-        return super.needsFullRender(false);
+        return this.dirty || super.needsFullRender(false);
     }
-    _prepareForDrawing(pointer) {
-        super._prepareForDrawing(pointer);
-        this.canvas.getContext().moveTo(pointer.x, pointer.y);
+    /**
+     * called from the `after:render` event subscriber
+     */
+    onUpdate() {
+        this.preparePattern();
+        this.render();
     }
+    /**
+     * @override prepare pattern, subscribe for updates and fire `erasing:start`
+     */
     onMouseDown(pointer, ev) {
         if (this.canvas._isMainEvent(ev.e)) {
             //  prepare for erasing
             this.preparePattern();
-            this._isErasing = true;
+            this.__disposer = this.canvas.on('after:render', () => {
+                this.updating && !this.blockUpdating && this.onUpdate();
+            });
             this.canvas.fire('erasing:start');
         }
         super.onMouseDown(pointer, ev);
     }
+    /**
+     * @override when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
+     */
     onPointAdded() {
-        if (this.needsFullRender()) {
-            // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
-            this.drawStraightLine && this.canvas.renderAll();
-            this.render();
+        if (this.drawStraightLine) {
+            this.blockUpdating = true;
+            this.canvas.renderAll();
+            this.blockUpdating = false;
         }
-        else {
-            this._renderCurve();
+        super.onPointAdded();
+    }
+    /**
+     * @override dispose of update subscriber {@link __disposer}
+     */
+    onMouseUp(ev) {
+        super.onMouseUp(ev);
+        if (this.__disposer) {
+            this.__disposer();
+            this.__disposer = undefined;
         }
     }
+    /**
+     * render pattern on top context
+     */
+    renderPattern(ctx = this.canvas.contextTop) {
+        const s = 1 / this.canvas.getRetinaScaling();
+        ctx.save();
+        this.setImageSmoothing(ctx);
+        ctx.scale(s, s);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.drawImage(this.patternCanvas, 0, 0);
+        ctx.restore();
+    }
+    /**
+     * clip main context with top context after brush has been drawn onto it
+     */
+    clipContext(destination = this.canvas.getContext(), source = this.canvas.contextTop) {
+        const s = 1 / this.canvas.getRetinaScaling();
+        destination.save();
+        this.setImageSmoothing(destination);
+        destination.scale(s, s);
+        destination.globalCompositeOperation = 'destination-out';
+        destination.drawImage(source.canvas, 0, 0);
+        destination.restore();
+    }
+    /**
+     * @override mask brush with pattern and clip main context
+     */
     _renderCurve(ctx = this.canvas.contextTop) {
-        const oldEnd = this.oldEnd;
-        // clip main context
-        const clip = this.prepareClippingContext();
-        super._renderCurve(clip);
-        clip.restore();
-        // restore the value for rendering to occur
-        this.oldEnd = oldEnd;
         // render brush and mask it with pattern
         super._renderCurve(ctx);
         this.renderPattern(ctx);
+        //  clip main context
+        this.clipContext(this.canvas.getContext(), ctx);
     }
     /**
      * Rendering Logic:
-     * 1. Use brush to clip canvas by rendering it on top of canvas
-     * 2. Render brush with canvas pattern on top context
+     * 1. Render brush with canvas pattern on top context
+     * 2. Use the top context to clip canvas
+     *
+     * @override mask brush with pattern and clip main context
      */
-    render(ctx = this.canvas.contextTop) {
-        //  clip main context
-        const clip = this.prepareClippingContext();
-        super.render(clip, false);
-        clip.restore();
+    render(ctx) {
+        this.dirty = false;
         //  render brush and mask it with pattern
         super.render(ctx);
         this.renderPattern(ctx);
+        //  clip main context
+        this.clipContext(this.canvas.getContext(), ctx);
     }
     finalizeShape() {
         const path = super.finalizeShape();
@@ -26696,6 +26682,10 @@ class EraserBrush extends PencilBrush {
                 context.drawables[drawableKey] = dContext;
             }));
     }
+    /**
+     * propagate eraser path to all affected {@link FabricObject}
+     * @param path eraser path
+     */
     async finalizeErasing(path) {
         const context = {
             targets: [],
@@ -26711,6 +26701,9 @@ class EraserBrush extends PencilBrush {
         await Promise.all(tasks);
         return context;
     }
+    /**
+     * @override finalize erasing and fire `erasing:end`
+     */
     async onEnd(result) {
         this.canvas.fire('erasing:end', result ? await this.finalizeErasing(result) : undefined);
         super.onEnd(result);
