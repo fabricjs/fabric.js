@@ -2324,7 +2324,7 @@ QUnit.module('Free Drawing', hooks => {
     if (clip) {
       const clipPath = new fabric.Circle({
         radius: 50,
-        inverted,
+        inverted: clip === 'inverted',
         canvas
       });
       clipPath.center();
@@ -2347,7 +2347,7 @@ QUnit.module('Free Drawing', hooks => {
     if (clip) {
       const clipPath = new fabric.Circle({
         radius: 50,
-        inverted,
+        inverted: clip === 'inverted',
         canvas
       });
       clipPath.center();
@@ -2364,8 +2364,8 @@ QUnit.module('Free Drawing', hooks => {
   }
 
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
-    [true, false].forEach(clip => {
-      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}`;
+    [true, false, 'inverted'].forEach(clip => {
+      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
       const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
       const main = !alpha && !inverted;
       tests.push({
@@ -2424,11 +2424,11 @@ QUnit.module('Free Drawing', hooks => {
           width: 200,
           height: 250,
           targets: {
-            main: false,
+            main,
             top: inverted && !vpt
           },
           onComplete: undefined
-        })      
+        })
       );
     });
   });
