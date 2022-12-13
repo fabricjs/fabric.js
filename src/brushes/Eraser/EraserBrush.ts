@@ -210,11 +210,6 @@ export class EraserBrush extends PencilBrush {
     return super.needsFullRender(false);
   }
 
-  protected _prepareForDrawing(pointer: Point) {
-    super._prepareForDrawing(pointer);
-    this.canvas.getContext().moveTo(pointer.x, pointer.y);
-  }
-
   onMouseDown(pointer: Point, ev: TBrushEventData) {
     if (this.canvas._isMainEvent(ev.e)) {
       //  prepare for erasing
