@@ -221,24 +221,24 @@ export class EraserBrush extends PencilBrush {
   _setBrushStyles(ctx: CanvasRenderingContext2D) {
     super._setBrushStyles(ctx);
     ctx.strokeStyle = 'black';
-    if (ctx === this.canvas.getContext()) {
-      ctx.globalCompositeOperation = 'destination-out';
-      //  a hack that fixes #7984 by reducing path width
-      //  the case seems to be aliasing of paths
-      ctx.lineWidth = Math.max(
-        this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(),
-        0
-      );
-    }
+  }
+
+  protected prepareClippingContext() {
+    const ctx = this.canvas.getContext();
+    ctx.save();
+    this._setBrushStyles(ctx);
+    ctx.globalCompositeOperation = 'destination-out';
+    //  a hack that fixes #7984 by reducing path width
+    //  the case seems to be aliasing of paths
+    ctx.lineWidth = Math.max(
+      this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(),
+      0
+    );
+    return ctx;
   }
 
   protected needsFullRender() {
     return super.needsFullRender(false);
-  }
-
-  protected _reset() {
-    super._reset();
-    this._setBrushStyles(this.canvas.getContext());
   }
 
   protected _prepareForDrawing(pointer: Point) {
@@ -271,7 +271,9 @@ export class EraserBrush extends PencilBrush {
   ) {
     const oldEnd = this.oldEnd;
     // clip main context
-    super._renderCurve(this.canvas.getContext());
+    const clip = this.prepareClippingContext();
+    super._renderCurve(clip);
+    clip.restore();
     // restore the value for rendering to occur
     this.oldEnd = oldEnd;
     // render brush and mask it with pattern
@@ -286,7 +288,9 @@ export class EraserBrush extends PencilBrush {
    */
   render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
     //  clip main context
-    super.render(this.canvas.getContext(), false);
+    const clip = this.prepareClippingContext();
+    super.render(clip, false);
+    clip.restore();
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
