@@ -3,7 +3,6 @@ import { Point } from '../../point.class';
 import { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
 import type { Path } from '../../shapes/path.class';
-import { capitalize } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
 import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
 import { isCollection } from '../../util/types';
@@ -50,16 +49,14 @@ export class EraserBrush extends PencilBrush {
    */
   inverted = false;
 
-  /**
-   * Used to fix #7984
-   * Reduces the path width while clipping the main context, resulting in a better visual overlap of both contexts
-   * @type number
-   */
-  erasingWidthAliasing = 4;
-
   protected _isErasing = false;
 
   protected patternCanvas: HTMLCanvasElement;
+
+  protected setImageSmoothing(ctx: CanvasRenderingContext2D) {
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+  }
 
   /**
    * This is designed to support erasing a collection with both erasable and non-erasable objects while maintaining object stacking.\
@@ -157,6 +154,7 @@ export class EraserBrush extends PencilBrush {
     canvas.width = this.canvas.width;
     canvas.height = this.canvas.height;
     const patternCtx = canvas.getContext('2d')!;
+    this.setImageSmoothing(patternCtx);
     // retina
     if (this.canvas._isRetinaScaling()) {
       this.canvas.__initRetinaScaling(
@@ -197,15 +195,6 @@ export class EraserBrush extends PencilBrush {
     );
   }
 
-  protected renderPattern(ctx: CanvasRenderingContext2D) {
-    const s = 1 / this.canvas.getRetinaScaling();
-    ctx.save();
-    ctx.scale(s, s);
-    ctx.globalCompositeOperation = 'source-in';
-    ctx.drawImage(this.patternCanvas, 0, 0);
-    ctx.restore();
-  }
-
   /**
    * @override
    */
@@ -214,20 +203,9 @@ export class EraserBrush extends PencilBrush {
     ctx.strokeStyle = 'black';
   }
 
-  protected prepareClippingContext() {
-    const ctx = this.canvas.getContext();
-    ctx.save();
-    this._setBrushStyles(ctx);
-    ctx.globalCompositeOperation = 'destination-out';
-    //  a hack that fixes #7984 by reducing path width
-    //  the case seems to be aliasing of paths
-    ctx.lineWidth = Math.max(
-      this.width - this.erasingWidthAliasing / this.canvas.getRetinaScaling(),
-      0
-    );
-    return ctx;
-  }
-
+  /**
+   * @override eraser isn't degraded by the alpha channel of {@link color}
+   */
   protected needsFullRender() {
     return super.needsFullRender(false);
   }
@@ -257,34 +235,58 @@ export class EraserBrush extends PencilBrush {
     }
   }
 
+  /**
+   * render pattern on top context
+   */
+  protected renderPattern(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
+    const s = 1 / this.canvas.getRetinaScaling();
+    ctx.save();
+    this.setImageSmoothing(ctx);
+    ctx.scale(s, s);
+    ctx.globalCompositeOperation = 'source-in';
+    ctx.drawImage(this.patternCanvas, 0, 0);
+    ctx.restore();
+  }
+
+  /**
+   * clip main context with top context after brush has been drawn onto it
+   */
+  protected clipContext(
+    destination = this.canvas.getContext(),
+    source = this.canvas.contextTop
+  ) {
+    const s = 1 / this.canvas.getRetinaScaling();
+    destination.save();
+    this.setImageSmoothing(destination);
+    destination.scale(s, s);
+    destination.globalCompositeOperation = 'destination-out';
+    destination.drawImage(source.canvas, 0, 0);
+    destination.restore();
+  }
+
   protected _renderCurve(
     ctx: CanvasRenderingContext2D = this.canvas.contextTop
   ) {
-    const oldEnd = this.oldEnd;
-    // clip main context
-    const clip = this.prepareClippingContext();
-    super._renderCurve(clip);
-    clip.restore();
-    // restore the value for rendering to occur
-    this.oldEnd = oldEnd;
     // render brush and mask it with pattern
     super._renderCurve(ctx);
     this.renderPattern(ctx);
+    //  clip main context
+    this.clipContext(this.canvas.getContext(), ctx);
   }
 
   /**
    * Rendering Logic:
-   * 1. Use brush to clip canvas by rendering it on top of canvas
-   * 2. Render brush with canvas pattern on top context
+   * 1. Render brush with canvas pattern on top context
+   * 2. Use the top context to clip canvas
    */
-  render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
-    //  clip main context
-    const clip = this.prepareClippingContext();
-    super.render(clip, false);
-    clip.restore();
+  render(ctx?: CanvasRenderingContext2D) {
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
+    //  clip main context
+    this.clipContext(this.canvas.getContext(), ctx);
   }
 
   finalizeShape() {
