@@ -8,6 +8,8 @@
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
 - chore(TS): migrate Polyline/Polygon [#8417](https://github.com/fabricjs/fabric.js/pull/8417)
+- chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
+- chore(TS): fix import cycle, extract `groupSVGElements` [#8506](https://github.com/fabricjs/fabric.js/pull/8506)
 - chore(TS): permissive `Point` typings [#8434](https://github.com/fabricjs/fabric.js/pull/8434)
 - chore(TS): polish files [#8488](https://github.com/fabricjs/fabric.js/pull/8488)
 - fix(TS): `EventSpec` recognition [#8497](https://github.com/fabricjs/fabric.js/pull/8497)
