@@ -183,7 +183,6 @@ export class SprayBrush extends BaseBrush<FabricObject> {
     for (let i = 0; i < this.sprayChunks.length; i++) {
       this.drawChunk(ctx, this.sprayChunks[i]);
     }
-    ctx.restore();
   }
 
   /**
