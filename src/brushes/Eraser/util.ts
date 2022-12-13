@@ -92,6 +92,7 @@ export async function addPathToObjectEraser(
   object: FabricObject,
   path: Path,
   context?: ErasingEventContextData,
+  applyTransform?: (t: TMat2D) => TMat2D,
   fireEvent = true
 ): Promise<void> {
   if (isCollection(object) && (object as Group).erasable === 'deep') {
@@ -121,7 +122,12 @@ export async function addPathToObjectEraser(
     invertTransform(object.calcTransformMatrix()),
     clone.calcTransformMatrix()
   );
-  applyTransformToObject(clone, desiredTransform);
+  applyTransformToObject(
+    clone,
+    typeof applyTransform === 'function'
+      ? applyTransform(desiredTransform)
+      : desiredTransform
+  );
   eraser.add(clone);
   object.set('dirty', true);
   fireEvent && object.fire('erasing:end', { path: clone });
