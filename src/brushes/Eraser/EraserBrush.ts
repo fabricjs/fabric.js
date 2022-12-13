@@ -1,4 +1,5 @@
 import { Color } from '../../color';
+import { TEvent, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
 import { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
@@ -31,27 +32,35 @@ type RestorationContext = {
  * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity.
  *
  * In order to support selective erasing, the brush clips the entire canvas
- * and then draws all non-erasable objects over the erased path using a pattern brush so to speak (masking).
- * If brush is **inverted** it draws all objects, erasable objects without their eraser, over the erased path.
+ * after drawing all non-erasable objects over the erased path using a pattern brush so to speak (masking).
+ *
+ * If **{@link inverted}** draws all objects, erasable objects without their eraser, over the erased path.
  * This achieves the desired effect of seeming to erase or undo erasing only on erasable objects.
+ *
  * After erasing is done the created path is added to all intersected objects' `eraser` property.
  *
- * In order to update the EraserBrush's pattern while drawing call `preparePattern`.
- * You will need to redraw the brush for it to properly update visuals, refer to {@link needsFullRender}.
- * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes (performance may suffer).
+ * The {@link updating} flag controls whether the pattern updates while drawing (performance may suffer).
+ * It is crucial in order to reflect visual changes made to canvas after erasing started (i.e animations).
  *
  * @tutorial http://fabricjs.com/erasing
  */
 export class EraserBrush extends PencilBrush {
   /**
    * When set to `true` the brush will create a visual effect of undoing erasing
-   * @type boolean
    */
   inverted = false;
 
-  protected _isErasing = false;
+  /**
+   * Indicates whether the eraser updates continuously on canvas rendering
+   * Performance may suffer, handle manually if so
+   */
+  updating = true;
 
   protected patternCanvas: HTMLCanvasElement;
+
+  private __disposer?: VoidFunction;
+  private blockUpdating = false;
+  private shouldFullyRender: boolean;
 
   protected setImageSmoothing(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = true;
@@ -193,6 +202,8 @@ export class EraserBrush extends PencilBrush {
       ([key, drawable]) =>
         (this.canvas[`${key as 'background' | 'overlay'}Image`] = drawable)
     );
+    // mark as dirty
+    this.shouldFullyRender = true;
   }
 
   /**
@@ -207,26 +218,53 @@ export class EraserBrush extends PencilBrush {
    * @override eraser isn't degraded by the alpha channel of {@link color}
    */
   protected needsFullRender() {
-    return super.needsFullRender(false);
+    return this.shouldFullyRender || super.needsFullRender(false);
   }
 
   /**
-   * @override prepare pattern and fire `erasing:start`
+   * called from the `after:render` event subscriber
+   */
+  protected onUpdate() {
+    this.preparePattern();
+    this.render();
+  }
+
+  /**
+   * @override prepare pattern, subscribe for updates and fire `erasing:start`
    */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
     if (this.canvas._isMainEvent(ev.e)) {
       //  prepare for erasing
       this.preparePattern();
-      this._isErasing = true;
+      this.__disposer = this.canvas.on('after:render', () => {
+        this.updating && !this.blockUpdating && this.onUpdate();
+      });
       this.canvas.fire('erasing:start');
     }
     super.onMouseDown(pointer, ev);
   }
 
+  /**
+   * @override when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
+   */
   protected onPointAdded() {
-    // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
-    this.drawStraightLine && this.canvas.renderAll();
+    if (this.drawStraightLine) {
+      this.blockUpdating = true;
+      this.canvas.renderAll();
+      this.blockUpdating = false;
+    }
     super.onPointAdded();
+  }
+
+  /**
+   * @override dispose of update subscriber {@link __disposer}
+   */
+  onMouseUp(ev: TEvent<TPointerEvent>) {
+    super.onMouseUp(ev);
+    if (this.__disposer) {
+      this.__disposer();
+      this.__disposer = undefined;
+    }
   }
 
   /**
@@ -281,6 +319,7 @@ export class EraserBrush extends PencilBrush {
    * @override mask brush with pattern and clip main context
    */
   render(ctx?: CanvasRenderingContext2D) {
+    this.shouldFullyRender = false;
     //  render brush and mask it with pattern
     super.render(ctx);
     this.renderPattern(ctx);
@@ -351,7 +390,7 @@ export class EraserBrush extends PencilBrush {
   }
 
   /**
-   * propagate eraser path to all affected objects
+   * propagate eraser path to all affected {@link FabricObject}
    * @param path eraser path
    */
   protected async finalizeErasing(path: Path) {
@@ -377,7 +416,7 @@ export class EraserBrush extends PencilBrush {
   }
 
   /**
-   * @override propagate eraser path to all affected objects and fire `erasing:end`
+   * @override finalize erasing and fire `erasing:end`
    */
   protected async onEnd(result?: Path) {
     this.canvas.fire(
