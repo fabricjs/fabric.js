@@ -25675,8 +25675,8 @@ class BaseBrush {
     /**
      * Render the full state of the brush
      */
-    render(ctx = this.canvas.contextTop, clearContext = true) {
-        clearContext && this.canvas.clearContext(ctx);
+    render(ctx = this.canvas.contextTop) {
+        this.canvas.clearContext(ctx);
         ctx.save();
         this.transform(ctx);
         this._render(ctx);
@@ -26290,9 +26290,6 @@ class PencilBrush extends BaseBrush {
 }
 fabric$1.PencilBrush = PencilBrush;
 
-function isObjectErasable(object) {
-    return object.erasable !== false;
-}
 /**
  * Utility to apply a clip path to a path.
  * Used to preserve clipping on eraser paths in nested objects.
@@ -26460,26 +26457,6 @@ class EraserBrush extends PencilBrush {
             }
         });
     }
-    prepareCanvasDrawable(key, restorationContext) {
-        const drawableKey = `${key}Image`;
-        const drawable = this.canvas[drawableKey];
-        const isErasable = drawable && isObjectErasable(drawable);
-        if (!this.inverted &&
-            ((drawable && !isErasable) || !!this.canvas[`${key}Color`])) {
-            if (isErasable) {
-                this.canvas[drawableKey] = undefined;
-                restorationContext.drawables[key] = drawable;
-            }
-        }
-        else if (this.inverted) {
-            const eraser = drawable && drawable.eraser;
-            if (eraser) {
-                drawable.eraser = undefined;
-                drawable.dirty = true;
-                restorationContext.eraser.push([drawable, eraser]);
-            }
-        }
-    }
     /**
      * Prepare the pattern for the erasing brush
      * This pattern will be drawn on the top context after clipping the main context,
@@ -26505,11 +26482,11 @@ class EraserBrush extends PencilBrush {
             visibility: [],
             eraser: [],
             collection: [],
-            drawables: {},
         };
-        this.prepareCollectionTraversal(this.canvas, objects, restorationContext);
-        this.prepareCanvasDrawable('background', restorationContext);
-        this.prepareCanvasDrawable('overlay', restorationContext);
+        this.prepareCollectionTraversal(this.canvas, [
+            ...objects,
+            ...[this.canvas.backgroundImage, this.canvas.overlayImage].filter((d) => !!d),
+        ], restorationContext);
         // render
         this.canvas.renderCanvas(patternCtx, objects, {
             fireEvents: false,
@@ -26526,7 +26503,6 @@ class EraserBrush extends PencilBrush {
         restorationContext.collection.forEach((obj) => {
             obj.dirty = true;
         });
-        Object.entries(restorationContext.drawables).forEach(([key, drawable]) => (this.canvas[`${key}Image`] = drawable));
         // mark as dirty
         this.dirty = true;
     }
@@ -26609,12 +26585,8 @@ class EraserBrush extends PencilBrush {
         destination.drawImage(source.canvas, 0, 0);
         destination.restore();
     }
-    /**
-     * @override mask brush with pattern and clip main context
-     */
-    _renderCurve(ctx = this.canvas.contextTop) {
-        // render brush and mask it with pattern
-        super._renderCurve(ctx);
+    finalizeRendering(ctx) {
+        // mask brush
         this.renderPattern(ctx);
         //  clip main context
         this.clipContext(this.canvas.getContext(), ctx);
@@ -26622,13 +26594,17 @@ class EraserBrush extends PencilBrush {
     /**
      * @override mask brush with pattern and clip main context
      */
+    _renderCurve(ctx) {
+        super._renderCurve(ctx);
+        this.finalizeRendering(ctx);
+    }
+    /**
+     * @override mask brush with pattern and clip main context
+     */
     render(ctx) {
         this.dirty = false;
-        //  render brush and mask it with pattern
         super.render(ctx);
-        this.renderPattern(ctx);
-        //  clip main context
-        this.clipContext(this.canvas.getContext(), ctx);
+        this.finalizeRendering(ctx);
     }
     finalizeShape() {
         const path = super.finalizeShape();
