@@ -20,6 +20,7 @@ import {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrices2,
 } from './matrix';
 import { stylesFromArray, stylesToArray, hasStyleChanged } from './textStyles';
 import { clone, extend } from '../lang_object';
@@ -122,6 +123,7 @@ fabric.util = {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrices2,
   // textStyles.ts file
   stylesFromArray,
   stylesToArray,

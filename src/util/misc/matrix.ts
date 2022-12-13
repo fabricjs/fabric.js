@@ -78,6 +78,18 @@ export const multiplyTransformMatrices = (
     is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5],
   ] as TMat2D;
 
+export const multiplyTransformMatrices2 = (
+  matrices: TMat2D[],
+  is2x2?: boolean
+) => {
+  return matrices
+    .slice(0, -1)
+    .reduceRight(
+      (right, left) => multiplyTransformMatrices(left, right, is2x2),
+      matrices[matrices.length - 1]
+    );
+};
+
 /**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
