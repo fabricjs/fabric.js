@@ -797,7 +797,17 @@ export class StaticCanvas extends createCollectionMixin(
    * @param {CanvasRenderingContext2D} ctx
    * @param {Array} objects to render
    */
-  renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
+  renderCanvas(
+    ctx: CanvasRenderingContext2D,
+    objects: FabricObject[],
+    {
+      fireEvents = true,
+      drawControls: controls = this.interactive,
+    }: {
+      fireEvents?: boolean;
+      drawControls?: boolean;
+    } = {}
+  ) {
     if (this.destroyed) {
       return;
     }
@@ -810,7 +820,7 @@ export class StaticCanvas extends createCollectionMixin(
     // node-canvas
     // @ts-ignore
     ctx.patternQuality = 'best';
-    this.fire('before:render', { ctx: ctx });
+    fireEvents && this.fire('before:render', { ctx: ctx });
     this._renderBackground(ctx);
 
     ctx.save();
@@ -818,7 +828,7 @@ export class StaticCanvas extends createCollectionMixin(
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this._renderObjects(ctx, objects);
     ctx.restore();
-    if (!this.controlsAboveOverlay && this.interactive) {
+    if (!this.controlsAboveOverlay && controls) {
       this.drawControls(ctx);
     }
     if (path) {
@@ -830,10 +840,10 @@ export class StaticCanvas extends createCollectionMixin(
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
-    if (this.controlsAboveOverlay && this.interactive) {
+    if (this.controlsAboveOverlay && controls) {
       this.drawControls(ctx);
     }
-    this.fire('after:render', { ctx: ctx });
+    fireEvents && this.fire('after:render', { ctx: ctx });
 
     if (this.__cleanupTask) {
       this.__cleanupTask();
