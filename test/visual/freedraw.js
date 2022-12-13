@@ -2305,17 +2305,17 @@ QUnit.module('Free Drawing', hooks => {
           left: 0,
           top: 100,
           fill: 'cyan',
-          clipPath: new fabric.Circle({ radius: 50, left: -25, top: -25, originX: 'center', originY: 'center' })
+          clipPath: new fabric.Circle({ radius: 50, left: -12, top: -12, originX: 'center', originY: 'center' })
         })
       ], {
         erasable: !group || group,
-        clipPath: new fabric.Circle({ radius: 50, left: 25, top: 25, originX: 'center', originY: 'center' })
+        clipPath: new fabric.Circle({ radius: 50, left: 12, top: 12, originX: 'center', originY: 'center' })
       }),
     ];
     canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
-    brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     if (inverted) {
+      brush.width = 8;
       await pointDrawer(pointsToCover, brush, () => {
         // run mouse up but don't add the path to canvas
       });
@@ -2330,6 +2330,7 @@ QUnit.module('Free Drawing', hooks => {
       clipPath.center();
       brush.clipPath = clipPath;
     }
+    brush.width = 16;
     return pointDrawer(points, brush);
   }
 
@@ -2352,7 +2353,7 @@ QUnit.module('Free Drawing', hooks => {
       clipPath.center();
       brush.clipPath = clipPath;
     }
-    brush.width = 8;
+    brush.width = 16;
     if (inverted) {
       await pointDrawer(pointsToCover, brush, () => {
         // run mouse up but don't add the path to canvas
