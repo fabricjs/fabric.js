@@ -228,11 +228,8 @@ export abstract class BaseBrush<T extends FabricObject> {
   /**
    * Render the full state of the brush
    */
-  render(
-    ctx: CanvasRenderingContext2D = this.canvas.contextTop,
-    clearContext = true
-  ) {
-    clearContext && this.canvas.clearContext(ctx);
+  render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+    this.canvas.clearContext(ctx);
     ctx.save();
     this.transform(ctx);
     this._render(ctx);
