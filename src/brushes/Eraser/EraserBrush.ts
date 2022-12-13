@@ -32,12 +32,15 @@ type RestorationContext = {
  * Supports **alpha** erasing: setting the alpha channel of the `color` property controls the eraser intensity.
  *
  * In order to support selective erasing, the brush clips the entire canvas
- * after drawing all non-erasable objects over the erased path using a pattern brush so to speak (masking).
+ * after drawing all non-erasable objects over the erased path using a pattern {@link preparePattern} brush so to speak (masking).
+ * Rendering Logic:
+ * 1. Render brush with pattern on top context
+ * 2. Use the top context to clip the main context
  *
  * If **{@link inverted}** draws all objects, erasable objects without their eraser, over the erased path.
  * This achieves the desired effect of seeming to erase or undo erasing only on erasable objects.
  *
- * After erasing is done the created path is added to all intersected objects' `eraser` property.
+ * After erasing is done the created path is added to all intersected objects' `eraser` property {@link finalizeErasing}.
  *
  * The {@link updating} flag controls whether the pattern updates while drawing (performance may suffer).
  * It is crucial in order to reflect visual changes made to canvas after erasing started (i.e animations).
@@ -327,7 +330,7 @@ export class EraserBrush extends PencilBrush {
     this.clipContext(this.canvas.getContext(), ctx);
   }
 
-  finalizeShape() {
+  protected finalizeShape() {
     const path = super.finalizeShape();
     path?.set(
       this.inverted
