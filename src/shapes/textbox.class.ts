@@ -468,12 +468,16 @@ export class Textbox extends IText {
    * @returns {Promise<Textbox>}
    */
   static fromObject(object: object): Promise<Textbox> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(Textbox, objCopy, {
-      extraParam: 'text',
-    });
+    return FabricObject._fromObject(
+      Textbox,
+      {
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   }
 }
 
