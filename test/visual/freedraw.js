@@ -2356,13 +2356,13 @@ QUnit.module('Free Drawing', hooks => {
 
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
     [true, false, 'inverted'].forEach(clip => {
-      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
+      const getName = (name = '') => `eraser/${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
       const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted, clip }, null, 2)})`;
       const main = !alpha && !inverted;
       tests.push({
         test: getTestName('Eraser brush'),
         build: canvas => eraser(canvas, { alpha, inverted, clip }),
-        name: getName('eraser'),
+        name: getName(),
         width: 200,
         height: 250,
         targets: {
@@ -2374,7 +2374,7 @@ QUnit.module('Free Drawing', hooks => {
       tests.push({
         test: getTestName('Eraser brush - custom stack ordering'),
         build: canvas => eraser(canvas, { alpha, inverted, clip, reverse: true }),
-        name: getName('eraser_custom_stack'),
+        name: getName('custom_stack'),
         width: 200,
         height: 250,
         targets: {
@@ -2386,7 +2386,7 @@ QUnit.module('Free Drawing', hooks => {
       tests.push({
         test: getTestName('Eraser brush - group with `erasable = true`'),
         build: canvas => eraser(canvas, { alpha, inverted, clip, group: true }),
-        name: getName('eraser_group'),
+        name: getName('group'),
         width: 200,
         height: 250,
         targets: {
@@ -2398,7 +2398,7 @@ QUnit.module('Free Drawing', hooks => {
       tests.push({
         test: getTestName('Eraser brush - group with `erasable = deep` should propagate eraser'),
         build: canvas => eraser(canvas, { alpha, inverted, clip, group: 'deep' }),
-        name: getName('eraser'),
+        name: getName(),
         width: 200,
         height: 250,
         targets: {
@@ -2411,7 +2411,7 @@ QUnit.module('Free Drawing', hooks => {
         tests.push({
           test: getTestName('Eraser brush - backgroundVpt'),
           build: async canvas => eraseBackground(canvas, { alpha, inverted, clip, vpt }),
-          name: `${getName('eraser_background')}${vpt ? '_vpt' : ''}`,
+          name: `${getName('background')}${vpt ? '_vpt' : ''}`,
           width: 200,
           height: 250,
           targets: {
