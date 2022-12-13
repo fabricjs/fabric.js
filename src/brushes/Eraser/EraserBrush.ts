@@ -304,9 +304,7 @@ export class EraserBrush extends PencilBrush {
   /**
    * @override mask brush with pattern and clip main context
    */
-  protected _renderCurve(
-    ctx: CanvasRenderingContext2D = this.canvas.contextTop
-  ) {
+  protected _renderCurve(ctx?: CanvasRenderingContext2D) {
     // render brush and mask it with pattern
     super._renderCurve(ctx);
     this.renderPattern(ctx);
