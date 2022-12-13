@@ -2289,7 +2289,31 @@ QUnit.module('Free Drawing', hooks => {
     });
   });
 
-  async function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false, clip = false } = {}) {
+  async function erase(canvas, brush, { inverted, clip }) {
+    if (inverted) {
+      brush.width = 8;
+      await new Promise(resolve => {
+        canvas.once('after:render', resolve);
+        pointDrawer(pointsToCover, brush, () => {
+          // run mouse up but don't add the path to canvas
+        });
+      });
+      brush.inverted = true;
+    }
+    if (clip) {
+      const clipPath = new fabric.Circle({
+        radius: 50,
+        inverted: clip === 'inverted',
+        canvas
+      });
+      clipPath.center();
+      brush.clipPath = clipPath;
+    }
+    brush.width = 16;
+    return pointDrawer(points, brush);
+  }
+
+  function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false, clip = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
     alpha && (brush.color = 'rgba(0,0,0,0.7)');
     const objects = [
@@ -2314,30 +2338,10 @@ QUnit.module('Free Drawing', hooks => {
     ];
     canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
-    if (inverted) {
-      brush.width = 8;
-      await new Promise(resolve => {
-        canvas.once('after:render', resolve);
-        pointDrawer(pointsToCover, brush, () => {
-          // run mouse up but don't add the path to canvas
-        });
-      });
-      brush.inverted = true;
-    }
-    if (clip) {
-      const clipPath = new fabric.Circle({
-        radius: 50,
-        inverted: clip === 'inverted',
-        canvas
-      });
-      clipPath.center();
-      brush.clipPath = clipPath;
-    }
-    brush.width = 16;
-    return pointDrawer(points, brush);
+    return erase(canvas, brush, { inverted, clip });
   }
 
-  async function eraseBackground(canvas, { alpha = false, inverted = false, vpt = false, clip = false } = {}) {
+  function eraseBackground(canvas, { alpha = false, inverted = false, vpt = false, clip = false } = {}) {
     const brush = new fabric.EraserBrush(canvas);
     alpha && (brush.color = 'rgba(0,0,0,0.7)');
     canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
@@ -2347,26 +2351,7 @@ QUnit.module('Free Drawing', hooks => {
       fill: 'blue'
     });
     canvas.backgroundVpt = vpt;
-    if (clip) {
-      const clipPath = new fabric.Circle({
-        radius: 50,
-        inverted: clip === 'inverted',
-        canvas
-      });
-      clipPath.center();
-      brush.clipPath = clipPath;
-    }
-    brush.width = 16;
-    if (inverted) {
-      await new Promise(resolve => {
-        canvas.once('after:render', resolve);
-        pointDrawer(pointsToCover, brush, () => {
-          // run mouse up but don't add the path to canvas
-        });
-      });
-      brush.inverted = true;
-    }
-    return pointDrawer(points, brush);
+    return erase(canvas, brush, { inverted, clip });
   }
 
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
