@@ -20,10 +20,10 @@
           resolve()
         });
         brush.onMouseUp(options);
-      });    
+      });
     }
   }
-  
+
   function fireBrushUp(canvas) {
     canvas.freeDrawingBrush.onMouseUp(options);
   }
@@ -2277,7 +2277,8 @@ QUnit.module('Free Drawing', hooks => {
               vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
               return pointDrawer(pointsToCover, brush);
             },
-            name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
+            name: `clipping/${builder.name.toLowerCase().replace('brush', '')}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
+            percentage: 0.09,
             width: 200,
             height: 200,
             targets: {
@@ -2440,7 +2441,7 @@ QUnit.module('Free Drawing', hooks => {
         }
       });
       main && visualTester({
-        ...options, 
+        ...options,
         test: 'main context',
         golden: `freedrawing/${name}_main_ctx.png`,
         code: async function (canvas, callback) {
@@ -2454,7 +2455,7 @@ QUnit.module('Free Drawing', hooks => {
         }
       });
       mesh && visualTester({
-        ...options, 
+        ...options,
         test: 'context mesh',
         golden: `freedrawing/${name}_result.png`,
         code: async function (canvas, callback) {
