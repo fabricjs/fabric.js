@@ -12,6 +12,7 @@ export type Canvas = StaticCanvas & {
   uniScaleKey: ModifierKey;
   uniformScaling: boolean;
   contextTop: CanvasRenderingContext2D;
+  getContext(): CanvasRenderingContext2D;
   getTopContext(): CanvasRenderingContext2D;
 } & Observable<CanvasEvents>;
 export type StaticCanvas = Record<string, any> & {
