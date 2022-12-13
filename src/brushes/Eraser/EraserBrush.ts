@@ -210,6 +210,9 @@ export class EraserBrush extends PencilBrush {
     return super.needsFullRender(false);
   }
 
+  /**
+   * @override prepare pattern and fire `erasing:start`
+   */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
     if (this.canvas._isMainEvent(ev.e)) {
       //  prepare for erasing
@@ -221,13 +224,9 @@ export class EraserBrush extends PencilBrush {
   }
 
   protected onPointAdded() {
-    if (this.needsFullRender()) {
-      // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
-      this.drawStraightLine && this.canvas.renderAll();
-      this.render();
-    } else {
-      this._renderCurve();
-    }
+    // when drawing a straight line we need to redraw canvas so it won't be clipped by the previous straight line
+    this.drawStraightLine && this.canvas.renderAll();
+    super.onPointAdded();
   }
 
   /**
@@ -261,6 +260,9 @@ export class EraserBrush extends PencilBrush {
     destination.restore();
   }
 
+  /**
+   * @override mask brush with pattern and clip main context
+   */
   protected _renderCurve(
     ctx: CanvasRenderingContext2D = this.canvas.contextTop
   ) {
@@ -275,6 +277,8 @@ export class EraserBrush extends PencilBrush {
    * Rendering Logic:
    * 1. Render brush with canvas pattern on top context
    * 2. Use the top context to clip canvas
+   *
+   * @override mask brush with pattern and clip main context
    */
   render(ctx?: CanvasRenderingContext2D) {
     //  render brush and mask it with pattern
@@ -346,6 +350,10 @@ export class EraserBrush extends PencilBrush {
     );
   }
 
+  /**
+   * propagate eraser path to all affected objects
+   * @param path eraser path
+   */
   protected async finalizeErasing(path: Path) {
     const context: ErasingEventContext = {
       targets: [],
@@ -368,6 +376,9 @@ export class EraserBrush extends PencilBrush {
     return context;
   }
 
+  /**
+   * @override propagate eraser path to all affected objects and fire `erasing:end`
+   */
   protected async onEnd(result?: Path) {
     this.canvas.fire(
       'erasing:end',
