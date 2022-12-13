@@ -1,10 +1,11 @@
 import { Color } from '../../color';
-import type { Point } from '../../point.class';
+import { Point } from '../../point.class';
 import { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
 import type { Path } from '../../shapes/path.class';
 import { capitalize } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
+import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
 import { isCollection } from '../../util/types';
 import type { Canvas } from '../../__types__';
 import { TBrushEventData } from '../base_brush.class';
@@ -321,6 +322,7 @@ export class EraserBrush extends PencilBrush {
     context: ErasingEventContext
   ) {
     const drawableKey = `${key}Image` as const;
+    const drawableVpt = this.canvas[`${key}Vpt` as const];
     const drawable = this.canvas[drawableKey];
     const dContext: ErasingEventContextData = {
       targets: [],
@@ -330,7 +332,23 @@ export class EraserBrush extends PencilBrush {
     return (
       drawable &&
       drawable.erasable &&
-      addPathToObjectEraser(drawable, path, dContext).then(() => {
+      addPathToObjectEraser(drawable, path, dContext, (t) => {
+        if (!drawableVpt) {
+          const d = drawable.translateToOriginPoint(
+            new Point(),
+            drawable.originX,
+            drawable.originY
+          );
+          return multiplyTransformMatrices2([
+            [1, 0, 0, 1, d.x, d.y],
+            // apply vpt from center of drawable
+            this.canvas.viewportTransform,
+            [1, 0, 0, 1, -d.x, -d.y],
+            t,
+          ]);
+        }
+        return t;
+      }).then(() => {
         context.drawables[drawableKey] = dContext;
       })
     );
