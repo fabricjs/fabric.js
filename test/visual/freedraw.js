@@ -2284,7 +2284,7 @@ QUnit.module('Free Drawing', hooks => {
               vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
               pointDrawer(pointsToCover, brush);
             },
-            name: `clipping_${builder.name}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
+            name: `clipping/${builder.name.toLowerCase().replace('brush', '')}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
             percentage: 0.09,
             width: 200,
             height: 200,
