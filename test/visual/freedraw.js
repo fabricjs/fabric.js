@@ -2305,17 +2305,17 @@ QUnit.module('Free Drawing', hooks => {
           left: 0,
           top: 100,
           fill: 'cyan',
-          clipPath: new fabric.Circle({ radius: 50, left: -25, top: -25, originX: 'center', originY: 'center' })
+          clipPath: new fabric.Circle({ radius: 50, left: -12, top: -12, originX: 'center', originY: 'center' })
         })
       ], {
         erasable: !group || group,
-        clipPath: new fabric.Circle({ radius: 50, left: 25, top: 25, originX: 'center', originY: 'center' })
+        clipPath: new fabric.Circle({ radius: 50, left: 12, top: 12, originX: 'center', originY: 'center' })
       }),
     ];
     canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
-    brush.width = 8;
     reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
     if (inverted) {
+      brush.width = 8;
       await pointDrawer(pointsToCover, brush, () => {
         // run mouse up but don't add the path to canvas
       });
@@ -2324,12 +2324,13 @@ QUnit.module('Free Drawing', hooks => {
     if (clip) {
       const clipPath = new fabric.Circle({
         radius: 50,
-        inverted,
+        inverted: clip === 'inverted',
         canvas
       });
       clipPath.center();
       brush.clipPath = clipPath;
     }
+    brush.width = 16;
     return pointDrawer(points, brush);
   }
 
@@ -2346,13 +2347,13 @@ QUnit.module('Free Drawing', hooks => {
     if (clip) {
       const clipPath = new fabric.Circle({
         radius: 50,
-        inverted,
+        inverted: clip === 'inverted',
         canvas
       });
       clipPath.center();
       brush.clipPath = clipPath;
     }
-    brush.width = 8;
+    brush.width = 16;
     if (inverted) {
       await pointDrawer(pointsToCover, brush, () => {
         // run mouse up but don't add the path to canvas
@@ -2363,8 +2364,8 @@ QUnit.module('Free Drawing', hooks => {
   }
 
   [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
-    [true, false].forEach(clip => {
-      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}`;
+    [true, false, 'inverted'].forEach(clip => {
+      const getName = name => `${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
       const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted }, null, 2)})`;
       const main = !alpha && !inverted;
       tests.push({
@@ -2423,11 +2424,11 @@ QUnit.module('Free Drawing', hooks => {
           width: 200,
           height: 250,
           targets: {
-            main: false,
+            main,
             top: inverted && !vpt
           },
           onComplete: undefined
-        })      
+        })
       );
     });
   });
