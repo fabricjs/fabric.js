@@ -18,10 +18,6 @@ type RestorationContext = {
   visibility: [FabricObject, number][];
   eraser: [FabricObject, Eraser][];
   collection: FabricObject[];
-  drawables: {
-    background?: FabricObject;
-    overlay?: FabricObject;
-  };
 };
 
 /**
@@ -124,31 +120,6 @@ export class EraserBrush extends PencilBrush {
     });
   }
 
-  protected prepareCanvasDrawable(
-    key: 'background' | 'overlay',
-    restorationContext: RestorationContext
-  ) {
-    const drawableKey = `${key}Image` as const;
-    const drawable = this.canvas[drawableKey];
-    const isErasable = drawable && isObjectErasable(drawable);
-    if (
-      !this.inverted &&
-      ((drawable && !isErasable) || !!this.canvas[`${key}Color`])
-    ) {
-      if (isErasable) {
-        this.canvas[drawableKey] = undefined;
-        restorationContext.drawables[key] = drawable;
-      }
-    } else if (this.inverted) {
-      const eraser = drawable && drawable.eraser;
-      if (eraser) {
-        drawable.eraser = undefined;
-        drawable.dirty = true;
-        restorationContext.eraser.push([drawable, eraser]);
-      }
-    }
-  }
-
   /**
    * Prepare the pattern for the erasing brush
    * This pattern will be drawn on the top context after clipping the main context,
@@ -180,11 +151,17 @@ export class EraserBrush extends PencilBrush {
       visibility: [],
       eraser: [],
       collection: [],
-      drawables: {},
     };
-    this.prepareCollectionTraversal(this.canvas, objects, restorationContext);
-    this.prepareCanvasDrawable('background', restorationContext);
-    this.prepareCanvasDrawable('overlay', restorationContext);
+    this.prepareCollectionTraversal(
+      this.canvas,
+      [
+        ...objects,
+        ...[this.canvas.backgroundImage, this.canvas.overlayImage].filter(
+          (d) => !!d
+        ),
+      ],
+      restorationContext
+    );
     // render
     this.canvas.renderCanvas(patternCtx, objects, {
       fireEvents: false,
@@ -201,10 +178,6 @@ export class EraserBrush extends PencilBrush {
     restorationContext.collection.forEach((obj) => {
       obj.dirty = true;
     });
-    Object.entries(restorationContext.drawables).forEach(
-      ([key, drawable]) =>
-        (this.canvas[`${key as 'background' | 'overlay'}Image`] = drawable)
-    );
     // mark as dirty
     this.dirty = true;
   }
