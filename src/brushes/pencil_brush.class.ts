@@ -204,7 +204,6 @@ export class PencilBrush extends BaseBrush<Path> {
     // the bezier control point
     ctx.lineTo(p1.x, p1.y);
     ctx.stroke();
-    ctx.restore();
   }
 
   /**
