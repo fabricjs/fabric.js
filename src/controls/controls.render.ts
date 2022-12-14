@@ -1,6 +1,27 @@
-//@ts-nocheck
-
+import { PiBy180, twoMathPi } from '../constants';
+import type { FabricObject } from '../shapes/object.class';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import type { Control } from './control.class';
+
+export type ControlRenderingStyleOverride = Partial<
+  Pick<
+    FabricObject,
+    | 'cornerStyle'
+    | 'cornerSize'
+    | 'cornerColor'
+    | 'cornerStrokeColor'
+    | 'cornerDashArray'
+    | 'transparentCorners'
+  >
+>;
+
+export type ControlRenderer = (
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  styleOverride: ControlRenderingStyleOverride,
+  fabricObject: FabricObject
+) => void;
 
 /**
  * Render a round control, as per fabric features.
@@ -10,18 +31,20 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
- * @param {Object} styleOverride override for fabric.Object controls style
- * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+ * @param {Object} styleOverride override for FabricObject controls style
+ * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderCircleControl(
-  ctx,
-  left,
-  top,
-  styleOverride,
-  fabricObject
+  this: Control,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  styleOverride: ControlRenderingStyleOverride,
+  fabricObject: FabricObject
 ) {
   styleOverride = styleOverride || {};
-  var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+  const xSize =
+      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
     ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
     transparentCorners =
       typeof styleOverride.transparentCorners !== 'undefined'
@@ -30,15 +53,15 @@ export function renderCircleControl(
     methodName = transparentCorners ? 'stroke' : 'fill',
     stroke =
       !transparentCorners &&
-      (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
-    myLeft = left,
+      (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+  let myLeft = left,
     myTop = top,
     size;
   ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
-    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
-  // as soon as fabric react v5, remove ie11, use proper ellipse code.
+    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
+  // TODO: use proper ellipse code.
   if (xSize > ySize) {
     size = xSize;
     ctx.scale(1.0, ySize / xSize);
@@ -53,7 +76,7 @@ export function renderCircleControl(
   // this is still wrong
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(myLeft, myTop, size / 2, 0, 2 * Math.PI, false);
+  ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
   ctx[methodName]();
   if (stroke) {
     ctx.stroke();
@@ -69,18 +92,20 @@ export function renderCircleControl(
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
- * @param {Object} styleOverride override for fabric.Object controls style
- * @param {fabric.Object} fabricObject the fabric object for which we are rendering controls
+ * @param {Object} styleOverride override for FabricObject controls style
+ * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderSquareControl(
-  ctx,
-  left,
-  top,
-  styleOverride,
-  fabricObject
+  this: Control,
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  styleOverride: ControlRenderingStyleOverride,
+  fabricObject: FabricObject
 ) {
   styleOverride = styleOverride || {};
-  var xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+  const xSize =
+      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
     ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
     transparentCorners =
       typeof styleOverride.transparentCorners !== 'undefined'
@@ -93,19 +118,19 @@ export function renderSquareControl(
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
   ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor;
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
-    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor;
+    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // this is still wrong
   ctx.lineWidth = 1;
   ctx.translate(left, top);
   //  angle is relative to canvas plane
-  var angle = fabricObject.getTotalAngle();
+  const angle = fabricObject.getTotalAngle();
   ctx.rotate(degreesToRadians(angle));
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-  ctx[methodName + 'Rect'](-xSizeBy2, -ySizeBy2, xSize, ySize);
+  ctx[`${methodName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
   if (stroke) {
     ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
   }

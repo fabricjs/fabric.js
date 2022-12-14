@@ -1,6 +1,13 @@
 (function() {
 
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function createTextObject(text) {
     return new fabric.Text(text || 'x');
@@ -77,7 +84,7 @@
   QUnit.test('toString', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
-    assert.equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+    assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
@@ -347,9 +354,9 @@
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
     text.cleanStyle('any');
-    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there were no usefull informations');
+    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there was no useful information');
   });
 
   QUnit.test('text cleanStyle with full style', function(assert) {
@@ -387,6 +394,24 @@
     text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
     text.removeStyle('fill');
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
+  });
+
+  QUnit.test('text toObject removes empty style object', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: {} } };
+    var obj = text.toObject();
+    assert.deepEqual(obj.styles, [], 'empty style object has been removed');
+  });
+
+  QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
+    var obj = text.toObject();
+    assert.deepEqual(
+      obj.styles,
+      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
+      'styles with only a textBackgroundColor property do not throw an error'
+    );
   });
 
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
@@ -699,7 +724,8 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2).setSuperscript(2, 3);
+    text.setSuperscript(1, 2);
+    text.setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -721,7 +747,8 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1,2).setSubscript(2,3);
+    text.setSubscript(1, 2);
+    text.setSubscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');

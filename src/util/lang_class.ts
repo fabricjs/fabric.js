@@ -57,7 +57,6 @@ function callSuper(methodName, ...args) {
 
 /**
  * Helper for creation of "classes".
- * @memberOf fabric.util
  * @param {Function} [parent] optional "Class" to inherit from
  * @param {Object} [properties] Properties shared by all instances of this class
  *                  (be careful modifying objects defined here as this would affect all instances)
@@ -74,12 +73,10 @@ export function createClass(...args) {
   }
 
   klass.superclass = parent;
-  klass.subclasses = [];
 
   if (parent) {
     Subclass.prototype = parent.prototype;
     klass.prototype = new Subclass();
-    parent.subclasses.push(klass);
   }
   for (var i = 0, length = properties.length; i < length; i++) {
     addMethods(klass, properties[i], parent);

@@ -1,10 +1,7 @@
 import './HEADER';
-// import './lib/event'), // optional gestures
-import './src/mixins/observable.mixin';
+// import './lib/event', // optional gestures
 import './src/mixins/collection.mixin';
-import './src/mixins/shared_methods.mixin';
 import './src/util/misc/misc';
-// import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
@@ -17,17 +14,13 @@ import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
 import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
-import './src/mixins/canvas_serialization.mixin'; // optiona serialization
+import './src/mixins/canvas_serialization.mixin'; // optional serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gestures
-import './src/shapes/object.class';
-import './src/mixins/object_origin.mixin';
-import './src/mixins/object_geometry.mixin';
-import './src/mixins/object_ancestry.mixin';
-import './src/mixins/object_stacking.mixin';
-import './src/mixins/object.svg_export';
-import './src/mixins/stateful.mixin';
-import './src/mixins/object_interactivity.mixin'; // optional interaction
-import './src/mixins/animation.mixin'; // optional animation
+import './src/mixins/canvas_animation.mixin'; // optional animation
+import './src/mixins/canvas_straightening.mixin'; // optional animation
+import './src/shapes/fabricObject.class';
+import './src/mixins/object_stacking.mixin'; // removed in #8461
+import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
 import './src/shapes/triangle.class';
@@ -39,9 +32,7 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/mixins/object_straightening.mixin'; // optional objectstraightening
-import './src/filters/webgl_backend.class'; // optional image_filters
-import './src/filters/2d_backend.class'; // optional image_filters
+import './src/filters/WebGLProbe'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
 import './src/filters/colormatrix_filter.class'; // optional image_filters
 import './src/filters/brightness_filter.class'; // optional image_filters
@@ -63,11 +54,7 @@ import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
 import './src/shapes/text.class'; // optional text
-import './src/mixins/text_style.mixin'; // optional text
 import './src/shapes/itext.class'; // optional itext
-import './src/mixins/itext_behavior.mixin'; // optional itext
-import './src/mixins/itext_click_behavior.mixin'; // optional itext
-import './src/mixins/itext_key_behavior.mixin'; // optional itext
 import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction

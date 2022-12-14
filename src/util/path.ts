@@ -2,13 +2,36 @@
 
 import { cache } from '../cache';
 import { config } from '../config';
-import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from '../constants';
 import { commaWsp, rePathCommand } from '../parser/constants';
 import { Point } from '../point.class';
+import type { PathData, TMat2D } from '../typedefs';
 import { cos } from './misc/cos';
-import { sin } from './misc/sin';
 import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
+import { sin } from './misc/sin';
+
+type PathSegmentInfoCommon = {
+  x: number;
+  y: number;
+  command: string;
+  length: number;
+};
+
+type CurveInfo = PathSegmentInfoCommon & {
+  iterator: (pct: number) => Point;
+  angleFinder: (pct: number) => number;
+  length: number;
+};
+
+export type PathSegmentInfo = {
+  M: PathSegmentInfoCommon;
+  L: PathSegmentInfoCommon;
+  C: CurveInfo;
+  Q: CurveInfo;
+  Z: PathSegmentInfoCommon & { destX: number; destY: number };
+};
+
+export type TPathSegmentsInfo = PathSegmentInfo[keyof PathSegmentInfo];
 
 const commandLengths = {
   m: 2,
@@ -240,14 +263,8 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   bounds[0][jlen + 1] = x3;
   bounds[1][jlen + 1] = y3;
   const result = [
-    {
-      x: Math.min(...bounds[0]),
-      y: Math.min(...bounds[1]),
-    },
-    {
-      x: Math.max(...bounds[0]),
-      y: Math.max(...bounds[1]),
-    },
+    new Point(Math.min(...bounds[0]), Math.min(...bounds[1])),
+    new Point(Math.max(...bounds[0]), Math.max(...bounds[1])),
   ];
   if (config.cachesBoundsOfCurve) {
     cache.boundsOfCurveCache[argsString] = result;
@@ -283,10 +300,10 @@ export const fromArcToBeziers = (
  * This function take a parsed SVG path and make it simpler for fabricJS logic.
  * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
  * S converted in C, T converted in Q, A converted in C.
- * @param {Array} path the array of commands of a parsed svg path for fabric.Path
- * @return {Array} the simplified array of commands of a parsed svg path for fabric.Path
+ * @param {PathData} path the array of commands of a parsed svg path for `Path`
+ * @return {PathData} the simplified array of commands of a parsed svg path for `Path`
  */
-export const makePathSimpler = (path) => {
+export const makePathSimpler = (path: PathData): PathData => {
   // x and y represent the last point of the path. the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
@@ -300,7 +317,7 @@ export const makePathSimpler = (path) => {
     y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath = [],
+  let destinationPath: PathData = [],
     previous,
     controlX,
     controlY;
@@ -473,23 +490,23 @@ const calcLineLength = (x1, y1, x2, y2) =>
   Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 const getPointOnCubicBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
     const c1 = CB1(pct),
       c2 = CB2(pct),
       c3 = CB3(pct),
       c4 = CB4(pct);
-    return {
-      x: p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-      y: p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4,
-    };
+    return new Point(
+      p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
+      p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+    );
   };
 
-const QB1 = (t) => t ** 2;
-const QB2 = (t) => 2 * t * (1 - t);
-const QB3 = (t) => (1 - t) ** 2;
+const QB1 = (t: number) => t ** 2;
+const QB2 = (t: number) => 2 * t * (1 - t);
+const QB3 = (t: number) => (1 - t) ** 2;
 
 const getTangentCubicIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
     const qb1 = QB1(pct),
       qb2 = QB2(pct),
       qb3 = QB3(pct),
@@ -501,14 +518,14 @@ const getTangentCubicIterator =
   };
 
 const getPointOnQuadraticBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
+  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct: number) => {
     const c1 = QB1(pct),
       c2 = QB2(pct),
       c3 = QB3(pct);
-    return {
-      x: p3x * c1 + p2x * c2 + p1x * c3,
-      y: p3y * c1 + p2y * c2 + p1y * c3,
-    };
+    return new Point(
+      p3x * c1 + p2x * c2 + p1x * c3,
+      p3y * c1 + p2y * c2 + p1y * c3
+    );
   };
 
 const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
@@ -518,10 +535,14 @@ const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
   return Math.atan2(tangentY, tangentX);
 };
 
-// this will run over a path segment ( a cubic or quadratic segment) and approximate it
-// with 100 segemnts. This will good enough to calculate the length of the curve
-const pathIterator = (iterator, x1, y1) => {
-  let tempP = { x: x1, y: y1 },
+// this will run over a path segment (a cubic or quadratic segment) and approximate it
+// with 100 segments. This will good enough to calculate the length of the curve
+const pathIterator = (
+  iterator: (pct: number) => Point,
+  x1: number,
+  y1: number
+) => {
+  let tempP = new Point(x1, y1),
     tmpLen = 0;
   for (let perc = 1; perc <= 100; perc += 1) {
     const p = iterator(perc / 100);
@@ -539,7 +560,7 @@ const pathIterator = (iterator, x1, y1) => {
  * @param {Number} distance from starting point, in pixels.
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
-const findPercentageForDistance = (segInfo, distance) => {
+const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
   let perc = 0,
     tmpLen = 0,
     tempP = { x: segInfo.x, y: segInfo.y },
@@ -571,12 +592,11 @@ const findPercentageForDistance = (segInfo, distance) => {
 };
 
 /**
- * Run over a parsed and simplifed path and extract some informations.
- * informations are length of each command and starting point
- * @param {Array} path fabricJS parsed path commands
- * @return {Array} path commands informations
+ * Run over a parsed and simplified path and extract some information (length of each command and starting point)
+ * @param {PathData} path parsed path commands
+ * @return {Array} path commands information
  */
-export const getPathSegmentsInfo = (path) => {
+export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
   let totalLength = 0,
     current,
     //x2 and y2 are the coords of segment start
@@ -595,7 +615,7 @@ export const getPathSegmentsInfo = (path) => {
     tempInfo = {
       x: x1,
       y: y1,
-      command: current[0],
+      command: current[0] as string,
     };
     switch (
       current[0] //first letter
@@ -677,10 +697,11 @@ export const getPathSegmentsInfo = (path) => {
   return info;
 };
 
-export const getPointOnPath = (path, distance, infos) => {
-  if (!infos) {
-    infos = getPathSegmentsInfo(path);
-  }
+export const getPointOnPath = (
+  path: PathData,
+  distance: number,
+  infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
+) => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;
@@ -850,14 +871,16 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
  * Transform a path by transforming each segment.
  * it has to be a simplified path or it won't work.
  * WARNING: this depends from pathOffset for correct operation
- * @param {Array} path fabricJS parsed and simplified path commands
- * @param {Array} transform matrix that represent the transformation
- * @param {Object} [pathOffset] the fabric.Path pathOffset
- * @param {Number} pathOffset.x
- * @param {Number} pathOffset.y
+ * @param {PathData} path fabricJS parsed and simplified path commands
+ * @param {TMat2D} transform matrix that represent the transformation
+ * @param {Point} [pathOffset] `Path.pathOffset`
  * @returns {Array} the transformed path
  */
-export const transformPath = (path, transform, pathOffset) => {
+export const transformPath = (
+  path: PathData,
+  transform: TMat2D,
+  pathOffset: Point
+) => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
       1,

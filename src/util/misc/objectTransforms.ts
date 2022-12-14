@@ -1,15 +1,14 @@
 import { Point } from '../../point.class';
+import type { FabricObject } from '../../shapes/object.class';
 import { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
+import type { TScaleMatrixArgs } from './matrix';
 import {
+  calcDimensionsMatrix,
   invertTransform,
   multiplyTransformMatrices,
   qrDecompose,
-  calcDimensionsMatrix,
 } from './matrix';
-import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
-
-type FabricObject = any;
 
 /**
  * given an object and a transform, apply the inverse transform to the object,
@@ -19,9 +18,8 @@ type FabricObject = any;
  * Removing from an object a transform that rotate by 30deg is like rotating by 30deg
  * in the opposite direction.
  * This util is used to add objects inside transformed groups or nested groups.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
- * @param {Array} transform the destination transform
+ * @param {FabricObject} object the object you want to transform
+ * @param {TMat2D} transform the destination transform
  */
 export const removeTransformFromObject = (
   object: FabricObject,
@@ -40,8 +38,7 @@ export const removeTransformFromObject = (
  * this is equivalent to change the space where the object is drawn.
  * Adding to an object a transform that scale by 2 is like scaling it by 2.
  * This is used when removing an object from an active selection for example.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
+ * @param {FabricObject} object the object you want to transform
  * @param {Array} transform the destination transform
  */
 export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
@@ -52,8 +49,7 @@ export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
 
 /**
  * discard an object transform state and apply the one from the matrix.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
+ * @param {FabricObject} object the object you want to transform
  * @param {Array} transform the destination transform
  */
 export const applyTransformToObject = (
@@ -71,9 +67,7 @@ export const applyTransformToObject = (
 };
 /**
  * reset an object transform state to neutral. Top and left are not accounted for
- * @static
- * @memberOf fabric.util
- * @param  {fabric.Object} target object to transform
+ * @param  {FabricObject} target object to transform
  */
 export const resetObjectTransform = (target: FabricObject) => {
   target.scaleX = 1;
@@ -87,14 +81,10 @@ export const resetObjectTransform = (target: FabricObject) => {
 
 /**
  * Extract Object transform values
- * @static
- * @memberOf fabric.util
- * @param  {fabric.Object} target object to read from
+ * @param  {FabricObject} target object to read from
  * @return {Object} Components of transform
  */
-export const saveObjectTransform = (
-  target: FabricObject
-): TComposeMatrixArgs & { left: number; top: number } => ({
+export const saveObjectTransform = (target: FabricObject) => ({
   scaleX: target.scaleX,
   scaleY: target.scaleY,
   skewX: target.skewX,
@@ -111,7 +101,6 @@ export const saveObjectTransform = (
  * that can contains the box with width/height with applied transform
  * described in options.
  * Use to calculate the boxes around objects for controls.
- * @memberOf fabric.util
  * @param {Number} width
  * @param {Number} height
  * @param {Object} options

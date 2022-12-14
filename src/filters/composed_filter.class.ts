@@ -1,67 +1,63 @@
-//@ts-nocheck
-(function (global) {
-  'use strict';
+// @ts-nocheck
+import * as filters from '.';
+import { TClassProperties } from '../typedefs';
+import {
+  AbstractBaseFilter,
+  BaseFilter,
+  BaseFilterOptions,
+} from './base_filter.class';
+import {
+  isWebGLPipelineState,
+  T2DPipelineState,
+  TWebGLPipelineState,
+} from './typedefs';
+/**
+ * A container class that knows how to apply a sequence of filters to an input image.
+ */
+export class Composed extends BaseFilter {
+  /**
+   * A non sparse array of filters to apply
+   */
+  subFilters: AbstractBaseFilter[];
 
-  var fabric = global.fabric || (global.fabric = {}),
-    filters = fabric.Image.filters,
-    createClass = fabric.util.createClass;
+  constructor({
+    subFilters = [],
+    ...options
+  }: Partial<BaseFilterOptions & { subFilters: AbstractBaseFilter[] }> = {}) {
+    super(options);
+    this.subFilters = subFilters;
+  }
 
   /**
-   * A container class that knows how to apply a sequence of filters to an input image.
+   * Apply this container's filters to the input image provided.
+   *
+   * @param {Object} options
+   * @param {Number} options.passes The number of filters remaining to be applied.
    */
-  filters.Composed = createClass(
-    filters.BaseFilter,
-    /** @lends fabric.Image.filters.Composed.prototype */ {
-      type: 'Composed',
-
-      /**
-       * A non sparse array of filters to apply
-       */
-      subFilters: [],
-
-      /**
-       * Constructor
-       * @param {Object} [options] Options object
-       */
-      initialize: function (options) {
-        this.callSuper('initialize', options);
-        // create a new array instead mutating the prototype with push
-        this.subFilters = this.subFilters.slice(0);
-      },
-
-      /**
-       * Apply this container's filters to the input image provided.
-       *
-       * @param {Object} options
-       * @param {Number} options.passes The number of filters remaining to be applied.
-       */
-      applyTo: function (options) {
-        options.passes += this.subFilters.length - 1;
-        this.subFilters.forEach(function (filter) {
-          filter.applyTo(options);
-        });
-      },
-
-      /**
-       * Serialize this filter into JSON.
-       *
-       * @returns {Object} A JSON representation of this filter.
-       */
-      toObject: function () {
-        return fabric.util.object.extend(this.callSuper('toObject'), {
-          subFilters: this.subFilters.map(function (filter) {
-            return filter.toObject();
-          }),
-        });
-      },
-
-      isNeutralState: function () {
-        return !this.subFilters.some(function (filter) {
-          return !filter.isNeutralState();
-        });
-      },
+  applyTo(options: TWebGLPipelineState | T2DPipelineState) {
+    if (isWebGLPipelineState(options)) {
+      options.passes += this.subFilters.length - 1;
     }
-  );
+    this.subFilters.forEach((filter) => {
+      filter.applyTo(options);
+    });
+  }
+
+  /**
+   * Serialize this filter into JSON.
+   *
+   * @returns {Object} A JSON representation of this filter.
+   */
+  toObject() {
+    return {
+      ...super.toObject(),
+      subFilters: this.subFilters.map((filter) => filter.toObject()),
+    };
+  }
+
+  isNeutralState() {
+    return !this.subFilters.some((filter) => !filter.isNeutralState());
+  }
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
@@ -69,16 +65,21 @@
    * @param {oject} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<fabric.Image.filters.Composed>}
+   * @returns {Promise<Composed>}
    */
-  fabric.Image.filters.Composed.fromObject = function (object, options) {
-    var filters = object.subFilters || [];
+  static fromObject(object, options) {
     return Promise.all(
-      filters.map(function (filter) {
-        return fabric.Image.filters[filter.type].fromObject(filter, options);
-      })
-    ).then(function (enlivedFilters) {
-      return new fabric.Image.filters.Composed({ subFilters: enlivedFilters });
-    });
-  };
-})(typeof exports !== 'undefined' ? exports : window);
+      ((object.subFilters || []) as AbstractBaseFilter[]).map((filter) =>
+        Object.values(filters)
+          .find((klass) => klass.prototype?.type === filter.type)!
+          .fromObject(filter, options)
+      )
+    ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
+  }
+}
+
+export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
+  type: 'Composed',
+};
+
+Object.assign(Composed.prototype, composedDefaultValues);

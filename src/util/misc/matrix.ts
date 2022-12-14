@@ -1,9 +1,9 @@
-import { cos } from './cos';
-import { sin } from './sin';
-import { degreesToRadians } from './radiansDegreesConversion';
-import { iMatrix, PiBy180 } from '../../constants';
+import { iMatrix } from '../../constants';
 import { IPoint, Point } from '../../point.class';
 import { TDegree, TMat2D } from '../../typedefs';
+import { cos } from './cos';
+import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
+import { sin } from './sin';
 
 type TRotateMatrixArgs = {
   angle?: TDegree;
@@ -26,25 +26,25 @@ export type TScaleMatrixArgs = {
 export type TComposeMatrixArgs = TTranslateMatrixArgs &
   TRotateMatrixArgs &
   TScaleMatrixArgs;
+
+export type TQrDecomposeOut = Required<
+  Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
+>;
 /**
  * Apply transform t to point p
- * @static
- * @memberOf fabric.util
  * @param  {Point | IPoint} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
 export const transformPoint = (
-  p: Point | IPoint,
+  p: IPoint,
   t: TMat2D,
   ignoreOffset?: boolean
 ): Point => new Point(p).transform(t, ignoreOffset);
 
 /**
  * Invert transformation t
- * @static
- * @memberOf fabric.util
  * @param {Array} t The transform
  * @return {Array} The inverted transform
  */
@@ -59,8 +59,6 @@ export const invertTransform = (t: TMat2D): TMat2D => {
 
 /**
  * Multiply matrix A by matrix B to nest transformations
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a First transformMatrix
  * @param  {TMat2D} b Second transformMatrix
  * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
@@ -82,27 +80,23 @@ export const multiplyTransformMatrices = (
 
 /**
  * Decomposes standard 2x3 matrix into transform components
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
-export const qrDecompose = (
-  a: TMat2D
-): Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>> => {
+export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
   const angle = Math.atan2(a[1], a[0]),
     denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
     scaleX = Math.sqrt(denom),
     scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
     skewX = Math.atan2(a[0] * a[2] + a[1] * a[3], denom);
   return {
-    angle: (angle / PiBy180) as TDegree,
+    angle: radiansToDegrees(angle),
     scaleX,
     scaleY,
-    skewX: (skewX / PiBy180) as TDegree,
+    skewX: radiansToDegrees(skewX),
     skewY: 0 as TDegree,
-    translateX: a[4],
-    translateY: a[5],
+    translateX: a[4] || 0,
+    translateY: a[5] || 0,
   };
 };
 
@@ -110,13 +104,10 @@ export const qrDecompose = (
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle] angle in degrees
  * @return {TMat2D} transform matrix
  */
-
 export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
   if (!angle) {
     return iMatrix;
@@ -133,8 +124,6 @@ export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
  * transformations from an object that is not enlived yet.
  * is called DimensionsTransformMatrix because those properties are the one that influence
  * the size of the resulting box of the object.
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.scaleX]
  * @param  {Number} [options.scaleY]
@@ -184,8 +173,6 @@ export const calcDimensionsMatrix = ({
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle]
  * @param  {Number} [options.scaleX]
@@ -198,7 +185,6 @@ export const calcDimensionsMatrix = ({
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-
 export const composeMatrix = ({
   translateX = 0,
   translateY = 0,

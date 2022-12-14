@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
   clipPaths,
@@ -41,7 +41,7 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  let svgUid = fabric.Object.__uid++,
+  let svgUid = uid(),
     i,
     len,
     options = applyViewboxTransform(doc),

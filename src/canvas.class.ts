@@ -1,5 +1,9 @@
 //@ts-nocheck
+import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
+import { FabricObject } from './shapes/fabricObject.class';
+import { Transform } from './EventTypeDefs';
+import { saveObjectTransform } from './util/misc/objectTransforms';
 
 (function (global) {
   var fabric = global.fabric,
@@ -138,7 +142,7 @@ import { Point } from './point.class';
        * if Canvas.uniformScaling is true, pressing this will set it to false
        * and viceversa.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       uniScaleKey: 'shiftKey',
@@ -167,7 +171,7 @@ import { Point } from './point.class';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled feature disabled.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       centeredKey: 'altKey',
@@ -178,7 +182,7 @@ import { Point } from './point.class';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled feature disabled.
        * @since 1.6.2
-       * @type String
+       * @type ModifierKey
        * @default
        */
       altActionKey: 'shiftKey',
@@ -204,7 +208,7 @@ import { Point } from './point.class';
        * If `null` or empty or containing any other string that is not a modifier key
        * feature is disabled.
        * @since 1.6.2
-       * @type String|Array
+       * @type ModifierKey|ModifierKey[]
        * @default
        */
       selectionKey: 'shiftKey',
@@ -218,7 +222,7 @@ import { Point } from './point.class';
        * If `null` or 'none' or any other string that is not a modifier key
        * feature is disabled.
        * @since 1.6.5
-       * @type null|String
+       * @type null|ModifierKey
        * @default
        */
       altSelectionKey: null,
@@ -345,23 +349,6 @@ import { Point } from './point.class';
       preserveObjectStacking: false,
 
       /**
-       * Indicates the angle that an object will lock to while rotating.
-       * @type Number
-       * @since 1.6.7
-       * @default
-       */
-      snapAngle: 0,
-
-      /**
-       * Indicates the distance from the snapAngle the rotation will lock to the snapAngle.
-       * When `null`, the snapThreshold will default to the snapAngle.
-       * @type null|Number
-       * @since 1.6.7
-       * @default
-       */
-      snapThreshold: null,
-
-      /**
        * Indicates if the right click on canvas can output the context menu or not
        * @type Boolean
        * @since 1.6.5
@@ -454,10 +441,12 @@ import { Point } from './point.class';
         this._objectsToRender = undefined;
         // removing active object should fire "selection:cleared" events
         if (obj === this._activeObject) {
-          this.fire('before:selection:cleared', { target: obj });
+          this.fire('before:selection:cleared', { deselected: [obj] });
           this._discardActiveObject();
-          this.fire('selection:cleared', { target: obj });
-          obj.fire('deselected');
+          this.fire('selection:cleared', { deselected: [obj] });
+          obj.fire('deselected', {
+            target: obj,
+          });
         }
         if (obj === this._hoveredTarget) {
           this._hoveredTarget = null;
@@ -561,7 +550,7 @@ import { Point } from './point.class';
         var ctx = this.contextTop;
         this.clearContext(ctx);
         this.renderTopLayer(ctx);
-        this.fire('after:render');
+        this.fire('after:render', { ctx });
         return this;
       },
 
@@ -739,21 +728,6 @@ import { Point } from './point.class';
 
       /**
        * @private
-       * @param {Boolean} alreadySelected true if target is already selected
-       * @param {String} corner a string representing the corner ml, mr, tl ...
-       * @param {Event} e Event object
-       * @param {fabric.Object} [target] inserted back to help overriding. Unused
-       */
-      _getActionFromCorner: function (alreadySelected, corner, e, target) {
-        if (!corner || !alreadySelected) {
-          return 'drag';
-        }
-        var control = target.controls[corner];
-        return control.getActionName(e, control, target);
-      },
-
-      /**
-       * @private
        * @param {Event} e Event object
        * @param {fabric.Object} target
        */
@@ -774,20 +748,15 @@ import { Point } from './point.class';
           actionHandler =
             alreadySelected && corner
               ? control.getActionHandler(e, target, control)
-              : fabric.controlsUtils.dragHandler,
-          action = this._getActionFromCorner(
-            alreadySelected,
-            corner,
-            e,
-            target
-          ),
+              : dragHandler,
+          action = getActionFromCorner(alreadySelected, corner, e, target),
           origin = this._getOriginFromCorner(target, corner),
           altKey = e[this.centeredKey],
           /**
            * relative to target's containing coordinate plane
            * both agree on every point
            **/
-          transform = {
+          transform: Transform = {
             target: target,
             action: action,
             actionHandler: actionHandler,
@@ -805,10 +774,11 @@ import { Point } from './point.class';
             lastX: pointer.x,
             lastY: pointer.y,
             theta: degreesToRadians(target.angle),
-            width: target.width * target.scaleX,
+            width: target.width,
+            height: target.height,
             shiftKey: e.shiftKey,
             altKey: altKey,
-            original: fabric.util.saveObjectTransform(target),
+            original: saveObjectTransform(target),
           };
 
         if (this._shouldCenterTransform(target, action, altKey)) {
@@ -871,7 +841,7 @@ import { Point } from './point.class';
         maxX -= strokeOffset;
         maxY -= strokeOffset;
         // selection border
-        fabric.Object.prototype._setLineDash.call(
+        FabricObject.prototype._setLineDash.call(
           this,
           ctx,
           this.selectionDashArray
@@ -1395,7 +1365,10 @@ import { Point } from './point.class';
         var currentActives = this.getActiveObjects(),
           activeObject = this.getActiveObject();
         if (currentActives.length) {
-          this.fire('before:selection:cleared', { target: activeObject, e: e });
+          this.fire('before:selection:cleared', {
+            e,
+            deselected: [activeObject],
+          });
         }
         this._discardActiveObject(e);
         this._fireSelectionEvents(currentActives, e);
@@ -1445,6 +1418,11 @@ import { Point } from './point.class';
         // this.discardActiveGroup();
         this.discardActiveObject();
         this.clearContext(this.contextTop);
+        if (this._hasITextHandlers) {
+          this.off('mouse:up', this._mouseUpITextHandler);
+          this._iTextInstances = null;
+          this._hasITextHandlers = false;
+        }
         return this.callSuper('clear');
       },
 
