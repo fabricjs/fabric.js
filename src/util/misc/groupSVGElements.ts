@@ -1,4 +1,4 @@
-import { FabricObject } from '../../shapes/fabricObject.class';
+import type { FabricObject } from '../../shapes/FabricObject';
 import { Group } from '../../shapes/group.class';
 
 /**

@@ -17,7 +17,7 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { FabricObject, fabricObjectDefaultValues } from './FabricObject';
 
 export type ImageSource =
   | HTMLImageElement

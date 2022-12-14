@@ -3,7 +3,7 @@ import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './FabricObject';
 import { fabricObjectDefaultValues } from './Object/Object';
 
 export class Rect extends FabricObject {

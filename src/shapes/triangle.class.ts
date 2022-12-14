@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './FabricObject';
 
 export class Triangle extends FabricObject {
   /**

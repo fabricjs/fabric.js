@@ -6,7 +6,7 @@ import {
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,

@@ -5,7 +5,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { clone } from '../util/lang_object';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './FabricObject';
 import { fabricObjectDefaultValues } from './Object/Object';
 
 const coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };

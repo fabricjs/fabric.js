@@ -9,7 +9,7 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './FabricObject';
 import { fabricObjectDefaultValues } from './Object/Object';
 
 export function polyFromElement<
