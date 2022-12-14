@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Move object classes #8511
 - chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
 - chore(TS): fix import cycle, extract `groupSVGElements` [#8506](https://github.com/fabricjs/fabric.js/pull/8506)
 - chore(TS): permissive `Point` typings [#8434](https://github.com/fabricjs/fabric.js/pull/8434)
