@@ -24,7 +24,7 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject } from './FabricObject';
+import { FabricObject } from './Object/FabricObject';
 import { fabricObjectDefaultValues } from './Object/Object';
 import { Path } from './path.class';
 

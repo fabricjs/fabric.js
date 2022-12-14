@@ -15,7 +15,7 @@ import {
   parsePath,
   type TPathSegmentsInfo,
 } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './FabricObject';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Path extends FabricObject {
   /**

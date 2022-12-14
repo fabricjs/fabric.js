@@ -1,7 +1,7 @@
 //@ts-nocheck this file is trash kept only for tests
 
 import { fabric } from '../../HEADER';
-import { FabricObject } from '../shapes/FabricObject';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 fabric.util.object.extend(
   FabricObject.prototype,

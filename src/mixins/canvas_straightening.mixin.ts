@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import type { FabricObject } from '../shapes/FabricObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 
 fabric.util.object.extend(
   fabric.StaticCanvas.prototype,
