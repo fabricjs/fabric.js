@@ -2,7 +2,7 @@ import { fabric } from '../../../HEADER';
 import { ObjectEvents } from '../../EventTypeDefs';
 import type { Group } from '../group.class';
 import type { Canvas, StaticCanvas } from '../../__types__';
-import { ObjectGeometry } from '../../mixins/object_geometry.mixin';
+import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;

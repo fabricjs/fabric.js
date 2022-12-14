@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import { ObjectEvents } from '../EventTypeDefs';
 import { FabricObjectSVGExportMixin } from '../mixins/object.svg_export';
-import { InteractiveFabricObject } from '../mixins/object_interactivity.mixin';
+import { InteractiveFabricObject } from './Object/InteractiveObject';
 import { applyMixins } from '../util/applyMixins';
 
 // TODO somehow we have to make a tree-shakeable import
