@@ -4,7 +4,7 @@ import {
   TransformAction,
   BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../shapes/Object/ObjectOrigin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import { TOriginX, TOriginY } from '../typedefs';
