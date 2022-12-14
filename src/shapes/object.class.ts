@@ -4,7 +4,7 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
-import { AnimatableObject } from '../mixins/object_animation.mixin';
+import { AnimatableObject } from './Object/AnimatableObject';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import type {
