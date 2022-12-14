@@ -10,7 +10,7 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { fabricObjectDefaultValues } from './Object/Object';
 
 export function polyFromElement<
   T extends {

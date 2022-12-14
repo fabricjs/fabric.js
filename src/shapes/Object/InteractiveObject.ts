@@ -1,6 +1,6 @@
 import { IPoint, Point } from '../../point.class';
 import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
-import { FabricObject } from '../object.class';
+import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
   calcRotateMatrix,

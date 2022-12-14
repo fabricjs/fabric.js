@@ -6,7 +6,7 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { fabricObjectDefaultValues } from './Object/Object';
 
 export class Circle extends FabricObject {
   /**

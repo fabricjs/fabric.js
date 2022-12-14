@@ -25,7 +25,7 @@ import {
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { fabricObjectDefaultValues } from './Object/Object';
 import { Path } from './path.class';
 
 let measuringContext: CanvasRenderingContext2D | null;

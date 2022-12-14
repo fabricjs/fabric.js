@@ -4,7 +4,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { fabricObjectDefaultValues } from './Object/Object';
 
 export class Ellipse extends FabricObject {
   /**

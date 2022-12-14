@@ -16,6 +16,6 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-export { fabricObjectDefaultValues } from './object.class';
+export { fabricObjectDefaultValues } from './Object/Object';
 
 fabric.Object = FabricObject;
