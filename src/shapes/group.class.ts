@@ -2,7 +2,7 @@
 import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from './Object/ObjectOrigin';
 import { Point } from '../point.class';
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';

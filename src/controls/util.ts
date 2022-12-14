@@ -4,7 +4,7 @@ import {
   TransformAction,
   BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../shapes/Object/ObjectOrigin';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/fabricObject.class';
 import { TOriginX, TOriginY } from '../typedefs';

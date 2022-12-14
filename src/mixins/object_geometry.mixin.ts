@@ -22,7 +22,7 @@ import {
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { Canvas, StaticCanvas } from '../__types__';
-import { ObjectOrigin } from './object_origin.mixin';
+import { ObjectOrigin } from '../shapes/Object/ObjectOrigin';
 import { ObjectEvents } from '../EventTypeDefs';
 
 type TLineDescriptor = {
