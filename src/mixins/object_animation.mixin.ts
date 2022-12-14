@@ -4,7 +4,7 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animate';
 import { animateColor } from '../util/animate_color';
-import { StackedObject } from './object_ancestry.mixin';
+import { StackedObject } from '../shapes/Object/StackedObject';
 
 /**
  * TODO remove transient
