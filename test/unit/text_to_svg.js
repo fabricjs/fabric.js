@@ -3,19 +3,19 @@
     return str.replace(/matrix\(.*?\)/, '');
   }
   QUnit.module('fabric.Text SVG Export', {
-    before() {
+    beforeEach() {
       fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
     },
-    after() {
+    afterEach() {
       fabric.config.restoreDefaults();
     }
   });
   QUnit.test('toSVG', function(assert) {
     var TEXT_SVG = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-10\" y=\"12.57\" >x</tspan></text>\n</g>\n';
     var text = new fabric.Text('x');
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
     text.set('fontFamily', 'Arial');
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="Arial"')));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="Arial"')));
   });
   QUnit.test('toSVG justified', function(assert) {
     var TEXT_SVG_JUSTIFIED = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-60\" y=\"-13.65\" >xxxxxx</tspan><tspan x=\"-60\" y=\"38.78\" style=\"white-space: pre; \">x </tspan><tspan x=\"40\" y=\"38.78\" >y</tspan></text>\n</g>\n';
@@ -23,12 +23,12 @@
       textAlign: 'justify',
     });
 
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_JUSTIFIED));
   });
   QUnit.test('toSVG with multiple spaces', function(assert) {
     var TEXT_SVG_MULTIPLESPACES = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-105\" y=\"12.57\" style=\"white-space: pre; \">x                 y</tspan></text>\n</g>\n';
     var text = new fabric.Text('x                 y');
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_MULTIPLESPACES));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_MULTIPLESPACES));
   });
   QUnit.test('toSVG with deltaY', function(assert) {
     fabric.config.configure({ NUM_FRACTION_DIGITS: 0 });
@@ -43,7 +43,7 @@
         }
       }
     });
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
     fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
   });
 
@@ -60,16 +60,14 @@
         5: {fontFamily: 'Times New Roman'}
       }}
     });
-    assert.equal(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_WITH_FONT));
+    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG_WITH_FONT));
   });
   QUnit.test('toSVG with text as a clipPath', function(assert) {
     fabric.config.configure({ NUM_FRACTION_DIGITS: 0 });
-    fabric.Object.__uid = 0;
     var EXPECTED = '<g transform=\"\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-122\" y=\"13\" >text as clipPath</tspan></text>\n</clipPath>\n<rect style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-100\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"200\" height=\"100\" />\n</g>\n';
     var clipPath = new fabric.Text('text as clipPath');
     var rect = new fabric.Rect({ width: 200, height: 100 });
     rect.clipPath = clipPath;
-    assert.equal(removeTranslate(rect.toSVG()), removeTranslate(EXPECTED));
-    fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    assert.equalSVG(removeTranslate(rect.toSVG()), removeTranslate(EXPECTED));
   });
 })();
