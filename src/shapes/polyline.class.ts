@@ -95,7 +95,10 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
+  constructor(
+    points: IPoint[] = [],
+    { points: _, left, top, ...options }: any = {}
+  ) {
     super({ points, ...options });
     this.initialized = true;
     this.setBoundingBox(true);
