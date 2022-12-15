@@ -137,13 +137,8 @@ function skewObject(
 }
 
 /**
- * Wrapped Action handler for skewing on a given axis, takes care of the
- * skew direction and determines the correct transform origin for the anchor point
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if some change happened
+ * Wrapped transform adaptor for skewing on a given axis.
+ * Takes care of the skew direction and determines the correct transform origin for the anchor point
  */
 function skewTransformAdaptor(
   axis: TAxis,
