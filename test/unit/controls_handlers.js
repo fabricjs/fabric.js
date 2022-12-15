@@ -255,10 +255,10 @@
       target.left = 0;
       target.scaleX = 1;
       target.scaleY = 1;
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x1, y1) => {
+      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x, y) => {
         assert.equal(t, transform, 'same ref');
-        assert.equal(x1, 1, 'same value');
-        assert.equal(y1, -1, 'same value');
+        assert.equal(x, 1, 'same value');
+        assert.equal(y, -1, 'same value');
         return { x: 'left', y: 'top' };
       })({}, transform, 1, -1);
       var center5 = target.getCenterPoint();
@@ -284,6 +284,64 @@
         fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)
       );
       wrapped(eventData, transform, x, y);
+    });
+    QUnit.test('wrapWithDisableAction', function (assert) {
+      function assertArgs(ev, t, x, y) {
+        assert.equal(ev, eventData, 'same ref');
+        assert.equal(t, transform, 'same ref');
+        assert.equal(x, 5, 'same value');
+        assert.equal(y, 6, 'same value');
+      }
+      const handler = (ev, t, x, y) => {
+        assertArgs(ev, t, x, y);
+        return true;
+      }
+      const wrapped = fabric.controlsUtils.wrapWithDisableAction(handler, 'testLocking');
+      const { target } = transform;
+      target.testLocking = true;
+      assert.equal(
+        wrapped(eventData, transform, 5, 6),
+        false,
+        'should be disabled'
+      );
+      target.testLocking = false;
+      assert.equal(
+        wrapped(eventData, transform, 5, 6),
+        true,
+        'should be enabled'
+      );
+      let disabled = true;
+      const wrappedWithHandler = fabric.controlsUtils.wrapWithDisableAction(handler, (ev, t, x, y) => {
+        assertArgs(ev, t, x, y);
+        return disabled;
+      });
+      assert.equal(
+        wrappedWithHandler(eventData, transform, 5, 6),
+        false,
+        'should be disabled'
+      );
+      disabled = false;
+      assert.equal(
+        wrappedWithHandler(eventData, transform, 5, 6),
+        true,
+        'should be enabled'
+      );
+    });
+    QUnit.test('wrapWithTransformAdaptor', function (assert) {
+      assert.expect(6);
+      function assertArgs(ev, t, x, y) {
+        assert.equal(ev, eventData, 'same ref');
+        assert.notEqual(t, transform, 'not the same ref');
+        assert.deepEqual(t, transform, 'same value');
+        assert.equal(x, 5, 'same value');
+        assert.equal(y, 6, 'same value');
+      }
+      const handler = (ev, t, x, y) => {
+        assertArgs(ev, t, x, y);
+        return true;
+      }
+      const wrapped = fabric.controlsUtils.wrapWithTransformAdaptor(handler, (ev, t, x, y) => ({ ...t }));
+      assert.ok(wrapped(eventData, transform, 5, 6), 'executed');
     });
     ['ml', 'mt', 'mr', 'mb'].forEach(controlKey => {
       const axis = {
