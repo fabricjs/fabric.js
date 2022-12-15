@@ -5,7 +5,6 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,
@@ -89,7 +88,7 @@ function skewObject(
   y: number
 ) {
   const { scale: scaleKey, skew: skewKey } = AXIS_KEYS[axis],
-    offset = ({ x, y }[axis] - transform[`e${axis}`]) / transform[scaleKey],
+    offset = ({ x, y }[axis] - transform[`e${axis}`]) / target[scaleKey],
     skewingBefore = target[skewKey],
     skewingStart = transform[skewKey],
     shearingStart = Math.tan(degreesToRadians(skewingStart)),
