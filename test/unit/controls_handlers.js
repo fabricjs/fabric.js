@@ -218,11 +218,11 @@
     });
     QUnit.test('wrapWithFixedAnchor', function(assert) {
       var target = transform.target;
-      transform.originX = 'center';
-      transform.originY = 'center';
       target.strokeWidth = 0;
-      var actionHandler = function (eventData, transform) {
+      var actionHandler = (eventData, transform) => {
         var target = transform.target;
+        assert.equal(transform.originX, 'left', 'should not be mutated');
+        assert.equal(transform.originY, 'top', 'should not be mutated');
         target.scaleX = 5;
         target.scaleY = 5;
       };
@@ -240,12 +240,32 @@
       var center3 = target.getCenterPoint();
       assert.deepEqual(center3.x, 50, 'after reset center is x 50');
       assert.deepEqual(center3.y, 50, 'after reset center is y 50');
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)({}, transform);
+      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x1, y1) => {
+        assert.equal(t, transform, 'same ref');
+        assert.equal(x1, 1, 'same value');
+        assert.equal(y1, -1, 'same value');
+        return { x: 'center', y: 'center' };
+      })({}, transform, 1, -1);
       var center4 = target.getCenterPoint();
       assert.equal(target.scaleX, 5, 'action made scaleX bigger');
       assert.equal(target.scaleY, 5, 'action made scaleY bigger');
       assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
       assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
+      target.top = 0;
+      target.left = 0;
+      target.scaleX = 1;
+      target.scaleY = 1;
+      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x1, y1) => {
+        assert.equal(t, transform, 'same ref');
+        assert.equal(x1, 1, 'same value');
+        assert.equal(y1, -1, 'same value');
+        return { x: 'left', y: 'top' };
+      })({}, transform, 1, -1);
+      var center5 = target.getCenterPoint();
+      assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+      assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+      assert.deepEqual(center5.x, 250, 'with wrapper center is x 50');
+      assert.deepEqual(center5.y, 250, 'with wrapper center is y 50');
     });
     QUnit.test('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', function(assert) {
       transform.target.canvas.on('object:scaling', function() {
