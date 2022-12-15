@@ -8,6 +8,9 @@ import { TOriginX, TOriginY } from '../typedefs';
 /**
  * Wrap an action handler with saving/restoring object position on the transform.
  * this is the code that permits to objects to keep their position while transforming.
+ * @param actionHandler the function to wrap
+ * @param [originAdaptor] enables adapting origin of the anchor point
+ * @return wrapped function
  */
 export function wrapWithFixedAnchor<T extends Transform>(
   actionHandler: TransformActionHandler<T>,
@@ -16,12 +19,6 @@ export function wrapWithFixedAnchor<T extends Transform>(
     {
       x: TOriginX;
       y: TOriginY;
-      /**
-       * propagate the new origin values to {@link actionHandler}
-       * consider using {@link wrapWithTransformAdaptor}
-       * @default true
-       */
-      propagate?: boolean;
     }
   >
 ) {
@@ -31,17 +28,9 @@ export function wrapWithFixedAnchor<T extends Transform>(
         originX: incomingOriginX,
         originY: incomingOriginY,
       } = transform,
-      {
-        x: originX,
-        y: originY,
-        propagate = true,
-      } = originAdaptor
+      { x: originX, y: originY } = originAdaptor
         ? originAdaptor(eventData, transform, x, y)
         : { x: incomingOriginX, y: incomingOriginY };
-    if (propagate) {
-      transform.originX = originX;
-      transform.originY = originY;
-    }
     const centerPoint = target.getRelativeCenterPoint(),
       constraint = target.translateToOriginPoint(centerPoint, originX, originY),
       actionPerformed = actionHandler(eventData, transform, x, y);
