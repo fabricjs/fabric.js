@@ -794,6 +794,10 @@ sandbox
       }
       template = pathToSandbox;
       pathToSandbox = undefined;
+    } else if (!fs.existsSync(pathToSandbox)) {
+      console.log(chalk.blue('Did you mean to use the build command?'));
+      context.help({ error: true });
+      return;
     }
     startSandbox(
       pathToSandbox || path.resolve(codesandboxTemplatesDir, template),
