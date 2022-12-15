@@ -10,12 +10,7 @@ import {
 export function wrapWithTransformAdaptor<T extends Transform>(
   actionHandler: TransformActionHandler<T>,
   adaptor: TransformAction<Transform, T>
-) {
-  return ((eventData, transform, x, y) =>
-    actionHandler(
-      eventData,
-      adaptor(eventData, transform, x, y),
-      x,
-      y
-    )) as TransformActionHandler;
+): TransformActionHandler {
+  return (eventData, transform, x, y) =>
+    actionHandler(eventData, adaptor(eventData, transform, x, y), x, y);
 }

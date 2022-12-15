@@ -14,12 +14,12 @@ import { commonEventInfo } from './util';
 export const wrapWithFireEvent = <T extends Transform>(
   eventName: TModificationEvents,
   actionHandler: TransformActionHandler<T>
-) => {
-  return ((eventData, transform, x, y) => {
+): TransformActionHandler<T> => {
+  return (eventData, transform, x, y) => {
     const actionPerformed = actionHandler(eventData, transform, x, y);
     if (actionPerformed) {
       fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
     }
     return actionPerformed;
-  }) as TransformActionHandler<T>;
+  };
 };

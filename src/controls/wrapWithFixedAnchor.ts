@@ -21,8 +21,8 @@ export function wrapWithFixedAnchor<T extends Transform>(
       y: TOriginY;
     }
   >
-) {
-  return ((eventData, transform, x, y) => {
+): TransformActionHandler<T> {
+  return (eventData, transform, x, y) => {
     const {
         target,
         originX: incomingOriginX,
@@ -36,5 +36,5 @@ export function wrapWithFixedAnchor<T extends Transform>(
       actionPerformed = actionHandler(eventData, transform, x, y);
     target.setPositionByOrigin(constraint, originX, originY);
     return actionPerformed;
-  }) as TransformActionHandler<T>;
+  };
 }
