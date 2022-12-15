@@ -16,9 +16,11 @@ import {
   scalingYOrSkewingX,
 } from './scaleSkew';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
-import { getLocalPoint, getActionFromCorner } from './util';
+import { getActionFromCorner, getLocalPoint } from './util';
+import { wrapWithDisableAction } from './wrapWithDisableAction';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { wrapWithTransformAdaptor } from './wrapWithTransformAdaptor';
 
 export {
   scaleCursorStyleHandler,
@@ -36,8 +38,10 @@ export {
   dragHandler,
   scaleOrSkewActionName,
   rotationStyleHandler,
-  wrapWithFixedAnchor,
+  wrapWithDisableAction,
   wrapWithFireEvent,
+  wrapWithFixedAnchor,
+  wrapWithTransformAdaptor,
   getLocalPoint,
   getActionFromCorner,
   renderCircleControl,
@@ -63,8 +67,10 @@ fabric.controlsUtils = {
   dragHandler,
   scaleOrSkewActionName,
   rotationStyleHandler,
-  wrapWithFixedAnchor,
+  wrapWithDisableAction,
   wrapWithFireEvent,
+  wrapWithFixedAnchor,
+  wrapWithTransformAdaptor,
   getLocalPoint,
   renderCircleControl,
   renderSquareControl,
