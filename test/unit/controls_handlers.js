@@ -21,6 +21,8 @@
         originY: origin.y,
         signX: 1,
         signY: 1,
+        ex: 0,
+        ey: 0
       };
     }
     QUnit.test('changeWidth changes the width', function(assert) {
