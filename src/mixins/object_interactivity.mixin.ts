@@ -43,7 +43,7 @@ export class InteractiveFabricObject<
    * @type number|string|any
    * @default 0
    */
-  __corner: number | string;
+  __corner: 0 | string;
 
   /**
    * a map of control visibility for this object.

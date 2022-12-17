@@ -40,10 +40,13 @@ export type TCachedFabricObject = FabricObject &
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
+      | '_cacheContext'
       | 'cacheTranslationX'
       | 'cacheTranslationY'
     >
-  >;
+  > & {
+    _cacheContext: CanvasRenderingContext2D;
+  };
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;

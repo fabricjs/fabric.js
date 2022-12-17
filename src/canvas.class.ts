@@ -1,11 +1,15 @@
 import { fabric } from '../HEADER';
 import { dragHandler, getActionFromCorner } from './controls/actions';
-import { Point } from './point.class';
+import { IPoint, Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
-import { CanvasEvents, TOptionalModifierKey, Transform } from './EventTypeDefs';
+import { CanvasEvents, ModifierKey, TOptionalModifierKey, Transform } from './EventTypeDefs';
 import { saveObjectTransform } from './util/misc/objectTransforms';
 import { StaticCanvas } from './static_canvas.class';
-
+import { isCollection, isFabricObjectCached } from './util/types';
+import { invertTransform, transformPoint } from './util/misc/matrix';
+import { isTransparent } from './util/misc/isTransparent';
+import { TOriginX, TOriginY } from './typedefs';
+import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 /**
  * Canvas class
  * @class fabric.Canvas
@@ -192,7 +196,7 @@ export class Canvas<
    * @type ModifierKey|ModifierKey[]
    * @default
    */
-  selectionKey: TOptionalModifierKey;
+  selectionKey: TOptionalModifierKey | ModifierKey[];
 
   /**
    * Indicates which key enable alternative selection
@@ -405,6 +409,23 @@ export class Canvas<
   _groupSelector: any;
 
   /**
+   * internal flag used to understand if the context top requires a cleanup
+   * in case this is true, the contextTop will be cleared at the next render
+   * @type boolean
+   * @private
+   */
+  contextTopDirty = false;
+
+  /**
+   * a reference to the context of an additional canvas that is used for scratch operations
+   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
+   * and is a memory waste. We should either have one that gets added/deleted
+   * @type CanvasRenderingContext2D
+   * @private
+   */
+  contextCache: CanvasRenderingContext2D;
+
+  /**
    * Constructor
    * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
    * @param {Object} [options] Options object
@@ -473,7 +494,7 @@ export class Canvas<
    * and one to render as activeGroup.
    * @return {Array} objects to render immediately and pushes the other in the activeGroup.
    */
-  _chooseObjectsToRender() {
+  _chooseObjectsToRender(): FabricObject[] {
     const activeObjects = this.getActiveObjects();
     let objsToRender,
       activeGroupObjects;
@@ -489,18 +510,18 @@ export class Canvas<
           activeGroupObjects.push(object);
         }
       }
-      if (activeObjects.length > 1) {
+      if (activeObjects.length > 1 && isCollection(this._activeObject)) {
         this._activeObject._objects = activeGroupObjects;
       }
-      objsToRender.push.apply(objsToRender, activeGroupObjects);
+      objsToRender.push(...activeGroupObjects);
     }
     //  in case a single object is selected render it's entire parent above the other objects
     else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-      var target = activeObjects[0],
+      const target = activeObjects[0],
         ancestors = target.getAncestors(true);
-      var topAncestor = ancestors.length === 0 ? target : ancestors.pop();
+      const topAncestor = ancestors.length === 0 ? target : ancestors.pop();
       objsToRender = this._objects.slice();
-      var index = objsToRender.indexOf(topAncestor);
+      const index = objsToRender.indexOf(topAncestor);
       index > -1 &&
         objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
       objsToRender.push(topAncestor);
@@ -513,7 +534,6 @@ export class Canvas<
   /**
    * Renders both the top canvas and the secondary container canvas.
    * @return {fabric.Canvas} instance
-   * @chainable
    */
   renderAll() {
     this.cancelRequestedRender();
@@ -535,10 +555,9 @@ export class Canvas<
     !this._objectsToRender &&
       (this._objectsToRender = this._chooseObjectsToRender());
     this.renderCanvas(this.contextContainer, this._objectsToRender);
-    return this;
   }
 
-  renderTopLayer(ctx) {
+  renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
       this.freeDrawingBrush && this.freeDrawingBrush._render();
@@ -556,45 +575,46 @@ export class Canvas<
    * Method to render only the top canvas.
    * Also used to render the group selection box.
    * @return {fabric.Canvas} thisArg
-   * @chainable
    */
   renderTop() {
-    var ctx = this.contextTop;
+    const ctx = this.contextTop;
     this.clearContext(ctx);
     this.renderTopLayer(ctx);
+    // todo: how do i know if the after:render is for the top or normal contex?
     this.fire('after:render', { ctx });
-    return this;
   }
 
   /**
+   * Given a pointer on the canvas with a viewport applied,
+   * find out the opinter in
    * @private
    */
-  _normalizePointer(object, pointer) {
-    var m = object.calcTransformMatrix(),
-      invertedM = fabric.util.invertTransform(m),
-      vptPointer = this.restorePointerVpt(pointer);
-    return fabric.util.transformPoint(vptPointer, invertedM);
+  _normalizePointer(object: FabricObject, pointer: IPoint): Point {
+    return transformPoint(
+      this.restorePointerVpt(pointer),
+      invertTransform(object.calcTransformMatrix())
+    );
   }
 
   /**
    * Returns true if object is transparent at a certain location
-   * @param {fabric.Object} target Object to check
+   * Clarification: this is `is target transparent at location X or are controls there`
+   * @TODO this seems dumb that we treat controls with transparency. we can find controls
+   * programmatically without painting them, the cache canvas optimization is always valid
+   * @param {FabricObject} target Object to check
    * @param {Number} x Left coordinate
    * @param {Number} y Top coordinate
    * @return {Boolean}
    */
-  isTargetTransparent(target, x, y) {
+  isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
     // in case the target is the activeObject, we cannot execute this optimization
     // because we need to draw controls too.
     if (
-      target.shouldCache() &&
-      target._cacheCanvas &&
+      isFabricObjectCached(target) &&
       target !== this._activeObject
     ) {
-      var normalizedPointer = this._normalizePointer(target, {
-          x: x,
-          y: y,
-        }),
+      // optimizatio: we can reuse the cache
+      const normalizedPointer = this._normalizePointer(target, { x, y }),
         targetRelativeX = Math.max(
           target.cacheTranslationX + normalizedPointer.x * target.zoomX,
           0
@@ -604,17 +624,15 @@ export class Canvas<
           0
         );
 
-      var isTransparent = fabric.util.isTransparent(
+      return isTransparent(
         target._cacheContext,
         Math.round(targetRelativeX),
         Math.round(targetRelativeY),
         this.targetFindTolerance
       );
-
-      return isTransparent;
     }
 
-    var ctx = this.contextCache,
+    const ctx = this.contextCache,
       originalColor = target.selectionBackgroundColor,
       v = this.viewportTransform;
 
@@ -629,42 +647,38 @@ export class Canvas<
 
     target.selectionBackgroundColor = originalColor;
 
-    var isTransparent = fabric.util.isTransparent(
+    return isTransparent(
       ctx,
       x,
       y,
       this.targetFindTolerance
     );
-
-    return isTransparent;
   }
 
   /**
    * takes an event and determines if selection key has been pressed
    * @private
-   * @param {Event} e Event object
+   * @param {MouseEvent} e Event object
    */
-  _isSelectionKeyPressed(e) {
-    var selectionKeyPressed = false;
-
-    if (Array.isArray(this.selectionKey)) {
-      selectionKeyPressed = !!this.selectionKey.find(function (key) {
-        return e[key] === true;
-      });
-    } else {
-      selectionKeyPressed = e[this.selectionKey];
+  _isSelectionKeyPressed(e: MouseEvent): boolean {
+    const sKey = this.selectionKey;
+    if (!sKey) {
+      return false
     }
-
-    return selectionKeyPressed;
+    if (Array.isArray(sKey)) {
+      return !!sKey.find((key) => !!key && e[key] === true );
+    } else {
+      return e[sKey];
+    }
   }
 
   /**
    * @private
-   * @param {Event} e Event object
-   * @param {fabric.Object} target
+   * @param {MouseEvent} e Event object
+   * @param {FabricObject} target
    */
-  _shouldClearSelection(e, target) {
-    var activeObjects = this.getActiveObjects(),
+  _shouldClearSelection(e: MouseEvent, target: FabricObject): boolean {
+    const activeObjects = this.getActiveObjects(),
       activeObject = this._activeObject;
 
     return (
@@ -684,21 +698,25 @@ export class Canvas<
   }
 
   /**
+   * This is an internal method to decide if given the action and the modifier key pressed
+   * the transformation should with the object center as origin
    * centeredScaling from object can't override centeredScaling from canvas.
    * this should be fixed, since object setting should take precedence over canvas.
    * also this should be something that will be migrated in the control properties.
    * as ability to define the origin of the transformation that the control provide.
+   * @TODO this probably deserve discussion/rediscovery and change/refactor
    * @private
-   * @param {fabric.Object} target
-   * @param {String} action
-   * @param {Boolean} altKey
+   * @param {FabricObject} target
+   * @param {string} action
+   * @param {boolean} altKey
+   * @returns {boolean} true if the transformation should be centered
    */
-  _shouldCenterTransform(target, action, altKey) {
+  _shouldCenterTransform(target: FabricObject, action: string, modifierKeyPressed: boolean) {
     if (!target) {
       return;
     }
 
-    var centerTransform;
+    let centerTransform;
 
     if (
       action === 'scale' ||
@@ -711,28 +729,33 @@ export class Canvas<
       centerTransform = this.centeredRotation || target.centeredRotation;
     }
 
-    return centerTransform ? !altKey : altKey;
+    return centerTransform ? !modifierKeyPressed : modifierKeyPressed;
   }
 
   /**
+   * Given the control clicked, determine the origin of the transform.
+   * This is bad because controls can totally have custom names
    * should disappear before release 4.0
    * @private
+   * @deprecated
    */
-  _getOriginFromCorner(target, corner) {
-    var origin = {
+  _getOriginFromCorner(target: FabricObject, controlName: string): { x: TOriginX, y: TOriginY } {
+    const origin = {
       x: target.originX,
       y: target.originY,
     };
-
-    if (corner === 'ml' || corner === 'tl' || corner === 'bl') {
+    // is a left control ?
+    if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = 'right';
-    } else if (corner === 'mr' || corner === 'tr' || corner === 'br') {
+    // is a right control ?
+    } else if (['mr', 'tr', 'br'].includes(controlName)) {
       origin.x = 'left';
     }
-
-    if (corner === 'tl' || corner === 'mt' || corner === 'tr') {
+    // is a top control ?
+    if (['tl', 'mt', 'tr'].includes(controlName)) {
       origin.y = 'bottom';
-    } else if (corner === 'bl' || corner === 'mb' || corner === 'br') {
+    // is a bottom control ?
+    } else if (['bl', 'mb', 'br'].includes(controlName)) {
       origin.y = 'top';
     }
     return origin;
@@ -743,19 +766,17 @@ export class Canvas<
    * @param {Event} e Event object
    * @param {fabric.Object} target
    */
-  _setupCurrentTransform(e, target, alreadySelected) {
+  _setupCurrentTransform(e: MouseEvent, target: FabricObject, alreadySelected: boolean): void {
     if (!target) {
       return;
     }
-    var pointer = this.getPointer(e);
+    let pointer = this.getPointer(e);
     if (target.group) {
-      //  transform pointer to target's containing coordinate plane
-      pointer = fabric.util.transformPoint(
-        pointer,
-        fabric.util.invertTransform(target.group.calcTransformMatrix())
-      );
+      // transform pointer to target's containing coordinate plane
+      // should we use send point to plane?
+      pointer = pointer.transform(invertTransform(target.group.calcTransformMatrix()));
     }
-    var corner = target.__corner,
+    const corner = target.__corner || '',
       control = target.controls[corner],
       actionHandler =
         alreadySelected && corner
@@ -763,7 +784,7 @@ export class Canvas<
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
       origin = this._getOriginFromCorner(target, corner),
-      altKey = e[this.centeredKey],
+      altKey = e[this.centeredKey as ModifierKey],
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
@@ -772,7 +793,7 @@ export class Canvas<
         target: target,
         action: action,
         actionHandler: actionHandler,
-        corner: corner,
+        corner,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
         skewX: target.skewX,
@@ -790,15 +811,17 @@ export class Canvas<
         height: target.height,
         shiftKey: e.shiftKey,
         altKey: altKey,
-        original: saveObjectTransform(target),
+        original: {
+          ...saveObjectTransform(target),
+          originX: origin.x,
+          originY: origin.y
+        },
       };
 
     if (this._shouldCenterTransform(target, action, altKey)) {
       transform.originX = 'center';
       transform.originY = 'center';
     }
-    transform.original.originX = origin.x;
-    transform.original.originY = origin.y;
     this._currentTransform = transform;
     this._beforeTransform(e);
   }
@@ -808,7 +831,7 @@ export class Canvas<
    * @param {String} value Cursor type of the canvas element.
    * @see http://www.w3.org/TR/css3-ui/#cursor
    */
-  setCursor(value) {
+  setCursor(value: CSSStyleDeclaration['cursor']): void {
     this.upperCanvasEl.style.cursor = value;
   }
 
@@ -816,26 +839,18 @@ export class Canvas<
    * @private
    * @param {CanvasRenderingContext2D} ctx to draw the selection on
    */
-  _drawSelection(ctx) {
-    var selector = this._groupSelector,
-      viewportStart = new Point(selector.ex, selector.ey),
-      start = fabric.util.transformPoint(
-        viewportStart,
-        this.viewportTransform
-      ),
-      viewportExtent = new Point(
-        selector.ex + selector.left,
-        selector.ey + selector.top
-      ),
-      extent = fabric.util.transformPoint(
-        viewportExtent,
-        this.viewportTransform
-      ),
-      minX = Math.min(start.x, extent.x),
+  _drawSelection(ctx: CanvasRenderingContext2D): void {
+    const { ex, ey, left, top } = this._groupSelector,
+      start = new Point(ex, ey).transform(this.viewportTransform),
+      extent = new Point(
+        ex + left,
+        ey + top
+      ).transform(this.viewportTransform),
+      strokeOffset = this.selectionLineWidth / 2;
+    let minX = Math.min(start.x, extent.x),
       minY = Math.min(start.y, extent.y),
       maxX = Math.max(start.x, extent.x),
-      maxY = Math.max(start.y, extent.y),
-      strokeOffset = this.selectionLineWidth / 2;
+      maxY = Math.max(start.y, extent.y);
 
     if (this.selectionColor) {
       ctx.fillStyle = this.selectionColor;
@@ -853,6 +868,7 @@ export class Canvas<
     maxX -= strokeOffset;
     maxY -= strokeOffset;
     // selection border
+    // @TODO: is _setLineDash still necessary on modern canvas?
     FabricObject.prototype._setLineDash.call(
       this,
       ctx,
@@ -870,7 +886,7 @@ export class Canvas<
    * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {fabric.Object} the target found
    */
-  findTarget(e, skipGroup) {
+  findTarget(e: MouseEvent, skipGroup: boolean) {
     if (this.skipTargetFind) {
       return;
     }
@@ -1040,7 +1056,7 @@ export class Canvas<
    * @param {Boolean} ignoreVpt
    * @return {Point}
    */
-  getPointer(e, ignoreVpt) {
+  getPointer(e: MouseEvent, ignoreVpt = false): Point {
     // return cached values if we are in the event processing chain
     if (this._absolutePointer && !ignoreVpt) {
       return this._absolutePointer;

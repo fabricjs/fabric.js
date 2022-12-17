@@ -1,6 +1,6 @@
 import type { ActiveSelection } from '../shapes/active_selection.class';
 import type { Group } from '../shapes/group.class';
-import { FabricObject } from '../shapes/object.class';
+import type { FabricObject, TCachedFabricObject } from '../shapes/object.class';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
@@ -35,4 +35,10 @@ export const isTextObject = (
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
   return !!fabricObject && fabricObject.type.includes('text');
+};
+
+export const isFabricObjectCached = (
+  fabricObject: FabricObject,
+): fabricObject is TCachedFabricObject => {
+  return fabricObject.shouldCache() && !!fabricObject._cacheCanvas
 };
