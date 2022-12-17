@@ -266,18 +266,7 @@ export class StaticCanvas<
   renderAndResetBound: () => void;
   requestRenderAllBound: () => void;
 
-  // TODO: move to canvas
-  interactive: boolean;
-  upperCanvasEl: HTMLCanvasElement;
-  contextTop: CanvasRenderingContext2D;
-  wrapperEl: HTMLDivElement;
-  cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
-  freeDrawingBrush: BaseBrush;
-  _activeObject: FabricObject;
-
   _offset: { left: number; top: number };
-  protected _originalCanvasStyle?: string;
   protected hasLostContext: boolean;
   protected nextRenderHandle: number;
   protected __cleanupTask: {
@@ -471,11 +460,6 @@ export class StaticCanvas<
     }
     this.lowerCanvasEl.classList.add('lower-canvas');
     this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    if (this.interactive) {
-      this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-      this._applyCanvasStyle(this.lowerCanvasEl);
-    }
-
     this.contextContainer = this.lowerCanvasEl.getContext('2d');
   }
 
@@ -546,11 +530,6 @@ export class StaticCanvas<
       }
     });
 
-    // @TODO: move to Canvas
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
     this._initRetinaScaling();
     this.calcOffset();
 
@@ -568,16 +547,6 @@ export class StaticCanvas<
    */
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     this.lowerCanvasEl[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl[prop] = value;
-    }
-
-    // TODO: move to canvas
-    if (this.cacheCanvasEl) {
-      this.cacheCanvasEl[prop] = value;
-    }
-
     this[prop] = value;
   }
 
@@ -590,14 +559,6 @@ export class StaticCanvas<
    */
   _setCssDimension(prop: keyof TSize, value: string) {
     this.lowerCanvasEl.style[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl.style[prop] = value;
-    }
-
-    if (this.wrapperEl) {
-      this.wrapperEl.style[prop] = value;
-    }
   }
 
   /**
@@ -1747,11 +1708,6 @@ export class StaticCanvas<
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
-    // needs to be moved into Canvas class
-    if (this.interactive) {
-      canvasElement.style.cssText = this._originalCanvasStyle || '';
-      delete this._originalCanvasStyle;
-    }
     // restore canvas size to original size in case retina scaling was applied
     canvasElement.setAttribute('width', `${this.width}`);
     canvasElement.setAttribute('height', `${this.height}`);
