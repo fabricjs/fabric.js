@@ -3,7 +3,7 @@ import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
 import { FabricObject } from './shapes/fabricObject.class';
 import { CanvasEvents, ModifierKey, TOptionalModifierKey, TPointerEvent, Transform } from './EventTypeDefs';
-import { saveObjectTransform } from './util/misc/objectTransforms';
+import { addTransformToObject, saveObjectTransform } from './util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 import { isActiveSelection, isCollection, isFabricObjectCached, isInteractiveTextObject } from './util/types';
 import { invertTransform, transformPoint } from './util/misc/matrix';
@@ -30,8 +30,8 @@ type TDestroyedCanvas = Omit<Canvas<CanvasEvents>, 'contextTop' | 'contextCache'
 
 /**
  * Canvas class
- * @class fabric.Canvas
- * @extends fabric.StaticCanvas
+ * @class Canvas
+ * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
  * @see {@link fabric.Canvas#initialize} for constructor definition
  *
@@ -377,7 +377,7 @@ export class Canvas<
 
   /**
    * Keep track of the subTargets for Mouse Events
-   * @type fabric.Object[]
+   * @type FabricObject[]
    */
   targets: FabricObject[] = [];
 
@@ -390,21 +390,21 @@ export class Canvas<
 
   /**
    * Keep track of the hovered target
-   * @type fabric.Object
+   * @type FabricObject | null
    * @private
    */
   _hoveredTarget: FabricObject | null = null;
 
   /**
    * hold the list of nested targets hovered
-   * @type fabric.Object[]
+   * @type FabricObject[]
    * @private
    */
   _hoveredTargets: FabricObject[] = [];
 
   /**
    * hold the list of objects to render
-   * @type fabric.Object[]
+   * @type FabricObject[]
    * @private
    */
   _objectsToRender?: FabricObject[] = [];
@@ -464,7 +464,7 @@ export class Canvas<
   wrapperEl: HTMLDivElement;
   cacheCanvasEl: HTMLCanvasElement;
   protected _isCurrentlyDrawing: boolean;
-  freeDrawingBrush: BaseBrush;
+  freeDrawingBrush?: BaseBrush;
   _activeObject: FabricObject | null;
   _originalCanvasStyle?: string;
   _hasITextHandlers?: boolean;
@@ -492,16 +492,15 @@ export class Canvas<
   _initInteractive() {
     this._initWrapperElement();
     this._createUpperCanvas();
+    // @ts-ignore
     this._initEventListeners();
     this._initRetinaScaling();
-    this.freeDrawingBrush =
-      fabric.PencilBrush && new fabric.PencilBrush(this);
     this.calcOffset();
   }
 
   /**
    * @private
-   * @param {fabric.Object} obj Object that was added
+   * @param {FabricObject} obj Object that was added
    */
   _onObjectAdded(obj: FabricObject) {
     this._objectsToRender = undefined;
@@ -510,7 +509,7 @@ export class Canvas<
 
   /**
    * @private
-   * @param {fabric.Object} obj Object that was removed
+   * @param {FabricObject} obj Object that was removed
    */
   _onObjectRemoved(obj: FabricObject) {
     this._objectsToRender = undefined;
@@ -574,7 +573,6 @@ export class Canvas<
 
   /**
    * Renders both the top canvas and the secondary container canvas.
-   * @return {fabric.Canvas} instance
    */
   renderAll() {
     this.cancelRequestedRender();
@@ -615,7 +613,7 @@ export class Canvas<
   /**
    * Method to render only the top canvas.
    * Also used to render the group selection box.
-   * @return {fabric.Canvas} thisArg
+   * @return {Canvas} thisArg
    */
   renderTop() {
     const ctx = this.contextTop;
@@ -805,7 +803,7 @@ export class Canvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {fabric.Object} target
+   * @param {FaricObject} target
    */
   _setupCurrentTransform(e: TPointerEvent, target: FabricObject, alreadySelected: boolean): void {
     if (!target) {
@@ -925,7 +923,7 @@ export class Canvas<
    * or the outside part of the corner.
    * @param {Event} e mouse event
    * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
-   * @return {fabric.Object} the target found
+   * @return {FabricObject | null} the target found
    */
   findTarget(e: TPointerEvent, skipGroup: boolean): FabricObject | null {
     if (this.skipTargetFind) {
@@ -1056,7 +1054,7 @@ export class Canvas<
    * @see {@link fabric.Canvas#_searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {fabric.Object} **top most object on screen** that contains pointer
+   * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(objects: FabricObject[], pointer: Point) {
     const target = this._searchPossibleTargets(objects, pointer);
@@ -1152,7 +1150,7 @@ export class Canvas<
    * @param {Object}        [options]                     Options object
    * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @return {fabric.Canvas} thisArg
+   * @return {Canvas} thisArg
    */
   setDimensions(dimensions: TSize, options?: TCanvasSizeOptions) {
     this._resetTransformEventData();
@@ -1293,7 +1291,7 @@ export class Canvas<
 
   /**
    * Returns currently active object
-   * @return {fabric.Object} active object
+   * @return {FabricObject | null} active object
    */
   getActiveObject(): FabricObject | null {
     return this._activeObject;
@@ -1301,7 +1299,7 @@ export class Canvas<
 
   /**
    * Returns an array with the current selected objects
-   * @return {fabric.Object} active object
+   * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
@@ -1375,9 +1373,8 @@ export class Canvas<
 
   /**
    * Sets given object as the only active object on canvas
-   * @param {fabric.Object} object Object to set as an active one
-   * @param {Event} [e] Event (passed along when firing "object:selected")
-   * @return {fabric.Canvas} thisArg
+   * @param {FabricObject} object Object to set as an active one
+   * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
    * @chainable
    */
   setActiveObject(object: FabricObject, e?: TPointerEvent) {
@@ -1385,7 +1382,6 @@ export class Canvas<
     const currentActives = this.getActiveObjects();
     this._setActiveObject(object, e);
     this._fireSelectionEvents(currentActives, e);
-    return this;
   }
 
   /**
@@ -1443,7 +1439,6 @@ export class Canvas<
    * sent to the fire function for the custom events. When used as a method the
    * e param does not have any application.
    * @param {event} e
-   * @return {fabric.Canvas} thisArg
    * @chainable
    */
   discardActiveObject(e?: TPointerEvent) {
@@ -1457,7 +1452,6 @@ export class Canvas<
     }
     this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
-    return this;
   }
 
   /**
@@ -1497,7 +1491,6 @@ export class Canvas<
 
   /**
    * Clears all contexts (background, main, top) of an instance
-   * @return {fabric.Canvas} thisArg
    */
   clear() {
     // this.discardActiveGroup();
@@ -1565,7 +1558,7 @@ export class Canvas<
         'top',
       ] as (keyof typeof instance)[];
       const  originalValues = pick<typeof instance>(instance, layoutProps);
-      fabric.util.addTransformToObject(
+      addTransformToObject(
         instance,
         this._activeObject.calcOwnMatrix()
       );

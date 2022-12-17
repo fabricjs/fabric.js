@@ -44,7 +44,7 @@ export const isInteractiveTextObject = (
 ): fabricObject is IText | Textbox => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.type === 'i-text' || fabricObject.type === 'textbox';
+  return !!fabricObject && ['i-text', 'textbox'].includes(fabricObject.type);
 };
 
 export const isFabricObjectCached = (
