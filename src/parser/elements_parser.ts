@@ -1,4 +1,7 @@
 import { fabric } from '../../HEADER';
+import { Gradient } from '../gradient';
+import { Group } from '../shapes/group.class';
+import { Image } from '../shapes/image.class';
 import { capitalize } from '../util/lang_string';
 import {
   invertTransform,
@@ -106,7 +109,7 @@ class ElementsParser {
       let _options;
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
-      if (obj instanceof fabric.Image && (obj as any)._originalElement) {
+      if (obj instanceof Image && (obj as any)._originalElement) {
         _options = (obj as any).parsePreserveAspectRatioAttribute(el);
       }
       obj._removeTransformMatrix(_options);
@@ -143,7 +146,7 @@ class ElementsParser {
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = fabric.Gradient.fromElement(gradientDef, obj, {
+      const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
       });
@@ -192,7 +195,7 @@ class ElementsParser {
         if (container.length === 1) {
           clipPath = container[0];
         } else {
-          clipPath = new fabric.Group(container);
+          clipPath = new Group(container);
         }
         const gTransform = multiplyTransformMatrices(
           objTransformInv,

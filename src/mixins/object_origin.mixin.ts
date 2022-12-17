@@ -1,10 +1,10 @@
-import { IPoint, Point } from '../point.class';
+import { Point } from '../point.class';
+import type { Group } from '../shapes/group.class';
+import { TDegree, TOriginX, TOriginY } from '../typedefs';
 import { transformPoint } from '../util/misc/matrix';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { CommonMethods } from './shared_methods.mixin';
-import { TDegree, TOriginX, TOriginY } from '../typedefs';
-import { Group } from '../shapes/group.class';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
 const originOffset = {
   left: -0.5,
@@ -27,7 +27,7 @@ export const resolveOrigin = (
     ? originOffset[originValue]
     : originValue - 0.5;
 
-export class ObjectOrigin extends CommonMethods {
+export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
   /**
    * Top position of an object. Note that by default it's relative to object top. You can change this by setting originY={top/center/bottom}
    * @type Number
@@ -193,7 +193,7 @@ export class ObjectOrigin extends CommonMethods {
    * @return {Point}
    */
   translateToGivenOrigin(
-    point: IPoint,
+    point: Point,
     fromOriginX: TOriginX,
     fromOriginY: TOriginY,
     toOriginX: TOriginX,
@@ -221,7 +221,7 @@ export class ObjectOrigin extends CommonMethods {
    * @return {Point}
    */
   translateToCenterPoint(
-    point: IPoint,
+    point: Point,
     originX: TOriginX,
     originY: TOriginY
   ): Point {
@@ -307,7 +307,7 @@ export class ObjectOrigin extends CommonMethods {
    * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {void}
    */
-  setPositionByOrigin(pos: IPoint, originX: TOriginX, originY: TOriginY) {
+  setPositionByOrigin(pos: Point, originX: TOriginX, originY: TOriginY) {
     const center = this.translateToCenterPoint(pos, originX, originY),
       position = this.translateToOriginPoint(
         center,

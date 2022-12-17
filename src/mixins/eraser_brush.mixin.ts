@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { uid } from '../util/internals/uid';
 
 (function (global) {
   /** ERASER_START */
@@ -105,7 +106,7 @@ import { Point } from '../point.class';
      */
     _createEraserSVGMarkup: function (reviver) {
       if (this.eraser) {
-        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
+        this.eraser.clipPathId = 'MASK_' + uid();
         return [
           '<mask id="',
           this.eraser.clipPathId,

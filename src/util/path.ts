@@ -2,13 +2,13 @@
 
 import { cache } from '../cache';
 import { config } from '../config';
-import { fabric } from '../../HEADER';
 import { halfPI, PiBy180 } from '../constants';
 import { commaWsp, rePathCommand } from '../parser/constants';
 import { Point } from '../point.class';
+import type { PathData, TMat2D } from '../typedefs';
 import { cos } from './misc/cos';
-import { sin } from './misc/sin';
 import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
+import { sin } from './misc/sin';
 
 const commandLengths = {
   m: 2,
@@ -277,10 +277,10 @@ export const fromArcToBeziers = (
  * This function take a parsed SVG path and make it simpler for fabricJS logic.
  * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
  * S converted in C, T converted in Q, A converted in C.
- * @param {Array} path the array of commands of a parsed svg path for fabric.Path
- * @return {Array} the simplified array of commands of a parsed svg path for fabric.Path
+ * @param {PathData} path the array of commands of a parsed svg path for `Path`
+ * @return {PathData} the simplified array of commands of a parsed svg path for `Path`
  */
-export const makePathSimpler = (path) => {
+export const makePathSimpler = (path: PathData): PathData => {
   // x and y represent the last point of the path. the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
@@ -294,7 +294,7 @@ export const makePathSimpler = (path) => {
     y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath = [],
+  let destinationPath: PathData = [],
     previous,
     controlX,
     controlY;
@@ -844,14 +844,16 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
  * Transform a path by transforming each segment.
  * it has to be a simplified path or it won't work.
  * WARNING: this depends from pathOffset for correct operation
- * @param {Array} path fabricJS parsed and simplified path commands
- * @param {Array} transform matrix that represent the transformation
- * @param {Object} [pathOffset] the fabric.Path pathOffset
- * @param {Number} pathOffset.x
- * @param {Number} pathOffset.y
+ * @param {PathData} path fabricJS parsed and simplified path commands
+ * @param {TMat2D} transform matrix that represent the transformation
+ * @param {Point} [pathOffset] `Path.pathOffset`
  * @returns {Array} the transformed path
  */
-export const transformPath = (path, transform, pathOffset) => {
+export const transformPath = (
+  path: PathData,
+  transform: TMat2D,
+  pathOffset: Point
+) => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
       1,

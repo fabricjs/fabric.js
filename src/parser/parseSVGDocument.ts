@@ -1,4 +1,5 @@
 import { fabric } from '../../HEADER';
+import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
   clipPaths,
@@ -59,7 +60,7 @@ export function parseSVGDocument(
   }
   parseUseDirectives(doc);
 
-  const svgUid = FabricObject.__uid++,
+  const svgUid = uid(),
     options: ElementsParserParsingOptions = applyViewboxTransform(doc);
   let descendants = Array.from(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;

@@ -108,37 +108,6 @@
     return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
   }
 
-  QUnit.assert.equalImageSVG = function (actual, expected) {
-    function extractBasename(s) {
-      var p = 'xlink:href', pos = s.indexOf(p) + p.length;
-      return basename(s.slice(pos, s.indexOf(' ', pos)));
-    }
-    this.pushResult({
-      result: extractBasename(actual) === extractBasename(expected),
-      actual: actual,
-      expected: expected,
-      message: 'svg is not equal to ref'
-    });
-  }
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    expected = expected || REFERENCE_IMG_OBJECT;
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
-  }
-
   QUnit.module('fabric.Image');
 
   QUnit.test('constructor', function(assert) {
@@ -296,7 +265,7 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toString === 'function');
-      assert.equal(image.toString(), '#<fabric.Image: { src: "' + image.getSrc() + '" }>');
+      assert.equal(image.toString(), '#<Image: { src: "' + image.getSrc() + '" }>');
       done();
     });
   });
@@ -308,9 +277,8 @@
       image.cropY = 1;
       image.width -= 2;
       image.height -= 2;
-      fabric.Object.__uid = 1;
       var expectedSVG = '<g transform=\"matrix(1 0 0 1 137 54)\"  >\n<clipPath id=\"imageCrop_1\">\n\t<rect x=\"-137\" y=\"-54\" width=\"274\" height=\"108\" />\n</clipPath>\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" clip-path=\"url(#imageCrop_1)\" ></image>\n</g>\n';
-      assert.equalImageSVG(image.toSVG(), expectedSVG);
+      assert.equalSVG(image.toSVG(), expectedSVG);
       done();
     });
   });
@@ -339,7 +307,7 @@
     createImageObject(function(image) {
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform=\"matrix(1 0 0 1 138 55)\"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\"></image>\n</g>\n';
-      assert.equalImageSVG(image.toSVG(), expectedSVG);
+      assert.equalSVG(image.toSVG(), expectedSVG);
       done();
     });
   });
@@ -350,7 +318,7 @@
       image.imageSmoothing = false;
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n\t<image style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  xlink:href=\"' + IMG_SRC + '\" x=\"-138\" y=\"-55\" width=\"276\" height=\"110\" image-rendering=\"optimizeSpeed\"></image>\n</g>\n';
-      assert.equalImageSVG(image.toSVG(), expectedSVG);
+      assert.equalSVG(image.toSVG(), expectedSVG);
       done();
     });
   });
@@ -361,7 +329,7 @@
       delete image._element;
       assert.ok(typeof image.toSVG === 'function');
       var expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
-      assert.equalImageSVG(image.toSVG(), expectedSVG);
+      assert.equalSVG(image.toSVG(), expectedSVG);
       done();
     });
   });
@@ -402,7 +370,7 @@
 
       var elImage = _createImageElement();
       assert.notEqual(image.getElement(), elImage);
-      assert.equal(image.setElement(elImage), image, 'chainable');
+      image.setElement(elImage);
       assert.equal(image.getElement(), elImage);
       assert.equal(image._originalElement, elImage);
       done();
@@ -421,7 +389,7 @@
       };
       var elImage = _createImageElement();
       fabric.filterBackend.textureCache[image.cacheKey] = 'something';
-      assert.equal(image.setElement(elImage), image, 'chainable');
+      image.setElement(elImage);
       assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
       fabric.filterBackend = fabricBackend;
       done();
