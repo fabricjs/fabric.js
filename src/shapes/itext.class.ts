@@ -4,7 +4,7 @@ import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import { TClassProperties, TFiller } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './Object/FabricObject';
 import {
   keysMap,
   keysMapRtl,

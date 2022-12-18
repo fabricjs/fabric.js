@@ -1,8 +1,8 @@
-import { fabric } from '../../HEADER';
-import { ObjectEvents } from '../EventTypeDefs';
-import type { Group } from '../shapes/group.class';
-import type { Canvas, StaticCanvas } from '../__types__';
-import { ObjectGeometry } from './object_geometry.mixin';
+import { fabric } from '../../../HEADER';
+import { ObjectEvents } from '../../EventTypeDefs';
+import type { Group } from '../group.class';
+import type { Canvas, StaticCanvas } from '../../__types__';
+import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
