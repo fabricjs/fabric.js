@@ -466,7 +466,6 @@ export class Canvas<
   protected _isCurrentlyDrawing: boolean;
   freeDrawingBrush?: BaseBrush;
   _activeObject: FabricObject | null;
-  _originalCanvasStyle?: string;
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[]
   /**
@@ -483,7 +482,6 @@ export class Canvas<
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
@@ -1483,8 +1481,6 @@ export class Canvas<
       cacheCanvasEl = this.cacheCanvasEl as HTMLCanvasElement;
     // @ts-ignore
     this.removeListeners();
-    lowerCanvasEl.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);

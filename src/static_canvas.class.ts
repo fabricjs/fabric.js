@@ -262,6 +262,13 @@ export class StaticCanvas<
    */
   disposed?: boolean;
 
+  /**
+   * Keeps a copy of the canvas style before setting retina scaling and other potions
+   * in order to return it to original state on dispose
+   * @type string
+   */
+  _originalCanvasStyle?: string;
+
   renderAndResetBound: () => void;
   requestRenderAllBound: () => void;
 
@@ -341,6 +348,7 @@ export class StaticCanvas<
   _initStatic(el: string | HTMLCanvasElement, options = {}) {
     this._objects = [];
     this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
     this._initOptions(options);
     this.calcOffset();
   }
@@ -1704,6 +1712,8 @@ export class StaticCanvas<
     // restore canvas size to original size in case retina scaling was applied
     canvasElement.setAttribute('width', `${this.width}`);
     canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
     cleanUpJsdomNode(canvasElement);
   }
 
