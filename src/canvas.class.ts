@@ -503,7 +503,6 @@ export class Canvas<
     super(el, options);
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
     this._createCacheCanvas();
   }
 
