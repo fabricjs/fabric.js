@@ -39,6 +39,7 @@ import { TSVGReviver } from './mixins/object.svg_export';
 import { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
 import { sendPointToPlane } from './util/misc/planeChange';
 
+
 type TDestroyedCanvas = Omit<
   Canvas<CanvasEvents>,
   | 'contextTop'
@@ -319,6 +320,7 @@ export class Canvas<
    * @default crosshair
    */
   freeDrawingCursor: CSSStyleDeclaration['cursor'];
+
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
