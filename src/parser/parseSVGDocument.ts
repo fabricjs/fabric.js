@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
@@ -20,14 +19,14 @@ import {
   TReviver,
 } from './elements_parser';
 
+import { FabricObject } from '../shapes/object.class';
+
 export type TParseSVGDocumentCallback = (
   instances: FabricObject[],
   options: ElementsParserOptions,
   elements?: Element[],
   descendants?: Element[]
 ) => void;
-import { FabricObject } from '../shapes/fabricObject.class';
-import {InteractiveFabricObject} from "../mixins/object_interactivity.mixin";
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -109,7 +108,7 @@ export function parseSVGDocument(
     elements,
     function (instances, elements) {
       if (callback) {
-        callback(instances as InteractiveFabricObject[], options, elements, descendants);
+        callback(instances, options, elements, descendants);
         delete gradientDefs[svgUid];
         delete cssRules[svgUid];
         delete clipPaths[svgUid];

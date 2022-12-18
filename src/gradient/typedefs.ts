@@ -86,11 +86,11 @@ export type SVGOptions = {
   /**
    * width part of the viewBox attribute on svg
    */
-  viewBoxWidth: number;
+  viewBoxWidth?: number;
   /**
    * height part of the viewBox attribute on svg
    */
-  viewBoxHeight: number;
+  viewBoxHeight?: number;
   /**
    * width part of the svg tag if viewBox is not specified
    */

@@ -4,50 +4,48 @@ import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
 /**
- * TODO: real docs, not sure what this is actually doing
+ * Inlines svg <use> tags by cloning the tag it references and replacing the use with the clone
+ * Puts referenced <svg> tags into a group
  * @param doc
  */
-export function parseUseDirectives(doc: Document | HTMLElement) {
-  const nodeList = getMultipleNodes(doc, ['use', 'svg:use']);
-  for (const el of nodeList) {
-    const xlinkAttribute =
-      el.getAttribute('xlink:href') || el.getAttribute('href');
+export function parseUseDirectives(doc: Document | HTMLElement | SVGElement) {
+  for (const node of getMultipleNodes(doc, ['use', 'svg:use'])) {
+    const hrefAttribute =
+      node.getAttribute('xlink:href') || node.getAttribute('href');
 
-    if (xlinkAttribute === null) {
+    // ignore this node since it doesn't link to anything
+    if (!hrefAttribute) {
       return;
     }
 
-    const xlink = xlinkAttribute.slice(1),
-      x = el.getAttribute('x') ?? '0',
-      y = el.getAttribute('y') ?? '0',
+    const xlink = hrefAttribute.slice(1),
+      x = node.getAttribute('x') ?? '0',
+      y = node.getAttribute('y') ?? '0',
       namespace = svgNS;
-    let el2 = elementById(doc, xlink)?.cloneNode(true) as Element,
-      currentTrans =
-        (el2?.getAttribute('transform') ?? '') +
-        ' translate(' +
-        x +
-        ', ' +
-        y +
-        ')',
+    let clonedLinkedEl = elementById(doc, xlink)?.cloneNode(true) as SVGElement,
+      currentTrans = `${
+        clonedLinkedEl?.getAttribute('transform') ?? ''
+      } translate(${x}, ${y})`,
       parentNode: ParentNode;
 
-    applyViewboxTransform(el2);
-    if (/^svg$/i.test(el2.nodeName)) {
-      const el3 = el2.ownerDocument.createElementNS(namespace, 'g');
+    applyViewboxTransform(clonedLinkedEl);
+    // if the thing we were referencing was another SVG tag (AKA the name of the tag is svg)
+    // "replace" the tag with a group <g> if true
+    if (/^svg$/i.test(clonedLinkedEl.nodeName)) {
+      const group = clonedLinkedEl.ownerDocument.createElementNS(namespace, 'g');
       Array<Attr>
-        .from(el2.attributes)
+        .from(clonedLinkedEl.attributes)
         .forEach((attr: Attr) =>
-          el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue ?? '')
+          group.setAttributeNS(namespace, attr.nodeName, attr.nodeValue ?? '')
         );
-      // el2.firstChild != null
-      while (el2.firstChild) {
-        el3.appendChild(el2.firstChild);
+      // put all the children of this element into a group
+      for (const child of clonedLinkedEl.children) {
+        group.appendChild(child);
       }
-      el2 = el3;
+      clonedLinkedEl = group;
     }
 
-    for (let j = 0, attrs = el.attributes, len = attrs.length; j < len; j++) {
-      const attr = attrs.item(j);
+    for (const attr of node.attributes) {
       if (
         attr?.nodeName === 'x' ||
         attr?.nodeName === 'y' ||
@@ -58,18 +56,18 @@ export function parseUseDirectives(doc: Document | HTMLElement) {
       }
 
       if (attr?.nodeName === 'transform') {
-        currentTrans = attr.nodeValue + ' ' + currentTrans;
+        currentTrans = `${attr.nodeValue} ${currentTrans}`;
       } else if (attr) {
-        el2.setAttribute(attr.nodeName, attr.nodeValue ?? '');
+        clonedLinkedEl.setAttribute(attr.nodeName, attr.nodeValue ?? '');
       }
     }
 
-    el2.setAttribute('transform', currentTrans);
-    el2.setAttribute('instantiated_by_use', '1');
-    el2.removeAttribute('id');
-    if (el.parentNode) {
-      parentNode = el.parentNode;
-      parentNode.replaceChild(el2, el);
+    clonedLinkedEl.setAttribute('transform', currentTrans);
+    clonedLinkedEl.setAttribute('instantiated_by_use', '1');
+    clonedLinkedEl.removeAttribute('id');
+    if (node.parentNode) {
+      parentNode = node.parentNode;
+      parentNode.replaceChild(clonedLinkedEl, node);
     }
     // TODO: ask about this
     // please tell me if deleting/changing this will affect functionality

@@ -9,7 +9,7 @@ import {
   qrDecompose,
 } from '../util/misc/matrix';
 import { TParsedViewBoxDims } from './applyViewboxTransform';
-import { FabricObject } from '../shapes/object.class';
+import { FabricObject } from '../shapes/fabricObject.class';
 import { Point } from '../point.class';
 
 export interface ElementsParserOptions extends TParsedViewBoxDims {
@@ -110,7 +110,7 @@ class ElementsParser {
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
       if (obj instanceof Image && (obj as any)._originalElement) {
-        _options = (obj as any).parsePreserveAspectRatioAttribute(el);
+        _options = obj.parsePreserveAspectRatioAttribute();
       }
       obj._removeTransformMatrix(_options);
       this.resolveClipPath(obj, el);
@@ -148,6 +148,8 @@ class ElementsParser {
       const opacityAttr = el.getAttribute(property + '-opacity');
       const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
+        width: this.options.viewBoxWidth ?? Infinity,
+        height: this.options.viewBoxHeight ?? Infinity,
         opacity: opacityAttr,
       });
       obj.set(property, gradient);
@@ -213,7 +215,7 @@ class ElementsParser {
         clipPath.skewX = options.skewX;
         clipPath.skewY = 0;
         clipPath.setPositionByOrigin(
-          { x: options.translateX, y: options.translateY },
+          new Point({ x: options.translateX, y: options.translateY }),
           'center',
           'center'
         );

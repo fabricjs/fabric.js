@@ -35,37 +35,40 @@ export type TParsedViewBoxDims = {
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  * @param element
  */
-export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
+export function applyViewboxTransform(element: SVGElement): TParsedViewBoxDims {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
-  let scaleX = 1,
-    scaleY = 1,
-    el: Element,
+
+  let el: Element,
     translateMatrix = '',
     widthDiff = 0,
-    heightDiff = 0,
-    matrix: string;
+    heightDiff = 0;
   const preserveAspectRatioAttr =
-      element.getAttribute('preserveAspectRatio') || '',
+      element.getAttribute('preserveAspectRatio') ?? '',
     viewBoxAttributeFull = element.getAttribute('viewBox'),
     viewBoxAttr = viewBoxAttributeFull?.match(reViewBoxAttrValue),
     widthAttr = element.getAttribute('width'),
     heightAttr = element.getAttribute('height'),
     xAttr = element.getAttribute('x') ?? '0',
     yAttr = element.getAttribute('y') ?? '0',
-    missingViewBox = !viewBoxAttr,
     missingDimAttr =
       !widthAttr ||
       !heightAttr ||
       widthAttr === '100%' ||
-      heightAttr === '100%',
-    toBeParsed = missingViewBox && missingDimAttr,
-    parsedDim: TParsedViewBoxDims = {};
+      heightAttr === '100%';
+
+  let scaleX = 1;
+  let scaleY = 1;
+  const missingViewBox = !viewBoxAttr;
+  const toBeParsed = missingViewBox && missingDimAttr;
+  const parsedDim: TParsedViewBoxDims = {};
 
   parsedDim.width = 0;
   parsedDim.height = 0;
   parsedDim.toBeParsed = toBeParsed;
+
+  let matrix: string;
 
   if (missingViewBox) {
     if (
@@ -73,8 +76,7 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
       element.parentNode &&
       element.parentNode.nodeName !== '#document'
     ) {
-      translateMatrix =
-        ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
+      translateMatrix = ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
       matrix = (element.getAttribute('transform') || '') + translateMatrix;
       element.setAttribute('transform', matrix);
       element.removeAttribute('x');
@@ -92,6 +94,7 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
     // set a transform for elements that have x y and are inner(only) SVGs
     return parsedDim;
   }
+
   const minX = -parseFloat(viewBoxAttr[1]);
   const minY = -parseFloat(viewBoxAttr[2]);
   const viewBoxWidth = parseFloat(viewBoxAttr[3]);
@@ -151,8 +154,7 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
     return parsedDim;
   }
   if ((xAttr || yAttr) && element.parentNode?.nodeName !== '#document') {
-    translateMatrix =
-      ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
+    translateMatrix = ` translate(${parseUnit(xAttr)} ${parseUnit(yAttr)}) `;
   }
 
   matrix = `${translateMatrix} matrix(${scaleX} 0 0 ${scaleY} ${
@@ -162,10 +164,8 @@ export function applyViewboxTransform(element: Element): TParsedViewBoxDims {
   // parsedDim.viewboxTransform = parseTransformAttribute(matrix);
   if (element.nodeName === 'svg') {
     el = element.ownerDocument.createElementNS(svgNS, 'g');
-    // element.firstChild != null
-    while (element.firstChild) {
-      //TODO: is this correct? shouldn't this infinitely loop????
-      el.appendChild(element.firstChild);
+    for (const child of element.children) {
+      el.appendChild(child);
     }
     element.appendChild(el);
   } else {

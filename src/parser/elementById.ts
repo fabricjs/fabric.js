@@ -4,7 +4,7 @@
  * @param id
  */
 export function elementById(
-  doc: Document | HTMLElement,
+  doc: Document | HTMLElement | SVGElement,
   id: string
 ): Element | undefined {
   const el = (doc as Document).getElementById?.(id);
