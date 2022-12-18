@@ -4,9 +4,9 @@ import {
   TransformAction,
   BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,

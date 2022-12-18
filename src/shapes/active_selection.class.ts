@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
 import { enlivenObjects } from '../util/misc/objectEnlive';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './Object/FabricObject';
 import { Group, groupDefaultValues } from './group.class';
 
 export class ActiveSelection extends Group {

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   changeWidth,
   rotationStyleHandler,

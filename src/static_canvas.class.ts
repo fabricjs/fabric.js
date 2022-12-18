@@ -10,8 +10,8 @@ import { TSVGReviver } from './mixins/object.svg_export';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Pattern } from './pattern.class';
 import { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
-import { TCachedFabricObject } from './shapes/object.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
+import { TCachedFabricObject } from './shapes/Object/Object';
 import { Rect } from './shapes/rect.class';
 import type {
   TCornerPoint,

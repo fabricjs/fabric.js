@@ -2,7 +2,7 @@ import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
 import { Gradient } from '../../gradient';
 import { Pattern } from '../../pattern.class';
-import type { FabricObject } from '../../shapes/fabricObject.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { camelize, capitalize } from '../lang_string';
 import { createImage } from './dom';

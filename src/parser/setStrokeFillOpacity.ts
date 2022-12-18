@@ -2,7 +2,7 @@
 import { Color } from '../color';
 import { toFixed } from '../util/misc/toFixed';
 import { colorAttributes } from './constants';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 /**
  * @private

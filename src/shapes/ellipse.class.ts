@@ -3,8 +3,7 @@ import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
   /**

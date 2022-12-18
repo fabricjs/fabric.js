@@ -18,7 +18,7 @@ import './src/mixins/canvas_serialization.mixin'; // optional serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gestures
 import './src/mixins/canvas_animation.mixin'; // optional animation
 import './src/mixins/canvas_straightening.mixin'; // optional animation
-import './src/shapes/fabricObject.class';
+import './src/shapes/Object/FabricObject';
 import './src/mixins/object_stacking.mixin'; // removed in #8461
 import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';

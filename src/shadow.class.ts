@@ -2,7 +2,7 @@ import { fabric } from '../HEADER';
 import { Color } from './color';
 import { config } from './config';
 import { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';

@@ -1,7 +1,7 @@
 import type { ErasingEventContext } from './brushes/Eraser';
 import type { Control } from './controls/control.class';
 import type { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 import type { Group } from './shapes/group.class';
 import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './static_canvas.class';

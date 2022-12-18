@@ -1,17 +1,17 @@
-import { IPoint, Point } from '../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
-import { FabricObject } from '../shapes/object.class';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { IPoint, Point } from '../../point.class';
+import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import { FabricObject } from './Object';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
   calcRotateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
   TQrDecomposeOut,
-} from '../util/misc/matrix';
-import { ObjectGeometry } from './object_geometry.mixin';
-import type { Control } from '../controls/control.class';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { ObjectEvents } from '../EventTypeDefs';
+} from '../../util/misc/matrix';
+import { ObjectGeometry } from './ObjectGeometry';
+import type { Control } from '../../controls/control.class';
+import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { ObjectEvents } from '../../EventTypeDefs';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;

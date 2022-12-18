@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './object.class';
+import { FabricObject } from './Object/FabricObject';
 import {
   polyFromElement,
   Polyline,

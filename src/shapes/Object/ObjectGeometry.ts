@@ -5,12 +5,12 @@ import type {
   TMat2D,
   TOriginX,
   TOriginY,
-} from '../typedefs';
-import { iMatrix } from '../constants';
-import { Intersection } from '../intersection.class';
-import { Point } from '../point.class';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import { cos } from '../util/misc/cos';
+} from '../../typedefs';
+import { iMatrix } from '../../constants';
+import { Intersection } from '../../intersection.class';
+import { Point } from '../../point.class';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { cos } from '../../util/misc/cos';
 import {
   calcRotateMatrix,
   composeMatrix,
@@ -18,12 +18,12 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
   transformPoint,
-} from '../util/misc/matrix';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
-import { Canvas, StaticCanvas } from '../__types__';
-import { ObjectOrigin } from './object_origin.mixin';
-import { ObjectEvents } from '../EventTypeDefs';
+} from '../../util/misc/matrix';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { sin } from '../../util/misc/sin';
+import { Canvas, StaticCanvas } from '../../__types__';
+import { ObjectOrigin } from './ObjectOrigin';
+import { ObjectEvents } from '../../EventTypeDefs';
 
 type TLineDescriptor = {
   o: Point;

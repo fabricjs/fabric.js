@@ -2,7 +2,7 @@
 import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
@@ -18,7 +18,7 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Rect } from './rect.class';
 
 export type LayoutContextType =
