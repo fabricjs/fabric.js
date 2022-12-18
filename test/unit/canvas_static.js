@@ -1449,6 +1449,20 @@
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
+
+    canvas.sendObjectBackwards(rect1, true);
+
+    assert.equal(canvas.item(1), rect1);
+    assert.equal(canvas.item(0), rect2);
+    assert.equal(canvas.item(2), rect3);
+
+    rect1.set({ top: 100 });
+    rect1.setCoords();
+    canvas.sendObjectBackwards(rect1, true);
+
+    assert.equal(canvas.item(1), rect1);
+    assert.equal(canvas.item(0), rect2);
+    assert.equal(canvas.item(2), rect3);
   });
 
   QUnit.test('bringObjectForward', function(assert) {
@@ -1491,6 +1505,21 @@
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
+    assert.equal(canvas.item(2), rect3);
+
+    canvas.bringObjectForward(rect2, true);
+    // [ 1, 2, 3 ]
+    assert.equal(canvas.item(0), rect1);
+    assert.equal(canvas.item(1), rect2);
+    assert.equal(canvas.item(2), rect3);
+
+    rect2.set({ left: 200 });
+    rect2.setCoords();
+    canvas.bringObjectForward(rect2, true);
+    
+    // rect2, rect3 do not overlap
+    assert.equal(canvas.item(0), rect1);
+    assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
   });
 
