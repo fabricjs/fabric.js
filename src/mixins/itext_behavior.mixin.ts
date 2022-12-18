@@ -65,7 +65,7 @@ export abstract class ITextBehaviorMixin<
     selectable: boolean;
     hoverCursor: string | null;
     defaultCursor: string;
-    moveCursor: string;
+    moveCursor: CSSStyleDeclaration['cursor'];
   };
   protected _selectionDirection: 'left' | 'right' | null;
 

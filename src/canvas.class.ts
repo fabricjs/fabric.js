@@ -37,6 +37,7 @@ import type { Textbox } from './shapes/textbox.class';
 import { pick } from './util/misc/pick';
 import { TSVGReviver } from './mixins/object.svg_export';
 import { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
+import { sendPointToPlane } from './util/misc/planeChange';
 
 type TDestroyedCanvas = Omit<
   Canvas<CanvasEvents>,
@@ -293,31 +294,31 @@ export class Canvas<
 
   /**
    * Default cursor value used when hovering over an object on canvas
-   * @type String
-   * @default
+   * @type CSSStyleDeclaration['cursor']
+   * @default move
    */
-  hoverCursor: string;
+  hoverCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used when moving an object on canvas
-   * @type String
-   * @default
+   * @type CSSStyleDeclaration['cursor']
+   * @default move
    */
-  moveCursor: string;
+  moveCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used for the entire canvas
    * @type String
-   * @default
+   * @default default
    */
-  defaultCursor: string;
+  defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used during free drawing
    * @type String
    * @default crosshair
    */
-  freeDrawingCursor: string;
+  freeDrawingCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
@@ -325,7 +326,7 @@ export class Canvas<
    * @since 2.0.0
    * @default not-allowed
    */
-  notAllowedCursor: string;
+  notAllowedCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default element class that's given to wrapper (div) element of canvas
@@ -752,20 +753,19 @@ export class Canvas<
   }
 
   /**
-   * This is an internal method to decide if given the action and the modifier key pressed
-   * the transformation should with the object center as origin
-   * centeredScaling from object can't override centeredScaling from canvas.
-   * this should be fixed, since object setting should take precedence over canvas.
-   * also this should be something that will be migrated in the control properties.
-   * as ability to define the origin of the transformation that the control provide.
+   * This method will take in consideration a modifier key pressed and the control we are
+   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
+   * This should be really in the realm of controls, and we should remove specific code for legacy
+   * embedded actions.
    * @TODO this probably deserve discussion/rediscovery and change/refactor
    * @private
+   * @deprecated
    * @param {FabricObject} target
    * @param {string} action
    * @param {boolean} altKey
    * @returns {boolean} true if the transformation should be centered
    */
-  _shouldCenterTransform(
+  private _shouldCenterTransform(
     target: FabricObject,
     action: string,
     modifierKeyPressed: boolean
@@ -839,9 +839,7 @@ export class Canvas<
     if (target.group) {
       // transform pointer to target's containing coordinate plane
       // should we use send point to plane?
-      pointer = pointer.transform(
-        invertTransform(target.group.calcTransformMatrix())
-      );
+      pointer = sendPointToPlane(undefined, target.group.calcTransformMatrix());
     }
     const corner = target.__corner || '',
       control = target.controls[corner],
@@ -1278,8 +1276,8 @@ export class Canvas<
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
     setStyle(this.wrapperEl, {
-      width: this.width + 'px',
-      height: this.height + 'px',
+      width: `${this.width}px`,
+      height: `${this.height}px`,
       position: 'relative',
     });
     makeElementUnselectable(this.wrapperEl);
@@ -1348,7 +1346,7 @@ export class Canvas<
     const active = this._activeObject;
     if (active) {
       if (isActiveSelection(active)) {
-        return active._objects.slice(0);
+        return [...active._objects];
       } else {
         return [active];
       }
@@ -1466,7 +1464,7 @@ export class Canvas<
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
-      if (obj.onDeselect({ e: e, object })) {
+      if (obj.onDeselect({ e, object })) {
         return false;
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
@@ -1513,9 +1511,9 @@ export class Canvas<
    */
   destroy(this: TDestroyedCanvas) {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
-      lowerCanvasEl = this.lowerCanvasEl as HTMLCanvasElement,
-      upperCanvasEl = this.upperCanvasEl as HTMLCanvasElement,
-      cacheCanvasEl = this.cacheCanvasEl as HTMLCanvasElement;
+      lowerCanvasEl = this.lowerCanvasEl!,
+      upperCanvasEl = this.upperCanvasEl!,
+      cacheCanvasEl = this.cacheCanvasEl!;
     // @ts-ignore
     this.removeListeners();
     super.destroy();
@@ -1621,8 +1619,8 @@ export class Canvas<
     instance: FabricObject,
     reviver: TSVGReviver
   ) {
-    //If the object is in a selection group, simulate what would happen to that
-    //object when the group is deselected
+    // If the object is in a selection group, simulate what would happen to that
+    // object when the group is deselected
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
