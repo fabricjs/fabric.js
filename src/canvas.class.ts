@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
-import { FabricObject } from './shapes/fabricObject.class';
+import { FabricObject } from './shapes/Object/FabricObject';
 import { Transform } from './EventTypeDefs';
 import { saveObjectTransform } from './util/misc/objectTransforms';
 
