@@ -509,9 +509,13 @@ export class Canvas<
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
-    this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
+  }
+
+  _createLowerCanvas(canvasEl: string | HTMLCanvasElement) {
+    super._createLowerCanvas(canvasEl);
+    this._applyCanvasStyle(this.lowerCanvasEl);
   }
 
   /**
