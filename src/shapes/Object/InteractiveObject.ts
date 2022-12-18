@@ -247,14 +247,16 @@ export class InteractiveFabricObject<
         this.cornerSize,
         control.x,
         control.y,
-        false
+        false,
+        this
       );
       control.touchCorner = controlObject.calcCornerCoords(
         this.angle,
         this.touchCornerSize,
         control.x,
         control.y,
-        true
+        true,
+        this
       );
     });
   }
