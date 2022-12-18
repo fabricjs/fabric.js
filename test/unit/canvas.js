@@ -194,7 +194,7 @@
   });
 
   QUnit.test('_initInteractive', function(assert) {
-    assert.ok(typeof canvas._initInteractive === 'function');
+    assert.ok(typeof canvas._init === 'function');
     assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
     assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
     assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');
@@ -202,7 +202,6 @@
 
   QUnit.test('renderTop', function(assert) {
     assert.ok(typeof canvas.renderTop === 'function');
-    assert.equal(canvas, canvas.renderTop());
   });
 
   QUnit.test('_chooseObjectsToRender', function(assert) {
@@ -756,7 +755,6 @@
 
   QUnit.test('renderAll', function(assert) {
     assert.ok(typeof canvas.renderAll === 'function');
-    assert.equal(canvas, canvas.renderAll());
   });
 
   QUnit.test('_drawSelection', function(assert) {
@@ -1706,7 +1704,7 @@
 
   QUnit.test('normalize pointer', function(assert) {
     assert.ok(typeof canvas._normalizePointer === 'function');
-    var pointer = { x: 10, y: 20 },
+    var pointer = new fabric.Point({ x: 10, y: 20 }),
         object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
         normalizedPointer = canvas._normalizePointer(object, pointer);
     assert.equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
@@ -1729,7 +1727,7 @@
 
   QUnit.test('restorePointerVpt', function(assert) {
     assert.ok(typeof canvas.restorePointerVpt === 'function');
-    var pointer = { x: 10, y: 20 },
+    var pointer = new fabric.Point({ x: 10, y: 20 }),
         restoredPointer = canvas.restorePointerVpt(pointer);
     assert.equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
     assert.equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
@@ -2055,7 +2053,8 @@
     assert.equal(aGroup._objects[1], circle2);
     assert.equal(aGroup._objects[2], rect1);
     assert.equal(aGroup._objects[3], circle1);
-    canvas.setActiveObject(aGroup).renderAll();
+    canvas.setActiveObject(aGroup)
+    canvas.renderAll();
     // after rendering objects are ordered in canvas stack order
     assert.equal(aGroup._objects[0], rect1);
     assert.equal(aGroup._objects[1], rect2);
