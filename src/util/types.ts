@@ -4,6 +4,7 @@ import type {
   FabricObject,
   TCachedFabricObject,
 } from '../shapes/Object/Object';
+import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
@@ -54,4 +55,10 @@ export const isFabricObjectCached = (
   fabricObject: FabricObject
 ): fabricObject is TCachedFabricObject => {
   return fabricObject.shouldCache() && !!fabricObject._cacheCanvas;
+};
+
+export const isFabricObjectWithDragSupport = (
+  fabricObject: FabricObject | null
+): fabricObject is FabricObjectWithDragSupport => {
+  return !!fabricObject && typeof (fabricObject as FabricObjectWithDragSupport).onDragStart === 'function';
 };

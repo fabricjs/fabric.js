@@ -119,7 +119,8 @@ type OutEvent = {
   nextTarget?: FabricObject;
 };
 
-type DragEventData = TEventWithTarget<DragEvent> & {
+type DragEventData = TEvent<DragEvent> & {
+  target?: FabricObject;
   subTargets?: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;

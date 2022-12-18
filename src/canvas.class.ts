@@ -36,6 +36,7 @@ import type { BaseBrush } from './brushes/base_brush.class';
 import type { Textbox } from './shapes/textbox.class';
 import { pick } from './util/misc/pick';
 import { TSVGReviver } from './mixins/object.svg_export';
+import { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
 
 type TDestroyedCanvas = Omit<
   Canvas<CanvasEvents>,
@@ -407,13 +408,6 @@ export class Canvas<
   targets: FabricObject[] = [];
 
   /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
-  enablePointerEvents: boolean;
-
-  /**
    * Keep track of the hovered target
    * @type FabricObject | null
    * @private
@@ -470,19 +464,29 @@ export class Canvas<
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _absolutePointer holds a reference to the pointer in coordinates that is valide for the event
+   * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
+   * @type {Point}
    */
-  _absolutePointer?: Point;
+  protected _absolutePointer?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _pointer holds a reference to the pointer in coordinates that is valide for the event
+   * _pointer holds a reference to the pointer in html coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
+   * @type {Point}
    */
-  _pointer?: Point;
+  protected _pointer?: Point;
+
+  /**
+   * During a mouse event we may need the target multiple times in multiple functions.
+   * _target holds a reference to the target that is valid for the event
+   * lifespan. Every fabricJS mouse event create and delete the cache every time
+   * @type {InteractiveFabricObject}
+   */
+  protected _target?: InteractiveFabricObject;
 
   upperCanvasEl: HTMLCanvasElement;
   contextTop: CanvasRenderingContext2D;
@@ -947,7 +951,7 @@ export class Canvas<
    * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent, skipGroup: boolean): FabricObject | null {
+  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | null {
     if (this.skipTargetFind) {
       return null;
     }
@@ -1332,7 +1336,7 @@ export class Canvas<
    * Returns currently active object
    * @return {FabricObject | null} active object
    */
-  getActiveObject(): FabricObject | null {
+  getActiveObject(): InteractiveFabricObject | null {
     return this._activeObject;
   }
 
@@ -1340,7 +1344,7 @@ export class Canvas<
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
-  getActiveObjects(): FabricObject[] {
+  getActiveObjects(): InteractiveFabricObject[] {
     const active = this._activeObject;
     if (active) {
       if (isActiveSelection(active)) {
@@ -1358,12 +1362,12 @@ export class Canvas<
    * @param {FabricObject[]} oldObjects old activeObject
    * @param {TPointerEvent} e mouse event triggering the selection events
    */
-  _fireSelectionEvents(oldObjects: FabricObject[], e?: TPointerEvent) {
+  _fireSelectionEvents(oldObjects: InteractiveFabricObject[], e?: TPointerEvent) {
     let somethingChanged = false,
       invalidate = false;
     const objects = this.getActiveObjects(),
-      added: FabricObject[] = [],
-      removed: FabricObject[] = [];
+      added: InteractiveFabricObject[] = [],
+      removed: InteractiveFabricObject[] = [];
 
     oldObjects.forEach((target) => {
       if (!objects.includes(target)) {
