@@ -5,8 +5,7 @@ import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Circle extends FabricObject {
   /**

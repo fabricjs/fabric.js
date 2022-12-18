@@ -1,7 +1,7 @@
 import { CanvasEvents, ModifierKey, StaticCanvasEvents } from './EventTypeDefs';
 import type { Observable } from './mixins/observable.mixin';
 import type { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 import { TMat2D } from './typedefs';
 
 /**

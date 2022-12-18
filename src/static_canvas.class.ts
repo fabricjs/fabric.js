@@ -9,8 +9,8 @@ import { TSVGReviver } from './mixins/object.svg_export';
 import { CommonMethods } from './mixins/shared_methods.mixin';
 import { Pattern } from './pattern.class';
 import { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
-import { TCachedFabricObject } from './shapes/object.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
+import { TCachedFabricObject } from './shapes/Object/Object';
 import { Rect } from './shapes/rect.class';
 import type {
   TCornerPoint,
@@ -72,9 +72,7 @@ export type TSVGExportOptions = {
 // eslint-disable-next-line max-len
 export class StaticCanvas<
   EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-  > extends createCollectionMixin(
-  CommonMethods<EventSpec>
-) {
+> extends createCollectionMixin(CommonMethods<EventSpec>) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
@@ -375,10 +373,7 @@ export class StaticCanvas<
     if (!this._isRetinaScaling()) {
       return;
     }
-    this.__initRetinaScaling(
-      this.lowerCanvasEl,
-      this.contextContainer,
-    );
+    this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
   __initRetinaScaling(

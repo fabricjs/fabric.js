@@ -1,5 +1,5 @@
 import { PiBy180, twoMathPi } from '../constants';
-import type { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './control.class';
 

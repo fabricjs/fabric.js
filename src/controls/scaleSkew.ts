@@ -4,7 +4,7 @@ import {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import { TAxisKey } from '../typedefs';
 import { Canvas } from '../__types__';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';

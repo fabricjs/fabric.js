@@ -1,6 +1,6 @@
 import type { Control } from './controls/control.class';
 import type { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 import type { Group } from './shapes/group.class';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
@@ -8,7 +8,10 @@ import type { Canvas } from './__types__';
 import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './static_canvas.class';
 
-export type ModifierKey = keyof Pick<MouseEvent | PointerEvent | TouchEvent, 'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey'>;
+export type ModifierKey = keyof Pick<
+  MouseEvent | PointerEvent | TouchEvent,
+  'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey'
+>;
 
 export type TOptionalModifierKey = ModifierKey | null | undefined;
 
@@ -58,7 +61,10 @@ export type Transform = {
   height: number;
   shiftKey: boolean;
   altKey: boolean;
-  original: ReturnType<typeof saveObjectTransform> & { originX: TOriginX, originY: TOriginY };
+  original: ReturnType<typeof saveObjectTransform> & {
+    originX: TOriginX;
+    originY: TOriginY;
+  };
 };
 
 export type TEvent<E extends Event = TPointerEvent> = {
@@ -67,7 +73,7 @@ export type TEvent<E extends Event = TPointerEvent> = {
 
 type TEventWithTarget<E extends Event = TPointerEvent> = TEvent<E> & {
   target: FabricObject;
-}
+};
 
 export type BasicTransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
   transform: Transform;
@@ -100,9 +106,10 @@ export type TransformEvent<T extends Event = TPointerEvent> =
     absolutePointer: Point;
   };
 
-type SimpleEventHandler<T extends Event = TPointerEvent> = TEventWithTarget<T> & {
-  subTargets: FabricObject[];
-};
+type SimpleEventHandler<T extends Event = TPointerEvent> =
+  TEventWithTarget<T> & {
+    subTargets: FabricObject[];
+  };
 
 type InEvent = {
   previousTarget?: FabricObject;
@@ -182,10 +189,10 @@ export type ObjectEvents = ObjectPointerEvents &
   ObjectModifiedEvents & {
     // selection
     selected: Partial<TEvent> & {
-      target: FabricObject,
+      target: FabricObject;
     };
     deselected: Partial<TEvent> & {
-      target: FabricObject,
+      target: FabricObject;
     };
 
     // tree

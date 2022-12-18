@@ -1,32 +1,58 @@
 import { fabric } from '../HEADER';
 import { dragHandler, getActionFromCorner } from './controls/actions';
 import { Point } from './point.class';
-import { FabricObject } from './shapes/fabricObject.class';
-import { CanvasEvents, ModifierKey, TOptionalModifierKey, TPointerEvent, Transform } from './EventTypeDefs';
-import { addTransformToObject, saveObjectTransform } from './util/misc/objectTransforms';
+import { FabricObject } from './shapes/Object/FabricObject';
+import {
+  CanvasEvents,
+  ModifierKey,
+  TOptionalModifierKey,
+  TPointerEvent,
+  Transform,
+} from './EventTypeDefs';
+import {
+  addTransformToObject,
+  saveObjectTransform,
+} from './util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
-import { isActiveSelection, isCollection, isFabricObjectCached, isInteractiveTextObject } from './util/types';
+import {
+  isActiveSelection,
+  isCollection,
+  isFabricObjectCached,
+  isInteractiveTextObject,
+} from './util/types';
 import { invertTransform, transformPoint } from './util/misc/matrix';
 import { isTransparent } from './util/misc/isTransparent';
 import { TMat2D, TOriginX, TOriginY, TSize } from './typedefs';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from './util/dom_event';
 import type { IText } from './shapes/itext.class';
-import { cleanUpJsdomNode, makeElementUnselectable, wrapElement } from './util/dom_misc';
+import {
+  cleanUpJsdomNode,
+  makeElementUnselectable,
+  wrapElement,
+} from './util/dom_misc';
 import { setStyle } from './util/dom_style';
 import type { BaseBrush } from './brushes/base_brush.class';
 import type { Textbox } from './shapes/textbox.class';
 import { pick } from './util/misc/pick';
 import { TSVGReviver } from './mixins/object.svg_export';
 
-type TDestroyedCanvas = Omit<Canvas<CanvasEvents>, 'contextTop' | 'contextCache' | 'lowerCanvasEl' | 'upperCanvasEl' | 'cacheCanvasEl' | 'wrapperEl'> & {
+type TDestroyedCanvas = Omit<
+  Canvas<CanvasEvents>,
+  | 'contextTop'
+  | 'contextCache'
+  | 'lowerCanvasEl'
+  | 'upperCanvasEl'
+  | 'cacheCanvasEl'
+  | 'wrapperEl'
+> & {
   wrapperEl?: HTMLDivElement;
   cacheCanvasEl?: HTMLCanvasElement;
   upperCanvasEl?: HTMLCanvasElement;
   lowerCanvasEl?: HTMLCanvasElement;
   contextCache?: CanvasRenderingContext2D | null;
   contextTop?: CanvasRenderingContext2D | null;
-}
+};
 
 /**
  * Canvas class
@@ -126,7 +152,6 @@ type TDestroyedCanvas = Omit<Canvas<CanvasEvents>, 'contextTop' | 'contextCache'
 export class Canvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
-
   /**
    * When true, objects can be transformed by one side (unproportionally)
    * when dragged on the corners that normally would not do that.
@@ -467,7 +492,7 @@ export class Canvas<
   freeDrawingBrush?: BaseBrush;
   _activeObject: FabricObject | null;
   _hasITextHandlers?: boolean;
-  _iTextInstances: (IText | Textbox)[]
+  _iTextInstances: (IText | Textbox)[];
   /**
    * Constructor
    * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
@@ -538,8 +563,7 @@ export class Canvas<
    */
   _chooseObjectsToRender(): FabricObject[] {
     const activeObjects = this.getActiveObjects();
-    let objsToRender,
-      activeGroupObjects;
+    let objsToRender, activeGroupObjects;
 
     if (!this.preserveObjectStacking && activeObjects.length > 1) {
       objsToRender = [];
@@ -561,11 +585,12 @@ export class Canvas<
     else if (!this.preserveObjectStacking && activeObjects.length === 1) {
       const target = activeObjects[0],
         ancestors = target.getAncestors(true);
-      const topAncestor = (ancestors.length === 0 ? target : ancestors.pop()) as FabricObject;
+      const topAncestor = (
+        ancestors.length === 0 ? target : ancestors.pop()
+      ) as FabricObject;
       objsToRender = this._objects.slice();
       const index = objsToRender.indexOf(topAncestor);
-      index > -1 &&
-        objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
+      index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
       objsToRender.push(topAncestor);
     } else {
       objsToRender = this._objects;
@@ -581,11 +606,7 @@ export class Canvas<
     if (this.destroyed) {
       return;
     }
-    if (
-      this.contextTopDirty &&
-      !this._groupSelector &&
-      !this.isDrawingMode
-    ) {
+    if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
       this.clearContext(this.contextTop);
       this.contextTopDirty = false;
     }
@@ -649,10 +670,7 @@ export class Canvas<
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
     // in case the target is the activeObject, we cannot execute this optimization
     // because we need to draw controls too.
-    if (
-      isFabricObjectCached(target) &&
-      target !== this._activeObject
-    ) {
+    if (isFabricObjectCached(target) && target !== this._activeObject) {
       // optimizatio: we can reuse the cache
       const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
         targetRelativeX = Math.max(
@@ -687,12 +705,7 @@ export class Canvas<
 
     target.selectionBackgroundColor = originalColor;
 
-    return isTransparent(
-      ctx,
-      x,
-      y,
-      this.targetFindTolerance
-    );
+    return isTransparent(ctx, x, y, this.targetFindTolerance);
   }
 
   /**
@@ -703,10 +716,10 @@ export class Canvas<
   _isSelectionKeyPressed(e: TPointerEvent): boolean {
     const sKey = this.selectionKey;
     if (!sKey) {
-      return false
+      return false;
     }
     if (Array.isArray(sKey)) {
-      return !!sKey.find((key) => !!key && e[key] === true );
+      return !!sKey.find((key) => !!key && e[key] === true);
     } else {
       return e[sKey];
     }
@@ -730,10 +743,7 @@ export class Canvas<
         activeObject !== target &&
         !this._isSelectionKeyPressed(e)) ||
       (target && !target.evented) ||
-      (target &&
-        !target.selectable &&
-        activeObject &&
-        activeObject !== target)
+      (target && !target.selectable && activeObject && activeObject !== target)
     );
   }
 
@@ -751,7 +761,11 @@ export class Canvas<
    * @param {boolean} altKey
    * @returns {boolean} true if the transformation should be centered
    */
-  _shouldCenterTransform(target: FabricObject, action: string, modifierKeyPressed: boolean) {
+  _shouldCenterTransform(
+    target: FabricObject,
+    action: string,
+    modifierKeyPressed: boolean
+  ) {
     if (!target) {
       return;
     }
@@ -779,7 +793,10 @@ export class Canvas<
    * @private
    * @deprecated
    */
-  _getOriginFromCorner(target: FabricObject, controlName: string): { x: TOriginX, y: TOriginY } {
+  _getOriginFromCorner(
+    target: FabricObject,
+    controlName: string
+  ): { x: TOriginX; y: TOriginY } {
     const origin = {
       x: target.originX,
       y: target.originY,
@@ -787,14 +804,14 @@ export class Canvas<
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = 'right';
-    // is a right control ?
+      // is a right control ?
     } else if (['mr', 'tr', 'br'].includes(controlName)) {
       origin.x = 'left';
     }
     // is a top control ?
     if (['tl', 'mt', 'tr'].includes(controlName)) {
       origin.y = 'bottom';
-    // is a bottom control ?
+      // is a bottom control ?
     } else if (['bl', 'mb', 'br'].includes(controlName)) {
       origin.y = 'top';
     }
@@ -806,7 +823,11 @@ export class Canvas<
    * @param {Event} e Event object
    * @param {FaricObject} target
    */
-  _setupCurrentTransform(e: TPointerEvent, target: FabricObject, alreadySelected: boolean): void {
+  _setupCurrentTransform(
+    e: TPointerEvent,
+    target: FabricObject,
+    alreadySelected: boolean
+  ): void {
     if (!target) {
       return;
     }
@@ -814,7 +835,9 @@ export class Canvas<
     if (target.group) {
       // transform pointer to target's containing coordinate plane
       // should we use send point to plane?
-      pointer = pointer.transform(invertTransform(target.group.calcTransformMatrix()));
+      pointer = pointer.transform(
+        invertTransform(target.group.calcTransformMatrix())
+      );
     }
     const corner = target.__corner || '',
       control = target.controls[corner],
@@ -854,7 +877,7 @@ export class Canvas<
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
-          originY: origin.y
+          originY: origin.y,
         },
       };
 
@@ -883,10 +906,7 @@ export class Canvas<
   _drawSelection(ctx: CanvasRenderingContext2D): void {
     const { ex, ey, left, top } = this._groupSelector,
       start = new Point(ex, ey).transform(this.viewportTransform),
-      extent = new Point(
-        ex + left,
-        ey + top
-      ).transform(this.viewportTransform),
+      extent = new Point(ex + left, ey + top).transform(this.viewportTransform),
       strokeOffset = this.selectionLineWidth / 2;
     let minX = Math.min(start.x, extent.x),
       minY = Math.min(start.y, extent.y),
@@ -999,7 +1019,11 @@ export class Canvas<
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(pointer: Point, obj: FabricObject, globalPointer: Point): boolean {
+  _checkTarget(
+    pointer: Point,
+    obj: FabricObject,
+    globalPointer: Point
+  ): boolean {
     if (
       obj &&
       obj.visible &&
@@ -1012,11 +1036,7 @@ export class Canvas<
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
       ) {
-        if (!this.isTargetTransparent(
-          obj,
-          globalPointer.x,
-          globalPointer.y
-        )) {
+        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
           return true;
         }
       } else {
@@ -1033,9 +1053,13 @@ export class Canvas<
    * @return {FabricObject} **top most object from given `objects`** that contains pointer
    * @private
    */
-  _searchPossibleTargets(objects: FabricObject[], pointer: Point): FabricObject | null {
+  _searchPossibleTargets(
+    objects: FabricObject[],
+    pointer: Point
+  ): FabricObject | null {
     // Cache all targets where their bounding box contains point.
-    let target = null, i = objects.length;
+    let target = null,
+      i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
@@ -1046,7 +1070,10 @@ export class Canvas<
       if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
         target = objects[i];
         if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(target._objects, pointer);
+          const subTarget = this._searchPossibleTargets(
+            target._objects,
+            pointer
+          );
           subTarget && this.targets.push(subTarget);
         }
         break;
@@ -1067,7 +1094,10 @@ export class Canvas<
     // if we found something in this.targets, and the group is interactive, return that subTarget
     // TODO: reverify why interactive. the target should be returned always, but selected only
     // if interactive.
-    return target && isCollection(target) && target.interactive && this.targets[0]
+    return target &&
+      isCollection(target) &&
+      target.interactive &&
+      this.targets[0]
       ? this.targets[0]
       : target;
   }
@@ -1215,7 +1245,9 @@ export class Canvas<
     upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(upperCanvasEl);
     upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext('2d') as CanvasRenderingContext2D;
+    this.contextTop = upperCanvasEl.getContext(
+      '2d'
+    ) as CanvasRenderingContext2D;
   }
 
   /**
@@ -1225,7 +1257,9 @@ export class Canvas<
     this.cacheCanvasEl = this._createCanvasElement();
     this.cacheCanvasEl.setAttribute('width', `${this.width}`);
     this.cacheCanvasEl.setAttribute('height', `${this.height}`);
-    this.contextCache = this.cacheCanvasEl.getContext('2d') as CanvasRenderingContext2D;
+    this.contextCache = this.cacheCanvasEl.getContext(
+      '2d'
+    ) as CanvasRenderingContext2D;
   }
 
   /**
@@ -1262,9 +1296,7 @@ export class Canvas<
       left: 0,
       top: 0,
       'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-      '-ms-touch-action': this.allowTouchScrolling
-        ? 'manipulation'
-        : 'none',
+      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
     });
     element.width = width;
     element.height = height;
@@ -1275,7 +1307,7 @@ export class Canvas<
    * Returns context of top canvas where interactions are drawn
    * @returns {CanvasRenderingContext2D}
    */
-  getTopContext(): CanvasRenderingContext2D  {
+  getTopContext(): CanvasRenderingContext2D {
     return this.contextTop;
   }
 
@@ -1327,7 +1359,8 @@ export class Canvas<
    * @param {TPointerEvent} e mouse event triggering the selection events
    */
   _fireSelectionEvents(oldObjects: FabricObject[], e?: TPointerEvent) {
-    let somethingChanged = false, invalidate = false;
+    let somethingChanged = false,
+      invalidate = false;
     const objects = this.getActiveObjects(),
       added: FabricObject[] = [],
       removed: FabricObject[] = [];
@@ -1527,17 +1560,17 @@ export class Canvas<
   /**
    * @private
    */
-  _toObject(instance: FabricObject, methodName: 'toObject' | 'toDatalessObject', propertiesToInclude: string[]): Record<string, any> {
+  _toObject(
+    instance: FabricObject,
+    methodName: 'toObject' | 'toDatalessObject',
+    propertiesToInclude: string[]
+  ): Record<string, any> {
     // If the object is part of the current selection group, it should
     // be transformed appropriately
     // i.e. it should be serialised as it would appear if the selection group
     // were to be destroyed.
     const originalProperties = this._realizeGroupTransformOnObject(instance),
-      object = super._toObject(
-        instance,
-        methodName,
-        propertiesToInclude
-      );
+      object = super._toObject(instance, methodName, propertiesToInclude);
     //Undo the damage we did by changing all of its properties
     instance.set(originalProperties);
     return object;
@@ -1549,7 +1582,9 @@ export class Canvas<
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
    */
-  _realizeGroupTransformOnObject(instance: FabricObject): Partial<typeof instance> {
+  _realizeGroupTransformOnObject(
+    instance: FabricObject
+  ): Partial<typeof instance> {
     if (
       instance.group &&
       isActiveSelection(instance.group) &&
@@ -1566,11 +1601,8 @@ export class Canvas<
         'skewY',
         'top',
       ] as (keyof typeof instance)[];
-      const  originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(
-        instance,
-        this._activeObject.calcOwnMatrix()
-      );
+      const originalValues = pick<typeof instance>(instance, layoutProps);
+      addTransformToObject(instance, this._activeObject.calcOwnMatrix());
       return originalValues;
     } else {
       return {};
@@ -1580,7 +1612,11 @@ export class Canvas<
   /**
    * @private
    */
-  _setSVGObject(markup: string[], instance: FabricObject, reviver: TSVGReviver) {
+  _setSVGObject(
+    markup: string[],
+    instance: FabricObject,
+    reviver: TSVGReviver
+  ) {
     //If the object is in a selection group, simulate what would happen to that
     //object when the group is deselected
     const originalProperties = this._realizeGroupTransformOnObject(instance);
@@ -1600,37 +1636,35 @@ export class Canvas<
   }
 }
 
-Object.assign(
-  Canvas.prototype, {
-    uniformScaling: true,
-    uniScaleKey: 'shiftKey',
-    centeredScaling: false,
-    centeredRotation: false,
-    centeredKey: 'altKey',
-    altActionKey: 'shiftKey',
-    selection: true,
-    selectionKey: 'shiftKey',
-    altSelectionKey: null,
-    selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-    selectionDashArray: [],
-    selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-    selectionLineWidth: 1,
-    selectionFullyContained: false,
-    hoverCursor: 'move',
-    moveCursor: 'move',
-    defaultCursor: 'default',
-    freeDrawingCursor: 'crosshair',
-    notAllowedCursor: 'not-allowed',
-    containerClass: 'canvas-container',
-    perPixelTargetFind: false,
-    targetFindTolerance: 0,
-    skipTargetFind: false,
-    preserveObjectStacking: false,
-    stopContextMenu: false,
-    fireRightClick: false,
-    fireMiddleClick: false,
-    enablePointerEvents: false,
-  },
-);
+Object.assign(Canvas.prototype, {
+  uniformScaling: true,
+  uniScaleKey: 'shiftKey',
+  centeredScaling: false,
+  centeredRotation: false,
+  centeredKey: 'altKey',
+  altActionKey: 'shiftKey',
+  selection: true,
+  selectionKey: 'shiftKey',
+  altSelectionKey: null,
+  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
+  selectionDashArray: [],
+  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
+  selectionLineWidth: 1,
+  selectionFullyContained: false,
+  hoverCursor: 'move',
+  moveCursor: 'move',
+  defaultCursor: 'default',
+  freeDrawingCursor: 'crosshair',
+  notAllowedCursor: 'not-allowed',
+  containerClass: 'canvas-container',
+  perPixelTargetFind: false,
+  targetFindTolerance: 0,
+  skipTargetFind: false,
+  preserveObjectStacking: false,
+  stopContextMenu: false,
+  fireRightClick: false,
+  fireMiddleClick: false,
+  enablePointerEvents: false,
+});
 
 fabric.Canvas = Canvas;
