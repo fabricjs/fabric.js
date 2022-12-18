@@ -363,7 +363,7 @@ export class ObjectGeometry<
    */
   containsPoint(
     point: Point,
-    lines: TBBoxLines | undefined,
+    lines?: TBBoxLines,
     absolute = false,
     calculate = false
   ): boolean {

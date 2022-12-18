@@ -8,9 +8,14 @@ import type { Canvas } from './__types__';
 import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './static_canvas.class';
 
-export type ModifierKey = 'altKey' | 'shiftKey' | 'ctrlKey';
+export type ModifierKey = keyof Pick<
+  MouseEvent | PointerEvent | TouchEvent,
+  'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey'
+>;
 
-export type TPointerEvent = MouseEvent | TouchEvent;
+export type TOptionalModifierKey = ModifierKey | null | undefined;
+
+export type TPointerEvent = MouseEvent | TouchEvent | PointerEvent;
 
 export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
@@ -38,7 +43,7 @@ export type Transform = {
   target: FabricObject;
   action: string;
   actionHandler: TransformActionHandler;
-  corner: string;
+  corner: string | 0;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -56,11 +61,18 @@ export type Transform = {
   height: number;
   shiftKey: boolean;
   altKey: boolean;
-  original: ReturnType<typeof saveObjectTransform>;
+  original: ReturnType<typeof saveObjectTransform> & {
+    originX: TOriginX;
+    originY: TOriginY;
+  };
 };
 
 export type TEvent<E extends Event = TPointerEvent> = {
   e: E;
+};
+
+type TEventWithTarget<E extends Event = TPointerEvent> = TEvent<E> & {
+  target: FabricObject;
 };
 
 export type BasicTransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
@@ -94,10 +106,10 @@ export type TransformEvent<T extends Event = TPointerEvent> =
     absolutePointer: Point;
   };
 
-type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
-  target: FabricObject;
-  subTargets: FabricObject[];
-};
+type SimpleEventHandler<T extends Event = TPointerEvent> =
+  TEventWithTarget<T> & {
+    subTargets: FabricObject[];
+  };
 
 type InEvent = {
   previousTarget?: FabricObject;
@@ -107,8 +119,7 @@ type OutEvent = {
   nextTarget?: FabricObject;
 };
 
-type DragEventData = TEvent<DragEvent> & {
-  target: FabricObject;
+type DragEventData = TEventWithTarget<DragEvent> & {
   subTargets?: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;
@@ -118,7 +129,7 @@ type DragEventData = TEvent<DragEvent> & {
 type DropEventData = DragEventData & { pointer: Point };
 
 type DnDEvents = {
-  dragstart: TEvent<DragEvent> & { target: FabricObject };
+  dragstart: TEventWithTarget<DragEvent>;
   drag: DragEventData;
   dragover: DragEventData;
   dragenter: DragEventData & InEvent;
@@ -177,12 +188,10 @@ export type ObjectEvents = ObjectPointerEvents &
   DnDEvents &
   ObjectModifiedEvents & {
     // selection
-    selected: {
-      e: TEvent;
+    selected: Partial<TEvent> & {
       target: FabricObject;
     };
-    deselected: {
-      e?: TEvent;
+    deselected: Partial<TEvent> & {
       target: FabricObject;
     };
 
