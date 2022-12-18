@@ -8,11 +8,11 @@ import type { Canvas } from './__types__';
 import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './static_canvas.class';
 
-export type ModifierKey = keyof Pick<MouseEvent | KeyboardEvent, 'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey'>;
+export type ModifierKey = keyof Pick<MouseEvent | PointerEvent | TouchEvent, 'altKey' | 'shiftKey' | 'ctrlKey' | 'metaKey'>;
 
 export type TOptionalModifierKey = ModifierKey | null | undefined;
 
-export type TPointerEvent = MouseEvent | TouchEvent;
+export type TPointerEvent = MouseEvent | TouchEvent | PointerEvent;
 
 export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
@@ -40,7 +40,7 @@ export type Transform = {
   target: FabricObject;
   action: string;
   actionHandler: TransformActionHandler;
-  corner: string | number;
+  corner: string | 0;
   scaleX: number;
   scaleY: number;
   skewX: number;
