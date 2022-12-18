@@ -4,12 +4,12 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import {
   findCornerQuadrant,
   getLocalPoint,

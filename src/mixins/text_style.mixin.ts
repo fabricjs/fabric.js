@@ -1,5 +1,5 @@
 import { ObjectEvents } from '../EventTypeDefs';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 export type TextStyleDeclaration = Record<string, any>;
 
