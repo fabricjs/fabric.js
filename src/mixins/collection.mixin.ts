@@ -292,8 +292,8 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       if (intersecting) {
         newIdx = idx;
         // traverse up the stack looking for the nearest intersecting object
-        for (let i = idx + 1; i < this.objects.length; ++i) {
-          if (object.isOverlapping(this.objects[i])) {
+        for (let i = idx + 1; i < this._objects.length; ++i) {
+          if (object.isOverlapping(this._objects[i])) {
             newIdx = i;
             break;
           }
