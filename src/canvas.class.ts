@@ -477,25 +477,29 @@ export class Canvas<
    */
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
+  }
+
+  _init(el: string | HTMLCanvasElement, options = {}) {
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
     this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(this.lowerCanvasEl);
-    this._initInteractive();
-    this._createCacheCanvas();
-  }
-
-  /**
-   * @private
-   */
-  _initInteractive() {
     this._initWrapperElement();
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
     this._initRetinaScaling();
     this.calcOffset();
+    this._createCacheCanvas();
+  }
+
+  /**
+   * @private
+   */
+  _initRetinaScaling() {
+    super._initRetinaScaling();
+    this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
 
   /**
@@ -613,7 +617,6 @@ export class Canvas<
   /**
    * Method to render only the top canvas.
    * Also used to render the group selection box.
-   * @return {Canvas} thisArg
    */
   renderTop() {
     const ctx = this.contextTop;
@@ -862,6 +865,7 @@ export class Canvas<
       transform.originY = 'center';
     }
     this._currentTransform = transform;
+    // @ts-ignore
     this._beforeTransform(e);
   }
 
@@ -944,6 +948,8 @@ export class Canvas<
 
     // if we hit the corner of an activeObject, let's return that.
     if (
+      // ts doesn't get that if shouldLookForActive is true, activeObject exists
+      activeObject &&
       shouldLookForActive &&
       activeObject._findTargetCorner(pointer, isTouch)
     ) {
@@ -951,7 +957,7 @@ export class Canvas<
     }
     if (
       aObjects.length > 1 &&
-      activeObject.type === 'activeSelection' &&
+      isActiveSelection(activeObject) &&
       !skipGroup &&
       this.searchPossibleTargets([activeObject], pointer)
     ) {
@@ -961,6 +967,8 @@ export class Canvas<
     let activeTarget;
     let activeTargetSubs: FabricObject[] = [];
     if (
+      // ts doesn't get that if aObjects has one object, activeObject exists
+      activeObject &&
       aObjects.length === 1 &&
       activeObject === this.searchPossibleTargets([activeObject], pointer)
     ) {
@@ -1153,6 +1161,7 @@ export class Canvas<
    * @return {Canvas} thisArg
    */
   setDimensions(dimensions: TSize, options?: TCanvasSizeOptions) {
+    // @ts-ignore
     this._resetTransformEventData();
     super.setDimensions(dimensions, options);
     if (this._isCurrentlyDrawing) {
@@ -1426,6 +1435,7 @@ export class Canvas<
         return false;
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
+        // @ts-ignore
         this.endCurrentTransform(e);
       }
       this._activeObject = null;
@@ -1471,6 +1481,7 @@ export class Canvas<
       lowerCanvasEl = this.lowerCanvasEl as HTMLCanvasElement,
       upperCanvasEl = this.upperCanvasEl as HTMLCanvasElement,
       cacheCanvasEl = this.cacheCanvasEl as HTMLCanvasElement;
+    // @ts-ignore
     this.removeListeners();
     lowerCanvasEl.style.cssText = this._originalCanvasStyle || '';
     this._originalCanvasStyle = undefined;
@@ -1497,6 +1508,7 @@ export class Canvas<
     this.discardActiveObject();
     this.clearContext(this.contextTop);
     if (this._hasITextHandlers) {
+      // @ts-ignore
       this.off('mouse:up', this._mouseUpITextHandler);
       this._iTextInstances = [];
       this._hasITextHandlers = false;
@@ -1531,7 +1543,7 @@ export class Canvas<
         propertiesToInclude
       );
     //Undo the damage we did by changing all of its properties
-    originalProperties && instance.set(originalProperties);
+    instance.set(originalProperties);
     return object;
   }
 
@@ -1543,7 +1555,8 @@ export class Canvas<
    */
   _realizeGroupTransformOnObject(instance: FabricObject): Partial<typeof instance> {
     if (
-      isActiveSelection(instance) &&
+      instance.group &&
+      isActiveSelection(instance.group) &&
       this._activeObject === instance.group
     ) {
       const layoutProps = [
@@ -1576,7 +1589,7 @@ export class Canvas<
     //object when the group is deselected
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
-    originalProperties && instance.set(originalProperties);
+    instance.set(originalProperties);
   }
 
   setViewportTransform(vpt: TMat2D) {

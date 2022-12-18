@@ -26,7 +26,7 @@ export const isCollection = (
 };
 
 export const isActiveSelection = (
-  fabricObject: FabricObject
+  fabricObject: FabricObject | null
 ): fabricObject is ActiveSelection => {
   return !!fabricObject && fabricObject.type === 'activeSelection';
 };

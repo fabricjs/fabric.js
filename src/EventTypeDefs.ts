@@ -181,10 +181,11 @@ export type ObjectEvents = ObjectPointerEvents &
   DnDEvents &
   ObjectModifiedEvents & {
     // selection
-    selected: TEventWithTarget;
-    deselected: {
-      e?: TPointerEvent;
-      target: FabricObject;
+    selected: Partial<TEvent> & {
+      target: FabricObject,
+    };
+    deselected: Partial<TEvent> & {
+      target: FabricObject,
     };
 
     // tree

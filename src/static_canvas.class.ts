@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { fabric } from '../HEADER';
-import type { BaseBrush } from './brushes';
 import { config } from './config';
 import { iMatrix, VERSION } from './constants';
 import type { StaticCanvasEvents } from './EventTypeDefs';
@@ -316,18 +315,21 @@ export class StaticCanvas<
     obj.fire('removed', { target: this });
   }
 
-  initialize(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
-    this.calcViewportBoundaries();
-  }
-
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    this._init(el, options);
+  }
+
+  /**
+   * @private
+   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
+   * @param {Object} [options] Options object
+   */
+  _init(el: string | HTMLCanvasElement, options = {}) {
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
+    this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -340,10 +342,6 @@ export class StaticCanvas<
     this._objects = [];
     this._createLowerCanvas(el);
     this._initOptions(options);
-    // only initialize retina scaling once
-    if (!this.interactive) {
-      this._initRetinaScaling();
-    }
     this.calcOffset();
   }
 
@@ -369,22 +367,17 @@ export class StaticCanvas<
     if (!this._isRetinaScaling()) {
       return;
     }
-    const scaleRatio = config.devicePixelRatio;
     this.__initRetinaScaling(
-      scaleRatio,
       this.lowerCanvasEl,
-      this.contextContainer
+      this.contextContainer,
     );
-    if (this.upperCanvasEl) {
-      this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
-    }
   }
 
   __initRetinaScaling(
-    scaleRatio: number,
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
+    const scaleRatio = config.devicePixelRatio;
     canvas.setAttribute('width', (this.width * scaleRatio).toString());
     canvas.setAttribute('height', (this.height * scaleRatio).toString());
     context.scale(scaleRatio, scaleRatio);
