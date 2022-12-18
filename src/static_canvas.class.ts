@@ -322,19 +322,33 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    this._init(el, options);
+  }
+
+  /**
+   * @private
+   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
+   * @param {Object} [options] Options object
+   */
+  _init(el: string | HTMLCanvasElement, options = {}) {
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._objects = [];
-    this.initElements(el);
-    this._initOptions(options);
-    this.calcOffset();
+    this._initStatic(el, options);
     this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
+  /**
+   * @private
+   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
+   * @param {Object} [options] Options object
+   */
+  _initStatic(el: string | HTMLCanvasElement, options = {}) {
+    this._objects = [];
     this._createLowerCanvas(el);
     this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+    this._initOptions(options);
+    this.calcOffset();
   }
 
   /**

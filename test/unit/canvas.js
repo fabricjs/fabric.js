@@ -194,6 +194,7 @@
   });
 
   QUnit.test('_initInteractive', function(assert) {
+    assert.ok(typeof canvas._init === 'function');
     assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
     assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
     assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');

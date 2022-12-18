@@ -501,20 +501,20 @@ export class Canvas<
    */
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
-    // @ts-ignore
-    this._initEventListeners();
-    this._createCacheCanvas();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
-    super.initElements(el);
+  _init(el: string | HTMLCanvasElement, options = {}) {
+    this.renderAndResetBound = this.renderAndReset.bind(this);
+    this.requestRenderAllBound = this.requestRenderAll.bind(this);
+    this._initStatic(el, options);
+    this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
-  }
-
-  _createLowerCanvas(canvasEl: string | HTMLCanvasElement) {
-    super._createLowerCanvas(canvasEl);
-    this._applyCanvasStyle(this.lowerCanvasEl);
+    // @ts-ignore
+    this._initEventListeners();
+    this._initRetinaScaling();
+    this.calcOffset();
+    this._createCacheCanvas();
   }
 
   /**
