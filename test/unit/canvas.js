@@ -1,5 +1,3 @@
-const { fabric } = require("fabric");
-
 (function() {
 
 
