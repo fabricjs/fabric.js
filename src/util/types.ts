@@ -1,6 +1,6 @@
 import type { ActiveSelection } from '../shapes/active_selection.class';
 import type { Group } from '../shapes/group.class';
-import { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
