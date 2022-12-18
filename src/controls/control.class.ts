@@ -139,7 +139,7 @@ export class Control {
    */
   withConnection = false;
 
-  constructor(options: Partial<Control>) {
+  constructor(options: Partial<Control> = {}) {
     Object.assign(this, options);
   }
 
