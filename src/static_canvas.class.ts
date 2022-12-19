@@ -278,6 +278,22 @@ export class StaticCanvas<
     kill: (reason?: any) => void;
   };
 
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super();
+    this.renderAndResetBound = this.renderAndReset.bind(this);
+    this.requestRenderAllBound = this.requestRenderAll.bind(this);
+    this.initElements(el);
+    this._initOptions(options);
+    this.calcOffset();
+    this._initRetinaScaling();
+    this.calcViewportBoundaries();
+  }
+
+  protected initElements(el: string | HTMLCanvasElement) {
+    this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+  }
+
   add(...objects: FabricObject[]) {
     const size = super.add(...objects);
     objects.length > 0 && this.renderOnAddRemove && this.requestRenderAll();
@@ -318,22 +334,6 @@ export class StaticCanvas<
     obj._set('canvas', undefined);
     this.fire('object:removed', { target: obj });
     obj.fire('removed', { target: this });
-  }
-
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super();
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this.initElements(el);
-    this._initOptions(options);
-    this.calcOffset();
-    this._initRetinaScaling();
-    this.calcViewportBoundaries();
-  }
-
-  protected initElements(el: string | HTMLCanvasElement) {
-    this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
   }
 
   /**
