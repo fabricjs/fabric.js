@@ -216,56 +216,101 @@
       });
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
     });
-    QUnit.test('wrapWithFixedAnchor', function (assert) {
-      var target = transform.target;
-      target.strokeWidth = 0;
-      var actionHandler = (eventData, transform) => {
-        var target = transform.target;
-        assert.equal(transform.originX, 'left', 'should not be mutated');
-        assert.equal(transform.originY, 'top', 'should not be mutated');
+    QUnit.module('wrapWithFixedAnchor', function (hooks) {
+      let target;
+      hooks.beforeEach(() => {
+        target = transform.target;
+        target.strokeWidth = 0;
+        target.top = 0;
+        target.left = 0;
+        target.scaleX = 1;
+        target.scaleY = 1;
+      });
+      const actionHandler = (eventData, transform) => {
+        const target = transform.target;
+        QUnit.assert.equal(transform.originX, 'left', 'should not be mutated');
+        QUnit.assert.equal(transform.originY, 'top', 'should not be mutated');
         target.scaleX = 5;
         target.scaleY = 5;
       };
-      var center = target.getCenterPoint();
-      assert.deepEqual(center.x, 50, 'initial center is x 50');
-      assert.deepEqual(center.y, 50, 'initial center is y 50');
-      actionHandler({}, transform);
-      var center2 = target.getCenterPoint();
-      assert.deepEqual(center2.x, 250, 'after action center is x 250');
-      assert.deepEqual(center2.y, 250, 'after action center is y 250');
-      target.top = 0;
-      target.left = 0;
-      target.scaleX = 1;
-      target.scaleY = 1;
-      var center3 = target.getCenterPoint();
-      assert.deepEqual(center3.x, 50, 'after reset center is x 50');
-      assert.deepEqual(center3.y, 50, 'after reset center is y 50');
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x1, y1) => {
-        assert.equal(t, transform, 'same ref');
-        assert.equal(x1, 1, 'same value');
-        assert.equal(y1, -1, 'same value');
-        return { x: 'center', y: 'center' };
-      })({}, transform, 1, -1);
-      var center4 = target.getCenterPoint();
-      assert.equal(target.scaleX, 5, 'action made scaleX bigger');
-      assert.equal(target.scaleY, 5, 'action made scaleY bigger');
-      assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
-      assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
-      target.top = 0;
-      target.left = 0;
-      target.scaleX = 1;
-      target.scaleY = 1;
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x, y) => {
-        assert.equal(t, transform, 'same ref');
-        assert.equal(x, 1, 'same value');
-        assert.equal(y, -1, 'same value');
-        return { x: 'left', y: 'top' };
-      })({}, transform, 1, -1);
-      var center5 = target.getCenterPoint();
-      assert.equal(target.scaleX, 5, 'action made scaleX bigger');
-      assert.equal(target.scaleY, 5, 'action made scaleY bigger');
-      assert.deepEqual(center5.x, 250, 'with wrapper center is x 50');
-      assert.deepEqual(center5.y, 250, 'with wrapper center is y 50');
+      QUnit.test('dry run', function (assert) {
+        const before = target.getCenterPoint();
+        assert.equal(before.x, 50, 'initial center is x 50');
+        assert.equal(before.y, 50, 'initial center is y 50');
+        actionHandler({}, transform);
+        const after = target.getCenterPoint();
+        assert.equal(after.x, 250, 'after action center is x 250');
+        assert.equal(after.y, 250, 'after action center is y 250');
+      });
+      QUnit.test('originAdaptor(center, center)', function (assert) {
+        const before = target.getCenterPoint();
+        assert.equal(before.x, 50, 'after reset center is x 50');
+        assert.equal(before.y, 50, 'after reset center is y 50');
+        fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x1, y1) => {
+          assert.equal(t, transform, 'same ref');
+          assert.equal(x1, 1, 'same value');
+          assert.equal(y1, -1, 'same value');
+          return { x: 'center', y: 'center' };
+        })({}, transform, 1, -1);
+        const after = target.getCenterPoint();
+        assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+        assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+        assert.equal(after.x, 50, 'with wrapper center is x 50');
+        assert.equal(after.y, 50, 'with wrapper center is y 50');
+      });
+      QUnit.test('originAdaptor(left, top)', function (assert) {
+        const before = target.getCenterPoint();
+        assert.equal(before.x, 50, 'after reset center is x 50');
+        assert.equal(before.y, 50, 'after reset center is y 50');
+        fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x, y) => {
+          assert.equal(t, transform, 'same ref');
+          assert.equal(x, 1, 'same value');
+          assert.equal(y, -1, 'same value');
+          return { x: 'left', y: 'top' };
+        })({}, transform, 1, -1);
+        const after = target.getCenterPoint();
+        assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+        assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+        assert.equal(after.x, 250, 'with wrapper center is x 250');
+        assert.equal(after.y, 250, 'with wrapper center is y 250');
+      });
+      QUnit.test('originAfterAdaptor(center, top)', function (assert) {
+        const before = target.getCenterPoint();
+        assert.equal(before.x, 50, 'after reset center is x 50');
+        assert.equal(before.y, 50, 'after reset center is y 50');
+        fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, undefined, (ev, t, x, y) => {
+          assert.equal(t, transform, 'same ref');
+          assert.equal(x, 1, 'same value');
+          assert.equal(y, -1, 'same value');
+          return { x: 'center', y: 'top' };
+        })({}, transform, 1, -1);
+        const after = target.getCenterPoint();
+        assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+        assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+        assert.equal(after.x, 0, 'with wrapper center is x 250');
+        assert.equal(after.y, 250, 'with wrapper center is y 250');
+      });
+      QUnit.test('originAdaptor(left, top) + originAfterAdaptor(right, bottom)', function (assert) {
+        const before = target.getCenterPoint();
+        assert.equal(before.x, 50, 'after reset center is x 50');
+        assert.equal(before.y, 50, 'after reset center is y 50');
+        fabric.controlsUtils.wrapWithFixedAnchor(actionHandler, (ev, t, x, y) => {
+          assert.equal(t, transform, 'same ref');
+          assert.equal(x, 1, 'same value');
+          assert.equal(y, -1, 'same value');
+          return { x: 'left', y: 'top' };
+        }, (ev, t, x, y) => {
+          assert.equal(t, transform, 'same ref');
+          assert.equal(x, 1, 'same value');
+          assert.equal(y, -1, 'same value');
+          return { x: 'right', y: 'bottom' };
+        })({}, transform, 1, -1);
+        const after = target.getCenterPoint();
+        assert.equal(target.scaleX, 5, 'action made scaleX bigger');
+        assert.equal(target.scaleY, 5, 'action made scaleY bigger');
+        assert.equal(after.x, -250, 'with wrapper center is x 250');
+        assert.equal(after.y, -250, 'with wrapper center is y 250');
+      });
     });
     QUnit.test('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', function (assert) {
       transform.target.canvas.on('object:scaling', function () {
