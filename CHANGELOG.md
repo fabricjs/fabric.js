@@ -4,6 +4,7 @@
 
 - fix(Object Stacking): 🔙 refactor logic to support Group 🔝
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
+- chore(TS): Convert Canvas class #8510
 - chore(TS): Move object classes #8511
 - chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
 - chore(TS): fix import cycle, extract `groupSVGElements` [#8506](https://github.com/fabricjs/fabric.js/pull/8506)
