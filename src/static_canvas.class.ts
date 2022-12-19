@@ -267,9 +267,6 @@ export class StaticCanvas<
    */
   private _originalCanvasStyle?: string;
 
-  renderAndResetBound: () => void;
-  requestRenderAllBound: () => void;
-
   _offset: { left: number; top: number };
   protected hasLostContext: boolean;
   protected nextRenderHandle: number;
@@ -280,8 +277,8 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
+    this.renderAndReset = this.renderAndReset.bind(this);
+    this.requestRenderAll = this.requestRenderAll.bind(this);
     this.initElements(el);
     this._initOptions(options);
     this.calcOffset();
@@ -700,7 +697,7 @@ export class StaticCanvas<
    */
   requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-      this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
+      this.nextRenderHandle = requestAnimFrame(this.renderAndReset);
     }
   }
 
