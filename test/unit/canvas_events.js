@@ -404,6 +404,30 @@
     assert.equal(rect.scaleY, 3, 'rect scaled Y');
   });
 
+  QUnit.test('A transform will update lastX/Y', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+    };
+    const controlA = [];
+    const controlB = [];
+    rect.controls.br.actionHandler = function(eventData,transform,x,y) {
+      controlA.push({ x, y });
+      controlB.push({ x: transform.lastX, y: transform.lastY });
+    };
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.deepEqual(controlA, [{ x: 6, y: 6 }, { x: 9, y: 9 }], 'should match');
+    assert.deepEqual(controlB, [{ x: 3, y: 3 }, { x: 6, y: 6 }], 'should match');
+  });
+
   QUnit.test('A transform will call mouseup and mousedown on the control', function(assert) {
     var e = { clientX: 3, clientY: 3, which: 1 };
     var e1 = { clientX: 6, clientY: 6, which: 1 };
