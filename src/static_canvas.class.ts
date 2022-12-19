@@ -265,7 +265,7 @@ export class StaticCanvas<
    * in order to return it to original state on dispose
    * @type string
    */
-  _originalCanvasStyle?: string;
+  private _originalCanvasStyle?: string;
 
   renderAndResetBound: () => void;
   requestRenderAllBound: () => void;
@@ -324,7 +324,6 @@ export class StaticCanvas<
     super();
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._objects = [];
     this.initElements(el);
     this._initOptions(options);
     this.calcOffset();
