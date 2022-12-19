@@ -312,7 +312,7 @@
         assert.equal(after.y, -250, 'with wrapper center is y 250');
       });
     });
-    QUnit.test('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', function (assert) {
+    QUnit.test('wrapWithFireEvent doesn\'t trigger event when actionHandler doesn\'t change anything', function (assert) {
       transform.target.canvas.on('object:scaling', function () {
         assert.ok(false);
       });
@@ -329,6 +329,20 @@
         fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)
       );
       wrapped(eventData, transform, x, y);
+    });
+    QUnit.test('wrapWithFireEvent custom event builder', function (assert) {
+      let fired;
+      transform.target.on('testing', function (context) {
+        fired = context;
+      });
+      const eventData = { some: 'data' }, x = 15, y = 25;
+      const wrapped = fabric.controlsUtils.wrapWithFireEvent(
+        'testing',
+        () => true,
+        (eventData, transform, x, y) => ({ eventData, transform, x, y, foo: 'bar' })
+      );
+      wrapped(eventData, transform, x, y);
+      assert.deepEqual(fired, { eventData, transform, x, y, foo: 'bar' }, 'event context should match');
     });
     QUnit.test('wrapWithDisableAction', function (assert) {
       function assertArgs(ev, t, x, y) {
