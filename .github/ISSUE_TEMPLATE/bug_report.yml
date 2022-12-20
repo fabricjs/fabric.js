@@ -1,0 +1,131 @@
+name: 🐛 Bug Report
+description: File a bug report
+title: '[Bug]: '
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thank you for wanting to create an issue in this repository. 
+
+        Before you do, please ensure you are filing the issue in the right
+        place. 
+
+        * If you have a question or if an issue is not right for what you mean
+        to file use
+        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: CheckList
+      description: >-
+        By submitting this issue, you agree to follow our [Code of
+        Conduct](https://github.com/fabricjs/fabric.js/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+        - label: >-
+            I have read and followed the [Contributing
+            Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md)
+          required: true
+        - label: >-
+            I have read and followed the [Issue Tracker
+            Guide](https://github.com/fabricjs/fabric.js/CONTRIBUTING.md#%EF%B8%8F-issue-tracker)
+          required: true
+        - label: I have searched and referenced existing issues and discussions
+          required: true
+        - label: I am filing a **BUG** report.
+          required: true
+        - label: >-
+            I have managed to reproduce the bug **after** upgrading to the
+            **latest** version
+          required: true
+        - label: I have created an accurate and minimal reproduction
+          required: true
+  - type: dropdown
+    id: _version
+    attributes:
+      label: Version
+      description: >-
+        If you are working on a version below latest you should upgrade to
+        latest before filing a bug report, your issue might have been resolved
+        already.
+      options:
+    validations:
+      required: true
+  - type: dropdown
+    id: environments
+    attributes:
+      label: In What environments are you experiencing the problem?
+      description: >-
+        checkout the [supported
+        browsers](/README.md#supported-browsersenvironments)
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Opera
+        - Microsoft Edge
+        - Node.js
+  - type: dropdown
+    id: _node_version
+    attributes:
+      label: Node Version (if applicable)
+      description: Provide the version if the bug occurs in Node.js
+      options:
+    validations:
+      required: false
+  - type: input
+    id: reproduction_link
+    attributes:
+      label: Link To Reproduction
+      description: >
+        A good reproduction helps us UNDERSTAND your issue, find the bug and fix
+        it quickly.
+
+        Take the time and put effort into making your reproduction accurate and
+        minimal.
+
+        Use the following reproduction templates.
+
+
+        - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
+
+        - [Node reproduction
+        template](https://codesandbox.io/s/exciting-browser-ytb701)
+
+
+        ⛔ No reproduction === closed issue ⛔
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      value: |
+        1. 
+        2. 
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: Provide screenshots/screencasts if relevant
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message & Stack Trace
+      description: Provide logging outputs/errors if relevant
+      render: bash
+    validations:
+      required: false

@@ -1235,6 +1235,7 @@
               prevStyle.fontFamily !== thisStyle.fontFamily ||
               prevStyle.fontWeight !== thisStyle.fontWeight ||
               prevStyle.fontStyle !== thisStyle.fontStyle ||
+              prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
               prevStyle.deltaY !== thisStyle.deltaY) ||
               (forTextSpans &&
                 (prevStyle.overline !== thisStyle.overline ||
@@ -1268,7 +1269,7 @@
           charIndex++;
           var thisStyle = styles[i][c];
           //check if style exists for this character
-          if (thisStyle) {
+          if (thisStyle && Object.keys(thisStyle).length > 0) {
             var styleChanged = fabric.util.hasStyleChanged(prevStyle, thisStyle, true);
             if (styleChanged) {
               stylesArray.push({
