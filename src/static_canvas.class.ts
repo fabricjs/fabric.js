@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { fabric } from '../HEADER';
-import type { BaseBrush } from './brushes';
 import { config } from './config';
 import { iMatrix, VERSION } from './constants';
 import type { StaticCanvasEvents } from './EventTypeDefs';
@@ -71,9 +70,9 @@ export type TSVGExportOptions = {
  * @fires object:removed
  */
 // eslint-disable-next-line max-len
-export class StaticCanvas extends createCollectionMixin(
-  CommonMethods<StaticCanvasEvents>
-) {
+export class StaticCanvas<
+  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+> extends createCollectionMixin(CommonMethods<EventSpec>) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
@@ -261,21 +260,17 @@ export class StaticCanvas extends createCollectionMixin(
    */
   disposed?: boolean;
 
-  renderAndResetBound: () => void;
-  requestRenderAllBound: () => StaticCanvas;
+  /**
+   * Keeps a copy of the canvas style before setting retina scaling and other potions
+   * in order to return it to original state on dispose
+   * @type string
+   */
+  _originalCanvasStyle?: string;
 
-  // TODO: move to canvas
-  interactive: boolean;
-  upperCanvasEl: HTMLCanvasElement;
-  contextTop: CanvasRenderingContext2D;
-  wrapperEl: HTMLDivElement;
-  cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
-  freeDrawingBrush: BaseBrush;
-  _activeObject: FabricObject;
+  renderAndResetBound: () => void;
+  requestRenderAllBound: () => void;
 
   _offset: { left: number; top: number };
-  protected _originalCanvasStyle?: string;
   protected hasLostContext: boolean;
   protected nextRenderHandle: number;
   protected __cleanupTask: {
@@ -325,18 +320,21 @@ export class StaticCanvas extends createCollectionMixin(
     obj.fire('removed', { target: this });
   }
 
-  initialize(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
-    this.calcViewportBoundaries();
-  }
-
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    this._init(el, options);
+  }
+
+  /**
+   * @private
+   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
+   * @param {Object} [options] Options object
+   */
+  _init(el: string | HTMLCanvasElement, options = {}) {
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
+    this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -348,11 +346,8 @@ export class StaticCanvas extends createCollectionMixin(
   _initStatic(el: string | HTMLCanvasElement, options = {}) {
     this._objects = [];
     this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
     this._initOptions(options);
-    // only initialize retina scaling once
-    if (!this.interactive) {
-      this._initRetinaScaling();
-    }
     this.calcOffset();
   }
 
@@ -378,22 +373,14 @@ export class StaticCanvas extends createCollectionMixin(
     if (!this._isRetinaScaling()) {
       return;
     }
-    const scaleRatio = config.devicePixelRatio;
-    this.__initRetinaScaling(
-      scaleRatio,
-      this.lowerCanvasEl,
-      this.contextContainer
-    );
-    if (this.upperCanvasEl) {
-      this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
-    }
+    this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
   __initRetinaScaling(
-    scaleRatio: number,
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
+    const scaleRatio = config.devicePixelRatio;
     canvas.setAttribute('width', (this.width * scaleRatio).toString());
     canvas.setAttribute('height', (this.height * scaleRatio).toString());
     context.scale(scaleRatio, scaleRatio);
@@ -469,11 +456,6 @@ export class StaticCanvas extends createCollectionMixin(
     }
     this.lowerCanvasEl.classList.add('lower-canvas');
     this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    if (this.interactive) {
-      this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-      this._applyCanvasStyle(this.lowerCanvasEl);
-    }
-
     this.contextContainer = this.lowerCanvasEl.getContext('2d');
   }
 
@@ -544,11 +526,6 @@ export class StaticCanvas extends createCollectionMixin(
       }
     });
 
-    // @TODO: move to Canvas
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
     this._initRetinaScaling();
     this.calcOffset();
 
@@ -566,16 +543,6 @@ export class StaticCanvas extends createCollectionMixin(
    */
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     this.lowerCanvasEl[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl[prop] = value;
-    }
-
-    // TODO: move to canvas
-    if (this.cacheCanvasEl) {
-      this.cacheCanvasEl[prop] = value;
-    }
-
     this[prop] = value;
   }
 
@@ -588,14 +555,6 @@ export class StaticCanvas extends createCollectionMixin(
    */
   _setCssDimension(prop: keyof TSize, value: string) {
     this.lowerCanvasEl.style[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl.style[prop] = value;
-    }
-
-    if (this.wrapperEl) {
-      this.wrapperEl.style[prop] = value;
-    }
   }
 
   /**
@@ -1745,14 +1704,11 @@ export class StaticCanvas extends createCollectionMixin(
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
-    // needs to be moved into Canvas class
-    if (this.interactive) {
-      canvasElement.style.cssText = this._originalCanvasStyle || '';
-      delete this._originalCanvasStyle;
-    }
     // restore canvas size to original size in case retina scaling was applied
     canvasElement.setAttribute('width', `${this.width}`);
     canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
     cleanUpJsdomNode(canvasElement);
   }
 
