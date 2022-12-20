@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(Textbox): Add a new text wrap strategy, similar to the css property `overflowWrap: break-word` #8526
 - chore(TS): Convert Canvas class #8510
 - chore(TS): Move object classes #8511
 - chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
