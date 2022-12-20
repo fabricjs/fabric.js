@@ -251,13 +251,14 @@
      * @param {Number} width The width to initialize the texture at.
      * @param {Number} height The height to initialize the texture.
      * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source for the texture data.
+     * @param {Number} filterType gl.NEAREST or gl.LINEAR usually, webgl numeri constants
      * @returns {WebGLTexture}
      */
-    createTexture: function(gl, width, height, textureImageSource) {
+    createTexture: function(gl, width, height, textureImageSource, filterType) {
       var texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filterType || gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filterType || gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       if (textureImageSource) {
