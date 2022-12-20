@@ -305,7 +305,9 @@ export class Textbox extends IText {
   }
 
   /**
-   * Wraps a line of text using the width of the Textbox and a context. For overflowBreakWord option
+   * This method splits text into lines by looking for the last space in a measured piece of text that fits the bounds.
+   * If a space is found, the line breaks before the last word in the sequence.
+   * If not, it splits the last word and breaks the line.
    * @param {Array} line The grapheme array that represent the line
    * @param {Number} lineIndex
    * @param {Number} desiredWidth width you want to wrap the line to
@@ -365,8 +367,13 @@ export class Textbox extends IText {
 
       if (text.length !== i) {
         // Get last space to split words
-        const lastSpace = temp.lastIndexOf(' ');
-        j = lastSpace >= 0 ? lastSpace + 1 : 0;
+        j = 0;
+        for (let l = temp.length - 1; l >= 0; l--) {
+          if (this._wordJoiners.test(temp[l])) {
+            j = l + 1;
+            break;
+          }
+        }
       }
       const currentLine = temp.substring(0, j || temp.length);
       offset += currentLine.length;
