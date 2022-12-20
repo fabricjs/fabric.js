@@ -270,7 +270,7 @@
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
-  QUnit.test('wrapping with charspacing and splitByGrapheme positive', function(assert) {
+  QUnit.test('wrapping with charspacing and textOverflow `anywhere` positive', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
       textOverflow: 'anywhere',
@@ -279,10 +279,10 @@
     assert.deepEqual(
       textbox.textLines,
       ['xaxbx', 'cxdey', 'aybid'],
-      'lines match splitByGrapheme charSpacing 400'
+      'lines match textOverflow `anywhere` charSpacing 400'
     );
   });
-  QUnit.test('wrapping with charspacing and splitByGrapheme negative', function(assert) {
+  QUnit.test('wrapping with charspacing and textOverflow `anywhere` negative', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
       textOverflow: 'anywhere',
@@ -291,10 +291,10 @@
     assert.deepEqual(
       textbox.textLines,
       ['xaxbxcxdeyay', 'bid'],
-      'lines match splitByGrapheme charSpacing -100'
+      'lines match textOverflow `anywhere` charSpacing -100'
     );
   });
-  QUnit.test('wrapping with charspacing and overflowBreakWord positive', function(assert) {
+  QUnit.test('wrapping with charspacing and textOverflow `break-word` positive', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
       textOverflow: 'break-word',
@@ -303,10 +303,10 @@
     assert.deepEqual(
       textbox.textLines,
       ['xaxbx', 'cxdey', 'aybid'],
-      'lines match overflowBreakWord charSpacing 400'
+      'lines match textOverflow `break-word` charSpacing 400'
     );
   });
-  QUnit.test('wrapping with charspacing and overflowBreakWord negative', function(assert) {
+  QUnit.test('wrapping with charspacing and textOverflow `break-word` negative', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
       textOverflow: 'break-word',
@@ -315,7 +315,7 @@
     assert.deepEqual(
       textbox.textLines,
       ['xaxbxcxdeyay', 'bid'],
-      'lines match overflowBreakWord charSpacing -100'
+      'lines match textOverflow `break-word` charSpacing -100'
     );
   });
   QUnit.test('wrapping with different things', function(assert) {
@@ -330,29 +330,29 @@
     assert.equal(textbox.textLines[5], 'ya', '5 line match expectations');
     assert.equal(textbox.textLines[6], 'yb', '6 line match expectations');
   });
-  QUnit.test('wrapping with splitByGrapheme', function(assert) {
+  QUnit.test('wrapping with textOverflow `anywhere`', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
       width: 1,
       textOverflow: 'anywhere',
     });
-    assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[2], 'x', '2 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[3], 'b', '3 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[4], 'x', '4 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[5], 'c', '5 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[0], 'x', '0 line match expectations');
+    assert.equal(textbox.textLines[1], 'a', '1 line match expectations');
+    assert.equal(textbox.textLines[2], 'x', '2 line match expectations');
+    assert.equal(textbox.textLines[3], 'b', '3 line match expectations');
+    assert.equal(textbox.textLines[4], 'x', '4 line match expectations');
+    assert.equal(textbox.textLines[5], 'c', '5 line match expectations');
   });
-  QUnit.test('wrapping with overflowBreakWord', function(assert) {
+  QUnit.test('wrapping with textOverflow `break-word`', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
       width: 1,
       textOverflow: 'anywhere',
     });
-    assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[2], 'x', '2 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[3], 'b', '3 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[4], 'x', '4 line match expectations splitByGrapheme');
-    assert.equal(textbox.textLines[5], 'c', '5 line match expectations splitByGrapheme');
+    assert.equal(textbox.textLines[0], 'x', '0 line match expectations');
+    assert.equal(textbox.textLines[1], 'a', '1 line match expectations');
+    assert.equal(textbox.textLines[2], 'x', '2 line match expectations');
+    assert.equal(textbox.textLines[3], 'b', '3 line match expectations');
+    assert.equal(textbox.textLines[4], 'x', '4 line match expectations');
+    assert.equal(textbox.textLines[5], 'c', '5 line match expectations');
   });
   QUnit.test('wrapping with custom space', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
@@ -384,13 +384,13 @@
       width: 10,
     });
     var line1 = textbox._wrapLine('', 0, 100, 0);
-    assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
+    assert.deepEqual(line1, [[]], 'wrapping without textOverflow `anywhere`');
     textbox.textOverflow = 'anywhere';
     var line2 = textbox._wrapLine('', 0, 100, 0);
-    assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
+    assert.deepEqual(line2, [[]], 'wrapping with textOverflow `anywhere`');
     textbox.textOverflow = 'break-word';
     var line3 = textbox._wrapLineOfWordBreak('', 0, 100, 0);
-    assert.deepEqual(line3, [[]], 'wrapping with overflowBreakWord');
+    assert.deepEqual(line3, [[]], 'wrapping with textOverflow `break-word`');
   });
   QUnit.test('texbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
@@ -457,7 +457,7 @@
     assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
   });
 
-  QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
+  QUnit.test('get2DCursorLocation with textOverflow `anywhere`', function(assert) {
     var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
       { width: 60, textOverflow: 'anywhere' });
     var loc = iText.get2DCursorLocation();
@@ -495,7 +495,7 @@
     assert.equal(loc.charIndex, 2, 'selection end 14 char 2');
   });
 
-  QUnit.test('get2DCursorLocation with overflowBreakWord', function(assert) {
+  QUnit.test('get2DCursorLocation with textOverflow `break-word`', function(assert) {
     var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
       { width: 60, textOverflow: 'break-word' });
     var loc = iText.get2DCursorLocation();
@@ -533,7 +533,7 @@
     assert.equal(loc.charIndex, 2, 'selection end 14 char 2');
   });
 
-  QUnit.test('missingNewlineOffset with splitByGrapheme', function(assert) {
+  QUnit.test('missingNewlineOffset with textOverflow `anywhere`', function(assert) {
     var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
       { width: 80, textOverflow: 'anywhere' });
 
@@ -565,11 +565,11 @@
     assert.equal(offset, 1, 'it returns always 1');
   });
 
-  QUnit.test('missingNewlineOffset with overflowBreakWord', function(assert) {
+  QUnit.test('missingNewlineOffset with textOverflow `break-word`', function(assert) {
     var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
       { width: 80, textOverflow: 'break-word' });
 
-    // Same behavior as splitByGrapheme in this case
+    // Same behavior as textOverflow `anywhere` in this case
     // [ [ 'a', 'a', 'a' ],
     //   [ 'a', 'a', 'a', 'a' ],
     //   [ 'a', 'a' ],
