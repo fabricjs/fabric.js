@@ -345,7 +345,7 @@
   QUnit.test('wrapping with textOverflow `break-word`', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
       width: 1,
-      textOverflow: 'anywhere',
+      textOverflow: 'break-word',
     });
     assert.equal(textbox.textLines[0], 'x', '0 line match expectations');
     assert.equal(textbox.textLines[1], 'a', '1 line match expectations');
