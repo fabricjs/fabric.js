@@ -45,6 +45,14 @@ export class Textbox extends IText {
   splitByGrapheme: boolean;
 
   /**
+   * Implementation of css property overflow-wrap.
+   * unlike splitByGrapheme, words will have reasonable newlines
+   * Will block splitByGrapheme option!
+   * @type Boolean
+   */
+  overflowBreakWord: boolean;
+
+  /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
    * @private
@@ -246,8 +254,11 @@ export class Textbox extends IText {
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     const wrapped = [];
     this.isWrapping = true;
+    const wrapFunction = this.overflowBreakWord
+      ? this._wrapLineOfWordBreak
+      : this._wrapLine;
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+      wrapped.push(...wrapFunction.call(this, lines[i], i, desiredWidth));
     }
     this.isWrapping = false;
     return wrapped;
@@ -291,6 +302,83 @@ export class Textbox extends IText {
    */
   wordSplit(value: string): string[] {
     return value.split(this._wordJoiners);
+  }
+
+  /**
+   * Wraps a line of text using the width of the Textbox and a context. For overflowBreakWord option
+   * @param {Array} line The grapheme array that represent the line
+   * @param {Number} lineIndex
+   * @param {Number} desiredWidth width you want to wrap the line to
+   * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
+   * @returns {Array} Array of line(s) into which the given text is wrapped
+   * to.
+   */
+  _wrapLineOfWordBreak(
+    _line,
+    lineIndex: number,
+    desiredWidth: number,
+    reservedSpace = 0
+  ): Array<any> {
+    desiredWidth -= reservedSpace;
+    const graphemeLines = [];
+    let text = _line || '',
+      i = 0,
+      j = 0,
+      offset = 0,
+      temp = '',
+      width = 0,
+      prevGrapheme = '',
+      largestLetterWidth = 0;
+
+    if (!text.length) {
+      graphemeLines.push([]);
+    }
+    while (text.length > 0) {
+      i = 0;
+      // Get the maximum string at a fixed width
+      width = 0;
+      prevGrapheme = '';
+      for (let k = 0, len = text.length; k < len; k++) {
+        const box = this._getGraphemeBox(
+          text[k],
+          lineIndex,
+          offset + k,
+          prevGrapheme,
+          true
+        );
+        width += box.kernedWidth;
+        largestLetterWidth = Math.max(largestLetterWidth, box.kernedWidth);
+        if (width > Math.max(largestLetterWidth, desiredWidth)) {
+          i = k;
+          break;
+        }
+        prevGrapheme = text[k];
+      }
+
+      // Prevent some edge case, may lead to an infinite loop
+      if (i === 0) {
+        graphemeLines.push(this.graphemeSplit(text));
+        break;
+      }
+
+      temp = text.substring(0, i);
+
+      if (text.length !== i) {
+        // Get last space to split words
+        const lastSpace = temp.lastIndexOf(' ');
+        j = lastSpace >= 0 ? lastSpace + 1 : 0;
+      }
+      const currentLine = temp.substring(0, j || temp.length);
+      offset += currentLine.length;
+
+      graphemeLines.push(this.graphemeSplit(currentLine));
+      text = text.substring(currentLine.length, text.length);
+      j = 0;
+    }
+    if (largestLetterWidth > this.dynamicMinWidth) {
+      this.dynamicMinWidth = largestLetterWidth;
+    }
+    return graphemeLines;
   }
 
   /**
@@ -405,7 +493,7 @@ export class Textbox extends IText {
    * @return Number
    */
   missingNewlineOffset(lineIndex) {
-    if (this.splitByGrapheme) {
+    if (this.splitByGrapheme || this.overflowBreakWord) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;
@@ -456,7 +544,9 @@ export class Textbox extends IText {
    */
   toObject(propertiesToInclude: Array<any>): object {
     return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
+      ['minWidth', 'splitByGrapheme', 'overflowBreakWord'].concat(
+        propertiesToInclude
+      )
     );
   }
 
@@ -491,6 +581,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
     textDefaultValues._dimensionAffectingProps!.concat('width'),
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
+  overflowBreakWord: false,
 };
 
 Object.assign(Textbox.prototype, textboxDefaultValues);
