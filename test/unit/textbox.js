@@ -98,7 +98,7 @@
     var textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
     assert.equal(textbox.type, 'textbox');
-    assert.deepEqual(textbox.styles, {});
+    assert.deepEqual(textbox.styles, { });
     assert.ok(textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });
 
@@ -106,20 +106,20 @@
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
       width: 120,
       styles: {
-        "0": {
-          "5": { fill: "red" },
-          "6": { fill: "red" },
-          "7": { fill: "red" },
-          "8": { fill: "red" }
+        "0":{
+          "5":{fill:"red"},
+          "6":{fill:"red"},
+          "7":{fill:"red"},
+          "8":{fill:"red"}
         },
-        "1": {
-          "3": { underline: true },
-          "4": { underline: true },
-          "5": { underline: true }
+        "1":{
+          "3":{underline:true},
+          "4":{underline:true},
+          "5":{underline:true}
         },
-        "2": {
-          "0": { underline: true },
-          "1": { underline: true }
+        "2":{
+          "0":{underline:true},
+          "1":{underline:true}
         }
       }
     });
@@ -146,20 +146,20 @@
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
       width: 120,
       styles: {
-        "0": {
-          "5": { fill: "red" },
-          "6": { fill: "red" },
-          "7": { fill: "red" },
-          "8": { fill: "red" }
+        "0":{
+          "5":{fill:"red"},
+          "6":{fill:"red"},
+          "7":{fill:"red"},
+          "8":{fill:"red"}
         },
-        "1": {
-          "3": { underline: true },
-          "4": { underline: true },
-          "5": { underline: true }
+        "1":{
+          "3":{underline:true},
+          "4":{underline:true},
+          "5":{underline:true}
         },
-        "2": {
-          "0": { underline: true },
-          "1": { underline: true }
+        "2":{
+          "0":{underline:true},
+          "1":{underline:true}
         }
       }
     });
@@ -368,7 +368,7 @@
     assert.deepEqual(line1, expected1, 'wrapping without reserved');
     assert.deepEqual(textbox.dynamicMinWidth, 40, 'wrapping without reserved');
     var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 50);
-    var expected2 = [
+    var expected2 =  [
       ['x', 'a'],
       ['x', 'b'],
       ['x', 'c'],
@@ -398,7 +398,7 @@
     canvas.add(text);
     canvas.setActiveObject(text);
     var canvasEl = canvas.getElement(),
-      canvasOffset = fabric.util.getElementOffset(canvasEl);
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.width,
       clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
@@ -423,7 +423,7 @@
     canvas.add(text);
     canvas.setActiveObject(text);
     var canvasEl = canvas.getElement(),
-      canvasOffset = fabric.util.getElementOffset(canvasEl);
+        canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.left,
       clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
@@ -444,15 +444,13 @@
     assert.equal(text.width, originalWidth + 20, 'width increased');
   });
   QUnit.test('_removeExtraneousStyles', function(assert) {
-    var iText = new fabric.Textbox('a\nq\qo', {
-      styles: {
-        0: { 0: { fontSize: 4 } },
-        1: { 0: { fontSize: 4 } },
-        2: { 0: { fontSize: 4 } },
-        3: { 0: { fontSize: 4 } },
-        4: { 0: { fontSize: 4 } },
-      }
-    });
+    var iText = new fabric.Textbox('a\nq\qo', { styles: {
+      0: { 0: { fontSize: 4 } },
+      1: { 0: { fontSize: 4 } },
+      2: { 0: { fontSize: 4 } },
+      3: { 0: { fontSize: 4 } },
+      4: { 0: { fontSize: 4 } },
+    } });
     assert.deepEqual(iText.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
     assert.deepEqual(iText.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
     iText._removeExtraneousStyles();
@@ -626,12 +624,11 @@
     assert.deepEqual(textbox.styles[0], {}, 'style is an empty object');
   });
 
-  QUnit.test('_deleteStyleDeclaration', function(assert) {
+  QUnit.test('_deleteStyleDeclaration', function (assert) {
     var text = 'aaa aaq ggg gg oee eee';
     var styles = {};
     for (var index = 0; index < text.length; index++) {
       styles[index] = { fontSize: 4 };
-
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
