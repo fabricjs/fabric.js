@@ -41,16 +41,25 @@ export class Textbox extends IText {
    * this is a cheap way to help with chinese/japanese
    * @type Boolean
    * @since 2.6.0
+   * @deprecated use {@link textOverflow} `anywhere` instead
    */
   splitByGrapheme: boolean;
 
   /**
-   * Implementation of css property overflow-wrap.
-   * unlike splitByGrapheme, words will have reasonable newlines
-   * Will block splitByGrapheme option!
-   * @type Boolean
+   * Implementation of css property `overflow-wrap`
+   * The `normal` option is not supported
+   * Default behavior adjusts size to fit the largest word
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
    */
-  overflowBreakWord: boolean;
+  textOverflow?: 'break-word' | 'anywhere' | '';
+
+  /**
+   * allow backward compatibility for {@link splitByGrapheme}
+   * @todo remove once {@link splitByGrapheme} is removed
+   */
+  protected resolveTextOverflowStrategy() {
+    return this.textOverflow || (this.splitByGrapheme && 'anywhere') || '';
+  }
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -101,7 +110,7 @@ export class Textbox extends IText {
         charCount++;
         realLineCount++;
       } else if (
-        !this.splitByGrapheme &&
+        this.resolveTextOverflowStrategy() !== 'anywhere' &&
         this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
         i > 0
       ) {
@@ -254,9 +263,10 @@ export class Textbox extends IText {
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     const wrapped = [];
     this.isWrapping = true;
-    const wrapFunction = this.overflowBreakWord
-      ? this._wrapLineOfWordBreak
-      : this._wrapLine;
+    const wrapFunction =
+      this.textOverflow === 'break-word'
+        ? this._wrapLineOfWordBreak
+        : this._wrapLine;
     for (let i = 0; i < lines.length; i++) {
       wrapped.push(...wrapFunction.call(this, lines[i], i, desiredWidth));
     }
@@ -404,12 +414,10 @@ export class Textbox extends IText {
     reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
-      splitByGrapheme = this.splitByGrapheme,
+      breakAnywhere = this.resolveTextOverflowStrategy() === 'anywhere',
       graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplit(_line)
-        : this.wordSplit(_line),
-      infix = splitByGrapheme ? '' : ' ';
+      words = breakAnywhere ? this.graphemeSplit(_line) : this.wordSplit(_line),
+      infix = breakAnywhere ? '' : ' ';
 
     let lineWidth = 0,
       line = [],
@@ -425,8 +433,8 @@ export class Textbox extends IText {
     desiredWidth -= reservedSpace;
     // measure words
     const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplit(word);
+      // if using textOverflow `anywhere` words are already in graphemes.
+      word = breakAnywhere ? word : this.graphemeSplit(word);
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
       offset += word.length + 1;
@@ -456,12 +464,12 @@ export class Textbox extends IText {
         lineWidth += additionalSpace;
       }
 
-      if (!lineJustStarted && !splitByGrapheme) {
+      if (!lineJustStarted && !breakAnywhere) {
         line.push(infix);
       }
       line = line.concat(word);
 
-      infixWidth = splitByGrapheme
+      infixWidth = breakAnywhere
         ? 0
         : this._measureWord([infix], lineIndex, offset);
       offset++;
@@ -500,7 +508,7 @@ export class Textbox extends IText {
    * @return Number
    */
   missingNewlineOffset(lineIndex) {
-    if (this.splitByGrapheme || this.overflowBreakWord) {
+    if (this.resolveTextOverflowStrategy()) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;
@@ -550,11 +558,10 @@ export class Textbox extends IText {
    * @return {Object} object representation of an instance
    */
   toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      ['minWidth', 'splitByGrapheme', 'overflowBreakWord'].concat(
-        propertiesToInclude
-      )
-    );
+    return {
+      ...super.toObject(['minWidth'].concat(propertiesToInclude)),
+      textOverflow: this.resolveTextOverflowStrategy(),
+    };
   }
 
   /**
@@ -587,8 +594,6 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   _dimensionAffectingProps:
     textDefaultValues._dimensionAffectingProps!.concat('width'),
   _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: false,
-  overflowBreakWord: false,
 };
 
 Object.assign(Textbox.prototype, textboxDefaultValues);

@@ -473,7 +473,7 @@
 
   function text13(canvas, callback) {
     fabric.Textbox.fromObject(
-      JSON.parse('{"type":"textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"Arial","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"splitByGrapheme":false,"styles":{},"path":null}')
+      JSON.parse('{"type":"textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"Arial","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"styles":{},"path":null}')
     ).then(function(text) {
       canvas.add(text);
       canvas.renderAll();

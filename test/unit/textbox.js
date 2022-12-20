@@ -67,8 +67,7 @@
       }
     ],
     minWidth: 20,
-    splitByGrapheme: false,
-    overflowBreakWord: false,
+    textOverflow: '',
     strokeUniform: false,
     path: null,
     direction: 'ltr',
@@ -274,7 +273,7 @@
   QUnit.test('wrapping with charspacing and splitByGrapheme positive', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
-      splitByGrapheme: true,
+      textOverflow: 'anywhere',
       charSpacing: 400
     });
     assert.deepEqual(
@@ -286,7 +285,7 @@
   QUnit.test('wrapping with charspacing and splitByGrapheme negative', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
-      splitByGrapheme: true,
+      textOverflow: 'anywhere',
       charSpacing: -100
     });
     assert.deepEqual(
@@ -298,7 +297,7 @@
   QUnit.test('wrapping with charspacing and overflowBreakWord positive', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
-      overflowBreakWord: true,
+      textOverflow: 'break-word',
       charSpacing: 400
     });
     assert.deepEqual(
@@ -310,7 +309,7 @@
   QUnit.test('wrapping with charspacing and overflowBreakWord negative', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
-      overflowBreakWord: true,
+      textOverflow: 'break-word',
       charSpacing: -100
     });
     assert.deepEqual(
@@ -334,7 +333,7 @@
   QUnit.test('wrapping with splitByGrapheme', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
       width: 1,
-      splitByGrapheme: true,
+      textOverflow: 'anywhere',
     });
     assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
     assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
@@ -346,7 +345,7 @@
   QUnit.test('wrapping with overflowBreakWord', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdxeyaybid', {
       width: 1,
-      splitByGrapheme: true,
+      textOverflow: 'anywhere',
     });
     assert.equal(textbox.textLines[0], 'x', '0 line match expectations splitByGrapheme');
     assert.equal(textbox.textLines[1], 'a', '1 line match expectations splitByGrapheme');
@@ -386,10 +385,10 @@
     });
     var line1 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
-    textbox.splitByGrapheme = true;
+    textbox.textOverflow = 'anywhere';
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
-    textbox.overflowBreakWord = true;
+    textbox.textOverflow = 'break-word';
     var line3 = textbox._wrapLineOfWordBreak('', 0, 100, 0);
     assert.deepEqual(line3, [[]], 'wrapping with overflowBreakWord');
   });
@@ -460,7 +459,7 @@
 
   QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
     var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
-      { width: 60, splitByGrapheme: true });
+      { width: 60, textOverflow: 'anywhere' });
     var loc = iText.get2DCursorLocation();
 
     // [ [ '由', '石', '墨' ],
@@ -498,7 +497,7 @@
 
   QUnit.test('get2DCursorLocation with overflowBreakWord', function(assert) {
     var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
-      { width: 60, overflowBreakWord: true });
+      { width: 60, textOverflow: 'break-word' });
     var loc = iText.get2DCursorLocation();
 
     // [ [ '由', '石', '墨' ],
@@ -536,7 +535,7 @@
 
   QUnit.test('missingNewlineOffset with splitByGrapheme', function(assert) {
     var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
-      { width: 80, splitByGrapheme: true });
+      { width: 80, textOverflow: 'anywhere' });
 
     // [ [ 'a', 'a', 'a' ],
     //   [ 'a', 'a', 'a', 'a' ],
@@ -568,7 +567,7 @@
 
   QUnit.test('missingNewlineOffset with overflowBreakWord', function(assert) {
     var textbox = new fabric.Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa',
-      { width: 80, overflowBreakWord: true });
+      { width: 80, textOverflow: 'break-word' });
 
     // Same behavior as splitByGrapheme in this case
     // [ [ 'a', 'a', 'a' ],
@@ -682,12 +681,12 @@
     var str = '0123456789';
     var measureTextbox = new fabric.Textbox(str, {
       fontSize: 20,
-      splitByGrapheme: false,
+      textOverflow: '',
     });
     var newTextbox = new fabric.Textbox(str, {
       width: measureTextbox.width,
       fontSize: 20,
-      splitByGrapheme: true,
+      textOverflow: 'anywhere',
     });
     assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
@@ -695,12 +694,12 @@
     var str = '0123456789';
     var measureTextbox = new fabric.Textbox(str, {
       fontSize: 20,
-      overflowBreakWord: false,
+      textOverflow: '',
     });
     var newTextbox = new fabric.Textbox(str, {
       width: measureTextbox.width,
       fontSize: 20,
-      overflowBreakWord: true,
+      textOverflow: 'break-word',
     });
     assert.equal(newTextbox.textLines.length, measureTextbox.textLines.length, 'The same text is not wrapped');
   });
