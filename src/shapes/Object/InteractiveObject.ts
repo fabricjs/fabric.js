@@ -86,20 +86,10 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options: Record<string, unknown>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Determines which corner has been clicked
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
-   * @param {boolean} forTouch indicates if we are looking for interactin area with a touch action
+   * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
    */
   _findTargetCorner(pointer: Point, forTouch: boolean): false | string {

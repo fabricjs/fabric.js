@@ -646,16 +646,6 @@ export class FabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options?: Partial<TClassProperties<FabricObject>>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Create a the canvas used to keep the cached copy of the object
    * @private
    */

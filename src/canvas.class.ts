@@ -59,7 +59,6 @@ type TDestroyedCanvas = Omit<
  * @class Canvas
  * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
- * @see {@link fabric.Canvas#initialize} for constructor definition
  *
  * @fires object:modified at the end of a transform or any change when statefull is true
  * @fires object:rotating while an object is being rotated from the control
@@ -105,8 +104,8 @@ type TDestroyedCanvas = Omit<
  * }
  * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
  * a.on('drop', opt => {
- *  opt.e.defaultPrevented  //  drop occured
- *  opt.didDrop             //  drop occured on canvas
+ *  opt.e.defaultPrevented  //  drop occurred
+ *  opt.didDrop             //  drop occurred on canvas
  *  opt.target              //  drop target
  *  opt.target !== a && a.set('text', 'I lost');
  * });
@@ -495,7 +494,7 @@ export class Canvas<
   _iTextInstances: (IText | Textbox)[];
   /**
    * Constructor
-   * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
+   * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
    * @param {Object} [options] Options object
    * @return {Object} thisArg
    */
