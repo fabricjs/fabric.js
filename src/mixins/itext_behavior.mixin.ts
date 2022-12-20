@@ -7,6 +7,7 @@ import { Text } from '../shapes/text.class';
 import { TPointerEvent } from '../typedefs';
 import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
+import { clone } from '../util/lang_object';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
 import { Canvas } from '../__types__';
@@ -564,7 +565,7 @@ export abstract class ITextBehaviorMixin<
     const offset = correction.add(diff).scalarMultiply(retinaScaling);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = this.backgroundColor;
-    const styles = object.clone(this.styles, true);
+    const styles = clone(this.styles, true);
     delete this.backgroundColor;
     const styleOverride = {
       fill: 'transparent',
@@ -679,7 +680,8 @@ export abstract class ITextBehaviorMixin<
    * @param {object} options
    * @param {DragEvent} options.e
    */
-  dragOverHandler({ e }: TEvent<DragEvent>) {
+  dragOverHandler(ev: TEvent<DragEvent>) {
+    const { e } = ev;
     const canDrop = !e.defaultPrevented && this.canDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
@@ -691,8 +693,8 @@ export abstract class ITextBehaviorMixin<
       //  can be dropped, inform browser
       e.preventDefault();
       //  inform event subscribers
-      options.canDrop = true;
-      options.dropTarget = this;
+      ev.canDrop = true;
+      ev.dropTarget = this;
       // find cursor under the drag part.
     }
   }
