@@ -306,6 +306,27 @@
       'lines match textOverflow `break-word` charSpacing 400'
     );
   });
+  QUnit.test('wrapping with textOverflow `break-word` and whitespace', function (assert) {
+    var textbox = new fabric.Textbox(
+      'xaxbxc                       xdeyaybid                                                                     \n   ',
+      {
+        width: 190,
+        textOverflow: 'break-word',
+        charSpacing: 400
+      }
+    );
+    assert.deepEqual(
+      textbox.textLines,
+      [
+        'xaxbx',
+        'c                       ',
+        'xdeya',
+        'ybid                                                                     ',
+        '   '
+      ],
+      'lines match textOverflow `break-word'
+    );
+  });
   QUnit.test('wrapping with charspacing and textOverflow `break-word` negative', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
