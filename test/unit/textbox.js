@@ -410,7 +410,7 @@
     var line2 = textbox._wrapLine('', 0, 100, 0);
     assert.deepEqual(line2, [[]], 'wrapping with textOverflow `anywhere`');
     textbox.textOverflow = 'break-word';
-    var line3 = textbox._wrapLineOfWordBreak('', 0, 100, 0);
+    var line3 = textbox._wrapLineWithTextOverflow('', 0, 100, 0);
     assert.deepEqual(line3, [[]], 'wrapping with textOverflow `break-word`');
   });
   QUnit.test('texbox will change width from the mr corner', function(assert) {

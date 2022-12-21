@@ -263,10 +263,9 @@ export class Textbox extends IText {
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     const wrapped = [];
     this.isWrapping = true;
-    const wrapFunction =
-      this.textOverflow === 'break-word'
-        ? this._wrapLineOfWordBreak
-        : this._wrapLine;
+    const wrapFunction = this.resolveTextOverflowStrategy()
+      ? this._wrapLineWithTextOverflow
+      : this._wrapLine;
     for (let i = 0; i < lines.length; i++) {
       wrapped.push(...wrapFunction.call(this, lines[i], i, desiredWidth));
     }
@@ -325,7 +324,7 @@ export class Textbox extends IText {
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
-  _wrapLineOfWordBreak(
+  _wrapLineWithTextOverflow(
     line: string,
     lineIndex: number,
     desiredWidth: number,
@@ -366,13 +365,14 @@ export class Textbox extends IText {
         }
         prevGrapheme = text[k];
       }
-      // break-word strategy logic start
       temp = text.substring(0, length);
-      // find last space to split words
-      for (let l = temp.length - 1; l >= 0; l--) {
-        if (this._wordJoiners.test(temp[l])) {
-          temp = temp.substring(0, l);
-          break;
+      if (this.resolveTextOverflowStrategy() === 'break-word') {
+        // find last space to split words
+        for (let l = temp.length - 1; l >= 0; l--) {
+          if (this._wordJoiners.test(temp[l])) {
+            temp = temp.substring(0, l);
+            break;
+          }
         }
       }
       // look ahead for whitespace to append to the current line
