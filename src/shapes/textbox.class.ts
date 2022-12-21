@@ -359,11 +359,11 @@ export class Textbox extends IText {
           true
         );
         width += box.kernedWidth;
-        largestLetterWidth = Math.max(largestLetterWidth, box.kernedWidth);
-        if (
-          width - charSpacing >
-          Math.max(largestLetterWidth - charSpacing, desiredWidth)
-        ) {
+        largestLetterWidth = Math.max(
+          largestLetterWidth,
+          box.kernedWidth - charSpacing
+        );
+        if (width - charSpacing > Math.max(largestLetterWidth, desiredWidth)) {
           length = k;
           break;
         }
@@ -395,7 +395,7 @@ export class Textbox extends IText {
       text = text.substring(temp.length);
     }
     if (largestLetterWidth > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestLetterWidth - charSpacing + reservedSpace;
+      this.dynamicMinWidth = largestLetterWidth + reservedSpace;
     }
     return graphemeLines;
   }
