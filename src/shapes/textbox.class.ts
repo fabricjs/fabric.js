@@ -110,7 +110,7 @@ export class Textbox extends IText {
         charCount++;
         realLineCount++;
       } else if (
-        this.resolveTextOverflowStrategy() !== 'anywhere' &&
+        !this.resolveTextOverflowStrategy() &&
         this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
         i > 0
       ) {
