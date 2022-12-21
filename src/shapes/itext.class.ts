@@ -391,7 +391,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
       leftOffset -= this._getWidthOfCharSpacing();
     }
     const boundaries = {
-      top: topOffset,
+      top: Math.min(topOffset, this.height),
       left: Math.min(
         lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
         this.width

@@ -326,30 +326,31 @@ export class Textbox extends IText {
    * to.
    */
   _wrapLineOfWordBreak(
-    line,
+    line: string,
     lineIndex: number,
     desiredWidth: number,
     reservedSpace = 0
-  ): Array<any> {
+  ): string[][] {
     desiredWidth -= reservedSpace;
     const graphemeLines = [];
     let text = line || '',
-      length = 0,
       offset = 0,
-      width = 0,
       largestLetterWidth = 0,
+      width: number,
+      length: number,
       temp: string,
-      prevGrapheme: string;
+      prevGrapheme: string,
+      appendWSLength: number;
 
     if (!text.length) {
       graphemeLines.push([]);
     }
     while (text.length > 0) {
-      length = 0;
-      // Get the maximum string at a fixed width
+      length = text.length;
+      // Get the maximum string at a fixed width by measuring chars until bounds are reached
       width = 0;
       prevGrapheme = '';
-      for (let k = 0, len = text.length; k < len; k++) {
+      for (let k = 0; k < text.length; k++) {
         const box = this._getGraphemeBox(
           text[k],
           lineIndex,
@@ -365,32 +366,27 @@ export class Textbox extends IText {
         }
         prevGrapheme = text[k];
       }
-
-      // no breaking found, we are at the last line
-      if (length === 0) {
-        graphemeLines.push(this.graphemeSplit(text));
-        break;
-      }
-
+      // break-word strategy logic start
       temp = text.substring(0, length);
-
-      if (text.length !== length) {
-        // Get last space to split words
-        for (let l = temp.length - 1; l >= 0; l--) {
-          if (this._wordJoiners.test(temp[l])) {
-            temp = temp.substring(0, l);
-            break;
-          }
-        }
-      }
-      // look ahead for whitespace to append to the current line
-      for (let k = temp.length; k < text.length; k++) {
-        if (!this._wordJoiners.test(text[k])) {
-          temp += text.substring(temp.length, k);
+      // find last space to split words
+      for (let l = temp.length - 1; l >= 0; l--) {
+        if (this._wordJoiners.test(temp[l])) {
+          temp = temp.substring(0, l);
           break;
         }
       }
+      // look ahead for whitespace to append to the current line
+      appendWSLength = text.length;
+      for (let k = temp.length; k < text.length; k++) {
+        if (!this._wordJoiners.test(text[k])) {
+          appendWSLength = k;
+          break;
+        }
+      }
+      // finalize line
+      temp += text.substring(temp.length, appendWSLength);
       graphemeLines.push(this.graphemeSplit(temp));
+      // prepare for next line
       offset += temp.length;
       text = text.substring(temp.length);
     }
