@@ -332,6 +332,7 @@ export class Textbox extends IText {
   ): string[][] {
     desiredWidth -= reservedSpace;
     const graphemeLines = [];
+    const charSpacing = this._getWidthOfCharSpacing();
     let text = line || '',
       offset = 0,
       largestLetterWidth = 0,
@@ -359,7 +360,10 @@ export class Textbox extends IText {
         );
         width += box.kernedWidth;
         largestLetterWidth = Math.max(largestLetterWidth, box.kernedWidth);
-        if (width > Math.max(largestLetterWidth, desiredWidth)) {
+        if (
+          width - charSpacing >
+          Math.max(largestLetterWidth - charSpacing, desiredWidth)
+        ) {
           length = k;
           break;
         }
