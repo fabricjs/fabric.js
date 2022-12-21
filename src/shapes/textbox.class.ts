@@ -395,7 +395,7 @@ export class Textbox extends IText {
       text = text.substring(temp.length);
     }
     if (largestLetterWidth > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestLetterWidth;
+      this.dynamicMinWidth = largestLetterWidth - charSpacing + reservedSpace;
     }
     return graphemeLines;
   }
