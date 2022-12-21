@@ -326,27 +326,26 @@ export class Textbox extends IText {
    * to.
    */
   _wrapLineOfWordBreak(
-    _line,
+    line,
     lineIndex: number,
     desiredWidth: number,
     reservedSpace = 0
   ): Array<any> {
     desiredWidth -= reservedSpace;
     const graphemeLines = [];
-    let text = _line || '',
-      i = 0,
-      j = 0,
+    let text = line || '',
+      length = 0,
       offset = 0,
-      temp = '',
       width = 0,
-      prevGrapheme = '',
-      largestLetterWidth = 0;
+      largestLetterWidth = 0,
+      temp: string,
+      prevGrapheme: string;
 
     if (!text.length) {
       graphemeLines.push([]);
     }
     while (text.length > 0) {
-      i = 0;
+      length = 0;
       // Get the maximum string at a fixed width
       width = 0;
       prevGrapheme = '';
@@ -361,39 +360,39 @@ export class Textbox extends IText {
         width += box.kernedWidth;
         largestLetterWidth = Math.max(largestLetterWidth, box.kernedWidth);
         if (width > Math.max(largestLetterWidth, desiredWidth)) {
-          i = k;
+          length = k;
           break;
         }
         prevGrapheme = text[k];
       }
 
-      // Prevent some edge case, may lead to an infinite loop
-      if (i === 0) {
+      // no breaking found, we are at the last line
+      if (length === 0) {
         graphemeLines.push(this.graphemeSplit(text));
         break;
       }
 
-      temp = text.substring(0, i);
+      temp = text.substring(0, length);
 
-      if (text.length !== i) {
+      if (text.length !== length) {
         // Get last space to split words
-        j = 0;
         for (let l = temp.length - 1; l >= 0; l--) {
           if (this._wordJoiners.test(temp[l])) {
-            j = l + 1;
+            temp = temp.substring(0, l);
             break;
           }
         }
       }
-      const currentLine = temp.substring(0, j || temp.length);
-      offset += currentLine.length;
-
-      // lines with whitespace only should be dropped
-      if (currentLine.trim()) {
-        graphemeLines.push(this.graphemeSplit(currentLine));
+      // look ahead for whitespace to append to the current line
+      for (let k = temp.length; k < text.length; k++) {
+        if (!this._wordJoiners.test(text[k])) {
+          temp += text.substring(temp.length, k);
+          break;
+        }
       }
-      text = text.substring(currentLine.length, text.length);
-      j = 0;
+      graphemeLines.push(this.graphemeSplit(temp));
+      offset += temp.length;
+      text = text.substring(temp.length);
     }
     if (largestLetterWidth > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestLetterWidth;
