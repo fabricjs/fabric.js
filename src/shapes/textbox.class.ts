@@ -388,7 +388,10 @@ export class Textbox extends IText {
       const currentLine = temp.substring(0, j || temp.length);
       offset += currentLine.length;
 
-      graphemeLines.push(this.graphemeSplit(currentLine));
+      // lines with whitespace only should be dropped
+      if (currentLine.trim()) {
+        graphemeLines.push(this.graphemeSplit(currentLine));
+      }
       text = text.substring(currentLine.length, text.length);
       j = 0;
     }
