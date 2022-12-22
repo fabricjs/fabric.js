@@ -504,7 +504,8 @@
       clientY: 0,
       dataTransfer: {
         setDragImage(imageSource, x, y) {
-          callback(imageSource);
+          canvas.getContext().drawImage(imageSource, 0, 0);
+          callback(canvas.lowerCanvasEl);
         }
       }
     };
@@ -519,6 +520,8 @@
     code: dragImage.bind(null, {}),
     disabled: fabric.isLikelyNode,
     golden: 'drag_image.png',
+    width: 120,
+    height: 220,
     percentage: 0.03,
     fabricClass: 'Canvas'
   });
@@ -528,6 +531,8 @@
     code: dragImage.bind(null, { retinaScaling: 3 }),
     disabled: fabric.isLikelyNode,
     golden: 'drag_image.png',
+    width: 110,
+    height: 250,
     percentage: 0.03,
     fabricClass: 'Canvas'
   });
@@ -537,6 +542,8 @@
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250] }),
     disabled: fabric.isLikelyNode,
     golden: 'drag_image_vpt.png',
+    width: 220,
+    height: 250,
     percentage: 0.03,
     fabricClass: 'Canvas'
   });
@@ -546,6 +553,8 @@
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250], retinaScaling: 1.25 }),
     disabled: fabric.isLikelyNode,
     golden: 'drag_image_vpt.png',
+    width: 220,
+    height: 250,
     percentage: 0.03,
     fabricClass: 'Canvas'
   });
