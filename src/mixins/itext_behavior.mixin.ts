@@ -618,7 +618,7 @@ export abstract class ITextBehaviorMixin<
       const value = this._text
         .slice(selection.selectionStart, selection.selectionEnd)
         .join('');
-      const data = Object.assign({ text: this.text, value: value }, selection);
+      const data = { text: this.text, value, ...selection };
       e.dataTransfer.setData('text/plain', value);
       e.dataTransfer.setData(
         'application/fabric',
@@ -764,10 +764,9 @@ export abstract class ITextBehaviorMixin<
    * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
    * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
    */
-  dropHandler({ e }: TEvent<DragEvent>) {
+  dropHandler(ev: TEvent<DragEvent>) {
+    const { e } = ev;
     const didDrop = e.defaultPrevented;
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
@@ -803,8 +802,8 @@ export abstract class ITextBehaviorMixin<
         insert = insert.trimEnd();
       }
       //  inform subscribers
-      options.didDrop = true;
-      options.dropTarget = this;
+      ev.didDrop = true;
+      ev.dropTarget = this;
       //  finalize
       this.insertChars(insert, styles, insertAt);
       // can this part be moved in an outside event? andrea to check.
