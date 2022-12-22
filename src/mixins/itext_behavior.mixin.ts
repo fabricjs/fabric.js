@@ -579,7 +579,7 @@ export abstract class ITextBehaviorMixin<
     if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
       const dragImageCanvas = createCanvasElement();
       const size = new Point(dragImage.width, dragImage.height)
-        .scalarMultiply(retinaScaling)
+        .scalarDivide(retinaScaling)
         .transform(vpt, true);
       dragImageCanvas.width = size.x;
       dragImageCanvas.height = size.y;
