@@ -563,6 +563,7 @@ export abstract class ITextBehaviorMixin<
     const styles = clone(this.styles, true);
     delete this.backgroundColor;
     const styleOverride = {
+      stroke: 'transparent',
       fill: 'transparent',
       textBackgroundColor: 'transparent',
     };
