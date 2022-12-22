@@ -548,21 +548,20 @@ export abstract class ITextBehaviorMixin<
       value: string;
     }
   ) {
-    const t = this.calcTransformMatrix();
     const flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
     const boundaries = this._getCursorBoundaries(data.selectionStart);
     const selectionPosition = new Point(
       boundaries.left + boundaries.leftOffset,
       boundaries.top + boundaries.topOffset
     ).multiply(flipFactor);
-    const pos = transformPoint(selectionPosition, t);
+    const pos = selectionPosition.transform(this.calcTransformMatrix());
     const pointer = this.canvas.getPointer(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = this.canvas._isRetinaScaling();
     const retinaScaling = this.getCanvasRetinaScaling();
     const bbox = this.getBoundingRect(true);
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
-    const offset = correction.add(diff).scalarMultiply(retinaScaling);
+    const offset = correction.add(diff);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = this.backgroundColor;
     const styles = clone(this.styles, true);
@@ -774,10 +773,9 @@ export abstract class ITextBehaviorMixin<
     let insert = e.dataTransfer.getData('text/plain');
     if (insert && !didDrop) {
       let insertAt = this.getSelectionStartFromPointer(e);
-      const data = e.dataTransfer.types.includes('application/fabric')
+      const { styles } = e.dataTransfer.types.includes('application/fabric')
         ? JSON.parse(e.dataTransfer.getData('application/fabric'))
         : {};
-      const styles = data.styles;
       const trailing = insert[Math.max(0, insert.length - 1)];
       const selectionStartOffset = 0;
       //  drag and drop in same instance
