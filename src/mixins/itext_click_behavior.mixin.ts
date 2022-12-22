@@ -106,6 +106,7 @@ export abstract class ITextClickBehaviorMixin<
     if (
       !this.canvas ||
       !this.editable ||
+      this.__isDragging ||
       (options.e.button && options.e.button !== 1)
     ) {
       return;
