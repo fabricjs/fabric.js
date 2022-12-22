@@ -9,7 +9,7 @@ import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { clone } from '../util/lang_object';
 import { createCanvasElement } from '../util/misc/dom';
-import { transformPoint } from '../util/misc/matrix';
+import { isIdentityMatrix, transformPoint } from '../util/misc/matrix';
 import { Canvas } from '../__types__';
 import { TextStyleDeclaration } from './text_style.mixin';
 
@@ -561,7 +561,8 @@ export abstract class ITextBehaviorMixin<
     const retinaScaling = this.getCanvasRetinaScaling();
     const bbox = this.getBoundingRect(true);
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
-    const offset = correction.add(diff);
+    const vpt = this.canvas.viewportTransform;
+    const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = this.backgroundColor;
     const styles = clone(this.styles, true);
@@ -573,25 +574,31 @@ export abstract class ITextBehaviorMixin<
     this.setSelectionStyles(styleOverride, 0, data.selectionStart);
     this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
     let dragImage = this.toCanvasElement({
-      enableRetinaScaling: enableRetinaScaling,
+      enableRetinaScaling,
     });
     this.backgroundColor = bgc;
     this.styles = styles;
-    //  handle retina scaling
-    if (enableRetinaScaling && retinaScaling > 1) {
-      const c = createCanvasElement();
-      c.width = dragImage.width / retinaScaling;
-      c.height = dragImage.height / retinaScaling;
-      const ctx = c.getContext('2d');
+    //  handle retina scaling and vpt
+    if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
+      const dragImageCanvas = createCanvasElement();
+      const size = new Point(dragImage.width, dragImage.height)
+        .scalarMultiply(retinaScaling)
+        .transform(vpt, true);
+      dragImageCanvas.width = size.x;
+      dragImageCanvas.height = size.y;
+      const ctx = dragImageCanvas.getContext('2d');
       ctx.scale(1 / retinaScaling, 1 / retinaScaling);
+      const [a, b, c, d] = vpt;
+      const origin = new Point().transform(vpt, true);
+      ctx.transform(a, b, c, d, -origin.x, -origin.y);
       ctx.drawImage(dragImage, 0, 0);
-      dragImage = c;
+      dragImage = dragImageCanvas;
     }
     this.__dragImageDisposer && this.__dragImageDisposer();
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    //  position drag image offsecreen
+    //  position drag image offscreen
     setStyle(dragImage, {
       position: 'absolute',
       left: -dragImage.width + 'px',
