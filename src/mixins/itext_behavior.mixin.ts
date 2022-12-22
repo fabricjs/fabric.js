@@ -532,24 +532,19 @@ export abstract class ITextBehaviorMixin<
   /**
    * Override to customize the drag image
    * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
-   * @param {DragEvent} e
-   * @param {object} data
-   * @param {number} data.selectionStart
-   * @param {number} data.selectionEnd
-   * @param {string} data.text
-   * @param {string} data.value selected text
    */
   setDragImage(
     e: DragEvent,
-    data: {
+    {
+      selectionStart,
+      selectionEnd,
+    }: {
       selectionStart: number;
       selectionEnd: number;
-      text: string;
-      value: string;
     }
   ) {
     const flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-    const boundaries = this._getCursorBoundaries(data.selectionStart);
+    const boundaries = this._getCursorBoundaries(selectionStart);
     const selectionPosition = new Point(
       boundaries.left + boundaries.leftOffset,
       boundaries.top + boundaries.topOffset
@@ -571,11 +566,12 @@ export abstract class ITextBehaviorMixin<
       fill: 'transparent',
       textBackgroundColor: 'transparent',
     };
-    this.setSelectionStyles(styleOverride, 0, data.selectionStart);
-    this.setSelectionStyles(styleOverride, data.selectionEnd, data.text.length);
+    this.setSelectionStyles(styleOverride, 0, selectionStart);
+    this.setSelectionStyles(styleOverride, selectionEnd, this.text.length);
     let dragImage = this.toCanvasElement({
       enableRetinaScaling,
     });
+    // restore values
     this.backgroundColor = bgc;
     this.styles = styles;
     //  handle retina scaling and vpt
