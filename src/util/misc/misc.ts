@@ -14,6 +14,7 @@ import { getRandomInt, removeFromArray } from '../internals';
 import { projectStrokeOnPoints } from './projectStroke';
 import {
   transformPoint,
+  isIdentityMatrix,
   invertTransform,
   composeMatrix,
   qrDecompose,
@@ -116,6 +117,7 @@ fabric.util = {
   projectStrokeOnPoints,
   // matrix.ts file
   transformPoint,
+  isIdentityMatrix,
   invertTransform,
   composeMatrix,
   qrDecompose,
