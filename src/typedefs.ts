@@ -1,7 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
-import type {IPoint, Point} from './point.class';
+import type { IPoint, Point } from './point.class';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -9,8 +9,8 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type TNonFunctionPropertyNames<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -64,11 +64,6 @@ export const enum SupportedSVGUnit {
 }
 
 export type TMat2D = [number, number, number, number, number, number];
-
-/**
- * SVG path commands
- */
-export type PathData = (string | number)[][];
 
 /**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.

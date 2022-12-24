@@ -3,17 +3,17 @@ import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Path } from '../shapes/path.class';
-import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path/path';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
+import { TSimplePathData } from '../util/path/path_types';
 
 /**
  * @private
- * @param {PathData} pathData SVG path commands
- * @returns {boolean}
+ * @param {TSimplePathData} pathData SVG path commands
+ * @returns {Boolean}
  */
-function isEmptySVGPath(pathData: PathData): boolean {
+function isEmptySVGPath(pathData: TSimplePathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
@@ -207,20 +207,20 @@ export class PencilBrush extends BaseBrush {
 
   /**
    * Converts points to SVG path
-   * @param {Array} points Array of points
-   * @return {PathData} SVG path commands
+   * @param {Point[]} points Array of points
+   * @return {TSimplePathData} SVG path commands
    */
-  convertPointsToSVGPath(points: Point[]): PathData {
+  convertPointsToSVGPath(points: Point[]): TSimplePathData {
     const correction = this.width / 1000;
     return getSmoothPathFromPoints(points, correction);
   }
 
   /**
    * Creates a Path object to add on canvas
-   * @param {PathData} pathData Path data
+   * @param {TSimplePathData} pathData Path data
    * @return {Path} Path to add on canvas
    */
-  createPath(pathData: PathData) {
+  createPath(pathData: TSimplePathData): Path {
     const path = new Path(pathData, {
       fill: null,
       stroke: this.color,

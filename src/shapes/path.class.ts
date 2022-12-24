@@ -5,7 +5,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { Point } from '../point.class';
-import { PathData, TClassProperties } from '../typedefs';
+import { TClassProperties } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -16,6 +16,7 @@ import {
   type TPathSegmentsInfo,
 } from '../util/path/path';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { TSimplePathData } from '../util/path/path_types';
 
 export class Path extends FabricObject {
   /**
@@ -23,7 +24,7 @@ export class Path extends FabricObject {
    * @type Array
    * @default
    */
-  path: PathData;
+  path: TSimplePathData;
 
   pathOffset: Point;
 
@@ -35,12 +36,14 @@ export class Path extends FabricObject {
 
   /**
    * Constructor
-   * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TSimplePathData} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {Number} left
+   * @param {Number} top
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
   constructor(
-    path: PathData | string,
+    path: TSimplePathData | string,
     { path: _, left, top, ...options }: any = {}
   ) {
     super(options);
@@ -58,11 +61,11 @@ export class Path extends FabricObject {
 
   /**
    * @private
-   * @param {PathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TSimplePathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
    * @param {boolean} [adjustPosition] pass true to reposition the object according to the bounding box
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  _setPath(path: PathData | string, adjustPosition?: boolean) {
+  _setPath(path: TSimplePathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
     return this.setDimensions();
   }

@@ -1,9 +1,9 @@
 import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
-import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
+import { TSimplePathData } from '../util/path/path_types';
 
 export class PatternBrush extends PencilBrush {
   source?: CanvasImageSource;
@@ -57,7 +57,7 @@ export class PatternBrush extends PencilBrush {
   /**
    * Creates path
    */
-  createPath(pathData: PathData) {
+  createPath(pathData: TSimplePathData) {
     const path = super.createPath(pathData),
       topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
 

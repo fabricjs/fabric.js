@@ -1,19 +1,33 @@
-import {IPoint, Point} from '../../point.class';
+import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
 
 type TPathSegmentInfoCommon = {
   x: number;
   y: number;
-  command: string;
+  command?: string;
   length: number;
 };
 
 export type TCurveInfo = TPathSegmentInfoCommon & {
+  /**
+   * Get the Point a certain percent distance along the curve
+   * @param pct
+   */
   iterator: (pct: number) => Point;
+  /**
+   * Get the angle to a percent
+   * @param pct
+   */
   angleFinder: (pct: number) => number;
+  /**
+   * Total length of the curve
+   */
   length: number;
 };
 
+/**
+ * Info about various paths
+ */
 export type TPathSegmentInfo = {
   M: TPathSegmentInfoCommon;
   L: TPathSegmentInfoCommon;
@@ -24,6 +38,9 @@ export type TPathSegmentInfo = {
 
 export type TPathSegmentsInfo = TPathSegmentInfo[keyof TPathSegmentInfo];
 
+/**
+ * A parsed command of any length (even impossible ones)
+ */
 export type TParsedCommand =
   | [command: string]
   | [command: string, arg1: number]
@@ -58,6 +75,9 @@ export type TParsedCommand =
       arg7: number
     ];
 
+/**
+ * Command strings of any length
+ */
 type TCommand1<T extends TParsedCommand> = `${T[0]}`;
 type TCommand2<T extends TParsedCommand> = `${T[0]} ${T[1]}`;
 type TCommand3<T extends TParsedCommand> = `${T[0]} ${T[1]} ${T[2]}`;
@@ -71,6 +91,10 @@ type TCommand7<T extends TParsedCommand> =
 type TCommand8<T extends TParsedCommand> =
   `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]} ${T[5]} ${T[6]} ${T[7]}`;
 
+/**
+ * Begin parsed SVG path commands
+ * Read about commands at {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths|MDN}
+ */
 export type TParsedAbsoluteMoveToCommand = [command: 'M', x: number, y: number];
 export type TParsedRelativeMoveToCommand = [
   command: 'm',
@@ -222,7 +246,13 @@ export type TParsedArcCommand =
   | TParsedRelativeArcCommand;
 
 export type TArcCommand = TCommand8<TParsedArcCommand>;
+/**
+ * End parsed path commands
+ */
 
+/**
+ * Any old valid SVG path command
+ */
 export type TComplexParsedCommand =
   | TParsedMoveToCommand
   | TParsedLineCommand
@@ -235,8 +265,15 @@ export type TComplexParsedCommand =
   | TParsedQuadraticCurveShortcutCommand
   | TParsedArcCommand;
 
+/**
+ * A series of path commands
+ */
 export type TComplexPathData = TComplexParsedCommand[];
 
+/**
+ * Any SVG command that all Fabric functions can understand
+ *
+ */
 export type TSimpleParsedCommand =
   | TParsedAbsoluteMoveToCommand
   | TParsedAbsoluteLineCommand
@@ -246,6 +283,12 @@ export type TSimpleParsedCommand =
   | TParsedAbsoluteCubicCurveCommand
   | TParsedAbsoluteQuadraticCurveCommand;
 
+/**
+ * A series of simple paths
+ */
 export type TSimplePathData = TSimpleParsedCommand[];
 
+/**
+ * A point and the of the vector to the point and the x-axis
+ */
 export type TPointAngle = IPoint & { angle: TRadian };
