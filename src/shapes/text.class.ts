@@ -23,7 +23,7 @@ import {
   stylesFromArray,
   stylesToArray,
 } from '../util/misc/textStyles';
-import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
+import { getPathSegmentsInfo, getPointOnPath } from '../util/path/path';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
 

@@ -14,7 +14,7 @@ import {
   makePathSimpler,
   parsePath,
   type TPathSegmentsInfo,
-} from '../util/path';
+} from '../util/path/path';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Path extends FabricObject {

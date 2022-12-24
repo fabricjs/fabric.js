@@ -1,37 +1,38 @@
-//@ts-nocheck
-
-import { cache } from '../cache';
-import { config } from '../config';
-import { halfPI, PiBy180 } from '../constants';
-import { commaWsp, rePathCommand } from '../parser/constants';
-import { Point } from '../point.class';
-import type { PathData, TMat2D } from '../typedefs';
-import { cos } from './misc/cos';
-import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
-import { sin } from './misc/sin';
-
-type PathSegmentInfoCommon = {
-  x: number;
-  y: number;
-  command: string;
-  length: number;
-};
-
-type CurveInfo = PathSegmentInfoCommon & {
-  iterator: (pct: number) => Point;
-  angleFinder: (pct: number) => number;
-  length: number;
-};
-
-export type PathSegmentInfo = {
-  M: PathSegmentInfoCommon;
-  L: PathSegmentInfoCommon;
-  C: CurveInfo;
-  Q: CurveInfo;
-  Z: PathSegmentInfoCommon & { destX: number; destY: number };
-};
-
-export type TPathSegmentsInfo = PathSegmentInfo[keyof PathSegmentInfo];
+import { cache } from '../../cache';
+import { config } from '../../config';
+import { halfPI, PiBy180 } from '../../constants';
+import { commaWsp, rePathCommand } from '../../parser/constants';
+import {IPoint, Point} from '../../point.class';
+import type { PathData, TBounds, TMat2D, TRadian } from '../../typedefs';
+import { cos } from '../misc/cos';
+import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
+import { sin } from '../misc/sin';
+import {
+  TCurveInfo,
+  TComplexPathData,
+  TParsedAbsoluteArcCommand,
+  TParsedAbsoluteCubicCurveCommand,
+  TParsedAbsoluteCubicCurveShortcutCommand,
+  TParsedAbsoluteHorizontalLineCommand,
+  TParsedAbsoluteLineCommand,
+  TParsedAbsoluteMoveToCommand,
+  TParsedAbsoluteQuadraticCurveCommand,
+  TParsedAbsoluteQuadraticCurveShortcutCommand,
+  TParsedAbsoluteVerticalLineCommand,
+  TParsedArcCommand,
+  TParsedCommand,
+  TParsedCubicCurveCommand,
+  TParsedHorizontalLineCommand,
+  TParsedLineCommand,
+  TParsedMoveToCommand,
+  TParsedRelativeHorizontalLineCommand,
+  TParsedRelativeLineCommand,
+  TParsedRelativeMoveToCommand,
+  TParsedRelativeVerticalLineCommand,
+  TParsedVerticalLineCommand, TPathSegmentsInfo, TPointAngle,
+  TSimpleParsedCommand,
+  TSimplePathData,
+} from './types';
 
 const commandLengths = {
   m: 2,
@@ -44,52 +45,83 @@ const commandLengths = {
   t: 2,
   a: 7,
 };
+
 const repeatedCommands = {
   m: 'l',
   M: 'L',
 };
 
+/**
+ * Convert an arc of a rotated ellipse to a Bezier Curve
+ * @param {TRadian} theta1 start of the arc
+ * @param {TRadian} theta2 end of the arc
+ * @param cosTh cosine of the angle of rotation
+ * @param sinTh sine of the angle of rotation
+ * @param rx x-axis radius (before rotation)
+ * @param ry y-axis radius (before rotation)
+ * @param cx1 center x of the ellipse
+ * @param cy1 center y of the ellipse
+ * @param mT
+ * @param fromX starting point of arc x
+ * @param fromY starting point of arc y
+ */
 const segmentToBezier = (
-  th2,
-  th3,
-  cosTh,
-  sinTh,
-  rx,
-  ry,
-  cx1,
-  cy1,
-  mT,
-  fromX,
-  fromY
-) => {
-  const costh2 = cos(th2),
-    sinth2 = sin(th2),
-    costh3 = cos(th3),
-    sinth3 = sin(th3),
-    toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
-    toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
-    cp1X = fromX + mT * (-cosTh * rx * sinth2 - sinTh * ry * costh2),
-    cp1Y = fromY + mT * (-sinTh * rx * sinth2 + cosTh * ry * costh2),
-    cp2X = toX + mT * (cosTh * rx * sinth3 + sinTh * ry * costh3),
-    cp2Y = toY + mT * (sinTh * rx * sinth3 - cosTh * ry * costh3);
+  theta1: TRadian,
+  theta2: TRadian,
+  cosTh: number,
+  sinTh: number,
+  rx: number,
+  ry: number,
+  cx1: number,
+  cy1: number,
+  mT: number,
+  fromX: number,
+  fromY: number
+): TParsedCubicCurveCommand => {
+  const costh1 = cos(theta1),
+    sinth1 = sin(theta1),
+    costh2 = cos(theta2),
+    sinth2 = sin(theta2),
+    toX = cosTh * rx * costh2 - sinTh * ry * sinth2 + cx1,
+    toY = sinTh * rx * costh2 + cosTh * ry * sinth2 + cy1,
+    cp1X = fromX + mT * (-cosTh * rx * sinth1 - sinTh * ry * costh1),
+    cp1Y = fromY + mT * (-sinTh * rx * sinth1 + cosTh * ry * costh1),
+    cp2X = toX + mT * (cosTh * rx * sinth2 + sinTh * ry * costh2),
+    cp2Y = toY + mT * (sinTh * rx * sinth2 - cosTh * ry * costh2);
 
   return ['C', cp1X, cp1Y, cp2X, cp2Y, toX, toY];
 };
 
-/* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
+/**
+ * Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
  * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
  * http://mozilla.org/MPL/2.0/
+ * @param toX
+ * @param toY
+ * @param rx
+ * @param ry
+ * @param {number} large 0 or 1 flag
+ * @param {number} sweep 0 or 1 flag
+ * @param rotateX
  */
-const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
+const arcToSegments = (
+  toX: number,
+  toY: number,
+  rx: number,
+  ry: number,
+  large: number,
+  sweep: number,
+  rotateX: TRadian
+): TParsedAbsoluteCubicCurveCommand[] => {
   let fromX = 0,
     fromY = 0,
     root = 0;
   const PI = Math.PI,
-    th = rotateX * PiBy180,
-    sinTh = sin(th),
-    cosTh = cos(th),
-    px = 0.5 * (-cosTh * toX - sinTh * toY),
-    py = 0.5 * (-cosTh * toY + sinTh * toX),
+    theta = rotateX * PiBy180,
+    sinTheta = sin(theta),
+    cosTh = cos(theta),
+    px = 0.5 * (-cosTh * toX - sinTheta * toY),
+    py = 0.5 * (-cosTh * toY + sinTheta * toX),
     rx2 = rx ** 2,
     ry2 = ry ** 2,
     py2 = py ** 2,
@@ -109,8 +141,8 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
 
   const cx = (root * _rx * py) / _ry,
     cy = (-root * _ry * px) / _rx,
-    cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
-    cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
+    cx1 = cosTh * cx - sinTheta * cy + toX * 0.5,
+    cy1 = sinTheta * cx + cosTh * cy + toY * 0.5;
   let mTheta = calcVectorAngle(1, 0, (px - cx) / _rx, (py - cy) / _ry);
   let dtheta = calcVectorAngle(
     (px - cx) / _rx,
@@ -139,7 +171,7 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
       mTheta,
       th3,
       cosTh,
-      sinTh,
+      sinTheta,
       _rx,
       _ry,
       cx1,
@@ -156,10 +188,20 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
   return result;
 };
 
-/*
- * Private
+/**
+ * @private
+ * Calculate the angle between two vectors
+ * @param ux u endpoint x
+ * @param uy u endpoint y
+ * @param vx v endpoint x
+ * @param vy v endpoint y
  */
-const calcVectorAngle = (ux, uy, vx, vy) => {
+const calcVectorAngle = (
+  ux: number,
+  uy: number,
+  vx: number,
+  vy: number
+): TRadian => {
   const ta = Math.atan2(uy, ux),
     tb = Math.atan2(vy, vx);
   if (tb >= ta) {
@@ -171,13 +213,15 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
 
 // functions for the Cubic beizer
 // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
-const CB1 = (t) => t ** 3;
-const CB2 = (t) => 3 * t ** 2 * (1 - t);
-const CB3 = (t) => 3 * t * (1 - t) ** 2;
-const CB4 = (t) => (1 - t) ** 3;
+const CB1 = (t: number) => t ** 3;
+const CB2 = (t: number) => 3 * t ** 2 * (1 - t);
+const CB3 = (t: number) => 3 * t * (1 - t) ** 2;
+const CB4 = (t: number) => (1 - t) ** 3;
 
 /**
  * Calculate bounding box of a beziercurve
+ * taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
+ * TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
  * @param {Number} x0 starting point
  * @param {Number} y0
  * @param {Number} x1 first control point
@@ -187,10 +231,17 @@ const CB4 = (t) => (1 - t) ** 3;
  * @param {Number} x3 end of bezier
  * @param {Number} y3
  */
-// taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
-// TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
-export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-  let argsString;
+export function getBoundsOfCurve(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x3: number,
+  y3: number
+): TBounds {
+  let argsString: string;
   if (config.cachesBoundsOfCurve) {
     // eslint-disable-next-line
     argsString = [...arguments].join();
@@ -202,7 +253,10 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   const sqrt = Math.sqrt,
     abs = Math.abs,
     tvalues = [],
-    bounds = [[], []];
+    bounds: [[x: number, y: number], [x: number, y: number]] = [
+      [0, 0],
+      [0, 0],
+    ];
 
   let b = 6 * x0 - 12 * x1 + 6 * x2;
   let a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
@@ -262,12 +316,12 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   bounds[1][jlen] = y0;
   bounds[0][jlen + 1] = x3;
   bounds[1][jlen + 1] = y3;
-  const result = [
+  const result: TBounds = [
     new Point(Math.min(...bounds[0]), Math.min(...bounds[1])),
     new Point(Math.max(...bounds[0]), Math.max(...bounds[1])),
   ];
   if (config.cachesBoundsOfCurve) {
-    cache.boundsOfCurveCache[argsString] = result;
+    cache.boundsOfCurveCache[argsString!] = result;
   }
   return result;
 }
@@ -276,13 +330,13 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
  * Converts arc to a bunch of bezier curves
  * @param {Number} fx starting point x
  * @param {Number} fy starting point y
- * @param {Array} coords Arc command
+ * @param {TParsedArcCommand} coords Arc command
  */
 export const fromArcToBeziers = (
-  fx,
-  fy,
-  [_, rx, ry, rot, large, sweep, tx, ty] = []
-) => {
+  fx: number,
+  fy: number,
+  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedAbsoluteArcCommand
+): TParsedAbsoluteCubicCurveCommand[] => {
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
   for (let i = 0, len = segsNorm.length; i < len; i++) {
@@ -297,19 +351,18 @@ export const fromArcToBeziers = (
 };
 
 /**
- * This function take a parsed SVG path and make it simpler for fabricJS logic.
+ * This function takes a parsed SVG path and makes it simpler for fabricJS logic.
  * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
- * S converted in C, T converted in Q, A converted in C.
- * @param {PathData} path the array of commands of a parsed svg path for `Path`
- * @return {PathData} the simplified array of commands of a parsed svg path for `Path`
+ * S converted to C, T converted to Q, A converted to C.
+ * @param {TComplexPathData} path the array of commands of a parsed svg path for `Path`
+ * @return {TSimplePathData} the simplified array of commands of a parsed svg path for `Path`
  */
-export const makePathSimpler = (path: PathData): PathData => {
-  // x and y represent the last point of the path. the previous command point.
+export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
+  // x and y represent the last point of the path, AKA the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
   let x = 0,
     y = 0;
-  const len = path.length;
   // x1 and y1 represent the last point of the subpath. the subpath is started with
   // m or M command. When a z or Z command is drawn, x and y need to be resetted to
   // the last x1 and y1.
@@ -317,74 +370,75 @@ export const makePathSimpler = (path: PathData): PathData => {
     y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath: PathData = [],
+  let destinationPath: TSimplePathData = [],
     previous,
-    controlX,
-    controlY;
-  for (let i = 0; i < len; ++i) {
+    // placeholders
+    controlX = 0,
+    controlY = 0;
+  for (const parsedCommand of path) {
     let converted = false;
-    const current = path[i].slice(0);
+    const current: TParsedCommand = Object.assign([], parsedCommand);
     switch (
       current[0] // first letter
     ) {
       case 'l': // lineto, relative
         current[0] = 'L';
-        current[1] += x;
-        current[2] += y;
+        (current as TParsedAbsoluteLineCommand)[1] += x;
+        (current as TParsedAbsoluteLineCommand)[2] += y;
       // falls through
       case 'L':
-        x = current[1];
-        y = current[2];
+        x = (current as TParsedAbsoluteLineCommand)[1];
+        y = (current as TParsedAbsoluteLineCommand)[2];
         break;
       case 'h': // horizontal lineto, relative
-        current[1] += x;
+        (current as TParsedAbsoluteHorizontalLineCommand)[1] += x;
       // falls through
       case 'H':
         current[0] = 'L';
+        x = (current as TParsedAbsoluteHorizontalLineCommand)[1];
         current[2] = y;
-        x = current[1];
         break;
       case 'v': // vertical lineto, relative
-        current[1] += y;
+        (current as TParsedAbsoluteVerticalLineCommand)[1] += y;
       // falls through
       case 'V':
         current[0] = 'L';
-        y = current[1];
+        y = (current as TParsedAbsoluteVerticalLineCommand)[1];
         current[1] = x;
         current[2] = y;
         break;
       case 'm': // moveTo, relative
         current[0] = 'M';
-        current[1] += x;
-        current[2] += y;
+        (current as TParsedAbsoluteMoveToCommand)[1] += x;
+        (current as TParsedAbsoluteMoveToCommand)[2] += y;
       // falls through
       case 'M':
-        x = current[1];
-        y = current[2];
-        x1 = current[1];
-        y1 = current[2];
+        x = (current as TParsedAbsoluteMoveToCommand)[1];
+        y = (current as TParsedAbsoluteMoveToCommand)[2];
+        x1 = (current as TParsedAbsoluteMoveToCommand)[1];
+        y1 = (current as TParsedAbsoluteMoveToCommand)[2];
         break;
       case 'c': // bezierCurveTo, relative
         current[0] = 'C';
-        current[1] += x;
-        current[2] += y;
-        current[3] += x;
-        current[4] += y;
-        current[5] += x;
-        current[6] += y;
+        (current as TParsedAbsoluteCubicCurveCommand)[1] += x;
+        (current as TParsedAbsoluteCubicCurveCommand)[2] += y;
+        (current as TParsedAbsoluteCubicCurveCommand)[3] += x;
+        (current as TParsedAbsoluteCubicCurveCommand)[4] += y;
+        (current as TParsedAbsoluteCubicCurveCommand)[5] += x;
+        (current as TParsedAbsoluteCubicCurveCommand)[6] += y;
       // falls through
       case 'C':
-        controlX = current[3];
-        controlY = current[4];
-        x = current[5];
-        y = current[6];
+        controlX = (current as TParsedAbsoluteCubicCurveCommand)[3];
+        controlY = (current as TParsedAbsoluteCubicCurveCommand)[4];
+        x = (current as TParsedAbsoluteCubicCurveCommand)[5];
+        y = (current as TParsedAbsoluteCubicCurveCommand)[6];
         break;
       case 's': // shorthand cubic bezierCurveTo, relative
         current[0] = 'S';
-        current[1] += x;
-        current[2] += y;
-        current[3] += x;
-        current[4] += y;
+        (current as TParsedAbsoluteCubicCurveShortcutCommand)[1] += x;
+        (current as TParsedAbsoluteCubicCurveShortcutCommand)[2] += y;
+        (current as TParsedAbsoluteCubicCurveShortcutCommand)[3] += x;
+        (current as TParsedAbsoluteCubicCurveShortcutCommand)[4] += y;
       // falls through
       case 'S':
         // would be sScC but since we are swapping sSc for C, we check just that.
@@ -398,8 +452,8 @@ export const makePathSimpler = (path: PathData): PathData => {
           controlX = x;
           controlY = y;
         }
-        x = current[3];
-        y = current[4];
+        x = (current as TParsedAbsoluteCubicCurveShortcutCommand)[3];
+        y = (current as TParsedAbsoluteCubicCurveShortcutCommand)[4];
         current[0] = 'C';
         current[5] = current[3];
         current[6] = current[4];
@@ -409,26 +463,26 @@ export const makePathSimpler = (path: PathData): PathData => {
         current[2] = controlY;
         // current[3] and current[4] are NOW the second control point.
         // we keep it for the next reflection.
-        controlX = current[3];
-        controlY = current[4];
+        controlX = (current as TParsedAbsoluteCubicCurveCommand)[3];
+        controlY = (current as TParsedAbsoluteCubicCurveCommand)[4];
         break;
       case 'q': // quadraticCurveTo, relative
         current[0] = 'Q';
-        current[1] += x;
-        current[2] += y;
-        current[3] += x;
-        current[4] += y;
+        (current as TParsedAbsoluteQuadraticCurveCommand)[1] += x;
+        (current as TParsedAbsoluteQuadraticCurveCommand)[2] += y;
+        (current as TParsedAbsoluteQuadraticCurveCommand)[3] += x;
+        (current as TParsedAbsoluteQuadraticCurveCommand)[4] += y;
       // falls through
       case 'Q':
-        controlX = current[1];
-        controlY = current[2];
-        x = current[3];
-        y = current[4];
+        controlX = (current as TParsedAbsoluteQuadraticCurveCommand)[1];
+        controlY = (current as TParsedAbsoluteQuadraticCurveCommand)[2];
+        x = (current as TParsedAbsoluteQuadraticCurveCommand)[3];
+        y = (current as TParsedAbsoluteQuadraticCurveCommand)[4];
         break;
       case 't': // shorthand quadraticCurveTo, relative
         current[0] = 'T';
-        current[1] += x;
-        current[2] += y;
+        (current as TParsedAbsoluteQuadraticCurveShortcutCommand)[1] += x;
+        (current as TParsedAbsoluteQuadraticCurveShortcutCommand)[2] += y;
       // falls through
       case 'T':
         if (previous === 'Q') {
@@ -442,8 +496,8 @@ export const makePathSimpler = (path: PathData): PathData => {
           controlY = y;
         }
         current[0] = 'Q';
-        x = current[1];
-        y = current[2];
+        x = (current as TParsedAbsoluteQuadraticCurveCommand)[1];
+        y = (current as TParsedAbsoluteQuadraticCurveCommand)[2];
         current[1] = controlX;
         current[2] = controlY;
         current[3] = x;
@@ -451,26 +505,27 @@ export const makePathSimpler = (path: PathData): PathData => {
         break;
       case 'a':
         current[0] = 'A';
-        current[6] += x;
-        current[7] += y;
+        (current as TParsedAbsoluteArcCommand)[6] += x;
+        (current as TParsedAbsoluteArcCommand)[7] += y;
       // falls through
       case 'A':
         converted = true;
         destinationPath = destinationPath.concat(
-          fromArcToBeziers(x, y, current)
+          fromArcToBeziers(x, y, current as TParsedAbsoluteArcCommand)
         );
-        x = current[6];
-        y = current[7];
+        x = (current as TParsedAbsoluteArcCommand)[6];
+        y = (current as TParsedAbsoluteArcCommand)[7];
         break;
       case 'z':
       case 'Z':
+        current[0] = 'Z';
         x = x1;
         y = y1;
         break;
       default:
     }
     if (!converted) {
-      destinationPath.push(current);
+      destinationPath.push(current as TSimpleParsedCommand);
     }
     previous = current[0];
   }
@@ -486,11 +541,25 @@ export const makePathSimpler = (path: PathData): PathData => {
  * @param {Number} y2 starting point y
  * @return {Number} length of segment
  */
-const calcLineLength = (x1, y1, x2, y2) =>
-  Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+const calcLineLength = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+): number => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 const getPointOnCubicBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number,
+    p4x: number,
+    p4y: number
+  ) =>
+  (pct: number) => {
     const c1 = CB1(pct),
       c2 = CB2(pct),
       c3 = CB3(pct),
@@ -506,7 +575,17 @@ const QB2 = (t: number) => 2 * t * (1 - t);
 const QB3 = (t: number) => (1 - t) ** 2;
 
 const getTangentCubicIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number,
+    p4x: number,
+    p4y: number
+  ) =>
+  (pct: number) => {
     const qb1 = QB1(pct),
       qb2 = QB2(pct),
       qb3 = QB3(pct),
@@ -518,7 +597,15 @@ const getTangentCubicIterator =
   };
 
 const getPointOnQuadraticBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct: number) => {
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number
+  ) =>
+  (pct: number) => {
     const c1 = QB1(pct),
       c2 = QB2(pct),
       c3 = QB3(pct);
@@ -528,12 +615,21 @@ const getPointOnQuadraticBezierIterator =
     );
   };
 
-const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
-  const invT = 1 - pct,
-    tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
-    tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
-  return Math.atan2(tangentY, tangentX);
-};
+const getTangentQuadraticIterator =
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number
+  ) =>
+  (pct: number) => {
+    const invT = 1 - pct,
+      tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
+      tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
+    return Math.atan2(tangentY, tangentX);
+  };
 
 // this will run over a path segment (a cubic or quadratic segment) and approximate it
 // with 100 segments. This will good enough to calculate the length of the curve
@@ -560,20 +656,20 @@ const pathIterator = (
  * @param {Number} distance from starting point, in pixels.
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
-const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
+const findPercentageForDistance = (segInfo: TCurveInfo, distance: number): TPointAngle => {
   let perc = 0,
     tmpLen = 0,
     tempP = { x: segInfo.x, y: segInfo.y },
-    p,
+    p: TPointAngle = { ...tempP, angle: 0 },
     nextLen,
     nextStep = 0.01,
-    lastPerc;
+    lastPerc = 0;
   // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
   // the path
   const iterator = segInfo.iterator,
     angleFinder = segInfo.angleFinder;
   while (tmpLen < distance && nextStep > 0.0001) {
-    p = iterator(perc);
+    p = { ...iterator(perc), angle: 0 };
     lastPerc = perc;
     nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
     // compare tmpLen each cycle with distance, decide next perc to test.
@@ -589,16 +685,15 @@ const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
   }
   p.angle = angleFinder(lastPerc);
   return p;
-};
+}
 
 /**
  * Run over a parsed and simplified path and extract some information (length of each command and starting point)
- * @param {PathData} path parsed path commands
- * @return {Array} path commands information
+ * @param {TSimplePathData} path parsed path commands
+ * @return {TPathSegmentsInfo[]} path commands information
  */
-export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
+export const getPathSegmentsInfo = (path: TSimplePathData): TPathSegmentsInfo[] => {
   let totalLength = 0,
-    current,
     //x2 and y2 are the coords of segment start
     //x1 and y1 are the coords of the current point
     x1 = 0,
@@ -606,16 +701,16 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
     x2 = 0,
     y2 = 0,
     iterator,
-    tempInfo,
+    tempInfo: TPathSegmentsInfo,
     angleFinder;
   const len = path.length,
     info = [];
-  for (let i = 0; i < len; i++) {
-    current = path[i];
+  for (const current of path) {
     tempInfo = {
       x: x1,
       y: y1,
       command: current[0] as string,
+      length: 0
     };
     switch (
       current[0] //first letter
@@ -651,8 +746,8 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[5],
           current[6]
         );
-        tempInfo.iterator = iterator;
-        tempInfo.angleFinder = angleFinder;
+        (tempInfo as TCurveInfo).iterator = iterator;
+        (tempInfo as TCurveInfo).angleFinder = angleFinder;
         tempInfo.length = pathIterator(iterator, x1, y1);
         x1 = current[5];
         y1 = current[6];
@@ -674,14 +769,13 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[3],
           current[4]
         );
-        tempInfo.iterator = iterator;
-        tempInfo.angleFinder = angleFinder;
+        (tempInfo as TCurveInfo).iterator = iterator;
+        (tempInfo as TCurveInfo).angleFinder = angleFinder;
         tempInfo.length = pathIterator(iterator, x1, y1);
         x1 = current[3];
         y1 = current[4];
         break;
       case 'Z':
-      case 'z':
         // we add those in order to ease calculations later
         tempInfo.destX = x2;
         tempInfo.destY = y2;
@@ -698,7 +792,7 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
 };
 
 export const getPointOnPath = (
-  path: PathData,
+  path: TSimplePathData,
   distance: number,
   infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
 ) => {

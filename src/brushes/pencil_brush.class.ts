@@ -4,7 +4,7 @@ import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
-import { getSmoothPathFromPoints, joinPath } from '../util/path';
+import { getSmoothPathFromPoints, joinPath } from '../util/path/path';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
 

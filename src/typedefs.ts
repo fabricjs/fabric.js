@@ -1,7 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
-import type { Point } from './point.class';
+import type {IPoint, Point} from './point.class';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -96,3 +96,5 @@ export type TCacheCanvasDimensions = {
   x: number;
   y: number;
 };
+
+export type TBounds = IPoint[];

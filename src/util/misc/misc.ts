@@ -72,7 +72,7 @@ import {
   getPointOnPath,
   transformPath,
   getRegularPolygonPath,
-} from '../path';
+} from '../path/path';
 import { setStyle } from '../dom_style';
 import { request } from '../dom_request';
 import {

@@ -1,4 +1,5 @@
 import { config } from './config';
+import {TBounds} from "./typedefs";
 
 export class Cache {
   /**
@@ -89,7 +90,7 @@ export class Cache {
    * can eventually clear it.
    * It was an internal variable, is accessible since version 2.3.4
    */
-  boundsOfCurveCache = {};
+  boundsOfCurveCache: Record<string, TBounds> = {};
 }
 
 export const cache = new Cache();
