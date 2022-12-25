@@ -1,6 +1,6 @@
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { BaseBrush } from './base_brush.class';
 
 /**

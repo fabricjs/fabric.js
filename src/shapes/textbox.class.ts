@@ -4,7 +4,7 @@ import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { stylesFromArray } from '../util/misc/textStyles';
 import { IText } from './itext.class';
-import { FabricObject } from './object.class';
+import { FabricObject } from './Object/FabricObject';
 import { textDefaultValues } from './text.class';
 
 /**

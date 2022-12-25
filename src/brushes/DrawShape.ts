@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
 import { ModifierKey } from '../EventTypeDefs';
 import { Point } from '../point.class';
-import { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/rect.class';
 import { TBrushEventData } from './base_brush.class';
 import { DrawShapeBase } from './DrawShapeBase';
