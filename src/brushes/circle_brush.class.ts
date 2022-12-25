@@ -1,11 +1,11 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { Color } from '../color';
 import { Point } from '../point.class';
 import { Circle } from '../shapes/circle.class';
-import { FabricObject } from '../shapes/fabricObject.class';
 import { Group } from '../shapes/group.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { getRandomInt } from '../util/internals';
-import { Canvas } from '../__types__';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export type CircleBrushPoint = {

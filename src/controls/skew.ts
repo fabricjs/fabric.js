@@ -4,7 +4,7 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import { TAxis, TAxisKey } from '../typedefs';
 import {

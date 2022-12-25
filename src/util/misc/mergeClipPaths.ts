@@ -1,5 +1,5 @@
 import { fabric } from '../../../HEADER';
-import type { FabricObject } from '../../shapes/object.class';
+import type { FabricObject } from '../../shapes/Object/Object';
 import { sendObjectToPlane } from './planeChange';
 
 /**

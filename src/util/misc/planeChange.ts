@@ -1,6 +1,6 @@
 import { iMatrix } from '../../constants';
 import type { Point } from '../../point.class';
-import type { FabricObject } from '../../shapes/object.class';
+import type { FabricObject } from '../../shapes/Object/Object';
 import type { TMat2D } from '../../typedefs';
 import { StaticCanvas } from '../../__types__';
 import { invertTransform, multiplyTransformMatrices } from './matrix';

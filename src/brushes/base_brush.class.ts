@@ -1,18 +1,18 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
-import { Canvas } from '../__types__';
 
 export type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush<T extends FabricObject> {
+export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   /**
    * Color of a brush
    * @type String
@@ -79,10 +79,7 @@ export abstract class BaseBrush<T extends FabricObject> {
    */
   clipPath?: FabricObject;
 
-  /**
-   * @todo add type
-   */
-  canvas: Canvas;
+  readonly canvas: Canvas;
 
   active = false;
 

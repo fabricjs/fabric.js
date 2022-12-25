@@ -1,11 +1,11 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { Color } from '../color';
-import { ModifierKey, TEvent } from '../EventTypeDefs';
+import { ModifierKey, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
-import { Canvas } from '../__types__';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 /**
@@ -31,7 +31,7 @@ export class PencilBrush extends BaseBrush<Path> {
    * @type boolean
    * @default false
    */
-  drawStraightLine = false;
+  protected drawStraightLine = false;
 
   /**
    * The event modifier key that makes the brush draw a straight line.
@@ -65,12 +65,17 @@ export class PencilBrush extends BaseBrush<Path> {
     return midPoint;
   }
 
+  protected shouldHandleEvent(e: TPointerEvent) {
+    // @ts-expect-error TODO: canvas events mixin migration
+    return this.canvas._isMainEvent(e);
+  }
+
   /**
    * Invoked on mouse down
    * @param {Point} pointer
    */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
-    if (!this.canvas._isMainEvent(ev.e)) {
+    if (!this.shouldHandleEvent(ev.e)) {
       return;
     }
     super.onMouseDown(pointer, ev);
@@ -88,7 +93,7 @@ export class PencilBrush extends BaseBrush<Path> {
    * @param {Point} pointer
    */
   onMouseMove(pointer: Point, { e }: TEvent) {
-    if (!this.canvas._isMainEvent(e)) {
+    if (!this.shouldHandleEvent(e)) {
       return;
     }
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
@@ -100,7 +105,7 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   onMouseUp({ e }: TEvent) {
-    if (!this.canvas._isMainEvent(e)) {
+    if (!this.shouldHandleEvent(e)) {
       return;
     }
     this.drawStraightLine = false;

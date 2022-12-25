@@ -12,9 +12,9 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Point } from '../point.class';
 import type {
+  TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
-  TCacheCanvasDimensions,
 } from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
@@ -24,8 +24,7 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
 
 let measuringContext: CanvasRenderingContext2D | null;

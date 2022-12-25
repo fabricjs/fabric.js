@@ -1,38 +1,38 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
+import type {
+  TCacheCanvasDimensions,
+  TClassProperties,
+  TDegree,
+  TFiller,
+  TSize,
+} from '../../typedefs';
+import { runningAnimations } from '../../util/animation_registry';
+import { clone } from '../../util/lang_object';
+import { capitalize } from '../../util/lang_string';
+import { capValue } from '../../util/misc/capValue';
+import { createCanvasElement, toDataURL } from '../../util/misc/dom';
+import {
+  invertTransform,
+  qrDecompose,
+  transformPoint,
+} from '../../util/misc/matrix';
+import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
+import {
+  resetObjectTransform,
+  saveObjectTransform,
+} from '../../util/misc/objectTransforms';
+import { pick } from '../../util/misc/pick';
+import { toFixed } from '../../util/misc/toFixed';
 import type { Eraser } from '../brushes/Eraser';
 import { cache } from '../cache';
 import { config } from '../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
+import type { Group } from '../group.class';
 import { AnimatableObject } from '../mixins/object_animation.mixin';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import type {
-  TClassProperties,
-  TDegree,
-  TFiller,
-  TSize,
-  TCacheCanvasDimensions,
-} from '../typedefs';
-import { runningAnimations } from '../util/animation_registry';
-import { clone } from '../util/lang_object';
-import { capitalize } from '../util/lang_string';
-import { capValue } from '../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../util/misc/dom';
-import {
-  invertTransform,
-  qrDecompose,
-  transformPoint,
-} from '../util/misc/matrix';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
-import {
-  resetObjectTransform,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { pick } from '../util/misc/pick';
-import { toFixed } from '../util/misc/toFixed';
-import type { Group } from './group.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -41,10 +41,13 @@ export type TCachedFabricObject = FabricObject &
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
+      | '_cacheContext'
       | 'cacheTranslationX'
       | 'cacheTranslationY'
     >
-  >;
+  > & {
+    _cacheContext: CanvasRenderingContext2D;
+  };
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
