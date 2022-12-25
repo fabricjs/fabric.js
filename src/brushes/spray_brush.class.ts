@@ -6,7 +6,7 @@ import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
 import { BaseBrush } from './base_brush.class';
-import { TBrushEventData } from './types';
+import { BrushOptions, TBrushEventData } from './types';
 
 export type SprayBrushPoint = {
   x: number;
