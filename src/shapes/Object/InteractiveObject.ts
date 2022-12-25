@@ -21,8 +21,8 @@ type TOCoord = IPoint & {
 type TControlSet = Record<string, Control>;
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & {
-  onDragStart: (e: DragEvent) => boolean,
-}
+  onDragStart: (e: DragEvent) => boolean;
+};
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -88,8 +88,7 @@ export class InteractiveFabricObject<
    * they need to be either both private or more generic
    * Canvas class needs to see this variable
    */
-  __isDragging?: boolean
-
+  __isDragging?: boolean;
 
   /**
    * A boolean used from the gesture module to keep tracking of a scaling
@@ -99,7 +98,7 @@ export class InteractiveFabricObject<
    * @TODO use git blame to investigate why it was added
    * DON'T USE IT. WE WILL TRY TO REMOVE IT
    */
-  _scaling?: boolean
+  _scaling?: boolean;
 
   /**
    * Constructor

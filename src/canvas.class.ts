@@ -38,7 +38,6 @@ import { pick } from './util/misc/pick';
 import { TSVGReviver } from './mixins/object.svg_export';
 import { sendPointToPlane } from './util/misc/planeChange';
 
-
 type TDestroyedCanvas = Omit<
   Canvas<CanvasEvents>,
   | 'contextTop'
@@ -319,7 +318,6 @@ export class Canvas<
    * @default crosshair
    */
   freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
@@ -1092,7 +1090,10 @@ export class Canvas<
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
-  searchPossibleTargets(objects: FabricObject[], pointer: Point): FabricObject | undefined {
+  searchPossibleTargets(
+    objects: FabricObject[],
+    pointer: Point
+  ): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
     // if we found something in this.targets, and the group is interactive, return that subTarget
     // TODO: reverify why interactive. the target should be returned always, but selected only

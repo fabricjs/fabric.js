@@ -60,5 +60,9 @@ export const isFabricObjectCached = (
 export const isFabricObjectWithDragSupport = (
   fabricObject: FabricObject | null
 ): fabricObject is FabricObjectWithDragSupport => {
-  return !!fabricObject && typeof (fabricObject as FabricObjectWithDragSupport).onDragStart === 'function';
+  return (
+    !!fabricObject &&
+    typeof (fabricObject as FabricObjectWithDragSupport).onDragStart ===
+      'function'
+  );
 };

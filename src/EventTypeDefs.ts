@@ -112,7 +112,8 @@ type CanvasModifiedEvents = Record<
   BasicTransformEvent & { target: FabricObject }
 >;
 
-export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> = TEvent<E> & {
+export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
+  TEvent<E> & {
     target?: FabricObject;
     subTargets?: FabricObject[];
     button: number;
@@ -201,14 +202,14 @@ type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
   Record<`${Prefix}out`, TPointerEventInfo & OutEvent & E>;
 
 export type TPointerEventsSuffixes =
-  'down'
+  | 'down'
   | 'move'
   | 'up'
   | 'dblclick'
   | 'up:before'
   | 'down:before'
   | 'move:before'
-  | 'wheel'
+  | 'wheel';
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
 
