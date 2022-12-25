@@ -1,5 +1,5 @@
-import type { FabricObject } from '../../shapes/fabricObject.class';
 import { Group } from '../../shapes/group.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { TClassProperties } from '../../typedefs';
 import {
   enlivenObjectEnlivables,

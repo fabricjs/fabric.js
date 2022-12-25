@@ -1,5 +1,5 @@
-import type { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { Path } from '../../shapes/path.class';
 import { TMat2D } from '../../typedefs';
 import {

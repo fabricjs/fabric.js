@@ -1,4 +1,4 @@
-import type { FabricObject } from '../../shapes/fabricObject.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { Path } from '../../shapes/path.class';
 
 export type ErasingEventContextData = {
