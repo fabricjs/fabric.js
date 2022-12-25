@@ -36,7 +36,6 @@ import type { BaseBrush } from './brushes/base_brush.class';
 import type { Textbox } from './shapes/textbox.class';
 import { pick } from './util/misc/pick';
 import { TSVGReviver } from './mixins/object.svg_export';
-import { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
 import { sendPointToPlane } from './util/misc/planeChange';
 
 
@@ -415,7 +414,7 @@ export class Canvas<
    * @type FabricObject | null
    * @private
    */
-  _hoveredTarget: FabricObject | null = null;
+  _hoveredTarget?: FabricObject;
 
   /**
    * hold the list of nested targets hovered
@@ -487,9 +486,9 @@ export class Canvas<
    * During a mouse event we may need the target multiple times in multiple functions.
    * _target holds a reference to the target that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {InteractiveFabricObject}
+   * @type {FabricObject}
    */
-  protected _target?: InteractiveFabricObject;
+  protected _target?: FabricObject;
 
   upperCanvasEl: HTMLCanvasElement;
   contextTop: CanvasRenderingContext2D;
@@ -737,7 +736,7 @@ export class Canvas<
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
    */
-  _shouldClearSelection(e: TPointerEvent, target: FabricObject): boolean {
+  _shouldClearSelection(e: TPointerEvent, target?: FabricObject): boolean {
     const activeObjects = this.getActiveObjects(),
       activeObject = this._activeObject;
 
@@ -859,7 +858,7 @@ export class Canvas<
       transform: Transform = {
         target: target,
         action: action,
-        actionHandler: actionHandler,
+        actionHandler,
         corner,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
@@ -951,9 +950,9 @@ export class Canvas<
    * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | null {
+  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | undefined {
     if (this.skipTargetFind) {
-      return null;
+      return undefined;
     }
 
     const pointer = this.getPointer(e, true),
@@ -1060,9 +1059,9 @@ export class Canvas<
   _searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point
-  ): FabricObject | null {
+  ): FabricObject | undefined {
     // Cache all targets where their bounding box contains point.
-    let target = null,
+    let target,
       i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
@@ -1093,7 +1092,7 @@ export class Canvas<
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
-  searchPossibleTargets(objects: FabricObject[], pointer: Point) {
+  searchPossibleTargets(objects: FabricObject[], pointer: Point): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
     // if we found something in this.targets, and the group is interactive, return that subTarget
     // TODO: reverify why interactive. the target should be returned always, but selected only
@@ -1336,7 +1335,7 @@ export class Canvas<
    * Returns currently active object
    * @return {FabricObject | null} active object
    */
-  getActiveObject(): InteractiveFabricObject | null {
+  getActiveObject(): FabricObject | null {
     return this._activeObject;
   }
 
@@ -1344,7 +1343,7 @@ export class Canvas<
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
-  getActiveObjects(): InteractiveFabricObject[] {
+  getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
     if (active) {
       if (isActiveSelection(active)) {
@@ -1362,12 +1361,12 @@ export class Canvas<
    * @param {FabricObject[]} oldObjects old activeObject
    * @param {TPointerEvent} e mouse event triggering the selection events
    */
-  _fireSelectionEvents(oldObjects: InteractiveFabricObject[], e?: TPointerEvent) {
+  _fireSelectionEvents(oldObjects: FabricObject[], e?: TPointerEvent) {
     let somethingChanged = false,
       invalidate = false;
     const objects = this.getActiveObjects(),
-      added: InteractiveFabricObject[] = [],
-      removed: InteractiveFabricObject[] = [];
+      added: FabricObject[] = [],
+      removed: FabricObject[] = [];
 
     oldObjects.forEach((target) => {
       if (!objects.includes(target)) {

@@ -90,6 +90,17 @@ export class InteractiveFabricObject<
    */
   __isDragging?: boolean
 
+
+  /**
+   * A boolean used from the gesture module to keep tracking of a scaling
+   * action when there is no scaling transform in place.
+   * This is an edge case and is used twice in all codebase.
+   * Probably added to keep track of some performance issues
+   * @TODO use git blame to investigate why it was added
+   * DON'T USE IT. WE WILL TRY TO REMOVE IT
+   */
+  _scaling?: boolean
+
   /**
    * Constructor
    * @param {Object} [options] Options object
@@ -115,13 +126,13 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interactin area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
    */
-  _findTargetCorner(pointer: Point, forTouch: boolean): false | string {
+  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
     if (
       !this.hasControls ||
       !this.canvas ||
       this.canvas._activeObject !== this
     ) {
-      return false;
+      return 0;
     }
 
     this.__corner = 0;
@@ -154,7 +165,7 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return false;
+    return 0;
   }
 
   /**

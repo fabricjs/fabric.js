@@ -271,7 +271,7 @@ export class ObjectGeometry<
     pointTL: Point,
     pointBR: Point,
     absolute: boolean,
-    calculate: boolean
+    calculate?: boolean
   ): boolean {
     const coords = this.getCoords(absolute, calculate),
       intersection = Intersection.intersectPolygonRectangle(
@@ -342,7 +342,7 @@ export class ObjectGeometry<
     pointTL: Point,
     pointBR: Point,
     absolute: boolean,
-    calculate: boolean
+    calculate?: boolean
   ): boolean {
     const boundingRect = this.getBoundingRect(absolute, calculate);
     return (

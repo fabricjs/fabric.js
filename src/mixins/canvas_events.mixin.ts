@@ -2,10 +2,12 @@ import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
 import { Canvas } from '../canvas.class';
 import { fabric } from '../../HEADER';
-import { TPointerEvent } from '../EventTypeDefs';
-import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
-import { isFabricObjectWithDragSupport, isInteractiveTextObject } from '../util/types';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import { TPointerEvent, TPointerEventsSuffixes, TPointerEventInfo, Transform, TModificationEvents } from '../EventTypeDefs';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { isActiveSelection, isFabricObjectWithDragSupport, isInteractiveTextObject } from '../util/types';
+import { Point } from '../point.class';
+import { sendPointToPlane } from '../util/misc/planeChange';
+import { ActiveSelection } from '../shapes/active_selection.class';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -21,6 +23,14 @@ function checkClick(e: TPointerEvent, value: number) {
 // few bytes but why give it away.
 const addListener = (el: HTMLElement, ...args: any[]) => el.addEventListener(...args);
 const removeListener = (el: HTMLElement, ...args: any[]) => el.removeEventListener(...args);
+
+type TSyntheticEventConfig = {
+  oldTarget?: FabricObject;
+  evtOut: 'mouseout' | 'dragleave',
+  canvasEvtOut?: 'mouse:out' | 'drag:leave',
+  evtIn: 'mouseover' | 'dragenter',
+  canvasEvtIn?: 'mouse:over' | 'drag:enter',
+}
 
 export class EventedCanvas extends Canvas {
   /**
@@ -53,17 +63,29 @@ export class EventedCanvas extends Canvas {
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
-   * @type InteractiveFabricObject
+   * @type FabricObject
    * @private
    */
-  private _draggedoverTarget?: InteractiveFabricObject;
+  private _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
-   * @type InteractiveFabricObject
+   * @type FabricObject
    * @private
    */
-  private _dragSource?: InteractiveFabricObject;
+  private _dragSource?: FabricObject;
+
+  currentTarget?: FabricObject;
+
+  currentSubTargets?: FabricObject[];
+
+  /**
+   * Holds a reference to a pointer during mousedown to compare on mouse up and determine
+   * if it was a click event
+   * @type FabricObject
+   * @private
+   */
+  _previousPointer: Point;
 
   /**
    * Adds mouse listeners to canvas
@@ -238,7 +260,7 @@ export class EventedCanvas extends Canvas {
   private _onMouseOut(e: TPointerEvent) {
     const target = this._hoveredTarget;
     this.fire('mouse:out', { target: target, e: e });
-    this._hoveredTarget = null;
+    this._hoveredTarget = undefined;
     target && target.fire('mouseout', { e });
 
     this._hoveredTargets.forEach((nestedTarget) => {
@@ -261,7 +283,7 @@ export class EventedCanvas extends Canvas {
     // side effects we added to it.
     if (!this._currentTransform && !this.findTarget(e)) {
       this.fire('mouse:over', { target: null, e });
-      this._hoveredTarget = null;
+      this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
   }
@@ -317,7 +339,7 @@ export class EventedCanvas extends Canvas {
   /**
    * @private
    */
-  private _renderDragEffects(e: DragEvent, source?: InteractiveFabricObject, target?: InteractiveFabricObject) {
+  private _renderDragEffects(e: DragEvent, source?: FabricObject, target?: FabricObject) {
     const ctx = this.contextTop;
     if (source) {
       source.clearContextTop(true);
@@ -702,7 +724,7 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Object} target
    */
-  _shouldRender(target: FabricObject) {
+  _shouldRender(target: FabricObject | undefined) {
     const activeObject = this.getActiveObject();
 
     // if just one of them is available or if they are both but are different objects
@@ -768,7 +790,7 @@ export class EventedCanvas extends Canvas {
       shouldRender = transform.actionPerformed;
     }
     if (!isClick) {
-      var targetWasActive = target === this._activeObject;
+      const targetWasActive = target === this._activeObject;
       this._maybeGroupObjects(e);
       if (!shouldRender) {
         shouldRender =
@@ -776,7 +798,7 @@ export class EventedCanvas extends Canvas {
           (!targetWasActive && target === this._activeObject);
       }
     }
-    var corner, pointer;
+    let pointer, corner;
     if (target) {
       corner = target._findTargetCorner(
         this.getPointer(e, true),
@@ -790,8 +812,8 @@ export class EventedCanvas extends Canvas {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else {
-        var control = target.controls[corner],
-          mouseUpHandler =
+        const control = target.controls[(corner as string)];
+        const mouseUpHandler =
             control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getPointer(e);
@@ -806,11 +828,11 @@ export class EventedCanvas extends Canvas {
       transform &&
       (transform.target !== target || transform.corner !== corner)
     ) {
-      var originalControl =
+      const originalControl =
           transform.target && transform.target.controls[transform.corner],
         originalMouseUpHandler =
           originalControl &&
-          originalControl.getMouseUpHandler(e, target, control);
+          originalControl.getMouseUpHandler(e, transform.target, originalControl);
       pointer = pointer || this.getPointer(e);
       originalMouseUpHandler &&
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
@@ -831,34 +853,31 @@ export class EventedCanvas extends Canvas {
   /**
    * @private
    * Handle event firing for target and subtargets
-   * @param {Event} e event from mouse
    * @param {String} eventType event to fire (up, down or move)
+   * @param {Event} e event from mouse
    * @param {object} [data] event data overrides
    * @return {object} options
    */
-  _simpleEventHandler(eventType, e, data: Record<string, any> = {}) {
-    var target = this.findTarget(e),
+  _simpleEventHandler(eventType: string, e: TPointerEvent, data: Record<string, any> = {}) {
+    const target = this.findTarget(e),
       subTargets = this.targets || [];
     return this._basicEventHandler(
       eventType,
-      Object.assign(
-        {},
-        {
-          e: e,
-          target: target,
-          subTargets: subTargets,
-        },
-        data
-      )
+      {
+        e,
+        target,
+        subTargets,
+        ...data,
+      }
     );
   }
 
-  _basicEventHandler(eventType, options) {
-    var target = options.target,
+  _basicEventHandler(eventType: string, options: Record<string, any>) {
+    const target = options.target,
       subTargets = options.subTargets;
     this.fire(eventType, options);
     target && target.fire(eventType, options);
-    for (var i = 0; i < subTargets.length; i++) {
+    for (let i = 0; i < subTargets.length; i++) {
       subTargets[i].fire(eventType, options);
     }
     return options;
@@ -873,27 +892,30 @@ export class EventedCanvas extends Canvas {
    * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
    * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
    */
-  _handleEvent(e, eventType, button = LEFT_CLICK, isClick = false) {
-    var target = this._target,
+  _handleEvent(e: TPointerEvent, eventType: TPointerEventsSuffixes, button = LEFT_CLICK, isClick = false) {
+    const target = this._target,
       targets = this.targets || [],
-      options = {
+      options: TPointerEventInfo = {
         e: e,
         target: target,
         subTargets: targets,
         button,
         isClick,
-        pointer: this._pointer,
-        absolutePointer: this._absolutePointer,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
         transform: this._currentTransform,
       };
     if (eventType === 'up') {
       options.currentTarget = this.findTarget(e);
       options.currentSubTargets = this.targets;
     }
-    this.fire('mouse:' + eventType, options);
-    target && target.fire('mouse' + eventType, options);
-    for (var i = 0; i < targets.length; i++) {
-      targets[i].fire('mouse' + eventType, options);
+    this.fire(`mouse:${eventType}`, options);
+    // this may be a little be more complicated of what we want to handle
+    // @ts-ignore
+    target && target.fire(`mouse${eventType}`, options);
+    for (let i = 0; i < targets.length; i++) {
+      // @ts-ignore
+      targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
@@ -903,8 +925,8 @@ export class EventedCanvas extends Canvas {
    * because of some other event ( a press of key combination, or something that block the user UX )
    * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
    */
-  endCurrentTransform(e) {
-    var transform = this._currentTransform;
+  endCurrentTransform(e: TPointerEvent) {
+    const transform = this._currentTransform;
     this._finalizeCurrentTransform(e);
     if (transform && transform.target) {
       // this could probably go inside _finalizeCurrentTransform
@@ -917,11 +939,11 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
    */
-  _finalizeCurrentTransform(e) {
-    var transform = this._currentTransform,
+  _finalizeCurrentTransform(e: TPointerEvent) {
+    const transform = this._currentTransform!,
       target = transform.target,
       options = {
-        e: e,
+        e,
         target: target,
         transform: transform,
         action: transform.action,
@@ -935,6 +957,7 @@ export class EventedCanvas extends Canvas {
 
     if (
       transform.actionPerformed ||
+      // @ts-ignore
       (this.stateful && target.hasStateChanged())
     ) {
       this._fire('modified', options);
@@ -945,13 +968,14 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on mousedown
    */
-  _onMouseDownInDrawingMode(e) {
+  _onMouseDownInDrawingMode(e: TPointerEvent) {
     this._isCurrentlyDrawing = true;
     if (this.getActiveObject()) {
-      this.discardActiveObject(e).requestRenderAll();
+      this.discardActiveObject(e)
+      this.requestRenderAll();
     }
-    var pointer = this.getPointer(e);
-    this.freeDrawingBrush.onMouseDown(pointer, { e: e, pointer: pointer });
+    const pointer = this.getPointer(e);
+    this.freeDrawingBrush && this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
     this._handleEvent(e, 'down');
   }
 
@@ -959,12 +983,12 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on mousemove
    */
-  _onMouseMoveInDrawingMode(e) {
+  _onMouseMoveInDrawingMode(e: TPointerEvent) {
     if (this._isCurrentlyDrawing) {
-      var pointer = this.getPointer(e);
-      this.freeDrawingBrush.onMouseMove(pointer, {
-        e: e,
-        pointer: pointer,
+      const pointer = this.getPointer(e);
+      this.freeDrawingBrush && this.freeDrawingBrush.onMouseMove(pointer, {
+        e,
+        pointer,
       });
     }
     this.setCursor(this.freeDrawingCursor);
@@ -975,12 +999,16 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on mouseup
    */
-  _onMouseUpInDrawingMode(e) {
-    var pointer = this.getPointer(e);
-    this._isCurrentlyDrawing = this.freeDrawingBrush.onMouseUp({
-      e: e,
-      pointer: pointer,
-    });
+  _onMouseUpInDrawingMode(e: TPointerEvent) {
+    const pointer = this.getPointer(e);
+    if (this.freeDrawingBrush) {
+      this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
+        e: e,
+        pointer: pointer,
+      });
+    } else {
+      this._isCurrentlyDrawing = false;
+    }
     this._handleEvent(e, 'up');
   }
 
@@ -992,10 +1020,10 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on mousedown
    */
-  __onMouseDown(e) {
+  __onMouseDown(e: TPointerEvent) {
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
-    var target = this._target;
+    let target: FabricObject | undefined = this._target;
     // if right click just fire events
     if (checkClick(e, RIGHT_CLICK)) {
       if (this.fireRightClick) {
@@ -1025,16 +1053,16 @@ export class EventedCanvas extends Canvas {
       return;
     }
 
-    var pointer = this._pointer;
+    const pointer = this.getPointer(e);
     // save pointer for check in __onMouseUp event
     this._previousPointer = pointer;
-    var shouldRender = this._shouldRender(target),
+    const shouldRender = this._shouldRender(target),
       shouldGroup = this._shouldGroup(e, target);
     if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
     } else if (shouldGroup) {
       this._handleGrouping(e, target);
-      target = this._activeObject;
+      target = this._activeObject ?? undefined;
     }
 
     if (
@@ -1044,27 +1072,27 @@ export class EventedCanvas extends Canvas {
           !target.isEditing &&
           target !== this._activeObject))
     ) {
+      const p = this.getPointer(e, true);
       this._groupSelector = {
-        ex: this._absolutePointer.x,
-        ey: this._absolutePointer.y,
+        ex: p.x,
+        ey: p.y,
         top: 0,
         left: 0,
       };
     }
 
     if (target) {
-      var alreadySelected = target === this._activeObject;
+      const alreadySelected = target === this._activeObject;
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      var corner = target._findTargetCorner(
+      const corner = target._findTargetCorner(
         this.getPointer(e, true),
         fabric.util.isTouchEvent(e)
       );
-      target.__corner = corner;
       if (target === this._activeObject && (corner || !shouldGroup)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        var control = target.controls[corner],
+        const control = target.controls[corner],
           pointer = this.getPointer(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
@@ -1073,7 +1101,7 @@ export class EventedCanvas extends Canvas {
         }
       }
     }
-    var invalidate = shouldRender || shouldGroup;
+    const invalidate = shouldRender || shouldGroup;
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
     //  run before firing the `down` event to give the dev a chance to populate it themselves
     invalidate && (this._objectsToRender = undefined);
@@ -1087,9 +1115,9 @@ export class EventedCanvas extends Canvas {
    * @private
    */
   _resetTransformEventData() {
-    this._target = null;
-    this._pointer = null;
-    this._absolutePointer = null;
+    this._target = undefined;
+    this._pointer = undefined;
+    this._absolutePointer = undefined;
   }
 
   /**
@@ -1097,24 +1125,25 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on event
    */
-  _cacheTransformEventData(e) {
+  _cacheTransformEventData(e: TPointerEvent) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
     this._pointer = this.getPointer(e, true);
     this._absolutePointer = this.restorePointerVpt(this._pointer);
     this._target = this._currentTransform
       ? this._currentTransform.target
-      : this.findTarget(e) || null;
+      : this.findTarget(e);
   }
 
   /**
    * @private
    */
-  _beforeTransform(e) {
-    var t = this._currentTransform;
+  _beforeTransform(e: TPointerEvent) {
+    const t = this._currentTransform!;
+    // @ts-ignore
     this.stateful && t.target.saveState();
     this.fire('before:transform', {
-      e: e,
+      e,
       transform: t,
     });
   }
@@ -1128,10 +1157,9 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event object fired on mousemove
    */
-  __onMouseMove(e) {
+  __onMouseMove(e: TPointerEvent) {
     this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
-    var target, pointer;
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -1142,20 +1170,20 @@ export class EventedCanvas extends Canvas {
       return;
     }
 
-    var groupSelector = this._groupSelector;
+    const groupSelector = this._groupSelector;
 
     // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
-      pointer = this._absolutePointer;
+      const pointer = this.getPointer(e, true);
 
       groupSelector.left = pointer.x - groupSelector.ex;
       groupSelector.top = pointer.y - groupSelector.ey;
 
       this.renderTop();
     } else if (!this._currentTransform) {
-      target = this.findTarget(e) || null;
+      const target = this.findTarget(e);
       this._setCursorFromEvent(e, target);
-      this._fireOverOutEvents(target, e);
+      this._fireOverOutEvents(e, target);
     } else {
       this._transformObject(e);
     }
@@ -1169,8 +1197,8 @@ export class EventedCanvas extends Canvas {
    * @param {Event} e Event object fired on mousemove
    * @private
    */
-  _fireOverOutEvents(target, e) {
-    var _hoveredTarget = this._hoveredTarget,
+  _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
+    const _hoveredTarget = this._hoveredTarget,
       _hoveredTargets = this._hoveredTargets,
       targets = this.targets,
       length = Math.max(_hoveredTargets.length, targets.length);
@@ -1186,7 +1214,7 @@ export class EventedCanvas extends Canvas {
         canvasEvtIn: 'mouse:over',
       }
     );
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       this.fireSyntheticInOutEvents(
         targets[i],
         { e: e },
@@ -1207,8 +1235,8 @@ export class EventedCanvas extends Canvas {
    * @param {Object} data Event object fired on dragover
    * @private
    */
-  _fireEnterLeaveEvents(target, data) {
-    var _draggedoverTarget = this._draggedoverTarget,
+  _fireEnterLeaveEvents(target: FabricObject, data: Record<string, any>) {
+    const _draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
       targets = this.targets,
       length = Math.max(_hoveredTargets.length, targets.length);
@@ -1220,7 +1248,7 @@ export class EventedCanvas extends Canvas {
       canvasEvtIn: 'drag:enter',
       canvasEvtOut: 'drag:leave',
     });
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       this.fireSyntheticInOutEvents(targets[i], data, {
         oldTarget: _hoveredTargets[i],
         evtOut: 'dragleave',
@@ -1242,34 +1270,30 @@ export class EventedCanvas extends Canvas {
    * @param {String} config.evtIn name of the event to fire for in
    * @private
    */
-  fireSyntheticInOutEvents(target, data, config) {
-    var inOpt,
-      outOpt,
-      oldTarget = config.oldTarget,
-      outFires,
-      inFires,
-      targetChanged = oldTarget !== target,
-      canvasEvtIn = config.canvasEvtIn,
-      canvasEvtOut = config.canvasEvtOut;
-    if (targetChanged) {
-      inOpt = Object.assign({}, data, {
-        target: target,
-        previousTarget: oldTarget,
-      });
-      outOpt = Object.assign({}, data, {
+  fireSyntheticInOutEvents(target: FabricObject, data: Record<string, any>, config: TSyntheticEventConfig) {
+    const { canvasEvtIn, canvasEvtOut, evtOut, evtIn } = config;
+    const oldTarget = config.oldTarget,
+      targetChanged = oldTarget !== target;
+
+    if (oldTarget && targetChanged) {
+      const outOpt = {
+        ...data,
         target: oldTarget,
         nextTarget: target,
-      });
-    }
-    inFires = target && targetChanged;
-    outFires = oldTarget && targetChanged;
-    if (outFires) {
+      };
       canvasEvtOut && this.fire(canvasEvtOut, outOpt);
-      oldTarget.fire(config.evtOut, outOpt);
+      // @ts-ignore
+      oldTarget.fire(evtOut, outOpt);
     }
-    if (inFires) {
+    if (target && targetChanged) {
+      const inOpt = {
+        ...data,
+        target,
+        previousTarget: oldTarget,
+      };
       canvasEvtIn && this.fire(canvasEvtIn, inOpt);
-      target.fire(config.evtIn, inOpt);
+      // @ts-ignore
+      target.fire(evtIn, inOpt);
     }
   }
 
@@ -1277,7 +1301,7 @@ export class EventedCanvas extends Canvas {
    * Method that defines actions when an Event Mouse Wheel
    * @param {Event} e Event object fired on mouseup
    */
-  __onMouseWheel(e) {
+  __onMouseWheel(e: TPointerEvent) {
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'wheel');
     this._resetTransformEventData();
@@ -1287,23 +1311,25 @@ export class EventedCanvas extends Canvas {
    * @private
    * @param {Event} e Event fired on mousemove
    */
-  _transformObject(e) {
-    var pointer = this.getPointer(e),
-      transform = this._currentTransform,
+  _transformObject(e: TPointerEvent) {
+    const pointer = this.getPointer(e),
+      transform = this._currentTransform!,
       target = transform.target,
       //  transform pointer to target's containing coordinate plane
       //  both pointer and object should agree on every point
       localPointer = target.group
-        ? fabric.util.sendPointToPlane(
+        ? sendPointToPlane(
             pointer,
             undefined,
             target.group.calcTransformMatrix()
           )
         : pointer;
-
+    // seems used only here.
+    // @TODO: investigate;
+    // @ts-ignore
     transform.reset = false;
     transform.shiftKey = e.shiftKey;
-    transform.altKey = e[this.centeredKey];
+    transform.altKey = !!this.centeredKey && e[this.centeredKey];
 
     this._performTransformAction(e, transform, localPointer);
     transform.actionPerformed && this.requestRenderAll();
@@ -1312,12 +1338,12 @@ export class EventedCanvas extends Canvas {
   /**
    * @private
    */
-  _performTransformAction(e, transform, pointer) {
-    var x = pointer.x,
+  _performTransformAction(e: TPointerEvent, transform: Transform, pointer: Point) {
+    const x = pointer.x,
       y = pointer.y,
       action = transform.action,
-      actionPerformed = false,
       actionHandler = transform.actionHandler;
+    let actionPerformed = false;
     // this object could be created from the function in the control handlers
 
     if (actionHandler) {
@@ -1334,7 +1360,7 @@ export class EventedCanvas extends Canvas {
   /**
    * @private
    */
-  _fire(eventName, options) {
+  _fire(eventName: TModificationEvents, options: Record<string, any>) {
     return fireEvent(eventName, options);
   }
 
@@ -1344,16 +1370,13 @@ export class EventedCanvas extends Canvas {
    * @param {Event} e Event object
    * @param {Object} target Object that the mouse is hovering, if so.
    */
-  _setCursorFromEvent(e, target) {
+  _setCursorFromEvent(e: TPointerEvent, target?: FabricObject) {
     if (!target) {
       this.setCursor(this.defaultCursor);
-      return false;
+      return;
     }
-    var hoverCursor = target.hoverCursor || this.hoverCursor,
-      activeSelection =
-        this._activeObject && this._activeObject.type === 'activeSelection'
-          ? this._activeObject
-          : null,
+    let hoverCursor = target.hoverCursor || this.hoverCursor;
+    const activeSelection = isActiveSelection(this._activeObject) ? this._activeObject : null,
       // only show proper corner when group selection is not active
       corner =
         (!activeSelection || !activeSelection.contains(target)) &&
@@ -1375,18 +1398,203 @@ export class EventedCanvas extends Canvas {
       }
       this.setCursor(hoverCursor);
     } else {
-      this.setCursor(this.getCornerCursor(corner, target, e));
+      const control = target.controls[corner];
+      this.setCursor(control.cursorStyleHandler(e, control, target));
+    }
+  }
+
+  // Grouping objects mixin
+
+  /**
+   * Return true if the current mouse event that generated a new selection should generate a group
+   * @private
+   * @param {TPointerEvent} e Event object
+   * @param {FabricObject} target
+   * @return {Boolean}
+   */
+  _shouldGroup(e: TPointerEvent, target: FabricObject): boolean {
+    const activeObject = this._activeObject;
+    // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
+    return (
+      !!activeObject &&
+      this._isSelectionKeyPressed(e) &&
+      this.selection &&
+      // on top of that the user also has to hit a target that is selectable.
+      !!target &&
+      target.selectable &&
+      // if all pre-requisite pass, the target is either something different from the current
+      // activeObject or if an activeSelection already exists
+      // TODO at time of writing why `activeObject.type === 'activeSelection'` matter is unclear.
+      // is a very old condition uncertain if still valid.
+      (activeObject !== target ||
+        activeObject.type === 'activeSelection') &&
+      //  make sure `activeObject` and `target` aren't ancestors of each other
+      !target.isDescendantOf(activeObject) &&
+      !activeObject.isDescendantOf(target) &&
+      //  target accepts selection
+      !target.onSelect({ e: e })
+    );
+  }
+
+  /**
+   * Handles active selection creation for user event
+   * @private
+   * @param {TPointerEvent} e Event object
+   * @param {FabricObject} target
+   */
+  _handleGrouping(e: TPointerEvent, target: FabricObject) {
+    let groupingTarget: FabricObject | undefined = target;
+    // Called always a shouldGroup, meaning that we can trust this._activeObject exists.
+    const activeObject = this._activeObject!;
+    // avoid multi select when shift click on a corner
+    if (activeObject.__corner) {
+      return;
+    }
+    if (groupingTarget === activeObject) {
+      // if it's a group, find target again, using activeGroup objects
+      groupingTarget = this.findTarget(e, true);
+      // if even object is not found or we are on activeObjectCorner, bail out
+      if (!groupingTarget || !groupingTarget.selectable) {
+        return;
+      }
+    }
+    if (activeObject && activeObject.type === 'activeSelection') {
+      this._updateActiveSelection(e, groupingTarget);
+    } else {
+      this._createActiveSelection(e, groupingTarget);
     }
   }
 
   /**
    * @private
    */
-  getCornerCursor(corner, target, e) {
-    var control = target.controls[corner];
-    return control.cursorStyleHandler(e, control, target);
+  _updateActiveSelection(e: TPointerEvent, target: FabricObject) {
+    const activeSelection = this._activeObject! as ActiveSelection,
+      currentActiveObjects = activeSelection.getObjects();
+    if (target.group === activeSelection) {
+      activeSelection.remove(target);
+      this._hoveredTarget = target;
+      this._hoveredTargets = this.targets.concat();
+      if (activeSelection.size() === 1) {
+        // activate last remaining object
+        this._setActiveObject(activeSelection.item(0), e);
+      }
+    } else {
+      activeSelection.add(target);
+      this._hoveredTarget = activeSelection;
+      this._hoveredTargets = this.targets.concat();
+    }
+    this._fireSelectionEvents(currentActiveObjects, e);
   }
 
+  /**
+   * Generates and set as active the active selection from user events
+   * @private
+   */
+  _createActiveSelection(e: TPointerEvent, target: FabricObject) {
+    const currentActive = this.getActiveObject()!;
+    const groupObjects = target.isInFrontOf(currentActive)
+      ? [currentActive, target]
+      : [target, currentActive];
+    // @ts-ignore
+    currentActive.isEditing && currentActive.exitEditing();
+    //  handle case: target is nested
+    const newActiveSelection = new ActiveSelection(groupObjects, {
+      canvas: this,
+    });
+    this._hoveredTarget = newActiveSelection;
+    // ISSUE 4115: should we consider subTargets here?
+    // this._hoveredTargets = [];
+    // this._hoveredTargets = this.targets.concat();
+    this._setActiveObject(newActiveSelection, e);
+    this._fireSelectionEvents([currentActive], e);
+  }
+
+  /**
+   * Finds objects inside the selection rectangle and group them
+   * @private
+   * @param {Event} e mouse event
+   */
+  _groupSelectedObjects(e: TPointerEvent) {
+    const group = this._collectObjects(e);
+    // do not create group for 1 element only
+    if (group.length === 1) {
+      this.setActiveObject(group[0], e);
+    } else if (group.length > 1) {
+      const aGroup = new ActiveSelection(group.reverse(), {
+        canvas: this,
+      });
+      this.setActiveObject(aGroup, e);
+    }
+  }
+
+  /**
+   * @private
+   */
+  _collectObjects(e: TPointerEvent) {
+    const group = [],
+      _groupSelector = this._groupSelector,
+      point1 = new Point(_groupSelector.ex, _groupSelector.ey),
+      point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
+      selectionX1Y1 = point1.min(point2),
+      selectionX2Y2 = point1.max(point2),
+      allowIntersect = !this.selectionFullyContained,
+      isClick = point1.eq(point2);
+    // we iterate reverse order to collect top first in case of click.
+    for (let i = this._objects.length; i--; ) {
+      const currentObject = this._objects[i];
+
+      if (
+        !currentObject ||
+        !currentObject.selectable ||
+        !currentObject.visible
+      ) {
+        continue;
+      }
+
+      if (
+        (allowIntersect &&
+          currentObject.intersectsWithRect(
+            selectionX1Y1,
+            selectionX2Y2,
+            true
+          )) ||
+        currentObject.isContainedWithinRect(
+          selectionX1Y1,
+          selectionX2Y2,
+          true
+        ) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX1Y1, undefined, true)) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX2Y2, undefined, true))
+      ) {
+        group.push(currentObject);
+        // only add one object if it's a click
+        if (isClick) {
+          break;
+        }
+      }
+    }
+
+    if (group.length > 1) {
+      return group.filter((object) => !object.onSelect({ e }));
+    }
+
+    return group;
+  }
+
+  /**
+   * @private
+   */
+  _maybeGroupObjects(e: TPointerEvent) {
+    if (this.selection && this._groupSelector) {
+      this._groupSelectedObjects(e);
+    }
+    this.setCursor(this.defaultCursor);
+    // clear selection and current transformation
+    this._groupSelector = null;
+  }
 }
 
 

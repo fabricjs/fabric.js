@@ -24,8 +24,23 @@ export type TransformAction<T extends Transform = Transform, R = void> = (
   y: number
 ) => R;
 
+/**
+ * Control handlers that define a transformation
+ * Those handlers run when the user starts a transform and during a trasnform
+ */
 export type TransformActionHandler<T extends Transform = Transform> =
   TransformAction<T, boolean>;
+
+/**
+ * Control handlers that run on control click/down/up
+ * Those handlers run with or without a transform defined
+ */
+export type ControlActionHandler = (
+  eventData: TPointerEvent,
+  transform: Transform | null,
+  x: number,
+  y: number
+) => any;
 
 export type ControlCallback<R = void> = (
   eventData: TPointerEvent,
@@ -65,6 +80,7 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
+  actionPerformed: boolean;
 };
 
 export type TEvent<E extends Event = TPointerEvent> = {
@@ -96,14 +112,16 @@ type CanvasModifiedEvents = Record<
   BasicTransformEvent & { target: FabricObject }
 >;
 
-export type TransformEvent<T extends Event = TPointerEvent> =
-  BasicTransformEvent<T> & {
-    target: FabricObject;
-    subTargets: FabricObject[];
+export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> = TEvent<E> & {
+    target?: FabricObject;
+    subTargets?: FabricObject[];
     button: number;
     isClick: boolean;
     pointer: Point;
+    transform?: Transform | null;
     absolutePointer: Point;
+    currentSubTargets?: FabricObject[];
+    currentTarget?: FabricObject | null;
   };
 
 type SimpleEventHandler<T extends Event = TPointerEvent> =
@@ -176,12 +194,21 @@ type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
     | WithBeforeSuffix<'move'>
     | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
-  TransformEvent & E
+  TPointerEventInfo & E
 > &
-  Record<`${Prefix}wheel`, TransformEvent<WheelEvent> & E> &
-  Record<`${Prefix}over`, TransformEvent & InEvent & E> &
-  Record<`${Prefix}out`, TransformEvent & OutEvent & E>;
+  Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent> & E> &
+  Record<`${Prefix}over`, TPointerEventInfo & InEvent & E> &
+  Record<`${Prefix}out`, TPointerEventInfo & OutEvent & E>;
 
+export type TPointerEventsSuffixes =
+  'down'
+  | 'move'
+  | 'up'
+  | 'dblclick'
+  | 'up:before'
+  | 'down:before'
+  | 'move:before'
+  | 'wheel'
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
 

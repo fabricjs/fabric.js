@@ -12,7 +12,6 @@ import './src/shadow.class'; // optional shadow
 import './src/static_canvas.class';
 import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
-import './src/mixins/canvas_grouping.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optional serialization
 import './src/mixins/canvas_gestures.mixin'; // optional gestures
