@@ -1,82 +1,34 @@
 import { fabric } from '../../HEADER';
-import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
 import { Canvas } from '../__types__';
-
-export type TBrushEventData = TEvent & { pointer: Point };
+import { BrushOptions, TBrushEventData } from './types';
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush<T extends FabricObject> {
-  /**
-   * Color of a brush
-   * @type String
-   * @default
-   */
+export abstract class BaseBrush<T extends FabricObject>
+  implements BrushOptions
+{
   color = 'rgb(0, 0, 0)';
 
-  /**
-   * Width of a brush, has to be a Number, no string literals
-   * @type Number
-   * @default
-   */
   width = 1;
 
-  /**
-   * Shadow object representing shadow of this shape.
-   * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
-   * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
-   * @type Shadow
-   * @default
-   */
   shadow: Shadow | null = null;
 
-  /**
-   * Line endings style of a brush (one of "butt", "round", "square")
-   * @type String
-   * @default
-   */
   strokeLineCap: CanvasLineCap = 'round';
 
-  /**
-   * Corner style of a brush (one of "bevel", "round", "miter")
-   * @type String
-   * @default
-   */
   strokeLineJoin: CanvasLineJoin = 'round';
 
-  /**
-   * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
-   * @type Number
-   * @default
-   */
   strokeMiterLimit = 10;
 
-  /**
-   * Stroke Dash Array.
-   * @type Array
-   * @default
-   */
   strokeDashArray: number[] | null = null;
-
-  /**
-   * When `true`, the free drawing is limited to the whiteboard size. Default to false.
-   * @type Boolean
-   * @default false
-   */
 
   limitedToCanvasSize = false;
 
-  /**
-   * Same as FabricObject `clipPath` property.
-   * The clip path is positioned relative to the top left corner of the viewport.
-   * The `absolutePositioned` property renders the clip path w/o viewport transform.
-   */
   clipPath?: FabricObject;
 
   /**
@@ -86,8 +38,13 @@ export abstract class BaseBrush<T extends FabricObject> {
 
   active = false;
 
-  constructor(canvas: Canvas) {
+  constructor(canvas: Canvas, options?: Partial<BrushOptions>) {
     this.canvas = canvas;
+    this.setOptions(options);
+  }
+
+  setOptions(options: Partial<BrushOptions> = {}) {
+    Object.assign(this, options);
   }
 
   protected abstract _render(ctx: CanvasRenderingContext2D): void;

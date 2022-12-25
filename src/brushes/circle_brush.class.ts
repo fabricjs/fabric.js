@@ -6,7 +6,8 @@ import { FabricObject } from '../shapes/fabricObject.class';
 import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
-import { BaseBrush, TBrushEventData } from './base_brush.class';
+import { BaseBrush } from './base_brush.class';
+import { BrushOptions, TBrushEventData } from './types';
 
 export type CircleBrushPoint = {
   x: number;
@@ -25,8 +26,8 @@ export class CircleBrush extends BaseBrush<FabricObject> {
 
   points: CircleBrushPoint[];
 
-  constructor(canvas: Canvas) {
-    super(canvas);
+  constructor(canvas: Canvas, options?: Partial<BrushOptions>) {
+    super(canvas, options);
     this.points = [];
   }
 

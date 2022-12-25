@@ -5,7 +5,8 @@ import { Group } from '../shapes/group.class';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';
-import { BaseBrush, TBrushEventData } from './base_brush.class';
+import { BaseBrush } from './base_brush.class';
+import { TBrushEventData } from './types';
 
 export type SprayBrushPoint = {
   x: number;
@@ -86,8 +87,8 @@ export class SprayBrush extends BaseBrush<FabricObject> {
    * @param {Canvas} canvas
    * @return {SprayBrush} Instance of a spray brush
    */
-  constructor(canvas: Canvas) {
-    super(canvas);
+  constructor(canvas: Canvas, options?: Partial<BrushOptions>) {
+    super(canvas, options);
     this.sprayChunks = [];
     this.sprayChunk = [];
   }

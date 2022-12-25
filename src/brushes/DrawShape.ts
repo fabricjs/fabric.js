@@ -3,7 +3,7 @@ import { ModifierKey } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { FabricObject } from '../shapes/fabricObject.class';
 import { Rect } from '../shapes/rect.class';
-import { TBrushEventData } from './base_brush.class';
+import { TBrushEventData } from './types';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawShape<

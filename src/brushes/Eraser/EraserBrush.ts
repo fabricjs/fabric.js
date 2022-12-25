@@ -8,7 +8,7 @@ import { createCanvasElement } from '../../util/misc/dom';
 import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
 import { isCollection } from '../../util/types';
 import type { Canvas } from '../../__types__';
-import { TBrushEventData } from '../base_brush.class';
+import { TBrushEventData } from '../types';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
 import { ErasingEventContext, ErasingEventContextData } from './types';

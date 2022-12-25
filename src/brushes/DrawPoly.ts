@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Polygon } from '../shapes/polygon.class';
 import { Polyline } from '../shapes/polyline.class';
-import { TBrushEventData } from './base_brush.class';
+import { TBrushEventData } from './types';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawPoly extends DrawShapeBase<Polyline> {

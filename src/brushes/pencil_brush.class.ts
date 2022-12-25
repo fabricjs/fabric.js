@@ -6,7 +6,8 @@ import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import { Canvas } from '../__types__';
-import { BaseBrush, TBrushEventData } from './base_brush.class';
+import { BaseBrush } from './base_brush.class';
+import { BrushOptions, TBrushEventData } from './types';
 
 /**
  * @param {PathData} pathData
@@ -43,8 +44,8 @@ export class PencilBrush extends BaseBrush<Path> {
   private _points: Point[];
   protected oldEnd?: Point;
 
-  constructor(canvas: Canvas) {
-    super(canvas);
+  constructor(canvas: Canvas, options?: Partial<BrushOptions>) {
+    super(canvas, options);
     this._points = [];
   }
 
