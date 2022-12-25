@@ -74,6 +74,8 @@ type TDestroyedCanvas = Omit<
  * @fires selection:created
  *
  * @fires interaction:completed after a drawing operation ends
+ * @fires erasing:start
+ * @fires erasing:end
  *
  * @fires mouse:down
  * @fires mouse:move
@@ -84,9 +86,6 @@ type TDestroyedCanvas = Omit<
  * @fires mouse:over
  * @fires mouse:out
  * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
- *
- * @fires erasing:start
- * @fires erasing:end
  *
  * @fires dragover
  * @fires dragenter
