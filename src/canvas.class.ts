@@ -554,7 +554,7 @@ export class Canvas<
       });
     }
     if (obj === this._hoveredTarget) {
-      this._hoveredTarget = null;
+      this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
     super._onObjectRemoved(obj);
@@ -838,7 +838,7 @@ export class Canvas<
     if (target.group) {
       // transform pointer to target's containing coordinate plane
       // should we use send point to plane?
-      pointer = sendPointToPlane(undefined, target.group.calcTransformMatrix());
+      pointer = sendPointToPlane(pointer, target.group.calcTransformMatrix());
     }
     const corner = target.__corner || '',
       control = target.controls[corner],
@@ -857,6 +857,7 @@ export class Canvas<
         target: target,
         action: action,
         actionHandler,
+        actionPerformed: false,
         corner,
         scaleX: target.scaleX,
         scaleY: target.scaleY,

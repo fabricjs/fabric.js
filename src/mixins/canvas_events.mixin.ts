@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
 import { Canvas } from '../canvas.class';
@@ -18,22 +19,23 @@ import {
 import { Point } from '../point.class';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/active_selection.class';
+import { Group } from '../shapes/group.class';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
   LEFT_CLICK = 1,
-  addEventOptions = { passive: false };
+  addEventOptions = { passive: false } as EventListenerOptions;
 
 function checkClick(e: TPointerEvent, value: number) {
-  return !!e.button && e.button === value - 1;
+  return !!(e as MouseEvent).button && (e as MouseEvent).button === value - 1;
 }
 
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
 // few bytes but why give it away.
-const addListener = (el: HTMLElement, ...args: any[]) =>
+const addListener = (el: HTMLElement, ...args: Parameters<HTMLElement["addEventListener"]>) =>
   el.addEventListener(...args);
-const removeListener = (el: HTMLElement, ...args: any[]) =>
+const removeListener = (el: HTMLElement, ...args: Parameters<HTMLElement["removeEventListener"]>) =>
   el.removeEventListener(...args);
 
 type TSyntheticEventConfig = {
@@ -146,15 +148,21 @@ export class EventedCanvas extends Canvas {
     if (!this.enablePointerEvents) {
       functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
+    // @ts-ignore
     if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
+      // @ts-ignore
       eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
+      // @ts-ignore
       eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
+      // @ts-ignore
       eventjs[eventjsFunctor](
         canvasElement,
         'orientation',
         this._onOrientationChange
       );
+      // @ts-ignore
       eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
+      // @ts-ignore
       eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
     }
   }
@@ -166,23 +174,23 @@ export class EventedCanvas extends Canvas {
     this.addOrRemove(removeListener, 'remove');
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
-    removeListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp);
+    removeListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp  as EventListener,);
     removeListener(
       fabric.document,
       'touchend',
-      this._onTouchEnd,
+      this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
       fabric.document,
       `${eventTypePrefix}move`,
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
     removeListener(
       fabric.document,
       'touchmove',
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
   }
@@ -376,7 +384,7 @@ export class EventedCanvas extends Canvas {
         didDrop: didDrop,
         dropTarget: dropTarget as FabricObject,
       };
-    removeListener(this.upperCanvasEl, 'drag', this._onDragProgress);
+    removeListener(this.upperCanvasEl, 'drag', this._onDragProgress as EventListener);
     this.fire('dragend', options);
     this._dragSource && this._dragSource.fire('dragend', options);
     delete this._dragSource;
@@ -478,7 +486,7 @@ export class EventedCanvas extends Canvas {
     };
     this.fire('dragleave', options);
     //  fire dragleave on targets
-    this._fireEnterLeaveEvents(null, options);
+    this._fireEnterLeaveEvents(undefined, options);
     //  clear targets
     this.targets = [];
     this._hoveredTargets = [];
@@ -589,15 +597,15 @@ export class EventedCanvas extends Canvas {
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    addListener(fabric.document, 'touchend', this._onTouchEnd, addEventOptions);
+    addListener(fabric.document, 'touchend', this._onTouchEnd  as EventListener, addEventOptions);
     addListener(
       fabric.document,
       'touchmove',
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
     // Unbind mousedown to prevent double triggers from touch devices
-    removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
+    removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown as EventListener);
   }
 
   /**
@@ -612,14 +620,14 @@ export class EventedCanvas extends Canvas {
     removeListener(
       canvasElement,
       `${eventTypePrefix}move`,
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
-    addListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp);
+    addListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp as EventListener);
     addListener(
       fabric.document,
       `${eventTypePrefix}move`,
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
   }
@@ -640,13 +648,13 @@ export class EventedCanvas extends Canvas {
     removeListener(
       fabric.document,
       'touchend',
-      this._onTouchEnd,
+      this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
       fabric.document,
       'touchmove',
-      this._onMouseMove,
+      this._onMouseMove as EventListener,
       addEventOptions
     );
     if (this._willAddMouseDown) {
@@ -658,7 +666,7 @@ export class EventedCanvas extends Canvas {
       addListener(
         this.upperCanvasEl,
         eventTypePrefix + 'down',
-        this._onMouseDown
+        this._onMouseDown as EventListener,
       );
       this._willAddMouseDown = 0;
     }, 400) as unknown as number;
@@ -674,17 +682,17 @@ export class EventedCanvas extends Canvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
-      removeListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp);
+      removeListener(fabric.document, `${eventTypePrefix}up`, this._onMouseUp as EventListener,);
       removeListener(
         fabric.document,
         `${eventTypePrefix}move`,
-        this._onMouseMove,
+        this._onMouseMove as EventListener,
         addEventOptions
       );
       addListener(
         canvasElement,
         `${eventTypePrefix}move`,
-        this._onMouseMove,
+        this._onMouseMove as EventListener,
         addEventOptions
       );
     }
@@ -1238,7 +1246,7 @@ export class EventedCanvas extends Canvas {
    * @param {Object} data Event object fired on dragover
    * @private
    */
-  _fireEnterLeaveEvents(target: FabricObject, data: Record<string, any>) {
+  _fireEnterLeaveEvents(target: FabricObject | undefined, data: Record<string, any>) {
     const _draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
       targets = this.targets,
@@ -1274,7 +1282,7 @@ export class EventedCanvas extends Canvas {
    * @private
    */
   fireSyntheticInOutEvents(
-    target: FabricObject,
+    target: FabricObject | undefined,
     data: Record<string, any>,
     config: TSyntheticEventConfig
   ) {
@@ -1398,13 +1406,13 @@ export class EventedCanvas extends Canvas {
         target._findTargetCorner(this.getPointer(e, true));
 
     if (!corner) {
-      if (target.subTargetCheck) {
+      if ((target as Group).subTargetCheck) {
         // hoverCursor should come from top-most subTarget,
         // so we walk the array backwards
         this.targets
           .concat()
           .reverse()
-          .map(function (_target) {
+          .map((_target) => {
             hoverCursor = _target.hoverCursor || hoverCursor;
           });
       }

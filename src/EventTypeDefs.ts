@@ -57,7 +57,7 @@ export type ControlCursorCallback = ControlCallback<string>;
 export type Transform = {
   target: FabricObject;
   action: string;
-  actionHandler: TransformActionHandler;
+  actionHandler?: TransformActionHandler;
   corner: string | 0;
   scaleX: number;
   scaleY: number;
