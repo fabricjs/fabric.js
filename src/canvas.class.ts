@@ -73,7 +73,8 @@ type TDestroyedCanvas = Omit<
  * @fires selection:updated
  * @fires selection:created
  *
- * @fires path:created after a drawing operation ends and the path is added
+ * @fires interaction:completed after a drawing operation ends
+ *
  * @fires mouse:down
  * @fires mouse:move
  * @fires mouse:up
@@ -606,9 +607,18 @@ export class Canvas<
     if (this.destroyed) {
       return;
     }
-    if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+    if (
+      (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) ||
+      this.shouldClearContextTop
+    ) {
       this.clearContext(this.contextTop);
       this.contextTopDirty = false;
+      if (this.shouldClearContextTop) {
+        // in case we are rendering a requested render state might have changed
+        // so we render top layer to sync visuals
+        this.hasLostContext = true;
+        this.shouldClearContextTop = false;
+      }
     }
     if (this.hasLostContext) {
       this.renderTopLayer(this.contextTop);
@@ -622,7 +632,7 @@ export class Canvas<
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush._render();
+      this.freeDrawingBrush && this.freeDrawingBrush.render();
       this.contextTopDirty = true;
     }
     // we render the top context - last object

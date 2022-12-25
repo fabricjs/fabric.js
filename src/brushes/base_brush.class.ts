@@ -13,7 +13,7 @@ export type TBrushEventData = TEvent & { pointer: Point };
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush<T extends FabricObject> {
+export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   /**
    * Color of a brush
    * @type String
