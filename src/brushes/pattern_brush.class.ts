@@ -1,7 +1,7 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { Pattern } from '../pattern.class';
 import { createCanvasElement } from '../util/misc/dom';
-import { Canvas } from '../__types__';
 import { PencilBrush } from './pencil_brush.class';
 
 export class PatternBrush extends PencilBrush {

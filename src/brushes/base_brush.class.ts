@@ -1,4 +1,5 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { Color } from '../color';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
@@ -6,7 +7,6 @@ import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
-import { Canvas } from '../__types__';
 
 export type TBrushEventData = TEvent & { pointer: Point };
 
@@ -80,10 +80,7 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
    */
   clipPath?: FabricObject;
 
-  /**
-   * @todo add type
-   */
-  canvas: Canvas;
+  readonly canvas: Canvas;
 
   active = false;
 

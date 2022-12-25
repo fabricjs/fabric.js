@@ -489,11 +489,13 @@ export class Canvas<
   contextTop: CanvasRenderingContext2D;
   wrapperEl: HTMLDivElement;
   cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
+  _isCurrentlyDrawing: boolean;
+  shouldClearContextTop: boolean;
   freeDrawingBrush?: BaseBrush;
   _activeObject: FabricObject | null;
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[];
+
   /**
    * Constructor
    * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on

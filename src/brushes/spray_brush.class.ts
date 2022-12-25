@@ -1,10 +1,10 @@
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas.class';
 import { Point } from '../point.class';
-import { FabricObject } from '../shapes/Object/FabricObject';
 import { Group } from '../shapes/group.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
-import { Canvas } from '../__types__';
 import { BaseBrush, TBrushEventData } from './base_brush.class';
 
 export type SprayBrushPoint = {
