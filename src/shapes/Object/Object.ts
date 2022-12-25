@@ -1,5 +1,12 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { fabric } from '../../../HEADER';
+import type { Eraser } from '../../brushes';
+import { cache } from '../../cache';
+import { config } from '../../config';
+import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
+import { ObjectEvents } from '../../EventTypeDefs';
+import { Point } from '../../point.class';
+import { Shadow } from '../../shadow.class';
 import type {
   TCacheCanvasDimensions,
   TClassProperties,
@@ -24,15 +31,8 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import type { Eraser } from '../brushes/Eraser';
-import { cache } from '../cache';
-import { config } from '../config';
-import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
-import { ObjectEvents } from '../EventTypeDefs';
 import type { Group } from '../group.class';
-import { AnimatableObject } from '../mixins/object_animation.mixin';
-import { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import { AnimatableObject } from './AnimatableObject';
 
 export type TCachedFabricObject = FabricObject &
   Required<

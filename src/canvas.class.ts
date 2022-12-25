@@ -54,127 +54,115 @@ type TDestroyedCanvas = Omit<
   contextTop?: CanvasRenderingContext2D | null;
 };
 
+/**
+ * Canvas class
+ * @class Canvas
+ * @extends StaticCanvas
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
+ * @see {@link fabric.Canvas#initialize} for constructor definition
+ *
+ * @fires object:modified at the end of a transform or any change when statefull is true
+ * @fires object:rotating while an object is being rotated from the control
+ * @fires object:scaling while an object is being scaled by controls
+ * @fires object:moving while an object is being dragged
+ * @fires object:skewing while an object is being skewed from the controls
+ *
+ * @fires before:transform before a transform is is started
+ * @fires before:selection:cleared
+ * @fires selection:cleared
+ * @fires selection:updated
+ * @fires selection:created
+ *
+ * @fires interaction:completed after a drawing operation ends
+ * @fires erasing:start
+ * @fires erasing:end
+ *
+ * @fires mouse:down
+ * @fires mouse:move
+ * @fires mouse:up
+ * @fires mouse:down:before  on mouse down, before the inner fabric logic runs
+ * @fires mouse:move:before on mouse move, before the inner fabric logic runs
+ * @fires mouse:up:before on mouse up, before the inner fabric logic runs
+ * @fires mouse:over
+ * @fires mouse:out
+ * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
+ *
+ * @fires dragover
+ * @fires dragenter
+ * @fires dragleave
+ * @fires drag:enter object drag enter
+ * @fires drag:leave object drag leave
+ * @fires drop:before before drop event. Prepare for the drop event (same native event).
+ * @fires drop
+ * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
+ * @example
+ * let a: fabric.Object, b: fabric.Object;
+ * let flag = false;
+ * canvas.add(a, b);
+ * a.on('drop:before', opt => {
+ *  //  we want a to accept the drop even though it's below b in the stack
+ *  flag = this.canDrop(opt.e);
+ * });
+ * b.canDrop = function(e) {
+ *  !flag && this.callSuper('canDrop', e);
+ * }
+ * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
+ * a.on('drop', opt => {
+ *  opt.e.defaultPrevented  //  drop occured
+ *  opt.didDrop             //  drop occured on canvas
+ *  opt.target              //  drop target
+ *  opt.target !== a && a.set('text', 'I lost');
+ * });
+ * canvas.on('drop:after', opt => {
+ *  //  inform user who won
+ *  if(!opt.e.defaultPrevented) {
+ *    // no winners
+ *  }
+ *  else if(!opt.didDrop) {
+ *    //  my objects didn't win, some other lucky object
+ *  }
+ *  else {
+ *    //  we have a winner it's opt.target!!
+ *  }
+ * })
+ *
+ * @fires after:render at the end of the render process, receives the context in the callback
+ * @fires before:render at start the render process, receives the context in the callback
+ *
+ * @fires contextmenu:before
+ * @fires contextmenu
+ * @example
+ * let handler;
+ * targets.forEach(target => {
+ *   target.on('contextmenu:before', opt => {
+ *     //  decide which target should handle the event before canvas hijacks it
+ *     if (someCaseHappens && opt.targets.includes(target)) {
+ *       handler = target;
+ *     }
+ *   });
+ *   target.on('contextmenu', opt => {
+ *     //  do something fantastic
+ *   });
+ * });
+ * canvas.on('contextmenu', opt => {
+ *   if (!handler) {
+ *     //  no one takes responsibility, it's always left to me
+ *     //  let's show them how it's done!
+ *   }
+ * });
+ *
+ */
+export class Canvas<
+  EventSpec extends CanvasEvents = CanvasEvents
+> extends StaticCanvas<EventSpec> {
   /**
-   * Canvas class
-   * @class fabric.Canvas
-   * @extends fabric.StaticCanvas
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
-   * @see {@link fabric.Canvas#initialize} for constructor definition
-   *
-   * @fires object:modified at the end of a transform or any change when statefull is true
-   * @fires object:rotating while an object is being rotated from the control
-   * @fires object:scaling while an object is being scaled by controls
-   * @fires object:moving while an object is being dragged
-   * @fires object:skewing while an object is being skewed from the controls
-   *
-   * @fires before:transform before a transform is is started
-   * @fires before:selection:cleared
-   * @fires selection:cleared
-   * @fires selection:updated
-   * @fires selection:created
-   *
-   * @fires interaction:completed after a drawing operation ends
-   * @fires mouse:down
-   * @fires mouse:move
-   * @fires mouse:up
-   * @fires mouse:down:before  on mouse down, before the inner fabric logic runs
-   * @fires mouse:move:before on mouse move, before the inner fabric logic runs
-   * @fires mouse:up:before on mouse up, before the inner fabric logic runs
-   * @fires mouse:over
-   * @fires mouse:out
-   * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
-   *
-   * @fires dragover
-   * @fires dragenter
-   * @fires dragleave
-   * @fires drag:enter object drag enter
-   * @fires drag:leave object drag leave
-   * @fires drop:before before drop event. Prepare for the drop event (same native event).
-   * @fires drop
-   * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
-   * @example
-   * let a: fabric.Object, b: fabric.Object;
-   * let flag = false;
-   * canvas.add(a, b);
-   * a.on('drop:before', opt => {
-   *  //  we want a to accept the drop even though it's below b in the stack
-   *  flag = this.canDrop(opt.e);
-   * });
-   * b.canDrop = function(e) {
-   *  !flag && this.callSuper('canDrop', e);
-   * }
-   * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
-   * a.on('drop', opt => {
-   *  opt.e.defaultPrevented  //  drop occured
-   *  opt.didDrop             //  drop occured on canvas
-   *  opt.target              //  drop target
-   *  opt.target !== a && a.set('text', 'I lost');
-   * });
-   * canvas.on('drop:after', opt => {
-   *  //  inform user who won
-   *  if(!opt.e.defaultPrevented) {
-   *    // no winners
-   *  }
-   *  else if(!opt.didDrop) {
-   *    //  my objects didn't win, some other lucky object
-   *  }
-   *  else {
-   *    //  we have a winner it's opt.target!!
-   *  }
-   * })
-   *
-   * @fires after:render at the end of the render process, receives the context in the callback
-   * @fires before:render at start the render process, receives the context in the callback
-   *
-   * @fires contextmenu:before
-   * @fires contextmenu
-   * @example
-   * let handler;
-   * targets.forEach(target => {
-   *   target.on('contextmenu:before', opt => {
-   *     //  decide which target should handle the event before canvas hijacks it
-   *     if (someCaseHappens && opt.targets.includes(target)) {
-   *       handler = target;
-   *     }
-   *   });
-   *   target.on('contextmenu', opt => {
-   *     //  do something fantastic
-   *   });
-   * });
-   * canvas.on('contextmenu', opt => {
-   *   if (!handler) {
-   *     //  no one takes responsibility, it's always left to me
-   *     //  let's show them how it's done!
-   *   }
-   * });
-   *
+   * When true, objects can be transformed by one side (unproportionally)
+   * when dragged on the corners that normally would not do that.
+   * @type Boolean
+   * @default
+   * @since fabric 4.0 // changed name and default value
    */
-  fabric.Canvas = fabric.util.createClass(
-    fabric.StaticCanvas,
-    /** @lends fabric.Canvas.prototype */ {
-      /**
-       * Constructor
-       * @param {HTMLElement | String} el &lt;canvas> element to initialize instance on
-       * @param {Object} [options] Options object
-       * @return {Object} thisArg
-       */
-      initialize: function (el, options) {
-        options || (options = {});
-        this.renderAndResetBound = this.renderAndReset.bind(this);
-        this.requestRenderAllBound = this.requestRenderAll.bind(this);
-        this._initStatic(el, options);
-        this._initInteractive();
-        this._createCacheCanvas();
-      },
-
-      /**
-       * When true, objects can be transformed by one side (unproportionally)
-       * when dragged on the corners that normally would not do that.
-       * @type Boolean
-       * @default
-       * @since fabric 4.0 // changed name and default value
-       */
-      uniformScaling: true,
+  uniformScaling: boolean;
 
   /**
    * Indicates which key switches uniform scaling.
