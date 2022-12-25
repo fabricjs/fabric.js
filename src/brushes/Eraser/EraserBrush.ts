@@ -1,3 +1,4 @@
+import type { Canvas } from '../../canvas.class';
 import { Color } from '../../color';
 import { TEvent, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
@@ -7,7 +8,6 @@ import type { Path } from '../../shapes/path.class';
 import { createCanvasElement } from '../../util/misc/dom';
 import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
 import { isCollection } from '../../util/types';
-import type { Canvas } from '../../__types__';
 import { TBrushEventData } from '../base_brush.class';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
@@ -140,11 +140,7 @@ export class EraserBrush extends PencilBrush {
     this.setImageSmoothing(patternCtx);
     // retina
     if (this.canvas._isRetinaScaling()) {
-      this.canvas.__initRetinaScaling(
-        this.canvas.getRetinaScaling(),
-        canvas,
-        patternCtx
-      );
+      this.canvas.__initRetinaScaling(canvas, patternCtx);
     }
     // prepare tree
     const restorationContext: RestorationContext = {
@@ -156,9 +152,9 @@ export class EraserBrush extends PencilBrush {
       this.canvas,
       [
         ...objects,
-        ...[this.canvas.backgroundImage, this.canvas.overlayImage].filter(
+        ...([this.canvas.backgroundImage, this.canvas.overlayImage].filter(
           (d) => !!d
-        ),
+        ) as FabricObject[]),
       ],
       restorationContext
     );
@@ -209,7 +205,7 @@ export class EraserBrush extends PencilBrush {
    * @override prepare pattern, subscribe for updates and fire `erasing:start`
    */
   onMouseDown(pointer: Point, ev: TBrushEventData) {
-    if (this.canvas._isMainEvent(ev.e)) {
+    if (this.shouldHandleEvent(ev.e)) {
       //  prepare for erasing
       this.preparePattern();
       this.__disposer = this.canvas.on('after:render', () => {
@@ -336,7 +332,7 @@ export class EraserBrush extends PencilBrush {
       paths: new Map(),
     };
     return (
-      drawable &&
+      !!drawable &&
       drawable.erasable &&
       addPathToObjectEraser(drawable, path, dContext, (t) => {
         if (!drawableVpt) {
