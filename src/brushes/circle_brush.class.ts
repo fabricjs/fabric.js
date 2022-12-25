@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { Point } from '../point.class';
 import { Circle } from '../shapes/circle.class';
-import { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
 import { Canvas } from '../__types__';

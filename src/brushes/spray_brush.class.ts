@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { Group } from '../shapes/group.class';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
