@@ -12,12 +12,12 @@ export type BrushOptions = {
   color: string;
 
   /**
-   * Width of a brush, has to be a Number, no string literals
+   * Width of a brush, has to be a Number
    */
   width: number;
 
   /**
-   * Shadow object representing shadow of this shape.
+   * Shadow object
    */
   shadow: Shadow | null;
 
