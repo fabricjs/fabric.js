@@ -4,7 +4,7 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxis } from '../typedefs';
 import { Canvas } from '../__types__';
 import {
