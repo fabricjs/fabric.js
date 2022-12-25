@@ -1,8 +1,8 @@
 import { Color } from '../../color';
 import { TEvent, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
-import { FabricObject } from '../../shapes/fabricObject.class';
 import type { Group } from '../../shapes/group.class';
+import { FabricObject } from '../../shapes/Object/FabricObject';
 import type { Path } from '../../shapes/path.class';
 import { createCanvasElement } from '../../util/misc/dom';
 import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
@@ -12,7 +12,7 @@ import { TBrushEventData } from '../base_brush.class';
 import { PencilBrush } from '../pencil_brush.class';
 import type { Eraser } from './Eraser';
 import { ErasingEventContext, ErasingEventContextData } from './types';
-import { addPathToObjectEraser, isObjectErasable } from './util';
+import { addPathToObjectEraser } from './util';
 
 type RestorationContext = {
   visibility: [FabricObject, number][];
