@@ -1823,7 +1823,7 @@ export class Text<
     const originalStrokeWidth = options.strokeWidth;
     options.strokeWidth = 0;
 
-    const text = new Text(textContent, options),
+    const text = new this(textContent, options),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1858,14 +1858,11 @@ export class Text<
 
   /**
    * Returns Text instance from an object representation
-   * @static
-   * @memberOf Text
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
   static fromObject(object: Record<string, any>): Promise<Text> {
-    return FabricObject._fromObject(
-      Text,
+    return this._fromObject(
       {
         ...object,
         styles: stylesFromArray(object.styles, object.text),
