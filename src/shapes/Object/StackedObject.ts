@@ -68,7 +68,9 @@ export class StackedObject<
     let parent = this.group || (strict ? undefined : this.canvas);
     while (parent) {
       ancestors.push(parent);
-      parent = (parent as Group).group || (strict ? undefined : (parent as Group).canvas);
+      parent =
+        (parent as Group).group ||
+        (strict ? undefined : (parent as Group).canvas);
     }
     return ancestors as Ancestors<T>;
   }

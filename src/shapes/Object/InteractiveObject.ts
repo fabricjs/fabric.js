@@ -132,7 +132,8 @@ export class InteractiveFabricObject<
     if (
       !this.hasControls ||
       !this.canvas ||
-      ((this.canvas as Canvas)._activeObject as InteractiveFabricObject) !== this
+      ((this.canvas as Canvas)._activeObject as InteractiveFabricObject) !==
+        this
     ) {
       return 0;
     }
@@ -299,7 +300,8 @@ export class InteractiveFabricObject<
     if (
       !this.selectionBackgroundColor ||
       (this.canvas && !this.canvas.interactive) ||
-      (this.canvas && (this.canvas._activeObject as InteractiveFabricObject) !== this)
+      (this.canvas &&
+        (this.canvas._activeObject as InteractiveFabricObject) !== this)
     ) {
       return;
     }
