@@ -1,7 +1,7 @@
 # Changelog
 
 ## [next]
-
+- chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
 - chore(TS): Convert Canvas class #8510
 - chore(TS): Move object classes #8511
 - chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
