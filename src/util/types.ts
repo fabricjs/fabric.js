@@ -24,19 +24,19 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
 };
 
 export const isCollection = (
-  fabricObject: FabricObject | null
+  fabricObject?: FabricObject
 ): fabricObject is Group | ActiveSelection => {
   return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
 
 export const isActiveSelection = (
-  fabricObject: FabricObject | null
+  fabricObject?: FabricObject
 ): fabricObject is ActiveSelection => {
   return !!fabricObject && fabricObject.type === 'activeSelection';
 };
 
 export const isTextObject = (
-  fabricObject: FabricObject
+  fabricObject?: FabricObject
 ): fabricObject is Text => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
@@ -44,7 +44,7 @@ export const isTextObject = (
 };
 
 export const isInteractiveTextObject = (
-  fabricObject: FabricObject | null
+  fabricObject?: FabricObject
 ): fabricObject is IText | Textbox => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
@@ -58,7 +58,7 @@ export const isFabricObjectCached = (
 };
 
 export const isFabricObjectWithDragSupport = (
-  fabricObject: FabricObject | null
+  fabricObject?: FabricObject
 ): fabricObject is FabricObjectWithDragSupport => {
   return (
     !!fabricObject &&

@@ -101,7 +101,8 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modified'
 
 type ObjectModifiedEvents = Record<TModificationEvents, BasicTransformEvent> & {
   modified: BasicTransformEvent | never;
@@ -116,7 +117,7 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
   TEvent<E> & {
     target?: FabricObject;
     subTargets?: FabricObject[];
-    button: number;
+    button?: number;
     isClick: boolean;
     pointer: Point;
     transform?: Transform | null;

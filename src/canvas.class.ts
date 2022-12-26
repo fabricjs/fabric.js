@@ -494,7 +494,7 @@ export class SelectableCanvas<
   cacheCanvasEl: HTMLCanvasElement;
   protected _isCurrentlyDrawing: boolean;
   freeDrawingBrush?: BaseBrush;
-  _activeObject: FabricObject | null;
+  _activeObject?: FabricObject;
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[];
   /**
@@ -1337,7 +1337,7 @@ export class SelectableCanvas<
    * Returns currently active object
    * @return {FabricObject | null} active object
    */
-  getActiveObject(): FabricObject | null {
+  getActiveObject(): FabricObject | undefined {
     return this._activeObject;
   }
 
@@ -1474,7 +1474,7 @@ export class SelectableCanvas<
         // @ts-ignore
         this.endCurrentTransform(e);
       }
-      this._activeObject = null;
+      this._activeObject = undefined;
     }
     return true;
   }

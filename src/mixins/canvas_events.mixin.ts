@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
 import { SelectableCanvas } from '../canvas.class';
@@ -9,6 +8,7 @@ import {
   TPointerEventInfo,
   Transform,
   TModificationEvents,
+  BasicTransformEvent,
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import {
@@ -152,23 +152,17 @@ export class Canvas extends SelectableCanvas {
     if (!this.enablePointerEvents) {
       functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
-    // @ts-ignore
-    if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
-      // @ts-ignore
-      eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
-      // @ts-ignore
-      eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
-      // @ts-ignore
-      eventjs[eventjsFunctor](
-        canvasElement,
-        'orientation',
-        this._onOrientationChange
-      );
-      // @ts-ignore
-      eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
-      // @ts-ignore
-      eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
-    }
+    // if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
+    //   eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
+    //   eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
+    //   eventjs[eventjsFunctor](
+    //     canvasElement,
+    //     'orientation',
+    //     this._onOrientationChange
+    //   );
+    //   eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
+    //   eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
+    // }
   }
 
   /**
@@ -218,11 +212,11 @@ export class Canvas extends SelectableCanvas {
       '_onMouseUp',
       '_onTouchEnd',
       '_onResize',
-      '_onGesture',
-      '_onDrag',
-      '_onShake',
-      '_onLongPress',
-      '_onOrientationChange',
+      // '_onGesture',
+      // '_onDrag',
+      // '_onShake',
+      // '_onLongPress',
+      // '_onOrientationChange',
       '_onMouseWheel',
       '_onMouseOut',
       '_onMouseEnter',
@@ -244,24 +238,6 @@ export class Canvas extends SelectableCanvas {
 
   /**
    * @private
-   * @param {Event} [e] Event object fired on Event.js gesture
-   * @param {Event} [self] Inner Event object
-   */
-  private _onGesture(e, self) {
-    this.__onTransformGesture && this.__onTransformGesture(e, self);
-  }
-
-  /**
-   * @private
-   * @param {Event} [e] Event object fired on Event.js drag
-   * @param {Event} [self] Inner Event object
-   */
-  private _onDrag(e, self) {
-    this.__onDrag && this.__onDrag(e, self);
-  }
-
-  /**
-   * @private
    * @param {Event} [e] Event object fired on wheel event
    */
   private _onMouseWheel(e: MouseEvent) {
@@ -276,10 +252,12 @@ export class Canvas extends SelectableCanvas {
     const target = this._hoveredTarget;
     this.fire('mouse:out', { target: target, e: e });
     this._hoveredTarget = undefined;
+    // @ts-ignore
     target && target.fire('mouseout', { e });
 
     this._hoveredTargets.forEach((nestedTarget) => {
       this.fire('mouse:out', { target: nestedTarget, e });
+      // @ts-ignore
       nestedTarget && nestedTarget.fire('mouseout', { e });
     });
     this._hoveredTargets = [];
@@ -304,33 +282,6 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * @private
-   * @param {Event} [e] Event object fired on Event.js orientation change
-   * @param {Event} [self] Inner Event object
-   */
-  private _onOrientationChange(e, self) {
-    this.__onOrientationChange && this.__onOrientationChange(e, self);
-  }
-
-  /**
-   * @private
-   * @param {Event} [e] Event object fired on Event.js shake
-   * @param {Event} [self] Inner Event object
-   */
-  private _onShake(e, self) {
-    this.__onShake && this.__onShake(e, self);
-  }
-
-  /**
-   * @private
-   * @param {Event} [e] Event object fired on Event.js shake
-   * @param {Event} [self] Inner Event object
-   */
-  private _onLongPress(e, self) {
-    this.__onLongPress && this.__onLongPress(e, self);
-  }
-
-  /**
    * supports native like text dragging
    * @private
    * @param {DragEvent} e
@@ -345,7 +296,7 @@ export class Canvas extends SelectableCanvas {
       const options = { e, target: activeObject };
       this.fire('dragstart', options);
       activeObject.fire('dragstart', options);
-      addListener(this.upperCanvasEl, 'drag', this._onDragProgress);
+      addListener(this.upperCanvasEl, 'drag', this._onDragProgress as EventListener);
       return;
     }
     stopEvent(e);
@@ -432,7 +383,7 @@ export class Canvas extends SelectableCanvas {
       targets = this.targets,
       options = {
         e: e,
-        target: target ?? undefined,
+        target,
         subTargets: targets,
         dragSource: this._dragSource as FabricObject,
         canDrop: false,
@@ -998,7 +949,7 @@ export class Canvas extends SelectableCanvas {
       // @ts-ignore
       (this.stateful && target.hasStateChanged())
     ) {
-      this._fire('modified', options);
+      fireEvent('modified', options as unknown as BasicTransformEvent<PointerEvent>);
     }
   }
 
@@ -1101,14 +1052,21 @@ export class Canvas extends SelectableCanvas {
     if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
     } else if (shouldGroup) {
-      this._handleGrouping(e, target);
-      target = this._activeObject ?? undefined;
+      // in order for shouldGroup to be true, target needs to be true
+      this._handleGrouping(e, target!);
+      target = this._activeObject;
     }
-
+    // we start a group selector rectangle if
+    // selection is enabled
+    // and there is no target, or the following 3 condition both apply
+    // target is not selectable ( otherwise we selected it )
+    // target is not editing
+    // target is not already selected ( otherwise we drage )
     if (
       this.selection &&
       (!target ||
         (!target.selectable &&
+          // @ts-ignore
           !target.isEditing &&
           target !== this._activeObject))
     ) {
@@ -1408,13 +1366,6 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * @private
-   */
-  _fire(eventName: TModificationEvents, options: Record<string, any>) {
-    return fireEvent(eventName, options);
-  }
-
-  /**
    * Sets the cursor depending on where the canvas is being hovered.
    * Note: very buggy in Opera
    * @param {Event} e Event object
@@ -1464,7 +1415,7 @@ export class Canvas extends SelectableCanvas {
    * @param {FabricObject} target
    * @return {Boolean}
    */
-  _shouldGroup(e: TPointerEvent, target: FabricObject): boolean {
+  _shouldGroup(e: TPointerEvent, target?: FabricObject): boolean {
     const activeObject = this._activeObject;
     // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
     return (
@@ -1649,6 +1600,8 @@ export class Canvas extends SelectableCanvas {
 }
 
 // there is an order execution bug if i put this as public property.
-Canvas.prototype.eventsBound = false;
+Object.assign(Canvas.prototype, {
+  eventsBound: false,
+});
 
 fabric.Canvas = Canvas;
