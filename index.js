@@ -10,7 +10,7 @@ import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
 import './src/static_canvas.class';
-import './src/canvas.class'; // optional interaction
+// import './src/canvas.class'; // optional interaction
 import './src/mixins/canvas_events.mixin'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optional serialization
