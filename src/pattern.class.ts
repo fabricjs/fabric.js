@@ -203,7 +203,7 @@ export class Pattern {
       ...options,
       crossOrigin: serialized.crossOrigin,
     });
-    return new Pattern({ ...serialized, source: img });
+    return new this({ ...serialized, source: img });
   }
 }
 
