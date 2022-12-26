@@ -11,36 +11,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
-export function polyFromElement<
-  T extends {
-    new (points: IPoint[], options: any): any;
-    ATTRIBUTE_NAMES: string[];
-  }
->(
-  klass: T,
-  element: SVGElement,
-  callback: (poly: InstanceType<T> | null) => any,
-  options = {}
-) {
-  if (!element) {
-    return callback(null);
-  }
-  const points = parsePointsAttribute(element.getAttribute('points')),
-    // we omit left and top to instruct the constructor to position the object using the bbox
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { left, top, ...parsedAttributes } = parseAttributes(
-      element,
-      klass.ATTRIBUTE_NAMES
-    );
-  callback(
-    new klass(points || [], {
-      ...parsedAttributes,
-      ...options,
-      fromSVG: true,
-    })
-  );
-}
-
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -305,7 +275,23 @@ export class Polyline extends FabricObject {
     callback: (poly: Polyline | null) => any,
     options?: any
   ) {
-    return polyFromElement(Polyline, element, callback, options);
+    if (!element) {
+      return callback(null);
+    }
+    const points = parsePointsAttribute(element.getAttribute('points')),
+      // we omit left and top to instruct the constructor to position the object using the bbox
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      { left, top, ...parsedAttributes } = parseAttributes(
+        element,
+        this.ATTRIBUTE_NAMES
+      );
+    callback(
+      new this(points || [], {
+        ...parsedAttributes,
+        ...options,
+        fromSVG: true,
+      })
+    );
   }
 
   /* _FROM_SVG_END_ */
@@ -317,8 +303,8 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: Record<string, unknown>): Promise<Polyline> {
-    return FabricObject._fromObject(Polyline, object, {
+  static fromObject(object: Record<string, unknown>) {
+    return this._fromObject(object, {
       extraParam: 'points',
     });
   }

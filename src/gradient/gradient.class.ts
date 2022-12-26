@@ -368,7 +368,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
-    return new Gradient({
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {

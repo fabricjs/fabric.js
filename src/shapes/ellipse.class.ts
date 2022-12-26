@@ -131,25 +131,14 @@ export class Ellipse extends FabricObject {
     element: SVGElement,
     callback: (ellipse: Ellipse) => void
   ) {
-    const parsedAttributes = parseAttributes(element, Ellipse.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    callback(new Ellipse(parsedAttributes));
+    callback(new this(parsedAttributes));
   }
 
   /* _FROM_SVG_END_ */
-
-  /**
-   * Returns {@link Ellipse} instance from an object representation
-   * @static
-   * @memberOf Ellipse
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Ellipse>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Ellipse, object);
-  }
 }
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {

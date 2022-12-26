@@ -1065,7 +1065,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new Group(objects, { ...options, ...hydratedOptions }, true)
+        new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
 }

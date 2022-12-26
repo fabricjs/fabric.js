@@ -2,9 +2,7 @@
 
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { stylesFromArray } from '../util/misc/textStyles';
 import { IText } from './itext.class';
-import { FabricObject } from './Object/FabricObject';
 import { textDefaultValues } from './text.class';
 
 /**
@@ -457,26 +455,6 @@ export class Textbox extends IText {
   toObject(propertiesToInclude: Array<any>): object {
     return super.toObject(
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
-    );
-  }
-
-  /**
-   * Returns Textbox instance from an object representation
-   * @static
-   * @memberOf Textbox
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Textbox>}
-   */
-  static fromObject(object: object): Promise<Textbox> {
-    return FabricObject._fromObject(
-      Textbox,
-      {
-        ...object,
-        styles: stylesFromArray(object.styles, object.text),
-      },
-      {
-        extraParam: 'text',
-      }
     );
   }
 }
