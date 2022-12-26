@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
 - chore(): use context in static constructors [#8522](https://github.com/fabricjs/fabric.js/issues/8522)
 - chore(TS): Convert Canvas class #8510
