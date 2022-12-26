@@ -70,7 +70,7 @@ export class Canvas extends SelectableCanvas {
    * @type Boolean
    * @private
    */
-  private eventsBound = false;
+  private eventsBound: boolean;
 
   /**
    * Holds a reference to a setTimeout timer for event syncronization
@@ -1093,7 +1093,7 @@ export class Canvas extends SelectableCanvas {
       return;
     }
 
-    const pointer = this.getPointer(e);
+    const pointer = this.getPointer(e, true);
     // save pointer for check in __onMouseUp event
     this._previousPointer = pointer;
     const shouldRender = this._shouldRender(target),
@@ -1112,7 +1112,7 @@ export class Canvas extends SelectableCanvas {
           !target.isEditing &&
           target !== this._activeObject))
     ) {
-      const p = this.getPointer(e, true);
+      const p = this.getPointer(e);
       this._groupSelector = {
         ex: p.x,
         ey: p.y,
@@ -1214,7 +1214,7 @@ export class Canvas extends SelectableCanvas {
 
     // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
-      const pointer = this.getPointer(e, true);
+      const pointer = this.getPointer(e);
 
       groupSelector.left = pointer.x - groupSelector.ex;
       groupSelector.top = pointer.y - groupSelector.ey;
@@ -1647,5 +1647,8 @@ export class Canvas extends SelectableCanvas {
     this._groupSelector = null;
   }
 }
+
+// there is an order execution bug if i put this as public property.
+Canvas.prototype.eventsBound = false;
 
 fabric.Canvas = Canvas;
