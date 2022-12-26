@@ -1,9 +1,8 @@
 import { fabric } from '../../HEADER';
 import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
-import { enlivenObjects } from '../util/misc/objectEnlive';
-import { FabricObject } from './Object/FabricObject';
 import { Group, groupDefaultValues } from './group.class';
+import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
   constructor(
@@ -143,19 +142,6 @@ export class ActiveSelection extends Group {
       this._objects[i]._renderControls(ctx, options);
     }
     ctx.restore();
-  }
-
-  /**
-   * Returns {@link ActiveSelection} instance from an object representation
-   * @static
-   * @memberOf ActiveSelection
-   * @param {Object} object Object to create a group from
-   * @returns {Promise<ActiveSelection>}
-   */
-  static fromObject({ objects = [], ...options }) {
-    return enlivenObjects(objects).then(
-      (enlivenedObjects) => new ActiveSelection(enlivenedObjects, options, true)
-    );
   }
 }
 

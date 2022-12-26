@@ -142,17 +142,6 @@ export class Rect extends FabricObject {
     'height',
   ];
 
-  /**
-   * Returns {@link Rect} instance from an object representation
-   * @static
-   * @memberOf Rect
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Rect>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Rect, object);
-  }
-
   /* _FROM_SVG_START_ */
 
   /**
@@ -178,9 +167,9 @@ export class Rect extends FabricObject {
       height = 0,
       visible = true,
       ...restOfparsedAttributes
-    } = parseAttributes(element, Rect.ATTRIBUTE_NAMES);
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
-    const rect = new Rect({
+    const rect = new this({
       ...options,
       ...restOfparsedAttributes,
       left,
