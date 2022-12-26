@@ -39,7 +39,7 @@ import { TSVGReviver } from './mixins/object.svg_export';
 import { sendPointToPlane } from './util/misc/planeChange';
 
 type TDestroyedCanvas = Omit<
-  Canvas<CanvasEvents>,
+  SelectableCanvas<CanvasEvents>,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
@@ -150,7 +150,7 @@ type TDestroyedCanvas = Omit<
  * });
  *
  */
-export class Canvas<
+export class SelectableCanvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
   /**
@@ -1641,7 +1641,7 @@ export class Canvas<
   }
 }
 
-Object.assign(Canvas.prototype, {
+Object.assign(SelectableCanvas.prototype, {
   uniformScaling: true,
   uniScaleKey: 'shiftKey',
   centeredScaling: false,
@@ -1671,5 +1671,3 @@ Object.assign(Canvas.prototype, {
   fireMiddleClick: false,
   enablePointerEvents: false,
 });
-
-fabric.Canvas = Canvas;

@@ -12,6 +12,7 @@ import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import { Canvas } from '../../mixins/canvas_events.mixin';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -100,6 +101,8 @@ export class InteractiveFabricObject<
    */
   _scaling?: boolean;
 
+  declare canvas?: Canvas;
+
   /**
    * Constructor
    * @param {Object} [options] Options object
@@ -129,7 +132,7 @@ export class InteractiveFabricObject<
     if (
       !this.hasControls ||
       !this.canvas ||
-      this.canvas._activeObject !== this
+      ((this.canvas as Canvas)._activeObject as InteractiveFabricObject) !== this
     ) {
       return 0;
     }
@@ -296,7 +299,7 @@ export class InteractiveFabricObject<
     if (
       !this.selectionBackgroundColor ||
       (this.canvas && !this.canvas.interactive) ||
-      (this.canvas && this.canvas._activeObject !== this)
+      (this.canvas && (this.canvas._activeObject as InteractiveFabricObject) !== this)
     ) {
       return;
     }

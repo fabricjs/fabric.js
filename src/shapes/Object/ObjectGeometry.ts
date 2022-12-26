@@ -21,7 +21,8 @@ import {
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { sin } from '../../util/misc/sin';
-import { Canvas, StaticCanvas } from '../../__types__';
+import type { Canvas } from '../../mixins/canvas_events.mixin';
+import type { StaticCanvas } from '../../static_canvas.class';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
 

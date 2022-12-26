@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
-import { Canvas } from '../canvas.class';
+import { SelectableCanvas } from '../canvas.class';
 import { fabric } from '../../HEADER';
 import {
   TPointerEvent,
@@ -46,7 +46,7 @@ type TSyntheticEventConfig = {
   canvasEvtIn?: 'mouse:over' | 'drag:enter';
 };
 
-export class EventedCanvas extends Canvas {
+export class Canvas extends SelectableCanvas {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -1615,3 +1615,5 @@ export class EventedCanvas extends Canvas {
     this._groupSelector = null;
   }
 }
+
+fabric.Canvas = Canvas;

@@ -4,7 +4,7 @@ import { Group } from '../shapes/group.class';
 import { Shadow } from '../shadow.class';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../mixins/canvas_events.mixin';
 import { BaseBrush } from './base_brush.class';
 
 export type SprayBrushPoint = {

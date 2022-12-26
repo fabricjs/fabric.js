@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../mixins/canvas_events.mixin';
 import { PencilBrush } from './pencil_brush.class';
 
 export class PatternBrush extends PencilBrush {

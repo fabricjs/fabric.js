@@ -6,12 +6,12 @@ import {
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TAxisKey } from '../typedefs';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../mixins/canvas_events.mixin';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 
 function isAltAction(eventData: TPointerEvent, target: FabricObject) {
-  return eventData[(target.canvas as Canvas)?.altActionKey];
+  return eventData[(target.canvas! as Canvas).altActionKey!];
 }
 
 /**
