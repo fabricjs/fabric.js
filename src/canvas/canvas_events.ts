@@ -1,13 +1,12 @@
 import { stopEvent } from '../util/dom_event';
 import { fireEvent } from '../util/fireEvent';
-import { SelectableCanvas } from '../canvas.class';
+import { SelectableCanvas } from './canvas.class';
 import { fabric } from '../../HEADER';
 import {
   TPointerEvent,
   TPointerEventsSuffixes,
   TPointerEventInfo,
   Transform,
-  TModificationEvents,
   BasicTransformEvent,
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';

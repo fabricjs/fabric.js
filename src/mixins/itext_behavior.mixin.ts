@@ -9,7 +9,7 @@ import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
-import type { Canvas } from '../mixins/canvas_events.mixin';
+import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages

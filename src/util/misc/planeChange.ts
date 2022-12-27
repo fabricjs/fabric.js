@@ -2,7 +2,7 @@ import { iMatrix } from '../../constants';
 import type { Point } from '../../point.class';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TMat2D } from '../../typedefs';
-import type { StaticCanvas } from '../../static_canvas.class';
+import type { StaticCanvas } from '../../canvas/static_canvas.class';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 

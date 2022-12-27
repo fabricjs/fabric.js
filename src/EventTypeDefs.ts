@@ -4,9 +4,9 @@ import type { FabricObject } from './shapes/Object/FabricObject';
 import type { Group } from './shapes/group.class';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
-import type { Canvas } from './mixins/canvas_events.mixin';
+import type { Canvas } from './canvas/canvas_events';
 import type { IText } from './shapes/itext.class';
-import type { StaticCanvas } from './static_canvas.class';
+import type { StaticCanvas } from './canvas/static_canvas.class';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,

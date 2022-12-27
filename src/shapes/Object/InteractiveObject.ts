@@ -12,7 +12,7 @@ import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
-import { Canvas } from '../../mixins/canvas_events.mixin';
+import { Canvas } from '../../canvas/canvas_events';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;

@@ -1,43 +1,43 @@
 // @ts-nocheck
-import { fabric } from '../HEADER';
-import { config } from './config';
-import { iMatrix, VERSION } from './constants';
-import type { StaticCanvasEvents } from './EventTypeDefs';
-import { Gradient } from './gradient';
-import { createCollectionMixin } from './mixins/collection.mixin';
-import { TSVGReviver } from './mixins/object.svg_export';
-import { CommonMethods } from './mixins/shared_methods.mixin';
-import { Pattern } from './pattern.class';
-import { Point } from './point.class';
-import type { FabricObject } from './shapes/Object/FabricObject';
-import { TCachedFabricObject } from './shapes/Object/Object';
-import { Rect } from './shapes/rect.class';
+import { fabric } from '../../HEADER';
+import { config } from '../config';
+import { iMatrix, VERSION } from '../constants';
+import type { StaticCanvasEvents } from '../EventTypeDefs';
+import { Gradient } from '../gradient';
+import { createCollectionMixin } from '../mixins/collection.mixin';
+import { TSVGReviver } from '../mixins/object.svg_export';
+import { CommonMethods } from '../mixins/shared_methods.mixin';
+import { Pattern } from '../pattern.class';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TCachedFabricObject } from '../shapes/Object/Object';
+import { Rect } from '../shapes/rect.class';
 import type {
   TCornerPoint,
   TFiller,
   TMat2D,
   TSize,
   TValidToObjectMethod,
-} from './typedefs';
-import { cancelAnimFrame, requestAnimFrame } from './util/animate';
+} from '../typedefs';
+import { cancelAnimFrame, requestAnimFrame } from '../util/animate';
 import {
   cleanUpJsdomNode,
   getElementOffset,
   getNodeCanvas,
-} from './util/dom_misc';
-import { removeFromArray } from './util/internals';
-import { uid } from './util/internals/uid';
-import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
-import { invertTransform, transformPoint } from './util/misc/matrix';
-import { pick } from './util/misc/pick';
-import { matrixToSVG } from './util/misc/svgParsing';
-import { toFixed } from './util/misc/toFixed';
+} from '../util/dom_misc';
+import { removeFromArray } from '../util/internals';
+import { uid } from '../util/internals/uid';
+import { createCanvasElement, isHTMLCanvas } from '../util/misc/dom';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { pick } from '../util/misc/pick';
+import { matrixToSVG } from '../util/misc/svgParsing';
+import { toFixed } from '../util/misc/toFixed';
 import {
   isActiveSelection,
   isCollection,
   isFiller,
   isTextObject,
-} from './util/types';
+} from '../util/types';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 

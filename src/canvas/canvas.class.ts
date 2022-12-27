@@ -1,42 +1,42 @@
-import { fabric } from '../HEADER';
-import { dragHandler, getActionFromCorner } from './controls/actions';
-import { Point } from './point.class';
-import { FabricObject } from './shapes/Object/FabricObject';
+import { fabric } from '../../HEADER';
+import { dragHandler, getActionFromCorner } from '../controls/actions';
+import { Point } from '../point.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
   TOptionalModifierKey,
   TPointerEvent,
   Transform,
-} from './EventTypeDefs';
+} from '../EventTypeDefs';
 import {
   addTransformToObject,
   saveObjectTransform,
-} from './util/misc/objectTransforms';
+} from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
   isInteractiveTextObject,
-} from './util/types';
-import { invertTransform, transformPoint } from './util/misc/matrix';
-import { isTransparent } from './util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from './typedefs';
-import { degreesToRadians } from './util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from './util/dom_event';
-import type { IText } from './shapes/itext.class';
+} from '../util/types';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isTransparent } from '../util/misc/isTransparent';
+import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { getPointer, isTouchEvent } from '../util/dom_event';
+import type { IText } from '../shapes/itext.class';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   wrapElement,
-} from './util/dom_misc';
-import { setStyle } from './util/dom_style';
-import type { BaseBrush } from './brushes/base_brush.class';
-import type { Textbox } from './shapes/textbox.class';
-import { pick } from './util/misc/pick';
-import { TSVGReviver } from './mixins/object.svg_export';
-import { sendPointToPlane } from './util/misc/planeChange';
+} from '../util/dom_misc';
+import { setStyle } from '../util/dom_style';
+import type { BaseBrush } from '../brushes/base_brush.class';
+import type { Textbox } from '../shapes/textbox.class';
+import { pick } from '../util/misc/pick';
+import { TSVGReviver } from '../mixins/object.svg_export';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,

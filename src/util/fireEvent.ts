@@ -1,5 +1,5 @@
 import { TModificationEvents, BasicTransformEvent } from '../EventTypeDefs';
-import type { Canvas } from '../mixins/canvas_events.mixin';
+import type { Canvas } from '../canvas/canvas_events';
 
 export const fireEvent = (
   eventName: TModificationEvents,

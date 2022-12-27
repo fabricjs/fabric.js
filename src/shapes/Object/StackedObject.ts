@@ -1,8 +1,8 @@
 import { fabric } from '../../../HEADER';
 import { ObjectEvents } from '../../EventTypeDefs';
 import type { Group } from '../group.class';
-import type { Canvas } from '../../mixins/canvas_events.mixin';
-import type { StaticCanvas } from '../../static_canvas.class';
+import type { Canvas } from '../../canvas/canvas_events';
+import type { StaticCanvas } from '../../canvas/static_canvas.class';
 import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
