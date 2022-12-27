@@ -71,7 +71,6 @@ import {
   getBoundsOfCurve,
   getPointOnPath,
   transformPath,
-  getRegularPolygonPath,
 } from '../path';
 import { setStyle } from '../dom_style';
 import { request } from '../dom_request';
@@ -172,7 +171,6 @@ fabric.util = {
   getBoundsOfCurve,
   getPointOnPath,
   transformPath,
-  getRegularPolygonPath,
   request,
   setStyle,
   isTouchEvent,
