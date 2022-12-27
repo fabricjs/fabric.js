@@ -1,7 +1,7 @@
 import { fabric } from '../../../HEADER';
-import type { FabricObject } from '../../shapes/fabricObject.class';
-import { Canvas } from '../../__types__';
-import { AnimationBase } from './AnimationBase';
+import type { Canvas } from '../../canvas.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
+import type { AnimationBase } from './AnimationBase';
 
 /**
  * Array holding all running animations
