@@ -401,6 +401,16 @@
     assert.equal(oColor.getAlpha(), 1);
   });
 
+  QUnit.test('from Color instance', function(assert) {
+    var oColor = new fabric.Color(new fabric.Color([255,255,255]));
+
+    assert.ok(oColor);
+    assert.ok(oColor instanceof fabric.Color);
+    assert.equal(oColor.toRgba(), 'rgba(255,255,255,1)');
+    assert.equal(oColor.toHex(), 'FFFFFF');
+    assert.equal(oColor.getAlpha(), 1);
+  });
+
   QUnit.test('overlayWith', function(assert) {
     var oColor = new fabric.Color('FF0000');
     assert.ok(typeof oColor.overlayWith === 'function');
