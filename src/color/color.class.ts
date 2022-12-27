@@ -17,7 +17,7 @@ export type TRGBAColorSource = [
   alpha: number
 ];
 
-export type TColorArg = string | TRGBColorSource | TRGBAColorSource;
+export type TColorArg = string | TRGBColorSource | TRGBAColorSource | Color;
 
 /**
  * @class Color common color operations
@@ -34,6 +34,8 @@ export class Color {
     if (!color) {
       // we default to black as canvas does
       this.setSource([0, 0, 0, 1]);
+    } else if (color instanceof Color) {
+      this.setSource([...color._source]);
     } else if (Array.isArray(color)) {
       const [r, g, b, a = 1] = color;
       this.setSource([r, g, b, a]);
