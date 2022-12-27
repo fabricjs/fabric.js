@@ -190,7 +190,10 @@ export class Polyline extends FabricObject {
   toObject(propertiesToInclude?: (keyof this)[]): object {
     return {
       ...super.toObject(propertiesToInclude),
-      points: this.points.concat(),
+      points: this.points.map(({ x, y }) => ({
+        x: toFixed(x, config.NUM_FRACTION_DIGITS),
+        y: toFixed(y, config.NUM_FRACTION_DIGITS),
+      })),
     };
   }
 
