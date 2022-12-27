@@ -33,10 +33,10 @@ import { toFixed } from './toFixed';
 import {
   matrixToSVG,
   parsePreserveAspectRatioAttribute,
-  groupSVGElements,
   parseUnit,
   getSvgAttributes,
 } from './svgParsing';
+import { groupSVGElements } from './groupSVGElements';
 import { findScaleToFit, findScaleToCover } from './findScaleTo';
 import { capValue } from './capValue';
 import {

@@ -3,8 +3,19 @@ import { fabric } from '../../HEADER';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
-import { TextStyle, TextStyleMixin } from '../mixins/text_style.mixin';
-import { TClassProperties, TFiller, TCacheCanvasDimensions } from '../typedefs';
+import {
+  TextStyle,
+  TextStyleDeclaration,
+  TextStyleMixin,
+} from '../mixins/text_style.mixin';
+import { SHARED_ATTRIBUTES } from '../parser/attributes';
+import { parseAttributes } from '../parser/parseAttributes';
+import type { Point } from '../point.class';
+import type {
+  TCacheCanvasDimensions,
+  TClassProperties,
+  TFiller,
+} from '../typedefs';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -13,21 +24,41 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { Path } from './path.class';
+
+let measuringContext: CanvasRenderingContext2D | null;
+
+/**
+ * Return a context for measurement of text string.
+ * if created it gets stored for reuse
+ */
+function getMeasuringContext() {
+  if (!measuringContext) {
+    measuringContext = createCanvasElement().getContext('2d');
+  }
+  return measuringContext;
+}
 
 /**
  * Measure and return the info of a single grapheme.
  * needs the the info of previous graphemes already filled
  * Override to customize measuring
  */
-export type GraphemeBBox = {
+export type GraphemeBBox<onPath = false> = {
   width: number;
   height: number;
   kernedWidth: number;
   left: number;
   deltaY: number;
-};
+} & (onPath extends true
+  ? {
+      // on path
+      renderLeft: number;
+      renderTop: number;
+      angle: number;
+    }
+  : Record<string, never>);
 
 const additionalProps = [
   'fontFamily',
@@ -48,7 +79,7 @@ const additionalProps = [
   'pathStartOffset',
   'pathSide',
   'pathAlign',
-];
+] as const;
 
 /**
  * Text class
@@ -66,7 +97,7 @@ export class Text<
    * @type Array
    * @private
    */
-  _dimensionAffectingProps: Partial<TClassProperties<this>>[];
+  _dimensionAffectingProps: (keyof this)[];
 
   /**
    * @private
@@ -199,22 +230,24 @@ export class Text<
    */
   textBackgroundColor: string;
 
+  protected _styleProperties: string[];
+
   styles: TextStyle;
 
   /**
-   * fabric.Path that the text should follow.
+   * Path that the text should follow.
    * since 4.6.0 the path will be drawn automatically.
    * if you want to make the path visible, give it a stroke and strokeWidth or fill value
    * if you want it to be hidden, assign visible = false to the path.
    * This feature is in BETA, and SVG import/export is not yet supported.
-   * @type fabric.Path
+   * @type Path
    * @example
-   * var textPath = new Text('Text on a path', {
+   * const textPath = new Text('Text on a path', {
    *     top: 150,
    *     left: 150,
    *     textAlign: 'center',
    *     charSpacing: -50,
-   *     path: new fabric.Path('M 0 0 C 50 -100 150 -100 200 0', {
+   *     path: new Path('M 0 0 C 50 -100 150 -100 200 0', {
    *         strokeWidth: 1,
    *         visible: false
    *     }),
@@ -223,7 +256,7 @@ export class Text<
    * });
    * @default
    */
-  path: FabricObject /* todo fabric.Path*/;
+  path: Path;
 
   /**
    * Offset amount for text path starting position
@@ -277,16 +310,6 @@ export class Text<
   charSpacing: number;
 
   /**
-   * Reference to a context to measure text char or couple of chars
-   * the cacheContext of the canvas will be used or a freshly created one if the object is not on canvas
-   * once created it will be referenced on fabric._measuringContext to avoid creating a canvas for every
-   * text object created.
-   * @type {CanvasRenderingContext2D}
-   * @default
-   */
-  _measuringContext: CanvasRenderingContext2D | null = null;
-
-  /**
    * Baseline shift, styles only, keep at 0 for the main text object
    * @type {Number}
    * @default
@@ -307,21 +330,9 @@ export class Text<
   direction: string;
 
   /**
-   * Array of properties that define a style unit (of 'styles').
-   * @type {Array}
-   * @default
-   */
-  _styleProperties: (keyof this)[];
-
-  /**
    * contains characters bounding boxes
    */
-  protected __charBounds: {
-    left: number;
-    width: number;
-    kernedWidth: number;
-    height: number;
-  }[][] = [];
+  protected __charBounds: GraphemeBBox[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -363,7 +374,7 @@ export class Text<
 
   initialized?: true;
 
-  constructor(text: string, options: object): Text {
+  constructor(text: string, options: any) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
@@ -371,6 +382,7 @@ export class Text<
     }
     this.initDimensions();
     this.setCoords();
+    // @ts-ignore
     this.setupState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -383,23 +395,6 @@ export class Text<
     if (path) {
       path.segmentsInfo = getPathSegmentsInfo(path.path);
     }
-  }
-
-  /**
-   * Return a context for measurement of text string.
-   * if created it gets stored for reuse
-   * this is for internal use, please do not use it
-   * @private
-   * @param {String} text Text string
-   * @param {Object} [options] Options object
-   */
-  getMeasuringContext() {
-    if (!fabric._measuringContext) {
-      fabric._measuringContext =
-        (this.canvas && this.canvas.contextCache) ||
-        createCanvasElement().getContext('2d');
-    }
-    return fabric._measuringContext;
   }
 
   /**
@@ -421,9 +416,6 @@ export class Text<
    * Does not return dimensions.
    */
   initDimensions() {
-    if (this.__skipDimension) {
-      return;
-    }
     this._splitText();
     this._clearCache();
     if (this.path) {
@@ -438,6 +430,7 @@ export class Text<
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
+    // @ts-ignore
     this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -468,7 +461,7 @@ export class Text<
       ) {
         numberOfSpaces = spaces.length;
         diffSpace = (this.width - currentLineWidth) / numberOfSpaces;
-        for (let j = 0, jlen = line.length; j <= jlen; j++) {
+        for (let j = 0; j <= line.length; j++) {
           charBound = this.__charBounds[i][j];
           if (this._reSpaceAndTab.test(line[j])) {
             charBound.width += diffSpace;
@@ -534,15 +527,9 @@ export class Text<
    * @return {String} String representation of text object
    */
   toString(): string {
-    return (
-      '#<Text (' +
-      this.complexity() +
-      '): { "text": "' +
-      this.text +
-      '", "fontFamily": "' +
-      this.fontFamily +
-      '" }>'
-    );
+    return `#<Text (${this.complexity()}): { "text": "${
+      this.text
+    }", "fontFamily": "${this.fontFamily}" }>`;
   }
 
   /**
@@ -605,10 +592,10 @@ export class Text<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle: any,
+    charStyle?: any,
     forMeasuring?: boolean
   ) {
-    ctx.textBaseline = 'alphabetical';
+    ctx.textBaseline = 'alphabetic';
     if (this.path) {
       switch (this.pathAlign) {
         case 'center':
@@ -655,7 +642,7 @@ export class Text<
   _renderTextLine(
     method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
-    line: string,
+    line: string[],
     left: number,
     top: number,
     lineIndex: number
@@ -761,9 +748,9 @@ export class Text<
    */
   _measureChar(
     _char: string,
-    charStyle: object,
-    previousChar: string,
-    prevCharStyle: object
+    charStyle: TextStyleDeclaration,
+    previousChar: string | undefined,
+    prevCharStyle: any
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
@@ -771,7 +758,10 @@ export class Text<
       couple = previousChar + _char,
       stylesAreEqual = fontDeclaration === previousFontDeclaration,
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
-    let width, coupleWidth, previousWidth, kernedWidth, ctx;
+    let width: number | undefined,
+      coupleWidth: number | undefined,
+      previousWidth: number | undefined,
+      kernedWidth: number | undefined;
 
     if (previousChar && fontCache[previousChar] !== undefined) {
       previousWidth = fontCache[previousChar];
@@ -788,7 +778,7 @@ export class Text<
       previousWidth === undefined ||
       coupleWidth === undefined
     ) {
-      ctx = this.getMeasuringContext();
+      const ctx = getMeasuringContext()!;
       // send a TRUE to specify measuring font size CACHE_FONT_SIZE
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
@@ -825,9 +815,8 @@ export class Text<
   /**
    * measure a text line measuring all characters.
    * @param {Number} lineIndex line number
-   * @return {Number} Line width
    */
-  measureLine(lineIndex: number): number {
+  measureLine(lineIndex: number) {
     const lineInfo = this._measureLine(lineIndex);
     if (this.charSpacing !== 0) {
       lineInfo.width -= this._getWidthOfCharSpacing();
@@ -844,16 +833,16 @@ export class Text<
    * @return {Object} object.width total width of characters
    * @return {Object} object.numOfSpaces length of chars that match this._reSpacesAndTabs
    */
-  _measureLine(lineIndex: number): object {
+  _measureLine(lineIndex: number) {
     let width = 0,
-      prevGrapheme,
-      graphemeInfo;
+      prevGrapheme: string | undefined,
+      graphemeInfo: GraphemeBBox | undefined;
 
     const reverse = this.pathSide === 'right',
       path = this.path,
       line = this._textLines[lineIndex],
       llength = line.length,
-      lineBounds = new Array(llength);
+      lineBounds = new Array<GraphemeBBox>(llength);
 
     this.__charBounds[lineIndex] = lineBounds;
     for (let i = 0; i < llength; i++) {
@@ -871,7 +860,7 @@ export class Text<
       kernedWidth: 0,
       height: this.fontSize,
     };
-    if (path) {
+    if (path && path.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;
@@ -921,8 +910,8 @@ export class Text<
    */
   _setGraphemeOnPath(
     positionInPath: number,
-    graphemeInfo: GraphemeBBox,
-    startingPoint
+    graphemeInfo: GraphemeBBox<true>,
+    startingPoint: Point
   ) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
       path = this.path;
@@ -946,8 +935,8 @@ export class Text<
     grapheme: string,
     lineIndex: number,
     charIndex: number,
-    prevGrapheme: string,
-    skipLeft
+    prevGrapheme?: string,
+    skipLeft?: boolean
   ): GraphemeBBox {
     const style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
       prevStyle = prevGrapheme
@@ -965,10 +954,10 @@ export class Text<
     }
 
     const box: GraphemeBBox = {
-      width: width,
+      width,
       left: 0,
       height: style.fontSize,
-      kernedWidth: kernedWidth,
+      kernedWidth,
       deltaY: style.deltaY,
     };
     if (charIndex > 0 && !skipLeft) {
@@ -989,7 +978,7 @@ export class Text<
       return this.__lineHeights[lineIndex];
     }
 
-    // char 0 is measured before the line cycle because it nneds to char
+    // char 0 is measured before the line cycle because it needs to char
     // emptylines
     let maxHeight = this.getHeightOfChar(lineIndex, 0);
     for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
@@ -1141,16 +1130,7 @@ export class Text<
     if (shortCut) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
-      this._renderChar(
-        method,
-        ctx,
-        lineIndex,
-        0,
-        line.join(''),
-        left,
-        top,
-        lineHeight
-      );
+      this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top);
       ctx.restore();
       return;
     }
@@ -1188,8 +1168,7 @@ export class Text<
             i,
             charsToRender,
             -boxWidth / 2,
-            0,
-            lineHeight
+            0
           );
           ctx.restore();
         } else {
@@ -1201,8 +1180,7 @@ export class Text<
             i,
             charsToRender,
             drawingLeft,
-            top,
-            lineHeight
+            top
           );
         }
         charsToRender = '';
@@ -1225,12 +1203,12 @@ export class Text<
    * @param {TFiller} filler a fabric gradient instance
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
-  _applyPatternGradientTransformText(filler: TFiller): CanvasPattern {
+  _applyPatternGradientTransformText(filler: TFiller) {
     const pCanvas = createCanvasElement(),
       // TODO: verify compatibility with strokeUniform
       width = this.width + this.strokeWidth,
       height = this.height + this.strokeWidth,
-      pCtx = pCanvas.getContext('2d');
+      pCtx = pCanvas.getContext('2d')!;
     pCanvas.width = width;
     pCanvas.height = height;
     pCtx.beginPath();
@@ -1240,13 +1218,17 @@ export class Text<
     pCtx.lineTo(0, height);
     pCtx.closePath();
     pCtx.translate(width / 2, height / 2);
-    pCtx.fillStyle = filler.toLive(pCtx);
+    pCtx.fillStyle = filler.toLive(pCtx) || '';
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fill();
-    return pCtx.createPattern(pCanvas, 'no-repeat');
+    return pCtx.createPattern(pCanvas, 'no-repeat')!;
   }
 
-  handleFiller(ctx, property, filler) {
+  handleFiller<T extends 'fill' | 'stroke'>(
+    ctx: CanvasRenderingContext2D,
+    property: `${T}Style`,
+    filler: TFiller | string
+  ) {
     let offsetX, offsetY;
     if (filler.toLive) {
       if (
@@ -1265,7 +1247,7 @@ export class Text<
         return { offsetX: offsetX, offsetY: offsetY };
       } else {
         // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx, this);
+        ctx[property] = filler.toLive(ctx, this) || '';
         return this._applyPatternGradientTransform(ctx, filler);
       }
     } else {
@@ -1275,17 +1257,20 @@ export class Text<
     return { offsetX: 0, offsetY: 0 };
   }
 
-  _setStrokeStyles(ctx, decl) {
-    ctx.lineWidth = decl.strokeWidth;
+  _setStrokeStyles(
+    ctx: CanvasRenderingContext2D,
+    { stroke, strokeWidth }: Pick<this, 'stroke' | 'strokeWidth'>
+  ) {
+    ctx.lineWidth = strokeWidth;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineDashOffset = this.strokeDashOffset;
     ctx.lineJoin = this.strokeLineJoin;
     ctx.miterLimit = this.strokeMiterLimit;
-    return this.handleFiller(ctx, 'strokeStyle', decl.stroke);
+    return this.handleFiller(ctx, 'strokeStyle', stroke);
   }
 
-  _setFillStyles(ctx, decl) {
-    return this.handleFiller(ctx, 'fillStyle', decl.fill);
+  _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
+    return this.handleFiller(ctx, 'fillStyle', fill);
   }
 
   /**
@@ -1371,7 +1356,14 @@ export class Text<
    * @param {Number} end selection end
    * @param {Number} schema
    */
-  protected _setScript(start: number, end: number, schema: number) {
+  protected _setScript(
+    start: number,
+    end: number,
+    schema: {
+      size: number;
+      baseline: number;
+    }
+  ) {
     const loc = this.get2DCursorLocation(start, true),
       fontSize = this.getValueOfPropertyAt(
         loc.lineIndex,
@@ -1469,8 +1461,7 @@ export class Text<
       return this.__lineWidths[lineIndex];
     }
 
-    const lineInfo = this.measureLine(lineIndex);
-    const width = lineInfo.width;
+    const { width } = this.measureLine(lineIndex);
     this.__lineWidths[lineIndex] = width;
     return width;
   }
@@ -1501,7 +1492,10 @@ export class Text<
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  _renderTextDecoration(ctx: CanvasRenderingContext2D, type) {
+  _renderTextDecoration(
+    ctx: CanvasRenderingContext2D,
+    type: 'underline' | 'linethrough' | 'overline'
+  ) {
     if (!this[type] && !this.styleHas(type)) {
       return;
     }
@@ -1602,7 +1596,10 @@ export class Text<
    * @param {Object} [styleObject] object
    * @returns {String} font declaration formatted for canvas context.
    */
-  _getFontDeclaration(styleObject: object, forMeasuring): string {
+  _getFontDeclaration(
+    styleObject?: TextStyleDeclaration,
+    forMeasuring?: boolean
+  ): string {
     const style = styleObject || this,
       family = this.fontFamily,
       fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
@@ -1613,7 +1610,7 @@ export class Text<
       family.indexOf('"') > -1 ||
       fontIsGeneric
         ? style.fontFamily
-        : '"' + style.fontFamily + '"';
+        : `"${style.fontFamily}"`;
     return [
       // node-canvas needs "weight style", while browsers need "style weight"
       // verify if this can be fixed in JSDOM
@@ -1667,7 +1664,7 @@ export class Text<
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
-    let newText = [];
+    let newText: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       newLines[i] = this.graphemeSplit(lines[i]);
       newText = newText.concat(newLines[i], newLine);
@@ -1686,14 +1683,12 @@ export class Text<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: Array<any>): object {
-    const allProperties = additionalProps.concat(propertiesToInclude);
-    const obj = super.toObject(allProperties);
-    obj.styles = stylesToArray(this.styles, this.text);
-    if (obj.path) {
-      obj.path = this.path.toObject();
-    }
-    return obj;
+  toObject(propertiesToInclude: (keyof this)[] = []) {
+    return {
+      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      styles: stylesToArray(this.styles, this.text),
+      ...(this.path ? { path: this.path.toObject() } : {}),
+    };
   }
 
   set(key: string | any, value?: any) {
@@ -1747,10 +1742,18 @@ export class Text<
    * @memberOf Text
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
    */
-  static ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat(
-    'x y dx dy font-family font-style font-weight font-size letter-spacing text-decoration text-anchor'.split(
-      ' '
-    )
+  static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat(
+    'x',
+    'y',
+    'dx',
+    'dy',
+    'font-family',
+    'font-style',
+    'font-weight',
+    'font-size',
+    'letter-spacing',
+    'text-decoration',
+    'text-anchor'
   );
 
   /**
@@ -1761,15 +1764,16 @@ export class Text<
    * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(element: SVGElement, callback: Function, options: object) {
+  static fromElement(
+    element: SVGElement,
+    callback: (text: Text | null) => any,
+    options: object
+  ) {
     if (!element) {
       return callback(null);
     }
 
-    const parsedAttributes = fabric.parseAttributes(
-        element,
-        Text.ATTRIBUTE_NAMES
-      ),
+    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
       parsedAnchor = parsedAttributes.textAnchor || 'left';
     options = Object.assign({}, options, parsedAttributes);
 
@@ -1819,7 +1823,7 @@ export class Text<
     const originalStrokeWidth = options.strokeWidth;
     options.strokeWidth = 0;
 
-    const text = new Text(textContent, options),
+    const text = new this(textContent, options),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1854,18 +1858,19 @@ export class Text<
 
   /**
    * Returns Text instance from an object representation
-   * @static
-   * @memberOf Text
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject(object: object): Promise<Text> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(Text, objCopy, {
-      extraParam: 'text',
-    });
+  static fromObject(object: Record<string, any>): Promise<Text> {
+    return this._fromObject(
+      {
+        ...object,
+        styles: stylesFromArray(object.styles, object.text),
+      },
+      {
+        extraParam: 'text',
+      }
+    );
   }
 }
 

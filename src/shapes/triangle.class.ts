@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './fabricObject.class';
+import { FabricObject } from './Object/FabricObject';
 
 export class Triangle extends FabricObject {
   /**
@@ -30,17 +30,6 @@ export class Triangle extends FabricObject {
       heightBy2 = this.height / 2,
       points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
-  }
-
-  /**
-   * Returns {@link Triangle} instance from an object representation
-   * @static
-   * @memberOf Triangle
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Triangle>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Triangle, object);
   }
 }
 

@@ -6,6 +6,11 @@
   BREAKING:
   - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
   - change `animateColor` signature to match `animate`, removed `colorEasing`
+- chore(): use context in static constructors [#8522](https://github.com/fabricjs/fabric.js/issues/8522)
+- chore(TS): Convert Canvas class #8510
+- chore(TS): Move object classes #8511
+- chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
+- chore(TS): fix import cycle, extract `groupSVGElements` [#8506](https://github.com/fabricjs/fabric.js/pull/8506)
 - chore(TS): permissive `Point` typings [#8434](https://github.com/fabricjs/fabric.js/pull/8434)
 - chore(TS): polish files [#8488](https://github.com/fabricjs/fabric.js/pull/8488)
 - fix(TS): `EventSpec` recognition [#8497](https://github.com/fabricjs/fabric.js/pull/8497)

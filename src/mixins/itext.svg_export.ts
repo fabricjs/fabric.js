@@ -2,7 +2,7 @@
 
 import { Color } from '../color';
 import { config } from '../config';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 /* _TO_SVG_START_ */
 (function (global) {

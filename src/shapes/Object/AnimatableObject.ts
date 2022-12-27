@@ -1,14 +1,14 @@
-import { TColorArg } from '../color/color.class';
-import { noop } from '../constants';
-import { ObjectEvents } from '../EventTypeDefs';
-import { TDegree } from '../typedefs';
+import { TColorArg } from '../../color/color.class';
+import { noop } from '../../constants';
+import { ObjectEvents } from '../../EventTypeDefs';
+import { TDegree } from '../../typedefs';
 import {
   animate,
   animateColor,
   AnimationOptions,
   ColorAnimationOptions,
-} from '../util/animation';
-import { StackedObject } from './object_ancestry.mixin';
+} from '../../util/animation';
+import { StackedObject } from './StackedObject';
 
 type TAnimationOptions<T extends number | TColorArg> = T extends number
   ? AnimationOptions
