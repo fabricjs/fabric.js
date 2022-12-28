@@ -16,6 +16,7 @@ import type {
   TClassProperties,
   TFiller,
 } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -1953,5 +1954,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 };
 
 Object.assign(Text.prototype, textDefaultValues);
+
+classRegistry.setClass(Text);
+classRegistry.setSVGClass(Text);
 
 fabric.Text = Text;

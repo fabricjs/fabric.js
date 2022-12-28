@@ -4,17 +4,8 @@ import { Gradient } from '../../gradient';
 import { Pattern } from '../../pattern.class';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
-import { camelize, capitalize } from '../lang_string';
 import { createImage } from './dom';
-
-/**
- * Returns klass "Class" object of given namespace
- * @param {String} type Type of object (eg. 'circle')
- * @param {object} namespace Namespace to get klass "Class" object from
- * @return {Object} klass "Class"
- */
-export const getKlass = (type: string, namespace = fabric): any =>
-  namespace[capitalize(camelize(type), true)];
+import { classRegistry } from '../class_registry';
 
 export type LoadImageOptions = {
   /**
@@ -99,18 +90,19 @@ type EnlivenObjectOptions = {
  */
 export const enlivenObjects = (
   objects: any[],
-  { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
   new Promise<FabricObject[]>((resolve, reject) => {
     const instances: FabricObject[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
-        getKlass(obj.type, namespace)
+        classRegistry
+          .getClass(obj.type)
+          // @ts-ignore
           .fromObject(obj, {
             signal,
             reviver,
-            namespace,
           })
           .then((fabricInstance: FabricObject) => {
             reviver(obj, fabricInstance);

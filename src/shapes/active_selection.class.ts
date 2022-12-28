@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { Group, groupDefaultValues } from './group.class';
 import type { FabricObject } from './Object/FabricObject';
 
@@ -156,5 +157,7 @@ export const activeSelectionDefaultValues: Partial<
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
+
+classRegistry.setClass(ActiveSelection);
 
 fabric.ActiveSelection = ActiveSelection;

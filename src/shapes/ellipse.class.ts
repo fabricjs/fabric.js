@@ -3,6 +3,7 @@ import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
@@ -149,5 +150,8 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
 };
 
 Object.assign(Ellipse.prototype, ellipseDefaultValues);
+
+classRegistry.setClass(Ellipse);
+classRegistry.setSVGClass(Ellipse);
 
 fabric.Ellipse = Ellipse;
