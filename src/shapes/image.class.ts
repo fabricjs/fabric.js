@@ -723,12 +723,13 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters: f, resizeFilter, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
     return Promise.all([
       loadImage(src, { ...options, crossOrigin }),
       f && enlivenObjects(f, options),
+      rf && enlivenObjects([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
