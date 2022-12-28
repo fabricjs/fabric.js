@@ -1,10 +1,7 @@
 import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import {
-  Polyline,
-  polylineDefaultValues,
-} from './polyline.class';
+import { Polyline, polylineDefaultValues } from './polyline.class';
 
 export class Polygon extends Polyline {
   protected isOpen() {
