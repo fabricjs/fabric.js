@@ -3,6 +3,7 @@ import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Rect extends FabricObject {
@@ -193,5 +194,8 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
 };
 
 Object.assign(Rect.prototype, rectDefaultValues);
+
+classRegistry.setClass(Rect);
+classRegistry.setSVGClass(Rect);
 
 fabric.Rect = Rect;

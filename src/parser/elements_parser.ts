@@ -1,10 +1,9 @@
 //@ts-nocheck
-
 import { fabric } from '../../HEADER';
 import { Gradient } from '../gradient';
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
-import { capitalize } from '../util/lang_string';
+import { classRegistry } from '../util/class_registry';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -44,7 +43,9 @@ const ElementsParser = function (
   };
 
   proto.findTag = function (el) {
-    return fabric[capitalize(el.tagName.replace('svg:', ''))];
+    return classRegistry.getSVGClass(
+      el.tagName.toLowerCase().replace('svg:', '')
+    );
   };
 
   proto.createObject = function (el, index) {

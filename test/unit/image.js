@@ -467,16 +467,27 @@
     });
   });
 
-  QUnit.test('fromObject with clipPath', function(assert) {
+  QUnit.test('fromObject with clipPath and filters', function(assert) {
     var done = assert.async();
     // should not throw error when no callback is given
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC,
       clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
+      filters: [{
+        type: 'Brightness',
+        brightness: 0.1
+      }],
+      resizeFilter: {
+        type: 'Resize',
+      }
     });
     fabric.Image.fromObject(obj).then(function(instance){
       assert.ok(instance instanceof fabric.Image);
       assert.ok(instance.clipPath instanceof fabric.Rect);
+      assert.ok(Array.isArray(instance.filters), 'should enliven filters');
+      assert.equal(instance.filters.length, 1, 'should enliven filters');
+      assert.ok(instance.filters[0] instanceof fabric.Image.filters.Brightness, 'should enliven filters');
+      assert.ok(instance.resizeFilter instanceof fabric.Image.filters.Resize, 'should enliven resizeFilter');
       done();
     });
   });

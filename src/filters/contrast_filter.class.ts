@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Contrast filter class
@@ -90,3 +91,4 @@ export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
 };
 
 Object.assign(Contrast.prototype, contrastDefaultValues);
+classRegistry.setClass(Contrast);

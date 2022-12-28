@@ -130,22 +130,6 @@
     assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
   });
 
-  QUnit.test('fabric.util.string.camelize', function(assert) {
-    var camelize = fabric.util.string.camelize;
-
-    assert.ok(typeof camelize === 'function');
-
-    assert.equal(camelize('foo'), 'foo');
-    assert.equal(camelize('foo-bar'), 'fooBar');
-    assert.equal(camelize('Foo-bar-Baz'), 'FooBarBaz');
-    assert.equal(camelize('FooBarBaz'), 'FooBarBaz');
-    assert.equal(camelize('-bar'), 'Bar');
-    assert.equal(camelize(''), '');
-    assert.equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
-    assert.equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
-    assert.equal(camelize('--double'), 'Double');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
@@ -594,14 +578,6 @@
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');
     assert.ok(typeof destination.ffffffffff === 'undefined');
-  });
-
-  QUnit.test('getKlass', function(assert) {
-    assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
-    assert.equal(fabric.util.getKlass('i-text'), fabric.IText);
-    assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
-    assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
-    assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
   QUnit.test('clearFontCache', function(assert) {

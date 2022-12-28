@@ -8,6 +8,7 @@ import {
   keysMap,
   keysMapRtl,
 } from '../mixins/itext_key_const';
+import { classRegistry } from '../util/class_registry';
 import { TClassProperties, TFiller } from '../typedefs';
 
 export type ITextEvents = ObjectEvents & {
@@ -651,5 +652,7 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
+
+classRegistry.setClass(IText);
 
 fabric.IText = IText;

@@ -1,7 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 /**
    * Color Matrix filter class
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
@@ -153,3 +153,4 @@ export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   };
 
 Object.assign(ColorMatrix.prototype, colorMatrixDefaultValues);
+classRegistry.setClass(ColorMatrix);

@@ -1,7 +1,8 @@
 import { Color } from '../color';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Remove white filter class
@@ -144,3 +145,4 @@ export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   };
 
 Object.assign(RemoveColor.prototype, removeColorDefaultValues);
+classRegistry.setClass(RemoveColor);

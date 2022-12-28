@@ -1,16 +1,14 @@
 // @ts-nocheck
-import * as filters from '.';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import {
   AbstractBaseFilter,
   BaseFilter,
   BaseFilterOptions,
 } from './base_filter.class';
-import {
-  isWebGLPipelineState,
-  T2DPipelineState,
-  TWebGLPipelineState,
-} from './typedefs';
+import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './typedefs';
+import { classRegistry } from '../util/class_registry';
+
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
@@ -70,9 +68,7 @@ export class Composed extends BaseFilter {
   static fromObject(object, options) {
     return Promise.all(
       ((object.subFilters || []) as AbstractBaseFilter[]).map((filter) =>
-        Object.values(filters)
-          .find((klass) => klass.prototype?.type === filter.type)!
-          .fromObject(filter, options)
+        classRegistry.getClass(filter.type).fromObject(filter, options)
       )
     ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
   }
@@ -83,3 +79,4 @@ export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
 };
 
 Object.assign(Composed.prototype, composedDefaultValues);
+classRegistry.setClass(Composed);

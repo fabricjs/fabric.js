@@ -4,6 +4,7 @@ import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { IText } from './itext.class';
 import { textDefaultValues } from './text.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -472,5 +473,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 };
 
 Object.assign(Textbox.prototype, textboxDefaultValues);
+
+classRegistry.setClass(Textbox);
 
 fabric.Textbox = Textbox;

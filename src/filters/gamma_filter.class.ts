@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter, BaseFilterOptions } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 export type GammaInput = [number, number, number];
 
@@ -123,3 +124,4 @@ export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
 };
 
 Object.assign(Gamma.prototype, gammaDefaultValues);
+classRegistry.setClass(Gamma);

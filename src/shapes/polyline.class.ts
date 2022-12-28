@@ -5,6 +5,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { IPoint, Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
@@ -327,6 +328,9 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
 };
 
 Object.assign(Polyline.prototype, polylineDefaultValues);
+
+classRegistry.setClass(Polyline);
+classRegistry.setSVGClass(Polyline);
 
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Polyline = Polyline;

@@ -15,6 +15,7 @@ import {
   parsePath,
   type TPathSegmentsInfo,
 } from '../util/path';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Path extends FabricObject {
@@ -393,6 +394,10 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 };
 
 Object.assign(Path.prototype, pathDefaultValues);
+
+classRegistry.setClass(Path);
+classRegistry.setSVGClass(Path);
+
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Path = Path;
 
