@@ -1,7 +1,6 @@
 import { fabric } from '../../HEADER';
+import type { BaseBrush } from '../brushes/base_brush.class';
 import { dragHandler, getActionFromCorner } from '../controls/actions';
-import { Point } from '../point.class';
-import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
@@ -9,34 +8,35 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import {
-  addTransformToObject,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
-import {
-  isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
-  isInteractiveTextObject,
-} from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
+import { TSVGReviver } from '../mixins/object.svg_export';
+import { Point } from '../point.class';
 import type { IText } from '../shapes/itext.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import type { Textbox } from '../shapes/textbox.class';
+import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { getPointer, isTouchEvent } from '../util/dom_event';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   wrapElement,
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/base_brush.class';
-import type { Textbox } from '../shapes/textbox.class';
+import { isTransparent } from '../util/misc/isTransparent';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  addTransformToObject,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../mixins/object.svg_export';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import {
+  isActiveSelection,
+  isCollection,
+  isFabricObjectCached,
+  isInteractiveTextObject,
+} from '../util/types';
+import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -837,7 +837,6 @@ export class SelectableCanvas<
     let pointer = this.getPointer(e);
     if (target.group) {
       // transform pointer to target's containing coordinate plane
-      // should we use send point to plane?
       pointer = sendPointToPlane(pointer, target.group.calcTransformMatrix());
     }
     const corner = target.__corner || '',
@@ -1493,7 +1492,7 @@ export class SelectableCanvas<
     if (currentActives.length) {
       this.fire('before:selection:cleared', {
         e,
-        deselected: [activeObject],
+        deselected: [activeObject!],
       });
     }
     this._discardActiveObject(e);

@@ -26,7 +26,7 @@ export type TransformAction<T extends Transform = Transform, R = void> = (
 
 /**
  * Control handlers that define a transformation
- * Those handlers run when the user starts a transform and during a trasnform
+ * Those handlers run when the user starts a transform and during a transform
  */
 export type TransformActionHandler<T extends Transform = Transform> =
   TransformAction<T, boolean>;
@@ -35,12 +35,7 @@ export type TransformActionHandler<T extends Transform = Transform> =
  * Control handlers that run on control click/down/up
  * Those handlers run with or without a transform defined
  */
-export type ControlActionHandler = (
-  eventData: TPointerEvent,
-  transform: Transform | null,
-  x: number,
-  y: number
-) => any;
+export type ControlActionHandler = TransformAction<Transform, any>;
 
 export type ControlCallback<R = void> = (
   eventData: TPointerEvent,
@@ -101,17 +96,30 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing'
-  | 'modified'
+  | 'resizing';
 
-type ObjectModifiedEvents = Record<TModificationEvents, BasicTransformEvent> & {
-  modified: BasicTransformEvent | never;
+export type ModifiedEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+  transform: Transform;
+  target: FabricObject;
+  action: string;
 };
 
-type CanvasModifiedEvents = Record<
-  `object:${keyof ObjectModifiedEvents}`,
-  BasicTransformEvent & { target: FabricObject }
->;
+type ModificationEventsSpec<
+  Prefix extends string = '',
+  Modification = BasicTransformEvent,
+  Modified = ModifiedEvent | never
+> = Record<`${Prefix}${TModificationEvents}`, Modification> &
+  Record<`${Prefix}modified`, Modified>;
+
+type ObjectModificationEvents = ModificationEventsSpec;
+
+type CanvasModificationEvents = ModificationEventsSpec<
+  'object:',
+  BasicTransformEvent & { target: FabricObject },
+  ModifiedEvent | { target: FabricObject }
+> & {
+  'before:transform': TEvent & { transform: Transform };
+};
 
 export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
   TEvent<E> & {
@@ -139,11 +147,12 @@ type OutEvent = {
   nextTarget?: FabricObject;
 };
 
-type DragEventData = TEvent<DragEvent> & {
+export type DragEventData = TEvent<DragEvent> & {
   target?: FabricObject;
   subTargets?: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;
+  didDrop?: boolean;
   dropTarget?: FabricObject;
 };
 
@@ -167,10 +176,10 @@ type CanvasDnDEvents = DnDEvents & {
 };
 
 type CanvasSelectionEvents = {
-  'selection:created': TEvent & {
+  'selection:created': Partial<TEvent> & {
     selected: FabricObject[];
   };
-  'selection:updated': TEvent & {
+  'selection:updated': Partial<TEvent> & {
     selected: FabricObject[];
     deselected: FabricObject[];
   };
@@ -190,33 +199,37 @@ export type CollectionEvents = {
 type BeforeSuffix<T extends string> = `${T}:before`;
 type WithBeforeSuffix<T extends string> = T | BeforeSuffix<T>;
 
-type TPointerEvents<Prefix extends string, E = Record<string, never>> = Record<
+type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
     | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
-  TPointerEventInfo & E
+  TPointerEventInfo
 > &
-  Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent> & E> &
-  Record<`${Prefix}over`, TPointerEventInfo & InEvent & E> &
-  Record<`${Prefix}out`, TPointerEventInfo & OutEvent & E>;
+  Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
+  Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
+  Record<`${Prefix}out`, TPointerEventInfo & OutEvent>;
 
-export type TPointerEventsSuffixes =
-  | 'down'
-  | 'move'
-  | 'up'
+export type TPointerEventNames =
+  | WithBeforeSuffix<'down'>
+  | WithBeforeSuffix<'move'>
+  | WithBeforeSuffix<'up'>
   | 'dblclick'
-  | 'up:before'
-  | 'down:before'
-  | 'move:before'
   | 'wheel';
+
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
 export type CanvasPointerEvents = TPointerEvents<'mouse:'>;
 
+export type MiscEvents = {
+  'contextmenu:before': SimpleEventHandler<Event>;
+  contextmenu: SimpleEventHandler<Event>;
+};
+
 export type ObjectEvents = ObjectPointerEvents &
   DnDEvents &
-  ObjectModifiedEvents & {
+  MiscEvents &
+  ObjectModificationEvents & {
     // selection
     selected: Partial<TEvent> & {
       target: FabricObject;
@@ -245,7 +258,8 @@ export type StaticCanvasEvents = CollectionEvents & {
 export type CanvasEvents = StaticCanvasEvents &
   CanvasPointerEvents &
   CanvasDnDEvents &
-  CanvasModifiedEvents &
+  MiscEvents &
+  CanvasModificationEvents &
   CanvasSelectionEvents & {
     // brushes
     'before:path:created': { path: FabricObject };
@@ -270,8 +284,4 @@ export type CanvasEvents = StaticCanvasEvents &
     'text:changed': { target: IText };
     'text:editing:entered': { target: IText };
     'text:editing:exited': { target: IText };
-
-    // misc
-    'contextmenu:before': SimpleEventHandler<Event>;
-    contextmenu: SimpleEventHandler<Event>;
   };

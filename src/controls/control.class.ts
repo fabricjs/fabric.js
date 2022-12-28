@@ -213,8 +213,8 @@ export class Control {
    */
   getMouseUpHandler(
     eventData: TPointerEvent,
-    fabricObject?: FabricObject,
-    control?: Control
+    fabricObject: FabricObject,
+    control: Control
   ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
   }

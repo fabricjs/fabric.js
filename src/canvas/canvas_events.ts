@@ -1,24 +1,26 @@
-import { stopEvent } from '../util/dom_event';
-import { fireEvent } from '../util/fireEvent';
-import { SelectableCanvas } from './canvas.class';
 import { fabric } from '../../HEADER';
 import {
+  CanvasEvents,
+  DragEventData,
+  ObjectEvents,
+  TEvent,
   TPointerEvent,
-  TPointerEventsSuffixes,
   TPointerEventInfo,
+  TPointerEventNames,
   Transform,
-  BasicTransformEvent,
 } from '../EventTypeDefs';
+import { Point } from '../point.class';
+import { ActiveSelection } from '../shapes/active_selection.class';
+import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { stopEvent } from '../util/dom_event';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
-import { Point } from '../point.class';
-import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/active_selection.class';
-import { Group } from '../shapes/group.class';
+import { SelectableCanvas } from './canvas.class';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -41,12 +43,28 @@ const removeListener = (
   ...args: Parameters<HTMLElement['removeEventListener']>
 ) => el.removeEventListener(...args);
 
-type TSyntheticEventConfig = {
-  oldTarget?: FabricObject;
-  evtOut: 'mouseout' | 'dragleave';
-  canvasEvtOut?: 'mouse:out' | 'drag:leave';
-  evtIn: 'mouseover' | 'dragenter';
-  canvasEvtIn?: 'mouse:over' | 'drag:enter';
+const syntheticEventConfig = {
+  mouse: {
+    in: 'over',
+    out: 'out',
+    targetIn: 'mouseover',
+    targetOut: 'mouseout',
+    canvasIn: 'mouse:over',
+    canvasOut: 'mouse:out',
+  },
+  drag: {
+    in: 'enter',
+    out: 'leave',
+    targetIn: 'dragenter',
+    targetOut: 'dragleave',
+    canvasIn: 'drag:enter',
+    canvasOut: 'drag:leave',
+  },
+} as const;
+
+type TSyntheticEventContext = {
+  mouse: { e: TPointerEvent };
+  drag: DragEventData;
 };
 
 export class Canvas extends SelectableCanvas {
@@ -72,7 +90,7 @@ export class Canvas extends SelectableCanvas {
   private eventsBound: boolean;
 
   /**
-   * Holds a reference to a setTimeout timer for event syncronization
+   * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
    */
@@ -204,33 +222,35 @@ export class Canvas extends SelectableCanvas {
       // for any reason we pass here twice we do not want to bind events twice.
       return;
     }
-    [
-      '_onMouseDown',
-      '_onTouchStart',
-      '_onMouseMove',
-      '_onMouseUp',
-      '_onTouchEnd',
-      '_onResize',
-      // '_onGesture',
-      // '_onDrag',
-      // '_onShake',
-      // '_onLongPress',
-      // '_onOrientationChange',
-      '_onMouseWheel',
-      '_onMouseOut',
-      '_onMouseEnter',
-      '_onContextMenu',
-      '_onDoubleClick',
-      '_onDragStart',
-      '_onDragEnd',
-      '_onDragProgress',
-      '_onDragOver',
-      '_onDragEnter',
-      '_onDragLeave',
-      '_onDrop',
-      // @ts-ignore
-    ].forEach((eventHandler: keyof this) => {
-      this[eventHandler] = (this[eventHandler] as any).bind(this);
+    (
+      [
+        '_onMouseDown',
+        '_onTouchStart',
+        '_onMouseMove',
+        '_onMouseUp',
+        '_onTouchEnd',
+        '_onResize',
+        // '_onGesture',
+        // '_onDrag',
+        // '_onShake',
+        // '_onLongPress',
+        // '_onOrientationChange',
+        '_onMouseWheel',
+        '_onMouseOut',
+        '_onMouseEnter',
+        '_onContextMenu',
+        '_onDoubleClick',
+        '_onDragStart',
+        '_onDragEnd',
+        '_onDragProgress',
+        '_onDragOver',
+        '_onDragEnter',
+        '_onDragLeave',
+        '_onDrop',
+      ] as const
+    ).forEach((eventHandler) => {
+      // @ts-expect-error dumb TS
+      this[eventHandler] = this[eventHandler].bind(this);
     });
     this.eventsBound = true;
   }
@@ -249,15 +269,18 @@ export class Canvas extends SelectableCanvas {
    */
   private _onMouseOut(e: TPointerEvent) {
     const target = this._hoveredTarget;
-    this.fire('mouse:out', { target: target, e: e });
+    const shared = {
+      e,
+      isClick: false,
+      pointer: this.getPointer(e),
+      absolutePointer: this.getPointer(e, true),
+    };
+    this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
-    // @ts-ignore
-    target && target.fire('mouseout', { e });
-
+    target && target.fire('mouseout', { ...shared });
     this._hoveredTargets.forEach((nestedTarget) => {
-      this.fire('mouse:out', { target: nestedTarget, e });
-      // @ts-ignore
-      nestedTarget && nestedTarget.fire('mouseout', { e });
+      this.fire('mouse:out', { ...shared, target: nestedTarget });
+      nestedTarget && nestedTarget.fire('mouseout', { ...shared });
     });
     this._hoveredTargets = [];
   }
@@ -274,7 +297,12 @@ export class Canvas extends SelectableCanvas {
     // as a long term fix we need to separate the action of finding a target with the
     // side effects we added to it.
     if (!this._currentTransform && !this.findTarget(e)) {
-      this.fire('mouse:over', { target: null, e });
+      this.fire('mouse:over', {
+        e,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
+      });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
@@ -295,7 +323,11 @@ export class Canvas extends SelectableCanvas {
       const options = { e, target: activeObject };
       this.fire('dragstart', options);
       activeObject.fire('dragstart', options);
-      addListener(this.upperCanvasEl, 'drag', this._onDragProgress as EventListener);
+      addListener(
+        this.upperCanvasEl,
+        'drag',
+        this._onDragProgress as EventListener
+      );
       return;
     }
     stopEvent(e);
@@ -332,14 +364,14 @@ export class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   private _onDragEnd(e: DragEvent) {
-    const didDrop = e.dataTransfer && e.dataTransfer.dropEffect !== 'none',
+    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== 'none',
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,
         target: this._dragSource as FabricObject,
         subTargets: this.targets,
         dragSource: this._dragSource as FabricObject,
-        didDrop: didDrop,
+        didDrop,
         dropTarget: dropTarget as FabricObject,
       };
     removeListener(
@@ -403,14 +435,14 @@ export class Canvas extends SelectableCanvas {
     }
     //  propagate the event to subtargets
     for (let i = 0; i < targets.length; i++) {
-      const subTtarget = targets[i];
+      const subTarget = targets[i];
       // accept event only if previous targets didn't
       // TODO: verify if those should loop in inverse order then?
       // what is the order of subtargets?
-      if (!e.defaultPrevented && subTtarget.canDrop(e)) {
-        dropTarget = subTtarget;
+      if (!e.defaultPrevented && subTarget.canDrop(e)) {
+        dropTarget = subTarget;
       }
-      subTtarget.fire(eventType, options);
+      subTarget.fire(eventType, options);
     }
     //  render drag effects now that relations between source and target is clear
     this._renderDragEffects(e, this._dragSource, dropTarget);
@@ -463,7 +495,8 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e
    */
   private _onDrop(e: DragEvent) {
-    const options = this._simpleEventHandler('drop:before', e, {
+    const options = this._simpleEventHandler('drop:before', {
+      e,
       dragSource: this._dragSource,
       pointer: this.getPointer(e),
     });
@@ -484,11 +517,9 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   private _onContextMenu(e: TPointerEvent): false {
-    const options = this._simpleEventHandler('contextmenu:before', e);
-    if (this.stopContextMenu) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
+    const options = this._simpleEventHandler('contextmenu:before', { e });
+    // TODO: this line is silly because the dev can subscribe to the event and prevent it themselves
+    this.stopContextMenu && stopEvent(e);
     this._basicEventHandler('contextmenu', options);
     return false;
   }
@@ -795,7 +826,7 @@ export class Canvas extends SelectableCanvas {
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getPointer(e);
-          mouseUpHandler(e, transform, pointer.x, pointer.y);
+          mouseUpHandler(e, transform!, pointer.x, pointer.y);
         }
       }
       target.isMoving = false;
@@ -840,13 +871,20 @@ export class Canvas extends SelectableCanvas {
    * @param {object} [data] event data overrides
    * @return {object} options
    */
-  _simpleEventHandler(
-    eventType: string,
-    e: TPointerEvent,
-    data: Record<string, any> = {}
+  _simpleEventHandler<
+    T extends keyof (CanvasEvents | ObjectEvents),
+    E extends TPointerEvent | DragEvent
+  >(
+    eventType: T,
+    {
+      e,
+      ...data
+    }: Omit<(CanvasEvents & ObjectEvents)[T], 'target' | 'subTargets'> &
+      TEvent<E>
   ) {
     const target = this.findTarget(e),
       subTargets = this.targets || [];
+    // @ts-expect-error TODO fix generic e
     return this._basicEventHandler(eventType, {
       e,
       target,
@@ -855,9 +893,14 @@ export class Canvas extends SelectableCanvas {
     });
   }
 
-  _basicEventHandler(eventType: string, options: Record<string, any>) {
-    const target = options.target,
-      subTargets = options.subTargets;
+  _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
+    eventType: T,
+    options: (CanvasEvents & ObjectEvents)[T]
+  ) {
+    const { target, subTargets = [] } = options as {
+      target?: FabricObject;
+      subTargets: FabricObject[];
+    };
     this.fire(eventType, options);
     target && target.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
@@ -877,7 +920,7 @@ export class Canvas extends SelectableCanvas {
    */
   _handleEvent(
     e: TPointerEvent,
-    eventType: TPointerEventsSuffixes,
+    eventType: TPointerEventNames,
     button = LEFT_CLICK,
     isClick = false
   ) {
@@ -899,17 +942,15 @@ export class Canvas extends SelectableCanvas {
     }
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
-    // @ts-ignore
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
-      // @ts-ignore
       targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
   /**
-   * End the current transfrom.
-   * You don't usually need to call this method unless you are interupting a user initiated transform
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
    * because of some other event ( a press of key combination, or something that block the user UX )
    * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
    */
@@ -932,8 +973,8 @@ export class Canvas extends SelectableCanvas {
       target = transform.target,
       options = {
         e,
-        target: target,
-        transform: transform,
+        target,
+        transform,
         action: transform.action,
       };
 
@@ -948,7 +989,8 @@ export class Canvas extends SelectableCanvas {
       // @ts-ignore
       (this.stateful && target.hasStateChanged())
     ) {
-      fireEvent('modified', options as unknown as BasicTransformEvent<PointerEvent>);
+      this.fire('object:modified', options);
+      target.fire('modified', options);
     }
   }
 
@@ -1094,7 +1136,7 @@ export class Canvas extends SelectableCanvas {
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
-          mouseDownHandler(e, this._currentTransform, pointer.x, pointer.y);
+          mouseDownHandler(e, this._currentTransform!, pointer.x, pointer.y);
         }
       }
     }
@@ -1200,27 +1242,18 @@ export class Canvas extends SelectableCanvas {
       targets = this.targets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
-    this.fireSyntheticInOutEvents(
+    this.fireSyntheticInOutEvents('mouse', {
+      e,
       target,
-      { e: e },
-      {
-        oldTarget: _hoveredTarget,
-        evtOut: 'mouseout',
-        canvasEvtOut: 'mouse:out',
-        evtIn: 'mouseover',
-        canvasEvtIn: 'mouse:over',
-      }
-    );
+      oldTarget: _hoveredTarget,
+      fireCanvas: true,
+    });
     for (let i = 0; i < length; i++) {
-      this.fireSyntheticInOutEvents(
-        targets[i],
-        { e: e },
-        {
-          oldTarget: _hoveredTargets[i],
-          evtOut: 'mouseout',
-          evtIn: 'mouseover',
-        }
-      );
+      this.fireSyntheticInOutEvents('mouse', {
+        e,
+        target: targets[i],
+        oldTarget: _hoveredTargets[i],
+      });
     }
     this._hoveredTarget = target;
     this._hoveredTargets = this.targets.concat();
@@ -1232,27 +1265,23 @@ export class Canvas extends SelectableCanvas {
    * @param {Object} data Event object fired on dragover
    * @private
    */
-  _fireEnterLeaveEvents(
-    target: FabricObject | undefined,
-    data: Record<string, any>
-  ) {
-    const _draggedoverTarget = this._draggedoverTarget,
+  _fireEnterLeaveEvents(target: FabricObject | undefined, data: DragEventData) {
+    const draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
       targets = this.targets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
-    this.fireSyntheticInOutEvents(target, data, {
-      oldTarget: _draggedoverTarget,
-      evtOut: 'dragleave',
-      evtIn: 'dragenter',
-      canvasEvtIn: 'drag:enter',
-      canvasEvtOut: 'drag:leave',
+    this.fireSyntheticInOutEvents('drag', {
+      ...data,
+      target,
+      oldTarget: draggedoverTarget,
+      fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
-      this.fireSyntheticInOutEvents(targets[i], data, {
+      this.fireSyntheticInOutEvents('drag', {
+        ...data,
+        target: targets[i],
         oldTarget: _hoveredTargets[i],
-        evtOut: 'dragleave',
-        evtIn: 'dragenter',
       });
     }
     this._draggedoverTarget = target;
@@ -1270,34 +1299,49 @@ export class Canvas extends SelectableCanvas {
    * @param {String} config.evtIn name of the event to fire for in
    * @private
    */
-  fireSyntheticInOutEvents(
-    target: FabricObject | undefined,
-    data: Record<string, any>,
-    config: TSyntheticEventConfig
+  fireSyntheticInOutEvents<T extends keyof TSyntheticEventContext>(
+    type: T,
+    {
+      target,
+      oldTarget,
+      fireCanvas,
+      e,
+      ...data
+    }: TSyntheticEventContext[T] & {
+      target?: FabricObject;
+      oldTarget?: FabricObject;
+      fireCanvas?: boolean;
+    }
   ) {
-    const { canvasEvtIn, canvasEvtOut, evtOut, evtIn } = config;
-    const oldTarget = config.oldTarget,
-      targetChanged = oldTarget !== target;
+    const { targetIn, targetOut, canvasIn, canvasOut } =
+      syntheticEventConfig[type];
+    const targetChanged = oldTarget !== target;
 
     if (oldTarget && targetChanged) {
       const outOpt = {
         ...data,
+        e,
         target: oldTarget,
         nextTarget: target,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
       };
-      canvasEvtOut && this.fire(canvasEvtOut, outOpt);
-      // @ts-ignore
-      oldTarget.fire(evtOut, outOpt);
+      fireCanvas && this.fire(canvasIn, outOpt);
+      oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
-      const inOpt = {
+      const inOpt: TPointerEventInfo = {
         ...data,
+        e,
         target,
         previousTarget: oldTarget,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
       };
-      canvasEvtIn && this.fire(canvasEvtIn, inOpt);
-      // @ts-ignore
-      target.fire(evtIn, inOpt);
+      fireCanvas && this.fire(canvasOut, inOpt);
+      target.fire(targetIn, inOpt);
     }
   }
 

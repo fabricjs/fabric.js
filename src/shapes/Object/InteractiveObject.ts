@@ -12,7 +12,7 @@ import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
-import { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/canvas_events';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -132,8 +132,7 @@ export class InteractiveFabricObject<
     if (
       !this.hasControls ||
       !this.canvas ||
-      ((this.canvas as Canvas)._activeObject as InteractiveFabricObject) !==
-        this
+      (this.canvas._activeObject as InteractiveFabricObject) !== this
     ) {
       return 0;
     }

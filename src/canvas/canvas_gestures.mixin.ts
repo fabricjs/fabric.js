@@ -135,7 +135,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js gesture
        * @param {Event} [self] Inner Event object
        */
-      _onGesture: function(e, self) {
+      _onGesture: function (e, self) {
         this.__onTransformGesture(e, self);
       },
 
@@ -144,7 +144,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js drag
        * @param {Event} [self] Inner Event object
        */
-      _onDrag: function(e, self) {
+      _onDrag: function (e, self) {
         this.__onDrag(e, self);
       },
 
@@ -185,7 +185,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js orientation change
        * @param {Event} [self] Inner Event object
        */
-      _onOrientationChange: function(e, self) {
+      _onOrientationChange: function (e, self) {
         this.__onOrientationChange(e, self);
       },
 
@@ -194,7 +194,7 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js shake
        * @param {Event} [self] Inner Event object
        */
-      _onShake: function(e, self) {
+      _onShake: function (e, self) {
         this.__onShake(e, self);
       },
 
@@ -203,9 +203,9 @@ import { fireEvent } from '../util/fireEvent';
        * @param {Event} [e] Event object fired on Event.js shake
        * @param {Event} [self] Inner Event object
        */
-      _onLongPress: function(e, self) {
+      _onLongPress: function (e, self) {
         this.__onLongPress(e, self);
-      }
+      },
     }
   );
 })(typeof exports !== 'undefined' ? exports : window);

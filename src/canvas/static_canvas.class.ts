@@ -2,7 +2,7 @@
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
-import type { StaticCanvasEvents } from '../EventTypeDefs';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import { Gradient } from '../gradient';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { TSVGReviver } from '../mixins/object.svg_export';
@@ -54,7 +54,7 @@ export type TSVGExportOptions = {
     width: number;
     height: number;
   };
-  encoding?: 'UTF-8'; // test Econding type and see what happens
+  encoding?: 'UTF-8'; // test Encoding type and see what happens
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
@@ -69,10 +69,10 @@ export type TSVGExportOptions = {
  * @fires object:added
  * @fires object:removed
  */
-// eslint-disable-next-line max-len
+// TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
   EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-> extends createCollectionMixin(CommonMethods<EventSpec>) {
+> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
