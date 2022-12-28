@@ -14,6 +14,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation_registry';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
@@ -927,7 +928,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = fabric.util.getKlass(object.type).prototype;
+    const prototype = classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -1964,25 +1965,18 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject<
-    T extends FabricObject,
-    X,
-    K extends X extends keyof T
-      ? { new (arg0: T[X], ...args: any[]): T }
-      : { new (...args: any[]): T }
-  >(
-    klass: K,
+  static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
+    { extraParam, ...options }: { extraParam?: any; signal?: AbortSignal } = {}
   ) {
-    return enlivenObjectEnlivables<InstanceType<K>>(
+    return enlivenObjectEnlivables<InstanceType<this>>(
       clone(object, true),
       options
     ).then((enlivedMap) => {
       // from the resulting enlived options, extract options.extraParam to arg0
       // to avoid accidental overrides later
       const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
-      return extraParam ? new klass(arg0, rest) : new klass(rest);
+      return extraParam ? new this(arg0, rest) : new this(rest);
     });
   }
 
@@ -1997,7 +1991,7 @@ export class FabricObject<
     object: Record<string, unknown>,
     options?: { signal?: AbortSignal }
   ) {
-    return FabricObject._fromObject(FabricObject, object, options);
+    return this._fromObject(object, options);
   }
 }
 
@@ -2128,3 +2122,5 @@ export const fabricObjectDefaultValues = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
+
+classRegistry.setClass(FabricObject);
