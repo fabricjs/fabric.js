@@ -723,7 +723,7 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters: f, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
     return Promise.all([

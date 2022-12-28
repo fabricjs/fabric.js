@@ -14,7 +14,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation_registry';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
