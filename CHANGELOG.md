@@ -7,6 +7,7 @@
   - brush doesn't add result to canvas anymore
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
+- chore(TS): Remove backward compatibility initialize methods [#8525](https://github.com/fabricjs/fabric.js/pull/8525/)
 - chore(TS): replace getKlass utility with a registry that doesn't require full fabricJS to work [#8500](https://github.com/fabricjs/fabric.js/pull/8500)
 - chore(): use context in static constructors [#8522](https://github.com/fabricjs/fabric.js/issues/8522)
 - chore(TS): Convert Canvas class #8510

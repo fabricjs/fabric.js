@@ -52,14 +52,6 @@ export abstract class AbstractBaseFilter<T> {
   }
 
   /**
-   * just the compatibility layer until all classes are translated
-   * @param {Object} [options] Options object
-   */
-  initialize(options = {}) {
-    this.setOptions(options);
-  }
-
-  /**
    * Sets filter's properties from options
    * @param {Object} [options] Options object
    */
