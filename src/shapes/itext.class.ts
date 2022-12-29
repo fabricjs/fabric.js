@@ -10,6 +10,7 @@ import {
 } from '../mixins/itext_key_const';
 import { classRegistry } from '../util/class_registry';
 import { TClassProperties, TFiller } from '../typedefs';
+import type { Canvas } from '../canvas/canvas_events';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
@@ -172,10 +173,13 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
-    } else {
-      super._set(key, value);
+      return;
     }
-    return this;
+    if (key === 'canvas') {
+      this.canvas?.textEditingManager.remove(this);
+      (value as Canvas | undefined)?.textEditingManager.add(this);
+    }
+    super._set(key, value);
   }
 
   /**

@@ -123,7 +123,7 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
-  private textEditingManager = new CanvasTextEditingManager(this);
+  textEditingManager = new CanvasTextEditingManager(this);
 
   /**
    * Adds mouse listeners to canvas
@@ -1646,22 +1646,6 @@ export class Canvas extends SelectableCanvas {
 
   exitTextEditing() {
     this.textEditingManager.exitTextEditing();
-  }
-
-  /**
-   * @override update {@link textEditingManager} if necessary
-   */
-  _onObjectAdded(obj: FabricObject<ObjectEvents>): void {
-    super._onObjectAdded(obj);
-    isInteractiveTextObject(obj) && this.textEditingManager.add(obj);
-  }
-
-  /**
-   * @override update {@link textEditingManager} if necessary
-   */
-  _onObjectRemoved(obj: FabricObject<ObjectEvents>): void {
-    super._onObjectRemoved(obj);
-    isInteractiveTextObject(obj) && this.textEditingManager.remove(obj);
   }
 
   /**
