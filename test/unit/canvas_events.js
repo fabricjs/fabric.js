@@ -781,14 +781,14 @@
         target.item(1).item(1),
         target.item(1).item(1).item(1)
       ];
-      canvas._fireOverOutEvents(target, moveEvent);
+      canvas._fireOverOutEvents(moveEvent, target);
       assert.equal(counterOver, 4, 'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, target, 'activeSelection is _hoveredTarget');
       assert.equal(canvas._hoveredTargets.length, 3, '3 additional subTargets are captured as _hoveredTargets');
 
       // perform MouseOut even on all hoveredTargets
       canvas.targets = [];
-      canvas._fireOverOutEvents(null, moveEvent);
+      canvas._fireOverOutEvents(moveEvent, null);
       assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
       assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');
@@ -1025,127 +1025,191 @@
   //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingX');
   // });
 
-  QUnit.test('getCornerCursor ', function(assert) {
-    assert.ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'getCornerCursor is a function');
+  QUnit.test('_setCursorFromEvent ', function(assert) {
     var key = canvas.altActionKey;
     var key2 = canvas.uniScaleKey;
-    var target = new fabric.Object({ canvas: canvas });
-    var e = { };
-    e[key] = false;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'crosshair action is not disabled');
+    var target = new fabric.Rect({ width: 100, height: 100 });
+    canvas.add(target);
+    canvas.setActiveObject(target);
+    target.setCoords();
+    const expected = {
+      mt: 'n-resize',
+      mb: 's-resize',
+      ml: 'w-resize',
+      mr: 'e-resize',
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expected[corner], `${expected[corner]} action is not disabled`);
+    })
 
-    target = new fabric.Object({ canvas: canvas });
+    const expectedLockScalinX = {
+      mt: 'n-resize',
+      mb: 's-resize',
+      ml: 'not-allowed',
+      mr: 'not-allowed',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
     target.lockScalingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingX');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingX key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinX[corner], `${corner} is ${expectedLockScalinX[corner]} for lockScalingX`);
+    });
+    // when triggering the uniscaleKey corners are ok
+    const expectedUniScale = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedUniScale[corner], `${corner} is ${expectedUniScale[corner]} for uniScaleKey pressed`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
+    const expectedLockScalinY = {
+      mt: 'not-allowed',
+      mb: 'not-allowed',
+      ml: 'w-resize',
+      mr: 'e-resize',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
+    target.lockScalingX = false;
     target.lockScalingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingY');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingY key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinY[corner], `${corner} is ${expectedLockScalinY[corner]} for lockScalingY`);
+    });
+    const expectedLockScalinYUniscaleKey = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinYUniscaleKey[corner], `${corner} is ${expectedLockScalinYUniscaleKey[corner]} for lockScalingY + uniscaleKey`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
+    const expectedAllLock = {
+      mt: 'not-allowed',
+      mb: 'not-allowed',
+      ml: 'not-allowed',
+      mr: 'not-allowed',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
     target.lockScalingY = true;
     target.lockScalingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScaling');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedAllLock[corner], `${corner} is ${expectedAllLock[corner]} for all locked`);
+    });
+    // when pressing uniscale key
+    const expectedAllLockUniscale = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedAllLockUniscale[corner], `${corner} is ${expectedAllLockUniscale[corner]} for all locked + uniscale`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
     target.lockRotation = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'mtr action is disabled lockRotation');
+    target.lockScalingY = false;
+    target.lockScalingX = false;
+    const e = { clientX: target.oCoords.mtr.x, clientY: target.oCoords.mtr.y, [key]: false };
+    canvas._setCursorFromEvent(e, target);
+    assert.equal(canvas.upperCanvasEl.style.cursor, 'not-allowed', `mtr is not allowed for locked rotation`);
 
-    target = new fabric.Object({ canvas: canvas });
     target.lockSkewingX = true;
     target.lockSkewingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    target.lockRotation = false;
+    // with lock-skewing we are back at normal
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expected[corner], `${key} is ${expected[corner]} for both lockskewing`);
+    });
 
-    e[key] = true;
-    target = new fabric.Object({ canvas: canvas });
+    // trying to skew while lock skew Y
     target.lockSkewingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'ew-resize', 'lockSkewingY mt action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'ew-resize', 'lockSkewingY mb action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'lockSkewingY ml action is disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'lockSkewingY mr action is disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingY tl action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingY tr action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingY bl action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingY br action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingY mtr action is not disabled');
+    target.lockSkewingX = false;
+    const expectedLockSkewingY = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'not-allowed', // skewing
+      mr: 'not-allowed', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingY[corner], `${corner} ${expectedLockSkewingY[corner]} for lockSkewingY`);
+    });
 
-    e[key] = true;
-    target = new fabric.Object({ canvas: canvas });
+    // trying to skew while lock skew X
+    target.lockSkewingY = false;
     target.lockSkewingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'lockSkewingX mt action is disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'lockSkewingX mb action is disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'ns-resize', 'lockSkewingX ml action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'ns-resize', 'lockSkewingX mr action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingX tl action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingX tr action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingX bl action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
+    const expectedLockSkewingX = {
+      mt: 'not-allowed', // skewing
+      mb: 'not-allowed', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingX[corner], `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`);
+    });
   });
 })();

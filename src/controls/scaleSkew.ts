@@ -4,14 +4,13 @@ import {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/Object/Object';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxisKey } from '../typedefs';
-import { Canvas } from '../__types__';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 
 function isAltAction(eventData: TPointerEvent, target: FabricObject) {
-  return eventData[(target.canvas as Canvas)?.altActionKey];
+  return eventData[target.canvas!.altActionKey!];
 }
 
 /**

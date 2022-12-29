@@ -5,7 +5,8 @@ import { Group } from '../shapes/group.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
-import { BaseBrush, TBrushEventData } from './base_brush.class';
+import type { Canvas } from '../canvas/canvas_events';
+import { BaseBrush } from './base_brush.class';
 
 export type SprayBrushPoint = {
   x: number;

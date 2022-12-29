@@ -6,7 +6,7 @@ import {
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxis } from '../typedefs';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -37,7 +37,7 @@ export function scaleIsProportional(
   fabricObject: FabricObject
 ): boolean {
   const canvas = fabricObject.canvas as Canvas,
-    uniformIsToggled = eventData[canvas.uniScaleKey];
+    uniformIsToggled = eventData[canvas.uniScaleKey!];
   return (
     (canvas.uniformScaling && !uniformIsToggled) ||
     (!canvas.uniformScaling && uniformIsToggled)

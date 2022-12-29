@@ -6,7 +6,8 @@ import { Circle } from '../shapes/circle.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { getRandomInt } from '../util/internals';
-import { BaseBrush, TBrushEventData } from './base_brush.class';
+import type { Canvas } from '../canvas/canvas_events';
+import { BaseBrush } from './base_brush.class';
 
 export type CircleBrushPoint = {
   x: number;

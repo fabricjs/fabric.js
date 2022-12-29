@@ -350,22 +350,57 @@
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     canvas.on('selection:created', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    canvas._createActiveSelection({}, rect2);
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
+    canvas.clear();
   });
 
   QUnit.test('create active selection fires selected on new object', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     rect2.on('selected', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    canvas._createActiveSelection({}, rect2);
+    const activeSelection = canvas.getActiveObjects();
     assert.equal(isFired, true, 'selected fired on rect2');
+    assert.equal(activeSelection[0], rect1, 'first rec1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
+    canvas.clear();
+  });
+
+  QUnit.test('create active selection selected in different order, but same result', function(assert) {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    rect2.on('selected', function( ) { isFired = true; });
+    canvas.setActiveObject(rect2);
+    canvas._createActiveSelection({}, rect1);
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[0], rect1, 'first rec1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
+    canvas.clear();
+  });
+
+  QUnit.test('create active added in different order, selection selected in different order, different result', function(assert) {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect2, rect1);
+    rect2.on('selected', function( ) { isFired = true; });
+    canvas.setActiveObject(rect2);
+    canvas._createActiveSelection({}, rect1);
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[1], rect1, 'then rect1');
+    assert.equal(activeSelection[0], rect2, 'first rect2');
+    canvas.clear();
   });
 
   QUnit.test('update active selection selection:updated', function(assert) {
@@ -375,7 +410,7 @@
     var rect3 = new fabric.Rect();
     canvas.on('selection:updated', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    canvas._updateActiveSelection({}, rect3);
     assert.equal(isFired, true, 'selection:updated fired');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
     canvas.off('selection:updated');
@@ -387,7 +422,7 @@
     var rect2 = new fabric.Rect();
     rect2.on('deselected', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect2, {});
+    canvas._updateActiveSelection({}, rect2);
     assert.equal(isFired, true, 'deselected on rect2 fired');
   });
 
@@ -398,7 +433,7 @@
     var rect3 = new fabric.Rect();
     rect3.on('selected', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    canvas._updateActiveSelection({}, rect3);
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
 
@@ -411,28 +446,6 @@
     canvas.setActiveObject(rect1);
     canvas.setActiveObject(rect2);
     assert.equal(isFired, true, 'switching active group fires deselected');
-  });
-
-  QUnit.test('_createGroup respect order of objects', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect1);
-    var selection = canvas._createGroup(rect2);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  });
-
-  QUnit.test('_createGroup respect order of objects (inverted)', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect2);
-    var selection = canvas._createGroup(rect1);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
   QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
