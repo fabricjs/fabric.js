@@ -794,22 +794,6 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
-  QUnit.test('straightenObject', function(assert) {
-    assert.ok(typeof canvas.straightenObject === 'function');
-    var rect = makeRect({ angle: 10 });
-    canvas.add(rect);
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
-
-    rect.rotate('60');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
-
-    rect.rotate('100');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
-  });
-
   QUnit.test('toSVG', function(assert) {
     assert.ok(typeof canvas.toSVG === 'function');
     canvas.clear();
