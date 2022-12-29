@@ -54,9 +54,8 @@ import {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './planeChange';
-import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
+import { escapeXml, graphemeSplit, capitalize } from '../lang_string';
 import {
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -100,6 +99,8 @@ import {
   cancelAnimFrame,
 } from '../animation';
 import { createClass } from '../lang_class';
+import { classRegistry } from '../class_registry';
+
 /**
  * @namespace fabric.util
  */
@@ -158,12 +159,10 @@ fabric.util = {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
   string: {
-    camelize,
-    capitalize,
     escapeXml,
     graphemeSplit,
+    capitalize,
   },
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -199,4 +198,5 @@ fabric.util = {
   requestAnimFrame,
   cancelAnimFrame,
   createClass,
+  classRegistry,
 };

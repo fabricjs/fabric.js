@@ -350,22 +350,57 @@
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     canvas.on('selection:created', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    canvas._createActiveSelection({}, rect2);
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
+    canvas.clear();
   });
 
   QUnit.test('create active selection fires selected on new object', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     rect2.on('selected', function( ) { isFired = true; });
     canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    canvas._createActiveSelection({}, rect2);
+    const activeSelection = canvas.getActiveObjects();
     assert.equal(isFired, true, 'selected fired on rect2');
+    assert.equal(activeSelection[0], rect1, 'first rec1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
+    canvas.clear();
+  });
+
+  QUnit.test('create active selection selected in different order, but same result', function(assert) {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    rect2.on('selected', function( ) { isFired = true; });
+    canvas.setActiveObject(rect2);
+    canvas._createActiveSelection({}, rect1);
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[0], rect1, 'first rec1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
+    canvas.clear();
+  });
+
+  QUnit.test('create active added in different order, selection selected in different order, different result', function(assert) {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect2, rect1);
+    rect2.on('selected', function( ) { isFired = true; });
+    canvas.setActiveObject(rect2);
+    canvas._createActiveSelection({}, rect1);
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[1], rect1, 'then rect1');
+    assert.equal(activeSelection[0], rect2, 'first rect2');
+    canvas.clear();
   });
 
   QUnit.test('update active selection selection:updated', function(assert) {
@@ -375,7 +410,7 @@
     var rect3 = new fabric.Rect();
     canvas.on('selection:updated', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    canvas._updateActiveSelection({}, rect3);
     assert.equal(isFired, true, 'selection:updated fired');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
     canvas.off('selection:updated');
@@ -387,7 +422,7 @@
     var rect2 = new fabric.Rect();
     rect2.on('deselected', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect2, {});
+    canvas._updateActiveSelection({}, rect2);
     assert.equal(isFired, true, 'deselected on rect2 fired');
   });
 
@@ -398,7 +433,7 @@
     var rect3 = new fabric.Rect();
     rect3.on('selected', function( ) { isFired = true; });
     canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    canvas._updateActiveSelection({}, rect3);
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
 
@@ -411,28 +446,6 @@
     canvas.setActiveObject(rect1);
     canvas.setActiveObject(rect2);
     assert.equal(isFired, true, 'switching active group fires deselected');
-  });
-
-  QUnit.test('_createGroup respect order of objects', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect1);
-    var selection = canvas._createGroup(rect2);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  });
-
-  QUnit.test('_createGroup respect order of objects (inverted)', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect2);
-    var selection = canvas._createGroup(rect1);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
   });
 
   QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
@@ -1151,107 +1164,6 @@
     canvas.preserveObjectStacking = false;
   });
 
-  QUnit.test('ActiveSelection sendToBack', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendToBack(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
-  });
-
-  QUnit.test('activeGroup bringToFront', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringToFront(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
-  });
-
-  QUnit.test('activeGroup bringForward', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect1, 'rect1 should be the new second');
-    assert.equal(canvas._objects[2], rect2, 'rect2 should be the third object');
-    assert.equal(canvas._objects[3], rect4, 'rect4 did not move');
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.bringForward(activeSel);
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 is still third');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still new top');
-  });
-
-  QUnit.test('activeGroup sendBackwards', function(assert) {
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 is still last');
-    assert.equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
-    assert.equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 is  last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be shifted down by 1');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be shifted down by 1');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still on top');
-    canvas.sendBackwards(activeSel);
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 is still last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be steady');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be steady');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still on top');
-  });
-
   QUnit.test('toDataURL', function(assert) {
     assert.ok(typeof canvas.toDataURL === 'function');
     var dataURL = canvas.toDataURL();
@@ -1319,22 +1231,6 @@
 
     assert.equal(rect.getCenterPoint().y, upperCanvasEl.height / 2, 'object\'s "top" property should correspond to canvas element\'s center');
     assert.equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
-  });
-
-  QUnit.test('straightenObject', function(assert) {
-    assert.ok(typeof canvas.straightenObject === 'function');
-    var rect = makeRect({ angle: 10 });
-    canvas.add(rect);
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
-
-    rect.rotate('60');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
-
-    rect.rotate('100');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
   });
 
   QUnit.test('toJSON', function(assert) {
@@ -1758,8 +1654,8 @@
   // });
 
 
-  QUnit.test('sendToBack', function(assert) {
-    assert.ok(typeof canvas.sendToBack === 'function');
+  QUnit.test('sendObjectToBack', function(assert) {
+    assert.ok(typeof canvas.sendObjectToBack === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1767,18 +1663,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.sendToBack(rect3);
+    canvas.sendObjectToBack(rect3);
     assert.equal(canvas.item(0), rect3, 'third should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should *still* be the first one');
   });
 
-  QUnit.test('bringToFront', function(assert) {
-    assert.ok(typeof canvas.bringToFront === 'function');
+  QUnit.test('bringObjectToFront', function(assert) {
+    assert.ok(typeof canvas.bringObjectToFront === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1786,18 +1682,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.bringToFront(rect1);
+    canvas.bringObjectToFront(rect1);
     assert.equal(canvas.item(2), rect1, 'first should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should *still* be the last one');
   });
 
-  QUnit.test('sendBackwards', function(assert) {
-    assert.ok(typeof canvas.sendBackwards === 'function');
+  QUnit.test('sendObjectBackwards', function(assert) {
+    assert.ok(typeof canvas.sendObjectBackwards === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1810,42 +1706,42 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [3, 1, 2]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // 3 stays at the deepEqual position — [2, 3, 1]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
   });
 
-  QUnit.test('bringForward', function(assert) {
-    assert.ok(typeof canvas.bringForward === 'function');
+  QUnit.test('bringObjectForward', function(assert) {
+    assert.ok(typeof canvas.bringObjectForward === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1858,28 +1754,28 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up again — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect3);
+    canvas.bringObjectForward(rect3);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
@@ -2113,22 +2009,19 @@
   });
 
   QUnit.test('cloneWithoutData', function(assert) {
-    var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
     canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
-    canvas.cloneWithoutData().then(function(clone) {
+    const clone = canvas.cloneWithoutData();
 
-      assert.ok(clone instanceof fabric.Canvas);
+    assert.ok(clone instanceof fabric.Canvas);
 
-      assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
+    assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
-      assert.equal(canvas.getWidth(), clone.getWidth());
-      assert.equal(canvas.getHeight(), clone.getHeight());
-      clone.renderAll();
-      done();
-    });
+    assert.equal(canvas.getWidth(), clone.getWidth());
+    assert.equal(canvas.getHeight(), clone.getHeight());
+    clone.renderAll();
   });
 
   QUnit.test('getSetWidth', function(assert) {

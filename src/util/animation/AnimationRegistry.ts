@@ -1,5 +1,5 @@
 import { fabric } from '../../../HEADER';
-import type { Canvas } from '../../canvas.class';
+import type { Canvas } from '../../canvas/canvas_events';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { AnimationBase } from './AnimationBase';
 
