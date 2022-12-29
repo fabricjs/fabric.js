@@ -14,6 +14,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation_registry';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
@@ -646,16 +647,6 @@ export class FabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options?: Partial<TClassProperties<FabricObject>>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Create a the canvas used to keep the cached copy of the object
    * @private
    */
@@ -937,7 +928,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = fabric.util.getKlass(object.type).prototype;
+    const prototype = classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -1976,7 +1967,7 @@ export class FabricObject<
    */
   static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
+    { extraParam, ...options }: { extraParam?: any; signal?: AbortSignal } = {}
   ) {
     return enlivenObjectEnlivables<InstanceType<this>>(
       clone(object, true),
@@ -2131,3 +2122,5 @@ export const fabricObjectDefaultValues = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
+
+classRegistry.setClass(FabricObject);
