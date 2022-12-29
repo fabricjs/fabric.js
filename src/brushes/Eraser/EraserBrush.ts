@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas.class';
+import type { Canvas } from '../../canvas/canvas_events';
 import { Color } from '../../color';
 import { TEvent, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
