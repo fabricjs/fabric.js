@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { fabric } from '../../HEADER';
+import type { Canvas } from '../canvas/canvas_events';
 import { ObjectEvents, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
@@ -9,8 +10,7 @@ import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { clone } from '../util/lang_object';
 import { createCanvasElement } from '../util/misc/dom';
-import { isIdentityMatrix, transformPoint } from '../util/misc/matrix';
-import { Canvas } from '../__types__';
+import { isIdentityMatrix } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
@@ -66,7 +66,7 @@ export abstract class ITextBehaviorMixin<
     selectable: boolean;
     hoverCursor: string | null;
     defaultCursor: string;
-    moveCursor: string;
+    moveCursor: CSSStyleDeclaration['cursor'];
   };
   protected _selectionDirection: 'left' | 'right' | null;
 
