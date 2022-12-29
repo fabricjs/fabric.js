@@ -1,18 +1,12 @@
 import type { IText } from '../shapes/itext.class';
 import type { Textbox } from '../shapes/textbox.class';
 import { removeFromArray } from '../util/internals';
-import type { Canvas } from './canvas_events';
 
 /**
  * In charge of synchronizing all interactive text instances of a canvas
  */
-export class CanvasTextEditingManager {
+export class TextEditingManager {
   private targets: (IText | Textbox)[] = [];
-  readonly canvas: Canvas;
-
-  constructor(canvas: Canvas) {
-    this.canvas = canvas;
-  }
 
   exitTextEditing() {
     this.targets.forEach((obj) => {
@@ -23,6 +17,9 @@ export class CanvasTextEditingManager {
     });
   }
 
+  /**
+   * called from canvas mouse up
+   */
   informMouseUp() {
     this.targets.forEach((obj) => {
       obj.__isMousedown = false;

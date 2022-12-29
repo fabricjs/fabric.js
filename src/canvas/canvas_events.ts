@@ -21,7 +21,7 @@ import {
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './canvas.class';
-import { CanvasTextEditingManager } from './CanvasTextEditingManager';
+import { TextEditingManager } from './TextEditingManager';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -123,7 +123,7 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
-  textEditingManager = new CanvasTextEditingManager(this);
+  textEditingManager = new TextEditingManager();
 
   /**
    * Adds mouse listeners to canvas
