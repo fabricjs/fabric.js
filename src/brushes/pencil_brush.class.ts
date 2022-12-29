@@ -66,7 +66,6 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   protected shouldHandleEvent(e: TPointerEvent) {
-    // @ts-expect-error TODO: canvas events mixin migration
     return this.canvas._isMainEvent(e);
   }
 
