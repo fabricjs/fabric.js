@@ -77,30 +77,6 @@
       assert.deepEqual(iText.styles, { });
     });
 
-    QUnit.test('instances', function(assert) {
-      var iText = new fabric.IText('test');
-
-      // Not on a sketchpad; storing it in instances array already would leak it forever.
-      var instances = canvas._iTextInstances && canvas._iTextInstances;
-      var lastInstance = instances && instances[instances.length - 1];
-      assert.equal(lastInstance, undefined);
-
-      canvas.add(iText);
-      instances = canvas._iTextInstances && canvas._iTextInstances;
-      lastInstance = instances && instances[instances.length - 1];
-      assert.equal(lastInstance, iText);
-
-      canvas.remove(iText);
-      instances = canvas._iTextInstances && canvas._iTextInstances;
-      lastInstance = instances && instances[instances.length - 1];
-      assert.equal(lastInstance, undefined);
-
-      // Should survive being added again after removal.
-      canvas.add(iText);
-      lastInstance = canvas._iTextInstances && canvas._iTextInstances[canvas._iTextInstances.length - 1];
-      assert.equal(lastInstance, iText);
-    });
-
     QUnit.test('fromObject', function(assert) {
       var done = assert.async();
       assert.ok(typeof fabric.IText.fromObject === 'function');
@@ -634,34 +610,6 @@
       assert.equal(iText.getCurrentCharFontSize(), 60);
       iText.selectionStart = 3;
       assert.equal(iText.getCurrentCharFontSize(), 40);
-    });
-
-    QUnit.test('object removal from canvas', function(assert) {
-      canvas.clear();
-      canvas._iTextInstances = null;
-      var text1 = new fabric.IText('Text Will be here');
-      var text2 = new fabric.IText('Text Will be here');
-      assert.ok(!canvas._iTextInstances, 'canvas has no iText instances');
-      assert.ok(!canvas._hasITextHandlers, 'canvas has no handlers');
-
-      canvas.add(text1);
-      assert.deepEqual(canvas._iTextInstances, [text1], 'canvas has 1 text instance');
-      assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
-      assert.equal(canvas._iTextInstances.length, 1, 'just one itext object should be on canvas');
-
-      canvas.add(text2);
-      assert.deepEqual(canvas._iTextInstances, [text1, text2], 'canvas has 2 text instance');
-      assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
-      assert.equal(canvas._iTextInstances.length, 2, 'just two itext object should be on canvas');
-
-      canvas.remove(text1);
-      assert.deepEqual(canvas._iTextInstances, [text2], 'canvas has 1 text instance');
-      assert.ok(canvas._hasITextHandlers, 'canvas has handlers');
-      assert.equal(canvas._iTextInstances.length, 1, 'just two itext object should be on canvas');
-
-      canvas.remove(text2);
-      assert.deepEqual(canvas._iTextInstances, [], 'canvas has 0 text instance');
-      assert.ok(!canvas._hasITextHandlers, 'canvas has no handlers');
     });
 
     QUnit.test('getCurrentCharColor', function(assert) {

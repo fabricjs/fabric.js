@@ -1212,4 +1212,35 @@
       assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingX[corner], `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`);
     });
   });
+
+  QUnit.test('text editing manager', function (assert) {
+    const manager = canvas.textEditingManager;
+    assert.ok(manager, 'should exist');
+    assert.equal(manager.canvas, canvas, 'should have same canvas ref');
+    assert.deepEqual(manager.targets, [], 'should be empty');
+
+    const a = new fabric.IText('test');
+    const b = new fabric.IText('test');
+    const e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
+
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.remove(a);
+    assert.deepEqual(manager.targets, []);
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [a, b]);
+    a.enterEditing();
+    assert.ok(a.isEditing);
+    b.enterEditing();
+    assert.ok(b.isEditing);
+    assert.ok(!a.isEditing, 'should have called exit editing');
+    b.fire('mousedown', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(b.__isMousedown);
+    canvas.__onMouseUp(e);
+    assert.ok(!b.__isMousedown, 'should have informed mouse up');
+    manager.dispose()
+    assert.deepEqual(manager.targets, [], 'should have disposed refs');
+  });
 })();
