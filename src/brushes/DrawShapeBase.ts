@@ -37,7 +37,7 @@ export abstract class DrawShapeBase<T extends FabricObject> extends BaseBrush {
     if (!shape) return;
     shape.setCoords();
     this.canvas.fire('before:path:created', { path: shape });
-    this.canvas.add(this.shape);
+    this.canvas.add(shape);
     this.canvas.fire('path:created', { path: shape });
     this.canvas.clearContext(this.canvas.contextTop);
     this.shape = undefined;
