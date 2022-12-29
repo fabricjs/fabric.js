@@ -1601,7 +1601,7 @@
     var clonedObjects = cloned.getObjects();
     assert.equal(clonedObjects.length, 0, 'no cloend objects');
     assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
-    assert.equal(cloned.backgroundColor, undefined, 'background color has not been cloned');
+    assert.notEqual(cloned.backgroundColor, 'red', 'background color has not been cloned');
   });
 
   QUnit.test('getSetWidth', function(assert) {
