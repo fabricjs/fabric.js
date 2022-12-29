@@ -84,13 +84,6 @@ export class Canvas extends SelectableCanvas {
   enablePointerEvents: boolean;
 
   /**
-   * an internal flag that is used to remember if we already bound the events
-   * @type Boolean
-   * @private
-   */
-  private eventsBound: boolean;
-
-  /**
    * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
@@ -125,7 +118,31 @@ export class Canvas extends SelectableCanvas {
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
-    this._bindEvents();
+    // bind event handlers
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onTouchStart = this._onTouchStart.bind(this);
+    this._onMouseMove = this._onMouseMove.bind(this);
+    this._onMouseUp = this._onMouseUp.bind(this);
+    this._onTouchEnd = this._onTouchEnd.bind(this);
+    this._onResize = this._onResize.bind(this);
+    // this._onGesture=this._onGesture.bind(this)
+    // this._onDrag=this._onDrag.bind(this)
+    // this._onShake=this._onShake.bind(this)
+    // this._onLongPress=this._onLongPress.bind(this)
+    // this._onOrientationChange=this._onOrientationChange.bind(this)
+    this._onMouseWheel = this._onMouseWheel.bind(this);
+    this._onMouseOut = this._onMouseOut.bind(this);
+    this._onMouseEnter = this._onMouseEnter.bind(this);
+    this._onContextMenu = this._onContextMenu.bind(this);
+    this._onDoubleClick = this._onDoubleClick.bind(this);
+    this._onDragStart = this._onDragStart.bind(this);
+    this._onDragEnd = this._onDragEnd.bind(this);
+    this._onDragProgress = this._onDragProgress.bind(this);
+    this._onDragOver = this._onDragOver.bind(this);
+    this._onDragEnter = this._onDragEnter.bind(this);
+    this._onDragLeave = this._onDragLeave.bind(this);
+    this._onDrop = this._onDrop.bind(this);
+    // register event handlers
     this.addOrRemove(addListener, 'add');
   }
 
@@ -205,47 +222,6 @@ export class Canvas extends SelectableCanvas {
       this._onMouseMove as EventListener,
       addEventOptions
     );
-  }
-
-  /**
-   * @private
-   */
-  private _bindEvents() {
-    if (this.eventsBound) {
-      // for any reason we pass here twice we do not want to bind events twice.
-      return;
-    }
-    (
-      [
-        '_onMouseDown',
-        '_onTouchStart',
-        '_onMouseMove',
-        '_onMouseUp',
-        '_onTouchEnd',
-        '_onResize',
-        // '_onGesture',
-        // '_onDrag',
-        // '_onShake',
-        // '_onLongPress',
-        // '_onOrientationChange',
-        '_onMouseWheel',
-        '_onMouseOut',
-        '_onMouseEnter',
-        '_onContextMenu',
-        '_onDoubleClick',
-        '_onDragStart',
-        '_onDragEnd',
-        '_onDragProgress',
-        '_onDragOver',
-        '_onDragEnter',
-        '_onDragLeave',
-        '_onDrop',
-      ] as const
-    ).forEach((eventHandler) => {
-      // @ts-expect-error dumb TS
-      this[eventHandler] = this[eventHandler].bind(this);
-    });
-    this.eventsBound = true;
   }
 
   /**
@@ -1647,10 +1623,5 @@ export class Canvas extends SelectableCanvas {
     return new Canvas(el);
   }
 }
-
-// there is an order execution bug if i put this as public property.
-Object.assign(Canvas.prototype, {
-  eventsBound: false,
-});
 
 fabric.Canvas = Canvas;
