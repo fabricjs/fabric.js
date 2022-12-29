@@ -12,6 +12,7 @@ import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { Canvas } from '../../canvas/canvas_events';
 
 type TOCoord = IPoint & {
   corner: TCornerPoint;
@@ -19,6 +20,10 @@ type TOCoord = IPoint & {
 };
 
 type TControlSet = Record<string, Control>;
+
+export type FabricObjectWithDragSupport = InteractiveFabricObject & {
+  onDragStart: (e: DragEvent) => boolean;
+};
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -73,9 +78,30 @@ export class InteractiveFabricObject<
 
   /**
    * internal boolean to signal the code that the object is
-   * part of the drag action.
+   * part of the move action.
    */
   isMoving?: boolean;
+
+  /**
+   * internal boolean to signal the code that the object is
+   * part of the draggin action.
+   * @TODO: discuss isMoving and isDragging being not adequate enough
+   * they need to be either both private or more generic
+   * Canvas class needs to see this variable
+   */
+  __isDragging?: boolean;
+
+  /**
+   * A boolean used from the gesture module to keep tracking of a scaling
+   * action when there is no scaling transform in place.
+   * This is an edge case and is used twice in all codebase.
+   * Probably added to keep track of some performance issues
+   * @TODO use git blame to investigate why it was added
+   * DON'T USE IT. WE WILL TRY TO REMOVE IT
+   */
+  _scaling?: boolean;
+
+  declare canvas?: Canvas;
 
   /**
    * Constructor
@@ -86,29 +112,19 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options: Record<string, unknown>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Determines which corner has been clicked
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
-   * @param {boolean} forTouch indicates if we are looking for interactin area with a touch action
+   * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
    */
-  _findTargetCorner(pointer: Point, forTouch: boolean): false | string {
+  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
     if (
       !this.hasControls ||
       !this.canvas ||
-      this.canvas._activeObject !== this
+      (this.canvas._activeObject as InteractiveFabricObject) !== this
     ) {
-      return false;
+      return 0;
     }
 
     this.__corner = 0;
@@ -141,7 +157,7 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return false;
+    return 0;
   }
 
   /**
@@ -275,7 +291,8 @@ export class InteractiveFabricObject<
     if (
       !this.selectionBackgroundColor ||
       (this.canvas && !this.canvas.interactive) ||
-      (this.canvas && this.canvas._activeObject !== this)
+      (this.canvas &&
+        (this.canvas._activeObject as InteractiveFabricObject) !== this)
     ) {
       return;
     }
@@ -570,7 +587,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect() {
+  renderDragSourceEffect(e: DragEvent) {
     // for subclasses
   }
 
