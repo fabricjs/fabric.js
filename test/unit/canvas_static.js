@@ -794,22 +794,6 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
-  QUnit.test('straightenObject', function(assert) {
-    assert.ok(typeof canvas.straightenObject === 'function');
-    var rect = makeRect({ angle: 10 });
-    canvas.add(rect);
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
-
-    rect.rotate('60');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
-
-    rect.rotate('100');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
-  });
-
   QUnit.test('toSVG', function(assert) {
     assert.ok(typeof canvas.toSVG === 'function');
     canvas.clear();
@@ -1594,7 +1578,10 @@
     var rect = new fabric.Rect();
     canvas2.add(rect);
     canvas2.clone().then(function(cloned) {
-      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      assert.ok(cloned instanceof fabric.StaticCanvas, 'is cloned in a StaticCanvas');
+      // check regression
+      assert.notOk(cloned instanceof fabric.Canvas, 'is not cloned in a Canvas');
+
       var clonedRect = cloned.getObjects()[0];
       assert.equal(clonedRect.type, 'rect', 'the rect has been cloned too');
       assert.equal(clonedRect.width, rect.width, 'the rect has been cloned too with properties');
@@ -1604,20 +1591,17 @@
   });
 
   QUnit.test('cloneWithoutData', function(assert) {
-    var done = assert.async();
     var canvas2 = new fabric.StaticCanvas(null, { renderOnAddRemove: false, width: 10, height: 10 });
     assert.ok(typeof canvas.clone === 'function');
     var rect = new fabric.Rect();
     canvas2.add(rect);
     canvas2.backgroundColor = 'red';
-    canvas2.cloneWithoutData().then(function(cloned) {
-      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
-      var clonedObjects = cloned.getObjects();
-      assert.equal(clonedObjects.length, 0, 'no cloend objects');
-      assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
-      assert.equal(cloned.backgroundColor, 'red', 'background color has been cloned');
-      done();
-    });
+    const cloned = canvas2.cloneWithoutData()
+    assert.ok(cloned instanceof fabric.StaticCanvas, 'is cloned in a StaticCanvas');
+    var clonedObjects = cloned.getObjects();
+    assert.equal(clonedObjects.length, 0, 'no cloend objects');
+    assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
+    assert.notEqual(cloned.backgroundColor, 'red', 'background color has not been cloned');
   });
 
   QUnit.test('getSetWidth', function(assert) {
