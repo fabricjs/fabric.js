@@ -993,14 +993,14 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   _onMouseDownInDrawingMode(e: TPointerEvent) {
-    this._isCurrentlyDrawing = true;
+    let dirty = false;
     if (this.getActiveObject()) {
       this.discardActiveObject(e);
-      this.requestRenderAll();
+      dirty = true;
     }
     const pointer = this.getPointer(e);
-    this.freeDrawingBrush &&
-      this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
+    this.freeDrawingBrush?.onMouseDown(pointer, { e, pointer });
+    dirty && this.requestRenderAll();
     this._handleEvent(e, 'down');
   }
 
@@ -1027,14 +1027,10 @@ export class Canvas extends SelectableCanvas {
    */
   _onMouseUpInDrawingMode(e: TPointerEvent) {
     const pointer = this.getPointer(e);
-    if (this.freeDrawingBrush) {
-      this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
-        e: e,
-        pointer: pointer,
-      });
-    } else {
-      this._isCurrentlyDrawing = false;
-    }
+    this.freeDrawingBrush!.onMouseUp({
+      e,
+      pointer,
+    });
     this._handleEvent(e, 'up');
   }
 
