@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
@@ -13,9 +14,11 @@ import { TCachedFabricObject } from '../shapes/Object/Object';
 import { Rect } from '../shapes/rect.class';
 import type {
   TCornerPoint,
+  TDataUrlOptions,
   TFiller,
   TMat2D,
   TSize,
+  TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
 import { cancelAnimFrame, requestAnimFrame } from '../util/animate';
@@ -1711,42 +1714,46 @@ export class StaticCanvas<
    * @param {Number} [options.height] Cropping height.
    * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
    */
-  toCanvasElement(multiplier: number, options: TDataUrlOptions): HTMLCanvasElement {
-    multiplier = multiplier || 1;
-    options = options || {};
-    const scaledWidth = (options.width || this.width) * multiplier,
-      scaledHeight = (options.height || this.height) * multiplier,
+  toCanvasElement(multiplier = 1, { width, height, left, top, filter } = {} as TToCanvasElementOptions): HTMLCanvasElement {
+    const scaledWidth = (width || this.width) * multiplier,
+      scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
       originalWidth = this.width,
       originalHeight = this.height,
       newZoom = zoom * multiplier,
       vp = this.viewportTransform,
-      translateX = (vp[4] - (options.left || 0)) * multiplier,
-      translateY = (vp[5] - (options.top || 0)) * multiplier,
+      translateX = (vp[4] - (left || 0)) * multiplier,
+      translateY = (vp[5] - (top || 0)) * multiplier,
+      // @ts-ignore
       originalInteractive = this.interactive,
-      newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
+      newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
-      canvasEl = fabric.util.createCanvasElement(),
+      canvasEl = createCanvasElement(),
+      // @ts-ignore
       originalContextTop = this.contextTop,
-      objectsToRender = options.filter
-        ? this._objects.filter(options.filter)
+      objectsToRender = filter
+        ? this._objects.filter(filter)
         : this._objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
+    // @ts-ignore
     this.contextTop = null;
     this.enableRetinaScaling = false;
+    // @ts-ignore
     this.interactive = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
     this.calcViewportBoundaries();
-    this.renderCanvas(canvasEl.getContext('2d'), objectsToRender);
+    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
     this.calcViewportBoundaries();
+    // @ts-ignore
     this.interactive = originalInteractive;
     this.enableRetinaScaling = originalRetina;
+    // @ts-ignore
     this.contextTop = originalContextTop;
     return canvasEl;
   }
