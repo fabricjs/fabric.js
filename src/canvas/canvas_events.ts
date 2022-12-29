@@ -125,7 +125,6 @@ export class Canvas extends SelectableCanvas {
   _previousPointer: Point;
 
   private _hasITextHandlers?: boolean;
-
   private _iTextInstances?: IText[];
   private _itextSelectionDisposer?: VoidFunction;
 
