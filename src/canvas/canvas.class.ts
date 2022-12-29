@@ -497,6 +497,7 @@ export class SelectableCanvas<
   _activeObject?: FabricObject;
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[];
+
   /**
    * Constructor
    * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
@@ -505,20 +506,14 @@ export class SelectableCanvas<
    */
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
+    this._createCacheCanvas();
   }
 
-  _init(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
+  protected initElements(el: string | HTMLCanvasElement) {
+    super.initElements(el);
     this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
-    // @ts-ignore
-    this._initEventListeners();
-    this._initRetinaScaling();
-    this.calcOffset();
-    this._createCacheCanvas();
   }
 
   /**
