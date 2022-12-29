@@ -36,6 +36,12 @@ export abstract class DrawShapeBase<
 
   protected finalizeShape() {
     const shape = this.shape;
+    if (!shape) return;
+    shape.setCoords();
+    this.canvas.fire('before:path:created', { path: shape });
+    this.canvas.add(shape);
+    this.canvas.fire('path:created', { path: shape });
+    this.canvas.clearContext(this.canvas.contextTop);
     // we release the ref here and not in `finalize` (async) to avoid a race condition
     this.shape = undefined;
     return shape;
