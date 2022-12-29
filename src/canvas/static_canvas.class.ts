@@ -1,43 +1,43 @@
 // @ts-nocheck
-import { fabric } from '../HEADER';
-import { config } from './config';
-import { iMatrix, VERSION } from './constants';
-import type { StaticCanvasEvents } from './EventTypeDefs';
-import { Gradient } from './gradient';
-import { createCollectionMixin } from './mixins/collection.mixin';
-import { TSVGReviver } from './mixins/object.svg_export';
-import { CommonMethods } from './mixins/shared_methods.mixin';
-import { Pattern } from './pattern.class';
-import { Point } from './point.class';
-import type { FabricObject } from './shapes/Object/FabricObject';
-import { TCachedFabricObject } from './shapes/Object/Object';
-import { Rect } from './shapes/rect.class';
+import { fabric } from '../../HEADER';
+import { config } from '../config';
+import { iMatrix, VERSION } from '../constants';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
+import { Gradient } from '../gradient';
+import { createCollectionMixin } from '../mixins/collection.mixin';
+import { TSVGReviver } from '../mixins/object.svg_export';
+import { CommonMethods } from '../mixins/shared_methods.mixin';
+import { Pattern } from '../pattern.class';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TCachedFabricObject } from '../shapes/Object/Object';
+import { Rect } from '../shapes/rect.class';
 import type {
   TCornerPoint,
   TFiller,
   TMat2D,
   TSize,
   TValidToObjectMethod,
-} from './typedefs';
-import { cancelAnimFrame, requestAnimFrame } from './util/animate';
+} from '../typedefs';
+import { cancelAnimFrame, requestAnimFrame } from '../util/animate';
 import {
   cleanUpJsdomNode,
   getElementOffset,
   getNodeCanvas,
-} from './util/dom_misc';
-import { removeFromArray } from './util/internals';
-import { uid } from './util/internals/uid';
-import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
-import { invertTransform, transformPoint } from './util/misc/matrix';
-import { pick } from './util/misc/pick';
-import { matrixToSVG } from './util/misc/svgParsing';
-import { toFixed } from './util/misc/toFixed';
+} from '../util/dom_misc';
+import { removeFromArray } from '../util/internals';
+import { uid } from '../util/internals/uid';
+import { createCanvasElement, isHTMLCanvas } from '../util/misc/dom';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { pick } from '../util/misc/pick';
+import { matrixToSVG } from '../util/misc/svgParsing';
+import { toFixed } from '../util/misc/toFixed';
 import {
   isActiveSelection,
   isCollection,
   isFiller,
   isTextObject,
-} from './util/types';
+} from '../util/types';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -54,7 +54,7 @@ export type TSVGExportOptions = {
     width: number;
     height: number;
   };
-  encoding?: 'UTF-8'; // test Econding type and see what happens
+  encoding?: 'UTF-8'; // test Encoding type and see what happens
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
@@ -69,10 +69,10 @@ export type TSVGExportOptions = {
  * @fires object:added
  * @fires object:removed
  */
-// eslint-disable-next-line max-len
+// TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
   EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-> extends createCollectionMixin(CommonMethods<EventSpec>) {
+> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}

@@ -1,9 +1,10 @@
 import { fabric } from '../../HEADER';
-import { halfPI } from '../constants';
+import { halfPI, twoMathPi } from '../constants';
 import { Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
+import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';
 
 export class Polygon extends Polyline {
@@ -18,7 +19,7 @@ export class Polygon extends Polyline {
     numVertexes: number;
     radius: number;
   }) {
-    const interiorAngle = (Math.PI * 2) / numVertexes;
+    const interiorAngle = twoMathPi / numVertexes;
     // rotate the polygon by 1/2 the interior angle so that the polygon always has a flat side on the bottom
     const rotationAdjustment =
       -halfPI + (numVertexes % 2 === 0 ? interiorAngle / 2 : 0);
@@ -50,5 +51,9 @@ export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
 };
 
 Object.assign(Polygon.prototype, polygonDefaultValues);
+
+classRegistry.setClass(Polygon);
+classRegistry.setSVGClass(Polygon);
+
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Polygon = Polygon;

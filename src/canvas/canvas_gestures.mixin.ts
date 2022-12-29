@@ -1,6 +1,7 @@
 //@ts-nocheck
 
 import { scalingEqually } from '../controls/actions';
+import { fireEvent } from '../util/fireEvent';
 
 (function (global) {
   var fabric = global.fabric,
@@ -130,6 +131,24 @@ import { scalingEqually } from '../controls/actions';
       },
 
       /**
+       * @private
+       * @param {Event} [e] Event object fired on Event.js gesture
+       * @param {Event} [self] Inner Event object
+       */
+      _onGesture: function (e, self) {
+        this.__onTransformGesture(e, self);
+      },
+
+      /**
+       * @private
+       * @param {Event} [e] Event object fired on Event.js drag
+       * @param {Event} [self] Inner Event object
+       */
+      _onDrag: function (e, self) {
+        this.__onDrag(e, self);
+      },
+
+      /**
        * Scales an object by a factor
        * @param {Number} s The scale factor to apply to the current scale level
        * @param {Event} e Event object by Event.js
@@ -154,11 +173,38 @@ import { scalingEqually } from '../controls/actions';
           return;
         }
         t.target.rotate(radiansToDegrees(degreesToRadians(curAngle) + t.theta));
-        this._fire('rotating', {
+        fireEvent('rotating', {
           target: t.target,
           e: e,
           transform: t,
         });
+      },
+
+      /**
+       * @private
+       * @param {Event} [e] Event object fired on Event.js orientation change
+       * @param {Event} [self] Inner Event object
+       */
+      _onOrientationChange: function (e, self) {
+        this.__onOrientationChange(e, self);
+      },
+
+      /**
+       * @private
+       * @param {Event} [e] Event object fired on Event.js shake
+       * @param {Event} [self] Inner Event object
+       */
+      _onShake: function (e, self) {
+        this.__onShake(e, self);
+      },
+
+      /**
+       * @private
+       * @param {Event} [e] Event object fired on Event.js shake
+       * @param {Event} [self] Inner Event object
+       */
+      _onLongPress: function (e, self) {
+        this.__onLongPress(e, self);
       },
     }
   );

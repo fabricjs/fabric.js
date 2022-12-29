@@ -16,6 +16,7 @@ import type {
   TClassProperties,
   TFiller,
 } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -83,11 +84,7 @@ const additionalProps = [
 
 /**
  * Text class
- * @class Text
- * @extends FabricObject
- * @return {Text} thisArg
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
- * @see {@link Text#initialize} for constructor definition
  */
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -1953,5 +1950,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 };
 
 Object.assign(Text.prototype, textDefaultValues);
+
+classRegistry.setClass(Text);
+classRegistry.setSVGClass(Text);
 
 fabric.Text = Text;

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
+import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -8,12 +8,13 @@ import {
   keysMap,
   keysMapRtl,
 } from '../mixins/itext_key_const';
+import { classRegistry } from '../util/class_registry';
 import { TClassProperties, TFiller } from '../typedefs';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never;
-  tripleclick: TransformEvent;
+  tripleclick: TPointerEventInfo;
   'editing:entered': never;
   'editing:exited': never;
 };
@@ -33,9 +34,6 @@ export type ITextEvents = ObjectEvents & {
  * @fires copy
  * @fires cut
  * @fires paste
- *
- * @return {IText} thisArg
- * @see {@link IText#initialize} for constructor definition
  *
  * <p>Supported key combinations:</p>
  * <pre>
@@ -651,5 +649,7 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
+
+classRegistry.setClass(IText);
 
 fabric.IText = IText;

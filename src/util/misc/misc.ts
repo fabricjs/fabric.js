@@ -54,9 +54,8 @@ import {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './planeChange';
-import { camelize, capitalize, escapeXml, graphemeSplit } from '../lang_string';
+import { escapeXml, graphemeSplit, capitalize } from '../lang_string';
 import {
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -95,6 +94,8 @@ import * as ease from '../anim_ease';
 import { animateColor } from '../animate_color';
 import { animate, requestAnimFrame, cancelAnimFrame } from '../animate';
 import { createClass } from '../lang_class';
+import { classRegistry } from '../class_registry';
+
 /**
  * @namespace fabric.util
  */
@@ -153,12 +154,10 @@ fabric.util = {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
   string: {
-    camelize,
-    capitalize,
     escapeXml,
     graphemeSplit,
+    capitalize,
   },
-  getKlass,
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
@@ -193,4 +192,5 @@ fabric.util = {
   requestAnimFrame,
   cancelAnimFrame,
   createClass,
+  classRegistry,
 };

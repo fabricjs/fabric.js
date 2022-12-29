@@ -1,13 +1,14 @@
 // @ts-nocheck
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './base_filter.class';
-import {
+import type {
   TWebGLPipelineState,
   T2DPipelineState,
   TWebGLUniformLocationMap,
-  isWebGLPipelineState,
 } from './typedefs';
+import { isWebGLPipelineState } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Blur filter class
@@ -199,3 +200,4 @@ export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
 };
 
 Object.assign(Blur.prototype, blurDefaultValues);
+classRegistry.setClass(Blur);
