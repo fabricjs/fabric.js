@@ -12,8 +12,10 @@ import {
 import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
+import type { IText } from '../shapes/itext.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { stopEvent } from '../util/dom_event';
+import { removeFromArray } from '../util/internals';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
@@ -121,6 +123,11 @@ export class Canvas extends SelectableCanvas {
    * @private
    */
   _previousPointer: Point;
+
+  private _hasITextHandlers?: boolean;
+
+  private _iTextInstances?: IText[];
+  private _itextSelectionDisposer?: VoidFunction;
 
   /**
    * Adds mouse listeners to canvas
@@ -1639,6 +1646,69 @@ export class Canvas extends SelectableCanvas {
     this.setCursor(this.defaultCursor);
     // clear selection and current transformation
     this._groupSelector = null;
+  }
+
+  exitTextEditing() {
+    if (this._iTextInstances) {
+      this._iTextInstances.forEach((obj) => {
+        obj.selected = false;
+        if (obj.isEditing) {
+          obj.exitEditing();
+        }
+      });
+    }
+  }
+
+  /**
+   * @override handle itext selection
+   */
+  _onObjectAdded(obj: FabricObject<ObjectEvents>): void {
+    super._onObjectAdded(obj);
+    if (isInteractiveTextObject(obj)) {
+      if (!this._hasITextHandlers) {
+        this._hasITextHandlers = true;
+        const disposer = this.on('mouse:up', () => {
+          if (this._iTextInstances) {
+            this._iTextInstances.forEach((obj) => {
+              obj.__isMousedown = false;
+            });
+          }
+        });
+        this._itextSelectionDisposer = () => {
+          disposer();
+          delete this._itextSelectionDisposer;
+        };
+      }
+      this._iTextInstances = this._iTextInstances || [];
+      this._iTextInstances.push(obj);
+    }
+  }
+
+  /**
+   * @override handle itext selection
+   */
+  _onObjectRemoved(obj: FabricObject<ObjectEvents>): void {
+    super._onObjectRemoved(obj);
+    if (isInteractiveTextObject(obj)) {
+      this._iTextInstances = this._iTextInstances || [];
+      removeFromArray(this._iTextInstances, obj);
+      if (this._iTextInstances.length === 0) {
+        this._hasITextHandlers = false;
+        this._itextSelectionDisposer && this._itextSelectionDisposer();
+      }
+    }
+  }
+
+  /**
+   * @override clear itext selection handles
+   */
+  clear() {
+    if (this._hasITextHandlers) {
+      this._itextSelectionDisposer && this._itextSelectionDisposer();
+      this._iTextInstances = undefined;
+      this._hasITextHandlers = false;
+    }
+    super.clear();
   }
 }
 

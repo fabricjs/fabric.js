@@ -494,8 +494,7 @@ export class SelectableCanvas<
   protected _isCurrentlyDrawing: boolean;
   freeDrawingBrush?: BaseBrush;
   _activeObject?: FabricObject;
-  _hasITextHandlers?: boolean;
-  _iTextInstances: (IText | Textbox)[];
+
   /**
    * Constructor
    * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
@@ -1539,12 +1538,6 @@ export class SelectableCanvas<
     // this.discardActiveGroup();
     this.discardActiveObject();
     this.clearContext(this.contextTop);
-    if (this._hasITextHandlers) {
-      // @ts-ignore
-      this.off('mouse:up', this._mouseUpITextHandler);
-      this._iTextInstances = [];
-      this._hasITextHandlers = false;
-    }
     super.clear();
   }
 
