@@ -1334,22 +1334,6 @@
     assert.equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
-  QUnit.test('straightenObject', function(assert) {
-    assert.ok(typeof canvas.straightenObject === 'function');
-    var rect = makeRect({ angle: 10 });
-    canvas.add(rect);
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
-
-    rect.rotate('60');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
-
-    rect.rotate('100');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
-  });
-
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
     assert.equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
@@ -2126,22 +2110,19 @@
   });
 
   QUnit.test('cloneWithoutData', function(assert) {
-    var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
     canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
-    canvas.cloneWithoutData().then(function(clone) {
+    const clone = canvas.cloneWithoutData();
 
-      assert.ok(clone instanceof fabric.Canvas);
+    assert.ok(clone instanceof fabric.Canvas);
 
-      assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
+    assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
-      assert.equal(canvas.getWidth(), clone.getWidth());
-      assert.equal(canvas.getHeight(), clone.getHeight());
-      clone.renderAll();
-      done();
-    });
+    assert.equal(canvas.getWidth(), clone.getWidth());
+    assert.equal(canvas.getHeight(), clone.getHeight());
+    clone.renderAll();
   });
 
   QUnit.test('getSetWidth', function(assert) {

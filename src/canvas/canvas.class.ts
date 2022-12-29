@@ -37,6 +37,7 @@ import type { Textbox } from '../shapes/textbox.class';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../mixins/object.svg_export';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { createCanvasElement } from '../util/misc/dom';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -1520,6 +1521,7 @@ export class SelectableCanvas<
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
+    this._iTextInstances = [];
     this.contextCache = null;
     this.contextTop = null;
     cleanUpJsdomNode(upperCanvasEl);
