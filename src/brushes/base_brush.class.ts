@@ -87,7 +87,9 @@ export abstract class BaseBrush {
    */
   abstract onMouseUp(ev: TBrushEventData): boolean | void;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onDoubleClick(pointer: Point) {}
+  onDoubleClick(pointer: Point) {
+    // noop
+  }
 
   /**
    * Sets brush styles
