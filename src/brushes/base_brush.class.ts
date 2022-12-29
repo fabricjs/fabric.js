@@ -2,7 +2,7 @@ import { fabric } from '../../HEADER';
 import type { Canvas } from '../canvas/canvas_events';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
-import type { Shadow } from '../shadow.class';
+import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
