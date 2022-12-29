@@ -12,10 +12,8 @@ import {
 import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
-import type { IText } from '../shapes/itext.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { stopEvent } from '../util/dom_event';
-import { removeFromArray } from '../util/internals';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,

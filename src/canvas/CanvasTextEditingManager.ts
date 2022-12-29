@@ -3,6 +3,9 @@ import type { Textbox } from '../shapes/textbox.class';
 import { removeFromArray } from '../util/internals';
 import type { Canvas } from './canvas_events';
 
+/**
+ * In charge of synchronizing all interactive text instances of a canvas
+ */
 export class CanvasTextEditingManager {
   private targets: (IText | Textbox)[] = [];
   readonly canvas: Canvas;
