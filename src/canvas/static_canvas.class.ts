@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
@@ -27,7 +26,7 @@ import {
 } from '../util/dom_misc';
 import { removeFromArray } from '../util/internals';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, isHTMLCanvas } from '../util/misc/dom';
+import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -1002,6 +1001,16 @@ export class StaticCanvas<
   }
 
   /**
+   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
+   * @TODO probably keen on deleting this.
+   * @param {FabricObject} object Object to center vertically and horizontally
+   */
+  straightenObject(object: FabricObject) {
+    object.straighten();
+    this.renderOnAddRemove && this.requestRenderAll();
+  }
+
+  /**
    * Returns dataless JSON representation of canvas
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {String} json string
@@ -1061,7 +1070,7 @@ export class StaticCanvas<
         : null;
     return {
       version: VERSION,
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       objects: this._objects
         .filter((object) => !object.excludeFromExport)
         .map((instance) =>
@@ -1296,9 +1305,9 @@ export class StaticCanvas<
   createSVGRefElementsMarkup(): string {
     return ['background', 'overlay']
       .map((prop) => {
-        const fill = this[`${prop}Color`];
+        const fill = this[`${prop}Color`as ('overlayColor' | `backgroundColor`)];
         if (isFiller(fill)) {
-          const shouldTransform = this[`${prop}Vpt`],
+          const shouldTransform = this[`${prop}Vpt` as ('overlayVpt' | `backgroundVpt`)] as boolean,
             vpt = this.viewportTransform,
             object = {
               width: this.width / (shouldTransform ? vpt[0] : 1),
@@ -1641,6 +1650,105 @@ export class StaticCanvas<
     removeFromArray(this._objects, object);
     this._objects.splice(index, 0, object);
     return this.renderOnAddRemove && this.requestRenderAll();
+  }
+
+  /**
+   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+   * @param {Object} [options] Options object
+   * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+   * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+   * @param {Number} [options.multiplier=1] Multiplier to scale by, to have consistent
+   * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+   * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+   * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+   * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+   * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
+   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+   * @see {@link https://jsfiddle.net/xsjua1rd/ demo}
+   * @example <caption>Generate jpeg dataURL with lower quality</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'jpeg',
+   *   quality: 0.8
+   * });
+   * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   left: 100,
+   *   top: 100,
+   *   width: 200,
+   *   height: 200
+   * });
+   * @example <caption>Generate double scaled png dataURL</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   multiplier: 2
+   * });
+   * @example <caption>Generate dataURL with objects that overlap a specified object</caption>
+   * var myObject;
+   * var dataURL = canvas.toDataURL({
+   *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
+   * });
+   */
+  toDataURL(options = {} as TDataUrlOptions): string {
+    const { format = 'png', quality = 1, multiplier = 1, enableRetinaScaling = false } = options;
+    const finalMultiplier = multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+
+    return toDataURL(this.toCanvasElement(finalMultiplier, options), format, quality);
+  }
+
+  /**
+   * Create a new HTMLCanvas element painted with the current canvas content.
+   * No need to resize the actual one or repaint it.
+   * Will transfer object ownership to a new canvas, paint it, and set everything back.
+   * This is an intermediary step used to get to a dataUrl but also it is useful to
+   * create quick image copies of a canvas without passing for the dataUrl string
+   * @param {Number} [multiplier] a zoom factor.
+   * @param {Object} [options] Cropping informations
+   * @param {Number} [options.left] Cropping left offset.
+   * @param {Number} [options.top] Cropping top offset.
+   * @param {Number} [options.width] Cropping width.
+   * @param {Number} [options.height] Cropping height.
+   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   */
+  toCanvasElement(multiplier: number, options: TDataUrlOptions): HTMLCanvasElement {
+    multiplier = multiplier || 1;
+    options = options || {};
+    const scaledWidth = (options.width || this.width) * multiplier,
+      scaledHeight = (options.height || this.height) * multiplier,
+      zoom = this.getZoom(),
+      originalWidth = this.width,
+      originalHeight = this.height,
+      newZoom = zoom * multiplier,
+      vp = this.viewportTransform,
+      translateX = (vp[4] - (options.left || 0)) * multiplier,
+      translateY = (vp[5] - (options.top || 0)) * multiplier,
+      originalInteractive = this.interactive,
+      newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
+      originalRetina = this.enableRetinaScaling,
+      canvasEl = fabric.util.createCanvasElement(),
+      originalContextTop = this.contextTop,
+      objectsToRender = options.filter
+        ? this._objects.filter(options.filter)
+        : this._objects;
+    canvasEl.width = scaledWidth;
+    canvasEl.height = scaledHeight;
+    this.contextTop = null;
+    this.enableRetinaScaling = false;
+    this.interactive = false;
+    this.viewportTransform = newVp;
+    this.width = scaledWidth;
+    this.height = scaledHeight;
+    this.calcViewportBoundaries();
+    this.renderCanvas(canvasEl.getContext('2d'), objectsToRender);
+    this.viewportTransform = vp;
+    this.width = originalWidth;
+    this.height = originalHeight;
+    this.calcViewportBoundaries();
+    this.interactive = originalInteractive;
+    this.enableRetinaScaling = originalRetina;
+    this.contextTop = originalContextTop;
+    return canvasEl;
   }
 
   /**

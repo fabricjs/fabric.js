@@ -88,7 +88,6 @@ fabric.util.object.extend(
      */
     fxRemove: function (object, callbacks) {
       callbacks = callbacks || {};
-
       var empty = function () {},
         onComplete = callbacks.onComplete || empty,
         onChange = callbacks.onChange || empty,
@@ -108,6 +107,17 @@ fabric.util.object.extend(
           _this.remove(object);
           onComplete();
         },
+      });
+    },
+
+    /**
+     * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
+     * @param {fabric.Object} object Object to straighten
+     * @return {fabric.Canvas} thisArg
+     */
+    fxStraightenObject: function (object: FabricObject) {
+      return object.fxStraighten({
+        onChange: this.requestRenderAllBound,
       });
     },
   }
