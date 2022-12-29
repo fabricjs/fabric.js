@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { Constructor } from '../typedefs';
+import { removeFromArray } from '../util/internals';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
@@ -16,6 +17,11 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _onObjectRemoved(object: FabricObject) {
+      // subclasses should override this method
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _onStackOrderChanged(object: FabricObject) {
       // subclasses should override this method
     }
 
@@ -151,6 +157,152 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         memo += current.complexity ? current.complexity() : 0;
         return memo;
       }, 0);
+    }
+
+    /**
+     * Moves an object or the objects of a multiple selection
+     * to the bottom of the stack of drawn objects
+     * @param {fabric.Object} object Object to send to back
+     * @returns {boolean} true if change occurred
+     */
+    sendObjectToBack(object: FabricObject) {
+      if (!object || object === this._objects[0]) {
+        return false;
+      }
+      removeFromArray(this._objects, object);
+      this._objects.unshift(object);
+      this._onStackOrderChanged(object);
+      return true;
+    }
+
+    /**
+     * Moves an object or the objects of a multiple selection
+     * to the top of the stack of drawn objects
+     * @param {fabric.Object} object Object to send
+     * @returns {boolean} true if change occurred
+     */
+    bringObjectToFront(object: FabricObject) {
+      if (!object || object === this._objects[this._objects.length - 1]) {
+        return false;
+      }
+      removeFromArray(this._objects, object);
+      this._objects.push(object);
+      this._onStackOrderChanged(object);
+      return true;
+    }
+
+    /**
+     * Moves an object or a selection down in stack of drawn objects
+     * An optional parameter, `intersecting` allows to move the object in behind
+     * the first intersecting object. Where intersection is calculated with
+     * bounding box. If no intersection is found, there will not be change in the
+     * stack.
+     * @param {fabric.Object} object Object to send
+     * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
+     * @returns {boolean} true if change occurred
+     */
+    sendObjectBackwards(object: FabricObject, intersecting?: boolean) {
+      if (!object) {
+        return false;
+      }
+      const idx = this._objects.indexOf(object);
+      if (idx !== 0) {
+        // if object is not on the bottom of stack
+        const newIdx = this.findNewLowerIndex(object, idx, intersecting);
+        removeFromArray(this._objects, object);
+        this._objects.splice(newIdx, 0, object);
+        this._onStackOrderChanged(object);
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Moves an object or a selection up in stack of drawn objects
+     * An optional parameter, intersecting allows to move the object in front
+     * of the first intersecting object. Where intersection is calculated with
+     * bounding box. If no intersection is found, there will not be change in the
+     * stack.
+     * @param {fabric.Object} object Object to send
+     * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
+     * @returns {boolean} true if change occurred
+     */
+    bringObjectForward(object: FabricObject, intersecting?: boolean) {
+      if (!object) {
+        return false;
+      }
+      const idx = this._objects.indexOf(object);
+      if (idx !== this._objects.length - 1) {
+        // if object is not on top of stack (last item in an array)
+        const newIdx = this.findNewUpperIndex(object, idx, intersecting);
+        removeFromArray(this._objects, object);
+        this._objects.splice(newIdx, 0, object);
+        this._onStackOrderChanged(object);
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Moves an object to specified level in stack of drawn objects
+     * @param {fabric.Object} object Object to send
+     * @param {number} index Position to move to
+     * @returns {boolean} true if change occurred
+     */
+    moveObjectTo(object: FabricObject, index: number) {
+      if (object === this._objects[index]) {
+        return false;
+      }
+      removeFromArray(this._objects, object);
+      this._objects.splice(index, 0, object);
+      this._onStackOrderChanged(object);
+      return true;
+    }
+
+    findNewLowerIndex(
+      object: FabricObject,
+      idx: number,
+      intersecting?: boolean
+    ) {
+      let newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+        // traverse down the stack looking for the nearest intersecting object
+        for (let i = idx - 1; i >= 0; --i) {
+          if (object.isOverlapping(this._objects[i])) {
+            newIdx = i;
+            break;
+          }
+        }
+      } else {
+        newIdx = idx - 1;
+      }
+
+      return newIdx;
+    }
+
+    findNewUpperIndex(
+      object: FabricObject,
+      idx: number,
+      intersecting?: boolean
+    ) {
+      let newIdx;
+
+      if (intersecting) {
+        newIdx = idx;
+        // traverse up the stack looking for the nearest intersecting object
+        for (let i = idx + 1; i < this._objects.length; ++i) {
+          if (object.isOverlapping(this._objects[i])) {
+            newIdx = i;
+            break;
+          }
+        }
+      } else {
+        newIdx = idx + 1;
+      }
+
+      return newIdx;
     }
   }
 

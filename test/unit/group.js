@@ -276,14 +276,12 @@
     assert.equal(group.item(9999), undefined);
   });
 
-  QUnit.test('moveTo', function(assert) {
+  QUnit.test('moveObjectTo', function(assert) {
     var group = makeGroupWith4Objects(),
         groupEl1 = group.getObjects()[0],
         groupEl2 = group.getObjects()[1],
         groupEl3 = group.getObjects()[2],
         groupEl4 = group.getObjects()[3];
-
-    assert.ok(typeof group.item(0).moveTo === 'function');
 
     // [ 1, 2, 3, 4 ]
     assert.equal(group.item(0), groupEl1);
@@ -292,7 +290,7 @@
     assert.equal(group.item(3), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(3);
+    group.moveObjectTo(group.item(0), 3);
 
     // moved 1 to level 3 — [2, 3, 4, 1]
     assert.equal(group.item(3), groupEl1);
@@ -301,7 +299,7 @@
     assert.equal(group.item(2), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(2);
+    group.moveObjectTo(group.item(0), 2);
 
     // moved 2 to level 2 — [3, 4, 2, 1]
     assert.equal(group.item(3), groupEl1);
@@ -521,7 +519,7 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('z-index methods with group objects', function(assert) {
+  QUnit.test('object stacking methods with group objects', function (assert) {
 
     var textBg = new fabric.Rect({
       fill: '#abc',
@@ -530,22 +528,77 @@
     });
 
     var text = new fabric.Text('text');
-    var group = new fabric.Group([textBg, text]);
+    var obj = new fabric.Object();
+    var group = new fabric.Group([textBg, text, obj]);
+
+    assert.ok(typeof group.sendObjectToBack === 'function');
+    assert.ok(typeof group.bringObjectToFront === 'function');
+    assert.ok(typeof group.sendObjectBackwards === 'function');
+    assert.ok(typeof group.bringObjectForward === 'function');
+    assert.ok(typeof group.moveObjectTo === 'function');
 
     canvas.add(group);
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
 
-    textBg.bringToFront();
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === text);
-    assert.ok(group.getObjects()[1] === textBg);
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    textBg.sendToBack();
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.sendObjectBackwards(obj);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(text);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(obj);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.bringObjectForward(textBg);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+    
+    group.dirty = false;
+    group.moveObjectTo(obj, 2);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+    
+    group.dirty = false;
+    group.moveObjectTo(obj, 0);
+    assert.deepEqual(group.getObjects(), [obj, text, textBg]);
   });
 
   QUnit.test('group reference on an object', function(assert) {
