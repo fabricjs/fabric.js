@@ -14,7 +14,6 @@ import './src/canvas/canvas_events'; // optional interaction
 import './src/canvas/canvas_gestures.mixin'; // optional gestures
 import './src/mixins/canvas_animation.mixin'; // optional animation
 import './src/shapes/Object/FabricObject';
-import './src/mixins/object_stacking.mixin'; // removed in #8461
 import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';
 import './src/shapes/circle.class';

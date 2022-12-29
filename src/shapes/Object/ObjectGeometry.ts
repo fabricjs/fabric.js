@@ -271,7 +271,7 @@ export class ObjectGeometry<
   intersectsWithRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
+    absolute?: boolean,
     calculate?: boolean
   ): boolean {
     const coords = this.getCoords(absolute, calculate),
@@ -342,7 +342,7 @@ export class ObjectGeometry<
   isContainedWithinRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
+    absolute?: boolean,
     calculate?: boolean
   ): boolean {
     const boundingRect = this.getBoundingRect(absolute, calculate);
@@ -351,6 +351,14 @@ export class ObjectGeometry<
       boundingRect.left + boundingRect.width <= pointBR.x &&
       boundingRect.top >= pointTL.y &&
       boundingRect.top + boundingRect.height <= pointBR.y
+    );
+  }
+
+  isOverlapping<T extends ObjectGeometry>(other: T): boolean {
+    return (
+      this.intersectsWithObject(other) ||
+      this.isContainedWithinObject(other) ||
+      other.isContainedWithinObject(this)
     );
   }
 
@@ -418,7 +426,7 @@ export class ObjectGeometry<
   private _containsCenterOfCanvas(
     pointTL: Point,
     pointBR: Point,
-    calculate: boolean
+    calculate?: boolean
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
@@ -430,7 +438,7 @@ export class ObjectGeometry<
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is partially contained within canvas
    */
-  isPartiallyOnScreen(calculate: boolean): boolean {
+  isPartiallyOnScreen(calculate?: boolean): boolean {
     if (!this.canvas) {
       return false;
     }
@@ -584,7 +592,7 @@ export class ObjectGeometry<
    * @param {Boolean} absolute ignore viewport
    * @return {void}
    */
-  scaleToWidth(value: number, absolute: boolean) {
+  scaleToWidth(value: number, absolute?: boolean) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
     const boundingRectFactor =
       this.getBoundingRect(absolute).width / this.getScaledWidth();
