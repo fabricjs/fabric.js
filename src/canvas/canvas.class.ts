@@ -492,7 +492,7 @@ export class SelectableCanvas<
   contextTop: CanvasRenderingContext2D;
   wrapperEl: HTMLDivElement;
   cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
+  _isCurrentlyDrawing: boolean;
   freeDrawingBrush?: BaseBrush;
   _activeObject?: FabricObject;
   _hasITextHandlers?: boolean;
