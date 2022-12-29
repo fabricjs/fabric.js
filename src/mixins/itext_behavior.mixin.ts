@@ -65,7 +65,7 @@ export abstract class ITextBehaviorMixin<
     moveCursor: CSSStyleDeclaration['cursor'];
   };
   protected _selectionDirection: 'left' | 'right' | null;
-  private _canvasMoveDisposer?: VoidFunction;
+  private _canvasMoveEventDisposer?: VoidFunction;
 
   abstract initHiddenTextarea(): void;
   abstract initCursorSelectionHandlers(): void;
@@ -404,9 +404,9 @@ export abstract class ITextBehaviorMixin<
     if (this.canvas) {
       this.canvas.fire('text:editing:entered', { target: this });
       const disposer = this.canvas.on('mouse:move', this.mouseMoveHandler);
-      this._canvasMoveDisposer = () => {
+      this._canvasMoveEventDisposer = () => {
         disposer();
-        delete this._canvasMoveDisposer;
+        delete this._canvasMoveEventDisposer;
       };
       this.canvas.requestRenderAll();
     }
@@ -985,7 +985,7 @@ export abstract class ITextBehaviorMixin<
     }
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
-    this._canvasMoveDisposer && this._canvasMoveDisposer();
+    this._canvasMoveEventDisposer && this._canvasMoveEventDisposer();
     if (this.canvas) {
       this.canvas.fire('text:editing:exited', { target: this });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
