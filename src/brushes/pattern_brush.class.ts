@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
+import type { Canvas } from '../canvas/canvas_events';
 import { Pattern } from '../pattern.class';
 import { createCanvasElement } from '../util/misc/dom';
 import { PencilBrush } from './pencil_brush.class';

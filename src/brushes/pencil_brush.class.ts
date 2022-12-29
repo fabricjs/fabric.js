@@ -1,6 +1,6 @@
 import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
 import { Color } from '../color';
+import type { Canvas } from '../canvas/canvas_events';
 import { ModifierKey, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Path } from '../shapes/path.class';

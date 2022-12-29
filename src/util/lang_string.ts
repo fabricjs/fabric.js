@@ -1,14 +1,4 @@
 /**
- * Camelizes a string
- * @param {String} string String to camelize
- * @return {String} Camelized version of a string
- */
-export const camelize = (string: string): string =>
-  string.replace(/-+(.)?/g, (match, character) =>
-    character ? character.toUpperCase() : ''
-  );
-
-/**
  * Capitalizes a string
  * @param {String} string String to capitalize
  * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
@@ -48,13 +38,13 @@ export const graphemeSplit = (textstring: string): string[] => {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
-    graphemes.push(chr);
+    graphemes.push(chr as string);
   }
   return graphemes;
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string | false => {
+const getWholeChar = (str: string, i: number): string | boolean => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found

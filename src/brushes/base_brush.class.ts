@@ -1,8 +1,8 @@
 import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
+import type { Canvas } from '../canvas/canvas_events';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import type { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
@@ -100,6 +100,11 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
    * @returns true if brush should continue blocking interaction
    */
   abstract onMouseUp(ev: TBrushEventData): void;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onDoubleClick(pointer: Point) {
+    // noop
+  }
 
   protected abstract finalizeShape(): T | undefined;
 

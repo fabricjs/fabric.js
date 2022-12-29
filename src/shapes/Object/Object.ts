@@ -14,6 +14,7 @@ import type {
   TFiller,
   TSize,
 } from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation_registry';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
@@ -117,17 +118,17 @@ export class FabricObject<
 
   /**
    * Default cursor value used when hovering over this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  hoverCursor: null;
+  hoverCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Default cursor value used when moving this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  moveCursor: null;
+  moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Color of controlling borders of an object (when it's active)
@@ -664,16 +665,6 @@ export class FabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options?: Partial<TClassProperties<FabricObject>>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Create a the canvas used to keep the cached copy of the object
    * @private
    */
@@ -961,7 +952,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = fabric.util.getKlass(object.type).prototype;
+    const prototype = classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -2010,25 +2001,18 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject<
-    T extends FabricObject,
-    X,
-    K extends X extends keyof T
-      ? { new (arg0: T[X], ...args: any[]): T }
-      : { new (...args: any[]): T }
-  >(
-    klass: K,
+  static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
+    { extraParam, ...options }: { extraParam?: any; signal?: AbortSignal } = {}
   ) {
-    return enlivenObjectEnlivables<InstanceType<K>>(
+    return enlivenObjectEnlivables<InstanceType<this>>(
       clone(object, true),
       options
     ).then((enlivedMap) => {
       // from the resulting enlived options, extract options.extraParam to arg0
       // to avoid accidental overrides later
       const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
-      return extraParam ? new klass(arg0, rest) : new klass(rest);
+      return extraParam ? new this(arg0, rest) : new this(rest);
     });
   }
 
@@ -2043,7 +2027,7 @@ export class FabricObject<
     object: Record<string, unknown>,
     options?: { signal?: AbortSignal }
   ) {
-    return FabricObject._fromObject(FabricObject, object, options);
+    return this._fromObject(object, options);
   }
 }
 
@@ -2177,3 +2161,5 @@ export const fabricObjectDefaultValues = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
+
+classRegistry.setClass(FabricObject);

@@ -1,14 +1,15 @@
 // @ts-nocheck
 import { Image } from '../shapes/image.class';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { AbstractBaseFilter } from './base_filter.class';
-import {
+import type {
   T2DPipelineState,
   TWebGLPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { WebGLFilterBackend } from './webgl_backend.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Image Blend filter class
@@ -248,3 +249,4 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
 };
 
 Object.assign(BlendImage.prototype, blendImageDefaultValues);
+classRegistry.setClass(BlendImage);
