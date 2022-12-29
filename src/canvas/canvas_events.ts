@@ -123,17 +123,9 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
-  /**
-   * Adds mouse listeners to canvas
-   * @private
-   */
-  private _initEventListeners() {
-    // in case we initialized the class twice. This should not happen normally
-    // but in some kind of applications where the canvas element may be changed
-    // this is a workaround to having double listeners.
-    this.removeListeners();
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
     this._bindEvents();
-    // @ts-ginore
     this.addOrRemove(addListener, 'add');
   }
 
