@@ -4,14 +4,15 @@ import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
+import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../point.class';
 import { Shadow } from '../../shadow.class';
 import type {
-  TCacheCanvasDimensions,
   TClassProperties,
   TDegree,
   TFiller,
   TSize,
+  TCacheCanvasDimensions,
 } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation';
@@ -32,7 +33,6 @@ import {
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../group.class';
-import { AnimatableObject } from './AnimatableObject';
 
 export type TCachedFabricObject = FabricObject &
   Required<
