@@ -23,6 +23,7 @@ import {
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './canvas.class';
+import { CanvasTextEditingManager } from './CanvasTextEditingManager';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -124,9 +125,7 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
-  private _hasITextHandlers?: boolean;
-  private _iTextInstances?: IText[];
-  private _itextSelectionDisposer?: VoidFunction;
+  private textEditingManager = new CanvasTextEditingManager(this);
 
   /**
    * Adds mouse listeners to canvas
@@ -138,7 +137,6 @@ export class Canvas extends SelectableCanvas {
     // this is a workaround to having double listeners.
     this.removeListeners();
     this._bindEvents();
-    // @ts-ginore
     this.addOrRemove(addListener, 'add');
   }
 
@@ -1648,65 +1646,30 @@ export class Canvas extends SelectableCanvas {
   }
 
   exitTextEditing() {
-    if (this._iTextInstances) {
-      this._iTextInstances.forEach((obj) => {
-        obj.selected = false;
-        if (obj.isEditing) {
-          obj.exitEditing();
-        }
-      });
-    }
+    this.textEditingManager.exitTextEditing();
   }
 
   /**
-   * @override handle itext selection
+   * @override update {@link textEditingManager} if necessary
    */
   _onObjectAdded(obj: FabricObject<ObjectEvents>): void {
     super._onObjectAdded(obj);
-    if (isInteractiveTextObject(obj)) {
-      if (!this._hasITextHandlers) {
-        this._hasITextHandlers = true;
-        const disposer = this.on('mouse:up', () => {
-          if (this._iTextInstances) {
-            this._iTextInstances.forEach((obj) => {
-              obj.__isMousedown = false;
-            });
-          }
-        });
-        this._itextSelectionDisposer = () => {
-          disposer();
-          delete this._itextSelectionDisposer;
-        };
-      }
-      this._iTextInstances = this._iTextInstances || [];
-      this._iTextInstances.push(obj);
-    }
+    isInteractiveTextObject(obj) && this.textEditingManager.add(obj);
   }
 
   /**
-   * @override handle itext selection
+   * @override update {@link textEditingManager} if necessary
    */
   _onObjectRemoved(obj: FabricObject<ObjectEvents>): void {
     super._onObjectRemoved(obj);
-    if (isInteractiveTextObject(obj)) {
-      this._iTextInstances = this._iTextInstances || [];
-      removeFromArray(this._iTextInstances, obj);
-      if (this._iTextInstances.length === 0) {
-        this._hasITextHandlers = false;
-        this._itextSelectionDisposer && this._itextSelectionDisposer();
-      }
-    }
+    isInteractiveTextObject(obj) && this.textEditingManager.remove(obj);
   }
 
   /**
-   * @override clear itext selection handles
+   * @override clear {@link textEditingManager}
    */
   clear() {
-    if (this._hasITextHandlers) {
-      this._itextSelectionDisposer && this._itextSelectionDisposer();
-      this._iTextInstances = undefined;
-      this._hasITextHandlers = false;
-    }
+    this.textEditingManager.dispose();
     super.clear();
   }
 }

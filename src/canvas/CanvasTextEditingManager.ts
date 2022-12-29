@@ -1,9 +1,10 @@
 import type { IText } from '../shapes/itext.class';
+import type { Textbox } from '../shapes/textbox.class';
 import { removeFromArray } from '../util/internals';
 import type { Canvas } from './canvas_events';
 
 export class CanvasTextEditingManager {
-  private targets: IText[] = [];
+  private targets: (IText | Textbox)[] = [];
   private disposer?: VoidFunction;
   readonly canvas: Canvas;
 
@@ -26,7 +27,7 @@ export class CanvasTextEditingManager {
     });
   }
 
-  onAdded(target: IText): void {
+  add(target: IText | Textbox) {
     if (!this.disposer) {
       const disposer = this.canvas.on('mouse:up', () => {
         this.informMouseUp();
@@ -39,7 +40,7 @@ export class CanvasTextEditingManager {
     this.targets.push(target);
   }
 
-  onRemoved(target: IText): void {
+  remove(target: IText | Textbox) {
     removeFromArray(this.targets, target);
     this.targets.length === 0 && this.disposer && this.disposer();
   }
