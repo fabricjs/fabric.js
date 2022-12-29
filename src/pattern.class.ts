@@ -8,6 +8,8 @@ import { uid } from './util/internals/uid';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
+import { classRegistry } from './util/class_registry';
+
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type TExportedKeys =
@@ -206,5 +208,7 @@ export class Pattern {
     return new this({ ...serialized, source: img });
   }
 }
+
+classRegistry.setClass(Pattern, 'pattern');
 
 fabric.Pattern = Pattern;

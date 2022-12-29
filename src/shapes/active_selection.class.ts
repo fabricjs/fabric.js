@@ -1,6 +1,7 @@
 import { fabric } from '../../HEADER';
 import { ControlRenderingStyleOverride } from '../controls';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { Group, groupDefaultValues } from './group.class';
 import type { FabricObject } from './Object/FabricObject';
 
@@ -60,7 +61,6 @@ export class ActiveSelection extends Group {
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
-    // @TODO figure out this change. This part wasn't here before migration.
     super._onAfterObjectsChange(type, targets);
     const groups: Group[] = [];
     targets.forEach((object) => {
@@ -156,5 +156,7 @@ export const activeSelectionDefaultValues: Partial<
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
+
+classRegistry.setClass(ActiveSelection);
 
 fabric.ActiveSelection = ActiveSelection;

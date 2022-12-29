@@ -20,6 +20,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Rect } from './rect.class';
+import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -259,6 +260,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       type: type,
       targets: targets,
     });
+    this._set('dirty', true);
+  }
+
+  _onStackOrderChanged() {
     this._set('dirty', true);
   }
 
@@ -1067,5 +1072,6 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 };
 
 Object.assign(Group.prototype, groupDefaultValues);
+classRegistry.setClass(Group);
 
 fabric.Group = Group;
