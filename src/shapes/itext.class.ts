@@ -35,9 +35,6 @@ export type ITextEvents = ObjectEvents & {
  * @fires cut
  * @fires paste
  *
- * @return {IText} thisArg
- * @see {@link IText#initialize} for constructor definition
- *
  * <p>Supported key combinations:</p>
  * <pre>
  *   Move cursor:                    left, right, up, down

@@ -84,11 +84,7 @@ const additionalProps = [
 
 /**
  * Text class
- * @class Text
- * @extends FabricObject
- * @return {Text} thisArg
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
- * @see {@link Text#initialize} for constructor definition
  */
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
