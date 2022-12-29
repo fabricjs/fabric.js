@@ -73,6 +73,8 @@ export abstract class AnimationBase<
     target,
   }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
     Required<Omit<TAnimationValues<T>, 'endValue'>>) {
+    this.tick = this.tick.bind(this);
+
     this.duration = duration;
     this.delay = delay;
     this.easing = easing;
@@ -122,7 +124,7 @@ export abstract class AnimationBase<
     }
   }
 
-  private tick: FrameRequestCallback = (t) => {
+  private tick(t: number) {
     const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationRatio = boundDurationMs / this.duration;
@@ -150,7 +152,7 @@ export abstract class AnimationBase<
       this._onChange(value, this.valueRatio, this.durationRatio);
       requestAnimFrame(this.tick);
     }
-  };
+  }
 
   private register() {
     runningAnimations.push(this as unknown as AnimationBase);
