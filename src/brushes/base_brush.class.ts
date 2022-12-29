@@ -102,7 +102,9 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   protected abstract finalizeShape(): T | undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onDoubleClick(pointer: Point) {}
+  onDoubleClick(pointer: Point) {
+    // noop
+  }
 
   /**
    * Sets brush styles
