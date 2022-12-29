@@ -1296,11 +1296,11 @@ export class StaticCanvas<
    * @return {String}
    */
   createSVGRefElementsMarkup(): string {
-    return ['background', 'overlay']
+    return (['background', 'overlay'] as const)
       .map((prop) => {
-        const fill = this[`${prop}Color`as ('overlayColor' | `backgroundColor`)];
+        const fill = this[`${prop}Color`];
         if (isFiller(fill)) {
-          const shouldTransform = this[`${prop}Vpt` as ('overlayVpt' | `backgroundVpt`)] as boolean,
+          const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
               width: this.width / (shouldTransform ? vpt[0] : 1),
@@ -1684,10 +1684,20 @@ export class StaticCanvas<
    * });
    */
   toDataURL(options = {} as TDataUrlOptions): string {
-    const { format = 'png', quality = 1, multiplier = 1, enableRetinaScaling = false } = options;
-    const finalMultiplier = multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+    const {
+      format = 'png',
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false,
+    } = options;
+    const finalMultiplier =
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
 
-    return toDataURL(this.toCanvasElement(finalMultiplier, options), format, quality);
+    return toDataURL(
+      this.toCanvasElement(finalMultiplier, options),
+      format,
+      quality
+    );
   }
 
   /**
@@ -1704,7 +1714,10 @@ export class StaticCanvas<
    * @param {Number} [options.height] Cropping height.
    * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
    */
-  toCanvasElement(multiplier = 1, { width, height, left, top, filter } = {} as TToCanvasElementOptions): HTMLCanvasElement {
+  toCanvasElement(
+    multiplier = 1,
+    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+  ): HTMLCanvasElement {
     const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
@@ -1721,9 +1734,7 @@ export class StaticCanvas<
       canvasEl = createCanvasElement(),
       // @ts-ignore
       originalContextTop = this.contextTop,
-      objectsToRender = filter
-        ? this._objects.filter(filter)
-        : this._objects;
+      objectsToRender = filter ? this._objects.filter(filter) : this._objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
     // @ts-ignore
