@@ -731,7 +731,7 @@ export class Image extends FabricObject {
       filters ? enlivenObjects<BaseFilter>(filters, options) : undefined,
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], hydratedProps = {}]) => {
-      return new Image(el, {
+      return new this(el, {
         ...object,
         src,
         crossOrigin,
