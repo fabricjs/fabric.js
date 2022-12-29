@@ -1639,19 +1639,6 @@ export class SelectableCanvas<
     }
     super.setViewportTransform(vpt);
   }
-
-  /**
-   * Clones canvas instance without cloning existing data.
-   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
-   * @returns {StaticCanvas}
-   */
-  cloneWithoutData(): StaticCanvas {
-    const el = createCanvasElement();
-    el.width = this.width;
-    el.height = this.height;
-    // this seems wrong. either Canvas or StaticCanvas
-    return new StaticCanvas(el);
-  }
 }
 
 Object.assign(SelectableCanvas.prototype, {

@@ -2110,22 +2110,19 @@
   });
 
   QUnit.test('cloneWithoutData', function(assert) {
-    var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
     canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
-    canvas.cloneWithoutData().then(function(clone) {
+    const clone = canvas.cloneWithoutData();
 
-      assert.ok(clone instanceof fabric.Canvas);
+    assert.ok(clone instanceof fabric.Canvas);
 
-      assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
+    assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
-      assert.equal(canvas.getWidth(), clone.getWidth());
-      assert.equal(canvas.getHeight(), clone.getHeight());
-      clone.renderAll();
-      done();
-    });
+    assert.equal(canvas.getWidth(), clone.getWidth());
+    assert.equal(canvas.getHeight(), clone.getHeight());
+    clone.renderAll();
   });
 
   QUnit.test('getSetWidth', function(assert) {

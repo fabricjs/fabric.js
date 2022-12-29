@@ -14,6 +14,7 @@ import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { stopEvent } from '../util/dom_event';
+import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
@@ -1639,6 +1640,19 @@ export class Canvas extends SelectableCanvas {
     this.setCursor(this.defaultCursor);
     // clear selection and current transformation
     this._groupSelector = null;
+  }
+
+  /**
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
+   */
+  cloneWithoutData(): Canvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new Canvas(el);
   }
 }
 
