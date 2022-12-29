@@ -59,7 +59,7 @@ export const loadImage = (
     img.src = url;
   });
 
-type EnlivenObjectOptions = {
+export type EnlivenObjectOptions = {
   /**
    * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
