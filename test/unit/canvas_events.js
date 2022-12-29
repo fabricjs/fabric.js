@@ -1216,7 +1216,6 @@
   QUnit.test('text editing manager', function (assert) {
     const manager = canvas.textEditingManager;
     assert.ok(manager, 'should exist');
-    assert.equal(manager.canvas, canvas, 'should have same canvas ref');
     assert.deepEqual(manager.targets, [], 'should be empty');
 
     const a = new fabric.IText('test');
@@ -1242,5 +1241,14 @@
     assert.ok(!b.__isMousedown, 'should have informed mouse up');
     manager.dispose()
     assert.deepEqual(manager.targets, [], 'should have disposed refs');
+    const g = new fabric.Group([a]);
+    canvas.add(g);
+    assert.deepEqual(manager.targets, [a], 'should register an existing nested instance');
+    g.add(b);
+    assert.deepEqual(manager.targets, [a, b], 'should register an added nested instance');
+    g.remove(b);
+    assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
+    canvas.remove(g);
+    assert.deepEqual(manager.targets, [], 'should unregister nested instances upon group removal');
   });
 })();
