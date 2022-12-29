@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)
 - chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
 - chore(TS): Remove backward compatibility initialize methods [#8525](https://github.com/fabricjs/fabric.js/pull/8525/)
