@@ -1,4 +1,4 @@
-import { Animation } from './Animation';
+import { ValueAnimation } from './ValueAnimation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
 import {
@@ -45,14 +45,14 @@ const isArrayAnimation = (
  */
 export const animate = <
   T extends AnimationOptions | ArrayAnimationOptions,
-  R extends T extends ArrayAnimationOptions ? ArrayAnimation : Animation
+  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
 >(
   options: T
 ): R => {
   const animation = (
     isArrayAnimation(options)
       ? new ArrayAnimation(options)
-      : new Animation(options)
+      : new ValueAnimation(options)
   ) as R;
   animation.start();
   return animation;

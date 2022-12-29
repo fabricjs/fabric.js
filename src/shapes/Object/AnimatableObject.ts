@@ -8,6 +8,8 @@ import {
   AnimationOptions,
   ColorAnimationOptions,
 } from '../../util/animation';
+import type { ColorAnimation } from '../../util/animation/ColorAnimation';
+import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { StackedObject } from './StackedObject';
 
 type TAnimationOptions<T extends number | TColorArg> = T extends number
@@ -37,7 +39,7 @@ export abstract class AnimatableObject<
    * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
    * @param {Number|Object} value Value to animate property to (if string was given first) or options object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {(ColorAnimation | Animation)[]} animation context (or an array if passed multiple properties)
+   * @return {(ColorAnimation | ValueAnimation)[]} animation context (or an array if passed multiple properties)
    *
    * As object — multiple properties
    *
@@ -58,16 +60,16 @@ export abstract class AnimatableObject<
     key: string,
     toValue: T,
     options?: Partial<TAnimationOptions<T>>
-  ): void;
+  ): (ColorAnimation | ValueAnimation)[];
   animate<T extends number | TColorArg>(
     animatable: Record<string, T>,
     options?: Partial<TAnimationOptions<T>>
-  ): void;
+  ): (ColorAnimation | ValueAnimation)[];
   animate<T extends number | TColorArg, S extends string | Record<string, T>>(
     arg0: S,
     arg1: S extends string ? T : Partial<TAnimationOptions<T>>,
     arg2?: S extends string ? Partial<TAnimationOptions<T>> : never
-  ) {
+  ): (ColorAnimation | ValueAnimation)[] {
     const animatable = (
       typeof arg0 === 'string' ? { [arg0]: arg1 } : arg0
     ) as Record<string, T>;

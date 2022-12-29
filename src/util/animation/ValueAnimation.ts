@@ -1,7 +1,7 @@
 import { AnimationBase } from './AnimationBase';
 import { AnimationOptions } from './types';
 
-export class Animation extends AnimationBase<number> {
+export class ValueAnimation extends AnimationBase<number> {
   constructor({
     startValue = 0,
     endValue = 100,
