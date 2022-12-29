@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
+import type { Canvas } from '../canvas/canvas_events';
 import { Color } from '../color';
 import { Point } from '../point.class';
 import { Circle } from '../shapes/circle.class';
