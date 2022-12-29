@@ -2,7 +2,7 @@
 import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
@@ -18,7 +18,7 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Rect } from './rect.class';
 import { classRegistry } from '../util/class_registry';
 
@@ -260,6 +260,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       type: type,
       targets: targets,
     });
+    this._set('dirty', true);
+  }
+
+  _onStackOrderChanged() {
     this._set('dirty', true);
   }
 
@@ -1053,7 +1057,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new Group(objects, { ...options, ...hydratedOptions }, true)
+        new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
 }

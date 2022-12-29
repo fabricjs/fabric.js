@@ -17,8 +17,8 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
 import { classRegistry } from '../util/class_registry';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export type ImageSource =
   | HTMLImageElement
@@ -749,7 +749,7 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
-    return loadImage(url, options).then((img) => new Image(img, options));
+    return loadImage(url, options).then((img) => new this(img, options));
   }
 
   /**
@@ -765,8 +765,8 @@ export class Image extends FabricObject {
     callback: (image: Image) => any,
     options: { signal?: AbortSignal } = {}
   ) {
-    const parsedAttributes = parseAttributes(element, Image.ATTRIBUTE_NAMES);
-    Image.fromURL(parsedAttributes['xlink:href'], {
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
     }).then(callback);

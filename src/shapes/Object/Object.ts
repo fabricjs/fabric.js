@@ -1,38 +1,39 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
-import { cache } from '../cache';
-import { config } from '../config';
-import { ALIASING_LIMIT, iMatrix, VERSION } from '../constants';
-import { ObjectEvents } from '../EventTypeDefs';
-import { AnimatableObject } from '../mixins/object_animation.mixin';
-import { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import { fabric } from '../../../HEADER';
+import { cache } from '../../cache';
+import { config } from '../../config';
+import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
+import { ObjectEvents } from '../../EventTypeDefs';
+import { AnimatableObject } from './AnimatableObject';
+import { Point } from '../../point.class';
+import { Shadow } from '../../shadow.class';
 import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TDegree,
   TFiller,
   TSize,
-} from '../typedefs';
-import { runningAnimations } from '../util/animation_registry';
-import { classRegistry } from '../util/class_registry';
-import { clone } from '../util/lang_object';
-import { capitalize } from '../util/lang_string';
-import { capValue } from '../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../util/misc/dom';
+  TCacheCanvasDimensions,
+} from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
+import { runningAnimations } from '../../util/animation_registry';
+import { clone } from '../../util/lang_object';
+import { capitalize } from '../../util/lang_string';
+import { capValue } from '../../util/misc/capValue';
+import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import {
   invertTransform,
   qrDecompose,
   transformPoint,
-} from '../util/misc/matrix';
-import { enlivenObjectEnlivables } from '../util/misc/objectEnlive';
+} from '../../util/misc/matrix';
+import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
   resetObjectTransform,
   saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { pick } from '../util/misc/pick';
-import { toFixed } from '../util/misc/toFixed';
-import type { Group } from './group.class';
+} from '../../util/misc/objectTransforms';
+import { pick } from '../../util/misc/pick';
+import { toFixed } from '../../util/misc/toFixed';
+import type { Group } from '../group.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -41,10 +42,13 @@ export type TCachedFabricObject = FabricObject &
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
+      | '_cacheContext'
       | 'cacheTranslationX'
       | 'cacheTranslationY'
     >
-  >;
+  > & {
+    _cacheContext: CanvasRenderingContext2D;
+  };
 
 // temporary hack for unfinished migration
 type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
@@ -112,17 +116,17 @@ export class FabricObject<
 
   /**
    * Default cursor value used when hovering over this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  hoverCursor: null;
+  hoverCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Default cursor value used when moving this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  moveCursor: null;
+  moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Color of controlling borders of an object (when it's active)
@@ -638,16 +642,6 @@ export class FabricObject<
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options?: Partial<TClassProperties<FabricObject>>) {
     if (options) {
       this.setOptions(options);
     }
@@ -1972,31 +1966,19 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject<
-    T extends FabricObject,
-    X extends string,
-    K extends X extends keyof T
-      ? new (arg0: T[X], ...args: any[]) => T
-      : new (...args: any[]) => T
-  >(
-    klass: K,
+  static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
-  ): Promise<InstanceType<K>> {
-    return enlivenObjectEnlivables(clone(object, true), options).then(
-      (enlivedMap) => {
-        // from the resulting enlived options, extract options.extraParam to arg0
-        // to avoid accidental overrides later
-        const { [extraParam || '']: arg0, ...rest } = {
-          ...options,
-          ...object,
-          ...enlivedMap,
-        };
-        return (
-          extraParam ? new klass(arg0, rest) : new klass(rest)
-        ) as InstanceType<K>;
-      }
-    );
+    { extraParam, ...options }: { extraParam?: any; signal?: AbortSignal } = {}
+  ) {
+    return enlivenObjectEnlivables<InstanceType<this>>(
+      clone(object, true),
+      options
+    ).then((enlivedMap) => {
+      // from the resulting enlived options, extract options.extraParam to arg0
+      // to avoid accidental overrides later
+      const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
+      return extraParam ? new this(arg0, rest) : new this(rest);
+    });
   }
 
   /**
@@ -2010,7 +1992,7 @@ export class FabricObject<
     object: Record<string, unknown>,
     options?: { signal?: AbortSignal }
   ) {
-    return FabricObject._fromObject(FabricObject, object, options);
+    return this._fromObject(object, options);
   }
 }
 

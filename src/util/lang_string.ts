@@ -1,5 +1,5 @@
 /**
- *  * Capitalizes a string
+ * Capitalizes a string
  * @param {String} string String to capitalize
  * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
  * and other letters stay untouched, if false first letter is capitalized

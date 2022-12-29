@@ -1,7 +1,7 @@
 import { noop } from '../../constants';
 import type { BaseFilter } from '../../filters';
-import type { FabricObject } from '../../shapes/fabricObject.class';
-import type { Constructor, TCrossOrigin, TFiller } from '../../typedefs';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
+import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { classRegistry } from '../class_registry';
 import { createImage } from './dom';
 

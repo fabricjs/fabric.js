@@ -3,7 +3,7 @@ import { fabric } from '../../HEADER';
 import { Color } from '../color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TMat2D } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { uid } from '../util/internals/uid';
@@ -373,7 +373,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
-    return new Gradient({
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
