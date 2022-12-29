@@ -1308,13 +1308,11 @@ export class StaticCanvas<
    * @return {String}
    */
   createSVGRefElementsMarkup(): string {
-    return ['background', 'overlay']
+    return (['background', 'overlay'] as const)
       .map((prop) => {
-        const fill = this[`${prop}Color` as 'overlayColor' | `backgroundColor`];
+        const fill = this[`${prop}Color`];
         if (isFiller(fill)) {
-          const shouldTransform = this[
-              `${prop}Vpt` as 'overlayVpt' | `backgroundVpt`
-            ] as boolean,
+          const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
               width: this.width / (shouldTransform ? vpt[0] : 1),
