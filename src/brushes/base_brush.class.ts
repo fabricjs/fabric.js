@@ -3,7 +3,7 @@ import type { Canvas } from '../canvas.class';
 import { Color } from '../color';
 import { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../shadow.class';
-import type { Canvas } from '../canvas/canvas_events';
+import { Point } from '../point.class';
 
 export type TBrushEventData = TEvent & { pointer: Point };
 
@@ -100,6 +100,9 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   abstract onMouseUp(ev: TBrushEventData): void;
 
   protected abstract finalizeShape(): T | undefined;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onDoubleClick(pointer: Point) {}
 
   /**
    * Sets brush styles
