@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
 - chore(TS): Remove backward compatibility initialize methods [#8525](https://github.com/fabricjs/fabric.js/pull/8525/)
 - chore(TS): replace getKlass utility with a registry that doesn't require full fabricJS to work [#8500](https://github.com/fabricjs/fabric.js/pull/8500)
 - chore(): use context in static constructors [#8522](https://github.com/fabricjs/fabric.js/issues/8522)

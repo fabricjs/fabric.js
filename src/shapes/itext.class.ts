@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
+import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -14,7 +14,7 @@ import { TClassProperties, TFiller } from '../typedefs';
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never;
-  tripleclick: TransformEvent;
+  tripleclick: TPointerEventInfo;
   'editing:entered': never;
   'editing:exited': never;
 };

@@ -9,13 +9,11 @@ import './src/color';
 import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
-import './src/static_canvas.class';
-import './src/canvas.class'; // optional interaction
-import './src/mixins/canvas_events.mixin'; // optional interaction
-import './src/mixins/canvas_grouping.mixin'; // optional interaction
+import './src/canvas/static_canvas.class';
+import './src/canvas/canvas_events'; // optional interaction
 import './src/mixins/canvas_dataurl_exporter.mixin';
 import './src/mixins/canvas_serialization.mixin'; // optional serialization
-import './src/mixins/canvas_gestures.mixin'; // optional gestures
+import './src/canvas/canvas_gestures.mixin'; // optional gestures
 import './src/mixins/canvas_animation.mixin'; // optional animation
 import './src/mixins/canvas_straightening.mixin'; // optional animation
 import './src/shapes/Object/FabricObject';

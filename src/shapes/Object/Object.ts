@@ -115,17 +115,17 @@ export class FabricObject<
 
   /**
    * Default cursor value used when hovering over this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  hoverCursor: null;
+  hoverCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Default cursor value used when moving this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  moveCursor: null;
+  moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Color of controlling borders of an object (when it's active)
