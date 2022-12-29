@@ -111,7 +111,6 @@ fabric.util.object.extend(
     },
 
     /**
-     * Same as {@link fabric.Canvas.prototype.straightenObject}, but animated
      * @param {fabric.Object} object Object to straighten
      * @return {fabric.Canvas} thisArg
      */

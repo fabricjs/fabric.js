@@ -1004,16 +1004,6 @@ export class StaticCanvas<
   }
 
   /**
-   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
-   * @TODO probably keen on deleting this.
-   * @param {FabricObject} object Object to center vertically and horizontally
-   */
-  straightenObject(object: FabricObject) {
-    object.straighten();
-    this.renderOnAddRemove && this.requestRenderAll();
-  }
-
-  /**
    * Returns dataless JSON representation of canvas
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {String} json string
