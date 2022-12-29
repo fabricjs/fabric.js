@@ -1401,6 +1401,9 @@ export class Canvas extends SelectableCanvas {
 
     if (actionHandler) {
       actionPerformed = actionHandler(e, transform, x, y);
+      // update lastX/Y
+      transform.lastX = x;
+      transform.lastY = y;
     }
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
