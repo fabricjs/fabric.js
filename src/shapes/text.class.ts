@@ -94,7 +94,7 @@ export class Text<
    * @type Array
    * @private
    */
-  _dimensionAffectingProps: (keyof this)[];
+  _dimensionAffectingProps: string[];
 
   /**
    * @private
