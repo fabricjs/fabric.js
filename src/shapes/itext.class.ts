@@ -173,13 +173,13 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
-      return;
+      return this;
     }
     if (key === 'canvas') {
       this.canvas?.textEditingManager.remove(this);
       (value as Canvas | undefined)?.textEditingManager.add(this);
     }
-    super._set(key, value);
+    return super._set(key, value);
   }
 
   /**
