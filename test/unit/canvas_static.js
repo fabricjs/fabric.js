@@ -1595,11 +1595,11 @@
     canvas2.add(rect);
     canvas2.backgroundColor = 'red';
     canvas2.cloneWithoutData().then(function(cloned) {
-      assert.ok(cloned instanceof fabric.Canvas, 'is cloned in a Canvas, sad but true');
+      assert.ok(cloned instanceof fabric.StaticCanvas, 'is cloned in a StaticCanvas');
       var clonedObjects = cloned.getObjects();
       assert.equal(clonedObjects.length, 0, 'no cloend objects');
       assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
-      assert.equal(cloned.backgroundColor, 'red', 'background color has been cloned');
+      assert.equal(cloned.backgroundColor, undefined, 'background color has not been cloned');
       done();
     });
   });

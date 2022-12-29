@@ -12,7 +12,8 @@ import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TCachedFabricObject } from '../shapes/Object/Object';
 import { Rect } from '../shapes/rect.class';
-import type {
+import {
+  ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
   TFiller,
@@ -31,6 +32,11 @@ import { removeFromArray } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  enlivenObjectEnlivables,
+  EnlivenObjectOptions,
+  enlivenObjects,
+} from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
@@ -60,6 +66,10 @@ export type TSVGExportOptions = {
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
+};
+
+type TCanvasHydrationOption = {
+  signal?: AbortSignal;
 };
 
 /**
@@ -275,7 +285,9 @@ export class StaticCanvas<
   _offset: { left: number; top: number };
   protected hasLostContext: boolean;
   protected nextRenderHandle: number;
-  protected __cleanupTask: {
+
+  // reference to
+  protected __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
@@ -458,7 +470,7 @@ export class StaticCanvas<
     }
     this.lowerCanvasEl.classList.add('lower-canvas');
     this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    this.contextContainer = this.lowerCanvasEl.getContext('2d');
+    this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
   }
 
   /**
@@ -1298,9 +1310,11 @@ export class StaticCanvas<
   createSVGRefElementsMarkup(): string {
     return ['background', 'overlay']
       .map((prop) => {
-        const fill = this[`${prop}Color`as ('overlayColor' | `backgroundColor`)];
+        const fill = this[`${prop}Color` as 'overlayColor' | `backgroundColor`];
         if (isFiller(fill)) {
-          const shouldTransform = this[`${prop}Vpt` as ('overlayVpt' | `backgroundVpt`)] as boolean,
+          const shouldTransform = this[
+              `${prop}Vpt` as 'overlayVpt' | `backgroundVpt`
+            ] as boolean,
             vpt = this.viewportTransform,
             object = {
               width: this.width / (shouldTransform ? vpt[0] : 1),
@@ -1646,6 +1660,103 @@ export class StaticCanvas<
   }
 
   /**
+   * Populates canvas with data from the specified JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
+   *
+   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
+   *
+   * @param {String|Object} json JSON string or object
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
+   * @param {Object} [options] options
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @return {Promise<Canvas | StaticCanvas>} instance
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
+   * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
+   * @example <caption>loadFromJSON</caption>
+   * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
+   * @example <caption>loadFromJSON with reviver</caption>
+   * canvas.loadFromJSON(json, function(o, object) {
+   *   // `o` = json object
+   *   // `object` = fabric.Object instance
+   *   // ... do some stuff ...
+   * }).then((canvas) => {
+   *   ... canvas is restored, add your code.
+   * });
+   *
+   */
+  loadFromJSON(
+    json: string | Record<string, any>,
+    reviver?: EnlivenObjectOptions['reviver'],
+    { signal }: TCanvasHydrationOption = {}
+  ): Promise<this> {
+    if (!json) {
+      return Promise.reject(new Error('fabric.js: `json` is undefined'));
+    }
+
+    // parse json if it wasn't already
+    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
+    const {
+      objects = [],
+      backgroundImage,
+      background,
+      overlayImage,
+      overlay,
+      clipPath,
+    } = serialized;
+    const renderOnAddRemove = this.renderOnAddRemove;
+    this.renderOnAddRemove = false;
+
+    return Promise.all([
+      enlivenObjects(objects, {
+        reviver,
+        signal,
+      }),
+      enlivenObjectEnlivables(
+        {
+          backgroundImage,
+          backgroundColor: background,
+          overlayImage,
+          overlayColor: overlay,
+          clipPath,
+        },
+        { signal }
+      ),
+    ]).then(([enlived, enlivedMap]) => {
+      this.clear();
+      this.add(...enlived);
+      this.set(serialized);
+      this.set(enlivedMap);
+      this.renderOnAddRemove = renderOnAddRemove;
+      return this;
+    });
+  }
+
+  /**
+   * Clones canvas instance
+   * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
+   * @returns {Promise<Canvas | StaticCanvas>}
+   */
+  clone(properties: string[]): Promise<this> {
+    const data = this.toObject(properties);
+    const canvas = this.cloneWithoutData();
+    // @ts-ignore
+    return canvas.loadFromJSON(data);
+  }
+
+  /**
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
+   */
+  cloneWithoutData(): StaticCanvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new StaticCanvas(el);
+  }
+
+  /**
    * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
    * @param {Object} [options] Options object
    * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
@@ -1684,10 +1795,20 @@ export class StaticCanvas<
    * });
    */
   toDataURL(options = {} as TDataUrlOptions): string {
-    const { format = 'png', quality = 1, multiplier = 1, enableRetinaScaling = false } = options;
-    const finalMultiplier = multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+    const {
+      format = ImageFormat.png,
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false,
+    } = options;
+    const finalMultiplier =
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
 
-    return toDataURL(this.toCanvasElement(finalMultiplier, options), format, quality);
+    return toDataURL(
+      this.toCanvasElement(finalMultiplier, options),
+      format,
+      quality
+    );
   }
 
   /**
@@ -1704,7 +1825,10 @@ export class StaticCanvas<
    * @param {Number} [options.height] Cropping height.
    * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
    */
-  toCanvasElement(multiplier = 1, { width, height, left, top, filter } = {} as TToCanvasElementOptions): HTMLCanvasElement {
+  toCanvasElement(
+    multiplier = 1,
+    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+  ): HTMLCanvasElement {
     const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
@@ -1721,9 +1845,7 @@ export class StaticCanvas<
       canvasEl = createCanvasElement(),
       // @ts-ignore
       originalContextTop = this.contextTop,
-      objectsToRender = filter
-        ? this._objects.filter(filter)
-        : this._objects;
+      objectsToRender = filter ? this._objects.filter(filter) : this._objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
     // @ts-ignore
@@ -1800,7 +1922,6 @@ export class StaticCanvas<
       this.overlayImage.dispose();
     }
     this.overlayImage = null;
-    this._iTextInstances = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl;
@@ -1828,39 +1949,41 @@ export class StaticCanvas<
   }
 }
 
-Object.assign(
-  StaticCanvas.prototype,
-  {
-    backgroundColor: '',
-    backgroundImage: null,
-    overlayColor: '',
-    overlayImage: null,
-    includeDefaultValues: true,
-    stateful: false,
-    renderOnAddRemove: true,
-    controlsAboveOverlay: false,
-    allowTouchScrolling: false,
-    imageSmoothingEnabled: true,
-    viewportTransform: iMatrix.concat(),
-    backgroundVpt: true,
-    overlayVpt: true,
-    enableRetinaScaling: true,
-    svgViewportTransformation: true,
-    skipOffscreen: true,
-    clipPath: undefined,
-  },
-  fabric.DataURLExporter
-);
+Object.assign(StaticCanvas.prototype, {
+  backgroundColor: '',
+  backgroundImage: null,
+  overlayColor: '',
+  overlayImage: null,
+  includeDefaultValues: true,
+  stateful: false,
+  renderOnAddRemove: true,
+  controlsAboveOverlay: false,
+  allowTouchScrolling: false,
+  imageSmoothingEnabled: true,
+  viewportTransform: iMatrix.concat(),
+  backgroundVpt: true,
+  overlayVpt: true,
+  enableRetinaScaling: true,
+  svgViewportTransformation: true,
+  skipOffscreen: true,
+  clipPath: undefined,
+});
 
 if (fabric.isLikelyNode) {
-  StaticCanvas.prototype.createPNGStream = function () {
-    const impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createPNGStream();
-  };
-  StaticCanvas.prototype.createJPEGStream = function (opts: any) {
-    const impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createJPEGStream(opts);
-  };
+  Object.assign(StaticCanvas.prototype, {
+    createPNGStream() {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createPNGStream();
+    },
+    createJPEGStream(opts: any) {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createJPEGStream(opts);
+    },
+  });
 }
 
 fabric.StaticCanvas = StaticCanvas;

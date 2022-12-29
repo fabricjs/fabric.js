@@ -37,6 +37,7 @@ import type { Textbox } from '../shapes/textbox.class';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../mixins/object.svg_export';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { createCanvasElement } from '../util/misc/dom';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -1520,6 +1521,7 @@ export class SelectableCanvas<
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
+    this._iTextInstances = [];
     this.contextCache = null;
     this.contextTop = null;
     cleanUpJsdomNode(upperCanvasEl);
@@ -1636,6 +1638,19 @@ export class SelectableCanvas<
       this._activeObject.clearContextTop();
     }
     super.setViewportTransform(vpt);
+  }
+
+  /**
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
+   */
+  cloneWithoutData(): StaticCanvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new StaticCanvas(el);
   }
 }
 

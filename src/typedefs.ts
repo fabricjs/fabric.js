@@ -100,17 +100,15 @@ export type TCacheCanvasDimensions = {
 
 export type TToCanvasElementOptions = {
   left?: number;
-  top?: number
+  top?: number;
   width?: number;
   height?: number;
-  filter?: (object: FabricObject) => boolean
-}
-
+  filter?: (object: FabricObject) => boolean;
+};
 
 export type TDataUrlOptions = TToCanvasElementOptions & {
   multiplier: number;
   format?: ImageFormat;
   quality?: number;
   enableRetinaScaling?: boolean;
-}
-
+};
