@@ -772,6 +772,7 @@ export class Canvas extends SelectableCanvas {
     this._cacheTransformEventData(e);
     const target = this._target;
     this._handleEvent(e, 'up:before');
+    this.textEditingManager.informMouseUp();
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
     if (checkClick(e, RIGHT_CLICK)) {
