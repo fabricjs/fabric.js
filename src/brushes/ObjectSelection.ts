@@ -1,6 +1,7 @@
 import { TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
+import { TBBox } from '../typedefs';
 import { TBrushEventData } from './base_brush.class';
 import { DrawShape } from './DrawShape';
 
@@ -33,7 +34,10 @@ export class ObjectSelection extends DrawShape {
    * @param {Event} e mouse event
    */
   groupSelectedObjects(e: TPointerEvent) {
-    const objects = this.collectObjects(e);
+    const objects = this.collectObjects(
+      this.shape!.getBoundingRect(true, true),
+      e
+    );
     // do not create group for 1 element only
     if (objects.length === 1) {
       this.canvas.setActiveObject(objects[0], e);
@@ -47,12 +51,8 @@ export class ObjectSelection extends DrawShape {
     }
   }
 
-  collectObjects(e: TPointerEvent) {
+  collectObjects({ left, top, height, width }: TBBox, e?: TPointerEvent) {
     const objects = [];
-    const { left, top, height, width } = this.shape!.getBoundingRect(
-      true,
-      true
-    );
     const selectionX1Y1 = new Point(left, top),
       selectionX2Y2 = selectionX1Y1.add(new Point(width, height)),
       allowIntersect = !this.selectionFullyContained,
