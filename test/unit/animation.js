@@ -1,5 +1,8 @@
-(function() {
-  QUnit.module('fabric.util.animate', {
+(function () {
+
+  const findAnimationsByTarget = target => fabric.runningAnimations.filter(({ target: t }) => target === t);
+
+  QUnit.module('animate', {
     afterEach: function (assert) {
       assert.equal(fabric.runningAnimations.length, 0, 'runningAnimations should be empty at the end of a test');
       fabric.runningAnimations.cancelAll();
@@ -18,9 +21,11 @@
       assert.ok(typeof val === 'string', 'expected type is String');
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
-    fabric.util.animateColor('red', 'blue', 16, {
-      onComplete: function(val, changePerc, timePerc) {
-        // animate color need some fixing
+    fabric.util.animateColor({
+      startValue: 'red',
+      endValue: 'blue',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
         assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
@@ -30,30 +35,111 @@
     });
   });
 
-  // QUnit.test('fabric.util.animate', function(assert) {
-  //   var done = assert.async();
-  //   function testing(val) {
-  //     assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
-  //     assert.ok(typeof val === 'String');
-  //   }
-  //   assert.ok(typeof fabric.util.animate === 'function', 'fabric.util.animate is a function');
-  //   fabric.util.animate('red', 'blue', 16, {
-  //     onComplete: function() {
-  //       // animate color need some fixing
-  //       // assert.equal(val, 'rgba(0,0,255,1)', 'color is blue')
-  //       done();
-  //     },
-  //     onChange: testing,
-  //   });
-  // });
+  QUnit.test('animateColor change percentage is calculated from a changed value', function (assert) {
+    const done = assert.async();
+    let called = false;
+    fabric.util.animateColor({
+      startValue: 'red',
+      endValue: 'magenta',
+      duration: 96,
+      onChange: function (val, changePerc) {
+        called && assert.ok(changePerc !== 0, 'change percentage');
+        called = true;
+      },
+      onComplete: done,
+    });
+  });
+  
+  QUnit.test('animateColor byValue', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: 'blue',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test('animateColor byValue with ignored opacity', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'rgba(255,0,0,0.5)',
+      byValue: 'rgba(0,0,255,0.5)',
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test('animateColor byValue with opacity', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: [0, 0, 255, -0.5],
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test('animateColor byValue with wrong opacity is ignored', function (assert) {
+    var done = assert.async();
+    fabric.util.animateColor({
+      startValue: 'red',
+      byValue: [0, 0, 255, 0.5],
+      duration: 16,
+      onChange: val => {
+        assert.equal(new fabric.Color(val).getAlpha(), 1, 'alpha diff should be ignored')
+      },
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
+
+  QUnit.test('byValue', function (assert) {
+    var done = assert.async();
+    fabric.util.animate({
+      startValue: 0,
+      byValue: 10,
+      endValue: 5,
+      duration: 16,
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 10, 'endValue is ignored');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        done();
+      }
+    });
+  });
 
   QUnit.test('animation context', function (assert) {
     var done = assert.async();
     var options = { foo: 'bar' };
-    fabric.util.animate(options);
+    const context = fabric.util.animate(options);
+    assert.equal(context.state, 'pending', 'state');
+    assert.ok(typeof context.abort === 'function', 'context');
+    assert.equal(context.duration, 500, 'defaults');
     assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
-    setTimeout(function() {
-      assert.equal(fabric.runningAnimations.length, 0, 'animation should exist in registry');
+    setTimeout(function () {
+      assert.equal(context.state, 'completed', 'state');
+      assert.equal(fabric.runningAnimations.length, 0, 'animation should not exist in registry');
       done();
     }, 1000);
   });
@@ -63,40 +149,31 @@
     assert.ok(fabric.runningAnimations instanceof Array);
     assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
     assert.ok(typeof fabric.runningAnimations.cancelByTarget === 'function');
-    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
-    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
-    assert.ok(typeof fabric.runningAnimations.findAnimationsByTarget === 'function');
+    assert.ok(typeof fabric.runningAnimations.cancelByCanvas === 'function');
     assert.equal(fabric.runningAnimations.length, 0, 'should have registered animation');
-    var abort, target = { foo: 'bar' };
+    var context, target = { foo: 'bar' };
     var options = {
       target,
-      onChange(currentValue, completionRate, durationRate) {
-        var context = fabric.runningAnimations.findAnimation(abort);
-        assert.equal(context.currentValue, currentValue, 'context.currentValue is wrong');
-        assert.equal(context.completionRate, completionRate, 'context.completionRate is wrong');
-        assert.equal(context.durationRate, durationRate, 'context.durationRate is wrong');
-        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+      onChange() {
+        assert.equal(context.state, 'running', 'state');
+        assert.equal(fabric.runningAnimations.indexOf(context), 0, 'animation should exist in registry');
       },
       onComplete() {
         setTimeout(() => {
+          assert.equal(context.state, 'completed', 'state');
           assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
           done();
         }, 0);
       }
     };
-    abort = fabric.util.animate(options);
-    var context = fabric.runningAnimations.findAnimation(abort);
+    context = fabric.util.animate(options);
     assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
-    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
-    assert.equal(context.cancel, abort, 'animation should exist in registry');
-    assert.equal(context.currentValue, 0, 'context.currentValue is wrong');
-    assert.equal(context.completionRate, 0, 'context.completionRate is wrong');
-    assert.equal(context.durationRate, 0, 'context.durationRate is wrong');
-    var byTarget = fabric.runningAnimations.findAnimationsByTarget(target);
+    assert.equal(fabric.runningAnimations.indexOf(context), 0, 'animation should exist in registry');
+    var byTarget = findAnimationsByTarget(target);
     assert.equal(byTarget.length, 1, 'should have found registered animation by target');
     assert.deepEqual(byTarget[0], context, 'should have found registered animation by target');
     delete byTarget[0].target;
-    assert.equal(fabric.runningAnimations.findAnimationsByTarget(target), 0, 'should not have found registered animation by target');
+    assert.equal(findAnimationsByTarget(target), 0, 'should not have found registered animation by target');
   });
 
   QUnit.test('fabric.runningAnimations with abort', function (assert) {
@@ -115,25 +192,24 @@
             done();
           }, 0);
         }
-        assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
+        assert.equal(fabric.runningAnimations.indexOf(context), 0, 'animation should exist in registry');
         return _abort;
       }
     };
-    var abort = fabric.util.animate(options);
+    var context = fabric.util.animate(options);
     assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
-    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
-    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
+    assert.equal(fabric.runningAnimations.indexOf(context), 0, 'animation should exist in registry');
   });
 
   QUnit.test('fabric.runningAnimations with imperative abort', function (assert) {
     var options = { foo: 'bar' };
-    var abort = fabric.util.animate(options);
+    var context = fabric.util.animate(options);
+    assert.equal(context.state, 'pending', 'state');
     assert.equal(fabric.runningAnimations.length, 1, 'should have registered animation');
-    assert.equal(fabric.runningAnimations.findAnimationIndex(abort), 0, 'animation should exist in registry');
-    assert.equal(fabric.runningAnimations.findAnimation(abort).cancel, abort, 'animation should exist in registry');
-    var context = abort();
+    assert.equal(fabric.runningAnimations.indexOf(context), 0, 'animation should exist in registry');
+    context.abort();
+    assert.equal(context.state, 'aborted', 'state');
     assert.equal(fabric.runningAnimations.length, 0, 'should have unregistered animation');
-    assert.equal(context.foo, 'bar', 'should return animation context');
   });
 
   QUnit.test('fabric.runningAnimations cancelAll', function (assert) {
@@ -149,8 +225,6 @@
     //  make sure splice didn't destroy instance
     assert.ok(fabric.runningAnimations instanceof Array);
     assert.ok(typeof fabric.runningAnimations.cancelAll === 'function');
-    assert.ok(typeof fabric.runningAnimations.findAnimationIndex === 'function');
-    assert.ok(typeof fabric.runningAnimations.findAnimation === 'function');
   });
 
   QUnit.test('fabric.runningAnimations cancelByCanvas', function (assert) {
@@ -179,7 +253,7 @@
     fabric.util.animate(options);
     fabric.util.animate(options);
     fabric.util.animate(options);
-    fabric.util.animate(opt2);
+    const baz = fabric.util.animate(opt2);
     assert.equal(fabric.runningAnimations.length, 4, 'should have registered animations');
     var cancelledAnimations = fabric.runningAnimations.cancelByTarget();
     assert.equal(cancelledAnimations.length, 0, 'should return empty array');
@@ -187,7 +261,7 @@
     cancelledAnimations = fabric.runningAnimations.cancelByTarget('pip');
     assert.equal(cancelledAnimations.length, 3, 'should return cancelled animations');
     assert.equal(fabric.runningAnimations.length, 1, 'should have left 1 registered animation');
-    assert.equal(fabric.runningAnimations[0].bar, opt2.bar, 'should have left 1 registered animation');
+    assert.strictEqual(fabric.runningAnimations[0], baz, 'should have left 1 registered animation');
     setTimeout(() => {
       done();
     }, 1000);
@@ -248,7 +322,7 @@
       object.animate(prop, 'blue');
       assert.ok(true, 'animate without options does not crash');
       assert.equal(fabric.runningAnimations.length, index + 1, 'should have 1 registered animation');
-      assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
+      assert.equal(findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
 
       setTimeout(function () {
         assert.equal(object[prop], new fabric.Color('blue').toRgba(), 'property [' + prop + '] has been animated');
@@ -283,7 +357,7 @@
     object.animate({ left: 40});
     assert.ok(true, 'animate without options does not crash');
     assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
-    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'animation.target should be set');
+    assert.equal(findAnimationsByTarget(object).length, 1, 'animation.target should be set');
 
     setTimeout(function() {
       assert.equal(40, Math.round(object.left));
@@ -343,7 +417,9 @@
       duration: 96,
       onChange: function(currentValue) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
-        assert.deepEqual(fabric.runningAnimations[0]['currentValue'], currentValue)
+        assert.ok(Array.isArray(currentValue), 'should be array');
+        assert.ok(fabric.runningAnimations[0].value !== currentValue, 'should not share array');
+        assert.deepEqual(fabric.runningAnimations[0].value, currentValue);
         assert.equal(currentValue.length, 3);
         currentValue.forEach(function(v) {
           assert.ok(v > 0, 'confirm values are not invalid numbers');
@@ -366,14 +442,14 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
 
-    var context;
+    var context; 
     object.animate({ left: 223, top: 224 }, {
       abort: function() {
         context = this;
         return true;
       }
     });
-
+    
     setTimeout(function() {
       assert.equal(123, Math.round(object.get('left')));
       assert.equal(124, Math.round(object.get('top')));
@@ -386,20 +462,22 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
 
-    var context;
-    var abort = object._animate('left', 223, {
+    let called = 0;
+    const context = object._animate('left', 223, {
       abort: function () {
-        context = this;
+        called++;
         return false;
       }
     });
 
-    assert.ok(typeof abort === 'function');
-    abort();
+    assert.ok(typeof context.abort === 'function');
+    assert.equal(context.state, 'pending', 'state');
+    context.abort();
+    assert.equal(context.state, 'aborted', 'state');
 
     setTimeout(function () {
-      assert.equal(123, Math.round(object.get('left')));
-      assert.equal(context, undefined, 'declarative abort should not be called after imperative abort was called');
+      assert.equal(Math.round(object.get('left')), 123);
+      assert.equal(called, 0, 'declarative abort should be called once before imperative abort cancels the run');
       done();
     }, 100);
   });
@@ -407,18 +485,17 @@
   QUnit.test('animate with delay', function (assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
-    var started = false;
     var t = new Date();
-    object._animate('left', 223, {
+    const context = object._animate('left', 223, {
       onStart: function () {
-        started = true;
+        assert.equal(context.state, 'running', 'state');
         assert.gte(new Date() - t, 500, 'animation delay');
         return false;
       },
       onComplete: done,
       delay: 500
     });
-    assert.ok(started === false);
+    assert.equal(context.state, 'pending', 'state');
   });
 
   QUnit.test('animate easing easeInQuad', function(assert) {

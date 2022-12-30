@@ -1,50 +1,66 @@
-//@ts-nocheck
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import { hue2rgb, hexify } from './util';
 
-type TColorSource = [number, number, number];
+/**
+ * RGB format
+ */
+export type TRGBColorSource = [red: number, green: number, blue: number];
 
-type TColorAlphaSource = [number, number, number, number];
+/**
+ * RGBA format
+ */
+export type TRGBAColorSource = [
+  red: number,
+  green: number,
+  blue: number,
+  alpha: number
+];
+
+export type TColorArg = string | TRGBColorSource | TRGBAColorSource | Color;
 
 /**
  * @class Color common color operations
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
-  private _source: TColorAlphaSource;
+  private _source: TRGBAColorSource;
 
   /**
    *
    * @param {string} [color] optional in hex or rgb(a) or hsl format or from known color list
    */
-  constructor(color?: string) {
+  constructor(color?: TColorArg) {
     if (!color) {
+      // we default to black as canvas does
       this.setSource([0, 0, 0, 1]);
+    } else if (color instanceof Color) {
+      this.setSource([...color._source]);
+    } else if (Array.isArray(color)) {
+      const [r, g, b, a = 1] = color;
+      this.setSource([r, g, b, a]);
     } else {
-      this._tryParsingColor(color);
+      this.setSource(this._tryParsingColor(color));
     }
   }
 
   /**
    * @private
    * @param {string} [color] Color value to parse
+   * @returns {TRGBAColorSource}
    */
-  _tryParsingColor(color?: string) {
+  protected _tryParsingColor(color: string) {
     if (color in ColorNameMap) {
-      color = ColorNameMap[color];
+      color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
-
-    const source =
-      color === 'transparent'
-        ? [255, 255, 255, 0]
-        : Color.sourceFromHex(color) ||
+    return color === 'transparent'
+      ? ([255, 255, 255, 0] as TRGBAColorSource)
+      : Color.sourceFromHex(color) ||
           Color.sourceFromRgb(color) ||
-          Color.sourceFromHsl(color) || [0, 0, 0, 1]; // color is not recognize let's default to black as canvas does
-
-    if (source) {
-      this.setSource(source);
-    }
+          Color.sourceFromHsl(color) ||
+          // color is not recognized
+          // we default to black as canvas does
+          ([0, 0, 0, 1] as TRGBAColorSource);
   }
 
   /**
@@ -53,16 +69,16 @@ export class Color {
    * @param {Number} r Red color value
    * @param {Number} g Green color value
    * @param {Number} b Blue color value
-   * @return {TColorSource} Hsl color
+   * @return {TRGBColorSource} Hsl color
    */
-  _rgbToHsl(r: number, g: number, b: number): TColorSource {
+  _rgbToHsl(r: number, g: number, b: number): TRGBColorSource {
     r /= 255;
     g /= 255;
     b /= 255;
     const maxValue = Math.max(r, g, b),
       minValue = Math.min(r, g, b);
 
-    let h, s;
+    let h!: number, s: number;
     const l = (maxValue + minValue) / 2;
 
     if (maxValue === minValue) {
@@ -89,7 +105,7 @@ export class Color {
 
   /**
    * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @return {TColorAlphaSource}
+   * @return {TRGBAColorSource}
    */
   getSource() {
     return this._source;
@@ -97,9 +113,9 @@ export class Color {
 
   /**
    * Sets source of this color (where source is an array representation; ex: [200, 200, 100, 1])
-   * @param {TColorAlphaSource} source
+   * @param {TRGBAColorSource} source
    */
-  setSource(source: TColorAlphaSource) {
+  setSource(source: TRGBAColorSource) {
     this._source = source;
   }
 
@@ -223,20 +239,14 @@ export class Color {
       otherColor = new Color(otherColor);
     }
 
-    const result = [],
-      alpha = this.getAlpha(),
+    const [r, g, b, alpha] = this.getSource(),
       otherAlpha = 0.5,
-      source = this.getSource(),
-      otherSource = otherColor.getSource();
-
-    for (let i = 0; i < 3; i++) {
-      result.push(
-        Math.round(source[i] * (1 - otherAlpha) + otherSource[i] * otherAlpha)
+      otherSource = otherColor.getSource(),
+      [R, G, B] = [r, g, b].map((value, index) =>
+        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha)
       );
-    }
 
-    result[3] = alpha;
-    this.setSource(result);
+    this.setSource([R, G, B, alpha]);
     return this;
   }
 
@@ -259,16 +269,16 @@ export class Color {
    * @return {Color}
    */
   static fromRgba(color: string): Color {
-    return Color.fromSource(Color.sourceFromRgb(color));
+    return new Color(Color.sourceFromRgb(color));
   }
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
    * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    */
-  static sourceFromRgb(color: string): TColorAlphaSource | undefined {
+  static sourceFromRgb(color: string): TRGBAColorSource | undefined {
     const match = color.match(reRGBa);
     if (match) {
       const r =
@@ -281,12 +291,7 @@ export class Color {
           (parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1)) *
           (/%$/.test(match[3]) ? 255 : 1);
 
-      return [
-        parseInt(r, 10),
-        parseInt(g, 10),
-        parseInt(b, 10),
-        match[4] ? parseFloat(match[4]) : 1,
-      ];
+      return [r, g, b, match[4] ? parseFloat(match[4]) : 1];
     }
   }
 
@@ -309,7 +314,7 @@ export class Color {
    * @return {Color}
    */
   static fromHsla(color: string): Color {
-    return Color.fromSource(Color.sourceFromHsl(color));
+    return new Color(Color.sourceFromHsl(color));
   }
 
   /**
@@ -317,10 +322,10 @@ export class Color {
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
    * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
-  static sourceFromHsl(color: string): TColorAlphaSource | undefined {
+  static sourceFromHsl(color: string): TRGBAColorSource | undefined {
     const match = color.match(reHSLa);
     if (!match) {
       return;
@@ -329,7 +334,7 @@ export class Color {
     const h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
       l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1);
-    let r, g, b;
+    let r: number, g: number, b: number;
 
     if (s === 0) {
       r = g = b = l;
@@ -358,7 +363,7 @@ export class Color {
    * @return {Color}
    */
   static fromHex(color: string): Color {
-    return Color.fromSource(Color.sourceFromHex(color));
+    return new Color(Color.sourceFromHex(color));
   }
 
   /**
@@ -366,9 +371,9 @@ export class Color {
    * @static
    * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
-   * @return {TColorAlphaSource | undefined} source
+   * @return {TRGBAColorSource | undefined} source
    */
-  static sourceFromHex(color: string): TColorAlphaSource | undefined {
+  static sourceFromHex(color: string): TRGBAColorSource | undefined {
     if (color.match(reHex)) {
       const value = color.slice(color.indexOf('#') + 1),
         isShortNotation = value.length === 3 || value.length === 4,
@@ -395,18 +400,5 @@ export class Color {
         parseFloat((parseInt(a, 16) / 255).toFixed(2)),
       ];
     }
-  }
-
-  /**
-   * Returns new color object, when given color in array representation (ex: [200, 100, 100, 0.5])
-   * @static
-   * @memberOf Color
-   * @param {TColorSource | TColorAlphaSource} source
-   * @return {Color}
-   */
-  static fromSource(source: TColorSource | TColorAlphaSource): Color {
-    const oColor = new Color();
-    oColor.setSource(source);
-    return oColor;
   }
 }
