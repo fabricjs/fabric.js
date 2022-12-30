@@ -3,13 +3,21 @@ import { TRGBAColorSource } from '../../color/color.class';
 import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
-import type { ColorAnimationOptions, TEasingFunction, TOnAnimationChangeCallback } from './types';
+import type {
+  ColorAnimationOptions,
+  TEasingFunction,
+  TOnAnimationChangeCallback,
+} from './types';
 
-const defaultColorEasing: TEasingFunction = (timeElapsed, startValue, byValue, duration) => {
-  const durationProgress =
-    1 - Math.cos((timeElapsed / duration) * (halfPI));
+const defaultColorEasing: TEasingFunction = (
+  timeElapsed,
+  startValue,
+  byValue,
+  duration
+) => {
+  const durationProgress = 1 - Math.cos((timeElapsed / duration) * halfPI);
   return startValue + byValue * durationProgress;
-}
+};
 
 const wrapColorCallback = <R>(
   callback?: TOnAnimationChangeCallback<string, R>

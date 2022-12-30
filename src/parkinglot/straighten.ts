@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { noop } from "../constants";
-import { FabricObject } from "../shapes/Object/FabricObject";
-import { TDegree } from "../typedefs";
-import { animate } from "../util/animation/animate";
+import { noop } from '../constants';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import { TDegree } from '../typedefs';
+import { animate } from '../util/animation/animate';
 
 Object.assign(FabricObject.prototype, {
   /**
@@ -54,5 +54,5 @@ Object.assign(FabricObject.prototype, {
         onComplete();
       },
     });
-  }
+  },
 });

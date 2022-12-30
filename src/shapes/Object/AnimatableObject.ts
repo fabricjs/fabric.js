@@ -1,10 +1,10 @@
 import { TColorArg } from '../../color/color.class';
 import { ObjectEvents } from '../../EventTypeDefs';
-import {
-  animate,
-  animateColor,
-} from '../../util/animation/animate';
-import type { AnimationOptions, ColorAnimationOptions } from '../../util/animation/types';
+import { animate, animateColor } from '../../util/animation/animate';
+import type {
+  AnimationOptions,
+  ColorAnimationOptions,
+} from '../../util/animation/types';
 import { ArrayAnimation } from '../../util/animation/ArrayAnimation';
 import type { ColorAnimation } from '../../util/animation/ColorAnimation';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
@@ -40,11 +40,7 @@ export abstract class AnimatableObject<
     options?: Partial<TAnimationOptions<T>>
   ): (ColorAnimation | ValueAnimation | ArrayAnimation)[] {
     return Object.entries(animatable).map(([key, endValue]) =>
-      this._animate(
-        key,
-        endValue,
-        options,
-      )
+      this._animate(key, endValue, options)
     );
   }
 
@@ -61,11 +57,20 @@ export abstract class AnimatableObject<
   ) {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
-    const { byValue, easing, duration, abort, startValue, onChange, onComplete } = options;
+    const {
+      byValue,
+      easing,
+      duration,
+      abort,
+      startValue,
+      onChange,
+      onComplete,
+    } = options;
     const animationOptions = {
       target: this,
       // path.reduce... is the current value in case start value isn't provided
-      startValue: startValue ?? path.reduce((deep: any, key) => deep[key], this),
+      startValue:
+        startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
       byValue,
       easing,

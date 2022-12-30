@@ -92,12 +92,11 @@ import {
 import { isTransparent } from './isTransparent';
 import { mergeClipPaths } from './mergeClipPaths';
 import * as ease from '../animation/easing';
+import { animate, animateColor } from '../animation/animate';
 import {
-  animate,
-  animateColor,
-} from '../animation/animate';
-import { requestAnimFrame,
-cancelAnimFrame, } from '../animation/AnimationFrameProvider';
+  requestAnimFrame,
+  cancelAnimFrame,
+} from '../animation/AnimationFrameProvider';
 import { createClass } from '../lang_class';
 import { classRegistry } from '../class_registry';
 

@@ -1,8 +1,8 @@
 # Changelog
 
 ## [next]
-
-- refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+- refactor(): Animation api reduction and semplification [#8547](https://github.com/fabricjs/fabric.js/pull/8547)
+- refactor():  `AnimationRegistry` and animations as classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
   BREAKING:
   - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
   - change `animateColor` signature to match `animate`, removed `colorEasing`
