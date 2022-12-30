@@ -252,10 +252,10 @@ QUnit.module('Object Selection', function (hooks) {
     });
 
     
-    QUnit.test.skip('mouse:down and group selector', function (assert) {
+    QUnit.test('mouse:down and group selector', function (assert) {
         var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
         var rect = new fabric.Rect({ width: 150, height: 150 });
-        var expectedGroupSelector = { width: 80, height: 120, top: 0, left: 0 };
+        var expectedGroupSelector = { left: 80, top: 120, width: 0, height: 0 };
         canvas.absolutePan(new fabric.Point(50, 80));
         canvas.__onMouseDown(e);
         assert.deepEqual(getSelectionBBox(), expectedGroupSelector, 'a new groupSelector is created');
@@ -282,10 +282,9 @@ QUnit.module('Object Selection', function (hooks) {
 
     QUnit.test.skip('mouse move and group selector', function (assert) {
         var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
-        var expectedGroupSelector = { ex: 15, ey: 30, left: 65, top: 90 };
+        var expectedGroupSelector = { left: 15, top: 30, width: 65, height: 90 };
         canvas.absolutePan(new fabric.Point(50, 80));
-        canvas._groupSelector = { width: 15, height: 30, top: 0, left: 0 };
-        canvas.__onMouseDown({ ...e, clientX: 0, clientY: 0 });
+        canvas.__onMouseDown({ ...e, clientX: 15, clientY: 30 });
         canvas.__onMouseMove(e);
         assert.deepEqual(getSelectionBBox(), expectedGroupSelector, 'groupSelector is updated');
     });
