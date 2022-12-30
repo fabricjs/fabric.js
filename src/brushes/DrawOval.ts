@@ -3,7 +3,7 @@ import { Point } from '../point.class';
 import { Ellipse } from '../shapes/ellipse.class';
 import { DrawShape } from './DrawShape';
 
-export class DrawOval extends DrawShape<typeof Ellipse> {
+export class DrawOval extends DrawShape<Ellipse> {
   builder = Ellipse;
 
   protected setBounds(a: Point, b: Point) {
