@@ -2,7 +2,6 @@ import './HEADER';
 // import './lib/event', // optional gestures
 import './src/mixins/collection.mixin';
 import './src/util/misc/misc';
-// import './src/util/named_accessors.mixin'; i would imagine dead forever or proper setters/getters
 import './src/parser'; // optional parser
 import './src/point.class';
 import './src/intersection.class';
@@ -10,19 +9,12 @@ import './src/color';
 import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
-import './src/static_canvas.class';
-import './src/canvas.class'; // optional interaction
-import './src/mixins/canvas_events.mixin'; // optional interaction
-import './src/mixins/canvas_grouping.mixin'; // optional interaction
-import './src/mixins/canvas_dataurl_exporter.mixin';
-import './src/mixins/canvas_serialization.mixin'; // optiona serialization
-import './src/mixins/canvas_gestures.mixin'; // optional gesturesv
-import './src/mixins/object_interactivity.mixin'; // optional interaction
-import './src/mixins/object_ancestry.mixin';
-import './src/mixins/object_stacking.mixin';
-import './src/mixins/object.svg_export';
-import './src/mixins/stateful.mixin';
-import './src/mixins/animation.mixin'; // optional animation
+import './src/canvas/static_canvas.class';
+import './src/canvas/canvas_events'; // optional interaction
+import './src/canvas/canvas_gestures.mixin'; // optional gestures
+import './src/mixins/canvas_animation.mixin'; // optional animation
+import './src/shapes/Object/FabricObject';
+import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
 import './src/shapes/triangle.class';
@@ -34,7 +26,6 @@ import './src/shapes/path.class';
 import './src/shapes/group.class';
 import './src/shapes/active_selection.class'; // optional interaction
 import './src/shapes/image.class';
-import './src/mixins/object_straightening.mixin'; // optional objectstraightening
 import './src/filters/WebGLProbe'; // optional image_filters
 import './src/filters/base_filter.class'; // optional image_filters
 import './src/filters/colormatrix_filter.class'; // optional image_filters

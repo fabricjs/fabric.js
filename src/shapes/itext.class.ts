@@ -1,21 +1,20 @@
 // @ts-nocheck
 import { fabric } from '../../HEADER';
-import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
+import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
-import { TClassProperties, TFiller } from '../typedefs';
-import { stylesFromArray } from '../util/misc/textStyles';
-import { FabricObject } from './fabricObject.class';
 import {
-  keysMap,
-  keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  keysMap,
+  keysMapRtl,
 } from '../mixins/itext_key_const';
+import { classRegistry } from '../util/class_registry';
+import { TClassProperties, TFiller } from '../typedefs';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never;
-  tripleclick: TransformEvent;
+  tripleclick: TPointerEventInfo;
   'editing:entered': never;
   'editing:exited': never;
 };
@@ -35,9 +34,6 @@ export type ITextEvents = ObjectEvents & {
  * @fires copy
  * @fires cut
  * @fires paste
- *
- * @return {IText} thisArg
- * @see {@link IText#initialize} for constructor definition
  *
  * <p>Supported key combinations:</p>
  * <pre>
@@ -626,22 +622,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
   }
-
-  /**
-   * Returns IText instance from an object representation
-   * @static
-   * @memberOf IText
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<IText>}
-   */
-  static fromObject(object: object): Promise<IText> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(IText, objCopy, {
-      extraParam: 'text',
-    });
-  }
 }
 
 export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
@@ -669,5 +649,7 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
+
+classRegistry.setClass(IText);
 
 fabric.IText = IText;

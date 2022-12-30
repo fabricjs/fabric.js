@@ -4,9 +4,9 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxis } from '../typedefs';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -37,7 +37,7 @@ export function scaleIsProportional(
   fabricObject: FabricObject
 ): boolean {
   const canvas = fabricObject.canvas as Canvas,
-    uniformIsToggled = eventData[canvas.uniScaleKey];
+    uniformIsToggled = eventData[canvas.uniScaleKey!];
   return (
     (canvas.uniformScaling && !uniformIsToggled) ||
     (!canvas.uniformScaling && uniformIsToggled)
@@ -145,8 +145,8 @@ function scaleObject(
     // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
     // cross many time the origin point and flip the object. so we need a way to filter out the noise.
     // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
-    signX = by !== 'y' ? Math.sign(newPoint.x) : 1;
-    signY = by !== 'x' ? Math.sign(newPoint.y) : 1;
+    signX = by !== 'y' ? Math.sign(newPoint.x || transform.signX || 1) : 1;
+    signY = by !== 'x' ? Math.sign(newPoint.y || transform.signY || 1) : 1;
     if (!transform.signX) {
       transform.signX = signX;
     }

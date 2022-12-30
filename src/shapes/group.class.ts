@@ -1,10 +1,10 @@
-//@ts-nocheck
-import { ObjectEvents } from '../EventTypeDefs';
+// @ts-nocheck
 import { fabric } from '../../HEADER';
+import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import {
   invertTransform,
@@ -18,7 +18,9 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { Rect } from './rect.class';
+import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -37,22 +39,14 @@ export type LayoutContext = {
   [key: string]: any;
 };
 
-export type LayoutResult = {
-  centerX: number;
-  centerY: number;
-  width: number;
-  height: number;
-};
-
-export type GroupEvents = ObjectEvents & {
-  layout: {
-    context: LayoutContext;
-    result: LayoutResult;
-    diff: Point;
+export type GroupEvents = ObjectEvents &
+  CollectionEvents & {
+    layout: {
+      context: LayoutContext;
+      result: LayoutResult;
+      diff: Point;
+    };
   };
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
-};
 
 export type LayoutStrategy =
   | 'fit-content'
@@ -266,6 +260,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       type: type,
       targets: targets,
     });
+    this._set('dirty', true);
+  }
+
+  _onStackOrderChanged() {
     this._set('dirty', true);
   }
 
@@ -993,7 +991,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     if (!this.backgroundColor) {
       return '';
     }
-    const fillStroke = fabric.Rect.prototype._toSVG.call(this, reviver);
+    const fillStroke = Rect.prototype._toSVG.call(this, reviver);
     const commons = fillStroke.indexOf('COMMON_PARTS');
     fillStroke[commons] = 'for="group" ';
     return fillStroke.join('');
@@ -1059,7 +1057,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new Group(objects, { ...options, ...hydratedOptions }, true)
+        new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
 }
@@ -1074,5 +1072,6 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 };
 
 Object.assign(Group.prototype, groupDefaultValues);
+classRegistry.setClass(Group);
 
 fabric.Group = Group;

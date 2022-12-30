@@ -6,8 +6,6 @@ const zero = new Point();
 
 /**
  * Rotates `vector` with `radians`
- * @static
- * @memberOf fabric.util
  * @param {Point} vector The vector to rotate (x and y)
  * @param {Number} radians The radians of the angle for the rotation
  * @return {Point} The new rotated point
@@ -17,8 +15,6 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
 
 /**
  * Creates a vector from points represented as a point
- * @static
- * @memberOf fabric.util
  *
  * @param {Point} from
  * @param {Point} to

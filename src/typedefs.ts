@@ -2,6 +2,7 @@
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { Point } from './point.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -14,6 +15,9 @@ type TNonFunctionPropertyNames<T> = {
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
+
+// https://github.com/microsoft/TypeScript/issues/32080
+export type Constructor<T = object> = new (...args: any[]) => T;
 
 const enum Degree {}
 const enum Radian {}
@@ -81,4 +85,30 @@ export type TCornerPoint = {
   tr: Point;
   bl: Point;
   br: Point;
+};
+
+export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
+
+export type TCacheCanvasDimensions = {
+  width: number;
+  height: number;
+  zoomX: number;
+  zoomY: number;
+  x: number;
+  y: number;
+};
+
+export type TToCanvasElementOptions = {
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+  filter?: (object: FabricObject) => boolean;
+};
+
+export type TDataUrlOptions = TToCanvasElementOptions & {
+  multiplier: number;
+  format?: ImageFormat;
+  quality?: number;
+  enableRetinaScaling?: boolean;
 };

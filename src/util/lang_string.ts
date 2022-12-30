@@ -1,20 +1,5 @@
-//@ts-nocheck
-import { fabric } from '../../HEADER';
-
-/**
- * Camelizes a string
- * @memberOf fabric.util.string
- * @param {String} string String to camelize
- * @return {String} Camelized version of a string
- */
-export const camelize = (string: string): string =>
-  string.replace(/-+(.)?/g, function (match, character) {
-    return character ? character.toUpperCase() : '';
-  });
-
 /**
  * Capitalizes a string
- * @memberOf fabric.util.string
  * @param {String} string String to capitalize
  * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
  * and other letters stay untouched, if false first letter is capitalized
@@ -28,7 +13,6 @@ export const capitalize = (string: string, firstLetterOnly = false): string =>
 
 /**
  * Escapes XML in a string
- * @memberOf fabric.util.string
  * @param {String} string String to escape
  * @return {String} Escaped version of a string
  */
@@ -42,7 +26,6 @@ export const escapeXml = (string: string): string =>
 
 /**
  * Divide a string in the user perceived single units
- * @memberOf fabric.util.string
  * @param {String} textstring String to escape
  * @return {Array} array containing the graphemes
  */
@@ -52,13 +35,13 @@ export const graphemeSplit = (textstring: string): string[] => {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
-    graphemes.push(chr);
+    graphemes.push(chr as string);
   }
   return graphemes;
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string => {
+const getWholeChar = (str: string, i: number): string | boolean => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found

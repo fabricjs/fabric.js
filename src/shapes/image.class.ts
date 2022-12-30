@@ -1,11 +1,13 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
+import * as filters from '../filters';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
 import { cleanUpJsdomNode } from '../util/dom_misc';
+import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import {
@@ -15,7 +17,8 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export type ImageSource =
   | HTMLImageElement
@@ -110,7 +113,7 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters: Record<string, BaseFilter>;
+  static filters = filters;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
@@ -133,7 +136,7 @@ export class Image extends FabricObject {
   constructor(arg0: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];
-    this.cacheKey = `texture${FabricObject.__uid++}`;
+    this.cacheKey = `texture${uid()}`;
     this.set(options);
     this.setElement(
       (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
@@ -300,7 +303,7 @@ export class Image extends FabricObject {
       return [];
     }
     if (this.hasCrop()) {
-      const clipPathId = FabricObject.__uid++;
+      const clipPathId = uid();
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' +
@@ -720,18 +723,16 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters, resizeFilter, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
-    const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: Image.filters };
     return Promise.all([
-      loadImage(src, imageOptions),
-      filters && enlivenObjects(filters, filterOptions),
-      resizeFilter && enlivenObjects([resizeFilter], filterOptions),
+      loadImage(src, { ...options, crossOrigin }),
+      f && enlivenObjects(f, options),
+      rf && enlivenObjects([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
-      return new Image(el, {
+      return new this(el, {
         ...object,
         src,
         crossOrigin,
@@ -750,7 +751,7 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
-    return loadImage(url, options).then((img) => new Image(img, options));
+    return loadImage(url, options).then((img) => new this(img, options));
   }
 
   /**
@@ -766,8 +767,8 @@ export class Image extends FabricObject {
     callback: (image: Image) => any,
     options: { signal?: AbortSignal } = {}
   ) {
-    const parsedAttributes = parseAttributes(element, Image.ATTRIBUTE_NAMES);
-    Image.fromURL(parsedAttributes['xlink:href'], {
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
     }).then(callback);
@@ -793,5 +794,8 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 };
 
 Object.assign(Image.prototype, imageDefaultValues);
+
+classRegistry.setClass(Image);
+classRegistry.setSVGClass(Image);
 
 fabric.Image = Image;

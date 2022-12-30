@@ -291,9 +291,9 @@
 
   QUnit.test('toString', function(assert) {
     var cObj = new fabric.Object();
-    assert.equal(cObj.toString(), '#<fabric.Object>');
+    assert.equal(cObj.toString(), '#<Object>');
     cObj.type = 'moo';
-    assert.equal(cObj.toString(), '#<fabric.Moo>');
+    assert.equal(cObj.toString(), '#<Moo>');
   });
 
   QUnit.test('render', function(assert) {
@@ -305,7 +305,7 @@
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.rotate === 'function');
     assert.equal(cObj.get('angle'), 0);
-    assert.equal(cObj.rotate(45), cObj, 'chainable');
+    cObj.rotate(45);
     assert.equal(cObj.get('angle'), 45);
   });
 
@@ -734,52 +734,6 @@
     object.viewportCenterV();
     assert.equal(object.getCenterPoint().y, canvas.getHeight() / (2 * canvas.getZoom()));
     assert.equal(object.left, oldX, 'object left did not change');
-  });
-
-
-  QUnit.test('sendToBack', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.sendToBack === 'function');
-
-    canvas.add(object);
-    assert.equal(object.sendToBack(), object, 'should be chainable');
-  });
-
-  QUnit.test('bringToFront', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.bringToFront === 'function');
-
-    canvas.add(object);
-    assert.equal(object.bringToFront(), object, 'should be chainable');
-  });
-
-  QUnit.test('sendBackwards', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.sendBackwards === 'function');
-
-    canvas.add(object);
-    assert.equal(object.sendBackwards(), object, 'should be chainable');
-  });
-
-  QUnit.test('bringForward', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.bringForward === 'function');
-
-    canvas.add(object);
-    assert.equal(object.bringForward(), object, 'should be chainable');
-  });
-
-  QUnit.test('moveTo', function(assert) {
-    var object = new fabric.Object();
-
-    assert.ok(typeof object.moveTo === 'function');
-
-    canvas.add(object);
-    assert.equal(object.moveTo(), object, 'should be chainable');
   });
 
   QUnit.test('isDescendantOf', function (assert) {
