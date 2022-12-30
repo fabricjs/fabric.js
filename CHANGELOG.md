@@ -2,6 +2,10 @@
 
 ## [next]
 
+- refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+  BREAKING:
+  - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
+  - change `animateColor` signature to match `animate`, removed `colorEasing`
 - fix(Object Stacking): 🔙 refactor logic to support Group 🔝
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)

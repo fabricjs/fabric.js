@@ -91,9 +91,13 @@ import {
 } from '../dom_misc';
 import { isTransparent } from './isTransparent';
 import { mergeClipPaths } from './mergeClipPaths';
-import * as ease from '../anim_ease';
-import { animateColor } from '../animate_color';
-import { animate, requestAnimFrame, cancelAnimFrame } from '../animate';
+import {
+  animate,
+  animateColor,
+  ease,
+  requestAnimFrame,
+  cancelAnimFrame,
+} from '../animation';
 import { createClass } from '../lang_class';
 import { classRegistry } from '../class_registry';
 

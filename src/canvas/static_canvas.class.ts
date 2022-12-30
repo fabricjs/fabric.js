@@ -22,7 +22,7 @@ import {
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
-import { cancelAnimFrame, requestAnimFrame } from '../util/animate';
+import { cancelAnimFrame, requestAnimFrame } from '../util/animation';
 import {
   cleanUpJsdomNode,
   getElementOffset,

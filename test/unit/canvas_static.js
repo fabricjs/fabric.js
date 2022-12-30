@@ -1717,7 +1717,7 @@
     }
 
     assert.ok(canvas.item(0) === rect);
-    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
+    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }).abort === 'function', 'should return animation abort function');
   });
 
   QUnit.test('setViewportTransform', function(assert) {
