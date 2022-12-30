@@ -3,6 +3,7 @@
 change-output.md
 /.nyc_output/
 /node_modules/
+/bundle/
 /npm-debug.log
 before_commit
 /coverage/

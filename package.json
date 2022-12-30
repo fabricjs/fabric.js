@@ -54,7 +54,6 @@
     "cli": "node ./scripts/index.mjs",
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "npm run cli -- build",
-    "build2": "rollup -c",
     "build:fast": "npm run build -- -f",
     "dev": "npm run cli -- dev",
     "start": "npm run cli -- start",
