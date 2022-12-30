@@ -1,0 +1,1 @@
+{"version":3,"file":"dom_event.d.ts","sourceRoot":"","sources":["../../../src/util/dom_event.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,KAAK,EAAE,MAAM,gBAAgB,CAAC;AAKvC;;;;;;GAMG;AACH,eAAO,MAAM,WAAW,mEAC0C,CAAC;AAEnE;;;;;;GAMG;AACH,eAAO,MAAM,cAAc,mEAC0C,CAAC;AAUtE,eAAO,MAAM,UAAU,uBAKtB,CAAC;AAEF,eAAO,MAAM,YAAY,yBAC8C,CAAC;AAExE,eAAO,MAAM,SAAS,MAAO,KAAK,SAGjC,CAAC"}
