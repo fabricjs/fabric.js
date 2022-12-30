@@ -1,7 +1,18 @@
 //@ts-nocheck
+import { AssertKeys } from '../typedefs';
 import { Observable } from './observable.mixin';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
+  /**
+   * use this internal method to assert state during execution
+   */
+  protected assertThisType<K extends keyof this>(): asserts this is AssertKeys<
+    this,
+    K
+  > {
+    // noop, here only for TS
+  }
+
   /**
    * Sets object's properties from options
    * @param {Object} [options] Options object
