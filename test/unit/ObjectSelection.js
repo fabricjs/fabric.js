@@ -101,10 +101,10 @@ QUnit.module('Object Selection', function (hooks) {
         var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
         canvas.add(rect1, rect2, rect3, rect4);
         var collected = collectObjects({
-            left: 1,
-            top: 1,
-            width: 24,
-            height: 24
+            left: 24,
+            top: 24,
+            width: 1,
+            height: 1
         });
         assert.equal(collected.length, 0, 'a rect outside objects do not collect any of them');
     });
@@ -128,10 +128,10 @@ QUnit.module('Object Selection', function (hooks) {
         var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
         canvas.add(rect1, rect2, rect3);
         var collected = collectObjects({
-            left: 0,
-            top: 0,
-            width: 1,
-            height: 1
+            left: 1,
+            top: 1,
+            width: 0,
+            height: 0
         });
         assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
         assert.equal(collected[0], rect3, 'rect3 is collected');
@@ -224,10 +224,10 @@ QUnit.module('Object Selection', function (hooks) {
         canvas.add(rect1, rect2);
         // Intersects none
         collectObjects({
-            left: 1,
-            top: 1,
-            width: 25,
-            height: 25
+            left: 25,
+            top: 25,
+            width: 1,
+            height: 1
         });
         var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
         assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
@@ -245,7 +245,7 @@ QUnit.module('Object Selection', function (hooks) {
             left: 0,
             top: 0,
             width: 15,
-            height: 15
+            height: 5
         });
         assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called');
         assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
