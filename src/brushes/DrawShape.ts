@@ -3,16 +3,15 @@ import { ModifierKey } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/rect.class';
+import { Constructor } from '../typedefs';
 import { TBrushEventData } from './base_brush.class';
 import { DrawShapeBase } from './DrawShapeBase';
 
-export class DrawShape<
-  T extends typeof FabricObject<any> = typeof Rect
-> extends DrawShapeBase<InstanceType<T>> {
+export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
   /**
    * class to build shape from
    */
-  builder: T = Rect as unknown as T;
+  builder: Constructor<T> = Rect as unknown as Constructor<T>;
 
   /**
    * set to `true` for the shape to be centered on mouse/touch down
@@ -32,7 +31,7 @@ export class DrawShape<
   protected start: Point;
 
   create() {
-    return new this.builder() as InstanceType<T>;
+    return new this.builder();
   }
 
   protected setBounds(a: Point, b: Point) {
