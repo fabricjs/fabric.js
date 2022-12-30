@@ -73,8 +73,8 @@ export abstract class AnimatableObject<
       abort: abort?.bind(this),
       onChange: (
         value: string | number,
-        valueRatio: number,
-        durationRatio: number
+        valueProgress: number,
+        durationProgress: number
       ) => {
         path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
@@ -84,17 +84,17 @@ export abstract class AnimatableObject<
         }, this);
         onChange &&
           // @ts-expect-error generic callback arg0 is wrong
-          onChange(value, valueRatio, durationRatio);
+          onChange(value, valueProgress, durationProgress);
       },
       onComplete: (
         value: string | number,
-        valueRatio: number,
-        durationRatio: number
+        valueProgress: number,
+        durationProgress: number
       ) => {
         this.setCoords();
         onComplete &&
           // @ts-expect-error generic callback arg0 is wrong
-          onComplete(value, valueRatio, durationRatio);
+          onComplete(value, valueProgress, durationProgress);
       },
     } as TAnimationOptions<T>;
 

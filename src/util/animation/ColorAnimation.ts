@@ -1,26 +1,29 @@
 import { Color } from '../../color';
 import { TRGBAColorSource } from '../../color/color.class';
+import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
-import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
+import type { ColorAnimationOptions, TEasingFunction, TOnAnimationChangeCallback } from './types';
+
+const defaultColorEasing: TEasingFunction = (timeElapsed, startValue, byValue, duration) => {
+  const durationProgress =
+    1 - Math.cos((timeElapsed / duration) * (halfPI));
+  return startValue + byValue * durationProgress;
+}
 
 const wrapColorCallback = <R>(
   callback?: TOnAnimationChangeCallback<string, R>
 ) =>
   callback &&
-  ((rgba: TRGBAColorSource, valueRatio: number, durationRatio: number) =>
-    callback(new Color(rgba).toRgba(), valueRatio, durationRatio));
+  ((rgba: TRGBAColorSource, valueProgress: number, durationProgress: number) =>
+    callback(new Color(rgba).toRgba(), valueProgress, durationProgress));
 
 export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
   constructor({
     startValue,
     endValue,
     byValue,
-    easing = (timeElapsed, startValue, byValue, duration) => {
-      const durationRatio =
-        1 - Math.cos((timeElapsed / duration) * (Math.PI / 2));
-      return startValue + byValue * durationRatio;
-    },
+    easing = defaultColorEasing,
     onChange,
     onComplete,
     abort,
