@@ -2118,7 +2118,6 @@ export const fabricObjectDefaultValues = {
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
-  FX_DURATION: 500,
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
