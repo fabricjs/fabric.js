@@ -91,7 +91,7 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMouseDown(pointer: Point, ev: TBrushEventData) {
-    this.canvas._isCurrentlyDrawing = this.active = true;
+    this.active = true;
   }
 
   abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
@@ -248,8 +248,7 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   }
 
   protected async finalize() {
-    // TODO: once canvas is migrated refactor `_isCurrentlyDrawing` to a method
-    this.canvas._isCurrentlyDrawing = this.active = false;
+    this.active = false;
     this._resetShadow();
     const shape = this.finalizeShape();
     if (shape) {

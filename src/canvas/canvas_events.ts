@@ -13,6 +13,7 @@ import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { AssertKeys } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -779,7 +780,7 @@ export class Canvas extends SelectableCanvas {
       return;
     }
 
-    if (this.isDrawingMode && this._isCurrentlyDrawing) {
+    if (this.isCurrentlyDrawing()) {
       this._onMouseUpInDrawingMode(e);
       return;
     }
@@ -1009,13 +1010,12 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousemove
    */
   _onMouseMoveInDrawingMode(e: TPointerEvent) {
-    if (this._isCurrentlyDrawing) {
+    if (this.isCurrentlyDrawing()) {
       const pointer = this.getPointer(e);
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush.onMouseMove(pointer, {
-          e,
-          pointer,
-        });
+      this.freeDrawingBrush!.onMouseMove(pointer, {
+        e,
+        pointer,
+      });
     }
     this.setCursor(this.freeDrawingCursor);
     this._handleEvent(e, 'move');
@@ -1025,9 +1025,12 @@ export class Canvas extends SelectableCanvas {
    * @private
    * @param {Event} e Event object fired on mouseup
    */
-  _onMouseUpInDrawingMode(e: TPointerEvent) {
+  _onMouseUpInDrawingMode(
+    this: AssertKeys<this, 'freeDrawingBrush'>,
+    e: TPointerEvent
+  ) {
     const pointer = this.getPointer(e);
-    this.freeDrawingBrush!.onMouseUp({
+    this.freeDrawingBrush.onMouseUp({
       e,
       pointer,
     });

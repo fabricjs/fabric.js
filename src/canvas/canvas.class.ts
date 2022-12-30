@@ -1,7 +1,6 @@
 import { fabric } from '../../HEADER';
+import type { BaseBrush } from '../brushes/base_brush.class';
 import { dragHandler, getActionFromCorner } from '../controls/actions';
-import { Point } from '../point.class';
-import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
@@ -9,35 +8,35 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import {
-  addTransformToObject,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
-import {
-  isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
-  isInteractiveTextObject,
-} from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
+import { TSVGReviver } from '../mixins/object.svg_export';
+import { Point } from '../point.class';
 import type { IText } from '../shapes/itext.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import type { Textbox } from '../shapes/textbox.class';
+import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { getPointer, isTouchEvent } from '../util/dom_event';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   wrapElement,
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/base_brush.class';
-import type { Textbox } from '../shapes/textbox.class';
+import { isTransparent } from '../util/misc/isTransparent';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  addTransformToObject,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../mixins/object.svg_export';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { createCanvasElement } from '../util/misc/dom';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import {
+  isActiveSelection,
+  isCollection,
+  isFabricObjectCached,
+  isInteractiveTextObject,
+} from '../util/types';
+import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -495,7 +494,6 @@ export class SelectableCanvas<
   contextTop: CanvasRenderingContext2D;
   wrapperEl: HTMLDivElement;
   cacheCanvasEl: HTMLCanvasElement;
-  _isCurrentlyDrawing: boolean;
   shouldClearContextTop: boolean;
   freeDrawingBrush?: BaseBrush;
   _activeObject?: FabricObject;
@@ -639,8 +637,8 @@ export class SelectableCanvas<
 
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush.render();
+    if (this.isCurrentlyDrawing()) {
+      this.freeDrawingBrush!.render();
       this.contextTopDirty = true;
     }
     // we render the top context - last object
@@ -1210,9 +1208,8 @@ export class SelectableCanvas<
     // @ts-ignore
     this._resetTransformEventData();
     super.setDimensions(dimensions, options);
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
+    if (this.isCurrentlyDrawing()) {
+      this.freeDrawingBrush!._setBrushStyles(this.contextTop);
     }
   }
 
@@ -1344,6 +1341,10 @@ export class SelectableCanvas<
    */
   getSelectionElement(): HTMLCanvasElement {
     return this.upperCanvasEl;
+  }
+
+  isCurrentlyDrawing(): this is AssertKeys<this, 'freeDrawingBrush'> {
+    return !!(this.isDrawingMode && this.freeDrawingBrush?.active);
   }
 
   /**
