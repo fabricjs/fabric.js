@@ -22,8 +22,9 @@ export class ObjectSelection extends DrawShape {
   }
 
   onMouseUp(ev: TBrushEventData): void {
+    const bbox = this.shape!.getBoundingRect(true, true);
     super.onMouseUp(ev);
-    this.groupSelectedObjects(ev.e);
+    this.groupSelectedObjects(bbox, ev.e);
     this.onEnd(this.shape);
     this.shape = undefined;
   }
@@ -33,11 +34,8 @@ export class ObjectSelection extends DrawShape {
    * @private
    * @param {Event} e mouse event
    */
-  groupSelectedObjects(e: TPointerEvent) {
-    const objects = this.collectObjects(
-      this.shape!.getBoundingRect(true, true),
-      e
-    );
+  protected groupSelectedObjects(bbox: TBBox, e?: TPointerEvent) {
+    const objects = this.collectObjects(bbox, e);
     // do not create group for 1 element only
     if (objects.length === 1) {
       this.canvas.setActiveObject(objects[0], e);
@@ -51,7 +49,10 @@ export class ObjectSelection extends DrawShape {
     }
   }
 
-  collectObjects({ left, top, height, width }: TBBox, e?: TPointerEvent) {
+  protected collectObjects(
+    { left, top, height, width }: TBBox,
+    e?: TPointerEvent
+  ) {
     const objects = [];
     const selectionX1Y1 = new Point(left, top),
       selectionX2Y2 = selectionX1Y1.add(new Point(width, height)),
