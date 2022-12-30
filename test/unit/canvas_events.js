@@ -311,7 +311,7 @@
     var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
-    canvas._isCurrentlyDrawing = true;
+    canvas.isCurrentlyDrawing = () => true;
     brush.render = function() { rendered = true; };
     brush._setBrushStyles = function() { prepareFor = true; };
     canvas.setDimensions({ width: 200, height: 200 });
