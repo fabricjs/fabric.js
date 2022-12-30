@@ -49,7 +49,7 @@
       onComplete: done,
     });
   });
-  
+
   QUnit.test('animateColor byValue', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
@@ -273,7 +273,7 @@
 
     assert.ok(typeof object.animate === 'function');
 
-    object.animate('left', 40);
+    object.animate({ left: 40 });
     assert.ok(true, 'animate without options does not crash');
     assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
     assert.equal(fabric.runningAnimations[0].target, object, 'animation.target should be set');
@@ -290,7 +290,7 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    object.animate('left', '+=40');
+    object.animate({ left: object.left + 40 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
@@ -304,7 +304,7 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43, shadow: { offsetX: 20 } });
 
-    object.animate('shadow.offsetX', 100);
+    object.animate({ 'shadow.offsetX': 100 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
@@ -319,7 +319,7 @@
 
     properties.forEach(function (prop, index) {
       object.set(prop, 'red');
-      object.animate(prop, 'blue');
+      object.animate({ [prop]: 'blue' });
       assert.ok(true, 'animate without options does not crash');
       assert.equal(fabric.runningAnimations.length, index + 1, 'should have 1 registered animation');
       assert.equal(findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
@@ -338,29 +338,12 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    object.animate('left', '-=40');
+    object.animate({ left: object.left - 40 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
 
       assert.equal(Math.round(object.left), -20, 'left has been decreased by 40');
-      done();
-    }, 1000);
-  });
-
-  QUnit.test('animate with object', function(assert) {
-    var done = assert.async();
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
-
-    assert.ok(typeof object.animate === 'function');
-
-    object.animate({ left: 40});
-    assert.ok(true, 'animate without options does not crash');
-    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
-    assert.equal(findAnimationsByTarget(object).length, 1, 'animation.target should be set');
-
-    setTimeout(function() {
-      assert.equal(40, Math.round(object.left));
       done();
     }, 1000);
   });
@@ -399,7 +382,7 @@
       assert.equal(Math.round(object.get('top')), 1);
 
       assert.ok(changedInvocations > 0);
-      assert.equal(completeInvocations, 1);
+      assert.equal(completeInvocations, 2, 'the callbacks get call for each animation');
 
       done();
 
@@ -442,14 +425,14 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
 
-    var context; 
+    var context;
     object.animate({ left: 223, top: 224 }, {
       abort: function() {
         context = this;
         return true;
       }
     });
-    
+
     setTimeout(function() {
       assert.equal(123, Math.round(object.get('left')));
       assert.equal(124, Math.round(object.get('top')));
