@@ -2,7 +2,7 @@
 import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
-import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
+import { type CanvasEvents, type StaticCanvasEvents } from '../EventTypeDefs';
 import { Gradient } from '../gradient';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { TSVGReviver } from '../mixins/object.svg_export';

@@ -1,7 +1,7 @@
 import { TMat2D } from './typedefs';
 
 // TODO: consider using https://github.com/swiing/rollup-plugin-import-assertions so we can import json in node and have rollup build pass
-export { version as VERSION } from '../package.json';
+// export { version as VERSION } from '../package.json';
 export function noop() {}
 export const halfPI = Math.PI / 2;
 export const twoMathPi = Math.PI * 2;
@@ -12,3 +12,4 @@ export const ALIASING_LIMIT = 2;
 
 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 export const kRect = 1 - 0.5522847498;
+export const VERSION = '6';
