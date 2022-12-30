@@ -124,6 +124,8 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
+  private _isClick: boolean;
+
   /**
    * Adds mouse listeners to canvas
    * @private
@@ -756,10 +758,8 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    const transform = this._currentTransform,
-      groupSelector = this._groupSelector,
-      isClick =
-        !groupSelector || (groupSelector.left === 0 && groupSelector.top === 0);
+    const transform = this._currentTransform;
+    const isClick = this._isClick;
     this._cacheTransformEventData(e);
     const target = this._target;
     this._handleEvent(e, 'up:before');
@@ -793,9 +793,12 @@ export class Canvas extends SelectableCanvas {
       this._finalizeCurrentTransform(e);
       shouldRender = transform.actionPerformed;
     }
+    if (this.selection && this._groupSelector.active) {
+      this._groupSelector.onMouseUp({ e, pointer: this.getPointer(e) });
+    }
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
-      this._maybeGroupObjects(e);
+      this.setCursor(this.defaultCursor);
       if (!shouldRender) {
         shouldRender =
           this._shouldRender(target) ||
@@ -847,7 +850,7 @@ export class Canvas extends SelectableCanvas {
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up', LEFT_CLICK, isClick);
-    this._groupSelector = null;
+    // this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
     target && (target.__corner = 0);
@@ -1048,6 +1051,7 @@ export class Canvas extends SelectableCanvas {
   __onMouseDown(e: TPointerEvent) {
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
+    this._isClick = true;
     let target: FabricObject | undefined = this._target;
     // if right click just fire events
     if (checkClick(e, RIGHT_CLICK)) {
@@ -1095,7 +1099,7 @@ export class Canvas extends SelectableCanvas {
     // and there is no target, or the following 3 condition both apply
     // target is not selectable ( otherwise we selected it )
     // target is not editing
-    // target is not already selected ( otherwise we drage )
+    // target is not already selected ( otherwise we drag )
     if (
       this.selection &&
       (!target ||
@@ -1104,13 +1108,8 @@ export class Canvas extends SelectableCanvas {
           !target.isEditing &&
           target !== this._activeObject))
     ) {
-      const p = this.getPointer(e);
-      this._groupSelector = {
-        ex: p.x,
-        ey: p.y,
-        top: 0,
-        left: 0,
-      };
+      const pointer = this.getPointer(e);
+      this._groupSelector.onMouseDown(pointer, { e, pointer: pointer });
     }
 
     if (target) {
@@ -1192,6 +1191,7 @@ export class Canvas extends SelectableCanvas {
   __onMouseMove(e: TPointerEvent) {
     this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    this._isClick = false;
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -1202,16 +1202,10 @@ export class Canvas extends SelectableCanvas {
       return;
     }
 
-    const groupSelector = this._groupSelector;
-
     // We initially clicked in an empty area, so we draw a box for multiple selection
-    if (groupSelector) {
+    if (this._groupSelector.active) {
       const pointer = this.getPointer(e);
-
-      groupSelector.left = pointer.x - groupSelector.ex;
-      groupSelector.top = pointer.y - groupSelector.ey;
-
-      this.renderTop();
+      this._groupSelector.onMouseMove(pointer, { e, pointer });
     } else if (!this._currentTransform) {
       const target = this.findTarget(e);
       this._setCursorFromEvent(e, target);
@@ -1546,92 +1540,6 @@ export class Canvas extends SelectableCanvas {
     // this._hoveredTargets = this.targets.concat();
     this._setActiveObject(newActiveSelection, e);
     this._fireSelectionEvents([currentActive], e);
-  }
-
-  /**
-   * Finds objects inside the selection rectangle and group them
-   * @private
-   * @param {Event} e mouse event
-   */
-  _groupSelectedObjects(e: TPointerEvent) {
-    const group = this._collectObjects(e);
-    // do not create group for 1 element only
-    if (group.length === 1) {
-      this.setActiveObject(group[0], e);
-    } else if (group.length > 1) {
-      const aGroup = new ActiveSelection(group.reverse(), {
-        canvas: this,
-      });
-      this.setActiveObject(aGroup, e);
-    }
-  }
-
-  /**
-   * @private
-   */
-  _collectObjects(e: TPointerEvent) {
-    const group = [],
-      _groupSelector = this._groupSelector,
-      point1 = new Point(_groupSelector.ex, _groupSelector.ey),
-      point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
-      selectionX1Y1 = point1.min(point2),
-      selectionX2Y2 = point1.max(point2),
-      allowIntersect = !this.selectionFullyContained,
-      isClick = point1.eq(point2);
-    // we iterate reverse order to collect top first in case of click.
-    for (let i = this._objects.length; i--; ) {
-      const currentObject = this._objects[i];
-
-      if (
-        !currentObject ||
-        !currentObject.selectable ||
-        !currentObject.visible
-      ) {
-        continue;
-      }
-
-      if (
-        (allowIntersect &&
-          currentObject.intersectsWithRect(
-            selectionX1Y1,
-            selectionX2Y2,
-            true
-          )) ||
-        currentObject.isContainedWithinRect(
-          selectionX1Y1,
-          selectionX2Y2,
-          true
-        ) ||
-        (allowIntersect &&
-          currentObject.containsPoint(selectionX1Y1, undefined, true)) ||
-        (allowIntersect &&
-          currentObject.containsPoint(selectionX2Y2, undefined, true))
-      ) {
-        group.push(currentObject);
-        // only add one object if it's a click
-        if (isClick) {
-          break;
-        }
-      }
-    }
-
-    if (group.length > 1) {
-      return group.filter((object) => !object.onSelect({ e }));
-    }
-
-    return group;
-  }
-
-  /**
-   * @private
-   */
-  _maybeGroupObjects(e: TPointerEvent) {
-    if (this.selection && this._groupSelector) {
-      this._groupSelectedObjects(e);
-    }
-    this.setCursor(this.defaultCursor);
-    // clear selection and current transformation
-    this._groupSelector = null;
   }
 
   /**

@@ -1,0 +1,102 @@
+import { TPointerEvent } from '../EventTypeDefs';
+import { Point } from '../point.class';
+import { ActiveSelection } from '../shapes/active_selection.class';
+import { TBrushEventData } from './base_brush.class';
+import { DrawShape } from './DrawShape';
+
+export class ObjectSelection extends DrawShape {
+  stroke = 'rgba(255, 255, 255, 0.3)';
+  fill = 'rgba(100, 100, 255, 0.3)'; // blue
+
+  /**
+   * Select only shapes that are fully contained in the selection rectangle.
+   * @type Boolean
+   * @default
+   */
+  selectionFullyContained = false;
+
+  protected async finalize() {
+    this.active = false;
+    this._resetShadow();
+  }
+
+  onMouseUp(ev: TBrushEventData): void {
+    super.onMouseUp(ev);
+    this.groupSelectedObjects(ev.e);
+    this.onEnd(this.shape);
+    this.shape = undefined;
+  }
+
+  /**
+   * Finds objects inside the selection rectangle and group them
+   * @private
+   * @param {Event} e mouse event
+   */
+  groupSelectedObjects(e: TPointerEvent) {
+    const objects = this.collectObjects(e);
+    // do not create group for 1 element only
+    if (objects.length === 1) {
+      this.canvas.setActiveObject(objects[0], e);
+    } else if (objects.length > 1) {
+      this.canvas.setActiveObject(
+        new ActiveSelection(objects.reverse(), {
+          canvas: this.canvas,
+        }),
+        e
+      );
+    }
+  }
+
+  collectObjects(e: TPointerEvent) {
+    const objects = [];
+    const { left, top, height, width } = this.shape!.getBoundingRect(
+      true,
+      true
+    );
+    const selectionX1Y1 = new Point(left, top),
+      selectionX2Y2 = selectionX1Y1.add(new Point(width, height)),
+      allowIntersect = !this.selectionFullyContained,
+      isClick = width === 0 && height === 0;
+
+    // we iterate in reverse order to collect top first in case of click.
+    for (let i = this.canvas._objects.length - 1; i >= 0; i--) {
+      const currentObject = this.canvas._objects[i];
+
+      if (
+        !currentObject ||
+        !currentObject.selectable ||
+        !currentObject.visible
+      ) {
+        continue;
+      }
+
+      if (
+        (allowIntersect &&
+          currentObject.intersectsWithRect(
+            selectionX1Y1,
+            selectionX2Y2,
+            true
+          )) ||
+        currentObject.isContainedWithinRect(
+          selectionX1Y1,
+          selectionX2Y2,
+          true
+        ) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX1Y1, undefined, true)) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX2Y2, undefined, true))
+      ) {
+        objects.push(currentObject);
+        // only add one object if it's a click
+        if (isClick) {
+          break;
+        }
+      }
+    }
+
+    return objects.length > 1
+      ? objects.filter((object) => !object.onSelect({ e }))
+      : objects;
+  }
+}

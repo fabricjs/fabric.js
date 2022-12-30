@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
 import type { BaseBrush } from '../brushes/base_brush.class';
+import { ObjectSelection } from '../brushes/ObjectSelection';
 import { dragHandler, getActionFromCorner } from '../controls/actions';
 import {
   CanvasEvents,
@@ -437,13 +438,14 @@ export class SelectableCanvas<
   _currentTransform: Transform | null = null;
 
   /**
-   * hold a reference to a data structure used to track the selecion
+   * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
    * @type
    * @private
    */
-  _groupSelector: any = null;
+  // @ts-expect-error TODO move to canvas events
+  _groupSelector: ObjectSelection = new ObjectSelection(this);
 
   /**
    * internal flag used to understand if the context top requires a cleanup
@@ -612,7 +614,9 @@ export class SelectableCanvas<
       return;
     }
     if (
-      (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) ||
+      (this.contextTopDirty &&
+        !this._groupSelector.active &&
+        !this.isDrawingMode) ||
       this.shouldClearContextTop
     ) {
       this.clearContext(this.contextTop);
@@ -636,12 +640,11 @@ export class SelectableCanvas<
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isCurrentlyDrawing()) {
-      this.freeDrawingBrush!.render();
+      this.freeDrawingBrush!.render(ctx);
       this.contextTopDirty = true;
     }
-    // we render the top context - last object
-    if (this.selection && this._groupSelector) {
-      this._drawSelection(ctx);
+    if (this.selection && this._groupSelector.active) {
+      this._groupSelector.render(ctx);
       this.contextTopDirty = true;
     }
     ctx.restore();
@@ -908,45 +911,6 @@ export class SelectableCanvas<
    */
   setCursor(value: CSSStyleDeclaration['cursor']): void {
     this.upperCanvasEl.style.cursor = value;
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx to draw the selection on
-   */
-  _drawSelection(ctx: CanvasRenderingContext2D): void {
-    const { ex, ey, left, top } = this._groupSelector,
-      start = new Point(ex, ey).transform(this.viewportTransform),
-      extent = new Point(ex + left, ey + top).transform(this.viewportTransform),
-      strokeOffset = this.selectionLineWidth / 2;
-    let minX = Math.min(start.x, extent.x),
-      minY = Math.min(start.y, extent.y),
-      maxX = Math.max(start.x, extent.x),
-      maxY = Math.max(start.y, extent.y);
-
-    if (this.selectionColor) {
-      ctx.fillStyle = this.selectionColor;
-      ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
-    }
-
-    if (!this.selectionLineWidth || !this.selectionBorderColor) {
-      return;
-    }
-    ctx.lineWidth = this.selectionLineWidth;
-    ctx.strokeStyle = this.selectionBorderColor;
-
-    minX += strokeOffset;
-    minY += strokeOffset;
-    maxX -= strokeOffset;
-    maxY -= strokeOffset;
-    // selection border
-    // @TODO: is _setLineDash still necessary on modern canvas?
-    FabricObject.prototype._setLineDash.call(
-      this,
-      ctx,
-      this.selectionDashArray
-    );
-    ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
   }
 
   /**
