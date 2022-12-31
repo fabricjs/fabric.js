@@ -1660,5 +1660,3 @@ export class Canvas extends SelectableCanvas {
 Object.assign(Canvas.prototype, {
   eventsBound: false,
 });
-
-fabric.Canvas = Canvas;
