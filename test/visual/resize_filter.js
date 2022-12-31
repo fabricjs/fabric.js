@@ -5,7 +5,7 @@
   var visualTestLoop;
   var getFixture;
   var isFirefox = false;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
     getFixture = global.getFixture;
   }

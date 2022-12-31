@@ -1,6 +1,6 @@
 (function() {
 
-  var canvas = fabric.document.createElement('canvas'),
+  var canvas = fabric.getDocument().createElement('canvas'),
       context = canvas.getContext('2d');
 
   function _createImageData(context) {

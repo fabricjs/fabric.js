@@ -22,6 +22,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Gradient class
@@ -392,3 +393,5 @@ export class Gradient<
   }
   /* _FROM_SVG_END_ */
 }
+
+classRegistry.setClass('gradient', Gradient);

@@ -76,3 +76,7 @@ export const getEnv = (): TFabricEnv => {
 
 export const getDocument = (): Document => fabricDocument;
 export const getWindow = (): Window => fabricWindow;
+export const setEnvForTests = (window: Window) => {
+  fabricDocument = window.document;
+  fabricWindow = window;
+}

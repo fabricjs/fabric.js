@@ -1,6 +1,6 @@
 import { noop } from '../../constants';
-import { Gradient } from '../../gradient/gradient.class';
-import { Pattern } from '../../pattern.class';
+import type { Gradient } from '../../gradient/gradient.class';
+import type { Pattern } from '../../pattern.class';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
@@ -146,7 +146,7 @@ export const enlivenObjectEnlivables = <
       }
       // gradient
       if (value.colorStops) {
-        return new Gradient(value);
+        return new (classRegistry.getClass('gradient'))(value);
       }
       // clipPath
       if (value.type) {
@@ -157,7 +157,7 @@ export const enlivenObjectEnlivables = <
       }
       // pattern
       if (value.source) {
-        return Pattern.fromObject(value, { signal }).then((pattern) => {
+        return classRegistry.getClass('pattern').fromObject(value, { signal }).then((pattern: Pattern) => {
           instances.push(pattern);
           return pattern;
         });

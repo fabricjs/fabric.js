@@ -39,6 +39,7 @@ import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../mixins/object.svg_export';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { createCanvasElement } from '../util/misc/dom';
+import { iMatrix } from '../constants';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,

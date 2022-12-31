@@ -440,7 +440,6 @@ export class StaticCanvas<
 
     lowerCanvasEl.style.width = this.width + 'px';
     lowerCanvasEl.style.height = this.height + 'px';
-
     this.viewportTransform = [...this.viewportTransform];
   }
 
@@ -1754,7 +1753,7 @@ export class StaticCanvas<
   }
 }
 
-Object.assign(StaticCanvas.prototype, {
+Object.assign(StaticCanvas.__proto__, {
   backgroundColor: '',
   backgroundImage: null,
   overlayColor: '',
@@ -1765,7 +1764,7 @@ Object.assign(StaticCanvas.prototype, {
   controlsAboveOverlay: false,
   allowTouchScrolling: false,
   imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
+  viewportTransform: iMatrix,
   backgroundVpt: true,
   overlayVpt: true,
   enableRetinaScaling: true,

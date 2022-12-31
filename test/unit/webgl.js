@@ -1,6 +1,6 @@
 
 QUnit.module('WebGL', hooks => {
-    const isNode = fabric.isLikelyNode;
+    const isNode = fabric.getEnv().isLikelyNode;
 
     hooks.afterEach(() => {
         fabric.config.restoreDefaults();

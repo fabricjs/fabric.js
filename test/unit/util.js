@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -24,7 +24,7 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = fabric.isLikelyNode
+  var IMG_URL = fabric.getEnv().isLikelyNode
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -260,19 +260,19 @@
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-    var wrapper = fabric.document.createElement('div');
-    var el = fabric.document.createElement('p');
+    var wrapper = fabric.getDocument().createElement('div');
+    var el = fabric.getDocument().createElement('p');
     var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-    var childEl = fabric.document.createElement('span');
-    var parentEl = fabric.document.createElement('p');
+    var childEl = fabric.getDocument().createElement('span');
+    var parentEl = fabric.getDocument().createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, fabric.document.createElement('strong'));
+    wrapper = wrapElement(childEl, fabric.getDocument().createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -284,8 +284,8 @@
 
     assert.ok(typeof makeElementUnselectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
 
@@ -309,8 +309,8 @@
 
     assert.ok(typeof makeElementSelectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     makeElementUnselectable(el);
     makeElementSelectable(el);
@@ -524,12 +524,12 @@
   });
 
   // element doesn't seem to have style on node
-  if (!fabric.isLikelyNode) {
+  if (!fabric.getEnv().isLikelyNode) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.document.createElement('div');
+      var el = fabric.getDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
