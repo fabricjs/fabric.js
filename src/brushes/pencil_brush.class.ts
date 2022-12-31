@@ -299,5 +299,3 @@ export class PencilBrush extends BaseBrush {
     this.canvas.fire('path:created', { path: path });
   }
 }
-
-fabric.PencilBrush = PencilBrush;

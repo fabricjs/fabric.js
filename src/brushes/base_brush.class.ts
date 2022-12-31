@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { Color } from '../color/color.class';
 import type { Point } from '../point.class';
 import { TEvent } from '../EventTypeDefs';
@@ -162,5 +161,3 @@ export abstract class BaseBrush {
     );
   }
 }
-
-fabric.BaseBrush = BaseBrush;

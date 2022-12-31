@@ -1,6 +1,6 @@
 /**
  *
- * ['document', 'window', 'isTouchSupported', 'isLikelyNode', 'util', 'controlsUtils','Pattern', 'Shadow', 'StaticCanvas', 'BaseBrush', 'PencilBrush', 'CircleBrush', 'SprayBrush', 'PatternBrush', 'Canvas', 'Object', 'Line', 'Circle', 'Triangle', 'Ellipse', 'Rect', 'Polyline', 'Polygon', 'Path', 'Group', 'ActiveSelection', 'Image', 'isWebglSupported', 'WebglFilterBackend', 'Canvas2dFilterBackend', 'Text', 'IText', 'Textbox', '_measuringContext', 'maxTextureSize', 'webGlPrecision', 'isSupported', 'filterBackend']
+ * ['document', 'window', 'isTouchSupported', 'isLikelyNode', 'util', 'controlsUtils', 'Circle', 'Triangle', 'Ellipse', 'Rect', 'Polyline', 'Polygon', 'Path', 'Group', 'ActiveSelection', 'Image', 'isWebglSupported', 'WebglFilterBackend', 'Canvas2dFilterBackend', 'Text', 'IText', 'Textbox', '_measuringContext', 'maxTextureSize', 'webGlPrecision', 'isSupported', 'filterBackend']
  *
  *  */
 
@@ -21,3 +21,11 @@ export { Color } from './color/color.class';
 export { Control } from './controls/control.class'
 export { Gradient } from './gradient/gradient.class';
 export { Pattern } from './pattern.class';
+export { Shadow } from './shadow.class';
+export { BaseBrush } from './brushes/base_brush.class';
+export { PencilBrush } from './brushes/pencil_brush.class';
+export { CircleBrush } from './brushes/circle_brush.class';
+export { SprayBrush } from './brushes/spray_brush.class';
+export { PatternBrush } from './brushes/pattern_brush.class';
+export { FabricObject } from './shapes/Object/FabricObject';
+export { Line } from './shapes/line.class';

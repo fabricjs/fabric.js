@@ -1,4 +1,3 @@
-import { fabric } from '../../../HEADER';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { FabricObjectSVGExportMixin } from '../../mixins/object.svg_export';
 import { InteractiveFabricObject } from './InteractiveObject';
@@ -17,5 +16,3 @@ export class FabricObject<
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
 export { fabricObjectDefaultValues } from './Object';
-
-fabric.Object = FabricObject;
