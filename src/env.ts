@@ -73,3 +73,6 @@ export const getEnv = (): TFabricEnv => {
     jsdomImplForWrapper,
   }
 }
+
+export const getDocument = (): Document => fabricDocument;
+export const getWindow = (): Window => fabricWindow;

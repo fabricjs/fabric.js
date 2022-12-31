@@ -334,5 +334,5 @@ export { Image } from './shapes/image.class';
 export { filters }
 export { util }
 export { controlsUtils }
-export { getEnv } from './env';
+export { getEnv, getDocument, getWindow } from './env';
 import './controls/default_controls';
