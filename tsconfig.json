@@ -99,5 +99,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "exclude": ["dist"],
-  "include": ["src"]
+  "include": ["src", "fabric.ts"]
 }

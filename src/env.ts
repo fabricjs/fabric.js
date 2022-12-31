@@ -49,7 +49,7 @@ function setupEnv() {
     nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
     isLikelyNode = true;
     fabricWindow = virtualWindow;
-    global.DOMParser = fabricWindow.DOMParser;
+    global.DOMParser = (fabricWindow as any).DOMParser;
   }
   isTouchSupported = 'ontouchstart' in fabricWindow ||
   'ontouchstart' in fabricDocument ||

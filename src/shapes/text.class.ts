@@ -380,7 +380,7 @@ export class Text<
     this.initDimensions();
     this.setCoords();
     // @ts-ignore
-    this.setupState({ propertySet: '_dimensionAffectingProps' });
+    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**

@@ -1,32 +1,40 @@
 import json from '@rollup/plugin-json';
-import terser from '@rollup/plugin-terser';
-import ts from '@rollup/plugin-typescript';
+import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
+import { terser } from 'rollup-plugin-terser';
+import ts from 'rollup-plugin-ts';
+
+const runStats = Number(process.env.BUILD_STATS);
 
 const splitter = /\n|\s|,/g;
 
-/**
- * @type {import('rollup').RollupOptions}
- */
+// https://rollupjs.org/guide/en/#configuration-files
 export default {
-  input: process.env.BUILD_INPUT?.split(splitter) || ['./src/index.ts'],
+  input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.js'],
   output: [
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
-      // dir: process.env.BUILD_OUTPUT || './dist',
       name: 'fabric',
-      format: 'umd',
+      format: 'cjs',
       sourcemap: true,
     },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
-          format: 'umd',
-          sourcemap: false,
-          plugins: [terser()],
+          format: 'cjs',
+          plugins: [
+            runStats &&
+              sizeSnapshot({
+                snapshotPath: 'cli_output/build_size.json',
+              }),
+            terser(),
+          ],
         }
       : null,
   ],
   // see list of plugins (not comprehensive): https://github.com/rollup/awesome
-  plugins: [json(), ts({ tsconfig: './tsconfig.json' })],
+  plugins: [
+    json(),
+    ts({ tsconfig: './tsconfig.json' }),
+  ],
 };
