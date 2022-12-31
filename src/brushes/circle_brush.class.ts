@@ -1,5 +1,5 @@
 import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Circle } from '../shapes/circle.class';

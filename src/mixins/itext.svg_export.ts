@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { config } from '../config';
 import { FabricObject } from '../shapes/Object/FabricObject';
 

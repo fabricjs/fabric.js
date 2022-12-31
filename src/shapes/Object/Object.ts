@@ -33,6 +33,7 @@ import {
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../group.class';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -1764,7 +1765,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    let canvas = new fabric.StaticCanvas(el, {
+    let canvas = StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,

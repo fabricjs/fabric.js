@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { config } from '../config';
 import { uid } from '../util/internals/uid';
 import { matrixToSVG } from '../util/misc/svgParsing';

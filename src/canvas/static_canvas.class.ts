@@ -3,7 +3,7 @@ import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import { type CanvasEvents, type StaticCanvasEvents } from '../EventTypeDefs';
-import { Gradient } from '../gradient';
+import { Gradient } from '../gradient/gradient.class';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { TSVGReviver } from '../mixins/object.svg_export';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
@@ -1790,5 +1790,3 @@ if (fabric.isLikelyNode) {
     },
   });
 }
-
-fabric.StaticCanvas = StaticCanvas;

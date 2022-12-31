@@ -57,5 +57,3 @@ class AnimationRegistry extends Array<AnimationBase> {
 }
 
 export const runningAnimations = new AnimationRegistry();
-
-fabric.runningAnimations = runningAnimations;

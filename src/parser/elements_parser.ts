@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
-import { Gradient } from '../gradient';
+import { Gradient } from '../gradient/gradient.class';
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
 import { classRegistry } from '../util/class_registry';

@@ -1,8 +1,7 @@
-import { fabric } from '../../../HEADER';
 import { ObjectEvents } from '../../EventTypeDefs';
 import type { Group } from '../group.class';
 import type { Canvas } from '../../canvas/canvas_events';
-import type { StaticCanvas } from '../../canvas/static_canvas.class';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
@@ -49,7 +48,8 @@ export class StackedObject<
     while (parent) {
       if (target === parent) {
         return true;
-      } else if (parent instanceof fabric.StaticCanvas) {
+      //@TODO ideally find a different way to identify a canvas without importing it
+      } else if (parent instanceof StaticCanvas) {
         //  happens after all parents were traversed through without a match
         return false;
       }

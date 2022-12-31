@@ -1,6 +1,6 @@
 import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
-import { Gradient } from '../../gradient';
+import { Gradient } from '../../gradient/gradient.class';
 import { Pattern } from '../../pattern.class';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
