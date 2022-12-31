@@ -5,7 +5,10 @@
  * @param {Object} [attributes] Attributes to set on a wrapper
  * @return {HTMLElement} wrapper
  */
-export function wrapElement(element: HTMLElement, wrapper: HTMLElement) {
+export function wrapElement<T extends HTMLElement>(
+  element: HTMLElement,
+  wrapper: T
+) {
   if (element.parentNode) {
     element.parentNode.replaceChild(wrapper, element);
   }
