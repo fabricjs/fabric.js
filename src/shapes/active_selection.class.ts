@@ -1,4 +1,4 @@
-import { ControlRenderingStyleOverride } from '../controls';
+import { ControlRenderingStyleOverride } from '../controls/controls.render';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { Group, groupDefaultValues } from './group.class';
