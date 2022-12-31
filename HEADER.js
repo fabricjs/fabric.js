@@ -9,15 +9,6 @@ var fabric = fabric || {
   iMatrix,
 };
 
-if (typeof exports !== 'undefined') {
-  exports.fabric = fabric;
-} else if (typeof define === 'function' && define.amd) {
-  /* _AMD_START_ */
-  define([], function () {
-    return fabric;
-  });
-}
-/* _AMD_END_ */
 if (typeof document !== 'undefined' && typeof window !== 'undefined') {
   if (
     document instanceof

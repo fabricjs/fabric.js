@@ -13,14 +13,14 @@ export default {
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
       name: 'fabric',
-      format: 'cjs',
+      format: 'umd',
       sourcemap: true,
     },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
-          format: 'cjs',
+          format: 'umd',
           plugins: [
             terser(),
           ],
