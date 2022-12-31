@@ -114,5 +114,6 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js"
+  "main": "./dist/fabric.js",
+  "types": "./dist/src/index.d.ts"
 }

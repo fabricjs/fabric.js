@@ -1,6 +1,6 @@
 /**
  *
- * ['document', 'window', 'isTouchSupported', 'isLikelyNode', 'util', 'controlsUtils',
+ * ['document', 'window', 'isTouchSupported', 'isLikelyNode',
  * 'isWebglSupported', ,
  *  '_measuringContext', 'maxTextureSize',
  * 'webGlPrecision', 'isSupported', 'filterBackend']
