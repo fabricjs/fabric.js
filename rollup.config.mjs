@@ -12,6 +12,7 @@ export default {
   output: [
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
+      // dir: process.env.BUILD_OUTPUT || './dist',
       name: 'fabric',
       format: 'umd',
       sourcemap: true,
@@ -21,17 +22,10 @@ export default {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
           format: 'umd',
-          plugins: [
-            terser(),
-          ],
+          plugins: [terser()],
         }
       : null,
   ],
   // see list of plugins (not comprehensive): https://github.com/rollup/awesome
-  plugins: [
-    json(),
-    ts({
-      /* Plugin options */
-    }),
-  ],
+  plugins: [json(), ts({ tsconfig: './tsconfig.json' })],
 };
