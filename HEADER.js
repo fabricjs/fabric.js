@@ -2,7 +2,7 @@ import { cache } from './src/cache';
 import { config } from './src/config';
 import { iMatrix, VERSION } from './src/constants';
 
-var fabric = fabric || {
+const fabric = {
   version: VERSION,
   config,
   cache,
