@@ -241,6 +241,56 @@ const util = {
   classRegistry,
 };
 
+// CONTROLS UTILS
+
+import { changeWidth } from './controls/changeWidth';
+import { renderCircleControl, renderSquareControl } from './controls/controls.render';
+import { dragHandler } from './controls/drag';
+import { rotationStyleHandler, rotationWithSnapping } from './controls/rotate';
+import {
+  scaleCursorStyleHandler,
+  scalingEqually,
+  scalingX,
+  scalingY,
+} from './controls/scale';
+import {
+  scaleOrSkewActionName,
+  scaleSkewCursorStyleHandler,
+  scalingXOrSkewingY,
+  scalingYOrSkewingX,
+} from './controls/scaleSkew';
+import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './controls/skew';
+import { getLocalPoint } from './controls/util';
+import { wrapWithFireEvent } from './controls/wrapWithFireEvent';
+import { wrapWithFixedAnchor } from './controls/wrapWithFixedAnchor';
+
+
+/**
+ * @todo remove as unused
+ */
+const controlsUtils = {
+  scaleCursorStyleHandler,
+  skewCursorStyleHandler,
+  scaleSkewCursorStyleHandler,
+  rotationWithSnapping,
+  scalingEqually,
+  scalingX,
+  scalingY,
+  scalingYOrSkewingX,
+  scalingXOrSkewingY,
+  changeWidth,
+  skewHandlerX,
+  skewHandlerY,
+  dragHandler,
+  scaleOrSkewActionName,
+  rotationStyleHandler,
+  wrapWithFixedAnchor,
+  wrapWithFireEvent,
+  getLocalPoint,
+  renderCircleControl,
+  renderSquareControl,
+};
+
 // EXPORTS
 
 export { cache } from './cache';
@@ -283,3 +333,5 @@ export { ActiveSelection } from './shapes/active_selection.class';
 export { Image } from './shapes/image.class';
 export { filters }
 export { util }
+export { controlsUtils }
+import './controls/default_controls';

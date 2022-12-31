@@ -1,5 +1,6 @@
 import { fabric } from '../../HEADER';
-import { dragHandler, getActionFromCorner } from '../controls/actions';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
 import { Point } from '../point.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import {
