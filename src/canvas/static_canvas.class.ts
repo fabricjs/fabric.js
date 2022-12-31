@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import { type CanvasEvents, type StaticCanvasEvents } from '../EventTypeDefs';
@@ -455,7 +455,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        fabric.document.getElementById(canvasEl) ||
+        getEnv().document.getElementById(canvasEl) ||
         canvasEl ||
         this._createCanvasElement();
     }
@@ -1774,7 +1774,7 @@ Object.assign(StaticCanvas.prototype, {
   clipPath: undefined,
 });
 
-if (fabric.isLikelyNode) {
+if (getEnv().isLikelyNode) {
   Object.assign(StaticCanvas.prototype, {
     createPNGStream() {
       const impl = getNodeCanvas(

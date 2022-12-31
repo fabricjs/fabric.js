@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
@@ -1609,10 +1609,8 @@ export class Text<
         ? style.fontFamily
         : `"${style.fontFamily}"`;
     return [
-      // node-canvas needs "weight style", while browsers need "style weight"
-      // verify if this can be fixed in JSDOM
-      fabric.isLikelyNode ? style.fontWeight : style.fontStyle,
-      fabric.isLikelyNode ? style.fontStyle : style.fontWeight,
+      style.fontStyle,
+      style.fontWeight,
       forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
       fontFamily,
     ].join(' ');

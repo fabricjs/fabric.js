@@ -1,4 +1,4 @@
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../point.class';
@@ -1274,7 +1274,7 @@ export class SelectableCanvas<
     if (this.wrapperEl) {
       return;
     }
-    const container = fabric.document.createElement('div');
+    const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');

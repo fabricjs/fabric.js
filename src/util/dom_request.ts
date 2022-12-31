@@ -16,7 +16,7 @@ import { noop } from '../constants';
 export function request(url, options = {}) {
   const method = options.method ? options.method.toUpperCase() : 'GET',
     onComplete = options.onComplete || noop,
-    xhr = new fabric.window.XMLHttpRequest(),
+    xhr = new getEnv().window.XMLHttpRequest(),
     body = options.body || options.parameters,
     signal = options.signal,
     abort = function () {

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { Gradient } from '../gradient/gradient.class';
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
