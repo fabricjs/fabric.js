@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): migrate text SVG export mixin [#8486](https://github.com/fabricjs/fabric.js/pull/8486)
 - refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
   BREAKING:
   - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`

@@ -474,55 +474,6 @@
     });
   });
 
-  QUnit.test('fabric.util.createClass', function(assert) {
-    var Klass = fabric.util.createClass();
-
-    assert.ok(typeof Klass === 'function');
-    assert.ok(typeof new Klass() === 'object');
-
-    var Person = fabric.util.createClass({
-      initialize: function(firstName, lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-      },
-      toString: function() {
-        return 'My name is ' + this.firstName + ' ' + this.lastName;
-      }
-    });
-
-    assert.ok(typeof Person === 'function');
-    assert.ok(typeof new Person() === 'object');
-
-    var john = new Person('John', 'Meadows');
-    assert.ok(john instanceof Person);
-
-    assert.equal(john.firstName, 'John');
-    assert.equal(john.lastName, 'Meadows');
-    assert.equal(john + '', 'My name is John Meadows');
-
-
-    var WebDeveloper = fabric.util.createClass(Person, {
-      initialize: function(firstName, lastName, skills) {
-        this.callSuper('initialize', firstName, lastName);
-        this.skills = skills;
-      },
-      toString: function() {
-        return this.callSuper('toString') + ' and my skills are ' + this.skills.join(', ');
-      }
-    });
-
-    assert.ok(typeof WebDeveloper === 'function');
-    var dan = new WebDeveloper('Dan', 'Trink', ['HTML', 'CSS', 'Javascript']);
-    assert.ok(dan instanceof Person);
-    assert.ok(dan instanceof WebDeveloper);
-
-    assert.equal(dan.firstName, 'Dan');
-    assert.equal(dan.lastName, 'Trink');
-    assert.deepEqual(dan.skills, ['HTML', 'CSS', 'Javascript']);
-
-    assert.equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
-  });
-
   // element doesn't seem to have style on node
   if (!fabric.getEnv().isLikelyNode) {
     QUnit.test('fabric.util.setStyle', function(assert) {

@@ -2355,18 +2355,6 @@
 
   });
 
-  QUnit.test('canvas inheritance', function(assert) {
-
-    // this should not error out
-    var InheritedCanvasClass = fabric.util.createClass(fabric.Canvas, {
-      initialize: function() {
-
-      }
-    });
-
-    assert.ok(typeof InheritedCanvasClass === 'function');
-  });
-
   QUnit.test('canvas getTopContext', function(assert) {
     assert.ok(typeof canvas.getTopContext === 'function');
     assert.equal(canvas.getTopContext(), canvas.contextTop, 'it jsut returns contextTop');

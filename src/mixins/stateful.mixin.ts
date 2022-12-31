@@ -85,7 +85,7 @@ export class statefulMixin {
     if (!this[destination]) {
       this[destination] = {};
     }
-    this.saveProps(this, destination, this[propertySet]);
+    this.saveProps(destination, this[propertySet]);
     return this;
   }
 }

@@ -5,7 +5,6 @@ import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/gradient.class';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import type { TSVGReviver } from '../mixins/object.svg_export';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
 import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
@@ -19,6 +18,7 @@ import {
   TFiller,
   TMat2D,
   TSize,
+  TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
