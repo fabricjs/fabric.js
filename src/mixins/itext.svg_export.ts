@@ -3,6 +3,7 @@
 import { Color } from '../color/color.class';
 import { config } from '../config';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { escapeXml } from '../util/lang_string';
 
 /* _TO_SVG_START_ */
 (function (global) {
@@ -144,7 +145,7 @@ import { FabricObject } from '../shapes/Object/FabricObject';
           dySpan,
           fillStyles,
           '>',
-          fabric.util.string.escapeXml(_char),
+          escapeXml(_char),
           '</tspan>',
         ].join('');
       },

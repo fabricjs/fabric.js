@@ -29,8 +29,8 @@ import type { IText } from '../shapes/itext.class';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
-  wrapElement,
 } from '../util/dom_misc';
+import { wrapElement } from '../util/internals/wrapElement';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
 import type { Textbox } from '../shapes/textbox.class';

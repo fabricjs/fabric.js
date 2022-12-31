@@ -1,4 +1,3 @@
-import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
 import { Gradient } from '../../gradient/gradient.class';
 import { Pattern } from '../../pattern.class';

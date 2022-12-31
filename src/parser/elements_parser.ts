@@ -86,6 +86,7 @@ const ElementsParser = function (
     regex.lastIndex = 0;
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
+    // @todo fix this
     return fabric[storage][this.svgUid][id];
   };
 

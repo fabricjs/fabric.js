@@ -25,7 +25,7 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1953,5 +1953,3 @@ Object.assign(Text.prototype, textDefaultValues);
 
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);
-
-fabric.Text = Text;

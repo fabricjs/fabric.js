@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { fabric } from '../../HEADER';
-import * as filters from '../filters';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -112,8 +111,6 @@ export class Image extends FabricObject {
   preserveAspectRatio: string;
 
   protected src: string;
-
-  static filters = filters;
 
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
@@ -797,5 +794,3 @@ Object.assign(Image.prototype, imageDefaultValues);
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);
-
-fabric.Image = Image;

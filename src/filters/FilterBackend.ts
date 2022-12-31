@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { Canvas2dFilterBackend } from './2d_backend.class';
 import { WebGLFilterBackend } from './webgl_backend.class';
@@ -15,16 +14,14 @@ export function initFilterBackend(): FilterBackend {
   }
 }
 
+let filterBackend: FilterBackend;
+
 /**
  * @todo refactor to a module w/o assigning to fabric
  */
 export function getFilterBackend(): FilterBackend {
-  if (!fabric.filterBackend) {
-    fabric.filterBackend = initFilterBackend();
+  if (!filterBackend) {
+    filterBackend = initFilterBackend();
   }
-  return fabric.filterBackend;
+  return filterBackend;
 }
-
-fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
-fabric.WebglFilterBackend = WebGLFilterBackend;
-fabric.initFilterBackend = initFilterBackend;

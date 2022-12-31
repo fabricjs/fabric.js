@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -1073,5 +1072,3 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 
 Object.assign(Group.prototype, groupDefaultValues);
 classRegistry.setClass(Group);
-
-fabric.Group = Group;
