@@ -3,10 +3,10 @@
 change-output.md
 /.nyc_output/
 /node_modules/
-/bundle/
 /npm-debug.log
 before_commit
 /coverage/
 .idea/
-/dist
+/dist/fabric.require.js
+/dist/fabric.min.js.gz
 /cli_output/
