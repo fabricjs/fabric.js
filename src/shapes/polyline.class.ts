@@ -14,18 +14,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
-const strokeProjectionOptions: (keyof TProjectStrokeOnPointsOptions)[] = [
-  'scaleX',
-  'scaleY',
-  'skewX',
-  'skewY',
-  'strokeLineCap',
-  'strokeLineJoin',
-  'strokeMiterLimit',
-  'strokeUniform',
-  'strokeWidth',
-];
-
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -192,10 +180,11 @@ export class Polyline extends FabricObject {
     if (this.exactBoundingBox) {
       let size: Point;
       if (
-        Object.keys(options).some((key) =>
-          strokeProjectionOptions.includes(
-            key as keyof TProjectStrokeOnPointsOptions
-          )
+        Object.keys(options).some(
+          (key) =>
+            this.strokeBBoxAffectingProperties.includes(
+              key as keyof TProjectStrokeOnPointsOptions
+            ) || this.strokeUniform
         )
       ) {
         const { width, height } = this._calcDimensions(options);
