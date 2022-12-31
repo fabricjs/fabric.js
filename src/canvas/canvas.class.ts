@@ -35,9 +35,8 @@ import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
 import type { Textbox } from '../shapes/textbox.class';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../mixins/object.svg_export';
+import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { createCanvasElement } from '../util/misc/dom';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
