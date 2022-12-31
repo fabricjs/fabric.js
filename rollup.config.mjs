@@ -22,6 +22,7 @@ export default {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
           format: 'umd',
+          sourcemap: false,
           plugins: [terser()],
         }
       : null,

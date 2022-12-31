@@ -2,16 +2,16 @@
 import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
-import { type CanvasEvents, type StaticCanvasEvents } from '../EventTypeDefs';
-import { Gradient } from '../gradient/gradient.class';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
+import type { Gradient } from '../gradient/gradient.class';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { TSVGReviver } from '../mixins/object.svg_export';
+import type { TSVGReviver } from '../mixins/object.svg_export';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
-import { Pattern } from '../pattern.class';
+import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TCachedFabricObject } from '../shapes/Object/Object';
-import { Rect } from '../shapes/rect.class';
+import type { TCachedFabricObject } from '../shapes/Object/Object';
+import type { Rect } from '../shapes/rect.class';
 import {
   ImageFormat,
   TCornerPoint,
@@ -430,17 +430,16 @@ export class StaticCanvas<
 
     this.width = this.width || lowerCanvasEl.width || 0;
     this.height = this.height || lowerCanvasEl.height || 0;
+    this.viewportTransform = [...this.viewportTransform];
 
     if (!this.lowerCanvasEl.style) {
       return;
     }
-
     lowerCanvasEl.width = this.width;
     lowerCanvasEl.height = this.height;
 
     lowerCanvasEl.style.width = this.width + 'px';
     lowerCanvasEl.style.height = this.height + 'px';
-    this.viewportTransform = [...this.viewportTransform];
   }
 
   /**
@@ -1753,7 +1752,7 @@ export class StaticCanvas<
   }
 }
 
-Object.assign(StaticCanvas.__proto__, {
+Object.assign(StaticCanvas.prototype, {
   backgroundColor: '',
   backgroundImage: null,
   overlayColor: '',
