@@ -266,7 +266,7 @@ export { PencilBrush } from './brushes/pencil_brush.class';
 export { CircleBrush } from './brushes/circle_brush.class';
 export { SprayBrush } from './brushes/spray_brush.class';
 export { PatternBrush } from './brushes/pattern_brush.class';
-export { FabricObject } from './shapes/Object/FabricObject';
+export { FabricObject as Object } from './shapes/Object/FabricObject';
 export { Line } from './shapes/line.class';
 export { Circle } from './shapes/circle.class';
 export { Triangle } from './shapes/triangle.class';
