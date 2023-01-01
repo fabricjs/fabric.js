@@ -493,18 +493,6 @@
     });
   }
 
-  QUnit.test('fabric.util.addListener', function(assert) {
-    assert.ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
-    fabric.util.addListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element addListener');
-  });
-
-  QUnit.test('fabric.util.removeListener', function(assert) {
-    assert.ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
-    fabric.util.removeListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element removeListener');
-  });
-
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
 

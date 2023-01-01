@@ -70,7 +70,7 @@ import {
   getBisector,
 } from './src/util/misc/vectors';
 import { degreesToRadians, radiansToDegrees } from './src/util/misc/radiansDegreesConversion';
-// import { rotatePoint } from './util/misc/rotatePoint';
+import { rotatePoint } from './src/util/misc/rotatePoint';
 import { projectStrokeOnPoints } from './src/util/misc/projectStroke';
 import {
   transformPoint,
@@ -92,9 +92,9 @@ import {
 import { toFixed } from './src/util/misc/toFixed';
 import {
   matrixToSVG,
-//  parsePreserveAspectRatioAttribute,
+  parsePreserveAspectRatioAttribute,
   parseUnit,
-//  getSvgAttributes,
+  getSvgAttributes,
 } from './src/util/misc/svgParsing';
 import { groupSVGElements } from './src/util/misc/groupSVGElements';
 import { findScaleToFit, findScaleToCover } from './src/util/misc/findScaleTo';
@@ -114,13 +114,13 @@ import {
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './src/util/misc/planeChange';
-import { graphemeSplit } from './src/util/lang_string';
+import { graphemeSplit, escapeXml, capitalize } from './src/util/lang_string';
 import {
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
 } from './src/util/misc/objectEnlive';
-// import { pick } from './util/misc/pick';
+import { pick } from './src/util/misc/pick';
 import {
   joinPath,
   parsePath,
@@ -132,7 +132,7 @@ import {
   transformPath,
   getRegularPolygonPath,
 } from './src/util/path';
-// import { setStyle } from './util/dom_style';
+import { setStyle } from './src/util/dom_style';
 import {
   isTouchEvent,
   getPointer,
@@ -142,8 +142,8 @@ import {
   getElementOffset,
   getNodeCanvas,
   cleanUpJsdomNode,
-  // makeElementUnselectable,
-  // makeElementSelectable,
+  makeElementUnselectable,
+  makeElementSelectable,
 } from './src/util/dom_misc';
 import { isTransparent } from './src/util/misc/isTransparent';
 import { mergeClipPaths } from './src/util/misc/mergeClipPaths';
@@ -155,8 +155,20 @@ import {
   cancelAnimFrame,
 } from './src/util/animation';
 import { classRegistry } from './src/util/class_registry';
+import { removeFromArray } from './src/util/internals/removeFromArray';
+import { getRandomInt } from './src/util/internals/getRandomInt';
+import { wrapElement } from './src/util/internals/wrapElement';
+import { request } from './src/util/dom_request';
 
 const util = {
+  rotatePoint,
+  removeFromArray,
+  getRandomInt,
+  wrapElement,
+  parsePreserveAspectRatioAttribute,
+  pick,
+  setStyle,
+  getSvgAttributes,
   cos,
   sin,
   rotateVector,
@@ -188,11 +200,9 @@ const util = {
   toDataURL,
   toFixed,
   matrixToSVG,
-  // parsePreserveAspectRatioAttribute,
   groupSVGElements,
   parseUnit,
   // is anyone using it?
-  // getSvgAttributes,
   findScaleToFit,
   findScaleToCover,
   capValue,
@@ -208,11 +218,12 @@ const util = {
   sendObjectToPlane,
   string: {
     graphemeSplit,
+    capitalize,
+    escapeXml,
   },
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
-  // pick,
   joinPath,
   parsePath,
   makePathSimpler,
@@ -222,18 +233,17 @@ const util = {
   getPointOnPath,
   transformPath,
   getRegularPolygonPath,
-  // setStyle,
   isTouchEvent,
   getPointer,
   // getScrollLeftTop,
-  // getElementOffset,
   getNodeCanvas,
   cleanUpJsdomNode,
-  // makeElementUnselectable,
-  // makeElementSelectable,
+  makeElementUnselectable,
+  makeElementSelectable,
   isTransparent,
   sizeAfterTransform,
   mergeClipPaths,
+  request,
   ease, // those are a lot of functions
   animateColor,
   animate,

@@ -13,7 +13,7 @@ import { parseSVGDocument } from './parseSVGDocument';
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function loadSVGFromString(string, callback, reviver, options) {
-  const parser = new getEnv().window.DOMParser(),
+  const parser = new (getEnv().window.DOMParser)(),
     doc = parser.parseFromString(string.trim(), 'text/xml');
   parseSVGDocument(
     doc.documentElement,
