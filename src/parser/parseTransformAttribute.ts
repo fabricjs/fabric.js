@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { iMatrix } from '../constants';
 import { commaWsp, reNum } from './constants';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
@@ -7,6 +6,7 @@ import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';
 import { skewMatrix } from './skewMatrix';
 import { translateMatrix } from './translateMatrix';
+import { TMat2D } from '../typedefs';
 
 // == begin transform regexp
 const number = reNum,
@@ -90,16 +90,13 @@ const number = reNum,
 
 /**
  * Parses "transform" attribute, returning an array of values
- * @static
- * @function
- * @memberOf fabric
  * @param {String} attributeValue String containing attribute value
- * @return {Array} Array of 6 elements representing transformation matrix
+ * @return {TMat2D} transformation matrix
  */
-export function parseTransformAttribute(attributeValue) {
+export function parseTransformAttribute(attributeValue: string) {
   // start with identity matrix
-  let matrix = iMatrix.concat(),
-    matrices = [];
+  let matrix = iMatrix.concat() as TMat2D;
+  const matrices: TMat2D[] = [];
 
   // return if no argument was given or
   // an argument does not match transform attribute regexp
@@ -110,8 +107,8 @@ export function parseTransformAttribute(attributeValue) {
     return matrix;
   }
 
-  attributeValue.replace(reTransform, function (match) {
-    const m = new RegExp(transform).exec(match).filter(function (match) {
+  attributeValue.replace(reTransform, (match) => {
+    const m = new RegExp(transform).exec(match)!.filter(function (match) {
         // match !== '' && match != null
         return !!match;
       }),
@@ -136,14 +133,14 @@ export function parseTransformAttribute(attributeValue) {
         skewMatrix(matrix, args, 1);
         break;
       case 'matrix':
-        matrix = args;
+        matrix = args as TMat2D;
         break;
     }
 
     // snapshot current matrix into matrices array
-    matrices.push(matrix.concat());
+    matrices.push(matrix.concat() as TMat2D);
     // reset
-    matrix = iMatrix.concat();
+    matrix = iMatrix.concat() as TMat2D;
   });
 
   let combinedMatrix = matrices[0];
