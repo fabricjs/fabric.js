@@ -1,21 +1,21 @@
 // @ts-nocheck
-import { getEnv } from '../../env';
 import { cache } from '../../cache';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
+import { getEnv } from '../../env';
 import { ObjectEvents } from '../../EventTypeDefs';
-import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../point.class';
 import { Shadow } from '../../shadow.class';
 import type {
+  TCacheCanvasDimensions,
   TClassProperties,
   TDegree,
   TFiller,
   TSize,
-  TCacheCanvasDimensions,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation';
+import { classRegistry } from '../../util/class_registry';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
@@ -32,10 +32,10 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import type { Group } from '../group.class';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { isTextObject } from '../../util/types';
+import type { Group } from '../group.class';
 import type { Image } from '../image.class';
+import { AnimatableObject } from './AnimatableObject';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -51,9 +51,6 @@ export type TCachedFabricObject = FabricObject &
   > & {
     _cacheContext: CanvasRenderingContext2D;
   };
-
-// temporary hack for unfinished migration
-type TCallSuper = (arg0: string, ...moreArgs: any[]) => any;
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -636,14 +633,17 @@ export class FabricObject<
    */
   _transformDone?: boolean;
 
-  callSuper?: TCallSuper;
-
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
+    const defaultValues = this.constructor.getDefaults();
+    for (const key in defaultValues) {
+      this[key] = defaultValues[key];
+    }
+    console.log('aaaa', this.radius);
     if (options) {
       this.setOptions(options);
     }
@@ -856,7 +856,10 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: (keyof this | string)[]): Record<string, any> {
+  toObject(
+    propertiesToInclude?: (keyof this | string)[],
+    includeDefaultValues = this.includeDefaultValues
+  ): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -911,9 +914,7 @@ export class FabricObject<
         ...(clipPathData ? { clipPath: clipPathData } : null),
       };
 
-    return !this.includeDefaultValues
-      ? this._removeDefaultValues(object)
-      : object;
+    return !includeDefaultValues ? this._removeDefaultValues(object) : object;
   }
 
   /**
@@ -931,20 +932,20 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    const defaults = (this.constructor as typeof this).getDefaults();
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
       }
-      if (object[prop] === prototype[prop]) {
+      if (object[prop] === defaults[prop]) {
         delete object[prop];
       }
       // basically a check for [] === []
       if (
         Array.isArray(object[prop]) &&
-        Array.isArray(prototype[prop]) &&
+        Array.isArray(defaults[prop]) &&
         object[prop].length === 0 &&
-        prototype[prop].length === 0
+        defaults[prop].length === 0
       ) {
         delete object[prop];
       }
@@ -1683,7 +1684,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   clone(propertiesToInclude: (keyof this)[]) {
-    const objectForm = this.toObject(propertiesToInclude);
+    const objectForm = this.toObject(propertiesToInclude, true);
     // todo ok understand this. is static or it isn't?
     return this.constructor.fromObject(objectForm);
   }
@@ -1994,134 +1995,134 @@ export class FabricObject<
   ) {
     return this._fromObject(object, options);
   }
+
+  static getDefaults() {
+    return {
+      type: 'object',
+      originX: 'left',
+      originY: 'top',
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+      scaleX: 1,
+      scaleY: 1,
+      flipX: false,
+      flipY: false,
+      opacity: 1,
+      angle: 0,
+      skewX: 0,
+      skewY: 0,
+      cornerSize: 13,
+      touchCornerSize: 24,
+      transparentCorners: true,
+      hoverCursor: null,
+      moveCursor: null,
+      padding: 0,
+      borderColor: 'rgb(178,204,255)',
+      borderDashArray: null,
+      cornerColor: 'rgb(178,204,255)',
+      cornerStrokeColor: '',
+      cornerStyle: 'rect',
+      cornerDashArray: null,
+      centeredScaling: false,
+      centeredRotation: true,
+      fill: 'rgb(0,0,0)',
+      fillRule: 'nonzero',
+      globalCompositeOperation: 'source-over',
+      backgroundColor: '',
+      selectionBackgroundColor: '',
+      stroke: null,
+      strokeWidth: 1,
+      strokeDashArray: null,
+      strokeDashOffset: 0,
+      strokeLineCap: 'butt',
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      shadow: null,
+      borderOpacityWhenMoving: 0.4,
+      borderScaleFactor: 1,
+      minScaleLimit: 0,
+      selectable: true,
+      evented: true,
+      visible: true,
+      hasControls: true,
+      hasBorders: true,
+      perPixelTargetFind: false,
+      includeDefaultValues: true,
+      lockMovementX: false,
+      lockMovementY: false,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockSkewingX: false,
+      lockSkewingY: false,
+      lockScalingFlip: false,
+      excludeFromExport: false,
+      objectCaching: !getEnv().isLikelyNode,
+      statefullCache: false,
+      noScaleCache: true,
+      strokeUniform: false,
+      dirty: true,
+      __corner: 0,
+      paintFirst: 'fill',
+      activeOn: 'down',
+      stateProperties: [
+        'top',
+        'left',
+        'width',
+        'height',
+        'scaleX',
+        'scaleY',
+        'flipX',
+        'flipY',
+        'originX',
+        'originY',
+        'transformMatrix',
+        'stroke',
+        'strokeWidth',
+        'strokeDashArray',
+        'strokeLineCap',
+        'strokeDashOffset',
+        'strokeLineJoin',
+        'strokeMiterLimit',
+        'angle',
+        'opacity',
+        'fill',
+        'globalCompositeOperation',
+        'shadow',
+        'visible',
+        'backgroundColor',
+        'skewX',
+        'skewY',
+        'fillRule',
+        'paintFirst',
+        'clipPath',
+        'strokeUniform',
+      ],
+      cacheProperties: [
+        'fill',
+        'stroke',
+        'strokeWidth',
+        'strokeDashArray',
+        'width',
+        'height',
+        'paintFirst',
+        'strokeUniform',
+        'strokeLineCap',
+        'strokeDashOffset',
+        'strokeLineJoin',
+        'strokeMiterLimit',
+        'backgroundColor',
+        'clipPath',
+      ],
+      colorProperties: ['fill', 'stroke', 'backgroundColor'],
+      clipPath: undefined,
+      inverted: false,
+      absolutePositioned: false,
+      FX_DURATION: 500,
+    };
+  }
 }
-
-export const fabricObjectDefaultValues = {
-  type: 'object',
-  originX: 'left',
-  originY: 'top',
-  top: 0,
-  left: 0,
-  width: 0,
-  height: 0,
-  scaleX: 1,
-  scaleY: 1,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
-  angle: 0,
-  skewX: 0,
-  skewY: 0,
-  cornerSize: 13,
-  touchCornerSize: 24,
-  transparentCorners: true,
-  hoverCursor: null,
-  moveCursor: null,
-  padding: 0,
-  borderColor: 'rgb(178,204,255)',
-  borderDashArray: null,
-  cornerColor: 'rgb(178,204,255)',
-  cornerStrokeColor: '',
-  cornerStyle: 'rect',
-  cornerDashArray: null,
-  centeredScaling: false,
-  centeredRotation: true,
-  fill: 'rgb(0,0,0)',
-  fillRule: 'nonzero',
-  globalCompositeOperation: 'source-over',
-  backgroundColor: '',
-  selectionBackgroundColor: '',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeDashOffset: 0,
-  strokeLineCap: 'butt',
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  shadow: null,
-  borderOpacityWhenMoving: 0.4,
-  borderScaleFactor: 1,
-  minScaleLimit: 0,
-  selectable: true,
-  evented: true,
-  visible: true,
-  hasControls: true,
-  hasBorders: true,
-  perPixelTargetFind: false,
-  includeDefaultValues: true,
-  lockMovementX: false,
-  lockMovementY: false,
-  lockRotation: false,
-  lockScalingX: false,
-  lockScalingY: false,
-  lockSkewingX: false,
-  lockSkewingY: false,
-  lockScalingFlip: false,
-  excludeFromExport: false,
-  objectCaching: !getEnv().isLikelyNode,
-  statefullCache: false,
-  noScaleCache: true,
-  strokeUniform: false,
-  dirty: true,
-  __corner: 0,
-  paintFirst: 'fill',
-  activeOn: 'down',
-  stateProperties: [
-    'top',
-    'left',
-    'width',
-    'height',
-    'scaleX',
-    'scaleY',
-    'flipX',
-    'flipY',
-    'originX',
-    'originY',
-    'transformMatrix',
-    'stroke',
-    'strokeWidth',
-    'strokeDashArray',
-    'strokeLineCap',
-    'strokeDashOffset',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'angle',
-    'opacity',
-    'fill',
-    'globalCompositeOperation',
-    'shadow',
-    'visible',
-    'backgroundColor',
-    'skewX',
-    'skewY',
-    'fillRule',
-    'paintFirst',
-    'clipPath',
-    'strokeUniform',
-  ],
-  cacheProperties: [
-    'fill',
-    'stroke',
-    'strokeWidth',
-    'strokeDashArray',
-    'width',
-    'height',
-    'paintFirst',
-    'strokeUniform',
-    'strokeLineCap',
-    'strokeDashOffset',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'backgroundColor',
-    'clipPath',
-  ],
-  colorProperties: ['fill', 'stroke', 'backgroundColor'],
-  clipPath: undefined,
-  inverted: false,
-  absolutePositioned: false,
-  FX_DURATION: 500,
-};
-
-Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
 
 classRegistry.setClass(FabricObject);

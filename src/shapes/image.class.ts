@@ -4,7 +4,8 @@ import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties, TSize } from '../typedefs';
+import { TSize } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { cleanUpJsdomNode } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
@@ -16,8 +17,7 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export type ImageSource =
   | HTMLImageElement
@@ -770,27 +770,23 @@ export class Image extends FabricObject {
       ...parsedAttributes,
     }).then(callback);
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'image',
+      strokeWidth: 0,
+      srcFromAttribute: false,
+      minimumScaleTrigger: 0.5,
+      stateProperties: superDefaults.stateProperties.concat('cropX', 'cropY'),
+      cacheProperties: superDefaults.cacheProperties.concat('cropX', 'cropY'),
+      cropX: 0,
+      cropY: 0,
+      imageSmoothing: true,
+    };
+  }
 }
-
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
-    'cropX',
-    'cropY'
-  ),
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'cropX',
-    'cropY'
-  ),
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
-Object.assign(Image.prototype, imageDefaultValues);
 
 Object.assign(FabricObject.prototype, {
   /**
@@ -815,7 +811,7 @@ Object.assign(FabricObject.prototype, {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     return new Image(canvasEl);
-  }
+  },
 });
 
 classRegistry.setClass(Image);

@@ -1,9 +1,8 @@
 // @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
-import type { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { cos } from '../util/misc/cos';
 import {
   invertTransform,
@@ -16,10 +15,10 @@ import {
 } from '../util/misc/objectEnlive';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 import { Rect } from './rect.class';
-import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -1059,16 +1058,19 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'group',
+      layout: 'fit-content',
+      strokeWidth: 0,
+      stateProperties: superDefaults.stateProperties.concat('layout'),
+      subTargetCheck: false,
+      interactive: false,
+    };
+  }
 }
 
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
-  layout: 'fit-content',
-  strokeWidth: 0,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('layout'),
-  subTargetCheck: false,
-  interactive: false,
-};
-
-Object.assign(Group.prototype, groupDefaultValues);
 classRegistry.setClass(Group);

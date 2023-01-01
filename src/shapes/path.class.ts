@@ -3,7 +3,8 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { Point } from '../point.class';
-import { PathData, TClassProperties } from '../typedefs';
+import { PathData } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -13,8 +14,7 @@ import {
   parsePath,
   type TPathSegmentsInfo,
 } from '../util/path';
-import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Path extends FabricObject {
   /**
@@ -379,19 +379,18 @@ export class Path extends FabricObject {
       })
     );
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'path',
+      path: null,
+      cacheProperties: superDefaults.cacheProperties.concat('path', 'fillRule'),
+      stateProperties: superDefaults.stateProperties.concat('path'),
+    };
+  }
 }
-
-export const pathDefaultValues: Partial<TClassProperties<Path>> = {
-  type: 'path',
-  path: null,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'path',
-    'fillRule'
-  ),
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('path'),
-};
-
-Object.assign(Path.prototype, pathDefaultValues);
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

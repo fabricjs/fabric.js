@@ -1,11 +1,10 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Circle extends FabricObject {
   /**
@@ -31,6 +30,17 @@ export class Circle extends FabricObject {
    */
   endAngle: number;
 
+  constructor(options: any = {}) {
+    super(options);
+    // const d = Circle.getDefaults();
+    // for (const key in d) {
+    //   // @ts-expect-error dfshngdhmj
+    //   this[key] = d[key];
+    // }
+    console.log('bbb', this.radius);
+    this.set(options);
+  }
+
   /**
    * @private
    * @param {String} key
@@ -38,7 +48,6 @@ export class Circle extends FabricObject {
    */
   _set(key: string, value: any) {
     super._set(key, value);
-
     if (key === 'radius') {
       this.setRadius(value);
     }
@@ -186,27 +195,31 @@ export class Circle extends FabricObject {
     );
   }
 
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'circle',
+      radius: 0,
+      startAngle: 0,
+      endAngle: 360,
+      stateProperties: [
+        ...superDefaults.stateProperties,
+        'radius',
+        'startAngle',
+        'endAngle',
+      ],
+      cacheProperties: [
+        ...superDefaults.cacheProperties,
+        'radius',
+        'startAngle',
+        'endAngle',
+      ],
+    };
+  }
+
   /* _FROM_SVG_END_ */
 }
-
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
-    'radius',
-    'startAngle',
-    'endAngle'
-  ),
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'radius',
-    'startAngle',
-    'endAngle'
-  ),
-};
-
-Object.assign(Circle.prototype, circleDefaultValues);
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

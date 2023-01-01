@@ -616,32 +616,34 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'i-text',
+      selectionStart: 0,
+      selectionEnd: 0,
+      selectionColor: 'rgba(17,119,255,0.3)',
+      isEditing: false,
+      editable: true,
+      editingBorderColor: 'rgba(102,153,255,0.25)',
+      cursorWidth: 2,
+      cursorColor: '',
+      cursorDelay: 1000,
+      cursorDuration: 600,
+      caching: true,
+      hiddenTextareaContainer: null,
+      _reSpace: /\s|\n/,
+      _currentCursorOpacity: 1,
+      _selectionDirection: null,
+      inCompositionMode: false,
+      keysMap,
+      keysMapRtl,
+      ctrlKeysMapDown,
+      ctrlKeysMapUp,
+    };
+  }
 }
-
-export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
-  type: 'i-text',
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _reSpace: /\s|\n/,
-  _currentCursorOpacity: 1,
-  _selectionDirection: null,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-};
-
-Object.assign(IText.prototype, iTextDefaultValues);
 
 classRegistry.setClass(IText);

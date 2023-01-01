@@ -664,8 +664,6 @@ export class ObjectGeometry<
 
   /**
    * Retrieves viewportTransform from Object's canvas if possible
-   * @method getViewportTransform
-   * @memberOf FabricObject.prototype
    * @return {TMat2D}
    */
   getViewportTransform(): TMat2D {

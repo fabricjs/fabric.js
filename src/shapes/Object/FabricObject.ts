@@ -15,5 +15,3 @@ export class FabricObject<
 > extends InteractiveFabricObject<EventSpec> {}
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin, StatefulMixin]);
-
-export { fabricObjectDefaultValues } from './Object';

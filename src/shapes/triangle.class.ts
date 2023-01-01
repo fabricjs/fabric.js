@@ -1,4 +1,3 @@
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './Object/FabricObject';
 
@@ -31,15 +30,17 @@ export class Triangle extends FabricObject {
       points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'triangle',
+      width: 100,
+      height: 100,
+    };
+  }
 }
-
-export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
-  type: 'triangle',
-  width: 100,
-  height: 100,
-};
-
-Object.assign(Triangle.prototype, triangleDefaultValues);
 
 classRegistry.setClass(Triangle);
 classRegistry.setSVGClass(Triangle);

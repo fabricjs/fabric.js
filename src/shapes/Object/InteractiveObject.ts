@@ -221,11 +221,7 @@ export class InteractiveFabricObject<
    * @return {void}
    */
   setCoords(): void {
-    if (this.callSuper) {
-      ObjectGeometry.prototype.setCoords.call(this);
-    } else {
-      super.setCoords();
-    }
+    super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.oCoords = this.calcOCoords();
     this._setCornerCoords();

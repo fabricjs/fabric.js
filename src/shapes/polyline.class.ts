@@ -3,13 +3,12 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { IPoint, Point } from '../point.class';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Polyline extends FabricObject {
   /**
@@ -308,25 +307,27 @@ export class Polyline extends FabricObject {
       extraParam: 'points',
     });
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'polyline',
+      exactBoundingBox: false,
+      cacheProperties: superDefaults.cacheProperties.concat('points'),
+      strokeBBoxAffectingProperties: [
+        'skewX',
+        'skewY',
+        'strokeLineCap',
+        'strokeLineJoin',
+        'strokeMiterLimit',
+        'strokeWidth',
+        'strokeUniform',
+        'points',
+      ],
+    };
+  }
 }
-
-export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  type: 'polyline',
-  exactBoundingBox: false,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
-  strokeBBoxAffectingProperties: [
-    'skewX',
-    'skewY',
-    'strokeLineCap',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'strokeWidth',
-    'strokeUniform',
-    'points',
-  ],
-};
-
-Object.assign(Polyline.prototype, polylineDefaultValues);
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);

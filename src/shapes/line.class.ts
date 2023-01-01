@@ -1,10 +1,9 @@
 // @ts-nocheck
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
-import { clone } from '../util/lang_object';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { clone } from '../util/lang_object';
+import { FabricObject } from './Object/FabricObject';
 
 const coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
 
@@ -304,23 +303,25 @@ export class Line extends FabricObject {
       return fabricLine;
     });
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'line',
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: 0,
+      cacheProperties: superDefaults.cacheProperties.concat(
+        'x1',
+        'x2',
+        'y1',
+        'y2'
+      ),
+    };
+  }
 }
-
-export const lineDefaultValues: Partial<TClassProperties<Line>> = {
-  type: 'line',
-  x1: 0,
-  y1: 0,
-  x2: 0,
-  y2: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'x1',
-    'x2',
-    'y1',
-    'y2'
-  ),
-};
-
-Object.assign(Line.prototype, lineDefaultValues);
 
 classRegistry.setClass(Line);
 classRegistry.setSVGClass(Line);

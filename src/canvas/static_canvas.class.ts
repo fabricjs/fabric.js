@@ -334,6 +334,10 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    const defaults = this.constructor.getDefaults();
+    for (const key in defaults) {
+      this[key] = defaults[key];
+    }
     this._init(el, options);
   }
 
@@ -1750,27 +1754,29 @@ export class StaticCanvas<
       this._objects.length
     } }>`;
   }
-}
 
-Object.assign(StaticCanvas.prototype, {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  stateful: false,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix,
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-});
+  static getDefaults() {
+    return {
+      backgroundColor: '',
+      backgroundImage: null,
+      overlayColor: '',
+      overlayImage: null,
+      includeDefaultValues: true,
+      stateful: false,
+      renderOnAddRemove: true,
+      controlsAboveOverlay: false,
+      allowTouchScrolling: false,
+      imageSmoothingEnabled: true,
+      viewportTransform: iMatrix,
+      backgroundVpt: true,
+      overlayVpt: true,
+      enableRetinaScaling: true,
+      svgViewportTransformation: true,
+      skipOffscreen: true,
+      clipPath: undefined,
+    };
+  }
+}
 
 if (getEnv().isLikelyNode) {
   Object.assign(StaticCanvas.prototype, {

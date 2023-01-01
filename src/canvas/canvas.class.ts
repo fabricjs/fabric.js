@@ -98,8 +98,9 @@ type TDestroyedCanvas = Omit<
  *  //  we want a to accept the drop even though it's below b in the stack
  *  flag = this.canDrop(opt.e);
  * });
+ * const bDefaultDrop = b.canDrop.bind(b);
  * b.canDrop = function(e) {
- *  !flag && this.callSuper('canDrop', e);
+ *  !flag && bDefaultDrop(e);
  * }
  * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
  * a.on('drop', opt => {
@@ -1636,35 +1637,39 @@ export class SelectableCanvas<
     }
     super.setViewportTransform(vpt);
   }
-}
 
-Object.assign(SelectableCanvas.prototype, {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  altSelectionKey: null,
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-});
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      uniformScaling: true,
+      uniScaleKey: 'shiftKey',
+      centeredScaling: false,
+      centeredRotation: false,
+      centeredKey: 'altKey',
+      altActionKey: 'shiftKey',
+      selection: true,
+      selectionKey: 'shiftKey',
+      altSelectionKey: null,
+      selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
+      selectionDashArray: [],
+      selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
+      selectionLineWidth: 1,
+      selectionFullyContained: false,
+      hoverCursor: 'move',
+      moveCursor: 'move',
+      defaultCursor: 'default',
+      freeDrawingCursor: 'crosshair',
+      notAllowedCursor: 'not-allowed',
+      containerClass: 'canvas-container',
+      perPixelTargetFind: false,
+      targetFindTolerance: 0,
+      skipTargetFind: false,
+      preserveObjectStacking: false,
+      stopContextMenu: false,
+      fireRightClick: false,
+      fireMiddleClick: false,
+      enablePointerEvents: false,
+    };
+  }
+}

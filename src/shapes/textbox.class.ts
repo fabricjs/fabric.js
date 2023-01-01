@@ -1,8 +1,6 @@
 // @ts-nocheck
-import { TClassProperties } from '../typedefs';
-import { IText } from './itext.class';
-import { textDefaultValues } from './text.class';
 import { classRegistry } from '../util/class_registry';
+import { IText } from './itext.class';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -456,20 +454,22 @@ export class Textbox extends IText {
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      type: 'textbox',
+      minWidth: 20,
+      dynamicMinWidth: 2,
+      lockScalingFlip: true,
+      noScaleCache: false,
+      _dimensionAffectingProps:
+        superDefaults._dimensionAffectingProps.concat('width'),
+      _wordJoiners: /[ \t\r]/,
+      splitByGrapheme: false,
+    };
+  }
 }
-
-export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
-  type: 'textbox',
-  minWidth: 20,
-  dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
-  _dimensionAffectingProps:
-    textDefaultValues._dimensionAffectingProps!.concat('width'),
-  _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: false,
-};
-
-Object.assign(Textbox.prototype, textboxDefaultValues);
 
 classRegistry.setClass(Textbox);

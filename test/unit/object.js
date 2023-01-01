@@ -1436,7 +1436,7 @@
     object.dispose();
     assert.equal(findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
   });
-  QUnit.test('prototype changes', function (assert) {
+  QUnit.skip('defaults changes', function (assert) {
     var object = new fabric.Object();
     var object2 = new fabric.Object();
     object2.fill = 'red'

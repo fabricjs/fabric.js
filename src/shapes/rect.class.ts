@@ -1,9 +1,8 @@
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Rect extends FabricObject {
   /**
@@ -182,17 +181,19 @@ export class Rect extends FabricObject {
   }
 
   /* _FROM_SVG_END_ */
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      stateProperties: superDefaults.stateProperties.concat('rx', 'ry'),
+      type: 'rect',
+      rx: 0,
+      ry: 0,
+      cacheProperties: superDefaults.cacheProperties.concat('rx', 'ry'),
+    };
+  }
 }
-
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('rx', 'ry'),
-  type: 'rect',
-  rx: 0,
-  ry: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('rx', 'ry'),
-};
-
-Object.assign(Rect.prototype, rectDefaultValues);
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);

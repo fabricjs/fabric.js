@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { getEnv } from '../env';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
@@ -11,11 +10,7 @@ import {
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Point } from '../point.class';
-import type {
-  TCacheCanvasDimensions,
-  TClassProperties,
-  TFiller,
-} from '../typedefs';
+import type { TCacheCanvasDimensions, TFiller } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
@@ -25,7 +20,6 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1867,87 +1861,87 @@ export class Text<
       }
     );
   }
+
+  static getDefaults() {
+    const superDefaults = super.getDefaults();
+    return {
+      ...superDefaults,
+      _dimensionAffectingProps: [
+        'fontSize',
+        'fontWeight',
+        'fontFamily',
+        'fontStyle',
+        'lineHeight',
+        'text',
+        'charSpacing',
+        'textAlign',
+        'styles',
+        'path',
+        'pathStartOffset',
+        'pathSide',
+        'pathAlign',
+      ],
+      _styleProperties: [
+        'stroke',
+        'strokeWidth',
+        'fill',
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'fontStyle',
+        'underline',
+        'overline',
+        'linethrough',
+        'deltaY',
+        'textBackgroundColor',
+      ],
+      _reNewline: /\r?\n/,
+      _reSpacesAndTabs: /[ \t\r]/g,
+      _reSpaceAndTab: /[ \t\r]/,
+      _reWords: /\S+/g,
+      type: 'text',
+      fontSize: 40,
+      fontWeight: 'normal',
+      fontFamily: 'Times New Roman',
+      underline: false,
+      overline: false,
+      linethrough: false,
+      textAlign: 'left',
+      fontStyle: 'normal',
+      lineHeight: 1.16,
+      superscript: {
+        size: 0.6, // fontSize factor
+        baseline: -0.35, // baseline-shift factor (upwards)
+      },
+      subscript: {
+        size: 0.6, // fontSize factor
+        baseline: 0.11, // baseline-shift factor (downwards)
+      },
+      textBackgroundColor: '',
+      stateProperties: superDefaults.stateProperties.concat(additionalProps),
+      cacheProperties: superDefaults.cacheProperties.concat(additionalProps),
+      stroke: null,
+      shadow: null,
+      path: null,
+      pathStartOffset: 0,
+      pathSide: 'left',
+      pathAlign: 'baseline',
+      _fontSizeFraction: 0.222,
+      offsets: {
+        underline: 0.1,
+        linethrough: -0.315,
+        overline: -0.88,
+      },
+      _fontSizeMult: 1.13,
+      charSpacing: 0,
+      styles: null,
+      deltaY: 0,
+      direction: 'ltr',
+      CACHE_FONT_SIZE: 400,
+      MIN_TEXT_WIDTH: 2,
+    };
+  }
 }
-
-export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _dimensionAffectingProps: [
-    'fontSize',
-    'fontWeight',
-    'fontFamily',
-    'fontStyle',
-    'lineHeight',
-    'text',
-    'charSpacing',
-    'textAlign',
-    'styles',
-    'path',
-    'pathStartOffset',
-    'pathSide',
-    'pathAlign',
-  ],
-  _styleProperties: [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ],
-  _reNewline: /\r?\n/,
-  _reSpacesAndTabs: /[ \t\r]/g,
-  _reSpaceAndTab: /[ \t\r]/,
-  _reWords: /\S+/g,
-  type: 'text',
-  fontSize: 40,
-  fontWeight: 'normal',
-  fontFamily: 'Times New Roman',
-  underline: false,
-  overline: false,
-  linethrough: false,
-  textAlign: 'left',
-  fontStyle: 'normal',
-  lineHeight: 1.16,
-  superscript: {
-    size: 0.6, // fontSize factor
-    baseline: -0.35, // baseline-shift factor (upwards)
-  },
-  subscript: {
-    size: 0.6, // fontSize factor
-    baseline: 0.11, // baseline-shift factor (downwards)
-  },
-  textBackgroundColor: '',
-  stateProperties:
-    fabricObjectDefaultValues.stateProperties.concat(additionalProps),
-  cacheProperties:
-    fabricObjectDefaultValues.cacheProperties.concat(additionalProps),
-  stroke: null,
-  shadow: null,
-  path: null,
-  pathStartOffset: 0,
-  pathSide: 'left',
-  pathAlign: 'baseline',
-  _fontSizeFraction: 0.222,
-  offsets: {
-    underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88,
-  },
-  _fontSizeMult: 1.13,
-  charSpacing: 0,
-  styles: null,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2,
-};
-
-Object.assign(Text.prototype, textDefaultValues);
 
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);

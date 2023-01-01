@@ -59,4 +59,8 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   get(property: string) {
     return this[property];
   }
+
+  static getDefaults() {
+    return {};
+  }
 }

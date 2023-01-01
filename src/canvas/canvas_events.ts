@@ -88,7 +88,7 @@ export class Canvas extends SelectableCanvas {
    * @type Boolean
    * @private
    */
-  private eventsBound: boolean;
+  private eventsBound = false;
 
   /**
    * Holds a reference to a setTimeout timer for event synchronization
@@ -1650,8 +1650,3 @@ export class Canvas extends SelectableCanvas {
     return new Canvas(el);
   }
 }
-
-// there is an order execution bug if i put this as public property.
-Object.assign(Canvas.prototype, {
-  eventsBound: false,
-});
