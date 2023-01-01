@@ -4,7 +4,7 @@ import { TMat2D } from '../typedefs';
 import { Polyline } from '../shapes/polyline.class';
 import { multiplyTransformMatrices, transformPoint } from '../util/misc/matrix';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
-import { normalizePoint } from './util'
+import { normalizePoint } from './util';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { TransformActionHandler } from '../EventTypeDefs';
 
@@ -30,37 +30,38 @@ export class PolyControl extends Control {
     return unskewedPoint;
   }
 
-  // This function locate the controls. 
+  // This function locate the controls.
   // It'll be used both for drawing and for interaction
-  positionHandler(
-    dim: Point,
-    finalMatrix: TMat2D,
-    polyObject: Polyline
-  ) {
+  positionHandler(dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[this.pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[this.pointIndex].y - polyObject.pathOffset.y;
     return transformPoint(
       { x: x, y: y },
       multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? [1, 0, 0, 1, 0, 0] as TMat2D,
+        polyObject.canvas?.viewportTransform ?? ([1, 0, 0, 1, 0, 0] as TMat2D),
         polyObject.calcTransformMatrix()
       )
     );
-  };
+  }
 
   // This function define what the control does.
   // It'll be called on every mouse move after a control has been clicked and is being dragged.
   // The function receive as argument the mouse event, the current trasnform object
   // and the current position in canvas coordinate
   // transform.target is a reference to the current object being transformed,
-  static polyActionHandler(eventData: TPointerEvent, transform: Transform, x: number, y: number) {
+  static polyActionHandler(
+    eventData: TPointerEvent,
+    transform: Transform,
+    x: number,
+    y: number
+  ) {
     const poly = transform.target as Polyline,
       currentControl = poly.controls[poly.__corner] as PolyControl,
       mouseLocalPosition = normalizePoint(
         poly,
         new Point(x, y),
-        "center",
-        "center"
+        'center',
+        'center'
       ),
       polygonBaseSize = new Point(poly.width, poly.height),
       size = poly._getTransformedDimensions({}),
@@ -86,7 +87,12 @@ export class PolyControl extends Control {
 
   // Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`
   static anchorWrapper(anchorIndex: number, fn: TransformActionHandler) {
-    return function (eventData: TPointerEvent, transform: Transform, x: number, y: number) {
+    return function (
+      eventData: TPointerEvent,
+      transform: Transform,
+      x: number,
+      y: number
+    ) {
       const poly = transform.target as Polyline,
         absolutePoint = transformPoint(
           new Point(
@@ -103,35 +109,41 @@ export class PolyControl extends Control {
         );
 
       const newPosition = PolyControl.applySkew(
-          new Point(
-            poly.points[anchorIndex].x,
-            poly.points[anchorIndex].y
-          ).subtract(poly.pathOffset),
-          shear
-        ).divide(polygonBaseSize);
+        new Point(
+          poly.points[anchorIndex].x,
+          poly.points[anchorIndex].y
+        ).subtract(poly.pathOffset),
+        shear
+      ).divide(polygonBaseSize);
 
-      poly.setPositionByOrigin(absolutePoint, newPosition.x + 0.5, newPosition.y + 0.5);
+      poly.setPositionByOrigin(
+        absolutePoint,
+        newPosition.x + 0.5,
+        newPosition.y + 0.5
+      );
       return actionPerformed;
     };
   }
 
-  static createPolyControls(controlPoints: Array<Point>, options?: Partial<Control>) {
+  static createPolyControls(
+    controlPoints: Array<Point>,
+    options?: Partial<Control>
+  ) {
     const lastControl = controlPoints.length - 1,
       controls = controlPoints.reduce((acc, point, index) => {
-        acc["p" + index] = new PolyControl(
+        acc['p' + index] = new PolyControl(
           {
-            actionName: "modifyPolygon",
+            actionName: 'modifyPolygon',
             actionHandler: PolyControl.anchorWrapper(
               index > 0 ? index - 1 : lastControl,
               PolyControl.polyActionHandler
             ),
-            ...options
+            ...options,
           },
           index
         );
         return acc;
       }, {} as Record<string, PolyControl>);
     return controls;
-  };
-
+  }
 }
