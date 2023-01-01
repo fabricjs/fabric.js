@@ -1,7 +1,7 @@
 import json from '@rollup/plugin-json';
+import terser from '@rollup/plugin-terser';
+import ts from '@rollup/plugin-typescript';
 import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
-import { terser } from 'rollup-plugin-terser';
-import ts from 'rollup-plugin-ts';
 
 const runStats = Number(process.env.BUILD_STATS);
 
@@ -9,19 +9,21 @@ const splitter = /\n|\s|,/g;
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
-  input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.js'],
+  input: process.env.BUILD_INPUT?.split(splitter) || ['./src/index.ts'],
   output: [
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
       name: 'fabric',
       format: 'umd',
       sourcemap: true,
+      exports: 'named',
     },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
           format: 'umd',
+          exports: 'named',
           plugins: [
             runStats &&
               sizeSnapshot({
