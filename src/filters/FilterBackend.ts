@@ -16,9 +16,6 @@ export function initFilterBackend(): FilterBackend {
 
 let filterBackend: FilterBackend;
 
-/**
- * @todo refactor to a module w/o assigning to fabric
- */
 export function getFilterBackend(): FilterBackend {
   if (!filterBackend) {
     filterBackend = initFilterBackend();
