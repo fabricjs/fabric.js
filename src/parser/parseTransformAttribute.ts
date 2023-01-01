@@ -108,10 +108,11 @@ export function parseTransformAttribute(attributeValue: string) {
   }
 
   attributeValue.replace(reTransform, (match) => {
-    const m = new RegExp(transform).exec(match)!.filter(function (match) {
-        // match !== '' && match != null
-        return !!match;
-      }),
+    const m = new RegExp(transform).exec(match)!.filter(
+        (match) =>
+          // match !== '' && match != null
+          !!match
+      ),
       operation = m[1],
       args = m.slice(2).map(parseFloat);
 
