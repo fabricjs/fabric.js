@@ -4,7 +4,7 @@
   QUnit.test('hasStateChanged', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.hasStateChanged === 'function');
-    cObj.setupState();
+    cObj.saveState();
     assert.ok(!cObj.hasStateChanged(), 'state should not be changed');
     cObj.saveState();
     cObj.set('left', 123).set('top', 456);
@@ -14,7 +14,7 @@
   QUnit.test('saveState', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.saveState === 'function');
-    cObj.setupState();
+    cObj.saveState();
     assert.equal(cObj.saveState(), cObj, 'chainable');
     cObj.set('left', 123).set('top', 456);
     cObj.saveState();
@@ -30,7 +30,7 @@
     cObj.left = 123;
     var extraProps = ['prop1', 'prop2'];
     var options = { stateProperties: extraProps };
-    cObj.setupState(options);
+    cObj.saveState(options);
     assert.equal(cObj._stateProperties.prop1, 'a', 'it saves the extra props');
     assert.equal(cObj._stateProperties.prop2, 'b', 'it saves the extra props');
     cObj.prop1 = 'c';
@@ -41,7 +41,7 @@
   QUnit.test('saveState with array', function(assert) {
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
-    cObj.setupState();
+    cObj.saveState();
     //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray[0] = 2;
@@ -55,7 +55,7 @@
   QUnit.test('saveState with array to null', function(assert) {
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
-    cObj.setupState();
+    cObj.saveState();
     //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray = null;
@@ -83,7 +83,7 @@
     });
 
     cObj.set('fill', '#FF0000');
-    cObj.setupState();
+    cObj.saveState();
     cObj.set('fill', gradient);
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
     cObj.saveState();
@@ -114,7 +114,7 @@
     });
 
     cObj.set('fill', gradient);
-    cObj.setupState();
+    cObj.saveState();
     cObj.set('fill', 'red');
     assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to string without throwing');
     cObj.saveState();
@@ -130,9 +130,9 @@
     cObj.myProperties = ['a', 'b'];
     cObj.a = 1;
     cObj.b = 3;
-    cObj.setupState();
+    cObj.saveState();
     assert.ok(!cObj._myProperties, 'custom properties set does not exist');
-    cObj.setupState({ propertySet: 'myProperties' });
+    cObj.saveState({ propertySet: 'myProperties' });
     assert.ok(cObj._myProperties.a, 'a has been added in the custom property set');
     cObj.left = 33;
     assert.ok(cObj.hasStateChanged(), 'state has changed');

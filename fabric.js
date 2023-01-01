@@ -315,6 +315,7 @@ import { initFilterBackend } from './src/filters/FilterBackend';
 import { Canvas2dFilterBackend } from './src/filters/2d_backend.class';
 import { WebGLFilterBackend } from './src/filters/webgl_backend.class';
 import { runningAnimations } from './src/util/animation/AnimationRegistry';
+import { Observable } from './src/mixins/observable.mixin';
 import { Point } from './src/point.class';
 import { Intersection } from './src/intersection.class';
 import { Color } from './src/color/color.class';
@@ -368,6 +369,7 @@ const fabric = {
   Intersection,
   Color,
   Control,
+  Observable,
   Gradient,
   Pattern,
   Shadow,
