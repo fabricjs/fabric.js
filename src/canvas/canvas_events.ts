@@ -913,11 +913,6 @@ export class Canvas extends SelectableCanvas {
   /**
    * @private
    * Handle event firing for target and subtargets
-   * @param {Event} e event from mouse
-   * @param {String} eventType event to fire (up, down or move)
-   * @param {fabric.Object} targetObj receiving event
-   * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
-   * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
    */
   _handleEvent(
     e: TPointerEvent,

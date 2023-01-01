@@ -5,7 +5,7 @@ import { Group } from '../../shapes/group.class';
  * Merges 2 clip paths into one visually equal clip path
  *
  * **IMPORTANT**:\
- * Does **NOT** clone the arguments, clone them proir if necessary.
+ * Does **NOT** clone the arguments, clone them prior if necessary.
  *
  * Creates a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
  * Use this method if both the clip paths may have nested clip paths of their own, so assigning one to the other's clip path property is not possible.
@@ -15,10 +15,9 @@ import { Group } from '../../shapes/group.class';
  * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
  * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
  *
- * @memberOf fabric.util
- * @param {fabric.Object} c1
- * @param {fabric.Object} c2
- * @returns {fabric.Object} merged clip path
+ * @param {FabricObject} c1
+ * @param {FabricObject} c2
+ * @returns {FabricObject} merged clip path
  */
 export const mergeClipPaths = (c1: FabricObject, c2: FabricObject) => {
   let a = c1,

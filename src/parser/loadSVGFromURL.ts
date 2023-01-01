@@ -6,7 +6,6 @@ import { parseSVGDocument } from './parseSVGDocument';
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
  * Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
- * @memberOf fabric
  * @param {String} url
  * @param {Function} callback
  * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.

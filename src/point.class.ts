@@ -350,8 +350,6 @@ export class Point implements IPoint {
 
   /**
    * Rotates `point` around `origin` with `radians`
-   * @static
-   * @memberOf fabric.util
    * @param {IPoint} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
@@ -371,8 +369,6 @@ export class Point implements IPoint {
 
   /**
    * Apply transform t to point p
-   * @static
-   * @memberOf fabric.util
    * @param  {TMat2D} t The transform
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point

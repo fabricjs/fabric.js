@@ -1464,7 +1464,7 @@ export class StaticCanvas<
 
   /**
    * Populates canvas with data from the specified JSON.
-   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
+   * JSON format must conform to the one of {@link toJSON}
    *
    * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
    *
@@ -1570,7 +1570,7 @@ export class StaticCanvas<
    * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
    * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
-   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   * @param {(object: FabricObject) => boolean} [options.filter] Function to filter objects.
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    * @see {@link https://jsfiddle.net/xsjua1rd/ demo}
    * @example <caption>Generate jpeg dataURL with lower quality</caption>
@@ -1626,7 +1626,7 @@ export class StaticCanvas<
    * @param {Number} [options.top] Cropping top offset.
    * @param {Number} [options.width] Cropping width.
    * @param {Number} [options.height] Cropping height.
-   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   * @param {(object: FabricObject) => boolean} [options.filter] Function to filter objects.
    */
   toCanvasElement(
     multiplier = 1,

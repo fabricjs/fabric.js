@@ -3,9 +3,7 @@
 import { ElementsParser } from './elements_parser';
 
 /**
- * Transforms an array of svg elements to corresponding fabric.* instances
- * @static
- * @memberOf fabric
+ * Transforms an array of svg elements to corresponding fabric instances
  * @param {Array} elements Array of elements to parse
  * @param {Function} callback Being passed an array of fabric instances (transformed from SVG elements)
  * @param {Object} [options] Options object

@@ -662,8 +662,8 @@ export class FabricObject<
   }
 
   /**
-   * Limit the cache dimensions so that X * Y do not cross config.perfLimitSizeTotal
-   * and each side do not cross fabric.cacheSideLimit
+   * Limit the cache dimensions so that X * Y do not cross {@link config.perfLimitSizeTotal}
+   * and each side do not cross {@link config.maxCacheSideLimit}
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
    * @param {Object} dims

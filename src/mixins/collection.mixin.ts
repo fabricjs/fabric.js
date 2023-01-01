@@ -161,7 +161,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     /**
      * Moves an object or the objects of a multiple selection
      * to the bottom of the stack of drawn objects
-     * @param {fabric.Object} object Object to send to back
+     * @param {FabricObject} object Object to send to back
      * @returns {boolean} true if change occurred
      */
     sendObjectToBack(object: FabricObject) {
@@ -177,7 +177,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     /**
      * Moves an object or the objects of a multiple selection
      * to the top of the stack of drawn objects
-     * @param {fabric.Object} object Object to send
+     * @param {FabricObject} object Object to send
      * @returns {boolean} true if change occurred
      */
     bringObjectToFront(object: FabricObject) {
@@ -196,7 +196,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * the first intersecting object. Where intersection is calculated with
      * bounding box. If no intersection is found, there will not be change in the
      * stack.
-     * @param {fabric.Object} object Object to send
+     * @param {FabricObject} object Object to send
      * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @returns {boolean} true if change occurred
      */
@@ -222,7 +222,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * of the first intersecting object. Where intersection is calculated with
      * bounding box. If no intersection is found, there will not be change in the
      * stack.
-     * @param {fabric.Object} object Object to send
+     * @param {FabricObject} object Object to send
      * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @returns {boolean} true if change occurred
      */
@@ -244,7 +244,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
 
     /**
      * Moves an object to specified level in stack of drawn objects
-     * @param {fabric.Object} object Object to send
+     * @param {FabricObject} object Object to send
      * @param {number} index Position to move to
      * @returns {boolean} true if change occurred
      */

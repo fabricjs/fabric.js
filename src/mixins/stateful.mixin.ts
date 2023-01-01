@@ -1,7 +1,7 @@
 // @ts-nocheck
-import type { FabricObject } from "../shapes/Object/Object";
-import { extend } from "../util/lang_object";
-import { pick } from "../util/misc/pick";
+import type { FabricObject } from '../shapes/Object/Object';
+import { extend } from '../util/lang_object';
+import { pick } from '../util/misc/pick';
 
 const originalSet = 'stateProperties';
 
@@ -56,7 +56,7 @@ export class statefulMixin {
   /**
    * Returns true if object state (one of its state properties) was changed
    * @param {String} [propertySet] optional name for the set of property we want to save
-   * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
+   * @return {Boolean} true if instance' state has changed since `{@link FabricObject#saveState}` was called
    */
   hasStateChanged(propertySet: string = originalSet): boolean {
     const dashedPropertySet = `_${propertySet}`;
@@ -69,7 +69,7 @@ export class statefulMixin {
   }
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
-    const savedProps = pick(this, props)
+    const savedProps = pick(this, props);
     extend(this[destination], savedProps, true);
   }
 
@@ -78,9 +78,12 @@ export class statefulMixin {
    * @param {Object} [options] Object with additional `stateProperties` array to include when saving state
    * @param {string[]} [options.stateProperties] Object with additional `stateProperties` array to include when saving state
    * @param {string} [options.propertySet] name for the property set to save
-   * @return {fabric.Object} thisArg
+   * @return {FabricObject} thisArg
    */
-  saveState(this: FabricObject, { propertySet = originalSet }: TSaveStateOptions = {}): FabricObject {
+  saveState(
+    this: FabricObject,
+    { propertySet = originalSet }: TSaveStateOptions = {}
+  ): FabricObject {
     const destination = `_${propertySet}`;
     if (!this[destination]) {
       this[destination] = {};

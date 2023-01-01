@@ -27,10 +27,7 @@ import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
-import {
-  cleanUpJsdomNode,
-  makeElementUnselectable,
-} from '../util/dom_misc';
+import { cleanUpJsdomNode, makeElementUnselectable } from '../util/dom_misc';
 import { wrapElement } from '../util/internals/wrapElement';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
@@ -362,7 +359,7 @@ export class SelectableCanvas<
   /**
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
    * After mousedown, mousemove creates a shape,
-   * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
+   * and then mouseup finalizes it and adds an instance of `Path` onto canvas.
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
    * @type Boolean
    * @default
@@ -1085,7 +1082,7 @@ export class SelectableCanvas<
 
   /**
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link fabric.Canvas#_searchPossibleTargets}
+   * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
