@@ -792,31 +792,5 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 
 Object.assign(Image.prototype, imageDefaultValues);
 
-Object.assign(FabricObject.prototype, {
-  /**
-   * Creates an instance of Image out of an object
-   * makes use of toCanvasElement.
-   * Once this method was based on toDataUrl and loadImage, so it also had a quality
-   * and format option. toCanvasElement is faster and produce no loss of quality.
-   * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
-   * toCanvasElement and then toBlob from the obtained canvas is also a good option.
-   * @param {Object} [options] for clone as image, passed to toDataURL
-   * @param {Number} [options.multiplier=1] Multiplier to scale by
-   * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
-   * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
-   * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
-   * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
-   * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
-   * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
-   * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
-   */
-  cloneAsImage(options: any): Image {
-    const canvasEl = this.toCanvasElement(options);
-    // TODO: how to import Image w/o an import cycle?
-    return new Image(canvasEl);
-  }
-});
-
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

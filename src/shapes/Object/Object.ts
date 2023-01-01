@@ -35,7 +35,7 @@ import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../group.class';
 import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { isTextObject } from '../../util/types';
-import type { Image } from '../image.class';
+import { Image } from '../image.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -1706,10 +1706,10 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {Image} Object cloned as image.
    */
-  cloneAsImage(options: any): Image | null {
-    // This method gets overridden if you import Image class.
-    // otherwise Image class is always imported not matter what.
-    return null;
+  cloneAsImage(options: any): Image {
+    const canvasEl = this.toCanvasElement(options);
+    // TODO: how to import Image w/o an import cycle?
+    return new Image(canvasEl);
   }
 
   /**
