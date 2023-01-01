@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(PolyControl): modify the shape of a poly with control points [#8556](https://github.com/fabricjs/fabric.js/pull/8556)
 - refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
   BREAKING:
   - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
