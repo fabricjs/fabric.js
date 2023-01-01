@@ -377,23 +377,33 @@
     });
   });
 
-  QUnit.test('setElement resets the webgl cache', function(assert) {
-    var done = assert.async();
-    var fabricBackend = fabric.filterBackend;
-    createImageObject(function(image) {
-      fabric.filterBackend = {
-        textureCache: {},
-        evictCachesForKey: function(key) {
-          delete this.textureCache[key];
-        }
-      };
-      var elImage = _createImageElement();
-      fabric.filterBackend.textureCache[image.cacheKey] = 'something';
-      image.setElement(elImage);
-      assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
-      fabric.filterBackend = fabricBackend;
+  QUnit.test('setElement calls `removeTexture`', function (assert) {
+    const done = assert.async();
+    const keys = [];
+    createImageObject((image) => {
+      image.cacheKey = 'TEST';
+      // use sinon replace or something one day
+      image.removeTexture = (key) => keys.push(key);
+      image.setElement(_createImageElement());
+      assert.deepEqual(keys, ['TEST', 'TEST_filtered'], 'should try to remove caches');
       done();
     });
+  });
+
+  QUnit.test('setElement resets the webgl cache', function (assert) {
+    const backend = fabric.getFilterBackend();
+    if (backend instanceof fabric.WebglFilterBackend) {
+      const done = assert.async();
+      createImageObject((image) => {
+        backend.textureCache[image.cacheKey] = backend.createTexture(backend.gl, 50, 50);
+        assert.ok(backend.textureCache[image.cacheKey]);
+        image.setElement(_createImageElement());
+        assert.equal(backend.textureCache[image.cacheKey], undefined);
+        done();
+      });
+    } else {
+      assert.expect(0);
+    }
   });
 
   QUnit.test('crossOrigin', function(assert) {
