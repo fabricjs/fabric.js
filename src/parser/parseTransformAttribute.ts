@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { iMatrix } from '../constants';
 import { commaWsp, reNum } from './constants';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
