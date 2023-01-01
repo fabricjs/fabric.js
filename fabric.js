@@ -346,11 +346,13 @@ import { Image } from './src/shapes/image.class';
 import { getEnv, getDocument, getWindow, setEnvForTests } from './src/env';
 import { createCollectionMixin } from './src/mixins/collection.mixin';
 import { parseAttributes } from './src/parser/parseAttributes';
+import { parseElements } from './src/parser/parseElements';
 
 import './src/controls/default_controls';
 import './src/mixins/text.svg_export.ts';
 
 const fabric = {
+  parseElements,
   parseAttributes,
   cache,
   version,
