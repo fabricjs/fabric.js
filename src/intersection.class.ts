@@ -1,7 +1,6 @@
-//@ts-nocheck
-import { Point } from './point.class';
-
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
+
+import { Point } from './point.class';
 
 export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
 
@@ -36,23 +35,20 @@ export class Intersection {
    * @param {Point} point
    * @returns
    */
-  contains(point) {
+  contains(point: Point) {
     return this.points.some((p) => p.eq(point));
   }
 
   /**
    * Appends points of intersection
    * @param {...Point[]} points
-   * @return {Intersection} thisArg
-   * @chainable
    */
-  private append(...points) {
+  private append(...points: Point[]) {
     this.points = this.points.concat(
       points.filter((point) => {
         return !this.contains(point);
       })
     );
-    return this;
   }
 
   /**
@@ -66,7 +62,14 @@ export class Intersection {
    * @param {boolean} [bInfinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLineLine(a1, a2, b1, b2, aInfinite = true, bInfinite = true) {
+  static intersectLineLine(
+    a1: Point,
+    a2: Point,
+    b1: Point,
+    b2: Point,
+    aInfinite = true,
+    bInfinite = true
+  ) {
     let result;
     const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
       ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
@@ -112,7 +115,7 @@ export class Intersection {
    * @param {Point} l2 other point on line
    * @return {Intersection}
    */
-  static intersectSegmentLine(s1, s2, l1, l2) {
+  static intersectSegmentLine(s1: Point, s2: Point, l1: Point, l2: Point) {
     return Intersection.intersectLineLine(s1, s2, l1, l2, false, true);
   }
 
@@ -126,7 +129,7 @@ export class Intersection {
    * @param {Point} b2 other boundary point of segment
    * @return {Intersection}
    */
-  static intersectSegmentSegment(a1, a2, b1, b2) {
+  static intersectSegmentSegment(a1: Point, a2: Point, b1: Point, b2: Point) {
     return Intersection.intersectLineLine(a1, a2, b1, b2, false, false);
   }
 
@@ -143,14 +146,26 @@ export class Intersection {
    * @param {boolean} [infinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLinePolygon(a1, a2, points, infinite = true) {
+  static intersectLinePolygon(
+    a1: Point,
+    a2: Point,
+    points: Point[],
+    infinite = true
+  ) {
     const result = new Intersection();
     const length = points.length;
 
-    for (let i = 0, b1, b2, inter; i < length; i++) {
-      b1 = points[i];
-      b2 = points[(i + 1) % length];
-      inter = Intersection.intersectLineLine(a1, a2, b1, b2, infinite, false);
+    for (let i = 0; i < length; i++) {
+      const b1 = points[i];
+      const b2 = points[(i + 1) % length];
+      const inter = Intersection.intersectLineLine(
+        a1,
+        a2,
+        b1,
+        b2,
+        infinite,
+        false
+      );
       if (inter.status === 'Coincident') {
         return inter;
       }
@@ -173,7 +188,7 @@ export class Intersection {
    * @param {Point[]} points polygon points
    * @return {Intersection}
    */
-  static intersectSegmentPolygon(a1, a2, points) {
+  static intersectSegmentPolygon(a1: Point, a2: Point, points: Point[]) {
     return Intersection.intersectLinePolygon(a1, a2, points, false);
   }
 
@@ -187,7 +202,7 @@ export class Intersection {
    * @param {Point[]} points2
    * @return {Intersection}
    */
-  static intersectPolygonPolygon(points1, points2) {
+  static intersectPolygonPolygon(points1: Point[], points2: Point[]) {
     const result = new Intersection(),
       length = points1.length;
     const coincidences = [];
@@ -215,14 +230,13 @@ export class Intersection {
 
   /**
    * Checks if polygon intersects rectangle
-   * @static
    * @see {@link intersectPolygonPolygon} for polygon intersection
    * @param {Point[]} points polygon points
    * @param {Point} r1 top left point of rect
    * @param {Point} r2 bottom right point of rect
    * @return {Intersection}
    */
-  static intersectPolygonRectangle(points, r1, r2) {
+  static intersectPolygonRectangle(points: Point[], r1: Point, r2: Point) {
     const min = r1.min(r2),
       max = r1.max(r2),
       topRight = new Point(max.x, min.y),
