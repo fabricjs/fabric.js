@@ -80,19 +80,19 @@ export const parseUnit = (value: string, fontSize: number) => {
   }
 };
 
-const enum MeetOrSlice {
+export const enum MeetOrSlice {
   meet = 'meet',
   slice = 'slice',
 }
 
-const enum MinMidMax {
+export const enum MinMidMax {
   min = 'Min',
   mid = 'Mid',
   max = 'Max',
   none = 'none',
 }
 
-type TPreserveArParsed = {
+export type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
   alignX: MinMidMax;
   alignY: MinMidMax;
