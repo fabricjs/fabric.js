@@ -9,17 +9,11 @@ import './src/color';
 import './src/gradient'; // optional gradient
 import './src/pattern.class'; // optional pattern
 import './src/shadow.class'; // optional shadow
-import './src/static_canvas.class';
-import './src/canvas.class'; // optional interaction
-import './src/mixins/canvas_events.mixin'; // optional interaction
-import './src/mixins/canvas_grouping.mixin'; // optional interaction
-import './src/mixins/canvas_dataurl_exporter.mixin';
-import './src/mixins/canvas_serialization.mixin'; // optional serialization
-import './src/mixins/canvas_gestures.mixin'; // optional gestures
+import './src/canvas/static_canvas.class';
+import './src/canvas/canvas_events'; // optional interaction
+import './src/canvas/canvas_gestures.mixin'; // optional gestures
 import './src/mixins/canvas_animation.mixin'; // optional animation
-import './src/mixins/canvas_straightening.mixin'; // optional animation
-import './src/shapes/fabricObject.class';
-import './src/mixins/object_stacking.mixin'; // removed in #8461
+import './src/shapes/Object/FabricObject';
 import './src/mixins/stateful.mixin'; // will die soon
 import './src/shapes/line.class';
 import './src/shapes/circle.class';
@@ -54,8 +48,8 @@ import './src/filters/gamma_filter.class'; // optional image_filters
 import './src/filters/composed_filter.class'; // optional image_filters
 import './src/filters/hue_rotation.class'; // optional image_filters
 import './src/shapes/text.class'; // optional text
+import './src/mixins/text.svg_export'; // optional svg
 import './src/shapes/itext.class'; // optional itext
-import './src/mixins/itext.svg_export'; // optional itext
 import './src/shapes/textbox.class'; // optional textbox
 import './src/controls'; // optional interaction
 import './src/brushes'; // optional freedrawing

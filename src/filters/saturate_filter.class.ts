@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Saturate filter class
@@ -96,3 +97,4 @@ export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
 };
 
 Object.assign(Saturation.prototype, saturationDefaultValues);
+classRegistry.setClass(Saturation);

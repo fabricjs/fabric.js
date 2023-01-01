@@ -15,7 +15,8 @@ import {
   parsePath,
   type TPathSegmentsInfo,
 } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Path extends FabricObject {
   /**
@@ -353,7 +354,7 @@ export class Path extends FabricObject {
    * @returns {Promise<Path>}
    */
   static fromObject(object) {
-    return FabricObject._fromObject(Path, object, {
+    return this._fromObject(object, {
       extraParam: 'path',
     });
   }
@@ -368,9 +369,9 @@ export class Path extends FabricObject {
    * @param {Function} [callback] Options callback invoked after parsing is finished
    */
   static fromElement(element, callback, options) {
-    const parsedAttributes = parseAttributes(element, Path.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
     callback(
-      new Path(parsedAttributes.d, {
+      new this(parsedAttributes.d, {
         ...parsedAttributes,
         ...options,
         // we pass undefined to instruct the constructor to position the object using the bbox
@@ -393,6 +394,10 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 };
 
 Object.assign(Path.prototype, pathDefaultValues);
+
+classRegistry.setClass(Path);
+classRegistry.setSVGClass(Path);
+
 /** @todo TODO_JS_MIGRATION remove next line after refactoring build */
 fabric.Path = Path;
 

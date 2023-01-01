@@ -1,44 +1,45 @@
 // @ts-nocheck
-import { fabric } from '../HEADER';
-import type { BaseBrush } from './brushes';
-import { config } from './config';
-import { iMatrix, VERSION } from './constants';
-import type { StaticCanvasEvents } from './EventTypeDefs';
-import { Gradient } from './gradient';
-import { createCollectionMixin } from './mixins/collection.mixin';
-import { TSVGReviver } from './mixins/object.svg_export';
-import { CommonMethods } from './mixins/shared_methods.mixin';
-import { Pattern } from './pattern.class';
-import { Point } from './point.class';
-import type { FabricObject } from './shapes/fabricObject.class';
-import { TCachedFabricObject } from './shapes/object.class';
-import { Rect } from './shapes/rect.class';
-import type {
+import { fabric } from '../../HEADER';
+import { config } from '../config';
+import { iMatrix, VERSION } from '../constants';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
+import { Gradient } from '../gradient';
+import { createCollectionMixin } from '../mixins/collection.mixin';
+import { CommonMethods } from '../mixins/shared_methods.mixin';
+import { Pattern } from '../pattern.class';
+import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TCachedFabricObject } from '../shapes/Object/Object';
+import { Rect } from '../shapes/rect.class';
+import {
+  ImageFormat,
   TCornerPoint,
+  TDataUrlOptions,
   TFiller,
   TMat2D,
   TSize,
+  TSVGReviver,
+  TToCanvasElementOptions,
   TValidToObjectMethod,
-} from './typedefs';
-import { cancelAnimFrame, requestAnimFrame } from './util/animate';
+} from '../typedefs';
+import { cancelAnimFrame, requestAnimFrame } from '../util/animation';
 import {
   cleanUpJsdomNode,
   getElementOffset,
   getNodeCanvas,
-} from './util/dom_misc';
-import { removeFromArray } from './util/internals';
-import { uid } from './util/internals/uid';
-import { createCanvasElement, isHTMLCanvas } from './util/misc/dom';
-import { invertTransform, transformPoint } from './util/misc/matrix';
-import { pick } from './util/misc/pick';
-import { matrixToSVG } from './util/misc/svgParsing';
-import { toFixed } from './util/misc/toFixed';
+} from '../util/dom_misc';
+import { uid } from '../util/internals/uid';
+import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
 import {
-  isActiveSelection,
-  isCollection,
-  isFiller,
-  isTextObject,
-} from './util/types';
+  enlivenObjectEnlivables,
+  EnlivenObjectOptions,
+  enlivenObjects,
+} from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { matrixToSVG } from '../util/misc/svgParsing';
+import { toFixed } from '../util/misc/toFixed';
+import { isCollection, isFiller, isTextObject } from '../util/types';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -55,10 +56,14 @@ export type TSVGExportOptions = {
     width: number;
     height: number;
   };
-  encoding?: 'UTF-8'; // test Econding type and see what happens
+  encoding?: 'UTF-8'; // test Encoding type and see what happens
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
+};
+
+type TCanvasHydrationOption = {
+  signal?: AbortSignal;
 };
 
 /**
@@ -70,10 +75,10 @@ export type TSVGExportOptions = {
  * @fires object:added
  * @fires object:removed
  */
-// eslint-disable-next-line max-len
-export class StaticCanvas extends createCollectionMixin(
-  CommonMethods<StaticCanvasEvents>
-) {
+// TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
+export class StaticCanvas<
+  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
@@ -129,7 +134,7 @@ export class StaticCanvas extends createCollectionMixin(
    * Indicates whether {@link add}, {@link insertAt} and {@link remove},
    * {@link moveTo}, {@link clear} and many more, should also re-render canvas.
    * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
-   * since the renders are quequed and executed one per frame.
+   * since the renders are queued and executed one per frame.
    * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
    * Left default to true to do not break documentation and old app, fiddles.
    * @type Boolean
@@ -261,24 +266,22 @@ export class StaticCanvas extends createCollectionMixin(
    */
   disposed?: boolean;
 
-  renderAndResetBound: () => void;
-  requestRenderAllBound: () => StaticCanvas;
+  /**
+   * Keeps a copy of the canvas style before setting retina scaling and other potions
+   * in order to return it to original state on dispose
+   * @type string
+   */
+  _originalCanvasStyle?: string;
 
-  // TODO: move to canvas
-  interactive: boolean;
-  upperCanvasEl: HTMLCanvasElement;
-  contextTop: CanvasRenderingContext2D;
-  wrapperEl: HTMLDivElement;
-  cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
-  freeDrawingBrush: BaseBrush;
-  _activeObject: FabricObject;
+  renderAndResetBound: () => void;
+  requestRenderAllBound: () => void;
 
   _offset: { left: number; top: number };
-  protected _originalCanvasStyle?: string;
   protected hasLostContext: boolean;
   protected nextRenderHandle: number;
-  protected __cleanupTask: {
+
+  // reference to
+  protected __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
@@ -325,18 +328,25 @@ export class StaticCanvas extends createCollectionMixin(
     obj.fire('removed', { target: this });
   }
 
-  initialize(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
-    this.calcViewportBoundaries();
+  _onStackOrderChanged() {
+    this.renderOnAddRemove && this.requestRenderAll();
   }
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    this._init(el, options);
+  }
+
+  /**
+   * @private
+   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
+   * @param {Object} [options] Options object
+   */
+  _init(el: string | HTMLCanvasElement, options = {}) {
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
+    this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -348,11 +358,8 @@ export class StaticCanvas extends createCollectionMixin(
   _initStatic(el: string | HTMLCanvasElement, options = {}) {
     this._objects = [];
     this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
     this._initOptions(options);
-    // only initialize retina scaling once
-    if (!this.interactive) {
-      this._initRetinaScaling();
-    }
     this.calcOffset();
   }
 
@@ -378,22 +385,14 @@ export class StaticCanvas extends createCollectionMixin(
     if (!this._isRetinaScaling()) {
       return;
     }
-    const scaleRatio = config.devicePixelRatio;
-    this.__initRetinaScaling(
-      scaleRatio,
-      this.lowerCanvasEl,
-      this.contextContainer
-    );
-    if (this.upperCanvasEl) {
-      this.__initRetinaScaling(scaleRatio, this.upperCanvasEl, this.contextTop);
-    }
+    this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
   __initRetinaScaling(
-    scaleRatio: number,
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
+    const scaleRatio = config.devicePixelRatio;
     canvas.setAttribute('width', (this.width * scaleRatio).toString());
     canvas.setAttribute('height', (this.height * scaleRatio).toString());
     context.scale(scaleRatio, scaleRatio);
@@ -469,12 +468,7 @@ export class StaticCanvas extends createCollectionMixin(
     }
     this.lowerCanvasEl.classList.add('lower-canvas');
     this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    if (this.interactive) {
-      this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-      this._applyCanvasStyle(this.lowerCanvasEl);
-    }
-
-    this.contextContainer = this.lowerCanvasEl.getContext('2d');
+    this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
   }
 
   /**
@@ -544,11 +538,6 @@ export class StaticCanvas extends createCollectionMixin(
       }
     });
 
-    // @TODO: move to Canvas
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
     this._initRetinaScaling();
     this.calcOffset();
 
@@ -566,16 +555,6 @@ export class StaticCanvas extends createCollectionMixin(
    */
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     this.lowerCanvasEl[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl[prop] = value;
-    }
-
-    // TODO: move to canvas
-    if (this.cacheCanvasEl) {
-      this.cacheCanvasEl[prop] = value;
-    }
-
     this[prop] = value;
   }
 
@@ -588,14 +567,6 @@ export class StaticCanvas extends createCollectionMixin(
    */
   _setCssDimension(prop: keyof TSize, value: string) {
     this.lowerCanvasEl.style[prop] = value;
-
-    if (this.upperCanvasEl) {
-      this.upperCanvasEl.style[prop] = value;
-    }
-
-    if (this.wrapperEl) {
-      this.wrapperEl.style[prop] = value;
-    }
   }
 
   /**
@@ -1102,7 +1073,7 @@ export class StaticCanvas extends createCollectionMixin(
         : null;
     return {
       version: VERSION,
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       objects: this._objects
         .filter((object) => !object.excludeFromExport)
         .map((instance) =>
@@ -1335,7 +1306,7 @@ export class StaticCanvas extends createCollectionMixin(
    * @return {String}
    */
   createSVGRefElementsMarkup(): string {
-    return ['background', 'overlay']
+    return (['background', 'overlay'] as const)
       .map((prop) => {
         const fill = this[`${prop}Color`];
         if (isFiller(fill)) {
@@ -1494,194 +1465,214 @@ export class StaticCanvas extends createCollectionMixin(
   /* _TO_SVG_END_ */
 
   /**
-   * Moves an object or the objects of a multiple selection
-   * to the bottom of the stack of drawn objects
-   * @param {FabricObject} object Object to send to back
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * Populates canvas with data from the specified JSON.
+   * JSON format must conform to the one of {@link fabric.Canvas#toJSON}
+   *
+   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
+   *
+   * @param {String|Object} json JSON string or object
+   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
+   * @param {Object} [options] options
+   * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @return {Promise<Canvas | StaticCanvas>} instance
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
+   * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
+   * @example <caption>loadFromJSON</caption>
+   * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
+   * @example <caption>loadFromJSON with reviver</caption>
+   * canvas.loadFromJSON(json, function(o, object) {
+   *   // `o` = json object
+   *   // `object` = fabric.Object instance
+   *   // ... do some stuff ...
+   * }).then((canvas) => {
+   *   ... canvas is restored, add your code.
+   * });
+   *
    */
-  sendToBack(object: FabricObject) {
-    const activeSelection = this._activeObject;
-    // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
-    if (object === activeSelection && isActiveSelection(object)) {
-      const objs = activeSelection._objects;
-      for (let i = objs.length; i--; ) {
-        const obj = objs[i];
-        removeFromArray(this._objects, obj);
-        this._objects.unshift(obj);
-      }
-    } else {
-      removeFromArray(this._objects, object);
-      this._objects.unshift(object);
+  loadFromJSON(
+    json: string | Record<string, any>,
+    reviver?: EnlivenObjectOptions['reviver'],
+    { signal }: TCanvasHydrationOption = {}
+  ): Promise<this> {
+    if (!json) {
+      return Promise.reject(new Error('fabric.js: `json` is undefined'));
     }
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
+
+    // parse json if it wasn't already
+    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
+    const {
+      objects = [],
+      backgroundImage,
+      background,
+      overlayImage,
+      overlay,
+      clipPath,
+    } = serialized;
+    const renderOnAddRemove = this.renderOnAddRemove;
+    this.renderOnAddRemove = false;
+
+    return Promise.all([
+      enlivenObjects(objects, {
+        reviver,
+        signal,
+      }),
+      enlivenObjectEnlivables(
+        {
+          backgroundImage,
+          backgroundColor: background,
+          overlayImage,
+          overlayColor: overlay,
+          clipPath,
+        },
+        { signal }
+      ),
+    ]).then(([enlived, enlivedMap]) => {
+      this.clear();
+      this.add(...enlived);
+      this.set(serialized);
+      this.set(enlivedMap);
+      this.renderOnAddRemove = renderOnAddRemove;
+      return this;
+    });
   }
 
   /**
-   * Moves an object or the objects of a multiple selection
-   * to the top of the stack of drawn objects
-   * @param {FabricObject} object Object to send
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * Clones canvas instance
+   * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
+   * @returns {Promise<Canvas | StaticCanvas>}
    */
-  bringToFront(object: FabricObject) {
-    const activeSelection = this._activeObject;
-    // @TODO: this part should be in canvas. StaticCanvas can't handle active selections
-    if (object === activeSelection && isActiveSelection(object)) {
-      const objs = activeSelection._objects;
-      for (let i = 0; i < objs.length; i++) {
-        const obj = objs[i];
-        removeFromArray(this._objects, obj);
-        this._objects.push(obj);
-      }
-    } else {
-      removeFromArray(this._objects, object);
-      this._objects.push(object);
-    }
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
+  clone(properties: string[]): Promise<this> {
+    const data = this.toObject(properties);
+    const canvas = this.cloneWithoutData();
+    // @ts-ignore
+    return canvas.loadFromJSON(data);
   }
 
   /**
-   * Moves an object or a selection down in stack of drawn objects
-   * An optional parameter, intersecting allows to move the object in behind
-   * the first intersecting object. Where intersection is calculated with
-   * bounding box. If no intersection is found, there will not be change in the
-   * stack.
-   * @param {FabricObject} object Object to send
-   * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
    */
-  sendBackwards(object: FabricObject, intersecting: boolean) {
-    const activeSelection = this._activeObject;
-    if (object === activeSelection && isActiveSelection(object)) {
-      let objsMoved = 0;
-      const objs = activeSelection._objects;
-      for (let i = 0; i < objs.length; i++) {
-        const obj = objs[i];
-        const idx = this._objects.indexOf(obj);
-        if (idx > 0 + objsMoved) {
-          removeFromArray(this._objects, obj);
-          this._objects.splice(idx - 1, 0, obj);
-        }
-        objsMoved++;
-      }
-    } else {
-      const idx: number = this._objects.indexOf(object);
-      if (idx !== 0) {
-        // if object is not on the bottom of stack
-        const newIdx = this._findNewLowerIndex(object, idx, intersecting);
-        removeFromArray(this._objects, object);
-        this._objects.splice(newIdx, 0, object);
-      }
-    }
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
+  cloneWithoutData(): StaticCanvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new StaticCanvas(el);
   }
 
   /**
-   * @private
+   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+   * @param {Object} [options] Options object
+   * @param {String} [options.format=png] The format of the output image. Either "jpeg" or "png"
+   * @param {Number} [options.quality=1] Quality level (0..1). Only used for jpeg.
+   * @param {Number} [options.multiplier=1] Multiplier to scale by, to have consistent
+   * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
+   * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
+   * @param {Number} [options.width] Cropping width. Introduced in v1.2.14
+   * @param {Number} [options.height] Cropping height. Introduced in v1.2.14
+   * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 2.0.0
+   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
+   * @see {@link https://jsfiddle.net/xsjua1rd/ demo}
+   * @example <caption>Generate jpeg dataURL with lower quality</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'jpeg',
+   *   quality: 0.8
+   * });
+   * @example <caption>Generate cropped png dataURL (clipping of canvas)</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   left: 100,
+   *   top: 100,
+   *   width: 200,
+   *   height: 200
+   * });
+   * @example <caption>Generate double scaled png dataURL</caption>
+   * var dataURL = canvas.toDataURL({
+   *   format: 'png',
+   *   multiplier: 2
+   * });
+   * @example <caption>Generate dataURL with objects that overlap a specified object</caption>
+   * var myObject;
+   * var dataURL = canvas.toDataURL({
+   *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
+   * });
    */
-  _findNewLowerIndex(
-    object: FabricObject,
-    idx: number,
-    intersecting: boolean
-  ): number {
-    if (intersecting) {
-      // traverse down the stack looking for the nearest intersecting object
-      for (let i = idx - 1; i >= 0; --i) {
-        const isIntersecting =
-          object.intersectsWithObject(this._objects[i]) ||
-          object.isContainedWithinObject(this._objects[i]) ||
-          this._objects[i].isContainedWithinObject(object);
-        if (isIntersecting) {
-          return i;
-        }
-      }
-    }
-    return idx - 1;
+  toDataURL(options = {} as TDataUrlOptions): string {
+    const {
+      format = ImageFormat.png,
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false,
+    } = options;
+    const finalMultiplier =
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+
+    return toDataURL(
+      this.toCanvasElement(finalMultiplier, options),
+      format,
+      quality
+    );
   }
 
   /**
-   * Moves an object or a selection up in stack of drawn objects
-   * An optional parameter, intersecting allows to move the object in front
-   * of the first intersecting object. Where intersection is calculated with
-   * bounding box. If no intersection is found, there will not be change in the
-   * stack.
-   * @param {FabricObject} object Object to send
-   * @param {Boolean} [intersecting] If `true`, send object in front of next upper intersecting object
-   * @return {fabric.Canvas} thisArg
-   * @chainable
+   * Create a new HTMLCanvas element painted with the current canvas content.
+   * No need to resize the actual one or repaint it.
+   * Will transfer object ownership to a new canvas, paint it, and set everything back.
+   * This is an intermediary step used to get to a dataUrl but also it is useful to
+   * create quick image copies of a canvas without passing for the dataUrl string
+   * @param {Number} [multiplier] a zoom factor.
+   * @param {Object} [options] Cropping informations
+   * @param {Number} [options.left] Cropping left offset.
+   * @param {Number} [options.top] Cropping top offset.
+   * @param {Number} [options.width] Cropping width.
+   * @param {Number} [options.height] Cropping height.
+   * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
    */
-  bringForward(object: FabricObject, intersecting: boolean) {
-    const activeSelection = this._activeObject;
-    let objsMoved = 0;
-
-    if (object === activeSelection && isActiveSelection(object)) {
-      const objs = activeSelection._objects;
-      for (let i = objs.length; i--; ) {
-        const obj = objs[i];
-        const idx = this._objects.indexOf(obj);
-        if (idx < this._objects.length - 1 - objsMoved) {
-          removeFromArray(this._objects, obj);
-          this._objects.splice(idx + 1, 0, obj);
-        }
-        objsMoved++;
-      }
-    } else {
-      const idx = this._objects.indexOf(object);
-      if (idx !== this._objects.length - 1) {
-        // if object is not on top of stack (last item in an array)
-        const newIdx = this._findNewUpperIndex(object, idx, intersecting);
-        removeFromArray(this._objects, object);
-        this._objects.splice(newIdx, 0, object);
-      }
-    }
-    this.renderOnAddRemove && this.requestRenderAll();
-    return this;
-  }
-
-  /**
-   * @private
-   */
-  _findNewUpperIndex(object: FabricObject, idx: number, intersecting: boolean) {
-    let newIdx;
-
-    if (intersecting) {
-      newIdx = idx;
-      const len = this._objects.length;
-      // traverse up the stack looking for the nearest intersecting object
-      for (let i = idx + 1; i < len; ++i) {
-        const isIntersecting =
-          object.intersectsWithObject(this._objects[i]) ||
-          object.isContainedWithinObject(this._objects[i]) ||
-          this._objects[i].isContainedWithinObject(object);
-
-        if (isIntersecting) {
-          newIdx = i;
-          break;
-        }
-      }
-    } else {
-      newIdx = idx + 1;
-    }
-
-    return newIdx;
-  }
-
-  /**
-   * Moves an object to specified level in stack of drawn objects
-   * @param {FabricObject} object Object to send
-   * @param {Number} index Position to move to
-   * @return {fabric.Canvas} thisArg
-   * @chainable
-   */
-  moveTo(object: FabricObject, index: number) {
-    removeFromArray(this._objects, object);
-    this._objects.splice(index, 0, object);
-    return this.renderOnAddRemove && this.requestRenderAll();
+  toCanvasElement(
+    multiplier = 1,
+    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+  ): HTMLCanvasElement {
+    const scaledWidth = (width || this.width) * multiplier,
+      scaledHeight = (height || this.height) * multiplier,
+      zoom = this.getZoom(),
+      originalWidth = this.width,
+      originalHeight = this.height,
+      newZoom = zoom * multiplier,
+      vp = this.viewportTransform,
+      translateX = (vp[4] - (left || 0)) * multiplier,
+      translateY = (vp[5] - (top || 0)) * multiplier,
+      // @ts-ignore
+      originalInteractive = this.interactive,
+      newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
+      originalRetina = this.enableRetinaScaling,
+      canvasEl = createCanvasElement(),
+      // @ts-ignore
+      originalContextTop = this.contextTop,
+      objectsToRender = filter ? this._objects.filter(filter) : this._objects;
+    canvasEl.width = scaledWidth;
+    canvasEl.height = scaledHeight;
+    // @ts-ignore
+    this.contextTop = null;
+    this.enableRetinaScaling = false;
+    // @ts-ignore
+    this.interactive = false;
+    this.viewportTransform = newVp;
+    this.width = scaledWidth;
+    this.height = scaledHeight;
+    this.calcViewportBoundaries();
+    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
+    this.viewportTransform = vp;
+    this.width = originalWidth;
+    this.height = originalHeight;
+    this.calcViewportBoundaries();
+    // @ts-ignore
+    this.interactive = originalInteractive;
+    this.enableRetinaScaling = originalRetina;
+    // @ts-ignore
+    this.contextTop = originalContextTop;
+    return canvasEl;
   }
 
   /**
@@ -1736,7 +1727,6 @@ export class StaticCanvas extends createCollectionMixin(
       this.overlayImage.dispose();
     }
     this.overlayImage = null;
-    this._iTextInstances = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl;
@@ -1745,14 +1735,11 @@ export class StaticCanvas extends createCollectionMixin(
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
-    // needs to be moved into Canvas class
-    if (this.interactive) {
-      canvasElement.style.cssText = this._originalCanvasStyle || '';
-      delete this._originalCanvasStyle;
-    }
     // restore canvas size to original size in case retina scaling was applied
     canvasElement.setAttribute('width', `${this.width}`);
     canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
     cleanUpJsdomNode(canvasElement);
   }
 
@@ -1767,39 +1754,41 @@ export class StaticCanvas extends createCollectionMixin(
   }
 }
 
-Object.assign(
-  StaticCanvas.prototype,
-  {
-    backgroundColor: '',
-    backgroundImage: null,
-    overlayColor: '',
-    overlayImage: null,
-    includeDefaultValues: true,
-    stateful: false,
-    renderOnAddRemove: true,
-    controlsAboveOverlay: false,
-    allowTouchScrolling: false,
-    imageSmoothingEnabled: true,
-    viewportTransform: iMatrix.concat(),
-    backgroundVpt: true,
-    overlayVpt: true,
-    enableRetinaScaling: true,
-    svgViewportTransformation: true,
-    skipOffscreen: true,
-    clipPath: undefined,
-  },
-  fabric.DataURLExporter
-);
+Object.assign(StaticCanvas.prototype, {
+  backgroundColor: '',
+  backgroundImage: null,
+  overlayColor: '',
+  overlayImage: null,
+  includeDefaultValues: true,
+  stateful: false,
+  renderOnAddRemove: true,
+  controlsAboveOverlay: false,
+  allowTouchScrolling: false,
+  imageSmoothingEnabled: true,
+  viewportTransform: iMatrix.concat(),
+  backgroundVpt: true,
+  overlayVpt: true,
+  enableRetinaScaling: true,
+  svgViewportTransformation: true,
+  skipOffscreen: true,
+  clipPath: undefined,
+});
 
 if (fabric.isLikelyNode) {
-  StaticCanvas.prototype.createPNGStream = function () {
-    const impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createPNGStream();
-  };
-  StaticCanvas.prototype.createJPEGStream = function (opts: any) {
-    const impl = getNodeCanvas(this.lowerCanvasEl);
-    return impl && impl.createJPEGStream(opts);
-  };
+  Object.assign(StaticCanvas.prototype, {
+    createPNGStream() {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createPNGStream();
+    },
+    createJPEGStream(opts: any) {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createJPEGStream(opts);
+    },
+  });
 }
 
 fabric.StaticCanvas = StaticCanvas;
