@@ -394,4 +394,4 @@ export class Gradient<
   /* _FROM_SVG_END_ */
 }
 
-classRegistry.setClass('gradient', Gradient);
+classRegistry.setClass(Gradient, 'gradient');
