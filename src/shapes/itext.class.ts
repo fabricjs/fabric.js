@@ -273,7 +273,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   render(ctx: CanvasRenderingContext2D) {
-    this.isEditing && this.clearContextTop();
+    // this.isEditing && this.clearContextTop();
     super.render(ctx);
     // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
     // the correct position but not at every cursor animation.
