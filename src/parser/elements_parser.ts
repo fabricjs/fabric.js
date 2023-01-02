@@ -1,5 +1,4 @@
 //@ts-nocheck
-import { getEnv } from '../env';
 import { Gradient } from '../gradient/gradient.class';
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
@@ -9,6 +8,7 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
+import { storage } from '../constants';
 
 const ElementsParser = function (
   elements,
@@ -77,7 +77,7 @@ const ElementsParser = function (
     };
   };
 
-  proto.extractPropertyDefinition = function (obj, property, storage) {
+  proto.extractPropertyDefinition = function (obj, property, storageType) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -87,7 +87,7 @@ const ElementsParser = function (
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
     // @todo fix this
-    return fabric[storage][this.svgUid][id];
+    return storage[storageType][this.svgUid][id];
   };
 
   proto.resolveGradient = function (obj, el, property) {
