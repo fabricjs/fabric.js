@@ -31,7 +31,7 @@ import {
   cleanUpJsdomNode,
   makeElementUnselectable,
 } from '../util/dom_misc';
-import { wrapElement } from '../util/internals/wrapElement';
+import { wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
 import type { Textbox } from '../shapes/textbox.class';
