@@ -347,6 +347,7 @@ import { getEnv, getDocument, getWindow, setEnvForTests } from './src/env';
 import { createCollectionMixin } from './src/mixins/collection.mixin';
 import { parseAttributes } from './src/parser/parseAttributes';
 import { parseElements } from './src/parser/parseElements';
+import { getFilterBackend } from './src/filters/FilterBackend';
 
 import './src/controls/default_controls';
 import './src/mixins/text.svg_export.ts';
@@ -398,6 +399,7 @@ const fabric = {
   controlsUtils,
   util,
   filters,
+  getFilterBackend,
   getEnv,
   getDocument,
   getWindow,

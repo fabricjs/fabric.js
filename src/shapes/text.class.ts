@@ -27,6 +27,7 @@ import {
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
+import { TextSVGExportMixin } from '../mixins/text.svg_export';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1949,5 +1950,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 
 Object.assign(Text.prototype, textDefaultValues);
 
+applyMixins(Text, [TextSVGExportMixin]);
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);

@@ -289,6 +289,3 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 }
-
-// TODO: handle differently?
-applyMixins(Text, [TextSVGExportMixin]);
