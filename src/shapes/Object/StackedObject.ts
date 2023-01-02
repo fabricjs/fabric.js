@@ -48,7 +48,7 @@ export class StackedObject<
     while (parent) {
       if (target === parent) {
         return true;
-      //@TODO ideally find a different way to identify a canvas without importing it
+        //@TODO ideally find a different way to identify a canvas without importing it
       } else if (parent instanceof StaticCanvas) {
         //  happens after all parents were traversed through without a match
         return false;

@@ -33,8 +33,5 @@ export default {
       : null,
   ],
   // see list of plugins (not comprehensive): https://github.com/rollup/awesome
-  plugins: [
-    json(),
-    ts({ }),
-  ],
+  plugins: [json(), ts({})],
 };

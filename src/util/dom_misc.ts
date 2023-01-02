@@ -74,7 +74,10 @@ export function getElementOffset(element) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = getEnv().document.defaultView.getComputedStyle(element, null);
+  const elemStyle = getEnv().document.defaultView.getComputedStyle(
+    element,
+    null
+  );
   for (const attr in offsetAttributes) {
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }

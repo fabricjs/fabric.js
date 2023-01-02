@@ -32,4 +32,3 @@ export function getFilterBackend(strict = true): FilterBackend {
   }
   return filterBackend;
 }
-

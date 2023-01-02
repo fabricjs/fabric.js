@@ -9,7 +9,7 @@ type TFabricEnv = {
   isLikelyNode: boolean;
   nodeCanvas: Canvas;
   jsdomImplForWrapper: any;
-}
+};
 
 let fabricDocument: Document;
 let fabricWindow: Window;
@@ -45,17 +45,19 @@ function setupEnv() {
       }
     ).window;
     fabricDocument = virtualWindow.document;
-    jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
+    jsdomImplForWrapper =
+      require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
     nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
     isLikelyNode = true;
     fabricWindow = virtualWindow;
     global.DOMParser = (fabricWindow as any).DOMParser;
   }
-  isTouchSupported = 'ontouchstart' in fabricWindow ||
-  'ontouchstart' in fabricDocument ||
-  (fabricWindow &&
-    fabricWindow.navigator &&
-    fabricWindow.navigator.maxTouchPoints > 0);
+  isTouchSupported =
+    'ontouchstart' in fabricWindow ||
+    'ontouchstart' in fabricDocument ||
+    (fabricWindow &&
+      fabricWindow.navigator &&
+      fabricWindow.navigator.maxTouchPoints > 0);
   config.configure({
     devicePixelRatio: fabricWindow.devicePixelRatio || 1,
   });
@@ -71,12 +73,12 @@ export const getEnv = (): TFabricEnv => {
     isLikelyNode,
     nodeCanvas,
     jsdomImplForWrapper,
-  }
-}
+  };
+};
 
 export const getDocument = (): Document => fabricDocument;
 export const getWindow = (): Window => fabricWindow;
 export const setEnvForTests = (window: Window) => {
   fabricDocument = window.document;
   fabricWindow = window;
-}
+};

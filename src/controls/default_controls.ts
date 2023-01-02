@@ -1,22 +1,14 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Textbox } from '../shapes/textbox.class';
-import {
-  scaleCursorStyleHandler,
-  scalingEqually,
-} from './scale';
-import {
-  changeWidth,
-} from './changeWidth';
-import {
-  rotationStyleHandler,
-  rotationWithSnapping,
-} from './rotate';
+import { scaleCursorStyleHandler, scalingEqually } from './scale';
+import { changeWidth } from './changeWidth';
+import { rotationStyleHandler, rotationWithSnapping } from './rotate';
 import {
   scaleOrSkewActionName,
   scaleSkewCursorStyleHandler,
   scalingXOrSkewingY,
   scalingYOrSkewingX,
-} from './scaleSkew'
+} from './scaleSkew';
 import { Control } from './control.class';
 
 // use this function if you want to generate new controls for every instance

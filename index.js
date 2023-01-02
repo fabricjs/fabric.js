@@ -8,7 +8,15 @@ import { ColorMatrix } from './src/filters/colormatrix_filter.class';
 import { Composed } from './src/filters/composed_filter.class';
 import { Contrast } from './src/filters/contrast_filter.class';
 import { Convolute } from './src/filters/convolute_filter.class';
-import { Sepia, Brownie, Vintage, Kodachrome, Technicolor, Polaroid, BlackWhite } from './src/filters/filter_generator';
+import {
+  Sepia,
+  Brownie,
+  Vintage,
+  Kodachrome,
+  Technicolor,
+  Polaroid,
+  BlackWhite,
+} from './src/filters/filter_generator';
 import { Gamma } from './src/filters/gamma_filter.class';
 import { Grayscale } from './src/filters/grayscale_filter.class';
 import { HueRotation } from './src/filters/hue_rotation.class';
@@ -60,7 +68,10 @@ import {
   getUnitVector,
   getBisector,
 } from './src/util/misc/vectors';
-import { degreesToRadians, radiansToDegrees } from './src/util/misc/radiansDegreesConversion';
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from './src/util/misc/radiansDegreesConversion';
 import { rotatePoint } from './src/util/misc/rotatePoint';
 import { projectStrokeOnPoints } from './src/util/misc/projectStroke';
 import {
@@ -72,7 +83,11 @@ import {
   calcRotateMatrix,
   multiplyTransformMatrices,
 } from './src/util/misc/matrix';
-import { stylesFromArray, stylesToArray, hasStyleChanged } from './src/util/misc/textStyles';
+import {
+  stylesFromArray,
+  stylesToArray,
+  hasStyleChanged,
+} from './src/util/misc/textStyles';
 import { clone, extend } from './src/util/lang_object';
 import {
   createCanvasElement,
@@ -124,10 +139,7 @@ import {
   getRegularPolygonPath,
 } from './src/util/path';
 import { setStyle } from './src/util/dom_style';
-import {
-  isTouchEvent,
-  getPointer,
-} from './src/util/dom_event';
+import { isTouchEvent, getPointer } from './src/util/dom_event';
 import {
   // getScrollLeftTop,
   getElementOffset,
@@ -247,9 +259,15 @@ const util = {
 // CONTROLS UTILS
 
 import { changeWidth } from './src/controls/changeWidth';
-import { renderCircleControl, renderSquareControl } from './src/controls/controls.render';
+import {
+  renderCircleControl,
+  renderSquareControl,
+} from './src/controls/controls.render';
 import { dragHandler } from './src/controls/drag';
-import { rotationStyleHandler, rotationWithSnapping } from './src/controls/rotate';
+import {
+  rotationStyleHandler,
+  rotationWithSnapping,
+} from './src/controls/rotate';
 import {
   scaleCursorStyleHandler,
   scalingEqually,
@@ -262,11 +280,14 @@ import {
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './src/controls/scaleSkew';
-import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './src/controls/skew';
+import {
+  skewCursorStyleHandler,
+  skewHandlerX,
+  skewHandlerY,
+} from './src/controls/skew';
 import { getLocalPoint } from './src/controls/util';
 import { wrapWithFireEvent } from './src/controls/wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './src/controls/wrapWithFixedAnchor';
-
 
 /**
  * @todo remove as unused
@@ -311,7 +332,7 @@ import { Observable } from './src/mixins/observable.mixin';
 import { Point } from './src/point.class';
 import { Intersection } from './src/intersection.class';
 import { Color } from './src/color/color.class';
-import { Control } from './src/controls/control.class'
+import { Control } from './src/controls/control.class';
 import { Gradient } from './src/gradient/gradient.class';
 import { Pattern } from './src/pattern.class';
 import { Shadow } from './src/shadow.class';
@@ -404,7 +425,7 @@ const fabric = {
   parseFontDeclaration,
   parseTransformAttribute,
   getCSSRules,
-}
+};
 
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;

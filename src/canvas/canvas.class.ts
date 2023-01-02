@@ -27,10 +27,7 @@ import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
-import {
-  cleanUpJsdomNode,
-  makeElementUnselectable,
-} from '../util/dom_misc';
+import { cleanUpJsdomNode, makeElementUnselectable } from '../util/dom_misc';
 import { wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';

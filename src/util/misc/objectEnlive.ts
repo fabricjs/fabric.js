@@ -157,10 +157,13 @@ export const enlivenObjectEnlivables = <
       }
       // pattern
       if (value.source) {
-        return classRegistry.getClass('pattern').fromObject(value, { signal }).then((pattern: Pattern) => {
-          instances.push(pattern);
-          return pattern;
-        });
+        return classRegistry
+          .getClass('pattern')
+          .fromObject(value, { signal })
+          .then((pattern: Pattern) => {
+            instances.push(pattern);
+            return pattern;
+          });
       }
       return value;
     });

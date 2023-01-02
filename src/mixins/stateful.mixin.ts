@@ -1,6 +1,6 @@
 // @ts-nocheck
-import type { FabricObject } from "../shapes/Object/Object";
-import { extend } from "../util/lang_object";
+import type { FabricObject } from '../shapes/Object/Object';
+import { extend } from '../util/lang_object';
 
 const originalSet = 'stateProperties';
 
@@ -60,7 +60,8 @@ export class statefulMixin {
   hasStateChanged(propertySet: string = originalSet): boolean {
     const dashedPropertySet = `_${propertySet}`;
     if (
-      Object.keys(this[dashedPropertySet] || {}).length < this[propertySet].length
+      Object.keys(this[dashedPropertySet] || {}).length <
+      this[propertySet].length
     ) {
       return true;
     }
@@ -69,7 +70,7 @@ export class statefulMixin {
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
     const savedProps = props.reduce((o, key) => {
-        o[key] = this[key];
+      o[key] = this[key];
       return o;
     }, {});
     extend(this[destination], savedProps, true);
@@ -82,7 +83,10 @@ export class statefulMixin {
    * @param {string} [options.propertySet] name for the property set to save
    * @return {fabric.Object} thisArg
    */
-  saveState(this: FabricObject, { propertySet = originalSet }: TSaveStateOptions = {}): FabricObject {
+  saveState(
+    this: FabricObject,
+    { propertySet = originalSet }: TSaveStateOptions = {}
+  ): FabricObject {
     const destination = `_${propertySet}`;
     if (!this[destination]) {
       this[destination] = {};
