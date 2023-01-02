@@ -157,7 +157,7 @@ import {
 import { classRegistry } from './src/util/class_registry';
 import { removeFromArray } from './src/util/internals/removeFromArray';
 import { getRandomInt } from './src/util/internals/getRandomInt';
-import { wrapElement } from './src/util/internals/wrapElement';
+import { wrapElement } from './src/util/dom_misc';
 import { request } from './src/util/dom_request';
 
 const util = {

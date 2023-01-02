@@ -3,6 +3,21 @@
 import { getEnv } from '../env';
 
 /**
+ * Wraps element with another element
+ * @param {HTMLElement} element Element to wrap
+ * @param {HTMLElement|String} wrapper Element to wrap with
+ * @param {Object} [attributes] Attributes to set on a wrapper
+ * @return {HTMLElement} wrapper
+ */
+export function wrapElement(element, wrapper) {
+  if (element.parentNode) {
+    element.parentNode.replaceChild(wrapper, element);
+  }
+  wrapper.appendChild(element);
+  return wrapper;
+}
+
+/**
  * Returns element scroll offsets
  * @param {HTMLElement} element Element to operate on
  * @return {Object} Object with left/top values
