@@ -687,7 +687,7 @@
   QUnit.test('getCssRule', function(assert) {
 
     assert.ok(fabric.getCSSRules);
-    const rules = {};
+    var rules = {};
     var doc = fabric.getDocument(),
         svgUid = 'uniqueId',
         styleElement = doc.createElement('style');
@@ -728,14 +728,13 @@
     elPolygon.setAttributeNS(namespace, 'class', 'cls');
     elPolygon.setAttributeNS(namespace, 'svgUid', svgUid);
 
-    var style = fabric.parseAttributes(elPolygon, []);
-    assert.deepEqual(style, expectedStyle);
+    var style = fabric.parseAttributes(elPolygon, ['fill', 'stroke']);
+    assert.deepEqual(style, {}, 'those are not attributes of the polygon');
 
     styleElement.textContent = '\t\n';
-    var expectedStyle2 = { };
     svgUid = 'uniqueId2';
-    rules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(rules[svgUid], expectedStyle2);
+    const reparse = fabric.getCSSRules(doc);
+    assert.deepEqual(reparse, {});
   });
 
   QUnit.test('getCssRule with same selectors', function(assert) {
