@@ -28,6 +28,7 @@ import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
 import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
 import { TextSVGExportMixin } from '../mixins/text.svg_export';
+import { applyMixins } from '../util/applyMixins';
 
 let measuringContext: CanvasRenderingContext2D | null;
 

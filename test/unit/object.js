@@ -1102,6 +1102,7 @@
     object.statefullCache = true;
     object.propA = 'A';
     object.saveState({ propertySet: 'cacheProperties' });
+    console.log(object._cacheProperties);
     assert.equal(object.isCacheDirty(), false, 'object is not dirty');
     object.propA = 'B';
     assert.equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');

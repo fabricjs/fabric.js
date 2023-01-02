@@ -69,7 +69,10 @@ export class statefulMixin {
   }
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
-    const savedProps = pick(this, props)
+    const savedProps = props.reduce((o, key) => {
+        o[key] = this[key];
+      return o;
+    }, {});
     extend(this[destination], savedProps, true);
   }
 
