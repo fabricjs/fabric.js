@@ -422,4 +422,6 @@ if (typeof exports !== 'undefined') {
   define([], function () {
     return fabric;
   });
+} else if (typeof window !== 'undefined') {
+  window.fabric = fabric;
 }
