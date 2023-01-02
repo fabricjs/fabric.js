@@ -1763,7 +1763,7 @@ Object.assign(StaticCanvas.prototype, {
   controlsAboveOverlay: false,
   allowTouchScrolling: false,
   imageSmoothingEnabled: true,
-  viewportTransform: iMatrix,
+  viewportTransform: iMatrix.concat(),
   backgroundVpt: true,
   overlayVpt: true,
   enableRetinaScaling: true,
