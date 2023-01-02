@@ -159,6 +159,7 @@ import { removeFromArray } from './src/util/internals/removeFromArray';
 import { getRandomInt } from './src/util/internals/getRandomInt';
 import { wrapElement } from './src/util/dom_misc';
 import { request } from './src/util/dom_request';
+import { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
 const util = {
   rotatePoint,
@@ -351,6 +352,7 @@ import { getFilterBackend } from './src/filters/FilterBackend';
 import { parseStyleAttribute } from './src/parser/parseStyleAttribute';
 import { parsePointsAttribute } from './src/parser/parsePointsAttribute';
 import { parseTransformAttribute } from './src/parser/parseTransformAttribute';
+import { getCSSRules } from './src/parser/getCSSRules';
 
 import './src/controls/default_controls';
 
@@ -408,6 +410,9 @@ const fabric = {
   setEnvForTests,
   parseStyleAttribute,
   parsePointsAttribute,
+  parseFontDeclaration,
+  parseTransformAttribute,
+  getCSSRules,
 }
 
 if (typeof exports !== 'undefined') {
