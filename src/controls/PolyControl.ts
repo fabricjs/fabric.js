@@ -2,7 +2,7 @@ import { Point } from '../point.class';
 import { Control } from './control.class';
 import { TMat2D } from '../typedefs';
 import { Polyline } from '../shapes/polyline.class';
-import { multiplyTransformMatrices, transformPoint } from '../util/misc/matrix';
+import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
 import { normalizePoint } from './util';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
@@ -35,8 +35,7 @@ export class PolyControl extends Control {
   positionHandler(dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[this.pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[this.pointIndex].y - polyObject.pathOffset.y;
-    return transformPoint(
-      { x: x, y: y },
+    return new Point(x, y).transform(
       multiplyTransformMatrices(
         polyObject.canvas?.viewportTransform ?? ([1, 0, 0, 1, 0, 0] as TMat2D),
         polyObject.calcTransformMatrix()
@@ -94,13 +93,10 @@ export class PolyControl extends Control {
       y: number
     ) {
       const poly = transform.target as Polyline,
-        absolutePoint = transformPoint(
-          new Point(
+        absolutePoint = new Point(
             poly.points[anchorIndex].x - poly.pathOffset.x,
             poly.points[anchorIndex].y - poly.pathOffset.y
-          ),
-          poly.calcTransformMatrix()
-        ),
+          ).transform(poly.calcTransformMatrix()),
         actionPerformed = fn(eventData, transform, x, y),
         polygonBaseSize = poly._getNonTransformedDimensions(),
         shear = new Point(
