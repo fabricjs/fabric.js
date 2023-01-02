@@ -348,9 +348,11 @@ import { createCollectionMixin } from './src/mixins/collection.mixin';
 import { parseAttributes } from './src/parser/parseAttributes';
 import { parseElements } from './src/parser/parseElements';
 import { getFilterBackend } from './src/filters/FilterBackend';
+import { parseStyleAttribute } from './src/parser/parseStyleAttribute';
+import { parsePointsAttribute } from './src/parser/parsePointsAttribute';
+import { parseTransformAttribute } from './src/parser/parseTransformAttribute';
 
 import './src/controls/default_controls';
-import './src/mixins/text.svg_export.ts';
 
 const fabric = {
   parseElements,
@@ -404,6 +406,8 @@ const fabric = {
   getDocument,
   getWindow,
   setEnvForTests,
+  parseStyleAttribute,
+  parsePointsAttribute,
 }
 
 if (typeof exports !== 'undefined') {

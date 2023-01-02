@@ -1,7 +1,6 @@
 // @ts-nocheck
 import type { FabricObject } from "../shapes/Object/Object";
 import { extend } from "../util/lang_object";
-import { pick } from "../util/misc/pick";
 
 const originalSet = 'stateProperties';
 
