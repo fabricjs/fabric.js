@@ -1,6 +1,7 @@
 import { Point } from '../point.class';
 import { Control } from './control.class';
 import { TMat2D } from '../typedefs';
+import { iMatrix } from '../constants';
 import { Polyline } from '../shapes/polyline.class';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
@@ -37,7 +38,7 @@ export class PolyControl extends Control {
       y = polyObject.points[this.pointIndex].y - polyObject.pathOffset.y;
     return new Point(x, y).transform(
       multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? ([1, 0, 0, 1, 0, 0] as TMat2D),
+        polyObject.canvas?.viewportTransform ?? iMatrix,
         polyObject.calcTransformMatrix()
       )
     );
