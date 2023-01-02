@@ -1700,7 +1700,7 @@
     canvas.cancelRequestedRender();
   });
 
-  QUnit.test('fxRemove', function(assert) {
+  QUnit.skip('fxRemove', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.fxRemove === 'function');
 

@@ -687,7 +687,7 @@
   QUnit.test('getCssRule', function(assert) {
 
     assert.ok(fabric.getCSSRules);
-
+    const rules = {};
     var doc = fabric.getDocument(),
         svgUid = 'uniqueId',
         styleElement = doc.createElement('style');
@@ -714,8 +714,8 @@
       }
     };
 
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
+    rules[svgUid] = fabric.getCSSRules(doc);
+    assert.deepEqual(rules[svgUid], expectedObject);
 
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon'),
@@ -732,16 +732,16 @@
     assert.deepEqual(style, expectedStyle);
 
     styleElement.textContent = '\t\n';
-    expectedStyle = { };
-    svgUid =  'uniqueId2';
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedStyle);
+    var expectedStyle2 = { };
+    svgUid = 'uniqueId2';
+    rules[svgUid] = fabric.getCSSRules(doc);
+    assert.deepEqual(rules[svgUid], expectedStyle2);
   });
 
   QUnit.test('getCssRule with same selectors', function(assert) {
 
     assert.ok(fabric.getCSSRules);
-
+    const rules = {};
     var doc = fabric.getDocument(),
         svgUid = 'uniqueId',
         styleElement = doc.createElement('style');
@@ -764,8 +764,8 @@
       }
     };
 
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
+    rules[svgUid] = fabric.getCSSRules(doc);
+    assert.deepEqual(rules[svgUid], expectedObject);
   });
 
   QUnit.test('parseSVGFromString with nested clippath', function(assert) {

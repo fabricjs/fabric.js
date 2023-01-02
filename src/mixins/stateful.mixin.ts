@@ -60,7 +60,7 @@ export class statefulMixin {
   hasStateChanged(propertySet: string = originalSet): boolean {
     const dashedPropertySet = `_${propertySet}`;
     if (
-      Object.keys(this[dashedPropertySet]).length < this[propertySet].length
+      Object.keys(this[dashedPropertySet] || {}).length < this[propertySet].length
     ) {
       return true;
     }

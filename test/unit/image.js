@@ -392,7 +392,7 @@
 
   QUnit.test('setElement resets the webgl cache', function (assert) {
     const backend = fabric.getFilterBackend();
-    if (backend instanceof fabric.WebglFilterBackend) {
+    if (backend instanceof fabric.WebGLFilterBackend) {
       const done = assert.async();
       createImageObject((image) => {
         backend.textureCache[image.cacheKey] = backend.createTexture(backend.gl, 50, 50);
