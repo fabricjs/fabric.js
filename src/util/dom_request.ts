@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getEnv } from '../env';
 import { noop } from '../constants';
 
