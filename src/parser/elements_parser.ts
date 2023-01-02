@@ -8,7 +8,7 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
-import { storage } from '../constants';
+import { storage } from './constants';
 
 const ElementsParser = function (
   elements,
