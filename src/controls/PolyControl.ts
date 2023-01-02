@@ -31,8 +31,10 @@ export class PolyControl extends Control {
     return unskewedPoint;
   }
 
-  // This function locate the controls.
-  // It'll be used both for drawing and for interaction
+  /**
+   * This function locates the controls.
+   * It'll be used both for drawing and for interaction.
+   */
   positionHandler(dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[this.pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[this.pointIndex].y - polyObject.pathOffset.y;
@@ -44,11 +46,13 @@ export class PolyControl extends Control {
     );
   }
 
-  // This function define what the control does.
-  // It'll be called on every mouse move after a control has been clicked and is being dragged.
-  // The function receive as argument the mouse event, the current trasnform object
-  // and the current position in canvas coordinate
-  // transform.target is a reference to the current object being transformed,
+  /**
+   * This function defines what the control does.
+   * It'll be called on every mouse move after a control has been clicked and is being dragged.
+   * The function receives as argument the mouse event, the current trasnform object
+   * and the current position in canvas coordinate `transform.target` is a reference to the 
+   * current object being transformed.
+   */
   static polyActionHandler(
     eventData: TPointerEvent,
     transform: Transform,
@@ -85,7 +89,9 @@ export class PolyControl extends Control {
     return true;
   }
 
-  // Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`
+  /** 
+   * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
+   */
   static anchorWrapper(anchorIndex: number, fn: TransformActionHandler) {
     return function (
       eventData: TPointerEvent,
