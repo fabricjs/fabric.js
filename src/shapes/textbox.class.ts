@@ -53,8 +53,10 @@ export class Textbox extends IText {
     if (!this.initialized) {
       return;
     }
-    this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
+    if (this.isEditing) {
+      this.initDelayedCursor();
+      this.clearContextTop();
+    }
     this._clearCache();
     // clear dynamicMinWidth as it will be different after we re-wrap line
     this.dynamicMinWidth = 0;

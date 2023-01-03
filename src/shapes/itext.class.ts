@@ -221,8 +221,10 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @private
    */
   initDimensions() {
-    this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
+    if (this.isEditing) {
+      this.initDelayedCursor();
+      this.clearContextTop();
+    }
     super.initDimensions();
   }
 
