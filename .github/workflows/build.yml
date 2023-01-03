@@ -39,7 +39,7 @@ jobs:
               size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
             });
       - name: checkout src files
-        run: git checkout origin/master -- src index.js HEADER.js
+        run: git checkout origin/master -- src index.js
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist
