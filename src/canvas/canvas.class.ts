@@ -516,10 +516,7 @@ export class SelectableCanvas<
     this._createUpperCanvas();
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
+  protected _initRetinaScaling() {
     super._initRetinaScaling();
     this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }

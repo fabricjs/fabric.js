@@ -290,7 +290,7 @@ export class StaticCanvas<
     this.initElements(el);
     this._initOptions(options);
     this.calcOffset();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -360,13 +360,7 @@ export class StaticCanvas<
     return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
-    if (!this._isRetinaScaling()) {
-      return;
-    }
+  protected _initRetinaScaling() {
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
