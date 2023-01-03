@@ -282,14 +282,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 
   /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   */
-  _render(ctx: CanvasRenderingContext2D) {
-    super._render(ctx);
-  }
-
-  /**
    * Renders cursor or selection (depending on what exists)
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
