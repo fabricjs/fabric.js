@@ -182,7 +182,7 @@ export class Image extends FabricObject {
    * Delete a single texture if in webgl mode
    */
   removeTexture(key: string) {
-    const backend = fabric.filterBackend;
+    const backend = getFilterBackend(false);
     if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }

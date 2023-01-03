@@ -681,7 +681,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         (context.type === 'initialization' || context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        const clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());
