@@ -289,7 +289,10 @@ export class StaticCanvas<
     this.requestRenderAll = this.requestRenderAll.bind(this);
     this.set(options);
     this.initElements(el);
-    this.initSize();
+    this.setDimensions({
+      width: this.width || this.lowerCanvasEl.width || 0,
+      height: this.height || this.lowerCanvasEl.height || 0,
+    });
     this.viewportTransform = [...this.viewportTransform];
     this.calcOffset();
     this._isRetinaScaling() && this._initRetinaScaling();
@@ -299,19 +302,6 @@ export class StaticCanvas<
   protected initElements(el: string | HTMLCanvasElement) {
     this._createLowerCanvas(el);
     this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-  }
-
-  protected initSize() {
-    const canvasEl = this.lowerCanvasEl;
-    this.width = this.width || canvasEl.width || 0;
-    this.height = this.height || canvasEl.height || 0;
-    if (!canvasEl.style) {
-      return;
-    }
-    canvasEl.width = this.width;
-    canvasEl.height = this.height;
-    canvasEl.style.width = `${this.width}px`;
-    canvasEl.style.height = `${this.height}px`;
   }
 
   add(...objects: FabricObject[]) {

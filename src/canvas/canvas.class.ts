@@ -498,34 +498,12 @@ export class SelectableCanvas<
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[];
 
-  /**
-   * Constructor
-   * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
-   * @param {Object} [options] Options object
-   * @return {Object} thisArg
-   */
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super(el, options);
-    this._createCacheCanvas();
-  }
-
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
     this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
-  }
-
-  protected initSize(): void {
-    super.initSize();
-    const upperCanvas = this.upperCanvasEl;
-    if (!upperCanvas.style) {
-      return;
-    }
-    upperCanvas.width = this.width;
-    upperCanvas.height = this.height;
-    upperCanvas.style.width = `${this.width}px`;
-    upperCanvas.style.height = `${this.height}px`;
+    this._createCacheCanvas();
   }
 
   protected _initRetinaScaling() {
@@ -1266,8 +1244,6 @@ export class SelectableCanvas<
    */
   _createCacheCanvas() {
     this.cacheCanvasEl = this._createCanvasElement();
-    this.cacheCanvasEl.setAttribute('width', `${this.width}`);
-    this.cacheCanvasEl.setAttribute('height', `${this.height}`);
     this.contextCache = this.cacheCanvasEl.getContext(
       '2d'
     ) as CanvasRenderingContext2D;
