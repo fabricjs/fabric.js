@@ -93,7 +93,7 @@ export function findCornerQuadrant(
 /**
  * @returns the normalized point (rotated relative to center) in local coordinates
  */
-export function normalizePoint(
+function normalizePoint(
   target: FabricObject,
   point: Point,
   originX: TOriginX,

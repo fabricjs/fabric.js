@@ -5,7 +5,7 @@ import { iMatrix } from '../constants';
 import { Polyline } from '../shapes/polyline.class';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
-import { normalizePoint } from './util';
+import { getLocalPoint } from './util';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { TransformActionHandler } from '../EventTypeDefs';
 
@@ -65,12 +65,7 @@ export class PolyControl extends Control {
   ) {
     const poly = transform.target as Polyline,
       currentControl = poly.controls[poly.__corner] as PolyControl,
-      mouseLocalPosition = normalizePoint(
-        poly,
-        new Point(x, y),
-        'center',
-        'center'
-      ),
+      mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
       polygonBaseSize = PolyControl.getSize(poly),
       size = poly._getTransformedDimensions({}),
       shear = new Point(
