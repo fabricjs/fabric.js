@@ -128,24 +128,27 @@ export class PolyControl extends Control {
   }
 
   static createPolyControls(
-    controlPoints: Array<Point>,
+    numOfControls: number,
     options?: Partial<Control>
   ) {
-    const lastControl = controlPoints.length - 1,
-      controls = controlPoints.reduce((acc, point, index) => {
-        acc['p' + index] = new PolyControl(
+    const lastControl = numOfControls - 1,
+      controls = {} as Record<string, PolyControl>; 
+    for (let idx = 0; idx < numOfControls; idx++) {
+        controls['p' + idx] = new PolyControl(
           {
             actionName: 'modifyPolygon',
             actionHandler: PolyControl.anchorWrapper(
-              index > 0 ? index - 1 : lastControl,
+              idx > 0 ? idx - 1 : lastControl,
               PolyControl.polyActionHandler
             ),
             ...options,
           },
-          index
+          idx 
         );
-        return acc;
-      }, {} as Record<string, PolyControl>);
+    };
     return controls;
   }
 }
+  
+
+  
