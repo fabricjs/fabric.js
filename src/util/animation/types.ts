@@ -5,8 +5,9 @@ export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 /**
  * Callback called every frame
  * @param {number | number[]} value current value of the animation.
- * @param {number} valueProgress ∈ [0, 1], current value / end value.
- * @param {number} durationProgress ∈ [0, 1], time passed / duration.
+ * @param {number} valueProgress ∈ [0, 1], the current animation progress reflected on value, normalized.
+ * 0 is the starting value and 1 is the ending value.
+ * @param {number} durationProgress ∈ [0, 1], the current animation duration normalized to 1.
  */
 export type TOnAnimationChangeCallback<T, R = void> = (
   value: T,
