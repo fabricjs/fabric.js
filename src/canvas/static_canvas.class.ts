@@ -287,8 +287,10 @@ export class StaticCanvas<
     super();
     this.renderAndReset = this.renderAndReset.bind(this);
     this.requestRenderAll = this.requestRenderAll.bind(this);
+    this.set(options);
     this.initElements(el);
-    this._initOptions(options);
+    this.initSize();
+    this.viewportTransform = [...this.viewportTransform];
     this.calcOffset();
     this._isRetinaScaling() && this._initRetinaScaling();
     this.calcViewportBoundaries();
@@ -297,6 +299,19 @@ export class StaticCanvas<
   protected initElements(el: string | HTMLCanvasElement) {
     this._createLowerCanvas(el);
     this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+  }
+
+  protected initSize() {
+    const canvasEl = this.lowerCanvasEl;
+    this.width = this.width || canvasEl.width || 0;
+    this.height = this.height || canvasEl.height || 0;
+    if (!canvasEl.style) {
+      return;
+    }
+    canvasEl.width = this.width;
+    canvasEl.height = this.height;
+    canvasEl.style.width = `${this.width}px`;
+    canvasEl.style.height = `${this.height}px`;
   }
 
   add(...objects: FabricObject[]) {
@@ -394,28 +409,6 @@ export class StaticCanvas<
       throw new Error(CANVAS_INIT_ERROR);
     }
     return element;
-  }
-
-  /**
-   * @private
-   * @param {Object} [options] Options object
-   */
-  _initOptions(options = {}) {
-    const lowerCanvasEl = this.lowerCanvasEl;
-    this.set(options);
-
-    this.width = this.width || lowerCanvasEl.width || 0;
-    this.height = this.height || lowerCanvasEl.height || 0;
-    this.viewportTransform = [...this.viewportTransform];
-
-    if (!this.lowerCanvasEl.style) {
-      return;
-    }
-    lowerCanvasEl.width = this.width;
-    lowerCanvasEl.height = this.height;
-
-    lowerCanvasEl.style.width = this.width + 'px';
-    lowerCanvasEl.style.height = this.height + 'px';
   }
 
   /**

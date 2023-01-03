@@ -516,6 +516,18 @@ export class SelectableCanvas<
     this._createUpperCanvas();
   }
 
+  protected initSize(): void {
+    super.initSize();
+    const upperCanvas = this.upperCanvasEl;
+    if (!upperCanvas.style) {
+      return;
+    }
+    upperCanvas.width = this.width;
+    upperCanvas.height = this.height;
+    upperCanvas.style.width = `${this.width}px`;
+    upperCanvas.style.height = `${this.height}px`;
+  }
+
   protected _initRetinaScaling() {
     super._initRetinaScaling();
     this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
