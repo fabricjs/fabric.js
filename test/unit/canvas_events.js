@@ -447,7 +447,7 @@
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
     assert.deepEqual(rect.calcTransformMatrix(), [1, 0, 0, 1, 9.5, 9.5], 'transform matrix');
-    assert.deepEqual(rect.getXY(), new fabric.Point(8, 8), 'position is maintained');
+    assert.deepEqual(rect.getXY(), new fabric.Point(8, 8), 'position changed by 8 pixels');
   });
 
   QUnit.test('A transform will call mouseup and mousedown on the control', function(assert) {
