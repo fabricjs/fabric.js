@@ -505,7 +505,7 @@ export class StaticCanvas<
       }
     });
 
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
 
     if (!cssOnly) {
