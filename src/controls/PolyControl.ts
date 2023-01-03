@@ -11,6 +11,7 @@ import { TransformActionHandler } from '../EventTypeDefs';
 
 export class PolyControl extends Control {
   pointIndex: number;
+  actionName = 'modifyPolygon';
 
   constructor(options: Partial<Control>, pointIndex: number) {
     super(options);
@@ -53,7 +54,7 @@ export class PolyControl extends Control {
   /**
    * This function defines what the control does.
    * It'll be called on every mouse move after a control has been clicked and is being dragged.
-   * The function receives as argument the mouse event, the current trasnform object
+   * The function receives as argument the mouse event, the current transform object
    * and the current position in canvas coordinate `transform.target` is a reference to the
    * current object being transformed.
    */
@@ -67,7 +68,7 @@ export class PolyControl extends Control {
       currentControl = poly.controls[poly.__corner] as PolyControl,
       mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
       polygonBaseSize = PolyControl.getSize(poly),
-      size = poly._getTransformedDimensions({}),
+      size = poly._getTransformedDimensions(),
       sizeFactor = polygonBaseSize.divide(size),
       shear = new Point(
         Math.tan(degreesToRadians(poly.skewX)),
@@ -136,9 +137,8 @@ export class PolyControl extends Control {
     const lastControl = numOfControls - 1,
       controls = {} as Record<string, PolyControl>;
     for (let idx = 0; idx < numOfControls; idx++) {
-      controls['p' + idx] = new PolyControl(
+      controls[`p${idx}`] = new PolyControl(
         {
-          actionName: 'modifyPolygon',
           actionHandler: PolyControl.anchorWrapper(
             idx > 0 ? idx - 1 : lastControl,
             PolyControl.polyActionHandler
