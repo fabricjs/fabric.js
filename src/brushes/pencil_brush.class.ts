@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
@@ -299,5 +298,3 @@ export class PencilBrush extends BaseBrush {
     this.canvas.fire('path:created', { path: path });
   }
 }
-
-fabric.PencilBrush = PencilBrush;

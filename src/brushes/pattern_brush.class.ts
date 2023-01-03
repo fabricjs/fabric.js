@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
@@ -69,5 +68,3 @@ export class PatternBrush extends PencilBrush {
     return path;
   }
 }
-
-fabric.PatternBrush = PatternBrush;

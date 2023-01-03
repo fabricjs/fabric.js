@@ -1,17 +1,14 @@
-// @ts-nocheck
-import { fabric } from '../../HEADER';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { Textbox } from '../shapes/textbox.class';
+import { scaleCursorStyleHandler, scalingEqually } from './scale';
+import { changeWidth } from './changeWidth';
+import { rotationStyleHandler, rotationWithSnapping } from './rotate';
 import {
-  changeWidth,
-  rotationStyleHandler,
-  rotationWithSnapping,
-  scaleCursorStyleHandler,
   scaleOrSkewActionName,
   scaleSkewCursorStyleHandler,
-  scalingEqually,
   scalingXOrSkewingY,
   scalingYOrSkewingX,
-} from './actions';
+} from './scaleSkew';
 import { Control } from './control.class';
 
 // use this function if you want to generate new controls for every instance
@@ -122,14 +119,14 @@ FabricObject.prototype.controls = {
   ...defaultControls,
 };
 
-if (fabric.Textbox) {
+if (Textbox) {
   // this is breaking the prototype inheritance, no time / ideas to fix it.
   // is important to document that if you want to have all objects to have a
   // specific custom control, you have to add it to Object prototype and to Textbox
   // prototype. The controls are shared as references. So changes to control `tr`
   // can still apply to all objects if needed.
-  fabric.Textbox.prototype.controls = {
-    ...(fabric.Textbox.prototype.controls || {}),
+  Textbox.prototype.controls = {
+    ...(Textbox.prototype.controls || {}),
     ...textboxDefaultControls,
   };
 }
