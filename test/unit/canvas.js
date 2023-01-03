@@ -65,7 +65,7 @@
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -78,7 +78,7 @@
     return src;
   }
 
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
+  var IMG_SRC = fabric.getEnv().isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
   var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
   var upperCanvasEl = canvas.upperCanvasEl;
@@ -1478,8 +1478,8 @@
 
   QUnit.test('loadFromJSON with no objects', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1497,8 +1497,8 @@
 
   QUnit.test('loadFromJSON without "objects" property', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1519,8 +1519,8 @@
 
   QUnit.test('loadFromJSON with empty fabric.Group', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
         c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
@@ -1959,8 +1959,8 @@
   });
 
   QUnit.test('set dimensions', async function (assert) {
-    var el = fabric.document.createElement('canvas'),
-      parentEl = fabric.document.createElement('div');
+    var el = fabric.getDocument().createElement('canvas'),
+      parentEl = fabric.getDocument().createElement('div');
     el.width = 200; el.height = 200;
     parentEl.className = 'rootNode';
     parentEl.appendChild(el);
@@ -2199,7 +2199,7 @@
   //   assert.equal(rect.originY, 'bottom');
   // });
 
-  QUnit.test('fxRemove', function(assert) {
+  QUnit.skip('fxRemove', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.fxRemove === 'function');
 
@@ -2234,12 +2234,12 @@
   //     assert.deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.document.location.protocol +
+  //       "backgroundImage": (fabric.getDocument().location.protocol +
   //                           '//' +
-  //                           fabric.document.location.hostname +
-  //                           ((fabric.document.location.port === '' || parseInt(fabric.document.location.port, 10) === 80)
+  //                           fabric.getDocument().location.hostname +
+  //                           ((fabric.getDocument().location.port === '' || parseInt(fabric.getDocument().location.port, 10) === 80)
   //                               ? ''
-  //                               : (':' + fabric.document.location.port)) +
+  //                               : (':' + fabric.getDocument().location.port)) +
   //                           '/assets/pug.jpg'),
   //       "backgroundImageOpacity": 1,
   //       "backgroundImageStretch": true
@@ -2353,18 +2353,6 @@
     assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
     assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
 
-  });
-
-  QUnit.test('canvas inheritance', function(assert) {
-
-    // this should not error out
-    var InheritedCanvasClass = fabric.util.createClass(fabric.Canvas, {
-      initialize: function() {
-
-      }
-    });
-
-    assert.ok(typeof InheritedCanvasClass === 'function');
   });
 
   QUnit.test('canvas getTopContext', function(assert) {

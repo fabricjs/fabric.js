@@ -1,6 +1,6 @@
 (function() {
   var simulateEvent;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     simulateEvent = global.simulateEvent;
   }
   else {
@@ -586,7 +586,7 @@
       // _initEventListeners canvas more than once
       c._initEventListeners(c.lowerCanvasEl);
       c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.document.createEvent('HTMLEvents');
+      var event = fabric.getDocument().createEvent('HTMLEvents');
       event.initEvent(eventName, true, true);
       c.upperCanvasEl.dispatchEvent(event);
       assert.equal(counter, 1, eventName + ' listener executed once');
@@ -602,7 +602,7 @@
         fired.push(eventName);
       });
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('drop', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
@@ -625,7 +625,7 @@
           assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
           canvasRegistry.push(eventName);
         });
-        var event = fabric.document.createEvent('HTMLEvents');
+        var event = fabric.getDocument().createEvent('HTMLEvents');
         event.initEvent(eventName, true, true);
         event.clientX = 5;
         event.clientY = 5;
@@ -669,7 +669,7 @@
         counter++;
         target = opt.target;
       });
-      var event = fabric.document.createEvent('HTMLEvents');
+      var event = fabric.getDocument().createEvent('HTMLEvents');
       event.initEvent(eventType, true, true);
       event.clientX = 5;
       event.clientY = 5;
@@ -686,7 +686,7 @@
     c.on(eventname, function () {
       counter++;
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('mouseenter', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(counter, 1, eventname + ' fabric event fired');
@@ -710,7 +710,7 @@
     c.on(canvasEventName, function (ev) {
       control.push(ev);
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent(eventName, true, true);
 
     //  with targets
@@ -819,7 +819,7 @@
       setSubTargetCheckRecursive(activeSelection);
 
       // perform MouseOver event on a deeply nested subTarget
-      var moveEvent = fabric.document.createEvent('HTMLEvents');
+      var moveEvent = fabric.getDocument().createEvent('HTMLEvents');
       moveEvent.initEvent('mousemove', true, true);
       var target = canvas.item(1);
       canvas.targets = [
@@ -872,7 +872,7 @@
       // _initEventListeners canvas more than once
       c._initEventListeners(c.lowerCanvasEl);
       c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.document.createEvent('MouseEvent');
+      var event = fabric.getDocument().createEvent('MouseEvent');
       event.initEvent(eventName, true, true);
       c.upperCanvasEl.dispatchEvent(event);
       assert.equal(counter, 1, eventName + ' listener executed once');
@@ -892,13 +892,13 @@
     c._initEventListeners(c.lowerCanvasEl);
 
     // a mouse down is necessary to register mouse up.
-    var _event = fabric.document.createEvent('MouseEvent');
+    var _event = fabric.getDocument().createEvent('MouseEvent');
     _event.initEvent('mousedown', true, true);
     c.upperCanvasEl.dispatchEvent(_event);
     setTimeout(function() {
-      var event = fabric.document.createEvent('MouseEvent');
+      var event = fabric.getDocument().createEvent('MouseEvent');
       event.initEvent('mouseup', true, true);
-      fabric.document.dispatchEvent(event);
+      fabric.getDocument().dispatchEvent(event);
       assert.equal(counter, 1, 'listener executed once');
       fabric.Canvas.prototype._onMouseUp = originalMouseUp;
       c.cancelRequestedRender();
@@ -907,7 +907,7 @@
   });
 
   QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     c._hoveredTarget = new fabric.Object();
@@ -916,7 +916,7 @@
   });
 
   QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
@@ -927,7 +927,7 @@
   });
 
   QUnit.test('mouseEnter removes __corner', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object({ top: 100, left: 100 });
@@ -939,7 +939,7 @@
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
@@ -960,9 +960,9 @@
     // _initEventListeners canvas more than once
     c._initEventListeners(c.lowerCanvasEl);
     c._initEventListeners(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('UIEvents');
-    event.initUIEvent('resize', true, false, fabric.window, 0);
-    fabric.window.dispatchEvent(event);
+    var event = fabric.getDocument().createEvent('UIEvents');
+    event.initUIEvent('resize', true, false, fabric.getWindow(), 0);
+    fabric.getWindow().dispatchEvent(event);
     assert.equal(counter, 1, 'listener on window executed once');
     fabric.Canvas.prototype._onResize = originalResize;
   });

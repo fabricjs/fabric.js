@@ -37,7 +37,7 @@
 
   function getPathElement(path) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'path');
+    var el = fabric.getDocument().createElementNS(namespace, 'path');
     el.setAttributeNS(namespace, 'd', path);
     el.setAttributeNS(namespace, 'fill', 'red');
     el.setAttributeNS(namespace, 'stroke', 'blue');
@@ -271,7 +271,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'fill', 'red');
@@ -313,7 +313,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'transform', 'scale(.2)');

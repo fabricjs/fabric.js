@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -197,5 +196,3 @@ Object.assign(Rect.prototype, rectDefaultValues);
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);
-
-fabric.Rect = Rect;
