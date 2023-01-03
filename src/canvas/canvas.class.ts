@@ -1627,17 +1627,6 @@ export class SelectableCanvas<
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
   }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
-  }
 }
 
 Object.assign(SelectableCanvas.prototype, {
