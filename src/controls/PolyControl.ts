@@ -32,7 +32,7 @@ export class PolyControl extends Control {
   }
 
   static getSize(poly: Polyline) {
-    return new Point(poly.width, poly.height)
+    return new Point(poly.width, poly.height);
   }
 
   /**
@@ -54,7 +54,7 @@ export class PolyControl extends Control {
    * This function defines what the control does.
    * It'll be called on every mouse move after a control has been clicked and is being dragged.
    * The function receives as argument the mouse event, the current trasnform object
-   * and the current position in canvas coordinate `transform.target` is a reference to the 
+   * and the current position in canvas coordinate `transform.target` is a reference to the
    * current object being transformed.
    */
   static polyActionHandler(
@@ -68,16 +68,18 @@ export class PolyControl extends Control {
       mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
       polygonBaseSize = PolyControl.getSize(poly),
       size = poly._getTransformedDimensions({}),
+      sizeFactor = polygonBaseSize.divide(size),
       shear = new Point(
         Math.tan(degreesToRadians(poly.skewX)),
         Math.tan(degreesToRadians(poly.skewY))
-      );
+      ),
+      adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
     const skewedPathOffset = PolyControl.applySkew(poly.pathOffset, shear),
       finalPointPosition = PolyControl.removeSkew(
         mouseLocalPosition
-          .multiply(polygonBaseSize)
-          .divide(size)
+          .multiply(adjustFlip)
+          .multiply(sizeFactor)
           .add(skewedPathOffset),
         shear
       );
@@ -88,7 +90,7 @@ export class PolyControl extends Control {
     return true;
   }
 
-  /** 
+  /**
    * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
    */
   static anchorWrapper(anchorIndex: number, fn: TransformActionHandler) {
@@ -100,15 +102,16 @@ export class PolyControl extends Control {
     ) {
       const poly = transform.target as Polyline,
         absolutePoint = new Point(
-            poly.points[anchorIndex].x - poly.pathOffset.x,
-            poly.points[anchorIndex].y - poly.pathOffset.y
-          ).transform(poly.calcTransformMatrix()),
+          poly.points[anchorIndex].x - poly.pathOffset.x,
+          poly.points[anchorIndex].y - poly.pathOffset.y
+        ).transform(poly.calcTransformMatrix()),
         actionPerformed = fn(eventData, transform, x, y),
         polygonBaseSize = PolyControl.getSize(poly),
         shear = new Point(
           Math.tan(degreesToRadians(poly.skewX)),
           Math.tan(degreesToRadians(poly.skewY))
-        );
+        ),
+        adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
       const newPosition = PolyControl.applySkew(
         new Point(
@@ -116,7 +119,9 @@ export class PolyControl extends Control {
           poly.points[anchorIndex].y
         ).subtract(poly.pathOffset),
         shear
-      ).divide(polygonBaseSize);
+      )
+        .divide(polygonBaseSize)
+        .multiply(adjustFlip);
 
       poly.setPositionByOrigin(
         absolutePoint,
@@ -127,28 +132,22 @@ export class PolyControl extends Control {
     };
   }
 
-  static createPolyControls(
-    numOfControls: number,
-    options?: Partial<Control>
-  ) {
+  static createPolyControls(numOfControls: number, options?: Partial<Control>) {
     const lastControl = numOfControls - 1,
-      controls = {} as Record<string, PolyControl>; 
+      controls = {} as Record<string, PolyControl>;
     for (let idx = 0; idx < numOfControls; idx++) {
-        controls['p' + idx] = new PolyControl(
-          {
-            actionName: 'modifyPolygon',
-            actionHandler: PolyControl.anchorWrapper(
-              idx > 0 ? idx - 1 : lastControl,
-              PolyControl.polyActionHandler
-            ),
-            ...options,
-          },
-          idx 
-        );
-    };
+      controls['p' + idx] = new PolyControl(
+        {
+          actionName: 'modifyPolygon',
+          actionHandler: PolyControl.anchorWrapper(
+            idx > 0 ? idx - 1 : lastControl,
+            PolyControl.polyActionHandler
+          ),
+          ...options,
+        },
+        idx
+      );
+    }
     return controls;
   }
 }
-  
-
-  

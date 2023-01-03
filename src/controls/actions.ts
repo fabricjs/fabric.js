@@ -19,7 +19,7 @@ import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 import { getLocalPoint, getActionFromCorner } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { PolyControl } from './PolyControl'
+import { PolyControl } from './PolyControl';
 
 export {
   scaleCursorStyleHandler,
