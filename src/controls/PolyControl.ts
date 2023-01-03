@@ -141,11 +141,23 @@ export class PolyControl extends Control {
   }
 
   static createPolyControls(
+    poly: Polyline,
+    options?: Partial<Control>
+  ): Record<string, PolyControl>;
+  static createPolyControls(
     numOfControls: number,
+    options?: Partial<Control>
+  ): Record<string, PolyControl>;
+  static createPolyControls(
+    arg0: number | Polyline,
     options: Partial<Control> = {}
   ) {
     const controls = {} as Record<string, PolyControl>;
-    for (let idx = 0; idx < numOfControls; idx++) {
+    for (
+      let idx = 0;
+      idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length);
+      idx++
+    ) {
       controls[`p${idx}`] = new PolyControl(options, idx);
     }
     return controls;
