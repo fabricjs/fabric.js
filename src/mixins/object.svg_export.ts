@@ -1,32 +1,7 @@
 // @ts-nocheck
-import { Color } from '../color';
-import { config } from '../config';
+import { TSVGReviver } from '../typedefs';
 import { uid } from '../util/internals/uid';
-import { matrixToSVG } from '../util/misc/svgParsing';
-import { toFixed } from '../util/misc/toFixed';
-
-export type TSVGReviver = (markup: string) => string;
-
-/* _TO_SVG_START_ */
-
-function getSvgColorString(prop: string, value?: any) {
-  if (!value) {
-    return `${prop}: none; `;
-  } else if (value.toLive) {
-    return `${prop}: url(#SVGID_${value.id}); `;
-  } else {
-    const color = new Color(value),
-      opacity = color.getAlpha();
-
-    let str = `${prop}: ${color.toRgb()}; `;
-
-    if (opacity !== 1) {
-      //change the color in rgb + opacity
-      str += `${prop}-opacity: ${opacity.toString()}; `;
-    }
-    return str;
-  }
-}
+import { colorPropToSVG, matrixToSVG } from '../util/misc/svgParsing';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -54,8 +29,8 @@ export class FabricObjectSVGExportMixin {
       opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
       visibility = this.visible ? '' : ' visibility: hidden;',
       filter = skipShadow ? '' : this.getSvgFilter(),
-      fill = getSvgColorString('fill', this.fill),
-      stroke = getSvgColorString('stroke', this.stroke);
+      fill = colorPropToSVG('fill', this.fill),
+      stroke = colorPropToSVG('stroke', this.stroke);
 
     return [
       stroke,
@@ -115,8 +90,8 @@ export class FabricObjectSVGExportMixin {
       fontWeight = style.fontWeight
         ? `font-weight: ${style.fontWeight}${term}`
         : '',
-      fill = style.fill ? getSvgColorString('fill', style.fill) : '',
-      stroke = style.stroke ? getSvgColorString('stroke', style.stroke) : '',
+      fill = style.fill ? colorPropToSVG('fill', style.fill) : '',
+      stroke = style.stroke ? colorPropToSVG('stroke', style.stroke) : '',
       textDecoration = this.getSvgTextDecoration(style),
       deltaY = style.deltaY ? `baseline-shift: ${-style.deltaY}; ` : '';
 
@@ -175,25 +150,6 @@ export class FabricObjectSVGExportMixin {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
       svgTransform = `transform="${matrixToSVG(transform)}`;
     return `${svgTransform}${additionalTransform}" `;
-  }
-
-  _setSVGBg(textBgRects: string[]) {
-    if (this.backgroundColor) {
-      const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
-      textBgRects.push(
-        '\t\t<rect ',
-        this._getFillAttributes(this.backgroundColor),
-        ' x="',
-        toFixed(-this.width / 2, NUM_FRACTION_DIGITS),
-        '" y="',
-        toFixed(-this.height / 2, NUM_FRACTION_DIGITS),
-        '" width="',
-        toFixed(this.width, NUM_FRACTION_DIGITS),
-        '" height="',
-        toFixed(this.height, NUM_FRACTION_DIGITS),
-        '"></rect>\n'
-      );
-    }
   }
 
   /**
@@ -319,5 +275,3 @@ export class FabricObjectSVGExportMixin {
       : '';
   }
 }
-
-/* _TO_SVG_END_ */

@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TPointerEvent } from '../typedefs';
@@ -56,7 +56,7 @@ export abstract class ITextKeyBehaviorMixin<
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = fabric.document.createElement('textarea');
+    this.hiddenTextarea = getEnv().document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -71,7 +71,7 @@ export abstract class ITextKeyBehaviorMixin<
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      fabric.document.body.appendChild(this.hiddenTextarea);
+      getEnv().document.body.appendChild(this.hiddenTextarea);
     }
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
