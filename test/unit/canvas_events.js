@@ -404,7 +404,7 @@
     assert.equal(rect.scaleY, 3, 'rect scaled Y');
   });
 
-  QUnit.test.only('scaling a nested target', function(assert) {
+  QUnit.test('scaling a nested target', function(assert) {
     var e = { clientX: 3, clientY: 3, which: 1 };
     var e1 = { clientX: 6, clientY: 6, which: 1 };
     var e2 = { clientX: 9, clientY: 9, which: 1 };
@@ -433,7 +433,7 @@
     assert.deepEqual(rect.getXY(), new fabric.Point(), 'position is maintained');
   });
 
-  QUnit.test.only('dragging a nested target', function (assert) {
+  QUnit.test('dragging a nested target', function (assert) {
     var e = { clientX: 1, clientY: 1, which: 1 };
     var e1 = { clientX: 6, clientY: 6, which: 1 };
     var e2 = { clientX: 9, clientY: 9, which: 1 };
