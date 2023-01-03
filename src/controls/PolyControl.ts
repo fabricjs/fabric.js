@@ -31,6 +31,10 @@ export class PolyControl extends Control {
     return unskewedPoint;
   }
 
+  static getSize(poly: Polyline) {
+    return new Point(poly.width, poly.height)
+  }
+
   /**
    * This function locates the controls.
    * It'll be used both for drawing and for interaction.
@@ -67,7 +71,7 @@ export class PolyControl extends Control {
         'center',
         'center'
       ),
-      polygonBaseSize = new Point(poly.width, poly.height),
+      polygonBaseSize = PolyControl.getSize(poly),
       size = poly._getTransformedDimensions({}),
       shear = new Point(
         Math.tan(degreesToRadians(poly.skewX)),
@@ -105,7 +109,7 @@ export class PolyControl extends Control {
             poly.points[anchorIndex].y - poly.pathOffset.y
           ).transform(poly.calcTransformMatrix()),
         actionPerformed = fn(eventData, transform, x, y),
-        polygonBaseSize = poly._getNonTransformedDimensions(),
+        polygonBaseSize = PolyControl.getSize(poly),
         shear = new Point(
           Math.tan(degreesToRadians(poly.skewX)),
           Math.tan(degreesToRadians(poly.skewY))
