@@ -150,10 +150,7 @@ import {
 } from './src/util/dom_misc';
 import { isTransparent } from './src/util/misc/isTransparent';
 import { mergeClipPaths } from './src/util/misc/mergeClipPaths';
-import {
-  animate,
-  animateColor,
-} from './src/util/animation/animate';
+import { animate, animateColor } from './src/util/animation/animate';
 import * as ease from './src/util/animation/easing';
 import {
   requestAnimFrame,

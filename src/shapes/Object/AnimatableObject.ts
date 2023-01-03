@@ -57,14 +57,8 @@ export abstract class AnimatableObject<
   ) {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
-    const {
-      easing,
-      duration,
-      abort,
-      startValue,
-      onChange,
-      onComplete,
-    } = options;
+    const { easing, duration, abort, startValue, onChange, onComplete } =
+      options;
     const animationOptions = {
       target: this,
       // path.reduce... is the current value in case start value isn't provided

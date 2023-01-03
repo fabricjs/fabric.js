@@ -10,10 +10,7 @@ import {
 const isArrayAnimation = (
   options: ArrayAnimationOptions | ValueAnimationOptions
 ): options is ArrayAnimationOptions => {
-  return (
-    Array.isArray(options.startValue) ||
-    Array.isArray(options.endValue)
-  );
+  return Array.isArray(options.startValue) || Array.isArray(options.endValue);
 };
 
 /**

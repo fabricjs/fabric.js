@@ -96,25 +96,26 @@ export type TAnimationCallbacks<T> = {
   abort: TAbortCallback<T>;
 };
 
-export type TAnimationValues<T> =
-  | {
-      /**
-       * Starting value(s)
-       * @default 0
-       */
-      startValue: T;
-      /**
-       * Ending value(s)
-       * @default 100
-       */
-      endValue: T;
-    };
+export type TAnimationValues<T> = {
+  /**
+   * Starting value(s)
+   * @default 0
+   */
+  startValue: T;
+  /**
+   * Ending value(s)
+   * @default 100
+   */
+  endValue: T;
+};
 
-export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> =
-  TAnimationBaseOptions<TEasing> &
-    Omit<TAnimationValues<T>, 'endValue'> &
-    Partial<TAnimationCallbacks<TCallback>>
-;
+export type TBaseAnimationOptions<
+  T,
+  TCallback = T,
+  TEasing = T
+> = TAnimationBaseOptions<TEasing> &
+  Omit<TAnimationValues<T>, 'endValue'> &
+  Partial<TAnimationCallbacks<TCallback>>;
 
 export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
   Omit<TAnimationBaseOptions<TEasing>, 'byValue'> &

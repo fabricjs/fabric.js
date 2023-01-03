@@ -76,7 +76,7 @@ export abstract class AnimationBase<
     this.target = target;
 
     this.startValue = startValue;
-    this.byValue = byValue
+    this.byValue = byValue;
     this.value = this.startValue;
     this.endValue = this.calculate(this.duration).value;
   }
