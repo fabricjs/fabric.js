@@ -1,6 +1,6 @@
 (function() {
   var getFixture;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
@@ -32,7 +32,7 @@
   });
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
   }
   else {
@@ -105,7 +105,7 @@
     code: renderStrokeWithNegativeScale,
     golden: 'strokeNegativeScale.png',
     percentage: 0.011,
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     width: 100,
     height: 100,
   });

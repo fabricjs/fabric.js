@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { scalingEqually } from '../controls/actions';
+import { scalingEqually } from '../controls/scale';
 import { fireEvent } from '../util/fireEvent';
 
 (function (global) {

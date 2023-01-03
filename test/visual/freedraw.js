@@ -2032,7 +2032,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2291,7 +2291,7 @@ QUnit.module('Free Drawing', hooks => {
           await test.build(canvas);
           callback(canvas.upperCanvasEl);
         },
-        disabled: fabric.isLikelyNode
+        disabled: fabric.getEnv().isLikelyNode
       }));
     }
     options.main && visualTester(Object.assign({}, test, {
@@ -2302,7 +2302,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: fabric.getEnv().isLikelyNode
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
@@ -2313,7 +2313,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: fabric.getEnv().isLikelyNode
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,
