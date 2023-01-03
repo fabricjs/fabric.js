@@ -1,5 +1,5 @@
 (function() {
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
+  var IMG_SRC = fabric.getEnv().isLikelyNode ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function setSrc(img, src, callback) {
     img.onload = callback;
@@ -8,7 +8,7 @@
 
   QUnit.module('fabric.Pattern');
 
-  var img = fabric.document.createElement('img');
+  var img = fabric.getDocument().createElement('img');
   setSrc(img, IMG_SRC);
 
   function createPattern() {

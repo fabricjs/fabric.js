@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
@@ -25,8 +25,10 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
+import { TextSVGExportMixin } from '../mixins/text.svg_export';
+import { applyMixins } from '../util/applyMixins';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -380,7 +382,7 @@ export class Text<
     this.initDimensions();
     this.setCoords();
     // @ts-ignore
-    this.setupState({ propertySet: '_dimensionAffectingProps' });
+    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**
@@ -1609,10 +1611,8 @@ export class Text<
         ? style.fontFamily
         : `"${style.fontFamily}"`;
     return [
-      // node-canvas needs "weight style", while browsers need "style weight"
-      // verify if this can be fixed in JSDOM
-      fabric.isLikelyNode ? style.fontWeight : style.fontStyle,
-      fabric.isLikelyNode ? style.fontStyle : style.fontWeight,
+      style.fontStyle,
+      style.fontWeight,
       forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
       fontFamily,
     ].join(' ');
@@ -1951,7 +1951,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 
 Object.assign(Text.prototype, textDefaultValues);
 
+applyMixins(Text, [TextSVGExportMixin]);
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);
-
-fabric.Text = Text;

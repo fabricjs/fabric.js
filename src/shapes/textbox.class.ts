@@ -1,6 +1,4 @@
 // @ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { IText } from './itext.class';
 import { textDefaultValues } from './text.class';
@@ -475,5 +473,3 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 Object.assign(Textbox.prototype, textboxDefaultValues);
 
 classRegistry.setClass(Textbox);
-
-fabric.Textbox = Textbox;

@@ -1,5 +1,3 @@
-import { fabric } from '../../HEADER';
-
 export type TEventCallback<T = any> = (options: T) => any;
 
 type EventRegistryObject<
@@ -175,5 +173,3 @@ export class Observable<EventSpec> {
     }
   }
 }
-
-fabric.Observable = Observable;

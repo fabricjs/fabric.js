@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { Canvas2dFilterBackend } from './2d_backend.class';
 import { WebGLFilterBackend } from './webgl_backend.class';
@@ -8,6 +7,9 @@ export type FilterBackend = WebGLFilterBackend | Canvas2dFilterBackend;
 
 let filterBackend: FilterBackend;
 
+/**
+ * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
+ */
 export function initFilterBackend(): FilterBackend {
   webGLProbe.queryWebGL();
   if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
@@ -18,7 +20,7 @@ export function initFilterBackend(): FilterBackend {
 }
 
 /**
- *
+ * Get the current fabricJS filter backend  or initialize one if not avaialble yet
  * @param [strict] pass `true` to create the backend if it wasn't created yet (default behavior),
  * pass `false` to get the backend ref without mutating it
  */
@@ -28,8 +30,3 @@ export function getFilterBackend(strict = true): FilterBackend {
   }
   return filterBackend;
 }
-
-fabric.getFilterBackend = getFilterBackend;
-fabric.Canvas2dFilterBackend = Canvas2dFilterBackend;
-fabric.WebglFilterBackend = WebGLFilterBackend;
-fabric.initFilterBackend = initFilterBackend;

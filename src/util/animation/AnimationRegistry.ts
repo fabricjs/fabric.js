@@ -1,4 +1,3 @@
-import { fabric } from '../../../HEADER';
 import type { Canvas } from '../../canvas/canvas_events';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { AnimationBase } from './AnimationBase';
@@ -57,5 +56,3 @@ class AnimationRegistry extends Array<AnimationBase> {
 }
 
 export const runningAnimations = new AnimationRegistry();
-
-fabric.runningAnimations = runningAnimations;

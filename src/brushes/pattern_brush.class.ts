@@ -1,5 +1,3 @@
-import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
 import { Pattern } from '../pattern.class';
 import { createCanvasElement } from '../util/misc/dom';
 import type { Canvas } from '../canvas/canvas_events';
@@ -70,5 +68,3 @@ export class PatternBrush extends PencilBrush {
     return path;
   }
 }
-
-fabric.PatternBrush = PatternBrush;

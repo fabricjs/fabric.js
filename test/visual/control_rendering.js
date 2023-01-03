@@ -1,5 +1,5 @@
 (function() {
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
@@ -29,7 +29,7 @@
   });
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
   }
   else {

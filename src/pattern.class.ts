@@ -1,6 +1,4 @@
 //@ts-nocheck
-
-import { fabric } from '../HEADER';
 import { config } from './config';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
@@ -210,5 +208,3 @@ export class Pattern {
 }
 
 classRegistry.setClass(Pattern, 'pattern');
-
-fabric.Pattern = Pattern;

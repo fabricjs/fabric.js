@@ -5,7 +5,7 @@
   var visualTestLoop;
   var getFixture;
   var isFirefox = false;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
     getFixture = global.getFixture;
   }
@@ -21,7 +21,7 @@
     getFixture('parrot.png', false, function(img) {
       var zoom = 8;
       var image = new fabric.Image(img);
-      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       canvas.setZoom(zoom);
       image.scaleToWidth(canvas.width / zoom);
       canvas.add(image);
@@ -48,7 +48,7 @@
   function imageResizeTestNoZoom(canvas, callback) {
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img);
-      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       image.scaleToWidth(canvas.width);
       canvas.add(image);
       canvas.renderAll();
@@ -70,7 +70,7 @@
   function imageResizeTestAnamorphic(canvas, callback) {
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img);
-      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       image.scaleY = 0.3;
       image.scaleX = 1;
       canvas.add(image);
@@ -93,7 +93,7 @@
   function imageResizeTestGroup(canvas, callback) {
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img, { strokeWidth: 0 });
-      image.resizeFilter = new fabric.Image.filters.Resize({ resizeType: 'lanczos' });
+      image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       var group = new fabric.Group([image]);
       group.strokeWidth = 0;
       group.scaleToWidth(canvas.width);
@@ -120,7 +120,7 @@
       var backdropImage = new fabric.Image(img);
       backdropImage.left = backdropImage.width;
       backdropImage.scaleX = -1;
-      image.filters.push(new fabric.Image.filters.BlendImage({ image: backdropImage }));
+      image.filters.push(new fabric.filters.BlendImage({ image: backdropImage }));
       image.applyFilters();
       image.scaleToWidth(400);
       canvas.add(image);
@@ -146,7 +146,7 @@
       getFixture('very_large_image.jpg', false, function(backdrop) {
         var image = new fabric.Image(img);
         var backdropImage = new fabric.Image(backdrop);
-        image.filters.push(new fabric.Image.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
+        image.filters.push(new fabric.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
         image.scaleToWidth(400);
         image.applyFilters();
         canvas.add(image);

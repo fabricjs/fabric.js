@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -331,6 +330,3 @@ Object.assign(Polyline.prototype, polylineDefaultValues);
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Polyline = Polyline;

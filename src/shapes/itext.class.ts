@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
@@ -646,5 +645,3 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 Object.assign(IText.prototype, iTextDefaultValues);
 
 classRegistry.setClass(IText);
-
-fabric.IText = IText;

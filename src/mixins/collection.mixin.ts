@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { Constructor } from '../typedefs';
 import { removeFromArray } from '../util/internals';
@@ -309,5 +308,3 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   // https://github.com/microsoft/TypeScript/issues/32080
   return Collection as typeof Collection & TBase;
 }
-
-fabric.createCollectionMixin = createCollectionMixin;

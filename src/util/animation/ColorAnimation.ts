@@ -1,4 +1,4 @@
-import { Color } from '../../color';
+import { Color } from '../../color/color.class';
 import { TRGBAColorSource } from '../../color/color.class';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';

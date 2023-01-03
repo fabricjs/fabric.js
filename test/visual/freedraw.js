@@ -2035,7 +2035,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2438,57 +2438,41 @@ QUnit.module('Free Drawing', hooks => {
           });
           await test.build(canvas);
           callback(canvas.upperCanvasEl);
-        }
-      });
-      main && visualTester({
-        ...options,
-        test: 'main context',
-        golden: `freedrawing/${name}_main_ctx.png`,
-        code: async function (canvas, callback) {
-          canvas.on('interaction:completed', ({ result }) => {
-            onComplete(canvas, result);
-            canvas.cancelRequestedRender();
-          });
-          await test.build(canvas);
-          canvas.renderAll();
-          callback(canvas.lowerCanvasEl);
-        }
-      });
-      mesh && visualTester({
-        ...options,
-        test: 'context mesh',
-        golden: `freedrawing/${name}_result.png`,
-        code: async function (canvas, callback) {
-          canvas.on('interaction:completed', ({ result }) => {
-            onComplete(canvas, result);
-            canvas.cancelRequestedRender();
-          });
-          await test.build(canvas);
-          const top = fabric.util.copyCanvasElement(canvas.upperCanvasEl);
-          canvas.renderAll();
-          canvas.contextContainer.drawImage(top, 0, 0);
-          callback(canvas.lowerCanvasEl);
-        }
-      });
-      result && visualTester({
-        ...options,
-        test: `result ${mesh ? '(should equal mesh)' : ''}`,
-        golden: `freedrawing/${name}_result.png`,
-        code: async function (canvas, callback) {
-          await test.build(canvas);
-          await new Promise(resolve => {
-            canvas.on('interaction:completed', ({ result }) => {
-              onComplete(canvas, result);
-              canvas.cancelRequestedRender();
-              resolve();
-            });
-            fireBrushUp(canvas);
-          });
-          canvas.renderAll();
-          callback(canvas.lowerCanvasEl);
-        }
-      });
-    });
+        },
+        disabled: fabric.getEnv().isLikelyNode
+      }));
+    }
+    options.main && visualTester(Object.assign({}, test, {
+      test: `${test.test} (main context)`,
+      golden: `main_ctx_${test.golden}`,
+      code: async function (canvas, callback) {
+        await test.build(canvas);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      },
+      disabled: fabric.getEnv().isLikelyNode
+    }));
+    options.mesh && visualTester(Object.assign({}, test, {
+      test: `${test.test} (context mesh)`,
+      golden: `mesh_${test.golden}`,
+      code: async function (canvas, callback) {
+        await test.build(canvas);
+        canvas.renderAll();
+        canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
+        callback(canvas.lowerCanvasEl);
+      },
+      disabled: fabric.getEnv().isLikelyNode
+    }));
+    options.result && visualTester(Object.assign({}, test, {
+      test: `${test.test} (result)`,
+      code: async function (canvas, callback) {
+        await test.build(canvas);
+        fireMouseUp(canvas.freeDrawingBrush);
+        canvas.renderAll();
+        callback(canvas.lowerCanvasEl);
+      }
+    }));
+    //options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
   });
 
 });

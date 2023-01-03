@@ -1,6 +1,4 @@
-import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { Point } from '../point.class';
 import { Circle } from '../shapes/circle.class';
 import { Group } from '../shapes/group.class';
@@ -133,5 +131,3 @@ export class CircleBrush extends BaseBrush<FabricObject> {
     this.finalize();
   }
 }
-
-fabric.CircleBrush = CircleBrush;

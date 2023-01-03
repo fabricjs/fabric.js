@@ -3,17 +3,17 @@
     enableGLFiltering: false
   });
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
-    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
+  if (fabric.getEnv().isLikelyNode) {
+    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'normal'
     });
-    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
+    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'normal'
     });
-    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
+    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'italic'
     });
-    fabric.nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
+    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'italic'
     });
     visualTestLoop = global.visualTestLoop;
@@ -209,7 +209,7 @@
     test: 'Text with custom fonts',
     code: text6,
     golden: 'text6.png',
-    disabled: !fabric.isLikelyNode,
+    disabled: !fabric.getEnv().isLikelyNode,
     percentage: 0.06,
   });
 
@@ -466,7 +466,7 @@
     code: text12,
     width: 400,
     height: 150,
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'text12.png',
     percentage: 0.095,
   });
@@ -486,7 +486,7 @@
     code: text13,
     width: 232,
     height: 255,
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'text13.png',
     percentage: 0.092,
   });

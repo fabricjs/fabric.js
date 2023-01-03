@@ -1,7 +1,4 @@
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
-import type { Canvas } from '../canvas.class';
-import { ModifierKey, TEvent, TPointerEvent } from '../EventTypeDefs';
+import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
@@ -286,5 +283,3 @@ export class PencilBrush extends BaseBrush<Path> {
     return super.finalize();
   }
 }
-
-fabric.PencilBrush = PencilBrush;

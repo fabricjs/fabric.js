@@ -79,11 +79,8 @@ var virtualWindow = new jsdom.JSDOM(
     },
     resources: new CustomResourceLoader(),
   }).window;
-fabric.document = virtualWindow.document;
-fabric.jsdomImplForWrapper = require('jsdom/lib/jsdom/living/generated/utils').implForWrapper;
-fabric.nodeCanvas = require('jsdom/lib/jsdom/utils').Canvas;
-fabric.window = virtualWindow;
-DOMParser = fabric.window.DOMParser;
+fabric.setEnvForTests(virtualWindow);
+DOMParser = fabric.getWindow().DOMParser;
 
 
 //  QUnit Logging
@@ -100,13 +97,13 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // JSDOM catches errors and throws them to the window
 
-fabric.window.addEventListener('unhandledrejection', (event) => {
+fabric.getWindow().addEventListener('unhandledrejection', (event) => {
   // prevent logging to console
   event.preventDefault();
   QUnit.onUncaughtException(event.reason);
 });
 
-fabric.window.addEventListener('error', (event) => {
+fabric.getWindow().addEventListener('error', (event) => {
   // prevent logging to console
   event.preventDefault();
   QUnit.onUncaughtException(event.error);

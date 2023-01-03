@@ -1,4 +1,4 @@
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
 import { TWebGLPipelineState, TProgramCache, TTextureCache } from './typedefs';
@@ -92,13 +92,13 @@ export class WebGLFilterBackend {
     targetCanvas.width = width;
     targetCanvas.height = height;
 
-    startTime = fabric.window.performance.now();
+    startTime = getEnv().window.performance.now();
     this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
-    const drawImageTime = fabric.window.performance.now() - startTime;
+    const drawImageTime = getEnv().window.performance.now() - startTime;
 
-    startTime = fabric.window.performance.now();
+    startTime = getEnv().window.performance.now();
     copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
-    const putImageDataTime = fabric.window.performance.now() - startTime;
+    const putImageDataTime = getEnv().window.performance.now() - startTime;
 
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;

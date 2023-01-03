@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -153,5 +152,3 @@ Object.assign(Ellipse.prototype, ellipseDefaultValues);
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);
-
-fabric.Ellipse = Ellipse;

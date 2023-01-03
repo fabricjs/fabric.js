@@ -1,6 +1,5 @@
-import { fabric } from '../../HEADER';
-import type { Canvas } from '../canvas.class';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
+import type { Point } from '../point.class';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
@@ -263,5 +262,3 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
     this.onEnd(shape);
   }
 }
-
-fabric.BaseBrush = BaseBrush;

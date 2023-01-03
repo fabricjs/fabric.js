@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
@@ -211,5 +210,3 @@ Object.assign(Circle.prototype, circleDefaultValues);
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);
-
-fabric.Circle = Circle;

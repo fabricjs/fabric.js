@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './Object/FabricObject';
@@ -44,5 +43,3 @@ Object.assign(Triangle.prototype, triangleDefaultValues);
 
 classRegistry.setClass(Triangle);
 classRegistry.setSVGClass(Triangle);
-
-fabric.Triangle = Triangle;

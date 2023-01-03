@@ -116,7 +116,7 @@
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elEllipse        = fabric.document.createElementNS(namespace, 'ellipse'),
+    var elEllipse        = fabric.getDocument().createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,

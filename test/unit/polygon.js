@@ -139,7 +139,7 @@
     assert.equal(Math.round(round.y), 185, 'round y');
     assert.deepEqual(polygon._getTransformedDimensions(), round, 'dims should match');
   });
-  
+
   QUnit.test('complexity', function(assert) {
     var polygon = new fabric.Polygon(getPoints());
     assert.ok(typeof polygon.complexity === 'function');
@@ -179,7 +179,7 @@
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
 
-    var elPolygonWithoutPoints = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
     fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
       assert.deepEqual(polygon.toObject(), empty_object);
@@ -188,7 +188,7 @@
 
   QUnit.test('fromElement with empty points', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygonWithEmptyPoints = fabric.document.createElementNS(namespace, 'polygon');
+    var elPolygonWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
     empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
@@ -199,7 +199,7 @@
 
   QUnit.test('fromElement with points', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygon = fabric.document.createElementNS(namespace, 'polygon');
+    var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
     fabric.Polygon.fromElement(elPolygon, function(polygon) {
       assert.ok(polygon instanceof fabric.Polygon);
@@ -215,7 +215,7 @@
 
   QUnit.test('fromElement with points and custom attributes', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygonWithAttrs = fabric.document.createElementNS(namespace, 'polygon');
+    var elPolygonWithAttrs = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
     elPolygonWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
     elPolygonWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');

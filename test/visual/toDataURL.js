@@ -1,5 +1,5 @@
 (function() {
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     if (process.env.launcher === 'Firefox') {
       fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
@@ -28,7 +28,7 @@
     enableGLFiltering: false
   });
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
   }
   else {
@@ -450,8 +450,8 @@
     var actualTest = test.code;
     test.code = function(fabricCanvas, callback) {
       actualTest(fabricCanvas, function(dataURL) {
-        var img = fabric.document.createElement('img');
-        var canvas = fabric.document.createElement('canvas');
+        var img = fabric.getDocument().createElement('img');
+        var canvas = fabric.getDocument().createElement('canvas');
         img.onload = function() {
           canvas.width = img.width;
           canvas.height = img.height;

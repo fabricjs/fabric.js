@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
@@ -240,7 +240,7 @@ export class Resize extends BaseFilter {
       dX = oW,
       dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = fabric.document.createElement('canvas');
+      resources.sliceByTwo = getEnv().document.createElement('canvas');
     }
     const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {

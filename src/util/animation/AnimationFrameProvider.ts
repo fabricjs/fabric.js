@@ -1,13 +1,13 @@
-import { fabric } from '../../../HEADER';
+import { getEnv } from '../../env';
 
 const _requestAnimFrame: AnimationFrameProvider['requestAnimationFrame'] =
-  fabric.window.requestAnimationFrame ||
+  getEnv().window.requestAnimationFrame ||
   function (callback: FrameRequestCallback) {
-    return fabric.window.setTimeout(callback, 1000 / 60);
+    return getEnv().window.setTimeout(callback, 1000 / 60);
   };
 
 const _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'] =
-  fabric.window.cancelAnimationFrame || fabric.window.clearTimeout;
+  getEnv().window.cancelAnimationFrame || getEnv().window.clearTimeout;
 
 /**
  * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -15,9 +15,9 @@ const _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'] =
  * @param {Function} callback Callback to invoke
  */
 export function requestAnimFrame(callback: FrameRequestCallback): number {
-  return _requestAnimFrame.call(fabric.window, callback);
+  return _requestAnimFrame.call(getEnv().window, callback);
 }
 
 export function cancelAnimFrame(handle: number): void {
-  return _cancelAnimFrame.call(fabric.window, handle);
+  return _cancelAnimFrame.call(getEnv().window, handle);
 }

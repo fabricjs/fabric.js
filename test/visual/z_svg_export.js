@@ -4,7 +4,7 @@
   });
   var visualTestLoop;
   var getAssetName;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     visualTestLoop = global.visualTestLoop;
     getAssetName = global.getAssetName;
   }
@@ -23,7 +23,7 @@
   function toSVGCanvas(canvas, callback) {
     var svg = canvas.toSVG();
     var dataUrl = svgToDataURL(svg);
-    var image = fabric.document.createElement('img');
+    var image = fabric.getDocument().createElement('img');
     image.onload = function() {
       var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
@@ -32,7 +32,7 @@
       callback(newCanvas);
     };
     image.onerror = console.log;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       image.src = dataUrl;
     }
     else {

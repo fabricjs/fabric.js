@@ -1,4 +1,4 @@
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';

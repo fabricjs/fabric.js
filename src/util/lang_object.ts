@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 
 /**
  * Copies all enumerable properties of one js object to another
@@ -18,7 +18,7 @@ export const extend = (destination, source, deep) => {
   // the deep clone is for internal use, is not meant to avoid
   // javascript traps or cloning html element or self referenced objects.
   if (deep) {
-    if (!fabric.isLikelyNode && source instanceof Element) {
+    if (!getEnv().isLikelyNode && source instanceof Element) {
       // avoid cloning deep images, canvases,
       destination = source;
     } else if (Array.isArray(source)) {
