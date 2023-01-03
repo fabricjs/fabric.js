@@ -9,8 +9,6 @@ let filterBackend: FilterBackend;
 
 /**
  * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
- * @param [strict] pass `true` to create the backend if it wasn't created yet (default behavior),
- * pass `false` to get the backend ref without mutating it
  */
 export function initFilterBackend(): FilterBackend {
   webGLProbe.queryWebGL();
