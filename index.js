@@ -153,10 +153,12 @@ import { mergeClipPaths } from './src/util/misc/mergeClipPaths';
 import {
   animate,
   animateColor,
-  ease,
+} from './src/util/animation/animate';
+import * as ease from './src/util/animation/easing';
+import {
   requestAnimFrame,
   cancelAnimFrame,
-} from './src/util/animation';
+} from './src/util/animation/AnimationFrameProvider';
 import { classRegistry } from './src/util/class_registry';
 import { removeFromArray } from './src/util/internals/removeFromArray';
 import { getRandomInt } from './src/util/internals/getRandomInt';

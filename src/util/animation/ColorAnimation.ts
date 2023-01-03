@@ -30,7 +30,6 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
   constructor({
     startValue,
     endValue,
-    byValue,
     easing = defaultColorEasing,
     onChange,
     onComplete,
@@ -42,13 +41,9 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
     super({
       ...options,
       startValue: startColor,
-      byValue: byValue
-        ? new Color(byValue)
-            .setAlpha(Array.isArray(byValue) && byValue[3] ? byValue[3] : 0)
-            .getSource()
-        : (endColor.map(
+      byValue: endColor.map(
             (value, i) => value - startColor[i]
-          ) as TRGBAColorSource),
+          ) as TRGBAColorSource,
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),

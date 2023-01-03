@@ -5,13 +5,12 @@ export class ArrayAnimation extends AnimationBase<number[]> {
   constructor({
     startValue = [0],
     endValue = [100],
-    byValue = endValue.map((value, i) => value - startValue[i]),
     ...options
   }: ArrayAnimationOptions) {
     super({
       ...options,
       startValue,
-      byValue,
+      byValue: endValue.map((value, i) => value - startValue[i]),
     });
   }
   protected calculate(timeElapsed: number) {

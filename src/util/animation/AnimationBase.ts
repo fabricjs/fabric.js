@@ -5,9 +5,7 @@ import { defaultEasing } from './easing';
 import {
   AnimationState,
   TAbortCallback,
-  TAnimationBaseOptions,
-  TAnimationCallbacks,
-  TAnimationValues,
+  TBaseAnimationOptions,
   TEasingFunction,
   TOnAnimationChangeCallback,
 } from './types';
@@ -54,12 +52,6 @@ export abstract class AnimationBase<
    */
   private startTime!: number;
 
-  /**
-   * Constructor
-   * Since both `byValue` and `endValue` are accepted in subclass options
-   * and are populated with defaults if missing, we defer to `byValue` and
-   * ignore `endValue` to avoid conflict
-   */
   constructor({
     startValue,
     byValue,
@@ -71,8 +63,7 @@ export abstract class AnimationBase<
     onComplete = noop,
     abort = defaultAbort,
     target,
-  }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
-    Required<Omit<TAnimationValues<T>, 'endValue'>>) {
+  }: TBaseAnimationOptions<T>) {
     this.tick = this.tick.bind(this);
 
     this.duration = duration;
@@ -85,7 +76,7 @@ export abstract class AnimationBase<
     this.target = target;
 
     this.startValue = startValue;
-    this.byValue = byValue;
+    this.byValue = byValue
     this.value = this.startValue;
     this.endValue = this.calculate(this.duration).value;
   }

@@ -2,7 +2,7 @@ import { TColorArg } from '../../color/color.class';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { animate, animateColor } from '../../util/animation/animate';
 import type {
-  AnimationOptions,
+  ValueAnimationOptions,
   ColorAnimationOptions,
 } from '../../util/animation/types';
 import { ArrayAnimation } from '../../util/animation/ArrayAnimation';
@@ -11,7 +11,7 @@ import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { StackedObject } from './StackedObject';
 
 type TAnimationOptions<T extends number | TColorArg> = T extends number
-  ? AnimationOptions
+  ? ValueAnimationOptions
   : ColorAnimationOptions;
 
 export abstract class AnimatableObject<
@@ -58,7 +58,6 @@ export abstract class AnimatableObject<
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
     const {
-      byValue,
       easing,
       duration,
       abort,
@@ -72,7 +71,6 @@ export abstract class AnimatableObject<
       startValue:
         startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
-      byValue,
       easing,
       duration,
       abort: abort?.bind(this),
@@ -106,7 +104,7 @@ export abstract class AnimatableObject<
     if (propIsColor) {
       return animateColor(animationOptions as ColorAnimationOptions);
     } else {
-      return animate(animationOptions as AnimationOptions);
+      return animate(animationOptions as ValueAnimationOptions);
     }
   }
 }

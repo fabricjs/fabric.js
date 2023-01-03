@@ -68,7 +68,9 @@ export type TAnimationBaseOptions<T> = {
   /**
    * The object this animation is being performed on
    */
-  target: unknown;
+  target?: unknown;
+
+  byValue: T;
 };
 
 export type TAnimationCallbacks<T> = {
@@ -101,34 +103,26 @@ export type TAnimationValues<T> =
        * @default 0
        */
       startValue: T;
-    } & (
-      | {
-          /**
-           * Ending value(s)
-           * Ignored if `byValue` exists
-           * @default 100
-           */
-          endValue: T;
-          byValue?: never;
-        }
-      | {
-          /**
-           * Difference between the start value(s) to the end value(s)
-           * Overrides `endValue`
-           * @default [endValue - startValue]
-           */
-          byValue: T;
-          endValue?: never;
-        }
-    );
+      /**
+       * Ending value(s)
+       * @default 100
+       */
+      endValue: T;
+    };
+
+export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> =
+  TAnimationBaseOptions<TEasing> &
+    Omit<TAnimationValues<T>, 'endValue'> &
+    Partial<TAnimationCallbacks<TCallback>>
+;
 
 export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
-  TAnimationBaseOptions<TEasing> &
+  Omit<TAnimationBaseOptions<TEasing>, 'byValue'> &
     TAnimationValues<T> &
     TAnimationCallbacks<TCallback>
 >;
 
-export type AnimationOptions = TAnimationOptions<number>;
+export type ValueAnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 

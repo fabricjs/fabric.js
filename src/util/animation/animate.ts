@@ -2,18 +2,17 @@ import { ValueAnimation } from './ValueAnimation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
 import {
-  AnimationOptions,
+  ValueAnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
 
 const isArrayAnimation = (
-  options: ArrayAnimationOptions | AnimationOptions
+  options: ArrayAnimationOptions | ValueAnimationOptions
 ): options is ArrayAnimationOptions => {
   return (
     Array.isArray(options.startValue) ||
-    Array.isArray(options.endValue) ||
-    Array.isArray(options.byValue)
+    Array.isArray(options.endValue)
   );
 };
 
@@ -44,7 +43,7 @@ const isArrayAnimation = (
  *
  */
 export const animate = <
-  T extends AnimationOptions | ArrayAnimationOptions,
+  T extends ValueAnimationOptions | ArrayAnimationOptions,
   R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
 >(
   options: T
