@@ -520,8 +520,16 @@
     fabricClass: 'Canvas'
   });
 
-  function selectionClearingEdgeCases2(canvas, callback) {
-    const text = new fabric.Textbox('lorem ipsum dolor sit Amet sit Amet', {
+  function selectionClearingEdgeCases2(canvas, callback, assert) {
+    // sinon could have spied this w/o effort and in one line
+    let called = false;
+    class TestTextbox extends fabric.Textbox {
+      initDimensions() {
+        super.initDimensions();
+        called = this.initialized;
+      }
+    }
+    const text = new TestTextbox('lorem ipsum dolor sit Amet sit Amet', {
       width: 200,
     });
     canvas.add(text);
@@ -532,6 +540,7 @@
     text.width = 150;
     text._forceClearCache = true;
     canvas.renderAll();
+    assert.ok(called, 'initDimensions was called');
     canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
     callback(canvas.lowerCanvasEl);
   }
