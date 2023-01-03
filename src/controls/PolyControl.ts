@@ -2,7 +2,7 @@ import { Point } from '../point.class';
 import { Control } from './control.class';
 import { TMat2D } from '../typedefs';
 import { iMatrix } from '../constants';
-import { Polyline } from '../shapes/polyline.class';
+import type { Polyline } from '../shapes/polyline.class';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
@@ -51,6 +51,8 @@ export class PolyControl extends Control {
     );
   }
 
+  actionHandler = PolyControl.anchorWrapper(PolyControl.polyActionHandler);
+
   /**
    * This function defines what the control does.
    * It'll be called on every mouse move after a control has been clicked and is being dragged.
@@ -94,7 +96,7 @@ export class PolyControl extends Control {
   /**
    * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
    */
-  static anchorWrapper(anchorIndex: number, fn: TransformActionHandler) {
+  static anchorWrapper(fn: TransformActionHandler) {
     return function (
       eventData: TPointerEvent,
       transform: Transform,
@@ -102,6 +104,11 @@ export class PolyControl extends Control {
       y: number
     ) {
       const poly = transform.target as Polyline,
+        currentControl = poly.controls[poly.__corner] as PolyControl,
+        anchorIndex =
+          (currentControl.pointIndex > 0
+            ? currentControl.pointIndex
+            : poly.points.length) - 1,
         absolutePoint = new Point(
           poly.points[anchorIndex].x - poly.pathOffset.x,
           poly.points[anchorIndex].y - poly.pathOffset.y
@@ -133,20 +140,13 @@ export class PolyControl extends Control {
     };
   }
 
-  static createPolyControls(numOfControls: number, options?: Partial<Control>) {
-    const lastControl = numOfControls - 1,
-      controls = {} as Record<string, PolyControl>;
+  static createPolyControls(
+    numOfControls: number,
+    options: Partial<Control> = {}
+  ) {
+    const controls = {} as Record<string, PolyControl>;
     for (let idx = 0; idx < numOfControls; idx++) {
-      controls[`p${idx}`] = new PolyControl(
-        {
-          actionHandler: PolyControl.anchorWrapper(
-            idx > 0 ? idx - 1 : lastControl,
-            PolyControl.polyActionHandler
-          ),
-          ...options,
-        },
-        idx
-      );
+      controls[`p${idx}`] = new PolyControl(options, idx);
     }
     return controls;
   }
