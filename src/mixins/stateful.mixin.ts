@@ -51,7 +51,7 @@ type TSaveStateOptions = {
   stateProperties: string[];
 };
 
-export class statefulMixin {
+export class StatefulMixin {
   /**
    * Returns true if object state (one of its state properties) was changed
    * @param {String} [propertySet] optional name for the set of property we want to save
