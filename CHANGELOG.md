@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(): Draggable Text migration bugs #8534
+- fix(): Draggable Text migration regressions #8534
 - fix(Object Stacking): 🔙 refactor logic to support Group 🔝
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)
