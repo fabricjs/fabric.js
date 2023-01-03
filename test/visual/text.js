@@ -543,7 +543,6 @@
     canvas.renderAll();
     text.width = 150;
     text._forceClearCache = true;
-    canvas.contextTopDirty = false;
     canvas.renderAll();
     assert.equal(text.__calledInitDimensions, 1, 'initDimensions was called');
     canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
