@@ -6,7 +6,7 @@
 
   exports.getAsset = function(name, callback) {
     var finalName = getAssetName(name);
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       var plainFileName = finalName.replace('file://', '');
       return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
     }
@@ -37,22 +37,22 @@
 
   function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
+    return fabric.getEnv().isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
   exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : finalName;
+    return fabric.getEnv().isLikelyNode ? localPath('/../visual', finalName) : finalName;
   }
 
   function getFixtureName(filename) {
     var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? localPath('/..', finalName) : finalName;
+    return fabric.getEnv().isLikelyNode ? localPath('/..', finalName) : finalName;
   }
 
   function generateGolden(filename, original) {
-    if (fabric.isLikelyNode && original) {
+    if (fabric.getEnv().isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
       var dataUrl = original.toDataURL().split(',')[1];
       console.log('creating golden for ', filename);
@@ -77,13 +77,13 @@
             }
           };
           request.send(formData);
-        });     
+        });
       }, 'image/png');
     }
   }
 
   async function getImage(filename, original) {
-    if (fabric.isLikelyNode && original) {
+    if (fabric.getEnv().isLikelyNode && original) {
       var plainFileName = filename.replace('file://', '');
       if (!fs.existsSync(plainFileName)) {
         generateGolden(filename, original);
@@ -95,7 +95,7 @@
         .then(res => !res.exists && generateGolden(filename, original));
     }
     return new Promise((resolve, reject) => {
-      const img = fabric.document.createElement('img');
+      const img = fabric.getDocument().createElement('img');
       img.onload = function () {
         img.onerror = null;
         img.onload = null;
@@ -108,14 +108,14 @@
       };
       img.src = filename;
     });
-   
+
   }
 
   exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
     var imageDataToChalk;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       _pixelMatch = global.pixelmatch;
       visualCallback = global.visualCallback;
       imageDataToChalk = global.imageDataToChalk;
@@ -156,7 +156,7 @@
           var height = renderedCanvas.height;
           var totalPixels = width * height;
           var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height);
-          var canvas = fabric.document.createElement('canvas');
+          var canvas = fabric.getDocument().createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           var ctx = canvas.getContext('2d');
@@ -187,7 +187,7 @@
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();
-          done();          
+          done();
         });
       });
     }
