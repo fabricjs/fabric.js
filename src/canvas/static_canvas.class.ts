@@ -371,7 +371,7 @@ export class StaticCanvas<
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
-  __initRetinaScaling(
+  protected __initRetinaScaling(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
@@ -392,7 +392,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _createCanvasElement() {
+  protected _createCanvasElement() {
     const element = createCanvasElement();
     if (!element) {
       throw new Error(CANVAS_INIT_ERROR);
@@ -408,7 +408,7 @@ export class StaticCanvas<
    * @private
    * @param {HTMLElement} [canvasEl]
    */
-  _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
+  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
     // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
     if (isHTMLCanvas(canvasEl)) {
       this.lowerCanvasEl = canvasEl;

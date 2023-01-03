@@ -1215,7 +1215,7 @@ export class SelectableCanvas<
    * @private
    * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
    */
-  _createUpperCanvas() {
+  protected _createUpperCanvas() {
     const lowerCanvasEl = this.lowerCanvasEl;
 
     // if there is no upperCanvas (most common case) we create one.
@@ -1234,28 +1234,15 @@ export class SelectableCanvas<
     upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(upperCanvasEl);
     upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextTop = upperCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _createCacheCanvas() {
+  protected _createCacheCanvas() {
     this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _initWrapperElement() {
-    if (this.wrapperEl) {
-      return;
-    }
+  protected _initWrapperElement() {
     const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
@@ -1272,7 +1259,7 @@ export class SelectableCanvas<
    * @private
    * @param {HTMLCanvasElement} element canvas element to apply styles on
    */
-  _applyCanvasStyle(element: HTMLCanvasElement) {
+  protected _applyCanvasStyle(element: HTMLCanvasElement) {
     const width = this.width || element.width,
       height = this.height || element.height;
 
