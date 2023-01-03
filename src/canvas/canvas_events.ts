@@ -1367,11 +1367,7 @@ export class Canvas extends SelectableCanvas {
       //  transform pointer to target's containing coordinate plane
       //  both pointer and object should agree on every point
       localPointer = target.group
-        ? sendPointToPlane(
-            pointer,
-            undefined,
-            target.group.calcTransformMatrix()
-          )
+        ? sendPointToPlane(pointer, target.group.calcTransformMatrix())
         : pointer;
     // seems used only here.
     // @TODO: investigate;
