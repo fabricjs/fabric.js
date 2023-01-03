@@ -404,6 +404,52 @@
     assert.equal(rect.scaleY, 3, 'rect scaled Y');
   });
 
+  QUnit.test('scaling a nested target', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
+    var mouseUpCalled = false;
+    var mouseDownCalled = false;
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+    };
+    rect.controls.br.mouseUpHandler = function() {
+      mouseUpCalled = true;
+    };
+    rect.controls.br.mouseDownHandler = function() {
+      mouseDownCalled = true;
+    };
+    const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(mouseUpCalled, true, 'mouse up handler for control has been called');
+    assert.equal(mouseDownCalled, true, 'mouse down handler for control has been called');
+    assert.deepEqual(rect.calcTransformMatrix(), [3, 0, 0, 3, 4.5, 4.5], 'transform matrix');
+    assert.deepEqual(rect.getXY(), new fabric.Point(), 'position is maintained');
+  });
+
+  QUnit.test('dragging a nested target', function (assert) {
+    var e = { clientX: 1, clientY: 1, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
+    rect.controls = {};
+    const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.deepEqual(rect.calcTransformMatrix(), [1, 0, 0, 1, 9.5, 9.5], 'transform matrix');
+    assert.deepEqual(rect.getXY(), new fabric.Point(8, 8), 'position changed by 8 pixels');
+  });
+
   QUnit.test('A transform will call mouseup and mousedown on the control', function(assert) {
     var e = { clientX: 3, clientY: 3, which: 1 };
     var e1 = { clientX: 6, clientY: 6, which: 1 };
