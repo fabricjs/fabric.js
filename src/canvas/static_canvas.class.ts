@@ -46,6 +46,7 @@ const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
   cssOnly?: boolean;
+  skipRendering?: boolean;
 };
 
 export type TSVGExportOptions = {
@@ -289,13 +290,14 @@ export class StaticCanvas<
     this.requestRenderAll = this.requestRenderAll.bind(this);
     this.set(options);
     this.initElements(el);
-    this.setDimensions({
-      width: this.width || this.lowerCanvasEl.width || 0,
-      height: this.height || this.lowerCanvasEl.height || 0,
-    });
+    this.setDimensions(
+      {
+        width: this.width || this.lowerCanvasEl.width || 0,
+        height: this.height || this.lowerCanvasEl.height || 0,
+      },
+      { skipRendering: true }
+    );
     this.viewportTransform = [...this.viewportTransform];
-    this.calcOffset();
-    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -479,7 +481,11 @@ export class StaticCanvas<
    */
   setDimensions(
     dimensions: Partial<TSize>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    {
+      cssOnly = false,
+      backstoreOnly = false,
+      skipRendering = false,
+    }: TCanvasSizeOptions = {}
   ) {
     Object.entries(dimensions).forEach(([prop, value]) => {
       let cssValue = `${value}`;
@@ -498,7 +504,7 @@ export class StaticCanvas<
     this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
 
-    if (!cssOnly) {
+    if (!cssOnly && !skipRendering) {
       this.requestRenderAll();
     }
   }
