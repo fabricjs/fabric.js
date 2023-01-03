@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../../HEADER';
+import { getEnv } from '../../env';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
@@ -33,6 +33,9 @@ import {
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../group.class';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
+import { isTextObject } from '../../util/types';
+import { Image } from '../image.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -796,7 +799,7 @@ export class FabricObject<
         additionalHeight = height * 0.1;
       }
     }
-    if (this instanceof fabric.Text && this.path) {
+    if (isTextObject(this) && this.path) {
       shouldRedraw = true;
       shouldResizeCanvas = true;
       // IMHO in those lines we are using zoomX and zoomY not the this version.
@@ -1703,10 +1706,10 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {Image} Object cloned as image.
    */
-  cloneAsImage(options: any) {
+  cloneAsImage(options: any): Image {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    return new fabric.Image(canvasEl);
+    return new Image(canvasEl);
   }
 
   /**
@@ -1722,9 +1725,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any) {
-    options || (options = {});
-
+  toCanvasElement(options: any = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
@@ -1764,7 +1765,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    let canvas = new fabric.StaticCanvas(el, {
+    let canvas = new StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,
@@ -2057,7 +2058,7 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  objectCaching: !fabric.isLikelyNode,
+  objectCaching: !getEnv().isLikelyNode,
   statefullCache: false,
   noScaleCache: true,
   strokeUniform: false,

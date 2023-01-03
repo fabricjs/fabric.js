@@ -1,6 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
@@ -23,6 +22,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Gradient class
@@ -394,4 +394,4 @@ export class Gradient<
   /* _FROM_SVG_END_ */
 }
 
-fabric.Gradient = Gradient;
+classRegistry.setClass(Gradient, 'gradient');
