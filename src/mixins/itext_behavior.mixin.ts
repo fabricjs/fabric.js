@@ -1,7 +1,7 @@
 // @ts-nocheck
 
-import { fabric } from '../../HEADER';
 import type { Canvas } from '../canvas/canvas_events';
+import { getEnv } from '../env';
 import { ObjectEvents, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
@@ -498,7 +498,7 @@ export abstract class ITextBehaviorMixin<
     }
 
     // regain focus
-    fabric.document.activeElement !== this.hiddenTextarea &&
+    getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(options.e),
@@ -601,7 +601,7 @@ export abstract class ITextBehaviorMixin<
       left: -dragImage.width + 'px',
       border: 'none',
     });
-    fabric.document.body.appendChild(dragImage);
+    getEnv().document.body.appendChild(dragImage);
     e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
   }
 
