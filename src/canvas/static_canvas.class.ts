@@ -346,7 +346,7 @@ export class StaticCanvas<
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -382,9 +382,6 @@ export class StaticCanvas<
    * @private
    */
   _initRetinaScaling() {
-    if (!this._isRetinaScaling()) {
-      return;
-    }
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
@@ -536,7 +533,7 @@ export class StaticCanvas<
       }
     });
 
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
 
     if (!cssOnly) {
