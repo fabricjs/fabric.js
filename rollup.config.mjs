@@ -2,15 +2,14 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import ts from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
-import { resolve } from "path";
+import dts from "rollup-plugin-dts";
 
-const runStats = Number(process.env.BUILD_STATS);
 
 const splitter = /\n|\s|,/g;
 
 // https://rollupjs.org/guide/en/#configuration-files
-export default {
-  input: process.env.BUILD_INPUT?.split(splitter) || ['./index.js'],
+export default [{
+  input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
   output: [
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
@@ -41,4 +40,10 @@ export default {
       babelHelpers: 'bundled',
     }),
   ],
-};
+},
+// {
+//   input: "./my-input/index.d.ts",
+//   output: [{ file: "dist/my-library.d.ts", format: "es" }],
+//   plugins: [dts()],
+// },
+];
