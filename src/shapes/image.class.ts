@@ -128,8 +128,8 @@ export class Image extends FabricObject {
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: any = {});
-  constructor(element: ImageSource, options: any = {});
+  constructor(elementId: string, options: any);
+  constructor(element: ImageSource, options: any);
   constructor(arg0: ImageSource | string, options: any = {}) {
     super();
     this.filters = [];

@@ -1,6 +1,8 @@
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
-import ts from 'rollup-plugin-ts';
+import ts from '@rollup/plugin-typescript';
+import { babel } from '@rollup/plugin-babel';
+import { resolve } from "path";
 
 const runStats = Number(process.env.BUILD_STATS);
 
@@ -13,14 +15,14 @@ export default {
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
       name: 'fabric',
-      format: 'cjs',
+      format: 'umd',
       sourcemap: true,
     },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
-          format: 'cjs',
+          format: 'umd',
           plugins: [
             terser(),
           ],
@@ -31,7 +33,12 @@ export default {
   plugins: [
     json(),
     ts({
+      noForceEmit: true,
       tsconfig: './tsconfig.json',
+    }),
+    babel({
+      extensions: [".ts", ".js"],
+      babelHelpers: 'bundled',
     }),
   ],
 };
