@@ -1,9 +1,6 @@
 // @ts-nocheck
-
 import { config } from '../config';
-import { Text } from '../shapes/text.class';
 import { TSVGReviver } from '../typedefs';
-import { applyMixins } from '../util/applyMixins';
 import { escapeXml } from '../util/lang_string';
 import { createSVGRect } from '../util/misc/svgParsing';
 import { hasStyleChanged } from '../util/misc/textStyles';
@@ -289,6 +286,3 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 }
-
-// TODO: handle differently?
-applyMixins(Text, [TextSVGExportMixin]);
