@@ -1,14 +1,13 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 
 /**
  * Copies all enumerable properties of one js object to another
  * this does not and cannot compete with generic utils.
- * Does not clone or extend fabric.Object subclasses.
+ * Does not clone or extend FabricObject subclasses.
  * This is mostly for internal use and has extra handling for fabricJS objects
  * it skips the canvas and group properties in deep cloning.
- * @memberOf fabric.util.object
  * @param {Object} destination Where to copy to
  * @param {Object} source Where to copy from
  * @param {Boolean} [deep] Whether to extend nested objects
@@ -19,7 +18,7 @@ export const extend = (destination, source, deep) => {
   // the deep clone is for internal use, is not meant to avoid
   // javascript traps or cloning html element or self referenced objects.
   if (deep) {
-    if (!fabric.isLikelyNode && source instanceof Element) {
+    if (!getEnv().isLikelyNode && source instanceof Element) {
       // avoid cloning deep images, canvases,
       destination = source;
     } else if (Array.isArray(source)) {
@@ -52,12 +51,10 @@ export const extend = (destination, source, deep) => {
 /**
  * Creates an empty object and copies all enumerable properties of another object to it
  * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
- * @memberOf fabric.util.object
  * @param {Object} object Object to clone
  * @param {Boolean} [deep] Whether to clone nested objects
  * @return {Object}
  */
-
 //TODO: this function return an empty object if you try to clone null
-export const clone = (object: any, deep: boolean) =>
+export const clone = <T>(object: T, deep: boolean): T =>
   deep ? extend({}, object, deep) : { ...object };

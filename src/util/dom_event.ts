@@ -1,31 +1,8 @@
 //@ts-nocheck
 import { Point } from '../point.class';
+import { getScrollLeftTop } from './dom_misc';
 
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];
-
-/**
- * Adds an event listener to an element
- * @function
- * @deprecated
- * @memberOf fabric.util
- * @param {HTMLElement} element
- * @param {String} eventName
- * @param {Function} handler
- */
-export const addListener = (element, eventName, handler, options) =>
-  element && element.addEventListener(eventName, handler, options);
-
-/**
- * Removes an event listener from an element
- * @function
- * @deprecated
- * @memberOf fabric.util
- * @param {HTMLElement} element
- * @param {String} eventName
- * @param {Function} handler
- */
-export const removeListener = (element, eventName, handler, options) =>
-  element && element.removeEventListener(eventName, handler, options);
 
 function getTouchInfo(event) {
   const touchProp = event.changedTouches;
@@ -37,7 +14,7 @@ function getTouchInfo(event) {
 
 export const getPointer = (event) => {
   const element = event.target,
-    scroll = fabric.util.getScrollLeftTop(element),
+    scroll = getScrollLeftTop(element),
     _evt = getTouchInfo(event);
   return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
 };

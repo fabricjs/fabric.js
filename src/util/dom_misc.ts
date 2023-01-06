@@ -1,10 +1,9 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 
 /**
  * Wraps element with another element
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to wrap
  * @param {HTMLElement|String} wrapper Element to wrap with
  * @param {Object} [attributes] Attributes to set on a wrapper
@@ -20,7 +19,6 @@ export function wrapElement(element, wrapper) {
 
 /**
  * Returns element scroll offsets
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to operate on
  * @return {Object} Object with left/top values
  */
@@ -28,8 +26,8 @@ export function getScrollLeftTop(element) {
   let left = 0,
     top = 0;
 
-  const docElement = fabric.document.documentElement,
-    body = fabric.document.body || {
+  const docElement = getEnv().document.documentElement,
+    body = getEnv().document.body || {
       scrollLeft: 0,
       scrollTop: 0,
     };
@@ -41,7 +39,7 @@ export function getScrollLeftTop(element) {
     // Set element to element parent, or 'host' in case of ShadowDOM
     element = element.parentNode || element.host;
 
-    if (element === fabric.document) {
+    if (element === getEnv().document) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
@@ -59,8 +57,6 @@ export function getScrollLeftTop(element) {
 
 /**
  * Returns offset for a given element
- * @function
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to get offset for
  * @return {Object} Object with "left" and "top" properties
  */
@@ -78,7 +74,10 @@ export function getElementOffset(element) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = fabric.document.defaultView.getComputedStyle(element, null);
+  const elemStyle = getEnv().document.defaultView.getComputedStyle(
+    element,
+    null
+  );
   for (const attr in offsetAttributes) {
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }
@@ -99,7 +98,6 @@ export function getElementOffset(element) {
 
 /**
  * Makes element unselectable
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to make unselectable
  * @return {HTMLElement} Element that was passed in
  */
@@ -113,7 +111,6 @@ export function makeElementUnselectable(element) {
 
 /**
  * Makes element selectable
- * @memberOf fabric.util
  * @param {HTMLElement} element Element to make selectable
  * @return {HTMLElement} Element that was passed in
  */
@@ -126,15 +123,15 @@ export function makeElementSelectable(element) {
 }
 
 export function getNodeCanvas(element) {
-  const impl = fabric.jsdomImplForWrapper(element);
+  const impl = getEnv().jsdomImplForWrapper(element);
   return impl._canvas || impl._image;
 }
 
 export function cleanUpJsdomNode(element) {
-  if (!fabric.isLikelyNode) {
+  if (!getEnv().isLikelyNode) {
     return;
   }
-  const impl = fabric.jsdomImplForWrapper(element);
+  const impl = getEnv().jsdomImplForWrapper(element);
   if (impl) {
     impl._image = null;
     impl._canvas = null;

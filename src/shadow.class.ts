@@ -1,9 +1,9 @@
-import { fabric } from '../HEADER';
-import { Color } from './color';
+import { Color } from './color/color.class';
 import { config } from './config';
 import { Point } from './point.class';
-import { FabricObject } from './shapes/fabricObject.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
+import { uid } from './util/internals/uid';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
 import { rotateVector } from './util/misc/vectors';
@@ -75,7 +75,7 @@ export class Shadow {
       this[prop] = options[prop];
     }
 
-    this.id = FabricObject.__uid++;
+    this.id = uid();
   }
 
   /**
@@ -213,5 +213,3 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 Object.assign(Shadow.prototype, shadowDefaultValues);
-
-fabric.Shadow = Shadow;

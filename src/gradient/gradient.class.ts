@@ -1,9 +1,10 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TMat2D } from '../typedefs';
+import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
@@ -21,7 +22,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Gradient class
@@ -74,9 +75,24 @@ export class Gradient<
    */
   type: T;
 
+  /**
+   * Defines how the gradient is located in space and spread
+   * @type GradientCoords
+   */
   coords: GradientCoords<T>;
 
+  /**
+   * Defines how many colors a gradient has and how they are located on the axis
+   * defined by coords
+   * @type GradientCoords
+   */
   colorStops: ColorStop[];
+
+  /**
+   * If true, this object will not be exported during the serialization of a canvas
+   * @type boolean
+   */
+  excludeFromExport?: boolean;
 
   private id: string | number;
 
@@ -90,8 +106,7 @@ export class Gradient<
     gradientTransform,
     id,
   }: GradientOptions<T>) {
-    const uid = FabricObject.__uid++;
-    this.id = id ? `${id}_${uid}` : uid;
+    this.id = id ? `${id}_${uid()}` : uid();
     this.type = type;
     this.gradientUnits = gradientUnits;
     this.gradientTransform = gradientTransform || null;
@@ -130,7 +145,7 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
       ...pick(this, propertiesToInclude),
       type: this.type,
@@ -148,7 +163,7 @@ export class Gradient<
   /* _TO_SVG_START_ */
   /**
    * Returns SVG representation of an gradient
-   * @param {fabric.Object} object Object to create a gradient for
+   * @param {FabricObject} object Object to create a gradient for
    * @return {String} SVG representation of an gradient (linear/radial)
    */
   toSVG(
@@ -276,11 +291,7 @@ export class Gradient<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D) {
-    if (!this.type) {
-      return;
-    }
-
+  toLive(ctx: CanvasRenderingContext2D): CanvasGradient {
     const coords = this.coords as GradientCoords<'radial'>;
     const gradient =
       this.type === 'linear'
@@ -357,7 +368,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
-    return new Gradient({
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
@@ -383,4 +394,4 @@ export class Gradient<
   /* _FROM_SVG_END_ */
 }
 
-fabric.Gradient = Gradient;
+classRegistry.setClass(Gradient, 'gradient');

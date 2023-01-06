@@ -1,11 +1,8 @@
 // @ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { stylesFromArray } from '../util/misc/textStyles';
 import { IText } from './itext.class';
-import { FabricObject } from './object.class';
 import { textDefaultValues } from './text.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -459,22 +456,6 @@ export class Textbox extends IText {
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );
   }
-
-  /**
-   * Returns Textbox instance from an object representation
-   * @static
-   * @memberOf Textbox
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Textbox>}
-   */
-  static fromObject(object: object): Promise<Textbox> {
-    const styles = stylesFromArray(object.styles, object.text);
-    //copy object to prevent mutation
-    const objCopy = Object.assign({}, object, { styles: styles });
-    return FabricObject._fromObject(Textbox, objCopy, {
-      extraParam: 'text',
-    });
-  }
 }
 
 export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
@@ -491,4 +472,4 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 Object.assign(Textbox.prototype, textboxDefaultValues);
 
-fabric.Textbox = Textbox;
+classRegistry.setClass(Textbox);
