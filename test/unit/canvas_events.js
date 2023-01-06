@@ -1259,7 +1259,8 @@
     });
   });
 
-  QUnit.test('text editing manager', function (assert) {
+  QUnit.test('text editing manager', async function (assert) {
+    const canvas = new fabric.Canvas();
     const manager = canvas.textEditingManager;
     assert.ok(manager, 'should exist');
     assert.deepEqual(manager.targets, [], 'should be empty');
@@ -1296,5 +1297,13 @@
     assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
     canvas.remove(g);
     assert.deepEqual(manager.targets, [], 'should unregister nested instances upon group removal');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    canvas.clear();
+    assert.deepEqual(manager.targets, [], 'clear should clear instances');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    await canvas.dispose();
+    assert.deepEqual(manager.targets, [], 'dispose should clear instances');
   });
 })();
