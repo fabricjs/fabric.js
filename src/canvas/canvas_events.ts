@@ -1658,6 +1658,14 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
+   * @override clear {@link textEditingManager}
+   */
+  destroy() {
+    super.destroy();
+    this.textEditingManager.dispose();
+  }
+
+  /**
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    * @returns {StaticCanvas}

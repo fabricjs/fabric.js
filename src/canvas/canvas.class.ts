@@ -1523,7 +1523,6 @@ export class SelectableCanvas<
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this._iTextInstances = [];
     this.contextCache = null;
     this.contextTop = null;
     cleanUpJsdomNode(upperCanvasEl);
