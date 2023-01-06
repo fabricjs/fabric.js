@@ -1,5 +1,5 @@
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './Object/FabricObject';
 
 export class Triangle extends FabricObject {
@@ -31,17 +31,6 @@ export class Triangle extends FabricObject {
       points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
   }
-
-  /**
-   * Returns {@link Triangle} instance from an object representation
-   * @static
-   * @memberOf Triangle
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Triangle>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Triangle, object);
-  }
 }
 
 export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
@@ -52,4 +41,5 @@ export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
 
 Object.assign(Triangle.prototype, triangleDefaultValues);
 
-fabric.Triangle = Triangle;
+classRegistry.setClass(Triangle);
+classRegistry.setSVGClass(Triangle);

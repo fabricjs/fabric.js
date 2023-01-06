@@ -1,11 +1,10 @@
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Circle } from '../shapes/circle.class';
 import { Group } from '../shapes/group.class';
 import { getRandomInt } from '../util/internals';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';
 
 export type CircleBrushPoint = {
@@ -144,5 +143,3 @@ export class CircleBrush extends BaseBrush {
     return pointerPoint;
   }
 }
-
-fabric.CircleBrush = CircleBrush;

@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 
 /**
  * Wraps element with another element
@@ -26,8 +26,8 @@ export function getScrollLeftTop(element) {
   let left = 0,
     top = 0;
 
-  const docElement = fabric.document.documentElement,
-    body = fabric.document.body || {
+  const docElement = getEnv().document.documentElement,
+    body = getEnv().document.body || {
       scrollLeft: 0,
       scrollTop: 0,
     };
@@ -39,7 +39,7 @@ export function getScrollLeftTop(element) {
     // Set element to element parent, or 'host' in case of ShadowDOM
     element = element.parentNode || element.host;
 
-    if (element === fabric.document) {
+    if (element === getEnv().document) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
@@ -74,7 +74,10 @@ export function getElementOffset(element) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = fabric.document.defaultView.getComputedStyle(element, null);
+  const elemStyle = getEnv().document.defaultView.getComputedStyle(
+    element,
+    null
+  );
   for (const attr in offsetAttributes) {
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }
@@ -120,15 +123,15 @@ export function makeElementSelectable(element) {
 }
 
 export function getNodeCanvas(element) {
-  const impl = fabric.jsdomImplForWrapper(element);
+  const impl = getEnv().jsdomImplForWrapper(element);
   return impl._canvas || impl._image;
 }
 
 export function cleanUpJsdomNode(element) {
-  if (!fabric.isLikelyNode) {
+  if (!getEnv().isLikelyNode) {
     return;
   }
-  const impl = fabric.jsdomImplForWrapper(element);
+  const impl = getEnv().jsdomImplForWrapper(element);
   if (impl) {
     impl._image = null;
     impl._canvas = null;
