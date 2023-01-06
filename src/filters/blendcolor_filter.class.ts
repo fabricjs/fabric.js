@@ -1,7 +1,8 @@
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Color Blend filter class
@@ -254,3 +255,4 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
 };
 
 Object.assign(BlendColor.prototype, blendColorDefaultValues);
+classRegistry.setClass(BlendColor);

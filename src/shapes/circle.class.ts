@@ -1,12 +1,11 @@
-import { fabric } from '../../HEADER';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Circle extends FabricObject {
   /**
@@ -168,7 +167,7 @@ export class Circle extends FabricObject {
       top = 0,
       radius,
       ...otherParsedAttributes
-    } = parseAttributes(element, Circle.ATTRIBUTE_NAMES);
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
     if (!radius || radius < 0) {
       throw new Error(
@@ -178,7 +177,7 @@ export class Circle extends FabricObject {
 
     // this probably requires to be fixed for default origins not being top/left.
     callback(
-      new Circle({
+      new this({
         ...otherParsedAttributes,
         radius,
         left: left - radius,
@@ -188,17 +187,6 @@ export class Circle extends FabricObject {
   }
 
   /* _FROM_SVG_END_ */
-
-  /**
-   * Returns {@link Circle} instance from an object representation
-   * @static
-   * @memberOf Circle
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Circle>}
-   */
-  static fromObject(object: Record<string, unknown>): Promise<Circle> {
-    return FabricObject._fromObject(Circle, object);
-  }
 }
 
 export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
@@ -220,4 +208,5 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 
 Object.assign(Circle.prototype, circleDefaultValues);
 
-fabric.Circle = Circle;
+classRegistry.setClass(Circle);
+classRegistry.setSVGClass(Circle);

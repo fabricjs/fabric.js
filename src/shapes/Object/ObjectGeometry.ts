@@ -5,12 +5,12 @@ import type {
   TMat2D,
   TOriginX,
   TOriginY,
-} from '../typedefs';
-import { iMatrix } from '../constants';
-import { Intersection } from '../intersection.class';
-import { Point } from '../point.class';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import { cos } from '../util/misc/cos';
+} from '../../typedefs';
+import { iMatrix } from '../../constants';
+import { Intersection } from '../../intersection.class';
+import { Point } from '../../point.class';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { cos } from '../../util/misc/cos';
 import {
   calcRotateMatrix,
   composeMatrix,
@@ -18,12 +18,13 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
   transformPoint,
-} from '../util/misc/matrix';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
-import { Canvas, StaticCanvas } from '../__types__';
-import { ObjectOrigin } from './object_origin.mixin';
-import { ObjectEvents } from '../EventTypeDefs';
+} from '../../util/misc/matrix';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { sin } from '../../util/misc/sin';
+import type { Canvas } from '../../canvas/canvas_events';
+import type { StaticCanvas } from '../../canvas/static_canvas.class';
+import { ObjectOrigin } from './ObjectOrigin';
+import { ObjectEvents } from '../../EventTypeDefs';
 
 type TLineDescriptor = {
   o: Point;
@@ -270,8 +271,8 @@ export class ObjectGeometry<
   intersectsWithRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
-    calculate: boolean
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const coords = this.getCoords(absolute, calculate),
       intersection = Intersection.intersectPolygonRectangle(
@@ -341,8 +342,8 @@ export class ObjectGeometry<
   isContainedWithinRect(
     pointTL: Point,
     pointBR: Point,
-    absolute: boolean,
-    calculate: boolean
+    absolute?: boolean,
+    calculate?: boolean
   ): boolean {
     const boundingRect = this.getBoundingRect(absolute, calculate);
     return (
@@ -350,6 +351,14 @@ export class ObjectGeometry<
       boundingRect.left + boundingRect.width <= pointBR.x &&
       boundingRect.top >= pointTL.y &&
       boundingRect.top + boundingRect.height <= pointBR.y
+    );
+  }
+
+  isOverlapping<T extends ObjectGeometry>(other: T): boolean {
+    return (
+      this.intersectsWithObject(other) ||
+      this.isContainedWithinObject(other) ||
+      other.isContainedWithinObject(this)
     );
   }
 
@@ -363,7 +372,7 @@ export class ObjectGeometry<
    */
   containsPoint(
     point: Point,
-    lines: TBBoxLines | undefined,
+    lines?: TBBoxLines,
     absolute = false,
     calculate = false
   ): boolean {
@@ -417,7 +426,7 @@ export class ObjectGeometry<
   private _containsCenterOfCanvas(
     pointTL: Point,
     pointBR: Point,
-    calculate: boolean
+    calculate?: boolean
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
@@ -429,7 +438,7 @@ export class ObjectGeometry<
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is partially contained within canvas
    */
-  isPartiallyOnScreen(calculate: boolean): boolean {
+  isPartiallyOnScreen(calculate?: boolean): boolean {
     if (!this.canvas) {
       return false;
     }
@@ -583,7 +592,7 @@ export class ObjectGeometry<
    * @param {Boolean} absolute ignore viewport
    * @return {void}
    */
-  scaleToWidth(value: number, absolute: boolean) {
+  scaleToWidth(value: number, absolute?: boolean) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
     const boundingRectFactor =
       this.getBoundingRect(absolute).width / this.getScaledWidth();

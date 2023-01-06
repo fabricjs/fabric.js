@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
@@ -12,10 +12,11 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Point } from '../point.class';
 import type {
+  TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
-  TCacheCanvasDimensions,
 } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { graphemeSplit } from '../util/lang_string';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -24,9 +25,10 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { fabricObjectDefaultValues } from './Object/FabricObject';
 import { Path } from './path.class';
+import { TextSVGExportMixin } from '../mixins/text.svg_export';
+import { applyMixins } from '../util/applyMixins';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -84,11 +86,7 @@ const additionalProps = [
 
 /**
  * Text class
- * @class Text
- * @extends FabricObject
- * @return {Text} thisArg
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
- * @see {@link Text#initialize} for constructor definition
  */
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -384,7 +382,7 @@ export class Text<
     this.initDimensions();
     this.setCoords();
     // @ts-ignore
-    this.setupState({ propertySet: '_dimensionAffectingProps' });
+    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**
@@ -1613,10 +1611,8 @@ export class Text<
         ? style.fontFamily
         : `"${style.fontFamily}"`;
     return [
-      // node-canvas needs "weight style", while browsers need "style weight"
-      // verify if this can be fixed in JSDOM
-      fabric.isLikelyNode ? style.fontWeight : style.fontStyle,
-      fabric.isLikelyNode ? style.fontStyle : style.fontWeight,
+      style.fontStyle,
+      style.fontWeight,
       forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
       fontFamily,
     ].join(' ');
@@ -1824,7 +1820,7 @@ export class Text<
     const originalStrokeWidth = options.strokeWidth;
     options.strokeWidth = 0;
 
-    const text = new Text(textContent, options),
+    const text = new this(textContent, options),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1859,14 +1855,11 @@ export class Text<
 
   /**
    * Returns Text instance from an object representation
-   * @static
-   * @memberOf Text
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
   static fromObject(object: Record<string, any>): Promise<Text> {
-    return FabricObject._fromObject(
-      Text,
+    return this._fromObject(
       {
         ...object,
         styles: stylesFromArray(object.styles, object.text),
@@ -1958,4 +1951,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 
 Object.assign(Text.prototype, textDefaultValues);
 
-fabric.Text = Text;
+applyMixins(Text, [TextSVGExportMixin]);
+classRegistry.setClass(Text);
+classRegistry.setSVGClass(Text);

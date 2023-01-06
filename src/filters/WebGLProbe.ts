@@ -1,4 +1,4 @@
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { createCanvasElement } from '../util/misc/dom';
 
 export enum WebGLPrecision {
@@ -40,7 +40,7 @@ class WebGLProbe {
    * @returns config object if true
    */
   queryWebGL() {
-    if (fabric.isLikelyNode) {
+    if (getEnv().isLikelyNode) {
       return;
     }
     const canvas = createCanvasElement();
