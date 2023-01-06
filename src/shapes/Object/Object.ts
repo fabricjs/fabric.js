@@ -1299,10 +1299,7 @@ export class FabricObject<
       // in this case the context is already cleared.
       return true;
     } else {
-      if (
-        this.dirty ||
-        (this.clipPath && this.clipPath.absolutePositioned)
-      ) {
+      if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
         if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
           const width = this.cacheWidth! / this.zoomX!;
           const height = this.cacheHeight! / this.zoomY!;

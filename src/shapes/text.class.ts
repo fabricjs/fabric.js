@@ -1922,7 +1922,10 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     baseline: 0.11, // baseline-shift factor (downwards)
   },
   textBackgroundColor: '',
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, ...additionalProps],
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
+    ...additionalProps,
+  ],
   stroke: null,
   shadow: null,
   path: null,

@@ -198,7 +198,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
     ...fabricObjectDefaultValues.cacheProperties,
     'radius',
     'startAngle',
-    'endAngle'
+    'endAngle',
   ],
 };
 
