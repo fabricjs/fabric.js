@@ -1,7 +1,7 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Textbox } from '../shapes/textbox.class';
 import { scaleCursorStyleHandler, scalingEqually } from './scale';
-import { changeWidth } from './changeWidth';
+import { changeWidth } from './changeSize';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
 import {
   scaleOrSkewActionName,
