@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { ModifierKey } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
@@ -76,5 +75,3 @@ export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
     this.finalize();
   }
 }
-
-fabric.DrawShape = DrawShape;
