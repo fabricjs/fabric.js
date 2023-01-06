@@ -845,7 +845,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
