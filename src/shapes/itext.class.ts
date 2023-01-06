@@ -221,7 +221,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    */
   initDimensions() {
     this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
     super.initDimensions();
   }
 
@@ -272,20 +271,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   render(ctx: CanvasRenderingContext2D) {
-    this.clearContextTop();
     super.render(ctx);
     // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
     // the correct position but not at every cursor animation.
     this.cursorOffsetCache = {};
     this.renderCursorOrSelection();
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   */
-  _render(ctx: CanvasRenderingContext2D) {
-    super._render(ctx);
   }
 
   /**
@@ -306,17 +296,8 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     } else {
       this.renderSelection(ctx, boundaries);
     }
+    this.canvas!.contextTopDirty = true;
     ctx.restore();
-  }
-
-  /**
-   * Renders cursor on context Top, outside the animation cycle, on request
-   * Used for the drag/drop effect.
-   * If contextTop is not available, do nothing.
-   */
-  renderCursorAt(selectionStart) {
-    const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
   }
 
   /**
@@ -407,6 +388,16 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 
   /**
+   * Renders cursor on context Top, outside the animation cycle, on request
+   * Used for the drag/drop effect.
+   * If contextTop is not available, do nothing.
+   */
+  renderCursorAt(selectionStart: number) {
+    const boundaries = this._getCursorBoundaries(selectionStart, true);
+    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
+  }
+
+  /**
    * Renders cursor
    * @param {Object} boundaries
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
@@ -468,11 +459,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Renders drag start text selection
    */
   renderDragSourceEffect() {
-    if (
-      this.__isDragging &&
-      this.__dragStartSelection &&
-      this.__dragStartSelection
-    ) {
+    if (this.__isDragging && this.__dragStartSelection) {
       this._renderSelection(
         this.canvas.contextTop,
         this.__dragStartSelection,
