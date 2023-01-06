@@ -409,14 +409,18 @@
     var e1 = { clientX: 6, clientY: 6, which: 1 };
     var e2 = { clientX: 9, clientY: 9, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
     const controlA = [];
     const controlB = [];
-    rect.controls.br.actionHandler = function(eventData,transform,x,y) {
-      controlA.push({ x, y });
-      controlB.push({ x: transform.lastX, y: transform.lastY });
+    const testControl = new fabric.Control({
+      x: 0.5,
+      y: 0.5,
+      actionHandler(eventData, transform, x, y) {
+        controlA.push({ x, y });
+        controlB.push({ x: transform.lastX, y: transform.lastY });
+      }
+    });
+    rect.controls = {
+      test: testControl,
     };
     canvas.add(rect);
     canvas.setActiveObject(rect);
