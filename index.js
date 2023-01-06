@@ -288,6 +288,8 @@ import {
 import { getLocalPoint } from './src/controls/util';
 import { wrapWithFireEvent } from './src/controls/wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './src/controls/wrapWithFixedAnchor';
+import { wrapWithDisableAction } from './src/controls/wrapWithDisableAction';
+import { wrapWithTransformAdaptor } from './src/controls/wrapWithTransformAdaptor';
 
 /**
  * @todo remove as unused
@@ -310,6 +312,8 @@ const controlsUtils = {
   rotationStyleHandler,
   wrapWithFixedAnchor,
   wrapWithFireEvent,
+  wrapWithDisableAction,
+  wrapWithTransformAdaptor,
   getLocalPoint,
   renderCircleControl,
   renderSquareControl,
