@@ -125,6 +125,7 @@ export function createPolyControls(
     idx++
   ) {
     controls[`p${idx}`] = new Control({
+      actionName: 'modifyPoly',
       positionHandler: factoryPolyPositionHandler(idx),
       actionHandler: anchorWrapper(idx, polyActionHandler),
       ...options,
