@@ -19,7 +19,7 @@ import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 import { getLocalPoint, getActionFromCorner } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { PolyControl } from './PolyControl';
+import { createPolyControls } from './polyControl';
 
 export {
   scaleCursorStyleHandler,
@@ -43,7 +43,7 @@ export {
   getActionFromCorner,
   renderCircleControl,
   renderSquareControl,
-  PolyControl,
+  createPolyControls,
 };
 
 /**
@@ -70,5 +70,5 @@ fabric.controlsUtils = {
   getLocalPoint,
   renderCircleControl,
   renderSquareControl,
-  PolyControl,
+  createPolyControls,
 };
