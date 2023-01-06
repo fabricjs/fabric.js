@@ -305,8 +305,6 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    // @ts-ignore;
-    this.stateful && obj.saveState();
     if (obj.canvas && obj.canvas !== this) {
       /* _DEV_MODE_START_ */
       console.warn(

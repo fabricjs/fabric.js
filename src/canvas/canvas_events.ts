@@ -989,11 +989,7 @@ export class Canvas extends SelectableCanvas {
 
     target.setCoords();
 
-    if (
-      transform.actionPerformed ||
-      // @ts-ignore
-      (this.stateful && target.hasStateChanged())
-    ) {
+    if (transform.actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
     }
@@ -1184,8 +1180,6 @@ export class Canvas extends SelectableCanvas {
    */
   _beforeTransform(e: TPointerEvent) {
     const t = this._currentTransform!;
-    // @ts-ignore
-    this.stateful && t.target.saveState();
     this.fire('before:transform', {
       e,
       transform: t,
