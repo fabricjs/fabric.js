@@ -50,7 +50,7 @@ export function applyClipPathToPath(
   //  this is done because both clip paths may have nested clip paths of their own (this method walks down a collection => this may reccur),
   //  so we can't assign one to the other's clip path property.
   path.clipPath = path.clipPath
-    ? mergeClipPaths(clipPath, path.clipPath)
+    ? mergeClipPaths(clipPath, path.clipPath as FabricObject)
     : clipPath;
   return path;
 }
