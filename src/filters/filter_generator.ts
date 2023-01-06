@@ -1,4 +1,5 @@
 import { ColorMatrix } from './colormatrix_filter.class';
+import { classRegistry } from '../util/class_registry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {
   return class GeneratedColorMatrix extends ColorMatrix {
@@ -42,6 +43,8 @@ export const Brownie = createColorMatrixFilter(
   ]
 );
 
+classRegistry.setClass(Brownie);
+
 export const Vintage = createColorMatrixFilter(
   'Vintage',
   [
@@ -49,6 +52,8 @@ export const Vintage = createColorMatrixFilter(
     0.02926, 0.0466, -0.08512, 0.52416, 0, 0.02023, 0, 0, 0, 1, 0,
   ]
 );
+
+classRegistry.setClass(Vintage);
 
 export const Kodachrome = createColorMatrixFilter(
   'Kodachrome',
@@ -58,6 +63,8 @@ export const Kodachrome = createColorMatrixFilter(
   ]
 );
 
+classRegistry.setClass(Kodachrome);
+
 export const Technicolor = createColorMatrixFilter(
   'Technicolor',
   [
@@ -65,6 +72,8 @@ export const Technicolor = createColorMatrixFilter(
     -0.27589, -0.2311, -0.75018, 1.84759, 0, 0.12137, 0, 0, 0, 1, 0,
   ]
 );
+
+classRegistry.setClass(Technicolor);
 
 export const Polaroid = createColorMatrixFilter(
   'Polaroid',
@@ -74,6 +83,8 @@ export const Polaroid = createColorMatrixFilter(
   ]
 );
 
+classRegistry.setClass(Polaroid);
+
 export const Sepia = createColorMatrixFilter(
   'Sepia',
   [
@@ -82,6 +93,8 @@ export const Sepia = createColorMatrixFilter(
   ]
 );
 
+classRegistry.setClass(Sepia);
+
 export const BlackWhite = createColorMatrixFilter(
   'BlackWhite',
   [
@@ -89,3 +102,5 @@ export const BlackWhite = createColorMatrixFilter(
     1, 0,
   ]
 );
+
+classRegistry.setClass(BlackWhite);

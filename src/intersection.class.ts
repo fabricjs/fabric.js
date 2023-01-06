@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Point } from './point.class';
-import { fabric } from '../HEADER';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
@@ -237,5 +236,3 @@ export class Intersection {
     ]);
   }
 }
-
-fabric.Intersection = Intersection;

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { ObjectEvents, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
@@ -9,7 +9,7 @@ import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
@@ -65,7 +65,7 @@ export abstract class ITextBehaviorMixin<
     selectable: boolean;
     hoverCursor: string | null;
     defaultCursor: string;
-    moveCursor: string;
+    moveCursor: CSSStyleDeclaration['cursor'];
   };
   protected _selectionDirection: 'left' | 'right' | null;
 
@@ -497,7 +497,7 @@ export abstract class ITextBehaviorMixin<
     }
 
     // regain focus
-    fabric.document.activeElement !== this.hiddenTextarea &&
+    getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(options.e),
@@ -597,7 +597,7 @@ export abstract class ITextBehaviorMixin<
       left: -dragImage.width + 'px',
       border: 'none',
     });
-    fabric.document.body.appendChild(dragImage);
+    getEnv().document.body.appendChild(dragImage);
     e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
   }
 
