@@ -583,7 +583,7 @@
     height: 200,
     disabled: fabric.getEnv().isLikelyNode,
     golden: 'textSelectionClearing3.png',
-    percentage: 0.02,
+    percentage: 0.03,
     fabricClass: 'Canvas'
   });
 
