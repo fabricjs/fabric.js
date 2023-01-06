@@ -258,7 +258,7 @@ const util = {
 
 // CONTROLS UTILS
 
-import { changeWidth } from './src/controls/changeWidth';
+import { changeWidth, changeHeight } from './src/controls/changeSize';
 import {
   renderCircleControl,
   renderSquareControl,
@@ -303,6 +303,7 @@ const controlsUtils = {
   scalingYOrSkewingX,
   scalingXOrSkewingY,
   changeWidth,
+  changeHeight,
   skewHandlerX,
   skewHandlerY,
   dragHandler,
