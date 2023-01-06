@@ -1,5 +1,5 @@
 import type { Canvas } from '../../canvas/canvas_events';
-import { Color } from '../../color';
+import { Color } from '../../color/color.class';
 import { TEvent, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
 import type { Group } from '../../shapes/group.class';
