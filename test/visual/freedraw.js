@@ -3,15 +3,14 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  async function pointDrawer(points, brush, onComplete = false) {
-    const canvas = brush.canvas;
-    canvas.calcViewportBoundaries();
-    setBrush(canvas, brush);
+  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
+    setBrush(brush.canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
+      onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       await new Promise(resolve => {
@@ -2243,195 +2242,37 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-  function generatePointsToCover(width, height, step) {
-    const out = [];
-    for (let y = -height, side = 0; y < height; y = y + step) {
-      side++;
-      out.push(new fabric.Point(side % 2 ? -width : width, y));
-    }
-    return out;
+  function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
   }
 
-  const pointsToCover = generatePointsToCover(500, 500, 30);
-
-  [fabric.PencilBrush, fabric.PatternBrush, /*fabric.CircleBrush, fabric.SprayBrush*/].forEach(builder => {
-    [true, false].forEach(vpt => {
-      [true, false].forEach(absolutePositioned => {
-        [true, false].forEach(inverted => {
-          tests.push({
-            test: `clipping ${builder.name}${vpt ? ' vpt' : ''}${absolutePositioned ? ' absolutePositioned' : ''}${inverted ? ' inverted' : ''}`,
-            build: canvas => {
-              const brush = new builder(canvas);
-              brush.width = 30;
-              brush.color = 'red';
-              const clipPath = new fabric.Circle({
-                radius: 50,
-                absolutePositioned,
-                inverted,
-                canvas
-              });
-              clipPath.viewportCenter();
-              brush.clipPath = clipPath;
-              canvas.freeDrawingBrush = brush;
-              canvas.isDrawingMode = true;
-              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
-              return pointDrawer(pointsToCover, brush);
-            },
-            name: `clipping/${builder.name.toLowerCase().replace('brush', '')}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
-            percentage: 0.09,
-            width: 200,
-            height: 200,
-            targets: {
-              mesh: true
-            }
-          });
-        });
-      });
-    });
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    golden: 'withText.png',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+      compare: false
+    }
   });
 
-  async function erase(canvas, brush, { inverted, clip }) {
-    if (inverted) {
-      brush.width = 8;
-      await new Promise(resolve => {
-        canvas.once('after:render', resolve);
-        pointDrawer(pointsToCover, brush, () => {
-          // run mouse up but don't add the path to canvas
-        });
-      });
-      brush.inverted = true;
-    }
-    if (clip) {
-      const clipPath = new fabric.Circle({
-        radius: 50,
-        inverted: clip === 'inverted',
-        canvas
-      });
-      clipPath.center();
-      brush.clipPath = clipPath;
-    }
-    brush.width = 16;
-    return pointDrawer(points, brush);
-  }
-
-  function eraser(canvas, { reverse = false, group = false, alpha = false, inverted = false, clip = false } = {}) {
-    const brush = new fabric.EraserBrush(canvas);
-    alpha && (brush.color = 'rgba(0,0,0,0.7)');
-    const objects = [
-      new fabric.Rect({ width: 100, height: 100, fill: 'blue' }),
-      new fabric.Rect({ width: 100, height: 100, left: 50, top: 50, fill: 'magenta', erasable: false }),
-      new fabric.Circle({ radius: 200 }),
-      new fabric.Rect({ width: 100, height: 100, left: 100, top: 100, fill: 'red', erasable: false, opacity: 0.8 }),
-      new fabric.Rect({ width: 100, height: 100, left: 0, top: 100, fill: 'red', erasable: false }),
-      new fabric.Circle({ radius: 50, left: 100, top: 100, fill: 'cyan' }),
-      new fabric.Group([
-        new fabric.Circle({
-          radius: 50,
-          left: 0,
-          top: 100,
-          fill: 'cyan',
-          clipPath: new fabric.Circle({ radius: 50, left: -12, top: -12, originX: 'center', originY: 'center' })
-        })
-      ], {
-        erasable: !group || group,
-        clipPath: new fabric.Circle({ radius: 50, left: 12, top: 12, originX: 'center', originY: 'center' })
-      }),
-    ];
-    canvas.add(...(group ? [new fabric.Group(objects, { erasable: group })] : objects));
-    reverse && (canvas._objectsToRender = canvas.getObjects().reverse());
-    return erase(canvas, brush, { inverted, clip });
-  }
-
-  function eraseBackground(canvas, { alpha = false, inverted = false, vpt = false, clip = false } = {}) {
-    const brush = new fabric.EraserBrush(canvas);
-    alpha && (brush.color = 'rgba(0,0,0,0.7)');
-    canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
-    canvas.backgroundImage = new fabric.Rect({
-      width: canvas.width,
-      height: canvas.height,
-      fill: 'blue'
-    });
-    canvas.backgroundVpt = vpt;
-    return erase(canvas, brush, { inverted, clip });
-  }
-
-  [{ alpha: true }, { alpha: false }, { inverted: true }].forEach(({ alpha, inverted }) => {
-    [true, false, 'inverted'].forEach(clip => {
-      const getName = (name = '') => `eraser/${name}${alpha ? '_alpha' : ''}${inverted ? '_inverted' : ''}${clip ? '_clipped' : ''}${clip==='inverted' ? 'inverted' : ''}`;
-      const getTestName = name => `${name} (${JSON.stringify({ alpha, inverted, clip }, null, 2)})`;
-      const main = !alpha && !inverted;
-      tests.push({
-        test: getTestName('Eraser brush'),
-        build: canvas => eraser(canvas, { alpha, inverted, clip }),
-        name: getName(),
-        width: 200,
-        height: 250,
-        targets: {
-          main
-        },
-        onComplete: undefined
-      });
-
-      tests.push({
-        test: getTestName('Eraser brush - custom stack ordering'),
-        build: canvas => eraser(canvas, { alpha, inverted, clip, reverse: true }),
-        name: getName('custom_stack'),
-        width: 200,
-        height: 250,
-        targets: {
-          main
-        },
-        onComplete: undefined
-      });
-
-      tests.push({
-        test: getTestName('Eraser brush - group with `erasable = true`'),
-        build: canvas => eraser(canvas, { alpha, inverted, clip, group: true }),
-        name: getName('group'),
-        width: 200,
-        height: 250,
-        targets: {
-          top: false,
-        },
-        onComplete: undefined
-      });
-
-      tests.push({
-        test: getTestName('Eraser brush - group with `erasable = deep` should propagate eraser'),
-        build: canvas => eraser(canvas, { alpha, inverted, clip, group: 'deep' }),
-        name: getName(),
-        width: 200,
-        height: 250,
-        targets: {
-          main
-        },
-        onComplete: undefined
-      });
-
-      [true, false].forEach(vpt =>
-        tests.push({
-          test: getTestName('Eraser brush - backgroundVpt'),
-          build: async canvas => eraseBackground(canvas, { alpha, inverted, clip, vpt }),
-          name: `${getName('background')}${vpt ? '_vpt' : ''}`,
-          width: 200,
-          height: 250,
-          targets: {
-            main: (inverted || alpha) && !vpt,
-            top: inverted && !vpt
-          },
-          onComplete: undefined
-        })
-      );
-    });
-  });
-
-  tests.forEach(({ name, targets, test: testName, ...test }) => {
-    const { top, main, mesh, result, onComplete = () => { }, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
-    QUnit.module(testName, () => {
-      top && visualTester({
-        ...options,
-        test: 'top context',
-        golden: `freedrawing/${name}_top_ctx.png`,
+  tests.forEach(function (test) {
+    var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
+    if (options.top) {
+      visualTester(Object.assign({}, test, {
+        test: `${test.test} (top context)`,
+        golden: `top_ctx_${test.golden}`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
             canvas.cancelRequestedRender();

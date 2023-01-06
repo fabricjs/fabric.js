@@ -342,10 +342,12 @@ export class Canvas extends SelectableCanvas {
     source?: FabricObject,
     target?: FabricObject
   ) {
+    let dirty = false;
     const ctx = this.contextTop;
     if (source) {
       source.clearContextTop(true);
       source.renderDragSourceEffect(e);
+      dirty = true;
     }
     if (target) {
       if (target !== source) {
@@ -354,8 +356,10 @@ export class Canvas extends SelectableCanvas {
         target.clearContextTop(true);
       }
       target.renderDropTargetEffect(e);
+      dirty = true;
     }
     ctx.restore();
+    dirty && (this.contextTopDirty = true);
   }
 
   /**

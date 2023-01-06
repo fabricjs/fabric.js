@@ -10,7 +10,21 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import { Point } from '../point.class';
+import {
+  addTransformToObject,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
+import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
+import {
+  isActiveSelection,
+  isCollection,
+  isFabricObjectCached,
+} from '../util/types';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isTransparent } from '../util/misc/isTransparent';
+import { TOriginX, TOriginY, TSize } from '../typedefs';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type { Textbox } from '../shapes/textbox.class';
@@ -1654,17 +1668,6 @@ export class SelectableCanvas<
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
-  }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
   }
 }
 

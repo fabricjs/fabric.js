@@ -491,5 +491,101 @@
     percentage: 0.092,
   });
 
+  
+  // sinon could have spied this w/o effort and in one line
+  class TestTextbox extends fabric.Textbox {
+    __calledInitDimensions = 0;
+    initDimensions() {
+      super.initDimensions();
+      this.initialized && this.__calledInitDimensions++;
+    }
+  }
+
+  function selectionClearingEdgeCases(canvas, callback, assert) {
+    const text = new TestTextbox('lorem ipsum dolor sit Amet consectgetur', {
+      width: 200,
+      centeredRotation: true
+    });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    text.enterEditing();
+    text.selectAll();
+    canvas.renderAll();
+    text.rotate(90);
+    text.scale(0.8);
+    canvas.centerObject(text);
+    canvas.renderAll();
+    assert.equal(text.__calledInitDimensions, 0, 'initDimensions was not called');
+    canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text selection clearing edge cases: transform',
+    code: selectionClearingEdgeCases,
+    width: 200,
+    height: 200,
+    disabled: fabric.getEnv().isLikelyNode,
+    golden: 'textSelectionClearing.png',
+    percentage: 0.02,
+    fabricClass: 'Canvas'
+  });
+
+  function selectionClearingEdgeCases2(canvas, callback, assert) {   
+    const text = new TestTextbox('lorem ipsum dolor sit Amet sit Amet', {
+      width: 200,
+    });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    text.enterEditing();
+    text.selectAll();
+    assert.ok(canvas.contextTopDirty, 'flagged as dirty');
+    canvas.renderAll();
+    text.width = 150;
+    text._forceClearCache = true;
+    canvas.renderAll();
+    assert.equal(text.__calledInitDimensions, 1, 'initDimensions was called');
+    canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text selection clearing edge cases: changing width, `initDimensions`',
+    code: selectionClearingEdgeCases2,
+    width: 200,
+    height: 200,
+    disabled: fabric.getEnv().isLikelyNode,
+    golden: 'textSelectionClearing2.png',
+    percentage: 0.02,
+    fabricClass: 'Canvas'
+  });
+
+  function selectionClearingEdgeCases3(canvas, callback, assert) {
+    const text = new TestTextbox('lorem ipsum dolor sit Amet consectgetur', {
+      width: 200
+    });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    text.enterEditing();
+    text.selectAll();
+    canvas.renderAll();
+    canvas.setViewportTransform([0.8, 0, 0, 1, 0, 0]);
+    canvas.renderAll();
+    assert.equal(text.__calledInitDimensions, 0, 'initDimensions was not called');
+    canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Text selection clearing edge cases: vpt',
+    code: selectionClearingEdgeCases3,
+    width: 200,
+    height: 200,
+    disabled: fabric.getEnv().isLikelyNode,
+    golden: 'textSelectionClearing3.png',
+    percentage: 0.03,
+    fabricClass: 'Canvas'
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();
