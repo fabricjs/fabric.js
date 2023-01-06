@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Ellipse } from '../shapes/ellipse.class';
 import { DrawShape } from './DrawShape';
@@ -33,5 +32,3 @@ export class DrawOval extends DrawShape<Ellipse> {
     }
   }
 }
-
-fabric.DrawOval = DrawOval;
