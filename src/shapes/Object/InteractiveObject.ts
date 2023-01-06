@@ -1,5 +1,6 @@
 import type { Canvas } from '../../canvas/canvas_events';
-import type { Control, ControlRenderingStyleOverride } from '../../controls';
+import type { Control } from '../../controls/control.class';
+import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
 import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
