@@ -1,31 +1,11 @@
-import { Point } from '../point.class';
-import type { Group } from '../shapes/group.class';
-import { TDegree, TOriginX, TOriginY } from '../typedefs';
-import { transformPoint } from '../util/misc/matrix';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { CommonMethods } from './shared_methods.mixin';
-
-const originOffset = {
-  left: -0.5,
-  top: -0.5,
-  center: 0,
-  bottom: 0.5,
-  right: 0.5,
-};
-
-/**
- * Resolves origin value relative to center
- * @private
- * @param {TOriginX | TOriginY} originValue originX / originY
- * @returns number
- */
-export const resolveOrigin = (
-  originValue: TOriginX | TOriginY | number
-): number =>
-  typeof originValue === 'string'
-    ? originOffset[originValue]
-    : originValue - 0.5;
+import { Point } from '../../point.class';
+import type { Group } from '../group.class';
+import { TDegree, TOriginX, TOriginY } from '../../typedefs';
+import { transformPoint } from '../../util/misc/matrix';
+import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { CommonMethods } from '../../mixins/shared_methods.mixin';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
   /**

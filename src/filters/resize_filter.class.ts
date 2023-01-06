@@ -1,12 +1,10 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
-import { TClassProperties } from '../typedefs';
+import { getEnv } from '../env';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import {
-  isWebGLPipelineState,
-  T2DPipelineState,
-  TWebGLPipelineState,
-} from './typedefs';
+import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Resize image filter class
@@ -242,7 +240,7 @@ export class Resize extends BaseFilter {
       dX = oW,
       dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = fabric.document.createElement('canvas');
+      resources.sliceByTwo = getEnv().document.createElement('canvas');
     }
     const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {
@@ -539,3 +537,4 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
 };
 
 Object.assign(Resize.prototype, resizeDefaultValues);
+classRegistry.setClass(Resize);

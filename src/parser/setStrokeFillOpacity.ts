@@ -1,8 +1,8 @@
 //@ts-nocheck
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { toFixed } from '../util/misc/toFixed';
 import { colorAttributes } from './constants';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 /**
  * @private

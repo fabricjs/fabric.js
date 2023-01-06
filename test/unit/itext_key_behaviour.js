@@ -1,5 +1,5 @@
 (function(){
-  var canvas = fabric.document.createElement('canvas'),
+  var canvas = fabric.getDocument().createElement('canvas'),
       ctx = canvas.getContext('2d');
 
   QUnit.test('event selection:changed firing', function(assert) {
