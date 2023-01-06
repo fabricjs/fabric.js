@@ -516,7 +516,7 @@ export class SelectableCanvas<
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
     this._createCacheCanvas();
   }
