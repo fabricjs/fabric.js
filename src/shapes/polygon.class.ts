@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';
@@ -17,6 +16,3 @@ export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
 Object.assign(Polygon.prototype, polygonDefaultValues);
 
 classRegistry.setClass(Polygon);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Polygon = Polygon;

@@ -1,6 +1,4 @@
 //@ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -396,8 +394,5 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 Object.assign(Path.prototype, pathDefaultValues);
 
 classRegistry.setClass(Path);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Path = Path;
 
 /* _FROM_SVG_START_ */

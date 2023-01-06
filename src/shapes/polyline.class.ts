@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -330,6 +329,3 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
 Object.assign(Polyline.prototype, polylineDefaultValues);
 
 classRegistry.setClass(Polyline);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Polyline = Polyline;

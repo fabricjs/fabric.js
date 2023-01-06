@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
+
 import { Group } from '../shapes/group.class';
 import { Image } from '../shapes/image.class';
 import { classRegistry } from '../util/class_registry';
@@ -8,6 +8,7 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
+import { storage } from './constants';
 
 const ElementsParser = function (
   elements,
@@ -77,7 +78,7 @@ const ElementsParser = function (
     };
   };
 
-  proto.extractPropertyDefinition = function (obj, property, storage) {
+  proto.extractPropertyDefinition = function (obj, property, storageType) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -86,7 +87,8 @@ const ElementsParser = function (
     regex.lastIndex = 0;
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
-    return fabric[storage][this.svgUid][id];
+    // @todo fix this
+    return storage[storageType][this.svgUid][id];
   };
 
   proto.resolveGradient = function (obj, el, property) {

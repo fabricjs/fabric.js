@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
@@ -324,6 +323,3 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
 Object.assign(Line.prototype, lineDefaultValues);
 
 classRegistry.setClass(Line);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Line = Line;

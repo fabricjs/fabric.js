@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -196,5 +195,3 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
 Object.assign(Rect.prototype, rectDefaultValues);
 
 classRegistry.setClass(Rect);
-
-fabric.Rect = Rect;
