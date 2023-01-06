@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
@@ -21,10 +20,6 @@ export type ITextEvents = ObjectEvents & {
 };
 
 /**
- * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
- * prefix when observing canvas.
- * @class IText
- *
  * @fires changed
  * @fires selection:changed
  * @fires editing:entered
@@ -36,8 +31,8 @@ export type ITextEvents = ObjectEvents & {
  * @fires cut
  * @fires paste
  *
- * <p>Supported key combinations:</p>
- * <pre>
+ * #### Supported key combinations
+ * ```
  *   Move cursor:                    left, right, up, down
  *   Select character:               shift + left, shift + right
  *   Select text vertically:         shift + up, shift + down
@@ -56,16 +51,16 @@ export type ITextEvents = ObjectEvents & {
  *   Cut text:                       ctrl/cmd + x
  *   Select entire text:             ctrl/cmd + a
  *   Quit editing                    tab or esc
- * </pre>
+ * ```
  *
- * <p>Supported mouse/touch combination</p>
- * <pre>
+ * #### Supported mouse/touch combination
+ * ```
  *   Position cursor:                click/touch
  *   Create selection:               click/touch & drag
  *   Create selection:               click & shift + click
  *   Select word:                    double click
  *   Select line:                    triple click
- * </pre>
+ * ```
  */
 export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
@@ -157,7 +152,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
-   * @return {IText} thisArg
    */
   constructor(text: string, options: object) {
     super(text, options);
@@ -656,5 +650,3 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 Object.assign(IText.prototype, iTextDefaultValues);
 
 classRegistry.setClass(IText);
-
-fabric.IText = IText;

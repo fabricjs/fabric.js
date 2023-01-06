@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 
 fabric.util.object.extend(
   fabric.StaticCanvas.prototype,
