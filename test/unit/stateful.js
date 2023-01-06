@@ -26,29 +26,29 @@
   QUnit.test('saveState with array', function(assert) {
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
-    cObj.saveState();
+    cObj.saveState({ propertySet: 'cacheProperties' });
     //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray[0] = 2;
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in nested props');
 
     cObj.saveState();
     cObj.strokeDashArray[2] = 2;
-    assert.ok(cObj.hasStateChanged(), 'more properties added');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'more properties added');
   });
 
   QUnit.test('saveState with array to null', function(assert) {
     var cObj = new fabric.Text('Hello');
     cObj.set('strokeDashArray', [0, 4]);
-    cObj.saveState();
+    cObj.saveState({ propertySet: 'cacheProperties' });
     //equal(cObj.underline, cObj._stateProperties.underline, 'textDecoration in state is deepEqual');
     //notEqual(cObj.textDecoration, cObj._stateProperties.textDecoration, 'textDecoration in not same Object');
     cObj.strokeDashArray = null;
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in array without throwing');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in array without throwing');
 
-    cObj.saveState();
+    cObj.saveState({ propertySet: 'cacheProperties' });
     cObj.strokeDashArray = [2, 3];
-    assert.ok(cObj.hasStateChanged(), 'back to array');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'back to array');
   });
 
   QUnit.test('saveState with fabric class gradient', function(assert) {
@@ -68,18 +68,18 @@
     });
 
     cObj.set('fill', '#FF0000');
-    cObj.saveState();
+    cObj.saveState({ propertySet: 'cacheProperties' });
     cObj.set('fill', gradient);
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in nested props');
     cObj.saveState();
     gradient.type = 'radial';
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on first level of nesting');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in nested props on first level of nesting');
     cObj.saveState();
     gradient.coords.x1 = 3;
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on second level of nesting');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in nested props on second level of nesting');
     cObj.saveState();
     gradient.colorStops[0].color = 'blue';
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in nested props on third level of nesting');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in nested props on third level of nesting');
   });
 
   QUnit.test('saveState with fabric class gradient to other types', function(assert) {
@@ -99,15 +99,15 @@
     });
 
     cObj.set('fill', gradient);
-    cObj.saveState();
+    cObj.saveState({ propertySet: 'cacheProperties' });
     cObj.set('fill', 'red');
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to string without throwing');
-    cObj.saveState();
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in object to string without throwing');
+    cObj.saveState({ propertySet: 'cacheProperties' });
     cObj.set('fill', gradient);
-    assert.ok(cObj.hasStateChanged(), 'back to gradient');
-    cObj.saveState();
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'back to gradient');
+    cObj.saveState({ propertySet: 'cacheProperties' });
     cObj.set('fill', null);
-    assert.ok(cObj.hasStateChanged(), 'hasStateChanged detects changes in object to null without throwing');
+    assert.ok(cObj.hasStateChanged('cacheProperties'), 'hasStateChanged detects changes in object to null without throwing');
   });
 
   QUnit.test('savestate with custom property set', function(assert) {

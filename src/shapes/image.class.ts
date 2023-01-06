@@ -777,14 +777,11 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
     'cropX',
-    'cropY'
-  ),
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'cropX',
-    'cropY'
-  ),
+    'cropY',
+  ],
   cropX: 0,
   cropY: 0,
   imageSmoothing: true,

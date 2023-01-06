@@ -384,11 +384,11 @@ export class Path extends FabricObject {
 export const pathDefaultValues: Partial<TClassProperties<Path>> = {
   type: 'path',
   path: null,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
     'path',
-    'fillRule'
-  ),
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('path'),
+    'fillRule',
+  ],
 };
 
 Object.assign(Path.prototype, pathDefaultValues);

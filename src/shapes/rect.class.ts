@@ -185,11 +185,10 @@ export class Rect extends FabricObject {
 }
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('rx', 'ry'),
   type: 'rect',
   rx: 0,
   ry: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('rx', 'ry'),
+  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 
 Object.assign(Rect.prototype, rectDefaultValues);
