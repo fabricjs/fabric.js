@@ -258,7 +258,9 @@ export abstract class ITextBehaviorMixin<
     this._currentCursorOpacity = 1;
 
     //  make sure we clear context even if instance is not editing
-    shouldClear && this.clearContextTop();
+    if (shouldClear) {
+      this.clearContextTop();
+    }
   }
 
   restartCursorIfNeeded() {
