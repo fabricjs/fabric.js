@@ -47,7 +47,7 @@
         called = true;
       },
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(0,0,255,1)', 'color is magenta');
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
