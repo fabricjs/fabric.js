@@ -19,11 +19,10 @@ import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
-  isInteractiveTextObject,
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -516,7 +515,7 @@ export class SelectableCanvas<
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
     this._createCacheCanvas();
   }
@@ -1630,17 +1629,6 @@ export class SelectableCanvas<
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
-  }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
   }
 }
 
