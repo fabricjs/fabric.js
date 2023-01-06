@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): `mergeClipPaths` now accepts an number of clip paths, added visual tests for `mergeClipPaths` [#8347](https://github.com/fabricjs/fabric.js/pull/8347)
 - fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 - chore(TS): Use exports from files to build fabricJS, get rid of HEADER.js [#8549](https://github.com/fabricjs/fabric.js/pull/8549)
