@@ -39,7 +39,7 @@ import {
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 
 type TDestroyedCanvas = Omit<
-  StaticCanvas,
+  SelectableCanvas<CanvasEvents>,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
