@@ -38,8 +38,25 @@ export class Textbox extends IText {
    * this is a cheap way to help with chinese/japanese
    * @type Boolean
    * @since 2.6.0
+   * @deprecated use {@link textOverflow} `anywhere` instead
    */
   splitByGrapheme: boolean;
+
+  /**
+   * Implementation of css property `overflow-wrap`
+   * The `normal` option is not supported
+   * Default behavior adjusts size to fit the largest word
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-wrap
+   */
+  textOverflow?: 'break-word' | 'anywhere' | '';
+
+  /**
+   * allow backward compatibility for {@link splitByGrapheme}
+   * @todo remove once {@link splitByGrapheme} is removed
+   */
+  protected resolveTextOverflowStrategy() {
+    return this.textOverflow || (this.splitByGrapheme && 'anywhere') || '';
+  }
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -90,7 +107,7 @@ export class Textbox extends IText {
         charCount++;
         realLineCount++;
       } else if (
-        !this.splitByGrapheme &&
+        !this.resolveTextOverflowStrategy() &&
         this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
         i > 0
       ) {
@@ -243,8 +260,11 @@ export class Textbox extends IText {
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     const wrapped = [];
     this.isWrapping = true;
+    const wrapFunction = this.resolveTextOverflowStrategy()
+      ? this._wrapLineWithTextOverflow
+      : this._wrapLine;
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+      wrapped.push(...wrapFunction.call(this, lines[i], i, desiredWidth));
     }
     this.isWrapping = false;
     return wrapped;
@@ -291,6 +311,93 @@ export class Textbox extends IText {
   }
 
   /**
+   * This method splits text into lines by looking for the last space in a measured piece of text that fits the bounds.
+   * If a space is found, the line breaks before the last word in the sequence.
+   * If not, it splits the last word and breaks the line.
+   * @param {Array} line The grapheme array that represent the line
+   * @param {Number} lineIndex
+   * @param {Number} desiredWidth width you want to wrap the line to
+   * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
+   * @returns {Array} Array of line(s) into which the given text is wrapped
+   * to.
+   */
+  _wrapLineWithTextOverflow(
+    line: string,
+    lineIndex: number,
+    desiredWidth: number,
+    reservedSpace = 0
+  ): string[][] {
+    desiredWidth -= reservedSpace;
+    const graphemeLines = [];
+    const charSpacing = this._getWidthOfCharSpacing();
+    let text = line || '',
+      offset = 0,
+      largestLetterWidth = 0,
+      width: number,
+      length: number,
+      temp: string,
+      prevGrapheme: string,
+      appendWSLength: number;
+
+    if (!text.length) {
+      graphemeLines.push([]);
+    }
+    while (text.length > 0) {
+      length = text.length;
+      // Get the maximum string at a fixed width by measuring chars until bounds are reached
+      width = 0;
+      prevGrapheme = '';
+      for (let k = 0; k < text.length; k++) {
+        const box = this._getGraphemeBox(
+          text[k],
+          lineIndex,
+          offset + k,
+          prevGrapheme,
+          true
+        );
+        width += box.kernedWidth;
+        largestLetterWidth = Math.max(
+          largestLetterWidth,
+          box.kernedWidth - charSpacing
+        );
+        if (width - charSpacing > Math.max(largestLetterWidth, desiredWidth)) {
+          length = k;
+          break;
+        }
+        prevGrapheme = text[k];
+      }
+      temp = text.substring(0, length);
+      if (this.resolveTextOverflowStrategy() === 'break-word') {
+        // find last space to split words
+        for (let l = temp.length - 1; l >= 0; l--) {
+          if (this._wordJoiners.test(temp[l])) {
+            temp = temp.substring(0, l);
+            break;
+          }
+        }
+      }
+      // look ahead for whitespace to append to the current line
+      appendWSLength = text.length;
+      for (let k = temp.length; k < text.length; k++) {
+        if (!this._wordJoiners.test(text[k])) {
+          appendWSLength = k;
+          break;
+        }
+      }
+      // finalize line
+      temp += text.substring(temp.length, appendWSLength);
+      graphemeLines.push(this.graphemeSplit(temp));
+      // prepare for next line
+      offset += temp.length;
+      text = text.substring(temp.length);
+    }
+    if (largestLetterWidth > this.dynamicMinWidth) {
+      this.dynamicMinWidth = largestLetterWidth + reservedSpace;
+    }
+    return graphemeLines;
+  }
+
+  /**
    * Wraps a line of text using the width of the Textbox and a context.
    * @param {Array} line The grapheme array that represent the line
    * @param {Number} lineIndex
@@ -306,12 +413,10 @@ export class Textbox extends IText {
     reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
-      splitByGrapheme = this.splitByGrapheme,
+      breakAnywhere = this.resolveTextOverflowStrategy() === 'anywhere',
       graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplit(_line)
-        : this.wordSplit(_line),
-      infix = splitByGrapheme ? '' : ' ';
+      words = breakAnywhere ? this.graphemeSplit(_line) : this.wordSplit(_line),
+      infix = breakAnywhere ? '' : ' ';
 
     let lineWidth = 0,
       line = [],
@@ -327,8 +432,8 @@ export class Textbox extends IText {
     desiredWidth -= reservedSpace;
     // measure words
     const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplit(word);
+      // if using textOverflow `anywhere` words are already in graphemes.
+      word = breakAnywhere ? word : this.graphemeSplit(word);
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
       offset += word.length + 1;
@@ -358,12 +463,12 @@ export class Textbox extends IText {
         lineWidth += additionalSpace;
       }
 
-      if (!lineJustStarted && !splitByGrapheme) {
+      if (!lineJustStarted && !breakAnywhere) {
         line.push(infix);
       }
       line = line.concat(word);
 
-      infixWidth = splitByGrapheme
+      infixWidth = breakAnywhere
         ? 0
         : this._measureWord([infix], lineIndex, offset);
       offset++;
@@ -402,7 +507,7 @@ export class Textbox extends IText {
    * @return Number
    */
   missingNewlineOffset(lineIndex) {
-    if (this.splitByGrapheme) {
+    if (this.resolveTextOverflowStrategy()) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;
@@ -452,9 +557,10 @@ export class Textbox extends IText {
    * @return {Object} object representation of an instance
    */
   toObject(propertiesToInclude: Array<any>): object {
-    return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
-    );
+    return {
+      ...super.toObject(['minWidth'].concat(propertiesToInclude)),
+      textOverflow: this.resolveTextOverflowStrategy(),
+    };
   }
 }
 
@@ -467,7 +573,6 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   _dimensionAffectingProps:
     textDefaultValues._dimensionAffectingProps!.concat('width'),
   _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: false,
 };
 
 Object.assign(Textbox.prototype, textboxDefaultValues);

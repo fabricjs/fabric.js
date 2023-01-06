@@ -381,8 +381,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
       leftOffset -= this._getWidthOfCharSpacing();
     }
     const boundaries = {
-      top: topOffset,
-      left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
+      top: Math.min(topOffset, this.height),
+      left: Math.min(
+        lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
+        this.width
+      ),
     };
     if (this.direction === 'rtl') {
       if (
