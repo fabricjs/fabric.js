@@ -106,10 +106,18 @@ const anchorWrapper = (
   };
 };
 
-export const createPolyControls = (
+export function createPolyControls(
+  poly: Polyline,
+  options?: Partial<Control>
+): Record<string, Control>;
+export function createPolyControls(
+  numOfControls: number,
+  options?: Partial<Control>
+): Record<string, Control>;
+export function createPolyControls(
   arg0: number | Polyline,
   options: Partial<Control> = {}
-) => {
+) {
   const controls = {} as Record<string, Control>;
   for (
     let idx = 0;
@@ -123,4 +131,4 @@ export const createPolyControls = (
     });
   }
   return controls;
-};
+}
