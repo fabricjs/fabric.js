@@ -83,6 +83,7 @@ export class Textbox extends IText {
       console.warn(`fabric.Textbox: setting ${key}, width is out of range`);
     }
     /* _DEV_MODE_END_ */
+    return this;
   }
 
   /**
