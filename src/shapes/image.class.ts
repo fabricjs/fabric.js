@@ -1,6 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
-import * as filters from '../filters';
+import { getEnv } from '../env';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -113,8 +112,6 @@ export class Image extends FabricObject {
 
   protected src: string;
 
-  static filters = filters;
-
   filters: BaseFilter[];
   resizeFilter: BaseFilter;
 
@@ -139,7 +136,7 @@ export class Image extends FabricObject {
     this.cacheKey = `texture${uid()}`;
     this.set(options);
     this.setElement(
-      (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
+      (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
         arg0,
       options
     );
@@ -182,7 +179,7 @@ export class Image extends FabricObject {
    * Delete a single texture if in webgl mode
    */
   removeTexture(key: string) {
-    const backend = fabric.filterBackend;
+    const backend = getFilterBackend(false);
     if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
@@ -797,5 +794,3 @@ Object.assign(Image.prototype, imageDefaultValues);
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);
-
-fabric.Image = Image;

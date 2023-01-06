@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Group } from '../shapes/group.class';
 import { Shadow } from '../shadow.class';
@@ -218,5 +217,3 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunks.push(this.sprayChunk);
   }
 }
-
-fabric.SprayBrush = SprayBrush;

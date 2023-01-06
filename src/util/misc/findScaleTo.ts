@@ -1,4 +1,4 @@
-interface IWithDimensions {
+export interface IWithDimensions {
   /**
    * natural unscaled width of the object
    */

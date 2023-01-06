@@ -1,7 +1,6 @@
-import { fabric } from '../../../HEADER';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendObjectToPlane } from './planeChange';
-
+import { Group } from '../../shapes/group.class';
 /**
  * Merges 2 clip paths into one visually equal clip path
  *
@@ -37,5 +36,5 @@ export const mergeClipPaths = (c1: FabricObject, c2: FabricObject) => {
     //  case (1)
     a.inverted = b.inverted = false;
   }
-  return new fabric.Group([a], { clipPath: b, inverted });
+  return new Group([a], { clipPath: b, inverted });
 };
