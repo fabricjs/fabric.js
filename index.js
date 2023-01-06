@@ -136,7 +136,6 @@ import {
   getBoundsOfCurve,
   getPointOnPath,
   transformPath,
-  getRegularPolygonPath,
 } from './src/util/path';
 import { setStyle } from './src/util/dom_style';
 import { isTouchEvent, getPointer } from './src/util/dom_event';
@@ -236,7 +235,6 @@ const util = {
   getBoundsOfCurve,
   getPointOnPath,
   transformPath,
-  getRegularPolygonPath,
   isTouchEvent,
   getPointer,
   // getScrollLeftTop,
