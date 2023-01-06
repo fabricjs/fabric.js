@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -681,7 +680,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         (context.type === 'initialization' || context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        const clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());
@@ -1073,5 +1072,3 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 
 Object.assign(Group.prototype, groupDefaultValues);
 classRegistry.setClass(Group);
-
-fabric.Group = Group;

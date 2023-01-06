@@ -1,6 +1,7 @@
-import { fabric } from '../../HEADER';
 import type { BaseBrush } from '../brushes/base_brush.class';
-import { dragHandler, getActionFromCorner } from '../controls/actions';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
+import { getEnv } from '../env';
 import {
   CanvasEvents,
   ModifierKey,
@@ -28,7 +29,6 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
-import { sendPointToPlane } from '../util/misc/planeChange';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   isActiveSelection,
@@ -39,7 +39,7 @@ import {
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 
 type TDestroyedCanvas = Omit<
-  SelectableCanvas<CanvasEvents>,
+  StaticCanvas,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
@@ -517,7 +517,7 @@ export class SelectableCanvas<
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
     this._createCacheCanvas();
   }
@@ -844,11 +844,14 @@ export class SelectableCanvas<
     if (!target) {
       return;
     }
-    let pointer = this.getPointer(e);
-    if (target.group) {
-      // transform pointer to target's containing coordinate plane
-      pointer = sendPointToPlane(pointer, target.group.calcTransformMatrix());
-    }
+    const pointer = target.group
+      ? // transform pointer to target's containing coordinate plane
+        sendPointToPlane(
+          this.getPointer(e),
+          undefined,
+          target.group.calcTransformMatrix()
+        )
+      : this.getPointer(e);
     const corner = target.__corner || '',
       control = target.controls[corner],
       actionHandler =
@@ -1282,7 +1285,7 @@ export class SelectableCanvas<
     if (this.wrapperEl) {
       return;
     }
-    const container = fabric.document.createElement('div');
+    const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');

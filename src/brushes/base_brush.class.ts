@@ -1,9 +1,8 @@
-import { fabric } from '../../HEADER';
 import type { Canvas } from '../canvas/canvas_events';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import type { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
@@ -268,5 +267,3 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
     this.onEnd(shape);
   }
 }
-
-fabric.BaseBrush = BaseBrush;

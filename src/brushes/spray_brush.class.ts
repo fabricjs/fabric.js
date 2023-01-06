@@ -1,4 +1,3 @@
-import { fabric } from '../../HEADER';
 import type { Canvas } from '../canvas/canvas_events';
 import { Point } from '../point.class';
 import { Group } from '../shapes/group.class';
@@ -210,5 +209,3 @@ export class SprayBrush extends BaseBrush<FabricObject> {
     this.sprayChunks.push(this.sprayChunk);
   }
 }
-
-fabric.SprayBrush = SprayBrush;
