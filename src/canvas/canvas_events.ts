@@ -1,4 +1,4 @@
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import {
   CanvasEvents,
   DragEventData,
@@ -13,7 +13,8 @@ import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { stopEvent } from '../util/dom_event';
+import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
@@ -35,11 +36,11 @@ function checkClick(e: TPointerEvent, value: number) {
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
 // few bytes but why give it away.
 const addListener = (
-  el: HTMLElement,
+  el: HTMLElement | Document,
   ...args: Parameters<HTMLElement['addEventListener']>
 ) => el.addEventListener(...args);
 const removeListener = (
-  el: HTMLElement,
+  el: HTMLElement | Document,
   ...args: Parameters<HTMLElement['removeEventListener']>
 ) => el.removeEventListener(...args);
 
@@ -147,7 +148,7 @@ export class Canvas extends SelectableCanvas {
   addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    functor(fabric.window, 'resize', this._onResize);
+    functor(getEnv().window, 'resize', this._onResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     functor(
       canvasElement,
@@ -190,24 +191,24 @@ export class Canvas extends SelectableCanvas {
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
     removeListener(
-      fabric.document,
+      getEnv().document,
       `${eventTypePrefix}up`,
       this._onMouseUp as EventListener
     );
     removeListener(
-      fabric.document,
+      getEnv().document,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      fabric.document,
+      getEnv().document,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
     );
     removeListener(
-      fabric.document,
+      getEnv().document,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -591,13 +592,13 @@ export class Canvas extends SelectableCanvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     addListener(
-      fabric.document,
+      getEnv().document,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     addListener(
-      fabric.document,
+      getEnv().document,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -626,12 +627,12 @@ export class Canvas extends SelectableCanvas {
       addEventOptions
     );
     addListener(
-      fabric.document,
+      getEnv().document,
       `${eventTypePrefix}up`,
       this._onMouseUp as EventListener
     );
     addListener(
-      fabric.document,
+      getEnv().document,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
@@ -652,13 +653,13 @@ export class Canvas extends SelectableCanvas {
     this.mainTouchId = null;
     const eventTypePrefix = this._getEventPrefix();
     removeListener(
-      fabric.document,
+      getEnv().document,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      fabric.document,
+      getEnv().document,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -689,12 +690,12 @@ export class Canvas extends SelectableCanvas {
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
       removeListener(
-        fabric.document,
+        getEnv().document,
         `${eventTypePrefix}up`,
         this._onMouseUp as EventListener
       );
       removeListener(
-        fabric.document,
+        getEnv().document,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
         addEventOptions
@@ -811,7 +812,7 @@ export class Canvas extends SelectableCanvas {
     if (target) {
       corner = target._findTargetCorner(
         this.getPointer(e, true),
-        fabric.util.isTouchEvent(e)
+        isTouchEvent(e)
       );
       if (
         target.selectable &&
@@ -1127,7 +1128,7 @@ export class Canvas extends SelectableCanvas {
       }
       const corner = target._findTargetCorner(
         this.getPointer(e, true),
-        fabric.util.isTouchEvent(e)
+        isTouchEvent(e)
       );
       if (target === this._activeObject && (corner || !shouldGroup)) {
         this._setupCurrentTransform(e, target, alreadySelected);
@@ -1640,11 +1641,22 @@ export class Canvas extends SelectableCanvas {
     // clear selection and current transformation
     this._groupSelector = null;
   }
+
+  /**
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
+   */
+  cloneWithoutData(): Canvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new Canvas(el);
+  }
 }
 
 // there is an order execution bug if i put this as public property.
 Object.assign(Canvas.prototype, {
   eventsBound: false,
 });
-
-fabric.Canvas = Canvas;

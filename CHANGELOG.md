@@ -3,6 +3,18 @@
 ## [next]
 
 - feat(): `getRegularPolygonPath` => `Polygon.getRegularPolygonPoints`, `Polygon.createRegularPolygon` [#8537](https://github.com/fabricjs/fabric.js/pull/8537)
+- fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
+- fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
+- chore(TS): Use exports from files to build fabricJS, get rid of HEADER.js [#8549](https://github.com/fabricjs/fabric.js/pull/8549)
+- chore(): rm `fabric.filterBackend` => `getFilterBackend` [#8487](https://github.com/fabricjs/fabric.js/pull/8487)
+- chore(TS): migrate text SVG export mixin [#8486](https://github.com/fabricjs/fabric.js/pull/8486)
+- refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+  BREAKING:
+  - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
+  - change `animateColor` signature to match `animate`, removed `colorEasing`
+- fix(Object Stacking): 🔙 refactor logic to support Group 🔝
+- chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
+- chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)
 - chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
 - chore(TS): Remove backward compatibility initialize methods [#8525](https://github.com/fabricjs/fabric.js/pull/8525/)
 - chore(TS): replace getKlass utility with a registry that doesn't require full fabricJS to work [#8500](https://github.com/fabricjs/fabric.js/pull/8500)

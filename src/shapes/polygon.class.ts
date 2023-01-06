@@ -1,10 +1,9 @@
-import { fabric } from '../../HEADER';
 import { halfPI, twoMathPi } from '../constants';
 import { Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
-import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';
 
 export class Polygon extends Polyline {
@@ -54,6 +53,3 @@ Object.assign(Polygon.prototype, polygonDefaultValues);
 
 classRegistry.setClass(Polygon);
 classRegistry.setSVGClass(Polygon);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Polygon = Polygon;
