@@ -1,6 +1,6 @@
 import { Transform } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
 import { TAxis } from '../typedefs';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { AXIS_KEYS } from './constants';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -47,7 +47,7 @@ const changeObjectSize = (
         0
       );
     target.set(sizeKey, size);
-    //  check against actual target width/height in case `newWidth` was rejected
+    //  check against actual target width/height in case the value was rejected
     return prevSize !== target[sizeKey];
   }
   return false;
