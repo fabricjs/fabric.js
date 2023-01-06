@@ -2035,7 +2035,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2079,9 +2079,9 @@ QUnit.module('Free Drawing', hooks => {
 
     fabricClass: 'Canvas',
 
-    disabled: fabric.isLikelyNode,
+    percentage: 0.06,
 
-    percentage: 0.06
+    disabled: fabric.getEnv().isLikelyNode
   };
 
   function freedrawing(canvas) {

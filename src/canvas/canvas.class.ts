@@ -1,6 +1,7 @@
-import { fabric } from '../../HEADER';
 import type { BaseBrush } from '../brushes/base_brush.class';
-import { dragHandler, getActionFromCorner } from '../controls/actions';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
+import { getEnv } from '../env';
 import {
   CanvasEvents,
   ModifierKey,
@@ -8,12 +9,18 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import { TSVGReviver } from '../mixins/object.svg_export';
 import { Point } from '../point.class';
 import type { IText } from '../shapes/itext.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type { Textbox } from '../shapes/textbox.class';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TSVGReviver,
+} from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import {
   cleanUpJsdomNode,
@@ -519,7 +526,7 @@ export class SelectableCanvas<
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
     this._createCacheCanvas();
   }
@@ -836,7 +843,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
@@ -846,11 +853,14 @@ export class SelectableCanvas<
     if (!target) {
       return;
     }
-    let pointer = this.getPointer(e);
-    if (target.group) {
-      // transform pointer to target's containing coordinate plane
-      pointer = sendPointToPlane(pointer, target.group.calcTransformMatrix());
-    }
+    const pointer = target.group
+      ? // transform pointer to target's containing coordinate plane
+        sendPointToPlane(
+          this.getPointer(e),
+          undefined,
+          target.group.calcTransformMatrix()
+        )
+      : this.getPointer(e);
     const corner = target.__corner || '',
       control = target.controls[corner],
       actionHandler =
@@ -1284,7 +1294,7 @@ export class SelectableCanvas<
     if (this.wrapperEl) {
       return;
     }
-    const container = fabric.document.createElement('div');
+    const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');

@@ -1,17 +1,16 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
-import { Gradient } from '../gradient';
+import type { Gradient } from '../gradient/gradient.class';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { TSVGReviver } from '../mixins/object.svg_export';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
-import { Pattern } from '../pattern.class';
+import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TCachedFabricObject } from '../shapes/Object/Object';
-import { Rect } from '../shapes/rect.class';
+import type { TCachedFabricObject } from '../shapes/Object/Object';
+import type { Rect } from '../shapes/rect.class';
 import {
   ImageFormat,
   TCornerPoint,
@@ -19,10 +18,11 @@ import {
   TFiller,
   TMat2D,
   TSize,
+  TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
-import { cancelAnimFrame, requestAnimFrame } from '../util/animate';
+import { cancelAnimFrame, requestAnimFrame } from '../util/animation';
 import {
   cleanUpJsdomNode,
   getElementOffset,
@@ -306,7 +306,7 @@ export class StaticCanvas<
 
   _onObjectAdded(obj: FabricObject) {
     // @ts-ignore;
-    this.stateful && obj.setupState();
+    this.stateful && obj.saveState();
     if (obj.canvas && obj.canvas !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
@@ -346,7 +346,7 @@ export class StaticCanvas<
     this.renderAndResetBound = this.renderAndReset.bind(this);
     this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this._initStatic(el, options);
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcViewportBoundaries();
   }
 
@@ -382,9 +382,6 @@ export class StaticCanvas<
    * @private
    */
   _initRetinaScaling() {
-    if (!this._isRetinaScaling()) {
-      return;
-    }
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
@@ -430,18 +427,16 @@ export class StaticCanvas<
 
     this.width = this.width || lowerCanvasEl.width || 0;
     this.height = this.height || lowerCanvasEl.height || 0;
+    this.viewportTransform = [...this.viewportTransform];
 
     if (!this.lowerCanvasEl.style) {
       return;
     }
-
     lowerCanvasEl.width = this.width;
     lowerCanvasEl.height = this.height;
 
     lowerCanvasEl.style.width = this.width + 'px';
     lowerCanvasEl.style.height = this.height + 'px';
-
-    this.viewportTransform = [...this.viewportTransform];
   }
 
   /**
@@ -455,7 +450,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        fabric.document.getElementById(canvasEl) ||
+        getEnv().document.getElementById(canvasEl) ||
         canvasEl ||
         this._createCanvasElement();
     }
@@ -538,7 +533,7 @@ export class StaticCanvas<
       }
     });
 
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
 
     if (!cssOnly) {
@@ -1784,7 +1779,7 @@ Object.assign(StaticCanvas.prototype, {
   clipPath: undefined,
 });
 
-if (fabric.isLikelyNode) {
+if (getEnv().isLikelyNode) {
   Object.assign(StaticCanvas.prototype, {
     createPNGStream() {
       const impl = getNodeCanvas(
@@ -1800,5 +1795,3 @@ if (fabric.isLikelyNode) {
     },
   });
 }
-
-fabric.StaticCanvas = StaticCanvas;

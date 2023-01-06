@@ -1,12 +1,11 @@
-import { fabric } from '../../../HEADER';
-import type { FabricObject } from '../../shapes/Object/Object';
+import { Group } from '../../shapes/group.class';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendObjectToPlane } from './planeChange';
-
 /**
  * Merges 2 clip paths into one visually equal clip path
  *
  * **IMPORTANT**:\
- * Does **NOT** clone the arguments, clone them proir if necessary.
+ * Does **NOT** clone the arguments, clone them prior if necessary.
  *
  * Creates a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
  * Use this method if both the clip paths may have nested clip paths of their own, so assigning one to the other's clip path property is not possible.
@@ -37,5 +36,5 @@ export const mergeClipPaths = (c1: FabricObject, c2: FabricObject) => {
     //  case (1)
     a.inverted = b.inverted = false;
   }
-  return new fabric.Group([a], { clipPath: b, inverted });
+  return new Group([a], { clipPath: b, inverted });
 };
