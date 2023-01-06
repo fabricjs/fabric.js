@@ -1,5 +1,4 @@
-import { fabric } from '../HEADER';
-import { Color } from './color';
+import { Color } from './color/color.class';
 import { config } from './config';
 import { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';
@@ -214,5 +213,3 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 Object.assign(Shadow.prototype, shadowDefaultValues);
-
-fabric.Shadow = Shadow;

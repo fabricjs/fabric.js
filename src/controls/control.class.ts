@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { fabric } from '../../HEADER';
 import { halfPI } from '../constants';
 import {
   ControlActionHandler,
@@ -377,5 +376,3 @@ export class Control {
     }
   }
 }
-
-fabric.Control = Control;
