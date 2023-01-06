@@ -341,6 +341,10 @@ import { PencilBrush } from './src/brushes/pencil_brush.class';
 import { CircleBrush } from './src/brushes/circle_brush.class';
 import { SprayBrush } from './src/brushes/spray_brush.class';
 import { PatternBrush } from './src/brushes/pattern_brush.class';
+import { DrawOval } from './src/brushes/DrawOval';
+import { DrawPoly } from './src/brushes/DrawPoly';
+import { DrawShape } from './src/brushes/DrawShape';
+import { DrawShapeBase } from './src/brushes/DrawShapeBase';
 import { FabricObject as Object } from './src/shapes/Object/FabricObject';
 import { Line } from './src/shapes/line.class';
 import { Circle } from './src/shapes/circle.class';
@@ -397,6 +401,10 @@ const fabric = {
   CircleBrush,
   SprayBrush,
   PatternBrush,
+  DrawOval,
+  DrawPoly,
+  DrawShape,
+  DrawShapeBase,
   Object,
   Line,
   Circle,
