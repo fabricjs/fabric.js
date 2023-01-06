@@ -10,23 +10,8 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 type TTransformAnchor = Transform & { pointIndex: number };
-
-const applySkew = (point: Point, shear: Point) => {
-  const skewedPoint = new Point();
-  skewedPoint.y = point.y + point.x * shear.y;
-  skewedPoint.x = point.x + skewedPoint.y * shear.x;
-  return skewedPoint;
-};
-
-const removeSkew = (point: Point, shear: Point) => {
-  const unskewedPoint = new Point();
-  unskewedPoint.x = point.x - point.y * shear.x;
-  unskewedPoint.y = point.y - unskewedPoint.x * shear.y;
-  return unskewedPoint;
-};
 
 const getSize = (poly: Polyline) => {
   return new Point(poly.width, poly.height);
@@ -68,20 +53,12 @@ const polyActionHandler = (
     polygonBaseSize = getSize(poly),
     size = poly._getTransformedDimensions(),
     sizeFactor = polygonBaseSize.divide(size),
-    shear = new Point(
-      Math.tan(degreesToRadians(poly.skewX)),
-      Math.tan(degreesToRadians(poly.skewY))
-    ),
     adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
-  const skewedPathOffset = applySkew(poly.pathOffset, shear),
-    finalPointPosition = removeSkew(
-      mouseLocalPosition
-        .multiply(adjustFlip)
-        .multiply(sizeFactor)
-        .add(skewedPathOffset),
-      shear
-    );
+  const finalPointPosition = mouseLocalPosition
+    .multiply(adjustFlip)
+    .multiply(sizeFactor)
+    .add(poly.pathOffset);
 
   poly.points[pointIndex] = finalPointPosition;
   poly.setDimensions();
@@ -110,19 +87,13 @@ const anchorWrapper = (
       ).transform(poly.calcTransformMatrix()),
       actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
       polygonBaseSize = getSize(poly),
-      shear = new Point(
-        Math.tan(degreesToRadians(poly.skewX)),
-        Math.tan(degreesToRadians(poly.skewY))
-      ),
       adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
-    const newPosition = applySkew(
-      new Point(
-        poly.points[anchorIndex].x,
-        poly.points[anchorIndex].y
-      ).subtract(poly.pathOffset),
-      shear
+    const newPosition = new Point(
+      poly.points[anchorIndex].x,
+      poly.points[anchorIndex].y
     )
+      .subtract(poly.pathOffset)
       .divide(polygonBaseSize)
       .multiply(adjustFlip);
 
