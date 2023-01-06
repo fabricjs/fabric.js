@@ -35,6 +35,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   isActiveSelection,
@@ -840,7 +841,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
