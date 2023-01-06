@@ -9,12 +9,18 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import { TSVGReviver } from '../mixins/object.svg_export';
 import { Point } from '../point.class';
 import type { IText } from '../shapes/itext.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type { Textbox } from '../shapes/textbox.class';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TSVGReviver,
+} from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import {
   cleanUpJsdomNode,
