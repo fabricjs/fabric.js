@@ -39,12 +39,12 @@ const isArrayAnimation = (
  * });
  *
  */
-export const animate = <
+export function animate(options: ValueAnimationOptions): ValueAnimation;
+export function animate(options: ArrayAnimationOptions): ArrayAnimation;
+export function animate<
   T extends ValueAnimationOptions | ArrayAnimationOptions,
   R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
->(
-  options: T
-): R => {
+>(options: T): R {
   const animation = (
     isArrayAnimation(options)
       ? new ArrayAnimation(options)
@@ -52,10 +52,10 @@ export const animate = <
   ) as R;
   animation.start();
   return animation;
-};
+}
 
-export const animateColor = (options: ColorAnimationOptions) => {
+export function animateColor(options: ColorAnimationOptions) {
   const animation = new ColorAnimation(options);
   animation.start();
   return animation;
-};
+}
