@@ -11,14 +11,6 @@ import { isFiller } from '../util/types';
 
 const coordProps = ['x1','x2', 'y1', 'y2'];
 
-export const lineDefaultValues: Partial<TClassProperties<Line>> = {
-  type: 'line',
-  x1: 0,
-  y1: 0,
-  x2: 0,
-  y2: 0,
-};
-
 export class Line extends FabricObject {
   /**
    * x value or first line edge
@@ -317,7 +309,18 @@ export class Line extends FabricObject {
   }
 }
 
-Line.prototype.cacheProperties = [...cacheProperties, 'x1', 'x2', 'y1', 'y2'];
+export const lineDefaultValues: Partial<TClassProperties<Line>> = {
+  type: 'line',
+  x1: 0,
+  y1: 0,
+  x2: 0,
+  y2: 0,
+};
+
+Object.assign(Line.prototype, {
+  ...lineDefaultValues,
+  cacheProperties: [...cacheProperties, 'x1', 'x2', 'y1', 'y2'],
+});
 
 classRegistry.setClass(Line);
 classRegistry.setSVGClass(Line);

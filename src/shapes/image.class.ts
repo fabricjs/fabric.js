@@ -782,7 +782,7 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 
 Object.assign(Image.prototype, {
   ...imageDefaultValues,
-  cacheProperties = [...cacheProperties, 'cropX', 'cropY'],
+  cacheProperties: [...cacheProperties, 'cropX', 'cropY'],
 })
 
 classRegistry.setClass(Image);
