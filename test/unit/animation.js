@@ -386,7 +386,8 @@
         currentValue[0] = 200;
         run = true;
       },
-      onComplete: function(endValue) {
+      onComplete: function (endValue) {
+        assert.ok(Object.isFrozen(endValue), 'should be frozen');
         assert.equal(endValue.length, 3);
         assert.deepEqual(endValue, [2, 4, 6]);
         assert.equal(run, true, 'something run');
