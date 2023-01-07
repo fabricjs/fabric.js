@@ -16,10 +16,11 @@ export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
   readonly startValue: T;
-  readonly byValue: T;
   readonly endValue: T;
   readonly duration: number;
   readonly delay: number;
+
+  protected readonly byValue: T;
   protected readonly easing: TEasingFunction<T>;
 
   private readonly _onStart: VoidFunction;
