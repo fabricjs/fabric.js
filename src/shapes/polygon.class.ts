@@ -4,9 +4,6 @@ import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';
 
 export class Polygon extends Polyline {
-  constructor(points: IPoint[] = [], options: any = {}) {
-    super(points, options);
-  }
 
   protected isOpen() {
     return false;
