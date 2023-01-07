@@ -623,13 +623,7 @@ export class FabricObject<
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
-    // those do not got through set options because they didn't before.
-    // probably even the initial options should be just assigned since
-    // setOptions -> set -> side effects
-    Object.assign(this, fabricObjectDefaultValues);
-    if (options) {
-      this.setOptions(options);
-    }
+    this.setOptions({ ...fabricObjectDefaultValues, ...options });
   }
 
   /**
@@ -807,10 +801,12 @@ export class FabricObject<
   }
 
   /**
-   * Sets object's properties from options
+   * Sets object's properties from options, for class constructor only.
+   * Needs to be overridden for different defaults.
+   * @protected
    * @param {Object} [options] Options object
    */
-  setOptions(options: Record<string, any> = {}) {
+  protected setOptions(options: Record<string, any> = {}) {
     this._setOptions(options);
   }
 

@@ -28,14 +28,6 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
   );
 };
 
-export const isGradient = (filler: TFiller): filler is Gradient<any, any> => {
-  return (
-    !!filler &&
-    (filler as Gradient<any, any>).offsetX !== undefined &&
-    (filler as Gradient<any, any>).source !== undefined
-  );
-};
-
 export const isCollection = (
   fabricObject?: FabricObject
 ): fabricObject is Group | ActiveSelection => {

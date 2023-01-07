@@ -17,12 +17,22 @@ import {
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export type ImageSource =
   | HTMLImageElement
   | HTMLVideoElement
   | HTMLCanvasElement;
+
+export const imageDefaultValues: Partial<TClassProperties<Image>> = {
+  type: 'image',
+  strokeWidth: 0,
+  srcFromAttribute: false,
+  minimumScaleTrigger: 0.5,
+  cropX: 0,
+  cropY: 0,
+  imageSmoothing: true,
+};
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
@@ -33,9 +43,9 @@ export class Image extends FabricObject {
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
-   * @default
+   * @default false
    */
-  srcFromAttribute: boolean;
+  declare srcFromAttribute: boolean;
 
   /**
    * private
@@ -73,7 +83,7 @@ export class Image extends FabricObject {
    * number bigger than 1 are not implemented yet.
    * @type Number
    */
-  minimumScaleTrigger: number;
+  declare minimumScaleTrigger: number;
 
   /**
    * key used to retrieve the texture representing this image
@@ -81,7 +91,7 @@ export class Image extends FabricObject {
    * @type String
    * @default
    */
-  cacheKey: string;
+  declare cacheKey: string;
 
   /**
    * Image crop in pixels from original image size.
@@ -89,7 +99,7 @@ export class Image extends FabricObject {
    * @type Number
    * @default
    */
-  cropX: number;
+  declare cropX: number;
 
   /**
    * Image crop in pixels from original image size.
@@ -97,7 +107,7 @@ export class Image extends FabricObject {
    * @type Number
    * @default
    */
-  cropY: number;
+  declare cropY: number;
 
   /**
    * Indicates whether this canvas will use image smoothing when painting this image.
@@ -106,18 +116,18 @@ export class Image extends FabricObject {
    * @type Boolean
    * @default
    */
-  imageSmoothing: boolean;
+  declare imageSmoothing: boolean;
 
-  preserveAspectRatio: string;
+  declare preserveAspectRatio: string;
 
-  protected src: string;
+  declare protected src: string;
 
-  filters: BaseFilter[];
-  resizeFilter: BaseFilter;
+  filters: BaseFilter[] = [];
+  declare resizeFilter: BaseFilter;
 
-  protected _element: ImageSource;
-  protected _originalElement: ImageSource;
-  protected _filteredEl: ImageSource;
+  declare protected _element: ImageSource;
+  declare protected _originalElement: ImageSource;
+  declare protected _filteredEl: ImageSource;
 
   /**
    * Constructor
@@ -131,10 +141,8 @@ export class Image extends FabricObject {
   constructor(elementId: string, options: any = {});
   constructor(element: ImageSource, options: any = {});
   constructor(arg0: ImageSource | string, options: any = {}) {
-    super();
-    this.filters = [];
+    super({ ...imageDefaultValues, ...options });
     this.cacheKey = `texture${uid()}`;
-    this.set(options);
     this.setElement(
       (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
         arg0,
@@ -772,22 +780,7 @@ export class Image extends FabricObject {
   }
 }
 
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
-    'cropX',
-    'cropY',
-  ],
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
-Object.assign(Image.prototype, imageDefaultValues);
+Image.prototype.cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

@@ -17,7 +17,7 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, stateProperties } from './Object/FabricObject';
 import { Rect } from './rect.class';
 import { classRegistry } from '../util/class_registry';
 
@@ -77,6 +77,14 @@ export type LayoutResult = {
   height: number;
 };
 
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
+  type: 'group',
+  layout: 'fit-content',
+  strokeWidth: 0,
+  subTargetCheck: false,
+  interactive: false,
+};
+
 /**
  * @fires object:added
  * @fires object:removed
@@ -90,7 +98,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @type LayoutStrategy
    * @default
    */
-  layout: LayoutStrategy;
+  declare layout: LayoutStrategy;
 
   /**
    * Used to optimize performance
@@ -98,7 +106,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  subTargetCheck: boolean;
+  declare subTargetCheck: boolean;
 
   /**
    * Used to allow targeting of object inside groups.
@@ -107,7 +115,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  interactive: boolean;
+  declare interactive: boolean;
 
   /**
    * Used internally to optimize performance
@@ -129,7 +137,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     options: any = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super();
+    super(groupDefaultValues);
     this._objects = objects || [];
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -1037,14 +1045,5 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 }
 
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
-  layout: 'fit-content',
-  strokeWidth: 0,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('layout'),
-  subTargetCheck: false,
-  interactive: false,
-};
-
-Object.assign(Group.prototype, groupDefaultValues);
+Group.prototype.stateProperties = [...stateProperties, 'layout'],
 classRegistry.setClass(Group);

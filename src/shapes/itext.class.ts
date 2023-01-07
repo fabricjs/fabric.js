@@ -18,6 +18,29 @@ export type ITextEvents = ObjectEvents & {
   'editing:exited': never;
 };
 
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
+  type: 'i-text',
+  selectionStart: 0,
+  selectionEnd: 0,
+  selectionColor: 'rgba(17,119,255,0.3)',
+  isEditing: false,
+  editable: true,
+  editingBorderColor: 'rgba(102,153,255,0.25)',
+  cursorWidth: 2,
+  cursorColor: '',
+  cursorDelay: 1000,
+  cursorDuration: 600,
+  caching: true,
+  hiddenTextareaContainer: null,
+  _currentCursorOpacity: 1,
+  _selectionDirection: null,
+  inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
+};
+
 /**
  * @fires changed
  * @fires selection:changed
@@ -67,53 +90,53 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @type Number
    * @default
    */
-  selectionStart: number;
+  declare selectionStart: number;
 
   /**
    * Index where text selection ends
    * @type Number
    * @default
    */
-  selectionEnd: number;
+  declare selectionEnd: number;
 
-  compositionStart: number;
+  declare compositionStart: number;
 
-  compositionEnd: number;
+  declare compositionEnd: number;
 
   /**
    * Color of text selection
    * @type String
    * @default
    */
-  selectionColor: string;
+  declare selectionColor: string;
 
   /**
    * Indicates whether text is in editing mode
    * @type Boolean
    * @default
    */
-  isEditing: boolean;
+  declare isEditing: boolean;
 
   /**
    * Indicates whether a text can be edited
    * @type Boolean
    * @default
    */
-  editable: boolean;
+  declare editable: boolean;
 
   /**
    * Border color of text object while it's in editing mode
    * @type String
    * @default
    */
-  editingBorderColor: string;
+  declare editingBorderColor: string;
 
   /**
    * Width of cursor (in px)
    * @type Number
    * @default
    */
-  cursorWidth: number;
+  declare cursorWidth: number;
 
   /**
    * Color of text cursor color in editing mode.
@@ -123,28 +146,28 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @type String
    * @default
    */
-  cursorColor: string;
+  declare cursorColor: string;
 
   /**
    * Delay between cursor blink (in ms)
    * @type Number
    * @default
    */
-  cursorDelay: number;
+  declare cursorDelay: number;
 
   /**
    * Duration of cursor fade in (in ms)
    * @type Number
    * @default
    */
-  cursorDuration: number;
+  declare cursorDuration: number;
 
   /**
    * Indicates whether internal text char widths can be cached
    * @type Boolean
    * @default
    */
-  caching: boolean;
+  declare caching: boolean;
 
   /**
 
@@ -153,7 +176,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {Object} [options] Options object
    */
   constructor(text: string, options: object) {
-    super(text, options);
+    super(text, {...iTextDefaultValues, ...options });
     this.initBehavior();
   }
 
@@ -605,30 +628,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 }
 
-export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
-  type: 'i-text',
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _reSpace: /\s|\n/,
-  _currentCursorOpacity: 1,
-  _selectionDirection: null,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-};
-
-Object.assign(IText.prototype, iTextDefaultValues);
+IText.prototype._reSpace = /\s|\n/;
 
 classRegistry.setClass(IText);

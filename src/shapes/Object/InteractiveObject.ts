@@ -8,7 +8,6 @@ import {
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
-import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
