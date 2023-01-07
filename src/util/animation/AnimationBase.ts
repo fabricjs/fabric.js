@@ -78,7 +78,7 @@ export abstract class AnimationBase<
     this.startValue = startValue;
     this.byValue = byValue;
     this.value = this.startValue;
-    this.endValue = this.calculate(this.duration).value;
+    this.endValue = Object.freeze(this.calculate(this.duration).value);
   }
 
   get state() {
@@ -120,27 +120,28 @@ export abstract class AnimationBase<
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationProgress = boundDurationMs / this.duration;
     const { value, changeRatio } = this.calculate(boundDurationMs);
-    this.value = Array.isArray(value) ? (value.slice() as T) : value;
+    this.value = Object.freeze(value);
     this.valueProgress = changeRatio;
 
     if (this._state === 'aborted') {
       return;
-    } else if (this._abort(value, this.valueProgress, this.durationProgress)) {
+    } else if (
+      this._abort(this.value, this.valueProgress, this.durationProgress)
+    ) {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      const endValue = this.endValue;
       this.durationProgress = this.valueProgress = 1;
-      this._onChange(
-        (Array.isArray(endValue) ? endValue.slice() : endValue) as T,
+      this._onChange(this.endValue, this.valueProgress, this.durationProgress);
+      this._state = 'completed';
+      this._onComplete(
+        this.endValue,
         this.valueProgress,
         this.durationProgress
       );
-      this._state = 'completed';
-      this._onComplete(endValue, this.valueProgress, this.durationProgress);
       this.unregister();
     } else {
-      this._onChange(value, this.valueProgress, this.durationProgress);
+      this._onChange(this.value, this.valueProgress, this.durationProgress);
       requestAnimFrame(this.tick);
     }
   }
