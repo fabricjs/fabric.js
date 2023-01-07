@@ -51,26 +51,24 @@ export type TAnimationBaseOptions<T> = {
    * Duration of the animation in ms
    * @default 500
    */
-  duration?: number;
+  duration: number;
 
   /**
    * Delay to start the animation in ms
    * @default 0
    */
-  delay?: number;
+  delay: number;
 
   /**
    * Easing function
    * @default {defaultEasing}
    */
-  easing?: TEasingFunction<T>;
+  easing: TEasingFunction<T>;
 
   /**
    * The object this animation is being performed on
    */
-  target?: unknown;
-
-  byValue: T;
+  target: unknown;
 };
 
 export type TAnimationCallbacks<T> = {
@@ -96,31 +94,28 @@ export type TAnimationCallbacks<T> = {
   abort: TAbortCallback<T>;
 };
 
-export type TAnimationValues<T> = {
-  /**
-   * Starting value(s)
-   * @default 0
-   */
+export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
+  TAnimationBaseOptions<TEasing> & TAnimationCallbacks<TCallback>
+> & {
   startValue: T;
-  /**
-   * Ending value(s)
-   * @default 100
-   */
-  endValue: T;
+  byValue: T;
 };
 
-export type TBaseAnimationOptions<
-  T,
-  TCallback = T,
-  TEasing = T
-> = TAnimationBaseOptions<TEasing> &
-  Omit<TAnimationValues<T>, 'endValue'> &
-  Partial<TAnimationCallbacks<TCallback>>;
-
 export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
-  Omit<TAnimationBaseOptions<TEasing>, 'byValue'> &
-    TAnimationValues<T> &
-    TAnimationCallbacks<TCallback>
+  TAnimationBaseOptions<TEasing> &
+    TAnimationCallbacks<TCallback> & {
+      /**
+       * Starting value(s)
+       * @default 0
+       */
+      startValue: T;
+
+      /**
+       * Ending value(s)
+       * @default 100
+       */
+      endValue: T;
+    }
 >;
 
 export type ValueAnimationOptions = TAnimationOptions<number>;
