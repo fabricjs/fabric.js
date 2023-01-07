@@ -621,7 +621,7 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   hiddenTextareaContainer: null,
   _currentCursorOpacity: 1,
   _selectionDirection: null,
-  _reSpace = /\s|\n/,
+  _reSpace: /\s|\n/,
   inCompositionMode: false,
   keysMap,
   keysMapRtl,
