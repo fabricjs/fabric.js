@@ -9,7 +9,12 @@ import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+
+export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
+  type: 'polyline',
+  exactBoundingBox: false,
+};
 
 export class Polyline extends FabricObject {
   /**
@@ -17,7 +22,7 @@ export class Polyline extends FabricObject {
    * @type Array
    * @default
    */
-  points: IPoint[];
+  declare points: IPoint[];
 
   /**
    * WARNING: Feature in progress
@@ -27,23 +32,22 @@ export class Polyline extends FabricObject {
    * @deprecated
    * @type Boolean
    * @default false
-   * @todo set default to true and remove flag and related logic
    */
-  exactBoundingBox: boolean;
+  declare exactBoundingBox: boolean;
 
-  private initialized: true | undefined;
+  declare private initialized: true | undefined;
 
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
-  strokeBBoxAffectingProperties: (keyof this)[];
+  declare strokeBBoxAffectingProperties: (keyof this)[];
 
-  fromSVG: boolean;
+  declare fromSVG: boolean;
 
-  pathOffset: Point;
+  declare pathOffset: Point;
 
-  strokeOffset: Point;
+  declare strokeOffset: Point;
 
   /**
    * Constructor
@@ -65,7 +69,7 @@ export class Polyline extends FabricObject {
    * });
    */
   constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
-    super({ points, ...options });
+    super({ ...polylineDefaultValues, points, ...options });
     this.initialized = true;
     this.setBoundingBox(true);
     typeof left === 'number' && this.set('left', left);
@@ -187,7 +191,7 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]): object {
+  toObject(propertiesToInclude?: string[]): object {
     return {
       ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
@@ -310,23 +314,17 @@ export class Polyline extends FabricObject {
   }
 }
 
-export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  type: 'polyline',
-  exactBoundingBox: false,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'points'],
-  strokeBBoxAffectingProperties: [
-    'skewX',
-    'skewY',
-    'strokeLineCap',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'strokeWidth',
-    'strokeUniform',
-    'points',
-  ],
-};
-
-Object.assign(Polyline.prototype, polylineDefaultValues);
+Polyline.prototype.cacheProperties = [...cacheProperties, 'points'];
+Polyline.prototype.strokeBBoxAffectingProperties = [
+  'skewX',
+  'skewY',
+  'strokeLineCap',
+  'strokeLineJoin',
+  'strokeMiterLimit',
+  'strokeWidth',
+  'strokeUniform',
+  'points',
+];
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);

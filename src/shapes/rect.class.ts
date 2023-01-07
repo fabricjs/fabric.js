@@ -3,7 +3,13 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+
+export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
+  type: 'rect',
+  rx: 0,
+  ry: 0,
+};
 
 export class Rect extends FabricObject {
   /**
@@ -11,14 +17,14 @@ export class Rect extends FabricObject {
    * @type Number
    * @default
    */
-  rx: number;
+  declare rx: number;
 
   /**
    * Vertical border radius
    * @type Number
    * @default
    */
-  ry: number;
+  declare ry: number;
 
   /**
    * Constructor
@@ -26,7 +32,7 @@ export class Rect extends FabricObject {
    * @return {Object} thisArg
    */
   constructor(options: Record<string, unknown>) {
-    super(options);
+    super({ ...rectDefaultValues, ...options });
     this._initRxRy();
   }
 
@@ -106,7 +112,7 @@ export class Rect extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject(propertiesToInclude: string[] = []) {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 
@@ -184,14 +190,7 @@ export class Rect extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  type: 'rect',
-  rx: 0,
-  ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
-};
-
-Object.assign(Rect.prototype, rectDefaultValues);
+Rect.prototype.cacheProperties = [...cacheProperties, 'rx', 'ry'];
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);

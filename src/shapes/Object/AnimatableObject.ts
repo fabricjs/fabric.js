@@ -24,13 +24,13 @@ export abstract class AnimatableObject<
    * @type Number
    * @default
    */
-  FX_DURATION: number;
+  declare FX_DURATION: number;
 
   /**
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  colorProperties: string[];
+  declare colorProperties: string[];
 
   abstract rotate(deg: TDegree): void;
 

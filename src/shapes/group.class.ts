@@ -921,7 +921,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   __serializeObjects(
     method: 'toObject' | 'toDatalessObject',
-    propertiesToInclude?: (keyof this)[]
+    propertiesToInclude?: string[]
   ) {
     const _includeDefaultValues = this.includeDefaultValues;
     return this._objects

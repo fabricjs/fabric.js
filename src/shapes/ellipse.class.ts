@@ -78,7 +78,7 @@ export class Ellipse extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject(propertiesToInclude: string[] = []) {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 

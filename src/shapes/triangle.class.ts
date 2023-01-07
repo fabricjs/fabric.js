@@ -2,7 +2,18 @@ import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './Object/FabricObject';
 
+export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
+  type: 'triangle',
+  width: 100,
+  height: 100,
+};
+
 export class Triangle extends FabricObject {
+
+  constructor(options: any = {}) {
+    super({ ...triangleDefaultValues, ...options });
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -32,14 +43,6 @@ export class Triangle extends FabricObject {
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
   }
 }
-
-export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
-  type: 'triangle',
-  width: 100,
-  height: 100,
-};
-
-Object.assign(Triangle.prototype, triangleDefaultValues);
 
 classRegistry.setClass(Triangle);
 classRegistry.setSVGClass(Triangle);

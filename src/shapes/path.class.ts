@@ -14,7 +14,12 @@ import {
   type TPathSegmentsInfo,
 } from '../util/path';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+
+export const pathDefaultValues: Partial<TClassProperties<Path>> = {
+  type: 'path',
+};
+
 
 export class Path extends FabricObject {
   /**
@@ -22,15 +27,15 @@ export class Path extends FabricObject {
    * @type Array
    * @default
    */
-  path: PathData;
+  declare path: PathData;
 
-  pathOffset: Point;
+  declare pathOffset: Point;
 
-  fromSVG?: boolean;
+  declare fromSVG?: boolean;
 
-  sourcePath?: string;
+  declare sourcePath?: string;
 
-  segmentsInfo?: TPathSegmentsInfo[];
+  declare segmentsInfo?: TPathSegmentsInfo[];
 
   /**
    * Constructor
@@ -42,7 +47,7 @@ export class Path extends FabricObject {
     path: PathData | string,
     { path: _, left, top, ...options }: any = {}
   ) {
-    super(options);
+    super({ ...pathDefaultValues, ...options });
 
     const pathTL = this._setPath(path || []);
     const origin = this.translateToGivenOrigin(
@@ -381,17 +386,7 @@ export class Path extends FabricObject {
   }
 }
 
-export const pathDefaultValues: Partial<TClassProperties<Path>> = {
-  type: 'path',
-  path: null,
-  cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
-    'path',
-    'fillRule',
-  ],
-};
-
-Object.assign(Path.prototype, pathDefaultValues);
+Path.prototype.cacheProperties = [...cacheProperties, 'path', 'fillRule']
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

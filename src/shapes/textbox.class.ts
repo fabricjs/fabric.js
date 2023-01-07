@@ -16,7 +16,7 @@ export class Textbox extends IText {
    * @type Number
    * @default
    */
-  minWidth: number;
+  declare minWidth: number;
 
   /**
    * Minimum calculated width of a textbox, in pixels.
@@ -25,13 +25,13 @@ export class Textbox extends IText {
    * @type Number
    * @default
    */
-  dynamicMinWidth: number;
+  declare dynamicMinWidth: number;
 
   /**
    * Cached array of text wrapping.
    * @type Array
    */
-  __cachedLines: Array<any> | null = null;
+  declare __cachedLines: Array<any> | null = null;
 
   /**
    * Use this boolean property in order to split strings that have no white space concept.
@@ -39,7 +39,7 @@ export class Textbox extends IText {
    * @type Boolean
    * @since 2.6.0
    */
-  splitByGrapheme: boolean;
+  declare splitByGrapheme: boolean;
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -457,11 +457,16 @@ export class Textbox extends IText {
   }
 }
 
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
 export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   type: 'textbox',
   minWidth: 20,
   dynamicMinWidth: 2,
+  // with the new controls this noScaleCache here shouldn't be needed anymore
   lockScalingFlip: true,
+  // with the new controls this noScaleCache here shouldn't be needed anymore
   noScaleCache: false,
   _dimensionAffectingProps:
     textDefaultValues._dimensionAffectingProps!.concat('width'),

@@ -5,8 +5,9 @@ import { clone } from '../util/lang_object';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../point.class';
+import { isFiller } from '../util/types';
 
-const coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
+const coordProps = ['x1','x2', 'y1', 'y2'];
 
 export const lineDefaultValues: Partial<TClassProperties<Line>> = {
   type: 'line',
@@ -78,9 +79,9 @@ export class Line extends FabricObject {
    * @param {String} key
    * @param {*} value
    */
-  _set(key, value) {
+  _set(key: string, value: any) {
     super._set(key, value);
-    if (typeof coordProps[key] !== 'undefined') {
+    if (coordProps.includes(key)) {
       this._setWidthHeight();
     }
     return this;
@@ -103,9 +104,11 @@ export class Line extends FabricObject {
     // make sure setting "fill" changes color of a line
     // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
     const origStrokeStyle = ctx.strokeStyle;
-    // todo: fix thi, stroke is not checked for canvas/pattern.
-    // @ts-nocheck
-    ctx.strokeStyle = this.stroke ?? ctx.fillStyle;
+    if (isFiller(this.stroke)) {
+      ctx.strokeStyle = this.stroke.toLive(ctx);
+    } else {
+      ctx.strokeStyle = this.stroke ?? ctx.fillStyle;
+    }
     this.stroke && this._renderStroke(ctx);
     ctx.strokeStyle = origStrokeStyle;
   }
@@ -281,7 +284,6 @@ export class Line extends FabricObject {
   static fromElement(
     element: SVGElement,
     callback: (line: Line) => any,
-    options: { signal?: AbortSignal } = {}
   ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
       points = [
@@ -290,7 +292,7 @@ export class Line extends FabricObject {
         parsedAttributes.x2 || 0,
         parsedAttributes.y2 || 0,
       ];
-    callback(new this(points, { ...parsedAttributes, ...options }));
+    callback(new this(points, parsedAttributes));
   }
 
   /* _FROM_SVG_END_ */
