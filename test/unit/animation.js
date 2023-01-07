@@ -12,13 +12,13 @@
   QUnit.test('animateColor', function(assert) {
     var done = assert.async();
     function testing(val, complete) {
+      assert.ok(val instanceof fabric.Color, 'expected type is color instance');
       if (complete !== 1) {
-        assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
+        assert.notEqual(val.toRgba(), 'rgba(0,0,255,1)', 'color is not blue');
       }
       else {
-        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+        assert.equal(val.toRgba(), 'rgba(0,0,255,1)', 'color is blue');
       }
-      assert.ok(typeof val === 'string', 'expected type is String');
     }
     assert.ok(typeof fabric.util.animateColor === 'function', 'animateColor is a function');
     fabric.util.animateColor({
@@ -26,7 +26,8 @@
       endValue: 'blue',
       duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+        assert.ok(val instanceof fabric.Color, 'expected type is color instance');
+        assert.equal(val.toRgba(), 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -47,7 +48,8 @@
         called = true;
       },
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
+        assert.ok(val instanceof fabric.Color, 'expected type is color instance');
+        assert.equal(val.toRgba(), 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -62,7 +64,8 @@
       endValue: 'rgba(0, 0, 255, 0.7)',
       duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(0,0,255,0.7)', 'color is animated on all 4 values');
+        assert.ok(val instanceof fabric.Color, 'expected type is color instance');
+        assert.equal(val.toRgba(), 'rgba(0,0,255,0.7)', 'color is animated on all 4 values');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -77,10 +80,11 @@
       endValue: [255, 255, 255, 3],
       duration: 16,
       onChange: val => {
-        assert.equal(new fabric.Color(val).getAlpha(), 1, 'alpha diff should be ignored')
+        assert.equal(val.getAlpha(), 1, 'alpha diff should be ignored')
       },
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,255,255,1)', 'color is normalized to max values');
+        assert.ok(val instanceof fabric.Color, 'expected type is color instance');
+        assert.equal(val.toRgba(), 'rgba(255,255,255,1)', 'color is normalized to max values');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();

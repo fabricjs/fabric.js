@@ -1,4 +1,4 @@
-import { TColorArg } from '../../color/color.class';
+import type { Color } from '../../color/color.class';
 
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 
@@ -31,19 +31,19 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  * @param duration in ms
  * @returns next value
  */
-export type TEasingFunction<T = unknown> = T extends number[]
+export type TEasingFunction<T = number> = T extends number
   ? (
       timeElapsed: number,
       startValue: number,
       byValue: number,
-      duration: number,
-      index: number
+      duration: number
     ) => number
   : (
       timeElapsed: number,
       startValue: number,
       byValue: number,
-      duration: number
+      duration: number,
+      index: number
     ) => number;
 
 export type TAnimationBaseOptions<T> = {
@@ -122,8 +122,4 @@ export type ValueAnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 
-export type ColorAnimationOptions = TAnimationOptions<
-  TColorArg,
-  string,
-  number[]
->;
+export type ColorAnimationOptions = TAnimationOptions<Color>;

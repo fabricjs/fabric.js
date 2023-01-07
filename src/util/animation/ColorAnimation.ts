@@ -1,13 +1,8 @@
-import { Color } from '../../color/color.class';
-import { TRGBAColorSource } from '../../color/color.class';
+import { Color, TRGBAColorSource } from '../../color/color.class';
 import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
-import type {
-  ColorAnimationOptions,
-  TEasingFunction,
-  TOnAnimationChangeCallback,
-} from './types';
+import type { ColorAnimationOptions, TEasingFunction } from './types';
 
 const defaultColorEasing: TEasingFunction = (
   timeElapsed,
@@ -19,51 +14,39 @@ const defaultColorEasing: TEasingFunction = (
   return startValue + byValue * durationProgress;
 };
 
-const wrapColorCallback = <R>(
-  callback?: TOnAnimationChangeCallback<string, R>
-) =>
-  callback &&
-  ((rgba: TRGBAColorSource, valueProgress: number, durationProgress: number) =>
-    callback(new Color(rgba).toRgba(), valueProgress, durationProgress));
-
-export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
+export class ColorAnimation extends AnimationBase<Color> {
   constructor({
-    startValue,
-    endValue,
+    startValue = new Color(),
+    endValue = new Color(),
     easing = defaultColorEasing,
-    onChange,
-    onComplete,
-    abort,
     ...options
   }: ColorAnimationOptions) {
-    const startColor = new Color(startValue).getSource();
-    const endColor = new Color(endValue).getSource();
+    const startColor = startValue.getSource();
     super({
-      ...options,
-      startValue: startColor,
-      byValue: endColor.map(
-        (value, i) => value - startColor[i]
-      ) as TRGBAColorSource,
+      startValue,
       easing,
-      onChange: wrapColorCallback(onChange),
-      onComplete: wrapColorCallback(onComplete),
-      abort: wrapColorCallback(abort),
+      byValue: new Color(
+        endValue
+          .getSource()
+          .map((value, i) => value - startColor[i]) as TRGBAColorSource
+      ),
+      ...options,
     });
   }
   protected calculate(timeElapsed: number) {
-    const [r, g, b, a] = this.startValue.map((value, i) =>
-      this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
+    const startValue = this.startValue.getSource();
+    const byValue = this.byValue.getSource();
+    const [r, g, b, a] = startValue.map((value, i) =>
+      this.easing(timeElapsed, value, byValue[i], this.duration, i)
     ) as TRGBAColorSource;
     const rgb = [r, g, b].map(Math.round);
     return {
-      value: [...rgb, capValue(0, a, 1)] as TRGBAColorSource,
+      value: new Color([...rgb, capValue(0, a, 1)] as TRGBAColorSource),
       changeRatio:
         // to correctly calculate the change ratio we must find a changed value
         rgb
           .map((p, i) =>
-            this.byValue[i] !== 0
-              ? Math.abs((p - this.startValue[i]) / this.byValue[i])
-              : 0
+            byValue[i] !== 0 ? Math.abs((p - startValue[i]) / byValue[i]) : 0
           )
           .find((p) => p !== 0) || 0,
     };

@@ -6,6 +6,15 @@ import {
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
+import { Color, TColorArg } from '../../color/color.class';
+
+const isColorAnimation = (
+  options: ColorAnimationOptions | ArrayAnimationOptions | ValueAnimationOptions
+): options is ColorAnimationOptions => {
+  return (
+    options.startValue instanceof Color || options.endValue instanceof Color
+  );
+};
 
 const isArrayAnimation = (
   options: ArrayAnimationOptions | ValueAnimationOptions
@@ -39,14 +48,21 @@ const isArrayAnimation = (
  * });
  *
  */
+export function animate(options: ColorAnimationOptions): ColorAnimation;
 export function animate(options: ArrayAnimationOptions): ArrayAnimation;
 export function animate(options: ValueAnimationOptions): ValueAnimation;
 export function animate<
   T extends ValueAnimationOptions | ArrayAnimationOptions,
-  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
+  R extends T extends ColorAnimationOptions
+    ? ColorAnimation
+    : T extends ArrayAnimationOptions
+    ? ArrayAnimation
+    : ValueAnimation
 >(options: T): R {
   const animation = (
-    isArrayAnimation(options)
+    isColorAnimation(options)
+      ? new ColorAnimation(options)
+      : isArrayAnimation(options)
       ? new ArrayAnimation(options)
       : new ValueAnimation(options)
   ) as R;
@@ -54,8 +70,20 @@ export function animate<
   return animation;
 }
 
-export function animateColor(options: ColorAnimationOptions) {
-  const animation = new ColorAnimation(options);
-  animation.start();
-  return animation;
+/**
+ * @deprecated use {@link animate}
+ */
+export function animateColor({
+  startValue,
+  endValue,
+  ...options
+}: ColorAnimationOptions & {
+  startValue?: TColorArg;
+  endValue?: TColorArg;
+}) {
+  return animate({
+    ...options,
+    startValue: new Color(startValue),
+    endValue: new Color(endValue),
+  });
 }

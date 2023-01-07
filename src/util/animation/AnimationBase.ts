@@ -12,9 +12,7 @@ import {
 
 const defaultAbort = () => false;
 
-export abstract class AnimationBase<
-  T extends number | number[] = number | number[]
-> {
+export abstract class AnimationBase<T = any> {
   readonly startValue: T;
   readonly byValue: T;
   readonly endValue: T;
@@ -120,7 +118,7 @@ export abstract class AnimationBase<
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationProgress = boundDurationMs / this.duration;
     const { value, changeRatio } = this.calculate(boundDurationMs);
-    this.value = Array.isArray(value) ? (value.slice() as T) : value;
+    this.value = Object.freeze(value);
     this.valueProgress = changeRatio;
 
     if (this._state === 'aborted') {
@@ -146,11 +144,11 @@ export abstract class AnimationBase<
   }
 
   private register() {
-    runningAnimations.push(this as unknown as AnimationBase);
+    runningAnimations.push(this);
   }
 
   private unregister() {
-    runningAnimations.remove(this as unknown as AnimationBase);
+    runningAnimations.remove(this);
   }
 
   abort() {
