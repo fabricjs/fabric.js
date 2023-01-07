@@ -375,7 +375,7 @@
       onChange: function(currentValue) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
         assert.ok(Array.isArray(currentValue), 'should be array');
-        assert.ok(fabric.runningAnimations[0].value !== currentValue, 'should not share array');
+        assert.ok(Object.isFrozen(fabric.runningAnimations[0].value), 'should be frozen');
         assert.deepEqual(fabric.runningAnimations[0].value, currentValue);
         assert.equal(currentValue.length, 3);
         currentValue.forEach(function(v) {
