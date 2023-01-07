@@ -112,7 +112,7 @@ export class Image extends FabricObject {
 
   declare protected src: string;
 
-  filters: BaseFilter[] = [];
+  declare filters: BaseFilter[];
   declare resizeFilter: BaseFilter;
 
   declare protected _element: ImageSource;
@@ -131,7 +131,7 @@ export class Image extends FabricObject {
   constructor(elementId: string, options: any = {});
   constructor(element: ImageSource, options: any = {});
   constructor(arg0: ImageSource | string, options: any = {}) {
-    super(options);
+    super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
