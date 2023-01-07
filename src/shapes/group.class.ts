@@ -77,14 +77,6 @@ export type LayoutResult = {
   height: number;
 };
 
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
-  layout: 'fit-content',
-  strokeWidth: 0,
-  subTargetCheck: false,
-  interactive: false,
-};
-
 /**
  * @fires object:added
  * @fires object:removed
@@ -137,8 +129,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     options: any = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super(groupDefaultValues);
-    this._objects = objects || [];
+    super({ _objects: objects });
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -149,7 +140,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       false
     );
     this._firstLayoutDone = false;
-    //  setting angle, skewX, skewY must occur after initial layout
+    // setting angle, skewX, skewY must occur after initial layout
     this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
@@ -1045,5 +1036,17 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 }
 
-Group.prototype.stateProperties = [...stateProperties, 'layout'],
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
+  type: 'group',
+  layout: 'fit-content',
+  strokeWidth: 0,
+  subTargetCheck: false,
+  interactive: false,
+};
+
+Object.assign(Group.prototype, {
+  ...groupDefaultValues,
+  stateProperties: [...stateProperties, 'layout'],
+})
+
 classRegistry.setClass(Group);

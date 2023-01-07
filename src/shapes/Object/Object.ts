@@ -615,15 +615,13 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
-  static defaultValues = fabricObjectDefaultValues;
-
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
-    this.setOptions({ ...fabricObjectDefaultValues, ...options });
+    this.setOptions(options);
   }
 
   /**
@@ -1878,8 +1876,10 @@ export class FabricObject<
  * That shouldn't be either on the instance and that can't be used as static
  * For inheritance reasons ( used in the superclass but static in the subclass )
  */
-
-FabricObject.prototype.cacheProperties = cacheProperties;
-FabricObject.prototype.stateProperties = stateProperties;
+Object.assign(FabricObject.prototype, {
+  cacheProperties,
+  stateProperties,
+  ...fabricObjectDefaultValues,
+});
 
 classRegistry.setClass(FabricObject);
