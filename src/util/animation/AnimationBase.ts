@@ -76,7 +76,7 @@ export abstract class AnimationBase<T = any> {
     this.startValue = startValue;
     this.byValue = byValue;
     this.value = this.startValue;
-    this.endValue = this.calculate(this.duration).value;
+    this.endValue = Object.freeze(this.calculate(this.duration).value);
   }
 
   get state() {
@@ -127,15 +127,14 @@ export abstract class AnimationBase<T = any> {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      const endValue = this.endValue;
       this.durationProgress = this.valueProgress = 1;
-      this._onChange(
-        (Array.isArray(endValue) ? endValue.slice() : endValue) as T,
+      this._onChange(this.endValue, this.valueProgress, this.durationProgress);
+      this._state = 'completed';
+      this._onComplete(
+        this.endValue,
         this.valueProgress,
         this.durationProgress
       );
-      this._state = 'completed';
-      this._onComplete(endValue, this.valueProgress, this.durationProgress);
       this.unregister();
     } else {
       this._onChange(value, this.valueProgress, this.durationProgress);
