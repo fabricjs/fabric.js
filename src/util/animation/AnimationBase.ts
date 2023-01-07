@@ -123,7 +123,9 @@ export abstract class AnimationBase<T = any> {
 
     if (this._state === 'aborted') {
       return;
-    } else if (this._abort(value, this.valueProgress, this.durationProgress)) {
+    } else if (
+      this._abort(this.value, this.valueProgress, this.durationProgress)
+    ) {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
@@ -137,7 +139,7 @@ export abstract class AnimationBase<T = any> {
       );
       this.unregister();
     } else {
-      this._onChange(value, this.valueProgress, this.durationProgress);
+      this._onChange(this.value, this.valueProgress, this.durationProgress);
       requestAnimFrame(this.tick);
     }
   }
