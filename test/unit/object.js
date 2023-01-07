@@ -1084,27 +1084,14 @@
     assert.equal(object.dirty, true, 'object is dirty again if cache gets created');
   });
 
-  QUnit.test('isCacheDirty statefullCache disabled', function(assert) {
+  QUnit.test('isCacheDirty', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
-    object.statefullCache = false;
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
     object.dirty = true;
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
-  });
-
-  QUnit.test('isCacheDirty statefullCache enabled', function(assert) {
-    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
-    object.cacheProperties = ['propA', 'propB'];
-    object.dirty = false;
-    object.statefullCache = true;
-    object.propA = 'A';
-    object.saveState({ propertySet: 'cacheProperties' });
-    assert.equal(object.isCacheDirty(), false, 'object is not dirty');
-    object.propA = 'B';
-    assert.equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {

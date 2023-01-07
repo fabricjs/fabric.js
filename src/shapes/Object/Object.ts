@@ -434,18 +434,6 @@ export class FabricObject<
   objectCaching: boolean;
 
   /**
-   * When `true`, object properties are checked for cache invalidation. In some particular
-   * situation you may want this to be disabled ( spray brush, very big, groups)
-   * or if your application does not allow you to modify properties for groups child you want
-   * to disable it for groups.
-   * default to false
-   * since 1.7.0
-   * @type Boolean
-   * @default false
-   */
-  statefullCache: boolean;
-
-  /**
    * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
    * too much and will be redrawn with correct details at the end of scaling.
    * this setting is performance and application dependant.
@@ -492,7 +480,7 @@ export class FabricObject<
 
   /**
    * List of properties to consider when checking if cache needs refresh
-   * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+   * Those properties are checked by
    * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
    * and refreshed at the next render
    * @type Array
@@ -1051,10 +1039,10 @@ export class FabricObject<
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (this.cacheProperties.indexOf(key) > -1) {
+      if (this.cacheProperties.includes(key)) {
         this.dirty = true;
         groupNeedsUpdate && this.group.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
+      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
         this.group.set('dirty', true);
       }
     }
@@ -1105,9 +1093,6 @@ export class FabricObject<
       this._removeCacheCanvas();
       this.dirty = false;
       this.drawObject(ctx);
-      if (this.objectCaching && this.statefullCache) {
-        this.saveState({ propertySet: 'cacheProperties' });
-      }
     }
     ctx.restore();
   }
@@ -1118,7 +1103,6 @@ export class FabricObject<
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
       this.drawObject(this._cacheContext, options.forClipping);
       this.dirty = false;
     }
@@ -1315,11 +1299,7 @@ export class FabricObject<
       // in this case the context is already cleared.
       return true;
     } else {
-      if (
-        this.dirty ||
-        (this.clipPath && this.clipPath.absolutePositioned) ||
-        (this.statefullCache && this.hasStateChanged('cacheProperties'))
-      ) {
+      if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
         if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
           const width = this.cacheWidth! / this.zoomX!;
           const height = this.cacheHeight! / this.zoomY!;
@@ -2059,7 +2039,6 @@ export const fabricObjectDefaultValues = {
   lockScalingFlip: false,
   excludeFromExport: false,
   objectCaching: !getEnv().isLikelyNode,
-  statefullCache: false,
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,
@@ -2069,35 +2048,19 @@ export const fabricObjectDefaultValues = {
   stateProperties: [
     'top',
     'left',
-    'width',
-    'height',
     'scaleX',
     'scaleY',
     'flipX',
     'flipY',
     'originX',
     'originY',
-    'transformMatrix',
-    'stroke',
-    'strokeWidth',
-    'strokeDashArray',
-    'strokeLineCap',
-    'strokeDashOffset',
-    'strokeLineJoin',
-    'strokeMiterLimit',
     'angle',
     'opacity',
-    'fill',
     'globalCompositeOperation',
     'shadow',
     'visible',
-    'backgroundColor',
     'skewX',
     'skewY',
-    'fillRule',
-    'paintFirst',
-    'clipPath',
-    'strokeUniform',
   ],
   cacheProperties: [
     'fill',

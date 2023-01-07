@@ -126,14 +126,6 @@ export class StaticCanvas<
   includeDefaultValues: boolean;
 
   /**
-   * Indicates whether objects' state should be saved
-   * @type Boolean
-   * @deprecated
-   * @default
-   */
-  stateful: boolean;
-
-  /**
    * Indicates whether {@link add}, {@link insertAt} and {@link remove},
    * {@link moveTo}, {@link clear} and many more, should also re-render canvas.
    * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
@@ -308,8 +300,6 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    // @ts-ignore;
-    this.stateful && obj.saveState();
     if (obj.canvas && obj.canvas !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
@@ -1758,7 +1748,6 @@ Object.assign(StaticCanvas.prototype, {
   overlayColor: '',
   overlayImage: null,
   includeDefaultValues: true,
-  stateful: false,
   renderOnAddRemove: true,
   controlsAboveOverlay: false,
   allowTouchScrolling: false,

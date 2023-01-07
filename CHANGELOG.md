@@ -3,6 +3,7 @@
 ## [next]
 
 - refactor(): BREAKING: Animation api reduction and semplification (byValue is removed) [#8547](https://github.com/fabricjs/fabric.js/pull/8547)
+- BREAKING: remove Object.stateful and Object.statefulCache [#8573](https://github.com/fabricjs/fabric.js/pull/8573)
 - fix(IText): refactor clearing context top logic of itext to align with brush pattern, using the canvas rendering cycle in order to guard from edge cases #8560
 - fix(Canvas): `_initRetinaScaling` initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(Canvas): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)

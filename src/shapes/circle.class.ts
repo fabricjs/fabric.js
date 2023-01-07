@@ -194,16 +194,12 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
     'radius',
     'startAngle',
-    'endAngle'
-  ),
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'radius',
-    'startAngle',
-    'endAngle'
-  ),
+    'endAngle',
+  ],
 };
 
 Object.assign(Circle.prototype, circleDefaultValues);
