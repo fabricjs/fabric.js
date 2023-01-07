@@ -5,12 +5,6 @@ import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  type: 'rect',
-  rx: 0,
-  ry: 0,
-};
-
 export class Rect extends FabricObject {
   /**
    * Horizontal border radius
@@ -32,7 +26,7 @@ export class Rect extends FabricObject {
    * @return {Object} thisArg
    */
   constructor(options: Record<string, unknown>) {
-    super({ ...rectDefaultValues, ...options });
+    super(options);
     this._initRxRy();
   }
 
@@ -190,7 +184,16 @@ export class Rect extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-Rect.prototype.cacheProperties = [...cacheProperties, 'rx', 'ry'];
+export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
+  type: 'rect',
+  rx: 0,
+  ry: 0,
+};
+
+Object.assign(Rect.prototype, {
+  ...rectDefaultValues,
+  cacheProperties: [...cacheProperties, 'rx', 'ry'],
+});
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);

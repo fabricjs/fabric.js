@@ -31,10 +31,6 @@ export class Circle extends FabricObject {
    */
   declare endAngle: number;
 
-  constructor(options: Record<string, unknown>) {
-    super({ ...circleDefaultValues, ...options });
-  }
-
   /**
    * @private
    * @param {String} key

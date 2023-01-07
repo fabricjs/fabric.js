@@ -7,6 +7,8 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../point.class';
 import { isFiller } from '../util/types';
 
+// @TODO this code is terrible and Line should be a special case of polyline.
+
 const coordProps = ['x1','x2', 'y1', 'y2'];
 
 export const lineDefaultValues: Partial<TClassProperties<Line>> = {
@@ -53,7 +55,7 @@ export class Line extends FabricObject {
    * @return {Line} thisArg
    */
   constructor(points = [0, 0, 0, 0], options: Partial<TClassProperties<Line>> = {}) {
-    super({...lineDefaultValues, ...options });
+    super(options);
 
     this.set('x1', points[0]);
     this.set('y1', points[1]);

@@ -11,11 +11,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
-export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  type: 'polyline',
-  exactBoundingBox: false,
-};
-
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -69,7 +64,7 @@ export class Polyline extends FabricObject {
    * });
    */
   constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
-    super({ ...polylineDefaultValues, points, ...options });
+    super({ points, ...options });
     this.initialized = true;
     this.setBoundingBox(true);
     typeof left === 'number' && this.set('left', left);
@@ -314,17 +309,25 @@ export class Polyline extends FabricObject {
   }
 }
 
-Polyline.prototype.cacheProperties = [...cacheProperties, 'points'];
-Polyline.prototype.strokeBBoxAffectingProperties = [
-  'skewX',
-  'skewY',
-  'strokeLineCap',
-  'strokeLineJoin',
-  'strokeMiterLimit',
-  'strokeWidth',
-  'strokeUniform',
-  'points',
-];
+export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
+  type: 'polyline',
+  exactBoundingBox: false,
+};
+
+Object.assign(Polyline.prototype, {
+  ...polylineDefaultValues,
+  cacheProperties: [...cacheProperties, 'points'],
+  strokeBBoxAffectingProperties: [
+    'skewX',
+    'skewY',
+    'strokeLineCap',
+    'strokeLineJoin',
+    'strokeMiterLimit',
+    'strokeWidth',
+    'strokeUniform',
+    'points',
+  ],
+});
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);
