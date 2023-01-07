@@ -5,12 +5,6 @@ import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
-  type: 'ellipse',
-  rx: 0,
-  ry: 0,
-};
-
 export class Ellipse extends FabricObject {
   /**
    * Horizontal radius
@@ -145,7 +139,16 @@ export class Ellipse extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-Ellipse.prototype.cacheProperties = [...cacheProperties, 'rx', 'ry'];
+export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
+  type: 'ellipse',
+  rx: 0,
+  ry: 0,
+};
+
+Object.assign(Ellipse.prototype, {
+  ...ellipseDefaultValues,
+  cacheProperties: [...cacheProperties, 'rx', 'ry'],
+});
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);

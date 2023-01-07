@@ -7,13 +7,6 @@ import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
 
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-};
-
 export class Circle extends FabricObject {
   /**
    * Radius of this circle
@@ -200,7 +193,17 @@ export class Circle extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-Circle.prototype.cacheProperties = [...cacheProperties, 'radius', 'startAngle', 'endAngle'];
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
+  type: 'circle',
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+};
+
+Object.assign(Circle.prototype, {
+  ...circleDefaultValues,
+  cacheProperties: [...cacheProperties, 'radius', 'startAngle', 'endAngle'],
+})
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

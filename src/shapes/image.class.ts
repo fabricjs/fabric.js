@@ -24,16 +24,6 @@ export type ImageSource =
   | HTMLVideoElement
   | HTMLCanvasElement;
 
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
@@ -141,7 +131,7 @@ export class Image extends FabricObject {
   constructor(elementId: string, options: any = {});
   constructor(element: ImageSource, options: any = {});
   constructor(arg0: ImageSource | string, options: any = {}) {
-    super({ ...imageDefaultValues, ...options });
+    super(options);
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
@@ -780,7 +770,20 @@ export class Image extends FabricObject {
   }
 }
 
-Image.prototype.cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
+export const imageDefaultValues: Partial<TClassProperties<Image>> = {
+  type: 'image',
+  strokeWidth: 0,
+  srcFromAttribute: false,
+  minimumScaleTrigger: 0.5,
+  cropX: 0,
+  cropY: 0,
+  imageSmoothing: true,
+};
+
+Object.assign(Image.prototype, {
+  ...imageDefaultValues,
+  cacheProperties = [...cacheProperties, 'cropX', 'cropY'],
+})
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

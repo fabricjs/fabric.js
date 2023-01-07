@@ -18,29 +18,6 @@ export type ITextEvents = ObjectEvents & {
   'editing:exited': never;
 };
 
-export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
-  type: 'i-text',
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _currentCursorOpacity: 1,
-  _selectionDirection: null,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-};
-
 /**
  * @fires changed
  * @fires selection:changed
@@ -176,7 +153,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {Object} [options] Options object
    */
   constructor(text: string, options: object) {
-    super(text, {...iTextDefaultValues, ...options });
+    super(text, options);
     this.initBehavior();
   }
 
@@ -628,6 +605,30 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 }
 
-IText.prototype._reSpace = /\s|\n/;
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
+  type: 'i-text',
+  selectionStart: 0,
+  selectionEnd: 0,
+  selectionColor: 'rgba(17,119,255,0.3)',
+  isEditing: false,
+  editable: true,
+  editingBorderColor: 'rgba(102,153,255,0.25)',
+  cursorWidth: 2,
+  cursorColor: '',
+  cursorDelay: 1000,
+  cursorDuration: 600,
+  caching: true,
+  hiddenTextareaContainer: null,
+  _currentCursorOpacity: 1,
+  _selectionDirection: null,
+  _reSpace = /\s|\n/;
+  inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
+};
+
+Object.assign(IText.prototype, iTextDefaultValues);
 
 classRegistry.setClass(IText);
