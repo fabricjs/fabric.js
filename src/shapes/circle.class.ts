@@ -5,7 +5,8 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
+import { cacheProperties } from './Object/defaultValues';
 
 export class Circle extends FabricObject {
   /**
@@ -195,7 +196,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   startAngle: 0,
   endAngle: 360,
   cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
+    ...cacheProperties,
     'radius',
     'startAngle',
     'endAngle',

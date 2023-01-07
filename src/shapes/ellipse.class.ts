@@ -3,7 +3,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
   /**
@@ -145,7 +145,7 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   type: 'ellipse',
   rx: 0,
   ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
+  cacheProperties: [...FabricObject.cacheProperties, 'rx', 'ry'],
 };
 
 Object.assign(Ellipse.prototype, ellipseDefaultValues);

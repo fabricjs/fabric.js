@@ -5,6 +5,7 @@ import { TClassProperties } from '../typedefs';
 import { clone } from '../util/lang_object';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { Point } from '../point.class';
 
 const coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
 
@@ -112,13 +113,13 @@ export class Line extends FabricObject {
    * This function is an helper for svg import. it returns the center of the object in the svg
    * untransformed coordinates
    * @private
-   * @return {Object} center point from element coordinates
+   * @return {Point} center point from element coordinates
    */
   _findCenterFromElement() {
-    return {
-      x: (this.x1 + this.x2) / 2,
-      y: (this.y1 + this.y2) / 2,
-    };
+    return new Point(
+      (this.x1 + this.x2) / 2,
+      (this.y1 + this.y2) / 2,
+    );
   }
 
   /**
