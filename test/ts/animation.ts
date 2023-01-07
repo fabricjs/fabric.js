@@ -1,5 +1,5 @@
 import { IsExact } from 'conditional-type-checks';
-import { animate } from '../../src/util/animation';
+import { animate } from '../../src/util/animation/animate';
 
 function assertStrict<T, U>(assertTrue: IsExact<T, U>) {
   return assertTrue;
@@ -9,11 +9,12 @@ animate({
   endValue: 3,
 });
 animate({
+  // @ts-expect-error `byValue` is not part of options
   byValue: 2,
 });
-// @ts-expect-error only one of (`byValue` | `endValue`) is allowed
 animate({
   endValue: 3,
+  // @ts-expect-error `byValue` is not part of options
   byValue: 2,
 });
 
