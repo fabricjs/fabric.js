@@ -48,22 +48,22 @@ const arrayContext = animate({
 assertStrict<typeof arrayContext.endValue, number[]>(true);
 
 const mixedContextError = animate({
-  // @ts-expect-error mixed context
   startValue: [5],
+  // @ts-expect-error mixed context
   endValue: 1,
   onChange(a, b, c) {
-    assertStrict<typeof a, number>(true);
+    assertStrict<typeof a, number[]>(true);
     assertStrict<typeof b, number>(true);
     assertStrict<typeof c, number>(true);
   },
 });
 
 const mixedContextError2 = animate({
-  startValue: 5,
   // @ts-expect-error mixed context
+  startValue: 5,
   endValue: [1],
   onChange(a, b, c) {
-    assertStrict<typeof a, number>(true);
+    assertStrict<typeof a, number[]>(true);
     assertStrict<typeof b, number>(true);
     assertStrict<typeof c, number>(true);
   },
