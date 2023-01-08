@@ -1,4 +1,3 @@
-import { IPoint } from '../point.class';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';

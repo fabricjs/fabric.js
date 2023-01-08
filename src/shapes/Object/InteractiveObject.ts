@@ -134,8 +134,7 @@ export class InteractiveFabricObject<
         action = targetCanvas._currentTransform.action;
       if (
         this === (target as InteractiveFabricObject) &&
-        action.slice &&
-        action.slice(0, 5) === 'scale'
+        action.startsWith('scale')
       ) {
         return false;
       }

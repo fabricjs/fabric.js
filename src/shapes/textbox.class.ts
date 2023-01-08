@@ -464,9 +464,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   type: 'textbox',
   minWidth: 20,
   dynamicMinWidth: 2,
-  // with the new controls this noScaleCache here shouldn't be needed anymore
   lockScalingFlip: true,
-  // with the new controls this noScaleCache here shouldn't be needed anymore
   noScaleCache: false,
   _dimensionAffectingProps:
     textDefaultValues._dimensionAffectingProps!.concat('width'),
