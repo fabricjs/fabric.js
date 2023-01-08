@@ -21,7 +21,7 @@ export const isFiller = (
 export const isSerializableFiller = (
   filler: TFiller | string | null
 ): filler is TFiller => {
-  return !!filler && (filler as TFiller).toObject !== undefined;
+  return !!filler && typeof (filler as TFiller).toObject === 'function';
 };
 
 export const isPattern = (filler: TFiller): filler is Pattern => {
