@@ -54,12 +54,15 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
     const [r, g, b, a] = this.startValue.map((value, i) =>
       this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
     ) as TRGBAColorSource;
-    const rgb = [r, g, b].map(Math.round);
+    const value = [
+      ...[r, g, b].map(Math.round),
+      capValue(0, a, 1),
+    ] as TRGBAColorSource;
     return {
-      value: [...rgb, capValue(0, a, 1)] as TRGBAColorSource,
+      value,
       changeRatio:
         // to correctly calculate the change ratio we must find a changed value
-        rgb
+        value
           .map((p, i) =>
             this.byValue[i] !== 0
               ? Math.abs((p - this.startValue[i]) / this.byValue[i])
