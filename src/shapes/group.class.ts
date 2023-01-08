@@ -129,7 +129,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     options: any = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super({ _objects: objects });
+    super();
+    this._objects = objects;
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,

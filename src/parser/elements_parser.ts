@@ -9,6 +9,7 @@ import {
   qrDecompose,
 } from '../util/misc/matrix';
 import { storage } from './constants';
+import { _removeTransformMatrix } from '../util/transform_matrix_removal';
 
 const ElementsParser = function (
   elements,
