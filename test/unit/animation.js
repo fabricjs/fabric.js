@@ -88,6 +88,28 @@
     });
   });
 
+  QUnit.test('animateColor opacity only', function (assert) {
+    var done = assert.async();
+    let called = false;
+    fabric.util.animateColor({
+      startValue: 'rgba(255, 0, 0, 0.9)',
+      endValue: 'rgba(255, 0, 0, 0.7)',
+      duration: 96,
+      onChange: function (val, changePerc) {
+        const alpha = new fabric.Color(val).getAlpha();
+        assert.equal(changePerc, (0.9 - alpha) / (0.9 - 0.7), 'valueProgress should match');
+        called = true;
+      },
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,0,0.7)', 'color is animated on all 4 values');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        assert.ok(called);
+        done();
+      }
+    });
+  });
+
   QUnit.test('endValue', function (assert) {
     var done = assert.async();
     fabric.util.animate({
@@ -370,9 +392,8 @@
     fabric.util.animate({
       startValue: [1, 2, 3],
       endValue: [2, 4, 6],
-      byValue: [1, 2, 3],
       duration: 96,
-      onChange: function(currentValue) {
+      onChange: function(currentValue, valueProgress) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
         assert.ok(Array.isArray(currentValue), 'should be array');
         assert.ok(Object.isFrozen(fabric.runningAnimations[0].value), 'should be frozen');
@@ -381,6 +402,7 @@
         currentValue.forEach(function(v) {
           assert.ok(v > 0, 'confirm values are not invalid numbers');
         })
+        assert.equal(valueProgress, currentValue[0] - 1, 'should match');
         // Make sure mutations are not kept
         assert.ok(currentValue[0] <= 2, 'mutating callback values must not persist');
         currentValue[0] = 200;
