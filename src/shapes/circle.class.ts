@@ -31,6 +31,24 @@ export class Circle extends FabricObject {
    */
   endAngle: number;
 
+  constructor(options: Record<string, unknown>) {
+    super({
+      ...fabricObjectDefaultValues,
+      type: 'circle',
+      radius: 0,
+      startAngle: 0,
+      endAngle: 360,
+      cacheProperties: [
+        ...fabricObjectDefaultValues.cacheProperties,
+        'radius',
+        'startAngle',
+        'endAngle',
+      ],
+      ...options,
+    });
+    this.setRadius(this.radius);
+  }
+
   /**
    * @private
    * @param {String} key

@@ -630,10 +630,10 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Partial<TClassProperties<FabricObject>>) {
+  constructor(options: Partial<TClassProperties<FabricObject>> = {}) {
     super();
-    if (options) {
-      this.setOptions(options);
+    for (const key in options) {
+      this[key] = options[key];
     }
   }
 
@@ -817,14 +817,6 @@ export class FabricObject<
       return true;
     }
     return false;
-  }
-
-  /**
-   * Sets object's properties from options
-   * @param {Object} [options] Options object
-   */
-  setOptions(options: Record<string, any> = {}) {
-    this._setOptions(options);
   }
 
   /**

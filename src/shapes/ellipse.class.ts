@@ -26,9 +26,20 @@ export class Ellipse extends FabricObject {
    * @return {Ellipse} thisArg
    */
   constructor(options: Record<string, unknown>) {
-    super(options);
-    this.set('rx', (options && options.rx) || 0);
-    this.set('ry', (options && options.ry) || 0);
+    super({
+      ...fabricObjectDefaultValues,
+      type: 'ellipse',
+      cacheProperties: [
+        ...fabricObjectDefaultValues.cacheProperties,
+        'rx',
+        'ry',
+      ],
+      rx: 0,
+      ry: 0,
+      ...options,
+    });
+    this.width = this.rx * 2;
+    this.height = this.ry * 2;
   }
 
   /**
@@ -148,7 +159,7 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 
-Object.assign(Ellipse.prototype, ellipseDefaultValues);
+// Object.assign(Ellipse.prototype, ellipseDefaultValues);
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);
