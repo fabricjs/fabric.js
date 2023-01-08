@@ -139,10 +139,6 @@ export class Ellipse extends FabricObject {
 
   /* _FROM_SVG_END_ */
 
-  static {
-    this.cacheProperties = [...super.cacheProperties, 'rx', 'ry'];
-  }
-
   static getDefaults() {
     return {
       ...super.getDefaults(),
@@ -151,6 +147,8 @@ export class Ellipse extends FabricObject {
       ry: 0,
     };
   }
+
+  static cacheProperties = [...FabricObject.cacheProperties, 'rx', 'ry'];
 }
 
 classRegistry.setClass(Ellipse, 'ellipse');

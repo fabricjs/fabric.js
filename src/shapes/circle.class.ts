@@ -202,14 +202,12 @@ export class Circle extends FabricObject {
     };
   }
 
-  static {
-    this.cacheProperties = [
-      ...super.cacheProperties,
-      'radius',
-      'startAngle',
-      'endAngle',
-    ];
-  }
+  static cacheProperties = [
+    ...FabricObject.cacheProperties,
+    'radius',
+    'startAngle',
+    'endAngle',
+  ];
 }
 
 classRegistry.setClass(Circle, 'circle');

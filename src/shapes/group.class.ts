@@ -1051,7 +1051,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     };
   }
 
-  static stateProperties = FabricObject.stateProperties.concat('layout');
+  static stateProperties = [...FabricObject.stateProperties, 'layout'];
 }
 
 classRegistry.setClass(Group, 'group');

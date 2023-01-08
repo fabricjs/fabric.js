@@ -192,9 +192,7 @@ export class Rect extends FabricObject {
     };
   }
 
-  static {
-    this.cacheProperties = [...super.cacheProperties, 'rx', 'ry'];
-  }
+  static cacheProperties = [...FabricObject.cacheProperties, 'rx', 'ry'];
 }
 
 classRegistry.setClass(Rect, 'rect');
