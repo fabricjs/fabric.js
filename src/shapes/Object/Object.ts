@@ -911,7 +911,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    const prototype = (this.constructor as typeof this).getDefaults(); //classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -1965,6 +1965,10 @@ export class FabricObject<
     options?: { signal?: AbortSignal }
   ) {
     return this._fromObject(object, options);
+  }
+
+  static getDefaults() {
+    return fabricObjectDefaultValues;
   }
 }
 

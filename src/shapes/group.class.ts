@@ -1047,6 +1047,19 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      type: 'group',
+      layout: 'fit-content',
+      strokeWidth: 0,
+      stateProperties:
+        fabricObjectDefaultValues.stateProperties.concat('layout'),
+      subTargetCheck: false,
+      interactive: false,
+    };
+  }
 }
 
 export const groupDefaultValues: Partial<TClassProperties<Group>> = {
@@ -1058,5 +1071,5 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   interactive: false,
 };
 
-Object.assign(Group.prototype, groupDefaultValues);
-classRegistry.setClass(Group);
+// Object.assign(Group.prototype, groupDefaultValues);
+classRegistry.setClass(Group, 'group');

@@ -7,10 +7,20 @@ import type { FabricObject } from './Object/FabricObject';
 export class ActiveSelection extends Group {
   constructor(
     objects?: FabricObject[],
-    options?: any,
+    options: any = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super(objects, options, objectsRelativeToGroup);
+    super(
+      objects,
+      {
+        type: 'activeSelection',
+        layout: 'fit-content',
+        subTargetCheck: false,
+        interactive: false,
+        ...options,
+      },
+      objectsRelativeToGroup
+    );
     this.setCoords();
   }
 
@@ -142,6 +152,16 @@ export class ActiveSelection extends Group {
     }
     ctx.restore();
   }
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      type: 'activeSelection',
+      layout: 'fit-content',
+      subTargetCheck: false,
+      interactive: false,
+    };
+  }
 }
 
 export const activeSelectionDefaultValues: Partial<
@@ -154,6 +174,7 @@ export const activeSelectionDefaultValues: Partial<
   interactive: false,
 };
 
-Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
+// Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
 
-classRegistry.setClass(ActiveSelection);
+classRegistry.setClass(ActiveSelection, 'activeSelection');
+classRegistry.setClass(ActiveSelection, 'active-selection');

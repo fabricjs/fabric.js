@@ -220,7 +220,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   ],
 };
 
-Object.assign(Circle.prototype, circleDefaultValues);
+// Object.assign(Circle.prototype, circleDefaultValues);
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);
