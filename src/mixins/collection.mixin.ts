@@ -7,7 +7,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     /**
      * @type {FabricObject[]}
      */
-    declare _objects: FabricObject[];
+    _objects: FabricObject[] = [];
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _onObjectAdded(object: FabricObject) {
