@@ -129,7 +129,21 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     options: any = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super();
+    //  setting angle, skewX, skewY must occur after initial layout
+    super({
+      ...fabricObjectDefaultValues,
+      type: 'group',
+      layout: 'fit-content',
+      strokeWidth: 0,
+      stateProperties:
+        fabricObjectDefaultValues.stateProperties.concat('layout'),
+      subTargetCheck: false,
+      interactive: false,
+      ...options,
+      angle: 0,
+      skewX: 0,
+      skewY: 0,
+    });
     this._objects = objects || [];
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -141,8 +155,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       false
     );
     this._firstLayoutDone = false;
-    //  setting angle, skewX, skewY must occur after initial layout
-    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
