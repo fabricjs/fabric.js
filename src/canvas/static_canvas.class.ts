@@ -269,11 +269,11 @@ export class StaticCanvas<
   declare requestRenderAllBound: () => void;
 
   declare _offset: { left: number; top: number };
-  declare protected hasLostContext: boolean;
-  declare protected nextRenderHandle: number;
+  protected declare hasLostContext: boolean;
+  protected declare nextRenderHandle: number;
 
   // reference to
-  declare protected __cleanupTask?: {
+  protected declare __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };

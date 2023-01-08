@@ -88,28 +88,28 @@ export class Canvas extends SelectableCanvas {
    * @type Boolean
    * @private
    */
-  declare private eventsBound: boolean;
+  private declare eventsBound: boolean;
 
   /**
    * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
    */
-  declare private _willAddMouseDown: number;
+  private declare _willAddMouseDown: number;
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
    * @type FabricObject
    * @private
    */
-  declare private _draggedoverTarget?: FabricObject;
+  private declare _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
    */
-  declare private _dragSource?: FabricObject;
+  private declare _dragSource?: FabricObject;
 
   declare currentTarget?: FabricObject;
 

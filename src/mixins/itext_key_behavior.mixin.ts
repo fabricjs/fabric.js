@@ -48,9 +48,9 @@ export abstract class ITextKeyBehaviorMixin<
    */
   declare hiddenTextareaContainer?: HTMLElement | null;
 
-  declare private _clickHandlerInitialized: boolean;
-  declare private _copyDone: boolean;
-  declare private fromPaste: boolean;
+  private declare _clickHandlerInitialized: boolean;
+  private declare _copyDone: boolean;
+  private declare fromPaste: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
