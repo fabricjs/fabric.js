@@ -2042,7 +2042,6 @@ export class FabricObject<
       paintFirst: 'fill',
       activeOn: 'down',
 
-      colorProperties: ['fill', 'stroke', 'backgroundColor'],
       clipPath: undefined,
       inverted: false,
       absolutePositioned: false,
@@ -2159,7 +2158,6 @@ export const fabricObjectDefaultValues = {
   cacheProperties: FabricObject.cacheProperties,
   stateProperties: FabricObject.stateProperties,
 
-  colorProperties: ['fill', 'stroke', 'backgroundColor'],
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,

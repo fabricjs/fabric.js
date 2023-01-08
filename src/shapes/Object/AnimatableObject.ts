@@ -30,7 +30,7 @@ export abstract class AnimatableObject<
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  colorProperties: string[];
+  static colorProperties = ['fill', 'stroke', 'backgroundColor'];
 
   abstract rotate(deg: TDegree): void;
 
@@ -100,7 +100,9 @@ export abstract class AnimatableObject<
     options: Partial<TAnimationOptions<T>> = {}
   ) {
     const path = key.split('.');
-    const propIsColor = this.colorProperties.includes(path[path.length - 1]);
+    const propIsColor = this.constructor.colorProperties.includes(
+      path[path.length - 1]
+    );
     const currentValue = path.reduce((deep: any, key) => deep[key], this);
 
     if (!propIsColor && typeof to === 'string') {
