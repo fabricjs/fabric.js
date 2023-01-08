@@ -11,9 +11,9 @@ export interface IPoint {
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
 export class Point implements IPoint {
-  x: number;
+  declare x: number;
 
-  y: number;
+  declare y: number;
 
   constructor();
   constructor(x: number, y: number);

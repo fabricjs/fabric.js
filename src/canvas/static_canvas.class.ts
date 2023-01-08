@@ -1145,7 +1145,7 @@ export class StaticCanvas<
    * @type Boolean
    * @default
    */
-  svgViewportTransformation: boolean;
+  declare svgViewportTransformation: boolean;
 
   /**
    * Returns SVG representation of canvas

@@ -31,7 +31,7 @@ export class Textbox extends IText {
    * Cached array of text wrapping.
    * @type Array
    */
-  declare __cachedLines: Array<any> | null = null;
+  declare __cachedLines: Array<any> | null;
 
   /**
    * Use this boolean property in order to split strings that have no white space concept.

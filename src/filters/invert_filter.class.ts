@@ -15,14 +15,14 @@ export class Invert extends BaseFilter {
    * @param {Boolean} alpha
    * @default
    **/
-  alpha: boolean;
+  declare alpha: boolean;
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
    * @default
    */
-  invert: boolean;
+  declare invert: boolean;
 
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.

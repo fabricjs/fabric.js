@@ -18,18 +18,18 @@ const reNonWord = /[ \n\.,;!\?\-]/;
 export abstract class ITextBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends Text<EventSpec> {
-  abstract isEditing: boolean;
-  abstract cursorDelay: number;
-  abstract selectionStart: number;
-  abstract selectionEnd: number;
-  abstract cursorDuration: number;
-  abstract editable: boolean;
-  abstract editingBorderColor: string;
+  declare abstract isEditing: boolean;
+  declare abstract cursorDelay: number;
+  declare abstract selectionStart: number;
+  declare abstract selectionEnd: number;
+  declare abstract cursorDuration: number;
+  declare abstract editable: boolean;
+  declare abstract editingBorderColor: string;
 
-  abstract compositionStart: number;
-  abstract compositionEnd: number;
+  declare abstract compositionStart: number;
+  declare abstract compositionEnd: number;
 
-  abstract hiddenTextarea: HTMLTextAreaElement;
+  declare abstract hiddenTextarea: HTMLTextAreaElement;
 
   /**
    * Helps determining when the text is in composition, so that the cursor
@@ -59,7 +59,7 @@ export abstract class ITextBehaviorMixin<
   protected declare __isDraggingOver: boolean;
   protected declare selected: boolean;
   protected declare __lastSelected: boolean;
-  protected declare cursorOffsetCache: { left?: number; top?: number } = {};
+  protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps: {
     hasControls: boolean;
     borderColor: string;

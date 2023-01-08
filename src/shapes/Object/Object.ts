@@ -86,7 +86,7 @@ export type TCachedFabricObject = FabricObject &
 export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends AnimatableObject<EventSpec> {
-  type: string;
+  declare type: string;
 
   /**
    * Opacity of an object
