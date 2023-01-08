@@ -632,8 +632,9 @@ export class FabricObject<
    */
   constructor(options: Partial<TClassProperties<FabricObject>> = {}) {
     super();
-    for (const key in options) {
-      this[key] = options[key];
+    const opts = { ...this.constructor.getDefaults(), ...options };
+    for (const key in opts) {
+      this[key] = opts[key];
     }
   }
 
@@ -1031,10 +1032,13 @@ export class FabricObject<
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (this.cacheProperties.includes(key)) {
+      if (this.constructor.cacheProperties.includes(key)) {
         this.dirty = true;
         groupNeedsUpdate && this.group.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
+      } else if (
+        groupNeedsUpdate &&
+        this.constructor.stateProperties.includes(key)
+      ) {
         this.group.set('dirty', true);
       }
     }
@@ -1968,8 +1972,117 @@ export class FabricObject<
   }
 
   static getDefaults() {
-    return fabricObjectDefaultValues;
+    return {
+      type: 'object',
+      originX: 'left',
+      originY: 'top',
+      top: 0,
+      left: 0,
+      width: 0,
+      height: 0,
+      scaleX: 1,
+      scaleY: 1,
+      flipX: false,
+      flipY: false,
+      opacity: 1,
+      angle: 0,
+      skewX: 0,
+      skewY: 0,
+      cornerSize: 13,
+      touchCornerSize: 24,
+      transparentCorners: true,
+      hoverCursor: null,
+      moveCursor: null,
+      padding: 0,
+      borderColor: 'rgb(178,204,255)',
+      borderDashArray: null,
+      cornerColor: 'rgb(178,204,255)',
+      cornerStrokeColor: '',
+      cornerStyle: 'rect',
+      cornerDashArray: null,
+      centeredScaling: false,
+      centeredRotation: true,
+      fill: 'rgb(0,0,0)',
+      fillRule: 'nonzero',
+      globalCompositeOperation: 'source-over',
+      backgroundColor: '',
+      selectionBackgroundColor: '',
+      stroke: null,
+      strokeWidth: 1,
+      strokeDashArray: null,
+      strokeDashOffset: 0,
+      strokeLineCap: 'butt',
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      shadow: null,
+      borderOpacityWhenMoving: 0.4,
+      borderScaleFactor: 1,
+      minScaleLimit: 0,
+      selectable: true,
+      evented: true,
+      visible: true,
+      hasControls: true,
+      hasBorders: true,
+      perPixelTargetFind: false,
+      includeDefaultValues: true,
+      lockMovementX: false,
+      lockMovementY: false,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockSkewingX: false,
+      lockSkewingY: false,
+      lockScalingFlip: false,
+      excludeFromExport: false,
+      objectCaching: !getEnv().isLikelyNode,
+      noScaleCache: true,
+      strokeUniform: false,
+      dirty: true,
+      __corner: 0,
+      paintFirst: 'fill',
+      activeOn: 'down',
+
+      colorProperties: ['fill', 'stroke', 'backgroundColor'],
+      clipPath: undefined,
+      inverted: false,
+      absolutePositioned: false,
+      FX_DURATION: 500,
+    };
   }
+
+  static stateProperties = [
+    'top',
+    'left',
+    'scaleX',
+    'scaleY',
+    'flipX',
+    'flipY',
+    'originX',
+    'originY',
+    'angle',
+    'opacity',
+    'globalCompositeOperation',
+    'shadow',
+    'visible',
+    'skewX',
+    'skewY',
+  ];
+  static cacheProperties = [
+    'fill',
+    'stroke',
+    'strokeWidth',
+    'strokeDashArray',
+    'width',
+    'height',
+    'paintFirst',
+    'strokeUniform',
+    'strokeLineCap',
+    'strokeDashOffset',
+    'strokeLineJoin',
+    'strokeMiterLimit',
+    'backgroundColor',
+    'clipPath',
+  ];
 }
 
 export const fabricObjectDefaultValues = {
@@ -2041,39 +2154,11 @@ export const fabricObjectDefaultValues = {
   __corner: 0,
   paintFirst: 'fill',
   activeOn: 'down',
-  stateProperties: [
-    'top',
-    'left',
-    'scaleX',
-    'scaleY',
-    'flipX',
-    'flipY',
-    'originX',
-    'originY',
-    'angle',
-    'opacity',
-    'globalCompositeOperation',
-    'shadow',
-    'visible',
-    'skewX',
-    'skewY',
-  ],
-  cacheProperties: [
-    'fill',
-    'stroke',
-    'strokeWidth',
-    'strokeDashArray',
-    'width',
-    'height',
-    'paintFirst',
-    'strokeUniform',
-    'strokeLineCap',
-    'strokeDashOffset',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'backgroundColor',
-    'clipPath',
-  ],
+
+  // silence TS for now
+  cacheProperties: FabricObject.cacheProperties,
+  stateProperties: FabricObject.stateProperties,
+
   colorProperties: ['fill', 'stroke', 'backgroundColor'],
   clipPath: undefined,
   inverted: false,
@@ -2081,6 +2166,4 @@ export const fabricObjectDefaultValues = {
   FX_DURATION: 500,
 };
 
-Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
-
-classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'object');

@@ -182,16 +182,20 @@ export class Rect extends FabricObject {
   }
 
   /* _FROM_SVG_END_ */
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      type: 'rect',
+      rx: 0,
+      ry: 0,
+    };
+  }
+
+  static {
+    this.cacheProperties = [...super.cacheProperties, 'rx', 'ry'];
+  }
 }
 
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  type: 'rect',
-  rx: 0,
-  ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
-};
-
-Object.assign(Rect.prototype, rectDefaultValues);
-
-classRegistry.setClass(Rect);
-classRegistry.setSVGClass(Rect);
+classRegistry.setClass(Rect, 'rect');
+classRegistry.setSVGClass(Rect, 'rect');

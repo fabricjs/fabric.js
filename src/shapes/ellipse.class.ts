@@ -1,9 +1,8 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
   /**
@@ -26,18 +25,7 @@ export class Ellipse extends FabricObject {
    * @return {Ellipse} thisArg
    */
   constructor(options: Record<string, unknown>) {
-    super({
-      ...fabricObjectDefaultValues,
-      type: 'ellipse',
-      cacheProperties: [
-        ...fabricObjectDefaultValues.cacheProperties,
-        'rx',
-        'ry',
-      ],
-      rx: 0,
-      ry: 0,
-      ...options,
-    });
+    super(options);
     this.width = this.rx * 2;
     this.height = this.ry * 2;
   }
@@ -150,16 +138,20 @@ export class Ellipse extends FabricObject {
   }
 
   /* _FROM_SVG_END_ */
+
+  static {
+    this.cacheProperties = [...super.cacheProperties, 'rx', 'ry'];
+  }
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      type: 'ellipse',
+      rx: 0,
+      ry: 0,
+    };
+  }
 }
 
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
-  type: 'ellipse',
-  rx: 0,
-  ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
-};
-
-// Object.assign(Ellipse.prototype, ellipseDefaultValues);
-
-classRegistry.setClass(Ellipse);
-classRegistry.setSVGClass(Ellipse);
+classRegistry.setClass(Ellipse, 'ellipse');
+classRegistry.setSVGClass(Ellipse, 'ellipse');

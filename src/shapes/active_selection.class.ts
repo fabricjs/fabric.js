@@ -1,26 +1,15 @@
 import { ControlRenderingStyleOverride } from '../controls/controls.render';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { Group, groupDefaultValues } from './group.class';
+import { Group } from './group.class';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
   constructor(
     objects?: FabricObject[],
-    options: any = {},
+    options?: any,
     objectsRelativeToGroup?: boolean
   ) {
-    super(
-      objects,
-      {
-        type: 'activeSelection',
-        layout: 'fit-content',
-        subTargetCheck: false,
-        interactive: false,
-        ...options,
-      },
-      objectsRelativeToGroup
-    );
+    super(objects, options, objectsRelativeToGroup);
     this.setCoords();
   }
 
@@ -163,18 +152,6 @@ export class ActiveSelection extends Group {
     };
   }
 }
-
-export const activeSelectionDefaultValues: Partial<
-  TClassProperties<ActiveSelection>
-> = {
-  ...groupDefaultValues,
-  type: 'activeSelection',
-  layout: 'fit-content',
-  subTargetCheck: false,
-  interactive: false,
-};
-
-// Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
 
 classRegistry.setClass(ActiveSelection, 'activeSelection');
 classRegistry.setClass(ActiveSelection, 'active-selection');

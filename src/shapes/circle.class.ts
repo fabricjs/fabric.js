@@ -1,11 +1,10 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 
 export class Circle extends FabricObject {
   /**
@@ -32,20 +31,7 @@ export class Circle extends FabricObject {
   endAngle: number;
 
   constructor(options: Record<string, unknown>) {
-    super({
-      ...fabricObjectDefaultValues,
-      type: 'circle',
-      radius: 0,
-      startAngle: 0,
-      endAngle: 360,
-      cacheProperties: [
-        ...fabricObjectDefaultValues.cacheProperties,
-        'radius',
-        'startAngle',
-        'endAngle',
-      ],
-      ...options,
-    });
+    super(options);
     this.setRadius(this.radius);
   }
 
@@ -205,22 +191,26 @@ export class Circle extends FabricObject {
   }
 
   /* _FROM_SVG_END_ */
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      type: 'circle',
+      radius: 0,
+      startAngle: 0,
+      endAngle: 360,
+    };
+  }
+
+  static {
+    this.cacheProperties = [
+      ...super.cacheProperties,
+      'radius',
+      'startAngle',
+      'endAngle',
+    ];
+  }
 }
 
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-  cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
-    'radius',
-    'startAngle',
-    'endAngle',
-  ],
-};
-
-// Object.assign(Circle.prototype, circleDefaultValues);
-
-classRegistry.setClass(Circle);
-classRegistry.setSVGClass(Circle);
+classRegistry.setClass(Circle, 'circle');
+classRegistry.setSVGClass(Circle, 'circle');
