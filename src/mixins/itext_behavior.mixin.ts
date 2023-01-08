@@ -35,29 +35,29 @@ export abstract class ITextBehaviorMixin<
    * Helps determining when the text is in composition, so that the cursor
    * rendering is altered.
    */
-  protected inCompositionMode: boolean;
+  declare protected inCompositionMode: boolean;
 
-  protected _reSpace: RegExp;
-  private _currentTickState: { isAborted: boolean; abort: () => void };
-  private _cursorTimeout1: number;
-  private _cursorTimeout2: number;
-  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
-  protected _currentCursorOpacity: number;
-  private _textBeforeEdit: string;
-  protected __isMousedown: boolean;
-  protected __selectionStartOnMouseDown: number;
-  private __dragImageDisposer: VoidFunction;
-  private __dragStartFired: boolean;
-  protected __isDragging: boolean;
-  protected __dragStartSelection: {
+  declare protected _reSpace: RegExp;
+  declare private _currentTickState: { isAborted: boolean; abort: () => void };
+  declare private _cursorTimeout1: number;
+  declare private _cursorTimeout2: number;
+  declare private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
+  declare protected _currentCursorOpacity: number;
+  declare private _textBeforeEdit: string;
+  declare protected __isMousedown: boolean;
+  declare protected __selectionStartOnMouseDown: number;
+  declare private __dragImageDisposer: VoidFunction;
+  declare private __dragStartFired: boolean;
+  declare protected __isDragging: boolean;
+  declare protected __dragStartSelection: {
     selectionStart: number;
     selectionEnd: number;
   };
-  protected __isDraggingOver: boolean;
-  protected selected: boolean;
-  protected __lastSelected: boolean;
-  protected cursorOffsetCache: { left?: number; top?: number } = {};
-  protected _savedProps: {
+  declare protected __isDraggingOver: boolean;
+  declare protected selected: boolean;
+  declare protected __lastSelected: boolean;
+  declare protected cursorOffsetCache: { left?: number; top?: number } = {};
+  declare protected _savedProps: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
@@ -67,7 +67,7 @@ export abstract class ITextBehaviorMixin<
     defaultCursor: string;
     moveCursor: CSSStyleDeclaration['cursor'];
   };
-  protected _selectionDirection: 'left' | 'right' | null;
+  declare protected _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
   abstract initCursorSelectionHandlers(): void;
