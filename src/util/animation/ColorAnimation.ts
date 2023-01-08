@@ -60,7 +60,7 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
     ] as TRGBAColorSource;
     return {
       value,
-      changeRatio:
+      valueProgress:
         // to correctly calculate the change ratio we must find a changed value
         value
           .map((p, i) =>

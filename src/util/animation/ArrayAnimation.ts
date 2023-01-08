@@ -19,7 +19,9 @@ export class ArrayAnimation extends AnimationBase<number[]> {
     );
     return {
       value: values,
-      changeRatio: Math.abs((values[0] - this.startValue[0]) / this.byValue[0]),
+      valueProgress: Math.abs(
+        (values[0] - this.startValue[0]) / this.byValue[0]
+      ),
     };
   }
 }

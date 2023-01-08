@@ -93,7 +93,7 @@ export abstract class AnimationBase<
    */
   protected abstract calculate(timeElapsed: number): {
     value: T;
-    changeRatio: number;
+    valueProgress: number;
   };
 
   start() {
@@ -120,9 +120,9 @@ export abstract class AnimationBase<
     const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationProgress = boundDurationMs / this.duration;
-    const { value, changeRatio } = this.calculate(boundDurationMs);
+    const { value, valueProgress } = this.calculate(boundDurationMs);
     this.value = Object.freeze(value);
-    this.valueProgress = changeRatio;
+    this.valueProgress = valueProgress;
 
     if (this._state === 'aborted') {
       return;

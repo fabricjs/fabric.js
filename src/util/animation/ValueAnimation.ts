@@ -23,7 +23,7 @@ export class ValueAnimation extends AnimationBase<number> {
     );
     return {
       value,
-      changeRatio: Math.abs((value - this.startValue) / this.byValue),
+      valueProgress: Math.abs((value - this.startValue) / this.byValue),
     };
   }
 }
