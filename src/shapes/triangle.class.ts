@@ -3,7 +3,6 @@ import { classRegistry } from '../util/class_registry';
 import { FabricObject } from './Object/FabricObject';
 
 export class Triangle extends FabricObject {
-
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on

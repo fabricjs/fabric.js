@@ -110,14 +110,14 @@ export class Image extends FabricObject {
 
   declare preserveAspectRatio: string;
 
-  declare protected src: string;
+  protected declare src: string;
 
   declare filters: BaseFilter[];
   declare resizeFilter: BaseFilter;
 
-  declare protected _element: ImageSource;
-  declare protected _originalElement: ImageSource;
-  declare protected _filteredEl: ImageSource;
+  protected declare _element: ImageSource;
+  protected declare _originalElement: ImageSource;
+  protected declare _filteredEl: ImageSource;
 
   /**
    * Constructor
@@ -783,7 +783,7 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 Object.assign(Image.prototype, {
   ...imageDefaultValues,
   cacheProperties: [...cacheProperties, 'cropX', 'cropY'],
-})
+});
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

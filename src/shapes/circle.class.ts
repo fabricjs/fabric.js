@@ -199,7 +199,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 Object.assign(Circle.prototype, {
   ...circleDefaultValues,
   cacheProperties: [...cacheProperties, 'radius', 'startAngle', 'endAngle'],
-})
+});
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

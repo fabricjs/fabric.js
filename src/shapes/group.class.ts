@@ -1048,6 +1048,6 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 Object.assign(Group.prototype, {
   ...groupDefaultValues,
   stateProperties: [...stateProperties, 'layout'],
-})
+});
 
 classRegistry.setClass(Group);

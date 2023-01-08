@@ -387,7 +387,7 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 Object.assign(Path.prototype, {
   ...pathDefaultValues,
   cacheProperties: [...cacheProperties, 'path', 'fillRule'],
-})
+});
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

@@ -1,9 +1,11 @@
-import { Image } from "../shapes/image.class";
-import type { FabricObject } from "../shapes/Object/FabricObject";
-import { TMat2D } from "../typedefs";
-import { qrDecompose } from "./misc/matrix";
+import { Image } from '../shapes/image.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TMat2D } from '../typedefs';
+import { qrDecompose } from './misc/matrix';
 
-type FabricObjectWithTransformMatrix = FabricObject & { transformMatrix?: TMat2D };
+type FabricObjectWithTransformMatrix = FabricObject & {
+  transformMatrix?: TMat2D;
+};
 
 /**
  * This function is an helper for svg import. it decompose the transformMatrix
@@ -11,9 +13,13 @@ type FabricObjectWithTransformMatrix = FabricObject & { transformMatrix?: TMat2D
  * untransformed coordinates
  * @private
  */
-export const _assignTransformMatrixProps = (object: FabricObjectWithTransformMatrix) => {
+export const _assignTransformMatrixProps = (
+  object: FabricObjectWithTransformMatrix
+) => {
   if (object.transformMatrix) {
-    const { scaleX, scaleY, angle, skewX } = qrDecompose(object.transformMatrix);
+    const { scaleX, scaleY, angle, skewX } = qrDecompose(
+      object.transformMatrix
+    );
     object.flipX = false;
     object.flipY = false;
     object.set('scaleX', scaleX);
@@ -22,15 +28,18 @@ export const _assignTransformMatrixProps = (object: FabricObjectWithTransformMat
     object.skewX = skewX;
     object.skewY = 0;
   }
-}
+};
 
-  /**
-   * This function is an helper for svg import. it removes the transform matrix
-   * and set to object properties that fabricjs can handle
-   * @private
-   * @param {Object} preserveAspectRatioOptions
-   */
-export const _removeTransformMatrix = (object: FabricObjectWithTransformMatrix, preserveAspectRatioOptions?: any) => {
+/**
+ * This function is an helper for svg import. it removes the transform matrix
+ * and set to object properties that fabricjs can handle
+ * @private
+ * @param {Object} preserveAspectRatioOptions
+ */
+export const _removeTransformMatrix = (
+  object: FabricObjectWithTransformMatrix,
+  preserveAspectRatioOptions?: any
+) => {
   let center = object._findCenterFromElement();
   if (object.transformMatrix) {
     _assignTransformMatrixProps(object);
@@ -48,4 +57,4 @@ export const _removeTransformMatrix = (object: FabricObjectWithTransformMatrix, 
     object.height = preserveAspectRatioOptions.height;
   }
   object.setPositionByOrigin(center, 'center', 'center');
-}
+};

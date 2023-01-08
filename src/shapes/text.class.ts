@@ -228,7 +228,7 @@ export class Text<
    */
   declare textBackgroundColor: string;
 
-  declare protected _styleProperties: string[];
+  protected declare _styleProperties: string[];
 
   declare styles: TextStyle;
 
@@ -1924,10 +1924,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     baseline: 0.11, // baseline-shift factor (downwards)
   },
   textBackgroundColor: '',
-  cacheProperties: [
-    ...cacheProperties,
-    ...additionalProps,
-  ],
+  cacheProperties: [...cacheProperties, ...additionalProps],
   stroke: null,
   shadow: null,
   path: null,

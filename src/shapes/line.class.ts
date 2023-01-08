@@ -9,7 +9,7 @@ import { isFiller } from '../util/types';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
-const coordProps = ['x1','x2', 'y1', 'y2'];
+const coordProps = ['x1', 'x2', 'y1', 'y2'];
 
 export class Line extends FabricObject {
   /**
@@ -46,7 +46,10 @@ export class Line extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor(points = [0, 0, 0, 0], options: Partial<TClassProperties<Line>> = {}) {
+  constructor(
+    points = [0, 0, 0, 0],
+    options: Partial<TClassProperties<Line>> = {}
+  ) {
     super(options);
 
     this.set('x1', points[0]);
@@ -114,10 +117,7 @@ export class Line extends FabricObject {
    * @return {Point} center point from element coordinates
    */
   _findCenterFromElement(): Point {
-    return new Point(
-      (this.x1 + this.x2) / 2,
-      (this.y1 + this.y2) / 2,
-    );
+    return new Point((this.x1 + this.x2) / 2, (this.y1 + this.y2) / 2);
   }
 
   /**
@@ -167,7 +167,10 @@ export class Line extends FabricObject {
     };
   }
 
-  private makeEdgeToOriginGetter(propertyNames: any, originValues: any): number {
+  private makeEdgeToOriginGetter(
+    propertyNames: any,
+    originValues: any
+  ): number {
     const origin = propertyNames.origin,
       axis1 = propertyNames.axis1,
       axis2 = propertyNames.axis2,
@@ -275,10 +278,7 @@ export class Line extends FabricObject {
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (line: Line) => any,
-  ) {
+  static fromElement(element: SVGElement, callback: (line: Line) => any) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
       points = [
         parsedAttributes.x1 || 0,

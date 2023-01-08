@@ -30,7 +30,7 @@ export class Polyline extends FabricObject {
    */
   declare exactBoundingBox: boolean;
 
-  declare private initialized: true | undefined;
+  private declare initialized: true | undefined;
 
   /**
    * A list of properties that if changed trigger a recalculation of dimensions

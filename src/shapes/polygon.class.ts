@@ -4,7 +4,6 @@ import { classRegistry } from '../util/class_registry';
 import { Polyline, polylineDefaultValues } from './polyline.class';
 
 export class Polygon extends Polyline {
-
   protected isOpen() {
     return false;
   }

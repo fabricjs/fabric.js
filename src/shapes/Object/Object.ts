@@ -18,10 +18,7 @@ import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
-import {
-  invertTransform,
-  qrDecompose,
-} from '../../util/misc/matrix';
+import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
   resetObjectTransform,
@@ -33,7 +30,11 @@ import type { Group } from '../group.class';
 import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
 import { Image } from '../image.class';
-import { cacheProperties, fabricObjectDefaultValues, stateProperties } from './defaultValues';
+import {
+  cacheProperties,
+  fabricObjectDefaultValues,
+  stateProperties,
+} from './defaultValues';
 import type { Gradient } from '../../gradient/gradient.class';
 import type { Pattern } from '../../pattern.class';
 import type { Canvas } from '../../canvas/canvas_events';
@@ -846,10 +847,12 @@ export class FabricObject<
         top: toFixed(this.top, NUM_FRACTION_DIGITS),
         width: toFixed(this.width, NUM_FRACTION_DIGITS),
         height: toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill: isSerializableFiller(this.fill) ? this.fill.toObject() : this.fill,
+        fill: isSerializableFiller(this.fill)
+          ? this.fill.toObject()
+          : this.fill,
         stroke: isSerializableFiller(this.stroke)
-            ? this.stroke.toObject()
-            : this.stroke,
+          ? this.stroke.toObject()
+          : this.stroke,
         strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray: this.strokeDashArray
           ? this.strokeDashArray.concat()
@@ -1009,7 +1012,7 @@ export class FabricObject<
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-    // i don't like this automatic initialization here
+      // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
     } else if (key === 'dirty' && this.group) {
@@ -1189,7 +1192,10 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {FabricObject} clipPath
    */
-  drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: TCachedFabricObject) {
+  drawClipPathOnCache(
+    ctx: CanvasRenderingContext2D,
+    clipPath: TCachedFabricObject
+  ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4
@@ -1363,7 +1369,7 @@ export class FabricObject<
         }
       } else {
         // is a color
-        ctx.strokeStyle = (decl.stroke as string);
+        ctx.strokeStyle = decl.stroke as string;
       }
     }
   }
@@ -1454,7 +1460,9 @@ export class FabricObject<
     if (!isFiller(filler)) {
       return { offsetX: 0, offsetY: 0 };
     }
-    const t = (filler as Gradient<'linear'>).gradientTransform || (filler as Pattern).patternTransform;
+    const t =
+      (filler as Gradient<'linear'>).gradientTransform ||
+      (filler as Pattern).patternTransform;
     const offsetX = -this.width / 2 + filler.offsetX || 0,
       offsetY = -this.height / 2 + filler.offsetY || 0;
 
@@ -1597,7 +1605,6 @@ export class FabricObject<
   _findCenterFromElement() {
     return new Point(this.left + this.width / 2, this.top + this.height / 2);
   }
-
 
   /**
    * Clones an instance.
@@ -1844,23 +1851,25 @@ export class FabricObject<
    */
   static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: string; signal?: AbortSignal } = {}
+    {
+      extraParam,
+      ...options
+    }: { extraParam?: string; signal?: AbortSignal } = {}
   ): Promise<FabricObject> {
-    return enlivenObjectEnlivables<any>(
-      clone(object, true),
-      options
-    ).then((enlivedMap) => {
-      const allOptions = { ...options, ...enlivedMap };
-      // from the resulting enlived options, extract options.extraParam to arg0
-      // to avoid accidental overrides later
-      if (extraParam) {
-        const { [extraParam]: arg0, ...rest } = allOptions;
-        // @ts-ignore;
-        return new this(arg0, rest);
-      } else {
-        return new this(allOptions);
+    return enlivenObjectEnlivables<any>(clone(object, true), options).then(
+      (enlivedMap) => {
+        const allOptions = { ...options, ...enlivedMap };
+        // from the resulting enlived options, extract options.extraParam to arg0
+        // to avoid accidental overrides later
+        if (extraParam) {
+          const { [extraParam]: arg0, ...rest } = allOptions;
+          // @ts-ignore;
+          return new this(arg0, rest);
+        } else {
+          return new this(allOptions);
+        }
       }
-    });
+    );
   }
 
   /**
