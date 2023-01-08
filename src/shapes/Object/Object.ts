@@ -38,7 +38,7 @@ import {
 import type { Gradient } from '../../gradient/gradient.class';
 import type { Pattern } from '../../pattern.class';
 import type { Canvas } from '../../canvas/canvas_events';
-import { _removeTransformMatrix } from '../../util/transform_matrix_removal';
+import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -1832,12 +1832,6 @@ export class FabricObject<
     if (runningAnimations) {
       runningAnimations.cancelByTarget(this);
     }
-  }
-
-  // test backward compatibility
-  _removeTransformMatrix(options: any) {
-    // @ts-ignore
-    return _removeTransformMatrix(this, options);
   }
 
   /**

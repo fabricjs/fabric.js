@@ -13,7 +13,7 @@ type FabricObjectWithTransformMatrix = FabricObject & {
  * untransformed coordinates
  * @private
  */
-export const _assignTransformMatrixProps = (
+const _assignTransformMatrixProps = (
   object: FabricObjectWithTransformMatrix
 ) => {
   if (object.transformMatrix) {
@@ -36,7 +36,7 @@ export const _assignTransformMatrixProps = (
  * @private
  * @param {Object} preserveAspectRatioOptions
  */
-export const _removeTransformMatrix = (
+export const removeTransformMatrixForSvgParsing = (
   object: FabricObjectWithTransformMatrix,
   preserveAspectRatioOptions?: any
 ) => {

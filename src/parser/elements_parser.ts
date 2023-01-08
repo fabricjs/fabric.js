@@ -9,7 +9,7 @@ import {
   qrDecompose,
 } from '../util/misc/matrix';
 import { storage } from './constants';
-import { _removeTransformMatrix } from '../util/transform_matrix_removal';
+import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 
 const ElementsParser = function (
   elements,
@@ -70,7 +70,7 @@ const ElementsParser = function (
       if (obj instanceof Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
-      _removeTransformMatrix(obj, _options);
+      removeTransformMatrixForSvgParsing(obj, _options);
       this.resolveClipPath(obj, el);
       this.reviver && this.reviver(el, obj);
       this.instances[index] = obj;
@@ -109,7 +109,7 @@ const ElementsParser = function (
 
   proto.createClipPathCallback = function (obj, container) {
     return function (_newObj) {
-      _removeTransformMatrix(_newObj);
+      removeTransformMatrixForSvgParsing(_newObj);
       _newObj.fillRule = _newObj.clipRule;
       container.push(_newObj);
     };
