@@ -51,7 +51,7 @@ export abstract class ITextBehaviorMixin<
     selectionEnd: number;
   };
   protected __isDraggingOver: boolean;
-  selected: boolean;
+  protected selected: boolean;
   protected __lastSelected: boolean;
   protected cursorOffsetCache: { left?: number; top?: number } = {};
   protected _savedProps: {
