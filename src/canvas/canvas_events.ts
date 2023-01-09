@@ -111,6 +111,15 @@ export class Canvas extends SelectableCanvas {
    */
   private _dragSource?: FabricObject;
 
+  /**
+   * Holds a reference to an object on the canvas that is the current drop target
+   * May differ from {@link _draggedoverTarget}
+   * @todo inspect whether {@link _draggedoverTarget} and {@link _dropTarget} should be merged somehow
+   * @type FabricObject
+   * @private
+   */
+  private _dropTarget: FabricObject<ObjectEvents> | undefined;
+
   currentTarget?: FabricObject;
 
   currentSubTargets?: FabricObject[];
@@ -347,6 +356,13 @@ export class Canvas extends SelectableCanvas {
   ) {
     let dirty = false;
     const ctx = this.contextTop;
+    if (
+      this._dropTarget &&
+      this._dropTarget !== source &&
+      this._dropTarget !== target
+    ) {
+      this._dropTarget.clearContextTop();
+    }
     if (source) {
       source.clearContextTop(true);
       source.renderDragSourceEffect(e);
@@ -435,7 +451,6 @@ export class Canvas extends SelectableCanvas {
     //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
     this._fireEnterLeaveEvents(target, options);
     if (target) {
-      // render drag selection before rendering target cursor for correct visuals
       if (target.canDrop(e)) {
         dropTarget = target;
       }
@@ -454,6 +469,7 @@ export class Canvas extends SelectableCanvas {
     }
     //  render drag effects now that relations between source and target is clear
     this._renderDragEffects(e, this._dragSource, dropTarget);
+    this._dropTarget = dropTarget;
   }
 
   /**
@@ -487,8 +503,11 @@ export class Canvas extends SelectableCanvas {
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
+
     //  fire dragleave on targets
     this._fireEnterLeaveEvents(undefined, options);
+    this._renderDragEffects(e, this._dragSource);
+    this._dropTarget = undefined;
     //  clear targets
     this.targets = [];
     this._hoveredTargets = [];
