@@ -827,19 +827,20 @@ export class Canvas extends SelectableCanvas {
     const transform = this._currentTransform;
     this._cacheTransformEventData(e);
     const target = this._target;
+    const isClick = this._isClick;
     this._handleEvent(e, 'up:before');
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
     if (checkClick(e, RIGHT_CLICK)) {
       if (this.fireRightClick) {
-        this._handleEvent(e, 'up', RIGHT_CLICK, this._isClick);
+        this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
       }
       return;
     }
 
     if (checkClick(e, MIDDLE_CLICK)) {
       if (this.fireMiddleClick) {
-        this._handleEvent(e, 'up', MIDDLE_CLICK, this._isClick);
+        this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
       }
       this._resetTransformEventData();
       return;
@@ -858,7 +859,7 @@ export class Canvas extends SelectableCanvas {
       this._finalizeCurrentTransform(e);
       shouldRender = transform.actionPerformed;
     }
-    if (!this._isClick) {
+    if (!isClick) {
       const targetWasActive = target === this._activeObject;
       this._maybeGroupObjects(e);
       if (!shouldRender) {
@@ -911,7 +912,7 @@ export class Canvas extends SelectableCanvas {
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, this._isClick);
+    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
@@ -919,7 +920,7 @@ export class Canvas extends SelectableCanvas {
     if (shouldRender) {
       this.requestRenderAll();
     } else if (
-      !this._isClick &&
+      !isClick &&
       !(
         isInteractiveTextObject(this._activeObject) &&
         this._activeObject.isEditing
