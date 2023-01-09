@@ -312,12 +312,13 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
   y1: 0,
   x2: 0,
   y2: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
     'x1',
     'x2',
     'y1',
-    'y2'
-  ),
+    'y2',
+  ],
 };
 
 Object.assign(Line.prototype, lineDefaultValues);

@@ -313,7 +313,7 @@ export class Polyline extends FabricObject {
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   type: 'polyline',
   exactBoundingBox: false,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
+  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'points'],
   strokeBBoxAffectingProperties: [
     'skewX',
     'skewY',
