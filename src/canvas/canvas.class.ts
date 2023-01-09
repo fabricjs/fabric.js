@@ -19,11 +19,10 @@ import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
-  isInteractiveTextObject,
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -62,7 +61,7 @@ type TDestroyedCanvas = Omit<
  * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
  *
- * @fires object:modified at the end of a transform or any change when statefull is true
+ * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
  * @fires object:scaling while an object is being scaled by controls
  * @fires object:moving while an object is being dragged
@@ -1630,17 +1629,6 @@ export class SelectableCanvas<
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
-  }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
   }
 }
 
