@@ -123,6 +123,8 @@ export class Canvas extends SelectableCanvas {
    */
   _previousPointer: Point;
 
+  private _isClick: boolean;
+
   /**
    * Adds mouse listeners to canvas
    * @private
@@ -315,6 +317,7 @@ export class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   private _onDragStart(e: DragEvent) {
+    this._isClick = false;
     const activeObject = this.getActiveObject();
     if (
       isFabricObjectWithDragSupport(activeObject) &&
@@ -766,10 +769,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    const transform = this._currentTransform,
-      groupSelector = this._groupSelector,
-      isClick =
-        !groupSelector || (groupSelector.left === 0 && groupSelector.top === 0);
+    const transform = this._currentTransform;
     this._cacheTransformEventData(e);
     const target = this._target;
     this._handleEvent(e, 'up:before');
@@ -777,14 +777,14 @@ export class Canvas extends SelectableCanvas {
     // target undefined will make the _handleEvent search the target
     if (checkClick(e, RIGHT_CLICK)) {
       if (this.fireRightClick) {
-        this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
+        this._handleEvent(e, 'up', RIGHT_CLICK, this._isClick);
       }
       return;
     }
 
     if (checkClick(e, MIDDLE_CLICK)) {
       if (this.fireMiddleClick) {
-        this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
+        this._handleEvent(e, 'up', MIDDLE_CLICK, this._isClick);
       }
       this._resetTransformEventData();
       return;
@@ -803,7 +803,7 @@ export class Canvas extends SelectableCanvas {
       this._finalizeCurrentTransform(e);
       shouldRender = transform.actionPerformed;
     }
-    if (!isClick) {
+    if (!this._isClick) {
       const targetWasActive = target === this._activeObject;
       this._maybeGroupObjects(e);
       if (!shouldRender) {
@@ -856,14 +856,14 @@ export class Canvas extends SelectableCanvas {
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+    this._handleEvent(e, 'up', LEFT_CLICK, this._isClick);
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
     target && (target.__corner = 0);
     if (shouldRender) {
       this.requestRenderAll();
-    } else if (!isClick) {
+    } else if (!this._isClick) {
       this.renderTop();
     }
   }
@@ -1054,6 +1054,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   __onMouseDown(e: TPointerEvent) {
+    this._isClick = true;
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
     let target: FabricObject | undefined = this._target;
@@ -1196,6 +1197,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousemove
    */
   __onMouseMove(e: TPointerEvent) {
+    this._isClick = false;
     this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
 
