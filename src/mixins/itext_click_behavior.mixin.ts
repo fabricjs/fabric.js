@@ -192,7 +192,10 @@ export abstract class ITextClickBehaviorMixin<
         return;
       }
     }
-
+    if (this.__isDragging && options.isClick) {
+      // false positive drag event, is actually a click
+      this.setCursorByClick(options.e);
+    }
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;
       this.__lastSelected = false;
