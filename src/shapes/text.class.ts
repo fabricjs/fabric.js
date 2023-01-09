@@ -381,7 +381,6 @@ export class Text<
     }
     this.initDimensions();
     this.setCoords();
-    // @ts-ignore
     this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -429,7 +428,6 @@ export class Text<
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
-    // @ts-ignore
     this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
@@ -1924,10 +1922,10 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     baseline: 0.11, // baseline-shift factor (downwards)
   },
   textBackgroundColor: '',
-  stateProperties:
-    fabricObjectDefaultValues.stateProperties.concat(additionalProps),
-  cacheProperties:
-    fabricObjectDefaultValues.cacheProperties.concat(additionalProps),
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
+    ...additionalProps,
+  ],
   stroke: null,
   shadow: null,
   path: null,

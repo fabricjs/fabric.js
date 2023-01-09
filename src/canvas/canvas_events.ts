@@ -344,10 +344,12 @@ export class Canvas extends SelectableCanvas {
     source?: FabricObject,
     target?: FabricObject
   ) {
+    let dirty = false;
     const ctx = this.contextTop;
     if (source) {
       source.clearContextTop(true);
       source.renderDragSourceEffect(e);
+      dirty = true;
     }
     if (target) {
       if (target !== source) {
@@ -356,8 +358,10 @@ export class Canvas extends SelectableCanvas {
         target.clearContextTop(true);
       }
       target.renderDropTargetEffect(e);
+      dirty = true;
     }
     ctx.restore();
+    dirty && (this.contextTopDirty = true);
   }
 
   /**
@@ -988,11 +992,7 @@ export class Canvas extends SelectableCanvas {
 
     target.setCoords();
 
-    if (
-      transform.actionPerformed ||
-      // @ts-ignore
-      (this.stateful && target.hasStateChanged())
-    ) {
+    if (transform.actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
     }
@@ -1183,8 +1183,6 @@ export class Canvas extends SelectableCanvas {
    */
   _beforeTransform(e: TPointerEvent) {
     const t = this._currentTransform!;
-    // @ts-ignore
-    this.stateful && t.target.saveState();
     this.fire('before:transform', {
       e,
       transform: t,
