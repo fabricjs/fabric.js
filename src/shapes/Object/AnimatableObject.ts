@@ -4,15 +4,13 @@ import { animate, animateColor } from '../../util/animation/animate';
 import type {
   ValueAnimationOptions,
   ColorAnimationOptions,
+  AnimationOptions,
+  ArrayAnimationOptions,
 } from '../../util/animation/types';
 import { ArrayAnimation } from '../../util/animation/ArrayAnimation';
 import type { ColorAnimation } from '../../util/animation/ColorAnimation';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { StackedObject } from './StackedObject';
-
-type TAnimationOptions<T extends number | TColorArg> = T extends number
-  ? ValueAnimationOptions
-  : ColorAnimationOptions;
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -35,13 +33,14 @@ export abstract class AnimatableObject<
    * object.animate({ left: ..., top: ... });
    * object.animate({ left: ..., top: ... }, { duration: ... });
    */
-  animate<T extends number | TColorArg>(
+  animate<T extends number | number[] | TColorArg>(
     animatable: Record<string, T>,
-    options?: Partial<TAnimationOptions<T>>
-  ): (ColorAnimation | ValueAnimation | ArrayAnimation)[] {
-    return Object.entries(animatable).map(([key, endValue]) =>
-      this._animate(key, endValue, options)
-    );
+    options?: Partial<AnimationOptions<T>>
+  ): Record<string, ColorAnimation | ValueAnimation | ArrayAnimation> {
+    return Object.entries(animatable).reduce((acc, [key, endValue]) => {
+      acc[key] = this._animate(key, endValue, options);
+      return acc;
+    }, {} as Record<string, ColorAnimation | ValueAnimation | ArrayAnimation>);
   }
 
   /**
@@ -50,10 +49,10 @@ export abstract class AnimatableObject<
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
    */
-  _animate<T extends number | TColorArg>(
+  _animate<T extends number | number[] | TColorArg>(
     key: string,
     endValue: T,
-    options: Partial<TAnimationOptions<T>> = {}
+    options: Partial<AnimationOptions<T>> = {}
   ) {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
@@ -93,12 +92,14 @@ export abstract class AnimatableObject<
           // @ts-expect-error generic callback arg0 is wrong
           onComplete(value, valueProgress, durationProgress);
       },
-    } as TAnimationOptions<T>;
+    } as AnimationOptions<T>;
 
     if (propIsColor) {
       return animateColor(animationOptions as ColorAnimationOptions);
     } else {
-      return animate(animationOptions as ValueAnimationOptions);
+      return animate(
+        animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+      );
     }
   }
 }

@@ -127,3 +127,10 @@ export type ColorAnimationOptions = TAnimationOptions<
   string,
   number[]
 >;
+
+export type AnimationOptions<T extends number | number[] | TColorArg> =
+  T extends TColorArg
+    ? ColorAnimationOptions
+    : T extends number[]
+    ? ArrayAnimationOptions
+    : ValueAnimationOptions;
