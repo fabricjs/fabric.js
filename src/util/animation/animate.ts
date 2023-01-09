@@ -6,6 +6,14 @@ import {
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
+import { TColorArg } from '../../color/color.class';
+
+export type TAnimation<T extends number | number[] | TColorArg> =
+  T extends TColorArg
+    ? ColorAnimation
+    : T extends number[]
+    ? ArrayAnimation
+    : ValueAnimation;
 
 const isArrayAnimation = (
   options: ArrayAnimationOptions | ValueAnimationOptions

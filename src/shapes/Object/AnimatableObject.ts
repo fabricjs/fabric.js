@@ -1,15 +1,16 @@
 import { TColorArg } from '../../color/color.class';
 import { ObjectEvents } from '../../EventTypeDefs';
-import { animate, animateColor } from '../../util/animation/animate';
+import {
+  animate,
+  animateColor,
+  TAnimation,
+} from '../../util/animation/animate';
 import type {
-  ValueAnimationOptions,
-  ColorAnimationOptions,
   AnimationOptions,
   ArrayAnimationOptions,
+  ColorAnimationOptions,
+  ValueAnimationOptions,
 } from '../../util/animation/types';
-import { ArrayAnimation } from '../../util/animation/ArrayAnimation';
-import type { ColorAnimation } from '../../util/animation/ColorAnimation';
-import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { StackedObject } from './StackedObject';
 
 export abstract class AnimatableObject<
@@ -23,10 +24,10 @@ export abstract class AnimatableObject<
 
   /**
    * Animates object's properties
-   * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
-   * @param {Number|Object} value Value to animate property to (if string was given first) or options object
+   * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
+   * @param {Partial<AnimationOptions<T>>} options
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {(ColorAnimation | ValueAnimation)[]} animation context (or an array if passed multiple properties)
+   * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties
    *
@@ -36,11 +37,11 @@ export abstract class AnimatableObject<
   animate<T extends number | number[] | TColorArg>(
     animatable: Record<string, T>,
     options?: Partial<AnimationOptions<T>>
-  ): Record<string, ColorAnimation | ValueAnimation | ArrayAnimation> {
+  ): Record<string, TAnimation<T>> {
     return Object.entries(animatable).reduce((acc, [key, endValue]) => {
       acc[key] = this._animate(key, endValue, options);
       return acc;
-    }, {} as Record<string, ColorAnimation | ValueAnimation | ArrayAnimation>);
+    }, {} as Record<string, TAnimation<T>>);
   }
 
   /**
@@ -53,7 +54,7 @@ export abstract class AnimatableObject<
     key: string,
     endValue: T,
     options: Partial<AnimationOptions<T>> = {}
-  ) {
+  ): TAnimation<T> {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
     const { easing, duration, abort, startValue, onChange, onComplete } =
@@ -94,12 +95,12 @@ export abstract class AnimatableObject<
       },
     } as AnimationOptions<T>;
 
-    if (propIsColor) {
-      return animateColor(animationOptions as ColorAnimationOptions);
-    } else {
-      return animate(
-        animationOptions as ValueAnimationOptions | ArrayAnimationOptions
-      );
-    }
+    return (
+      propIsColor
+        ? animateColor(animationOptions as ColorAnimationOptions)
+        : animate(
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+          )
+    ) as TAnimation<T>;
   }
 }
