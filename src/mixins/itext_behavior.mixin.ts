@@ -176,18 +176,6 @@ export abstract class ITextBehaviorMixin<
   /**
    * @private
    */
-  _tick(delay?: number) {
-    this._currentTickState = this._animateCursor({
-      toValue: 1,
-      duration: this.cursorDuration,
-      delay,
-      onComplete: this._onTickComplete,
-    });
-  }
-
-  /**
-   * @private
-   */
   _animateCursor({
     toValue,
     duration,
@@ -213,10 +201,16 @@ export abstract class ITextBehaviorMixin<
     });
   }
 
-  /**
-   * @private
-   */
-  _onTickComplete() {
+  private _tick(delay?: number) {
+    this._currentTickState = this._animateCursor({
+      toValue: 1,
+      duration: this.cursorDuration,
+      delay,
+      onComplete: this._onTickComplete,
+    });
+  }
+
+  private _onTickComplete() {
     this._currentTickCompleteState?.abort();
     this._currentTickCompleteState = this._animateCursor({
       toValue: 0,
