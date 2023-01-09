@@ -263,6 +263,7 @@ import {
   renderSquareControl,
 } from './src/controls/controls.render';
 import { dragHandler } from './src/controls/drag';
+import { createPolyControls } from './src/controls/polyControl';
 import {
   rotationStyleHandler,
   rotationWithSnapping,
@@ -305,6 +306,7 @@ const controlsUtils = {
   skewHandlerX,
   skewHandlerY,
   dragHandler,
+  createPolyControls,
   scaleOrSkewActionName,
   rotationStyleHandler,
   wrapWithFixedAnchor,
