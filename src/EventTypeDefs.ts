@@ -134,10 +134,10 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
     currentTarget?: FabricObject | null;
   };
 
-type SimpleEventHandler<T extends Event = TPointerEvent> =
-  TEventWithTarget<T> & {
-    subTargets: FabricObject[];
-  };
+type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
+  target?: FabricObject;
+  subTargets: FabricObject[];
+};
 
 type InEvent = {
   previousTarget?: FabricObject;
