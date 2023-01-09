@@ -68,7 +68,7 @@ export abstract class AnimatableObject<
       duration,
       abort: abort?.bind(this),
       onChange: (
-        value: string | number,
+        value: number | number[] | string,
         valueProgress: number,
         durationProgress: number
       ) => {
@@ -83,7 +83,7 @@ export abstract class AnimatableObject<
           onChange(value, valueProgress, durationProgress);
       },
       onComplete: (
-        value: string | number,
+        value: number | number[] | string,
         valueProgress: number,
         durationProgress: number
       ) => {
