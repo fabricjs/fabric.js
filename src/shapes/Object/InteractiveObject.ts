@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
@@ -585,7 +585,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect(e: DragEvent) {
+  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 
@@ -598,7 +598,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 }

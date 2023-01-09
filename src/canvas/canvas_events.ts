@@ -13,6 +13,7 @@ import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -347,6 +348,9 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
+   * First we clear top context where the effects are being rendered.
+   * Then we render the effects.
+   * Doing so will render the correct effect for all cases including an overlap between `source` and `target`.
    * @private
    */
   private _renderDragEffects(
@@ -355,26 +359,33 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ) {
     let dirty = false;
-    const ctx = this.contextTop;
+    // clear top context
     if (
       this._dropTarget &&
       this._dropTarget !== source &&
       this._dropTarget !== target
     ) {
       this._dropTarget.clearContextTop();
+      dirty = true;
     }
+    source?.clearContextTop();
+    target !== source && target?.clearContextTop();
+    // render effects
+    const ctx = this.contextTop;
+    ctx.save();
+    ctx.transform(...this.viewportTransform);
     if (source) {
-      source.clearContextTop(true);
-      source.renderDragSourceEffect(e);
+      ctx.save();
+      source.transform(ctx);
+      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      ctx.restore();
       dirty = true;
     }
     if (target) {
-      if (target !== source) {
-        ctx.restore();
-        ctx.save();
-        target.clearContextTop(true);
-      }
-      target.renderDropTargetEffect(e);
+      ctx.save();
+      target.transform(ctx);
+      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      ctx.restore();
       dirty = true;
     }
     ctx.restore();

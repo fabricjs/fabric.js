@@ -8,7 +8,8 @@ import {
   keysMapRtl,
 } from '../mixins/itext_key_const';
 import { classRegistry } from '../util/class_registry';
-import { TClassProperties, TFiller } from '../typedefs';
+import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
+import type { Canvas } from '../canvas/canvas_events';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
@@ -470,20 +471,15 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
    * Renders drag start text selection
    */
-  renderDragSourceEffect() {
-    if (this.__isDragging && this.__dragStartSelection) {
-      this._renderSelection(
-        this.canvas.contextTop,
-        this.__dragStartSelection,
-        this._getCursorBoundaries(
-          this.__dragStartSelection.selectionStart,
-          true
-        )
-      );
-    }
+  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+    this._renderSelection(
+      this.canvas.contextTop,
+      this.__dragStartSelection,
+      this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true)
+    );
   }
 
-  renderDropTargetEffect(e) {
+  renderDropTargetEffect(e: DragEvent) {
     const dragSelection = this.getSelectionStartFromPointer(e);
     this.renderCursorAt(dragSelection);
   }
