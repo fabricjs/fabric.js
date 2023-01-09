@@ -1,3 +1,4 @@
+import { TPointerEvent } from '../EventTypeDefs';
 import type { IText } from '../shapes/itext.class';
 import type { Textbox } from '../shapes/textbox.class';
 import { removeFromArray } from '../util/internals';
@@ -7,23 +8,16 @@ import { removeFromArray } from '../util/internals';
  */
 export class TextEditingManager {
   private targets: (IText | Textbox)[] = [];
+  private target?: IText | Textbox;
 
-  exitTextEditing() {
-    this.targets.forEach((obj) => {
-      obj.selected = false;
-      if (obj.isEditing) {
-        obj.exitEditing();
-      }
-    });
+  private static blur(target: IText | Textbox) {
+    if (target.isEditing) {
+      target.exitEditing();
+    }
   }
 
-  /**
-   * called from canvas mouse up
-   */
-  informMouseUp() {
-    this.targets.forEach((obj) => {
-      obj.__isMousedown = false;
-    });
+  exitTextEditing() {
+    this.targets.forEach(TextEditingManager.blur);
   }
 
   add(target: IText | Textbox) {
@@ -34,7 +28,19 @@ export class TextEditingManager {
     removeFromArray(this.targets, target);
   }
 
+  focus(target: IText | Textbox) {
+    this.target = target;
+    this.targets.forEach(
+      (obj) => obj !== target && TextEditingManager.blur(obj)
+    );
+  }
+
+  onMouseMove(e: TPointerEvent) {
+    this.target?.isEditing && this.target.updateSelection(e);
+  }
+
   dispose() {
     this.targets = [];
+    this.target = undefined;
   }
 }

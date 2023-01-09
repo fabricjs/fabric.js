@@ -434,7 +434,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     ctx.fillStyle =
       this.cursorColor ||
       this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+    ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
       topOffset + boundaries.top + dy,

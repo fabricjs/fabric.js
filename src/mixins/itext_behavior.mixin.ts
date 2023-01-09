@@ -41,7 +41,7 @@ export abstract class ITextBehaviorMixin<
   private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
   protected _currentCursorOpacity: number;
   private _textBeforeEdit: string;
-  __isMousedown: boolean;
+  protected __isMousedown: boolean;
   protected __selectionStartOnMouseDown: number;
   private __dragImageDisposer: VoidFunction;
   private __dragStartFired: boolean;
@@ -65,7 +65,6 @@ export abstract class ITextBehaviorMixin<
     moveCursor: CSSStyleDeclaration['cursor'];
   };
   protected _selectionDirection: 'left' | 'right' | null;
-  private _canvasMoveEventDisposer?: VoidFunction;
 
   abstract initHiddenTextarea(): void;
   abstract initCursorSelectionHandlers(): void;
@@ -89,7 +88,7 @@ export abstract class ITextBehaviorMixin<
   initBehavior() {
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
-    this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+    this.updateSelection = this.updateSelection.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
     this.dragOverHandler = this.dragOverHandler.bind(this);
     this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
@@ -130,7 +129,7 @@ export abstract class ITextBehaviorMixin<
       },
     };
 
-    obj.animate('_currentCursorOpacity', targetOpacity, {
+    obj._animate('_currentCursorOpacity', targetOpacity, {
       duration: duration,
       onComplete: function () {
         if (!tickState.isAborted) {
@@ -385,7 +384,7 @@ export abstract class ITextBehaviorMixin<
     }
     if (this.canvas) {
       this.canvas.calcOffset();
-      this.canvas.exitTextEditing();
+      this.canvas.textEditingManager.focus(this);
     }
 
     this.isEditing = true;
@@ -403,11 +402,6 @@ export abstract class ITextBehaviorMixin<
     this._fireSelectionChanged();
     if (this.canvas) {
       this.canvas.fire('text:editing:entered', { target: this });
-      const disposer = this.canvas.on('mouse:move', this.mouseMoveHandler);
-      this._canvasMoveEventDisposer = () => {
-        disposer();
-        delete this._canvasMoveEventDisposer;
-      };
       this.canvas.requestRenderAll();
     }
   }
@@ -415,8 +409,8 @@ export abstract class ITextBehaviorMixin<
   /**
    * @private
    */
-  protected mouseMoveHandler(options) {
-    if (!this.__isMousedown || !this.isEditing) {
+  updateSelection(e: TPointerEvent) {
+    if (!this.__isMousedown) {
       return;
     }
 
@@ -424,7 +418,7 @@ export abstract class ITextBehaviorMixin<
     getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
 
-    const newSelectionStart = this.getSelectionStartFromPointer(options.e),
+    const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
       currentEnd = this.selectionEnd;
     if (
@@ -445,7 +439,6 @@ export abstract class ITextBehaviorMixin<
       this.selectionStart !== currentStart ||
       this.selectionEnd !== currentEnd
     ) {
-      this.restartCursorIfNeeded();
       this._fireSelectionChanged();
       this._updateTextarea();
       this.renderCursorOrSelection();
@@ -985,7 +978,6 @@ export abstract class ITextBehaviorMixin<
     }
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
-    this._canvasMoveEventDisposer && this._canvasMoveEventDisposer();
     if (this.canvas) {
       this.canvas.fire('text:editing:exited', { target: this });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
