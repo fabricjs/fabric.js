@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): Draggable Text migration regressions #8534
+- feat(PolyControl): modify the shape of a poly with control points [#8556](https://github.com/fabricjs/fabric.js/pull/8556)
 - BREAKING: remove Object.stateful and Object.statefulCache [#8573](https://github.com/fabricjs/fabric.js/pull/8573)
 - fix(IText): refactor clearing context top logic of itext to align with brush pattern, using the canvas rendering cycle in order to guard from edge cases #8560
 - fix(Canvas): `_initRetinaScaling` initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
