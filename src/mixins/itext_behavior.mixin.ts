@@ -247,7 +247,7 @@ export abstract class ITextBehaviorMixin<
   /**
    * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
    */
-  abortCursorAnimation() {
+  abortCursorAnimation(skipClearing = false) {
     const shouldClear =
       this._currentTickState || this._currentTickCompleteState;
     this._currentTickState && this._currentTickState.abort();
@@ -259,7 +259,7 @@ export abstract class ITextBehaviorMixin<
     this._currentCursorOpacity = 1;
 
     //  make sure we clear context even if instance is not editing
-    if (shouldClear) {
+    if (shouldClear && !skipClearing) {
       this.clearContextTop();
     }
   }
@@ -636,7 +636,7 @@ export abstract class ITextBehaviorMixin<
       e.dataTransfer.effectAllowed = 'copyMove';
       this.setDragImage(e, data);
     }
-    this.abortCursorAnimation();
+    this.abortCursorAnimation(true);
     return this.__isDragging;
   }
 
