@@ -49,9 +49,11 @@ const isArrayAnimation = (
  */
 export function animate(options: ArrayAnimationOptions): ArrayAnimation;
 export function animate(options: ValueAnimationOptions): ValueAnimation;
-export function animate(
-  options: ValueAnimationOptions | ArrayAnimationOptions
-): ValueAnimation | ArrayAnimation;
+export function animate<
+  T extends ValueAnimationOptions | ArrayAnimationOptions
+>(
+  options: T
+): T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation;
 export function animate<
   T extends ValueAnimationOptions | ArrayAnimationOptions,
   R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
