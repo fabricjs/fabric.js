@@ -2,19 +2,15 @@ import { ValueAnimation } from './ValueAnimation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
 import {
-  AnimationOptions,
+  ValueAnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
 
 const isArrayAnimation = (
-  options: ArrayAnimationOptions | AnimationOptions
+  options: ArrayAnimationOptions | ValueAnimationOptions
 ): options is ArrayAnimationOptions => {
-  return (
-    Array.isArray(options.startValue) ||
-    Array.isArray(options.endValue) ||
-    Array.isArray(options.byValue)
-  );
+  return Array.isArray(options.startValue) || Array.isArray(options.endValue);
 };
 
 /**
@@ -43,12 +39,12 @@ const isArrayAnimation = (
  * });
  *
  */
-export const animate = <
-  T extends AnimationOptions | ArrayAnimationOptions,
+export function animate(options: ArrayAnimationOptions): ArrayAnimation;
+export function animate(options: ValueAnimationOptions): ValueAnimation;
+export function animate<
+  T extends ValueAnimationOptions | ArrayAnimationOptions,
   R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
->(
-  options: T
-): R => {
+>(options: T): R {
   const animation = (
     isArrayAnimation(options)
       ? new ArrayAnimation(options)
@@ -56,10 +52,10 @@ export const animate = <
   ) as R;
   animation.start();
   return animation;
-};
+}
 
-export const animateColor = (options: ColorAnimationOptions) => {
+export function animateColor(options: ColorAnimationOptions) {
   const animation = new ColorAnimation(options);
   animation.start();
   return animation;
-};
+}

@@ -208,7 +208,7 @@ function testCanvasDisposing() {
         assert.ok(typeof canvas.dispose === 'function');
         assert.ok(typeof canvas.destroy === 'function');
         canvas.add(makeRect(), makeRect(), makeRect());
-        canvas.item(0).animate('scaleX', 10);
+        canvas.item(0).animate({ scaleX: 10 });
         assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
         await canvas.dispose();
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');

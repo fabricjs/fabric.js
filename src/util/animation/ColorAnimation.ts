@@ -1,26 +1,36 @@
 import { Color } from '../../color/color.class';
 import { TRGBAColorSource } from '../../color/color.class';
+import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
-import { ColorAnimationOptions, TOnAnimationChangeCallback } from './types';
+import type {
+  ColorAnimationOptions,
+  TEasingFunction,
+  TOnAnimationChangeCallback,
+} from './types';
+
+const defaultColorEasing: TEasingFunction = (
+  timeElapsed,
+  startValue,
+  byValue,
+  duration
+) => {
+  const durationProgress = 1 - Math.cos((timeElapsed / duration) * halfPI);
+  return startValue + byValue * durationProgress;
+};
 
 const wrapColorCallback = <R>(
   callback?: TOnAnimationChangeCallback<string, R>
 ) =>
   callback &&
-  ((rgba: TRGBAColorSource, valueRatio: number, durationRatio: number) =>
-    callback(new Color(rgba).toRgba(), valueRatio, durationRatio));
+  ((rgba: TRGBAColorSource, valueProgress: number, durationProgress: number) =>
+    callback(new Color(rgba).toRgba(), valueProgress, durationProgress));
 
 export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
   constructor({
     startValue,
     endValue,
-    byValue,
-    easing = (timeElapsed, startValue, byValue, duration) => {
-      const durationRatio =
-        1 - Math.cos((timeElapsed / duration) * (Math.PI / 2));
-      return startValue + byValue * durationRatio;
-    },
+    easing = defaultColorEasing,
     onChange,
     onComplete,
     abort,
@@ -31,13 +41,9 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
     super({
       ...options,
       startValue: startColor,
-      byValue: byValue
-        ? new Color(byValue)
-            .setAlpha(Array.isArray(byValue) && byValue[3] ? byValue[3] : 0)
-            .getSource()
-        : (endColor.map(
-            (value, i) => value - startColor[i]
-          ) as TRGBAColorSource),
+      byValue: endColor.map(
+        (value, i) => value - startColor[i]
+      ) as TRGBAColorSource,
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
@@ -48,12 +54,15 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
     const [r, g, b, a] = this.startValue.map((value, i) =>
       this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
     ) as TRGBAColorSource;
-    const rgb = [r, g, b].map(Math.round);
+    const value = [
+      ...[r, g, b].map(Math.round),
+      capValue(0, a, 1),
+    ] as TRGBAColorSource;
     return {
-      value: [...rgb, capValue(0, a, 1)] as TRGBAColorSource,
-      changeRatio:
+      value,
+      valueProgress:
         // to correctly calculate the change ratio we must find a changed value
-        rgb
+        value
           .map((p, i) =>
             this.byValue[i] !== 0
               ? Math.abs((p - this.startValue[i]) / this.byValue[i])

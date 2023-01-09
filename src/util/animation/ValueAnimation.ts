@@ -1,17 +1,16 @@
 import { AnimationBase } from './AnimationBase';
-import { AnimationOptions } from './types';
+import { ValueAnimationOptions } from './types';
 
 export class ValueAnimation extends AnimationBase<number> {
   constructor({
     startValue = 0,
     endValue = 100,
-    byValue = endValue - startValue,
-    ...options
-  }: AnimationOptions) {
+    ...otherOptions
+  }: ValueAnimationOptions) {
     super({
-      ...options,
+      ...otherOptions,
       startValue,
-      byValue,
+      byValue: endValue - startValue,
     });
   }
 
@@ -24,7 +23,7 @@ export class ValueAnimation extends AnimationBase<number> {
     );
     return {
       value,
-      changeRatio: Math.abs((value - this.startValue) / this.byValue),
+      valueProgress: Math.abs((value - this.startValue) / this.byValue),
     };
   }
 }
