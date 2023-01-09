@@ -11,6 +11,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
 import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
+import { TOnAnimationChangeCallback } from '../util/animation/types';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
@@ -38,10 +39,10 @@ export abstract class ITextBehaviorMixin<
   protected inCompositionMode: boolean;
 
   protected _reSpace: RegExp;
-  private _currentTickState: { isAborted: boolean; abort: () => void };
+  private _currentTickState: ReturnType<this['_animateCursor']>;
   private _cursorTimeout1: number;
   private _cursorTimeout2: number;
-  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
+  private _currentTickCompleteState: ReturnType<this['_animateCursor']>;
   protected _currentCursorOpacity: number;
   private _textBeforeEdit: string;
   protected __isMousedown: boolean;
@@ -93,6 +94,8 @@ export abstract class ITextBehaviorMixin<
     this.initRemovedHandler();
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
+    this._tick = this._tick.bind(this);
+    this._onTickComplete = this._onTickComplete.bind(this);
     this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
     this.dragOverHandler = this.dragOverHandler.bind(this);
@@ -172,42 +175,30 @@ export abstract class ITextBehaviorMixin<
    */
   _tick() {
     this._currentTickState = this._animateCursor(
-      this,
       1,
       this.cursorDuration,
-      '_onTickComplete'
+      this._onTickComplete
     );
   }
 
   /**
    * @private
    */
-  _animateCursor(obj, targetOpacity, duration, completeMethod) {
-    const tickState = {
-      isAborted: false,
-      abort: function () {
-        this.isAborted = true;
-      },
-    };
-
-    obj.animate('_currentCursorOpacity', targetOpacity, {
-      duration: duration,
-      onComplete: function () {
-        if (!tickState.isAborted) {
-          obj[completeMethod]();
-        }
-      },
-      onChange: function () {
+  _animateCursor(
+    targetOpacity: number,
+    duration: number,
+    onComplete?: TOnAnimationChangeCallback<number, void>
+  ) {
+    return this._animate('_currentCursorOpacity', targetOpacity, {
+      duration,
+      onComplete,
+      onChange: () => {
         // we do not want to animate a selection, only cursor
-        if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
-          obj.renderCursorOrSelection();
+        if (this.canvas && this.selectionStart === this.selectionEnd) {
+          this.renderCursorOrSelection();
         }
-      },
-      abort: function () {
-        return tickState.isAborted;
       },
     });
-    return tickState;
   }
 
   /**
@@ -219,10 +210,9 @@ export abstract class ITextBehaviorMixin<
     }
     this._cursorTimeout1 = setTimeout(() => {
       this._currentTickCompleteState = this._animateCursor(
-        this,
         0,
         this.cursorDuration / 2,
-        '_tick'
+        this._tick
       );
     }, 100);
   }
@@ -266,9 +256,9 @@ export abstract class ITextBehaviorMixin<
   restartCursorIfNeeded() {
     if (
       !this._currentTickState ||
-      this._currentTickState.isAborted ||
+      this._currentTickState.state === 'aborted' ||
       !this._currentTickCompleteState ||
-      this._currentTickCompleteState.isAborted
+      this._currentTickCompleteState.state === 'aborted'
     ) {
       this.initDelayedCursor();
     }
