@@ -1,10 +1,9 @@
 // @ts-nocheck
 
 import { getEnv } from '../env';
-import { ObjectEvents, TEvent } from '../EventTypeDefs';
+import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Text } from '../shapes/text.class';
-import { TPointerEvent } from '../typedefs';
 import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
@@ -12,6 +11,8 @@ import { transformPoint } from '../util/misc/matrix';
 import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
+import type { ValueAnimation } from '../util/animation/ValueAnimation';
+import { FabricObject } from '../shapes/Object/Object';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
@@ -39,10 +40,8 @@ export abstract class ITextBehaviorMixin<
   protected inCompositionMode: boolean;
 
   protected _reSpace: RegExp;
-  private _currentTickState: ReturnType<this['_animateCursor']>;
-  private _cursorTimeout1: number;
-  private _cursorTimeout2: number;
-  private _currentTickCompleteState: ReturnType<this['_animateCursor']>;
+  private _currentTickState?: ValueAnimation;
+  private _currentTickCompleteState?: ValueAnimation;
   protected _currentCursorOpacity: number;
   private _textBeforeEdit: string;
   protected __isMousedown: boolean;
@@ -109,9 +108,13 @@ export abstract class ITextBehaviorMixin<
     this.on('drop', this.dropHandler);
   }
 
-  onDeselect() {
+  onDeselect(options?: {
+    e?: TPointerEvent;
+    object?: FabricObject<ObjectEvents>;
+  }) {
     this.isEditing && this.exitEditing();
     this.selected = false;
+    return super.onDeselect(options);
   }
 
   /**
@@ -173,28 +176,37 @@ export abstract class ITextBehaviorMixin<
   /**
    * @private
    */
-  _tick() {
-    this._currentTickState = this._animateCursor(
-      1,
-      this.cursorDuration,
-      this._onTickComplete
-    );
+  _tick(delay?: number) {
+    this._currentTickState = this._animateCursor({
+      toValue: 1,
+      duration: this.cursorDuration,
+      delay,
+      onComplete: this._onTickComplete,
+    });
   }
 
   /**
    * @private
    */
-  _animateCursor(
-    targetOpacity: number,
-    duration: number,
-    onComplete?: TOnAnimationChangeCallback<number, void>
-  ) {
-    return this._animate('_currentCursorOpacity', targetOpacity, {
+  _animateCursor({
+    toValue,
+    duration,
+    delay,
+    onComplete,
+  }: {
+    toValue: number;
+    duration: number;
+    delay?: number;
+    onComplete?: TOnAnimationChangeCallback<number, void>;
+  }) {
+    return this._animate('_currentCursorOpacity', toValue, {
       duration,
+      delay,
       onComplete,
+      abort: () => !this.canvas,
       onChange: () => {
         // we do not want to animate a selection, only cursor
-        if (this.canvas && this.selectionStart === this.selectionEnd) {
+        if (this.selectionStart === this.selectionEnd) {
           this.renderCursorOrSelection();
         }
       },
@@ -205,45 +217,36 @@ export abstract class ITextBehaviorMixin<
    * @private
    */
   _onTickComplete() {
-    if (this._cursorTimeout1) {
-      clearTimeout(this._cursorTimeout1);
-    }
-    this._cursorTimeout1 = setTimeout(() => {
-      this._currentTickCompleteState = this._animateCursor(
-        0,
-        this.cursorDuration / 2,
-        this._tick
-      );
-    }, 100);
+    this._currentTickCompleteState?.abort();
+    this._currentTickCompleteState = this._animateCursor({
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: 100,
+      onComplete: this._tick,
+    });
   }
 
   /**
    * Initializes delayed cursor
    */
   initDelayedCursor(restart?: boolean) {
-    const delay = restart ? 0 : this.cursorDelay;
-
     this.abortCursorAnimation();
-    if (delay) {
-      this._cursorTimeout2 = setTimeout(() => {
-        this._tick();
-      }, delay);
-    } else {
-      this._tick();
-    }
+    this._tick(restart ? 0 : this.cursorDelay);
   }
 
   /**
    * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
    */
   abortCursorAnimation() {
-    const shouldClear =
-      this._currentTickState || this._currentTickCompleteState;
-    this._currentTickState && this._currentTickState.abort();
-    this._currentTickCompleteState && this._currentTickCompleteState.abort();
-
-    clearTimeout(this._cursorTimeout1);
-    clearTimeout(this._cursorTimeout2);
+    let shouldClear = false;
+    [this._currentTickState, this._currentTickCompleteState].forEach(
+      (cursorAnimation) => {
+        if (cursorAnimation && !cursorAnimation.isDone()) {
+          shouldClear = true;
+          cursorAnimation.abort();
+        }
+      }
+    );
 
     this._currentCursorOpacity = 1;
 
@@ -255,10 +258,9 @@ export abstract class ITextBehaviorMixin<
 
   restartCursorIfNeeded() {
     if (
-      !this._currentTickState ||
-      this._currentTickState.state === 'aborted' ||
-      !this._currentTickCompleteState ||
-      this._currentTickCompleteState.state === 'aborted'
+      [this._currentTickState, this._currentTickCompleteState].some(
+        (cursorAnimation) => !cursorAnimation || cursorAnimation.isDone()
+      )
     ) {
       this.initDelayedCursor();
     }
