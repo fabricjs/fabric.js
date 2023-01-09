@@ -586,8 +586,7 @@ export abstract class ITextBehaviorMixin<
       const ctx = dragImageCanvas.getContext('2d');
       ctx.scale(1 / retinaScaling, 1 / retinaScaling);
       const [a, b, c, d] = vpt;
-      const origin = new Point().transform(vpt, true);
-      ctx.transform(a, b, c, d, -origin.x, -origin.y);
+      ctx.transform(a, b, c, d, 0, 0);
       ctx.drawImage(dragImage, 0, 0);
       dragImage = dragImageCanvas;
     }
