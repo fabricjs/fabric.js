@@ -10,14 +10,12 @@ export class TextEditingManager {
   private targets: (IText | Textbox)[] = [];
   private target?: IText | Textbox;
 
-  private static blur(target: IText | Textbox) {
-    if (target.isEditing) {
-      target.exitEditing();
-    }
-  }
-
   exitTextEditing() {
-    this.targets.forEach(TextEditingManager.blur);
+    this.targets.forEach((target) => {
+      if (target.isEditing) {
+        target.exitEditing();
+      }
+    });
   }
 
   add(target: IText | Textbox) {
@@ -28,11 +26,14 @@ export class TextEditingManager {
     removeFromArray(this.targets, target);
   }
 
-  focus(target: IText | Textbox) {
+  register(target: IText | Textbox) {
     this.target = target;
-    this.targets.forEach(
-      (obj) => obj !== target && TextEditingManager.blur(obj)
-    );
+  }
+
+  unregister(target: IText | Textbox) {
+    if (target === this.target) {
+      this.target = undefined;
+    }
   }
 
   onMouseMove(e: TPointerEvent) {

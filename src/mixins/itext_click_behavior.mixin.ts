@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { ObjectEvents } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -111,7 +112,7 @@ export abstract class ITextClickBehaviorMixin<
       return;
     }
 
-    this.__isMousedown = true;
+    this.canvas.textEditingManager.register(this);
 
     if (this.selected) {
       this.inCompositionMode = false;
@@ -172,7 +173,11 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    this.__isMousedown = false;
+    let activeObject: FabricObject | undefined;
+    if (this.canvas) {
+      activeObject = this.canvas._activeObject;
+      this.canvas.textEditingManager.unregister(this);
+    }
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
@@ -181,15 +186,11 @@ export abstract class ITextClickBehaviorMixin<
     ) {
       return;
     }
-
-    if (this.canvas) {
-      const currentActive = this.canvas._activeObject;
-      if (currentActive && currentActive !== this) {
-        // avoid running this logic when there is an active object
-        // this because is possible with shift click and fast clicks,
-        // to rapidly deselect and reselect this object and trigger an enterEdit
-        return;
-      }
+    if (activeObject !== this) {
+      // avoid running this logic when there is an active object
+      // this because is possible with shift click and fast clicks,
+      // to rapidly deselect and reselect this object and trigger an enterEdit
+      return;
     }
 
     if (this.__lastSelected && !this.__corner) {

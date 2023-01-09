@@ -41,7 +41,6 @@ export abstract class ITextBehaviorMixin<
   private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
   protected _currentCursorOpacity: number;
   private _textBeforeEdit: string;
-  protected __isMousedown: boolean;
   protected __selectionStartOnMouseDown: number;
   private __dragImageDisposer: VoidFunction;
   private __dragStartFired: boolean;
@@ -384,7 +383,7 @@ export abstract class ITextBehaviorMixin<
     }
     if (this.canvas) {
       this.canvas.calcOffset();
-      this.canvas.textEditingManager.focus(this);
+      this.canvas.textEditingManager.exitTextEditing();
     }
 
     this.isEditing = true;
@@ -407,13 +406,9 @@ export abstract class ITextBehaviorMixin<
   }
 
   /**
-   * @private
+   * called by {@link canvas#textEditingManager}
    */
   updateSelection(e: TPointerEvent) {
-    if (!this.__isMousedown) {
-      return;
-    }
-
     // regain focus
     getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
