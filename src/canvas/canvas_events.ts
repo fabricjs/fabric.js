@@ -438,23 +438,39 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
+   * As opposed to {@link findTarget} we want the top most object to be returned w/o the active object cutting in line.
+   * Override at will
+   */
+  protected findDragTargets(e: DragEvent) {
+    this.targets = [];
+    const target = this._searchPossibleTargets(
+      this._objects,
+      this.getPointer(e, true)
+    );
+    return {
+      target,
+      targets: [...this.targets],
+    };
+  }
+
+  /**
    * prevent default to allow drop event to be fired
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
    * @private
    * @param {DragEvent} [e] Event object fired on Event.js shake
    */
   private _onDragOver(e: DragEvent) {
-    const eventType = 'dragover',
-      target = this.findTarget(e),
-      targets = this.targets,
-      options = {
-        e: e,
-        target,
-        subTargets: targets,
-        dragSource: this._dragSource as FabricObject,
-        canDrop: false,
-        dropTarget: undefined,
-      };
+    const eventType = 'dragover';
+    const { target, targets } = this.findDragTargets(e);
+    const dragSource = this._dragSource as FabricObject;
+    const options = {
+      e: e,
+      target,
+      subTargets: targets,
+      dragSource,
+      canDrop: false,
+      dropTarget: undefined,
+    };
     let dropTarget;
     //  fire on canvas
     this.fire(eventType, options);
@@ -479,7 +495,7 @@ export class Canvas extends SelectableCanvas {
       subTarget.fire(eventType, options);
     }
     //  render drag effects now that relations between source and target is clear
-    this._renderDragEffects(e, this._dragSource, dropTarget);
+    this._renderDragEffects(e, dragSource, dropTarget);
     this._dropTarget = dropTarget;
   }
 
@@ -489,11 +505,11 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragEnter(e: DragEvent) {
-    const target = this.findTarget(e);
+    const { target, targets } = this.findDragTargets(e);
     const options = {
       e,
-      target: target as FabricObject,
-      subTargets: this.targets,
+      target,
+      subTargets: targets,
       dragSource: this._dragSource,
     };
     this.fire('dragenter', options);
@@ -533,8 +549,11 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e
    */
   private _onDrop(e: DragEvent) {
-    const options = this._simpleEventHandler('drop:before', {
+    const { target, targets } = this.findDragTargets(e);
+    const options = this._basicEventHandler('drop:before', {
       e,
+      target,
+      subTargets: targets,
       dragSource: this._dragSource,
       pointer: this.getPointer(e),
     });
@@ -555,7 +574,13 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   private _onContextMenu(e: TPointerEvent): false {
-    const options = this._simpleEventHandler('contextmenu:before', { e });
+    const target = this.findTarget(e),
+      subTargets = this.targets || [];
+    const options = this._basicEventHandler('contextmenu:before', {
+      e,
+      target,
+      subTargets,
+    });
     // TODO: this line is silly because the dev can subscribe to the event and prevent it themselves
     this.stopContextMenu && stopEvent(e);
     this._basicEventHandler('contextmenu', options);
@@ -902,36 +927,6 @@ export class Canvas extends SelectableCanvas {
     ) {
       this.renderTop();
     }
-  }
-
-  /**
-   * @private
-   * Handle event firing for target and subtargets
-   * @param {String} eventType event to fire (up, down or move)
-   * @param {Event} e event from mouse
-   * @param {object} [data] event data overrides
-   * @return {object} options
-   */
-  _simpleEventHandler<
-    T extends keyof (CanvasEvents | ObjectEvents),
-    E extends TPointerEvent | DragEvent
-  >(
-    eventType: T,
-    {
-      e,
-      ...data
-    }: Omit<(CanvasEvents & ObjectEvents)[T], 'target' | 'subTargets'> &
-      TEvent<E>
-  ) {
-    const target = this.findTarget(e),
-      subTargets = this.targets || [];
-    // @ts-expect-error TODO fix generic e
-    return this._basicEventHandler(eventType, {
-      e,
-      target,
-      subTargets,
-      ...data,
-    });
   }
 
   _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
