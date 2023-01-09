@@ -255,4 +255,45 @@
       assert.equal(polygon, null);
     });
   });
+
+  QUnit.test('Regular Polygon', function (assert) {
+
+    const roundDecimals = (points) => points.map(({ x, y }) => {
+      return new fabric.Point(x.toFixed(4), y.toFixed(4));
+    });
+
+    assert.ok(typeof fabric.Polygon.getRegularPolygonPoints === 'function');
+    var penta = fabric.Polygon.getRegularPolygonPoints({ numVertexes: 5, radius: 50 });
+    var hexa = fabric.Polygon.getRegularPolygonPoints({ numVertexes: 6, radius: 50 });
+
+    var expectedPenta = [
+      new fabric.Point( 3.061616997868383e-15, -50),
+      new fabric.Point(47.552825814757675, -15.450849718747369),
+      new fabric.Point(29.389262614623657, 40.45084971874737),
+      new fabric.Point(-29.38926261462365, 40.45084971874737),
+      new fabric.Point(-47.55282581475768, -15.450849718747364),
+    ];
+
+    var expectedHexa = [
+      new fabric.Point(24.999999999999993, -43.30127018922194),
+      new fabric.Point(50, -1.1102230246251565e-14),
+      new fabric.Point(25.000000000000018, 43.301270189221924),
+      new fabric.Point(-24.99999999999999, 43.30127018922194),
+      new fabric.Point(-50, 2.8327694488239898e-14),
+      new fabric.Point(-25.00000000000006, -43.301270189221896),
+    ];
+
+    assert.deepEqual(roundDecimals(penta), roundDecimals(expectedPenta), 'regualr pentagon should match');
+    assert.deepEqual(roundDecimals(hexa), roundDecimals(expectedHexa), 'regualr hexagon should match');
+    assert.deepEqual(
+      fabric.Polygon.createRegularPolygon({ numVertexes: 5, radius: 50 }).toObject(),
+      new fabric.Polygon(expectedPenta, { left: 0, top: 0 }).toObject(),
+      'same polygon'
+    );
+    assert.deepEqual(
+      fabric.Polygon.createRegularPolygon({ numVertexes: 6, radius: 50 }).toObject(),
+      new fabric.Polygon(expectedHexa, { left: 0, top: 0 }).toObject(),
+      'same polygon'
+    );
+  });
 })();

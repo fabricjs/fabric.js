@@ -909,30 +909,6 @@ export const transformPath = (
 };
 
 /**
- * Returns an array of path commands to create a regular polygon
- * @param {number} radius
- * @param {number} numVertexes
- * @returns {(string|number)[][]} An array of SVG path commands
- */
-export const getRegularPolygonPath = (numVertexes, radius) => {
-  const interiorAngle = (Math.PI * 2) / numVertexes;
-  // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
-  // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
-  let rotationAdjustment = -halfPI;
-  if (numVertexes % 2 === 0) {
-    rotationAdjustment += interiorAngle / 2;
-  }
-  const d = new Array(numVertexes + 1);
-  for (let i = 0; i < numVertexes; i++) {
-    const rad = i * interiorAngle + rotationAdjustment;
-    const { x, y } = new Point(cos(rad), sin(rad)).scalarMultiply(radius);
-    d[i] = [i === 0 ? 'M' : 'L', x, y];
-  }
-  d[numVertexes] = ['Z'];
-  return d;
-};
-
-/**
  * Join path commands to go back to svg format
  * @param {Array} pathData fabricJS parsed path commands
  * @return {String} joined path 'M 0 0 L 20 30'
