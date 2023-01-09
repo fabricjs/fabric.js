@@ -279,6 +279,18 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 
   /**
+   * @override block cursor/selection logic while rendering the exported canvas
+   * @todo this workaround should be replaced with a more robust solution
+   */
+  toCanvasElement(options?: any): HTMLCanvasElement {
+    const isEditing = this.isEditing;
+    this.isEditing = false;
+    const canvas = super.toCanvasElement(options);
+    this.isEditing = isEditing;
+    return canvas;
+  }
+
+  /**
    * Renders cursor or selection (depending on what exists)
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
