@@ -148,7 +148,7 @@ export class Polyline extends FabricObject {
    *
    * @private
    */
-  _getTransformedDimensions(options: any) {
+  _getTransformedDimensions(options?: any) {
     return this.exactBoundingBox
       ? super._getTransformedDimensions({
           ...(options || {}),
