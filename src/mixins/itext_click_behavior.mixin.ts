@@ -173,7 +173,8 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    this.__isMousedown = false;
+    const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
+    this.__isMousedown = this.__isDragging = false;
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
@@ -192,10 +193,7 @@ export abstract class ITextClickBehaviorMixin<
         return;
       }
     }
-    if (this.__isDragging && options.isClick) {
-      // false positive drag event, is actually a click
-      this.setCursorByClick(options.e);
-    }
+    shouldSetCursor && this.setCursorByClick(options.e);
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;
       this.__lastSelected = false;
