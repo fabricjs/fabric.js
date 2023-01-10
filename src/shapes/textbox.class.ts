@@ -28,12 +28,6 @@ export class Textbox extends IText {
   declare dynamicMinWidth: number;
 
   /**
-   * Cached array of text wrapping.
-   * @type Array
-   */
-  declare __cachedLines: Array<any> | null;
-
-  /**
    * Use this boolean property in order to split strings that have no white space concept.
    * this is a cheap way to help with chinese/japanese
    * @type Boolean
