@@ -9,7 +9,7 @@ export class FabricObjectSVGExportMixin {
    * This reference is a UID in the fabric namespace and is temporary stored here.
    * @type {String}
    */
-  clipPathId?: string;
+  declare clipPathId?: string;
 
   /**
    * Returns styles-string for svg-export

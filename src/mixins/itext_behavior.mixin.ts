@@ -15,45 +15,48 @@ const reNonWord = /[ \n\.,;!\?\-]/;
 export abstract class ITextBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends Text<EventSpec> {
-  abstract isEditing: boolean;
-  abstract cursorDelay: number;
-  abstract selectionStart: number;
-  abstract selectionEnd: number;
-  abstract cursorDuration: number;
-  abstract editable: boolean;
-  abstract editingBorderColor: string;
+  declare abstract isEditing: boolean;
+  declare abstract cursorDelay: number;
+  declare abstract selectionStart: number;
+  declare abstract selectionEnd: number;
+  declare abstract cursorDuration: number;
+  declare abstract editable: boolean;
+  declare abstract editingBorderColor: string;
 
-  abstract compositionStart: number;
-  abstract compositionEnd: number;
+  declare abstract compositionStart: number;
+  declare abstract compositionEnd: number;
 
-  abstract hiddenTextarea: HTMLTextAreaElement;
+  declare abstract hiddenTextarea: HTMLTextAreaElement;
 
   /**
    * Helps determining when the text is in composition, so that the cursor
    * rendering is altered.
    */
-  protected inCompositionMode: boolean;
+  protected declare inCompositionMode: boolean;
 
-  protected _reSpace: RegExp;
-  private _currentTickState: { isAborted: boolean; abort: () => void };
-  private _cursorTimeout1: number;
-  private _cursorTimeout2: number;
-  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
-  protected _currentCursorOpacity: number;
-  private _textBeforeEdit: string;
-  protected __selectionStartOnMouseDown: number;
-  private __dragImageDisposer: VoidFunction;
-  private __dragStartFired: boolean;
-  protected __isDragging: boolean;
-  protected __dragStartSelection: {
+  protected declare _reSpace: RegExp;
+  private declare _currentTickState: { isAborted: boolean; abort: () => void };
+  private declare _cursorTimeout1: number;
+  private declare _cursorTimeout2: number;
+  private declare _currentTickCompleteState: {
+    isAborted: boolean;
+    abort: () => void;
+  };
+  protected declare _currentCursorOpacity: number;
+  private declare _textBeforeEdit: string;
+  protected declare __selectionStartOnMouseDown: number;
+  private declare __dragImageDisposer: VoidFunction;
+  private declare __dragStartFired: boolean;
+  protected declare __isDragging: boolean;
+  protected declare __dragStartSelection: {
     selectionStart: number;
     selectionEnd: number;
   };
-  protected __isDraggingOver: boolean;
-  protected selected: boolean;
-  protected __lastSelected: boolean;
-  protected cursorOffsetCache: { left?: number; top?: number } = {};
-  protected _savedProps: {
+  protected declare __isDraggingOver: boolean;
+  protected declare selected: boolean;
+  protected declare __lastSelected: boolean;
+  protected declare cursorOffsetCache: { left?: number; top?: number };
+  protected declare _savedProps: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
@@ -63,7 +66,7 @@ export abstract class ITextBehaviorMixin<
     defaultCursor: string;
     moveCursor: CSSStyleDeclaration['cursor'];
   };
-  protected _selectionDirection: 'left' | 'right' | null;
+  protected declare _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
   abstract initCursorSelectionHandlers(): void;

@@ -47,12 +47,12 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   /*
    * Opaque value (true/false)
    */
-  opaque: boolean;
+  declare opaque: boolean;
 
   /*
    * matrix for the filter, max 9x9
    */
-  matrix: number[];
+  declare matrix: number[];
 
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
