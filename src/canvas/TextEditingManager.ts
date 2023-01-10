@@ -11,6 +11,7 @@ export class TextEditingManager {
   private target?: IText | Textbox;
 
   exitTextEditing() {
+    this.target = undefined;
     this.targets.forEach((target) => {
       if (target.isEditing) {
         target.exitEditing();
@@ -23,6 +24,7 @@ export class TextEditingManager {
   }
 
   remove(target: IText | Textbox) {
+    this.unregister(target);
     removeFromArray(this.targets, target);
   }
 
