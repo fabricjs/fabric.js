@@ -19,7 +19,7 @@ export class MyFilter extends BaseFilter {
    * @param {Number} myParameter
    * @default
    */
-  myParameter: number;
+  declare myParameter: number;
 
   /**
    * Apply the MyFilter operation to a Uint8ClampedArray representing the pixels of an image.

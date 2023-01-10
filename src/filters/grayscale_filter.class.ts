@@ -11,7 +11,7 @@ import { classRegistry } from '../util/class_registry';
  * object.applyFilters();
  */
 export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
-  mode: 'average' | 'lightness' | 'luminosity';
+  declare mode: 'average' | 'lightness' | 'luminosity';
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.

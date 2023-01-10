@@ -78,15 +78,15 @@ export class Pattern {
   /**
    * The actual pixel source of the pattern
    */
-  source!: CanvasImageSource;
+  declare source!: CanvasImageSource;
 
   /**
    * If true, this object will not be exported during the serialization of a canvas
    * @type boolean
    */
-  excludeFromExport?: boolean;
+  declare excludeFromExport?: boolean;
 
-  readonly id: number;
+  declare readonly id: number;
 
   /**
    * Constructor

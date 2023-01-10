@@ -4,7 +4,7 @@ import { createCanvasElement } from '../util/misc/dom';
 import { TWebGLPipelineState, TProgramCache, TTextureCache } from './typedefs';
 
 export class WebGLFilterBackend {
-  tileSize: number;
+  declare tileSize: number;
 
   /**
    * Define ...
@@ -15,29 +15,29 @@ export class WebGLFilterBackend {
    * If GLPut data is the fastest operation, or if forced, this buffer will be used
    * to transfer the data back in the 2d logic
    **/
-  imageBuffer?: ArrayBuffer;
+  declare imageBuffer?: ArrayBuffer;
 
-  canvas: HTMLCanvasElement;
+  declare canvas: HTMLCanvasElement;
 
   /**
    * The Webgl context that will execute the operations for filtering
    **/
-  gl: WebGLRenderingContext;
+  declare gl: WebGLRenderingContext;
 
   /**
    * Keyed map for shader cache
    **/
-  programCache: TProgramCache;
+  declare programCache: TProgramCache;
 
   /**
    * Keyed map for texture cache
    **/
-  textureCache: TTextureCache;
+  declare textureCache: TTextureCache;
 
   /**
    * Contains GPU info for debug
    **/
-  gpuInfo: any;
+  declare gpuInfo: any;
 
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid

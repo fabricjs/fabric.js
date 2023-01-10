@@ -19,7 +19,7 @@ export class Noise extends BaseFilter {
    * @param {Number} noise
    * @default
    */
-  noise: number;
+  declare noise: number;
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.

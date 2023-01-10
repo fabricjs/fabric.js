@@ -22,9 +22,9 @@ const isContainedInInterval = (T: Point, A: Point, B: Point) => {
 };
 
 export class Intersection {
-  points: Point[];
+  declare points: Point[];
 
-  status?: IntersectionType;
+  declare status?: IntersectionType;
 
   constructor(status?: IntersectionType) {
     this.status = status;

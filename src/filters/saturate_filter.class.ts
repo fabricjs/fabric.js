@@ -21,7 +21,7 @@ export class Saturation extends BaseFilter {
    * @param {Number} saturation
    * @default
    */
-  saturation: number;
+  declare saturation: number;
 
   /**
    * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.

@@ -16,4 +16,4 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin, StatefulMixin]);
 
-export { fabricObjectDefaultValues } from './Object';
+export { cacheProperties, stateProperties } from './defaultValues';

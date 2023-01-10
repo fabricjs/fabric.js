@@ -28,9 +28,9 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    * @type String
    * @default
    **/
-  color: string;
+  declare color: string;
 
-  mode:
+  declare mode:
     | 'multiply'
     | 'add'
     | 'diff'
@@ -48,7 +48,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    * @type Number
    * @default
    **/
-  alpha: number;
+  declare alpha: number;
 
   /**
    * build the fragment source for the filters, joining the common part with

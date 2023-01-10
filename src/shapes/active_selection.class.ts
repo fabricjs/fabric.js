@@ -1,7 +1,7 @@
 import { ControlRenderingStyleOverride } from '../controls/controls.render';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { Group, groupDefaultValues } from './group.class';
+import { Group } from './group.class';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
@@ -147,11 +147,7 @@ export class ActiveSelection extends Group {
 export const activeSelectionDefaultValues: Partial<
   TClassProperties<ActiveSelection>
 > = {
-  ...groupDefaultValues,
   type: 'activeSelection',
-  layout: 'fit-content',
-  subTargetCheck: false,
-  interactive: false,
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);

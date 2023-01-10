@@ -33,15 +33,15 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    **/
-  image: Image;
+  declare image: Image;
 
-  mode: 'multiply' | 'mask';
+  declare mode: 'multiply' | 'mask';
 
   /**
    * alpha value. represent the strength of the blend image operation.
    * not implemented.
    **/
-  alpha: number;
+  declare alpha: number;
 
   getCacheKey() {
     return `${this.type}_${this.mode}`;

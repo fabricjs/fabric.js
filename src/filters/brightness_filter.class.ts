@@ -19,7 +19,7 @@ export class Brightness extends BaseFilter {
    * @param {Number} brightness
    * @default
    */
-  brightness: number;
+  declare brightness: number;
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.

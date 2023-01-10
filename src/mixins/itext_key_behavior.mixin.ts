@@ -22,21 +22,21 @@ export abstract class ITextKeyBehaviorMixin<
    * this.keysMap = Object.assign({}, this.keysMap);
    * The function must be in IText.prototype.myFunction And will receive event as args[0]
    */
-  keysMap: TKeyMapIText;
+  declare keysMap: TKeyMapIText;
 
-  keysMapRtl: TKeyMapIText;
+  declare keysMapRtl: TKeyMapIText;
 
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: TKeyMapIText;
+  declare ctrlKeysMapUp: TKeyMapIText;
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown: TKeyMapIText;
+  declare ctrlKeysMapDown: TKeyMapIText;
 
-  hiddenTextarea: HTMLTextAreaElement | null;
+  declare hiddenTextarea: HTMLTextAreaElement | null;
 
   /**
    * DOM container to append the hiddenTextarea.
@@ -46,11 +46,11 @@ export abstract class ITextKeyBehaviorMixin<
    * @type HTMLElement
    * @default
    */
-  hiddenTextareaContainer?: HTMLElement | null;
+  declare hiddenTextareaContainer?: HTMLElement | null;
 
-  private _clickHandlerInitialized: boolean;
-  private _copyDone: boolean;
-  private fromPaste: boolean;
+  private declare _clickHandlerInitialized: boolean;
+  private declare _copyDone: boolean;
+  private declare fromPaste: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)

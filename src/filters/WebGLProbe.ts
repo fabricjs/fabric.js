@@ -11,9 +11,9 @@ export enum WebGLPrecision {
  * Lazy initialize WebGL constants
  */
 class WebGLProbe {
-  maxTextureSize?: number;
+  declare maxTextureSize?: number;
 
-  webGLPrecision: WebGLPrecision | undefined;
+  declare webGLPrecision: WebGLPrecision | undefined;
 
   /**
    * Tests if webgl supports certain precision

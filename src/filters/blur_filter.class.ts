@@ -28,10 +28,10 @@ export class Blur extends BaseFilter {
    * @type Number
    * @default
    */
-  blur: number;
+  declare blur: number;
 
-  horizontal: boolean;
-  aspectRatio: number;
+  declare horizontal: boolean;
+  declare aspectRatio: number;
 
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     if (isWebGLPipelineState(options)) {

@@ -1,19 +1,19 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+import { TClassProperties } from '../typedefs';
 
 export class Circle extends FabricObject {
   /**
    * Radius of this circle
    * @type Number
-   * @default
+   * @default 0
    */
-  radius: number;
+  declare radius: number;
 
   /**
    * degrees of start of the circle.
@@ -21,7 +21,7 @@ export class Circle extends FabricObject {
    * @type Number 0 - 359
    * @default 0
    */
-  startAngle: number;
+  declare startAngle: number;
 
   /**
    * End angle of the circle
@@ -29,7 +29,7 @@ export class Circle extends FabricObject {
    * @type Number 1 - 360
    * @default 360
    */
-  endAngle: number;
+  declare endAngle: number;
 
   /**
    * @private
@@ -92,7 +92,7 @@ export class Circle extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []): object {
+  toObject(propertiesToInclude: string[] = []): object {
     return super.toObject([
       'radius',
       'startAngle',
@@ -194,15 +194,12 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
-  cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
-    'radius',
-    'startAngle',
-    'endAngle',
-  ],
 };
 
-Object.assign(Circle.prototype, circleDefaultValues);
+Object.assign(Circle.prototype, {
+  ...circleDefaultValues,
+  cacheProperties: [...cacheProperties, 'radius', 'startAngle', 'endAngle'],
+});
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

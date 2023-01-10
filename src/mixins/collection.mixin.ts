@@ -6,6 +6,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
     /**
      * @type {FabricObject[]}
+     * @TODO needs to end up in the constructor too
      */
     _objects: FabricObject[] = [];
 

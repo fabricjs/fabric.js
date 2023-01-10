@@ -10,9 +10,18 @@ import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
 import type { IText } from '../shapes/itext.class';
 import type { Textbox } from '../shapes/textbox.class';
+import type { Gradient } from '../gradient/gradient.class';
 
-export const isFiller = (filler: TFiller | string): filler is TFiller => {
+export const isFiller = (
+  filler: TFiller | string | null
+): filler is TFiller => {
   return !!filler && (filler as TFiller).toLive !== undefined;
+};
+
+export const isSerializableFiller = (
+  filler: TFiller | string | null
+): filler is TFiller => {
+  return !!filler && typeof (filler as TFiller).toObject === 'function';
 };
 
 export const isPattern = (filler: TFiller): filler is Pattern => {

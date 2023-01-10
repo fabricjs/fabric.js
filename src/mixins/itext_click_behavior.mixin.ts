@@ -9,10 +9,10 @@ import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 export abstract class ITextClickBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends ITextKeyBehaviorMixin<EventSpec> {
-  private __lastClickTime: number;
-  private __lastLastClickTime: number;
-  private __lastPointer: IPoint | Record<string, never>;
-  private __newClickTime: number;
+  private declare __lastClickTime: number;
+  private declare __lastLastClickTime: number;
+  private declare __lastPointer: IPoint | Record<string, never>;
+  private declare __newClickTime: number;
 
   /**
    * Initializes "dbclick" event handler

@@ -18,7 +18,7 @@ export class Contrast extends BaseFilter {
    * @param {Number} contrast
    * @default 0
    */
-  contrast: number;
+  declare contrast: number;
 
   /**
    * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
