@@ -1,7 +1,6 @@
 //@ts-nocheck
 import { ObjectEvents } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
-import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -173,10 +172,16 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    let activeObject: FabricObject | undefined;
     if (this.canvas) {
-      activeObject = this.canvas._activeObject;
       this.canvas.textEditingManager.unregister(this);
+
+      const activeObject = this.canvas._activeObject;
+      if (activeObject && activeObject !== this) {
+        // avoid running this logic when there is an active object
+        // this because is possible with shift click and fast clicks,
+        // to rapidly deselect and reselect this object and trigger an enterEdit
+        return;
+      }
     }
     if (
       !this.editable ||
@@ -184,12 +189,6 @@ export abstract class ITextClickBehaviorMixin<
       (options.transform && options.transform.actionPerformed) ||
       (options.e.button && options.e.button !== 1)
     ) {
-      return;
-    }
-    if (activeObject !== this) {
-      // avoid running this logic when there is an active object
-      // this because is possible with shift click and fast clicks,
-      // to rapidly deselect and reselect this object and trigger an enterEdit
       return;
     }
 
