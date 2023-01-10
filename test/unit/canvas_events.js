@@ -1305,7 +1305,7 @@
     canvas.remove(a);
     assert.ok(!manager.target, 'should unregister a');
     manager.dispose();
-    assert.equal(manager.target, undefined, 'should have disposed ref');
+    assert.ok(!manager.target, 'should have disposed ref');
     assert.deepEqual(manager.targets, [], 'should have disposed refs');
     const g = new fabric.Group([a]);
     canvas.add(g);
@@ -1315,7 +1315,7 @@
     manager.register(b);
     assert.ok(manager.target === b, 'should register b');
     g.remove(b);
-    assert.equal(manager.target, undefined, 'should unregister b');
+    assert.ok(!manager.target, 'should unregister b');
     assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
     manager.register(a);
     assert.ok(manager.target === a, 'should register a');
@@ -1328,7 +1328,10 @@
     assert.deepEqual(manager.targets, [], 'clear should clear instances');
     canvas.add(b);
     assert.deepEqual(manager.targets, [b], 'should register instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
     await canvas.dispose();
     assert.deepEqual(manager.targets, [], 'dispose should clear instances');
+    assert.ok(!manager.target, 'should unregister b');
   });
 })();
