@@ -25,15 +25,15 @@ export abstract class AbstractBaseFilter<T> {
    * @param {String} type
    * @default
    */
-  type: string;
+  declare type: string;
 
   /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
-  vertexSource: string;
+  declare vertexSource: string;
 
-  fragmentSource: T;
+  declare fragmentSource: T;
 
   /**
    * Name of the parameter that can be changed in the filter.
@@ -41,7 +41,7 @@ export abstract class AbstractBaseFilter<T> {
    * mainParameter
    * @private
    */
-  mainParameter?: keyof this;
+  declare mainParameter?: keyof this;
 
   /**
    * Constructor

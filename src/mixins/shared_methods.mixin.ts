@@ -3,10 +3,11 @@ import { Observable } from './observable.mixin';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   /**
-   * Sets object's properties from options
+   * Sets object's properties from options, for initialization only
+   * @protected
    * @param {Object} [options] Options object
    */
-  _setOptions(options: any) {
+  protected _setOptions(options: any = {}) {
     for (const prop in options) {
       this.set(prop, options[prop]);
     }

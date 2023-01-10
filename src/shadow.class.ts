@@ -14,41 +14,41 @@ export class Shadow {
    * @type String
    * @default
    */
-  color: string;
+  declare color: string;
 
   /**
    * Shadow blur
    * @type Number
    */
-  blur: number;
+  declare blur: number;
 
   /**
    * Shadow horizontal offset
    * @type Number
    * @default
    */
-  offsetX: number;
+  declare offsetX: number;
 
   /**
    * Shadow vertical offset
    * @type Number
    * @default
    */
-  offsetY: number;
+  declare offsetY: number;
 
   /**
    * Whether the shadow should affect stroke operations
    * @type Boolean
    * @default
    */
-  affectStroke: boolean;
+  declare affectStroke: boolean;
 
   /**
    * Indicates whether toObject should include default values
    * @type Boolean
    * @default
    */
-  includeDefaultValues: boolean;
+  declare includeDefaultValues: boolean;
 
   /**
    * When `false`, the shadow will scale with the object.
@@ -57,9 +57,9 @@ export class Shadow {
    * @type Boolean
    * @default
    */
-  nonScaling: boolean;
+  declare nonScaling: boolean;
 
-  id: number;
+  declare id: number;
 
   /**
    * @see {@link http://fabricjs.com/shadows|Shadow demo}
