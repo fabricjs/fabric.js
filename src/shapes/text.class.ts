@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { getEnv } from '../env';
 import { cache } from '../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../constants';
 import { ObjectEvents } from '../EventTypeDefs';
@@ -25,7 +24,7 @@ import {
   stylesToArray,
 } from '../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { fabricObjectDefaultValues } from './Object/FabricObject';
+import { cacheProperties } from './Object/FabricObject';
 import { Path } from './path.class';
 import { TextSVGExportMixin } from '../mixins/text.svg_export';
 import { applyMixins } from '../util/applyMixins';
@@ -96,77 +95,77 @@ export class Text<
    * @type Array
    * @private
    */
-  _dimensionAffectingProps: (keyof this)[];
+  declare _dimensionAffectingProps: (keyof this)[];
 
   /**
    * @private
    */
-  _reNewline: RegExp;
+  declare _reNewline: RegExp;
 
   /**
    * Use this regular expression to filter for whitespaces that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpacesAndTabs: RegExp;
+  declare _reSpacesAndTabs: RegExp;
 
   /**
    * Use this regular expression to filter for whitespace that is not a new line.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reSpaceAndTab: RegExp;
+  declare _reSpaceAndTab: RegExp;
 
   /**
    * Use this regular expression to filter consecutive groups of non spaces.
    * Mostly used when text is 'justify' aligned.
    * @private
    */
-  _reWords: RegExp;
+  declare _reWords: RegExp;
 
-  text: string;
+  declare text: string;
 
   /**
    * Font size (in pixels)
    * @type Number
    * @default
    */
-  fontSize: number;
+  declare fontSize: number;
 
   /**
    * Font weight (e.g. bold, normal, 400, 600, 800)
    * @type {(Number|String)}
    * @default
    */
-  fontWeight: string;
+  declare fontWeight: string;
 
   /**
    * Font family
    * @type String
    * @default
    */
-  fontFamily: string;
+  declare fontFamily: string;
 
   /**
    * Text decoration underline.
    * @type Boolean
    * @default
    */
-  underline: boolean;
+  declare underline: boolean;
 
   /**
    * Text decoration overline.
    * @type Boolean
    * @default
    */
-  overline: boolean;
+  declare overline: boolean;
 
   /**
    * Text decoration linethrough.
    * @type Boolean
    * @default
    */
-  linethrough: boolean;
+  declare linethrough: boolean;
 
   /**
    * Text alignment. Possible values: "left", "center", "right", "justify",
@@ -174,26 +173,26 @@ export class Text<
    * @type String
    * @default
    */
-  textAlign: string;
+  declare textAlign: string;
 
   /**
    * Font style . Possible values: "", "normal", "italic" or "oblique".
    * @type String
    * @default
    */
-  fontStyle: string;
+  declare fontStyle: string;
 
   /**
    * Line height
    * @type Number
    * @default
    */
-  lineHeight: number;
+  declare lineHeight: number;
 
   /**
    * Superscript schema object (minimum overlap)
    */
-  superscript: {
+  declare superscript: {
     /**
      * fontSize factor
      * @default 0.6
@@ -209,7 +208,7 @@ export class Text<
   /**
    * Subscript schema object (minimum overlap)
    */
-  subscript: {
+  declare subscript: {
     /**
      * fontSize factor
      * @default 0.6
@@ -227,11 +226,11 @@ export class Text<
    * @type String
    * @default
    */
-  textBackgroundColor: string;
+  declare textBackgroundColor: string;
 
-  protected _styleProperties: string[];
+  protected declare _styleProperties: string[];
 
-  styles: TextStyle;
+  declare styles: TextStyle;
 
   /**
    * Path that the text should follow.
@@ -255,7 +254,7 @@ export class Text<
    * });
    * @default
    */
-  path: Path;
+  declare path: Path;
 
   /**
    * Offset amount for text path starting position
@@ -263,7 +262,7 @@ export class Text<
    * @type Number
    * @default
    */
-  pathStartOffset: number;
+  declare pathStartOffset: number;
 
   /**
    * Which side of the path the text should be drawn on.
@@ -271,7 +270,7 @@ export class Text<
    * @type {String} 'left|right'
    * @default
    */
-  pathSide: string;
+  declare pathSide: string;
 
   /**
    * How text is aligned to the path. This property determines
@@ -281,24 +280,24 @@ export class Text<
    * @type String
    * @default
    */
-  pathAlign: string;
+  declare pathAlign: string;
 
   /**
    * @private
    */
-  _fontSizeFraction: number;
+  declare _fontSizeFraction: number;
 
   /**
    * @private
    */
-  offsets: { underline: number; linethrough: number; overline: number };
+  declare offsets: { underline: number; linethrough: number; overline: number };
 
   /**
    * Text Line proportion to font Size (in pixels)
    * @type Number
    * @default
    */
-  _fontSizeMult: number;
+  declare _fontSizeMult: number;
 
   /**
    * additional space between characters
@@ -306,14 +305,14 @@ export class Text<
    * @type Number
    * @default
    */
-  charSpacing: number;
+  declare charSpacing: number;
 
   /**
    * Baseline shift, styles only, keep at 0 for the main text object
    * @type {Number}
    * @default
    */
-  deltaY: number;
+  declare deltaY: number;
 
   /**
    * WARNING: EXPERIMENTAL. NOT SUPPORTED YET
@@ -326,7 +325,7 @@ export class Text<
    * @type {String} 'ltr|rtl'
    * @default
    */
-  direction: string;
+  declare direction: string;
 
   /**
    * contains characters bounding boxes
@@ -340,14 +339,14 @@ export class Text<
    * @readonly
    * @private
    */
-  CACHE_FONT_SIZE: number;
+  declare CACHE_FONT_SIZE: number;
 
   /**
    * contains the min text width to avoid getting 0
    * @type {Number}
    * @default
    */
-  MIN_TEXT_WIDTH: number;
+  declare MIN_TEXT_WIDTH: number;
 
   /**
    * contains the the text of the object, divided in lines as they are displayed
@@ -355,23 +354,23 @@ export class Text<
    * @type {string[]}
    * @default
    */
-  textLines: string[];
+  declare textLines: string[];
 
   /**
    * same as textlines, but each line is an array of graphemes as split by splitByGrapheme
    * @type {string[]}
    * @default
    */
-  _textLines: string[][];
+  declare _textLines: string[][];
 
-  _unwrappedTextLines: string[][];
-  _text: string[];
-  cursorWidth: number;
-  __lineHeights: number[];
-  __lineWidths: number[];
-  _forceClearCache: boolean;
+  declare _unwrappedTextLines: string[][];
+  declare _text: string[];
+  declare cursorWidth: number;
+  declare __lineHeights: number[];
+  declare __lineWidths: number[];
+  declare _forceClearCache: boolean;
 
-  initialized?: true;
+  declare initialized?: true;
 
   constructor(text: string, options: any) {
     super({ ...options, text, styles: options?.styles || {} });
@@ -1869,6 +1868,9 @@ export class Text<
   }
 }
 
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
 export const textDefaultValues: Partial<TClassProperties<Text>> = {
   _dimensionAffectingProps: [
     'fontSize',
@@ -1922,10 +1924,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     baseline: 0.11, // baseline-shift factor (downwards)
   },
   textBackgroundColor: '',
-  cacheProperties: [
-    ...fabricObjectDefaultValues.cacheProperties,
-    ...additionalProps,
-  ],
+  cacheProperties: [...cacheProperties, ...additionalProps],
   stroke: null,
   shadow: null,
   path: null,

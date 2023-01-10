@@ -161,6 +161,7 @@ import { removeFromArray } from './src/util/internals/removeFromArray';
 import { getRandomInt } from './src/util/internals/getRandomInt';
 import { wrapElement } from './src/util/dom_misc';
 import { request } from './src/util/dom_request';
+import { removeTransformMatrixForSvgParsing } from './src/util/transform_matrix_removal';
 import { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
 const util = {
@@ -253,6 +254,8 @@ const util = {
   requestAnimFrame,
   cancelAnimFrame,
   classRegistry,
+  // for test compatibility. We don't want to export it.
+  removeTransformMatrixForSvgParsing,
 };
 
 // CONTROLS UTILS
