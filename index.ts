@@ -431,13 +431,6 @@ const fabric = {
   getCSSRules,
 };
 
-if (typeof exports !== 'undefined') {
-  exports.fabric = fabric;
-} else if (typeof define === 'function' && define.amd) {
-  /* _AMD_START_ */
-  define([], function () {
-    return fabric;
-  });
-} else if (typeof window !== 'undefined') {
-  window.fabric = fabric;
-}
+export default fabric;
+
+export { fabric };

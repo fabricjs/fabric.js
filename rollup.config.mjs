@@ -1,32 +1,28 @@
 import json from '@rollup/plugin-json';
-import { sizeSnapshot } from 'rollup-plugin-size-snapshot';
-import { terser } from 'rollup-plugin-terser';
-import ts from 'rollup-plugin-ts';
+import terser from '@rollup/plugin-terser';
+import ts from '@rollup/plugin-typescript';
+import { babel } from '@rollup/plugin-babel';
+// import dts from "rollup-plugin-dts";
 
-const runStats = Number(process.env.BUILD_STATS);
 
 const splitter = /\n|\s|,/g;
 
 // https://rollupjs.org/guide/en/#configuration-files
-export default {
-  input: process.env.BUILD_INPUT?.split(splitter) || ['./index.js'],
+export default [{
+  input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
   output: [
     {
       file: process.env.BUILD_OUTPUT || './dist/fabric.js',
       name: 'fabric',
-      format: 'cjs',
+      format: 'umd',
       sourcemap: true,
     },
     Number(process.env.MINIFY)
       ? {
           file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
           name: 'fabric',
-          format: 'cjs',
+          format: 'umd',
           plugins: [
-            runStats &&
-              sizeSnapshot({
-                snapshotPath: 'cli_output/build_size.json',
-              }),
             terser(),
           ],
         }
@@ -36,7 +32,18 @@ export default {
   plugins: [
     json(),
     ts({
-      /* Plugin options */
+      noForceEmit: true,
+      tsconfig: './tsconfig.json',
+    }),
+    babel({
+      extensions: [".ts", ".js"],
+      babelHelpers: 'bundled',
     }),
   ],
-};
+},
+// {
+//   input: "./my-input/index.d.ts",
+//   output: [{ file: "dist/my-library.d.ts", format: "es" }],
+//   plugins: [dts()],
+// },
+];
