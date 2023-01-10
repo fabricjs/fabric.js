@@ -1,18 +1,18 @@
 // @ts-nocheck
 
+import type { Canvas } from '../canvas/canvas_events';
 import { getEnv } from '../env';
 import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
+import { TOnAnimationChangeCallback } from '../util/animation/types';
+import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
 import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
-import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
-import { TOnAnimationChangeCallback } from '../util/animation/types';
-import type { ValueAnimation } from '../util/animation/ValueAnimation';
-import { FabricObject } from '../shapes/Object/Object';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
@@ -108,10 +108,7 @@ export abstract class ITextBehaviorMixin<
     this.on('drop', this.dropHandler);
   }
 
-  onDeselect(options?: {
-    e?: TPointerEvent;
-    object?: FabricObject<ObjectEvents>;
-  }) {
+  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }) {
     this.isEditing && this.exitEditing();
     this.selected = false;
     return super.onDeselect(options);
