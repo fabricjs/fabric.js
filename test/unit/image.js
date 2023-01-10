@@ -613,7 +613,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -641,7 +641,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -670,7 +670,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -699,7 +699,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -728,7 +728,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -757,7 +757,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 35, 'left');
@@ -786,7 +786,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 70, 'left');

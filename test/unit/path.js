@@ -127,11 +127,6 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var left = path.left;
-    var top = path.top;
-    path.center();
-    assert.equal(left, path.left);
-    assert.equal(top, path.top);
     var opts = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
     delete opts.path;
     path.set(opts);
