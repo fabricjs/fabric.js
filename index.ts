@@ -432,5 +432,3 @@ const fabric = {
 };
 
 export default fabric;
-
-export { fabric };
