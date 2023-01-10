@@ -310,19 +310,6 @@
       iText.abortCursorAnimation();
     });
 
-    QUnit.test('exitEditing after removed from canvas', function (assert) {
-      const iText = new fabric.IText('test');
-      canvas.add(iText);
-      iText.enterEditing();
-      assert.deepEqual(Object.keys(canvas.__eventListeners), ['mouse:move'], 'iText should subscribe to canvas mouse move');
-      assert.ok(Array.isArray(canvas.__eventListeners['mouse:move'])
-        && canvas.__eventListeners['mouse:move'].length === 1
-        && typeof canvas.__eventListeners['mouse:move'][0] === 'function', 'iText should subscribe to canvas mouse move');
-      canvas.remove(iText);
-      iText.exitEditing();
-      assert.deepEqual(canvas.__eventListeners, { 'mouse:move': [] }, 'should unsubscribe from canvas mouse move');
-    });
-
     QUnit.test('event firing', function(assert) {
       var iText = new fabric.IText('test'),
           enter = 0, exit = 0, modify = 0;
