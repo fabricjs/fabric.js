@@ -10,6 +10,14 @@
       canvas.clear();
       canvas.cancelRequestedRender();
     });
+
+    function assertCursorAnimation(assert, text, active = false) {
+      const cursorState = [text._currentTickState, text._currentTickCompleteState].some(
+        (cursorAnimation) => cursorAnimation && !cursorAnimation.isDone()
+      );
+      assert.equal(cursorState, active, `cursor animation state should be ${active}`);
+    }
+
     QUnit.test('doubleClickHandler', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
@@ -25,6 +33,7 @@
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
+      assertCursorAnimation(assert, iText);
       var eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
@@ -36,6 +45,7 @@
       });
       assert.equal(iText.selectionStart, 20, 'second dblClick selection start is');
       assert.equal(iText.selectionEnd, 26, 'second dblClick selection end is');
+      assertCursorAnimation(assert, iText);
       iText.exitEditing();
     });
     QUnit.test('doubleClickHandler no editing', function(assert) {
@@ -52,6 +62,7 @@
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 0, 'dblClick selection end is');
+      assertCursorAnimation(assert, iText);
     });
     QUnit.test('tripleClickHandler', function(assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
@@ -68,6 +79,7 @@
       });
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
+      assertCursorAnimation(assert, iText);
       var eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
@@ -79,6 +91,7 @@
       });
       assert.equal(iText.selectionStart, 20, 'second tripleClick selection start is');
       assert.equal(iText.selectionEnd, 31, 'second tripleClick selection end is');
+      assertCursorAnimation(assert, iText);
       iText.exitEditing();
     });
     QUnit.test('tripleClickHandler', function(assert) {
@@ -172,6 +185,7 @@
       iText.__lastSelected = true;
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, true, 'iText entered editing');
+      assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
     });
     QUnit.test('_mouseUpHandler on a selected object does enter edit if there is an activeObject', function(assert) {
@@ -185,6 +199,7 @@
       iText.__lastSelected = true;
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
+      assertCursorAnimation(assert, iText);
       iText.exitEditing();
     });
     QUnit.test('_mouseUpHandler on a selected text in a group does NOT enter editing', function(assert) {
@@ -212,6 +227,7 @@
       iText.__lastSelected = true;
       canvas.__onMouseUp({ clientX: 1, clientY: 1 });
       assert.equal(iText.isEditing, true, 'iText should enter editing');
+      assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
       group.interactive = false;
       iText.selected = true;
@@ -274,6 +290,7 @@
           assert.equal(iText.isEditing, true, 'Itext entered editing');
           assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
           assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
+          assertCursorAnimation(assert, iText, true);
           assert.equal(count, 1, 'no selection:changed fired yet');
           assert.equal(countCanvas, 1, 'no text:selection:changed fired yet');
           done();
