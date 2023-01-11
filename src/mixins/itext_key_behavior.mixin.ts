@@ -111,7 +111,7 @@ export abstract class ITextKeyBehaviorMixin<
    * Override this method to customize cursor behavior on textbox blur
    */
   blur() {
-    !this.selected && this.abortCursorAnimation();
+    this.abortCursorAnimation();
   }
 
   /**
