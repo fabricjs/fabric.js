@@ -303,6 +303,7 @@
           iText.on('selection:changed', function () {
             count++;
           });
+          assert.equal(canvas._isRetinaScaling(), enableRetinaScaling, 'test state is correct');
           canvas.add(iText);
           assert.equal(canvas.getActiveObject(), null, 'no active object exist');
           assert.equal(count, 0, 'no selection:changed fired yet');
