@@ -774,6 +774,18 @@
       assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
     });
 
+    QUnit.test('dispose', function (assert) {
+      const iText = new fabric.IText('a');
+      const cursorState = () => [iText._currentTickState, iText._currentTickCompleteState].some(
+        (cursorAnimation) => cursorAnimation && !cursorAnimation.isDone()
+      );
+      iText.enterEditing();
+      assert.equal(cursorState(), true, 'should have been started');
+      iText.dispose();
+      assert.equal(iText.isEditing, false, 'should have been aborted');
+      assert.equal(cursorState(), false, 'should have been aborted');
+    });
+
     QUnit.module('fabric.IText and retina scaling', function (hooks) {
       hooks.before(function () {
         fabric.config.configure({ devicePixelRatio: 2 });
@@ -782,7 +794,7 @@
         fabric.config.restoreDefaults();
       });
       [true, false].forEach(enableRetinaScaling => {
-        QUnit.test('hiddenTextarea does not move DOM', function (assert) {
+        QUnit.test(`hiddenTextarea does not move DOM, enableRetinaScaling ${enableRetinaScaling}`, function (assert) {
           var iText = new fabric.IText('a', { fill: '#ffffff', fontSize: 50 });
           var canvas2 = new fabric.Canvas(null, { width: 800, height: 800, renderOnAddRemove: false, enableRetinaScaling });
           canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
