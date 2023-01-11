@@ -177,6 +177,18 @@
       assert.equal(iText.selected, true, 'iText has selected property');
       assert.equal(iText.__lastSelected, undefined, 'iText has no __lastSelected property');
     });
+    QUnit.test('mouse down aborts cursor animation', function (assert) {
+      var iText = new fabric.IText('test need some word\nsecond line', { canvas });
+      assert.ok(typeof iText._animateCursor === 'function', 'method is defined');
+      let animate = 0, aborted = 0;
+      iText._animateCursor = () => animate++;
+      iText.abortCursorAnimation = () => aborted++;
+      canvas.setActiveObject(iText);
+      iText.enterEditing();
+      iText._mouseDownHandler({ e: {} });
+      assert.equal(animate, 1, 'called from enterEditing');
+      assert.equal(aborted, 1, 'called from render');
+    });
     QUnit.test('_mouseUpHandler set selected as true', function (assert) {
       var iText = new fabric.IText('test');
       iText.initDelayedCursor = function () { };
