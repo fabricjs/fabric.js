@@ -18,7 +18,7 @@
       assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
-    function wait(ms) {
+    function wait(ms = 16) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -40,7 +40,7 @@
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
       // wait for cursor animation tick to run
-      await wait(16);
+      await wait();
       assertCursorAnimation(assert, iText);
       eventData = {
         which: 1,
@@ -91,7 +91,7 @@
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
       // wait for cursor animation tick to run
-      await wait(16);
+      await wait();
       assertCursorAnimation(assert, iText);
       eventData = {
         which: 1,
@@ -289,42 +289,45 @@
         };
       });
       hooks.afterEach(() => canvas.dispose());
-     
-      QUnit.test(`click on editing itext make selection:changed fire (enableRetinaScaling = ${enableRetinaScaling})`, function (assert) {
-        var done = assert.async();
-        var count = 0;
-        var countCanvas = 0;
-        var iText = new fabric.IText('test test');
-        canvas.on('text:selection:changed', function () {
-          countCanvas++;
-        });
-        iText.on('selection:changed', function () {
-          count++;
-        });
-        canvas.add(iText);
-        assert.equal(canvas.getActiveObject(), null, 'no active object exist');
-        assert.equal(count, 0, 'no selection:changed fired yet');
-        assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');
-        canvas._onMouseDown(eventData);
-        canvas._onMouseUp(eventData);
-        assert.equal(canvas.getActiveObject(), iText, 'Itext got selected');
-        assert.equal(iText.isEditing, false, 'Itext is not editing yet');
-        assert.equal(count, 0, 'no selection:changed fired yet');
-        assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');
-        assert.equal(iText.selectionStart, 0, 'Itext did not set the selectionStart');
-        assert.equal(iText.selectionEnd, 0, 'Itext did not set the selectionend');
-        // make a little delay or it will act as double click and select everything
-        setTimeout(function () {
+
+      [true, false].forEach(shouldScale => {
+        enableRetinaScaling = shouldScale;
+        QUnit.test(`click on editing itext make selection:changed fire (enableRetinaScaling = ${enableRetinaScaling})`, function (assert) {
+          var done = assert.async();
+          var count = 0;
+          var countCanvas = 0;
+          var iText = new fabric.IText('test test');
+          canvas.on('text:selection:changed', function () {
+            countCanvas++;
+          });
+          iText.on('selection:changed', function () {
+            count++;
+          });
+          canvas.add(iText);
+          assert.equal(canvas.getActiveObject(), null, 'no active object exist');
+          assert.equal(count, 0, 'no selection:changed fired yet');
+          assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');
           canvas._onMouseDown(eventData);
           canvas._onMouseUp(eventData);
-          assert.equal(iText.isEditing, true, 'Itext entered editing');
-          assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
-          assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
-          assertCursorAnimation(assert, iText, true);
-          assert.equal(count, 1, 'no selection:changed fired yet');
-          assert.equal(countCanvas, 1, 'no text:selection:changed fired yet');
-          done();
-        }, 500);
+          assert.equal(canvas.getActiveObject(), iText, 'Itext got selected');
+          assert.equal(iText.isEditing, false, 'Itext is not editing yet');
+          assert.equal(count, 0, 'no selection:changed fired yet');
+          assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');
+          assert.equal(iText.selectionStart, 0, 'Itext did not set the selectionStart');
+          assert.equal(iText.selectionEnd, 0, 'Itext did not set the selectionend');
+          // make a little delay or it will act as double click and select everything
+          setTimeout(function () {
+            canvas._onMouseDown(eventData);
+            canvas._onMouseUp(eventData);
+            assert.equal(iText.isEditing, true, 'Itext entered editing');
+            assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
+            assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
+            assertCursorAnimation(assert, iText, true);
+            assert.equal(count, 1, 'no selection:changed fired yet');
+            assert.equal(countCanvas, 1, 'no text:selection:changed fired yet');
+            done();
+          }, 500);
+        });
       });
     });
   });
