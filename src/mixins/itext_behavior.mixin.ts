@@ -6,6 +6,7 @@ import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
+import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
@@ -184,16 +185,22 @@ export abstract class ITextBehaviorMixin<
     delay?: number;
     onComplete?: TOnAnimationChangeCallback<number, void>;
   }) {
-    return this._animate('_currentCursorOpacity', toValue, {
+    return animate({
+      startValue: this._currentCursorOpacity,
+      endValue: toValue,
       duration,
       delay,
       onComplete,
-      abort: () => !this.canvas,
-      onChange: () => {
-        // we do not want to animate a selection, only cursor
-        if (this.selectionStart === this.selectionEnd) {
-          this.renderCursorOrSelection();
-        }
+      abort: () => {
+        return (
+          !this.canvas ||
+          // we do not want to animate a selection, only cursor
+          this.selectionStart !== this.selectionEnd
+        );
+      },
+      onChange: (value) => {
+        this._currentCursorOpacity = value;
+        this.renderCursorOrSelection();
       },
     });
   }
