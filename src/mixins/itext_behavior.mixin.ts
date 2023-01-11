@@ -1027,15 +1027,12 @@ export abstract class ITextBehaviorMixin<
   }
 
   /**
-   * Exits from editing state
+   * runs the actual logic that exits from editing state, see {@link exitEditing}
    */
-  exitEditing() {
-    const isTextChanged = this._textBeforeEdit !== this.text;
+  protected _exitEditing() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
-
-    this.selectionEnd = this.selectionStart;
 
     if (hiddenTextarea) {
       hiddenTextarea.blur && hiddenTextarea.blur();
@@ -1044,6 +1041,15 @@ export abstract class ITextBehaviorMixin<
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
+  }
+
+  /**
+   * Exits from editing state and fires relevant events
+   */
+  exitEditing() {
+    const isTextChanged = this._textBeforeEdit !== this.text;
+    this.selectionEnd = this.selectionStart;
+    this._exitEditing();
     this._restoreEditingProps();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();

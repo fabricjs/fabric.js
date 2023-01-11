@@ -603,6 +603,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
   }
+
+  dispose() {
+    this._exitEditing();
+    super.dispose();
+  }
 }
 
 export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
