@@ -18,7 +18,12 @@
       assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
-    QUnit.test('doubleClickHandler', function (assert) {
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    QUnit.test('doubleClickHandler', async function (assert) {
+      var done = assert.async();
       var iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
       var eventData = {
@@ -28,13 +33,16 @@
         clientY: 10
       };
       iText.enterEditing();
+      assertCursorAnimation(assert, iText, true);
       iText.doubleClickHandler({
         e: eventData
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
+      // wait for cursor animation tick to run
+      await wait(16);
       assertCursorAnimation(assert, iText);
-      var eventData = {
+      eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
@@ -47,6 +55,7 @@
       assert.equal(iText.selectionEnd, 26, 'second dblClick selection end is');
       assertCursorAnimation(assert, iText);
       iText.exitEditing();
+      done();
     });
     QUnit.test('doubleClickHandler no editing', function (assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
@@ -64,7 +73,8 @@
       assert.equal(iText.selectionEnd, 0, 'dblClick selection end is');
       assertCursorAnimation(assert, iText);
     });
-    QUnit.test('tripleClickHandler', function (assert) {
+    QUnit.test('tripleClickHandler', async function (assert) {
+      var done = assert.async();
       var iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
       var eventData = {
@@ -74,13 +84,16 @@
         clientY: 10
       };
       iText.enterEditing();
+      assertCursorAnimation(assert, iText, true);
       iText.tripleClickHandler({
         e: eventData
       });
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
+      // wait for cursor animation tick to run
+      await wait(16);
       assertCursorAnimation(assert, iText);
-      var eventData = {
+      eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
@@ -93,6 +106,7 @@
       assert.equal(iText.selectionEnd, 31, 'second tripleClick selection end is');
       assertCursorAnimation(assert, iText);
       iText.exitEditing();
+      done();
     });
     QUnit.test('tripleClickHandler', function (assert) {
       var iText = new fabric.IText('test need some word\nsecond line');
