@@ -1290,8 +1290,8 @@
     b.fire('mousedown', { e, pointer: new fabric.Point(30, 40) });
     assert.ok(manager.target === b, 'should register b');
     const called = [];
-    a.updateSelection = () => called.push(a);
-    b.updateSelection = () => called.push(b);
+    a.updateSelectionOnMouseMove = () => called.push(a);
+    b.updateSelectionOnMouseMove = () => called.push(b);
     canvas.__onMouseMove(e);
     assert.deepEqual(called, [b], 'manager is called from mouse move');
     manager.unregister(a);
