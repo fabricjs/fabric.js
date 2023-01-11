@@ -193,7 +193,7 @@ export abstract class ITextBehaviorMixin<
       },
     };
 
-    obj.animate('_currentCursorOpacity', targetOpacity, {
+    obj._animate('_currentCursorOpacity', targetOpacity, {
       duration: duration,
       onComplete: function () {
         if (!tickState.isAborted) {
