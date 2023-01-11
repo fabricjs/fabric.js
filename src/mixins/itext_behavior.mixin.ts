@@ -90,7 +90,8 @@ export abstract class ITextBehaviorMixin<
   initBehavior() {
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
-    this.updateSelection = this.updateSelection.bind(this);
+    this.updateSelectionOnMouseMove =
+      this.updateSelectionOnMouseMove.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
     this.dragOverHandler = this.dragOverHandler.bind(this);
     this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
@@ -411,7 +412,7 @@ export abstract class ITextBehaviorMixin<
   /**
    * called by {@link canvas#textEditingManager}
    */
-  updateSelection(e: TPointerEvent) {
+  updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
     getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();

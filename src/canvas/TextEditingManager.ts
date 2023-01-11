@@ -39,7 +39,7 @@ export class TextEditingManager {
   }
 
   onMouseMove(e: TPointerEvent) {
-    this.target?.isEditing && this.target.updateSelection(e);
+    this.target?.isEditing && this.target.updateSelectionOnMouseMove(e);
   }
 
   dispose() {
