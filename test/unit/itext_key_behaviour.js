@@ -23,10 +23,10 @@
     return assertCursorAnimation(assert, iText, true);
   }
 
-  QUnit.module.only('selection changes', function (hooks) {
+  QUnit.module('selection changes', function (hooks) {
     let iText, selection = 0, _assertCursorAnimation, _setSelection;
-    hooks.before((context) => {
-      iText = new fabric.IText('test neei some word\nsecond line');
+    hooks.before(() => {
+      iText = new fabric.IText('test need some word\nsecond line');
       iText.ctx = ctx;
       iText.on('selection:changed', () => selection++);
       _assertCursorAnimation = assertCursorAnimation.bind(null, QUnit.assert, iText);
@@ -200,6 +200,51 @@
       done();
     });
 
+    QUnit.test('moveCursor at start with shift', async function (assert) {
+      const done = assert.async();
+      await _setSelection(0, 1);
+      await _assertCursorAnimation(false, true);
+      iText._selectionDirection = 'left';
+      iText.moveCursorLeft({ shiftKey: true });
+      assert.equal(selection, 0, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 0, 'should not move');
+      assert.equal(iText.selectionEnd, 1, 'should not move');
+      await _assertCursorAnimation(false, true);
+      iText.moveCursorUp({ shiftKey: true });
+      assert.equal(selection, 0, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 0, 'should not move');
+      assert.equal(iText.selectionEnd, 1, 'should not move');
+      await _assertCursorAnimation(false, true);
+      iText.moveCursorRight({ shiftKey: true });
+      assert.equal(selection, 1, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 1, 'should not move');
+      assert.equal(iText.selectionEnd, 1, 'should not move');
+      await _assertCursorAnimation(true, true);
+      done();
+    });
+
+    QUnit.test('moveCursor at end with shift', async function (assert) {
+      const done = assert.async();
+      await _setSelection(30, 31);
+      await _assertCursorAnimation(false, true);
+      iText._selectionDirection = 'right';
+      iText.moveCursorRight({ shiftKey: true });
+      assert.equal(selection, 0, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 30, 'should not move');
+      assert.equal(iText.selectionEnd, 31, 'should not move');
+      await _assertCursorAnimation(false, true);
+      iText.moveCursorDown({ shiftKey: true });
+      assert.equal(selection, 0, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 30, 'should not move');
+      assert.equal(iText.selectionEnd, 31, 'should not move');
+      await _assertCursorAnimation(false, true);
+      iText.moveCursorLeft({ shiftKey: true });
+      assert.equal(selection, 1, 'should not fire with no change');
+      assert.equal(iText.selectionStart, 30, 'should not move');
+      assert.equal(iText.selectionEnd, 30, 'should not move');
+      await _assertCursorAnimation(true, true);
+      done();
+    });
     
     // TODO verify and dp
     // iText.selectionStart = 0;
@@ -209,139 +254,6 @@
     // assert.equal(iText.selectionStart, 5, 'should be at end of text inserted');
     // assert.equal(iText.selectionEnd, 5, 'should be at end of text inserted');
 
-  });
-
-  QUnit.test('moving cursor with shift', async function (assert) {
-    var done = assert.async();
-    var iText = new fabric.IText('test need some word\nsecond line'),
-        selection = 0;
-    iText.ctx = ctx;
-    function countSelectionChange() {
-      selection++;
-    }
-
-    
-
-    iText.on('selection:changed', countSelectionChange);
-
-    iText.enterEditing();
-    await _assertCursorAnimation(true);
-    assert.equal(selection, 1, 'should fire on enter edit');
-    selection = 0;
-
-    iText.selectAll();
-    assert.equal(selection, 1, 'should fire once on selectAll');
-    assert.equal(iText.selectionStart, 0, 'should start from 0');
-    assert.equal(iText.selectionEnd, 31, 'should end at end of text');
-    await _assertCursorAnimation(false, true);
-    selection = 0;
-
-    await setSelection(2, 2);
-    iText.selectWord();
-    assert.equal(selection, 1, 'should fire once on selectWord');
-    assert.equal(iText.selectionStart, 0, 'should start at word start');
-    assert.equal(iText.selectionEnd, 4, 'should end at word end');
-    await wait();
-    await _assertCursorAnimation(iText);
-    selection = 0;
-
-    await setSelection(2, 2);
-    iText.selectLine();
-    assert.equal(selection, 1, 'should fire once on selectLine');
-    assert.equal(iText.selectionStart, 0, 'should start at line start');
-    assert.equal(iText.selectionEnd, 19, 'should end at line end');
-    await wait();
-    await _assertCursorAnimation(iText);
-    selection = 0;
-
-    await setSelection(2, 2);
-    iText.moveCursorLeft({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorLeft');
-    assert.equal(iText.selectionStart, 1, 'should be 1 less than 2');
-    assert.equal(iText.selectionEnd, 1, 'should be 1 less than 2');
-    await wait();
-    await _assertCursorAnimation(true);
-    selection = 0;
-
-    await setSelection(2, 2);
-    iText.moveCursorRight({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorRight');
-    assert.equal(iText.selectionStart, 3, 'should be 1 more than 2');
-    assert.equal(iText.selectionEnd, 3, 'should be 1 more than 2');
-    await wait();
-    await _assertCursorAnimation(true);
-    selection = 0;
-
-    await setSelection(2, 2);
-    iText.moveCursorDown({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorDown');
-    assert.equal(iText.selectionStart, 22, 'should be on second line');
-    assert.equal(iText.selectionEnd, 22, 'should be on second line');
-    await wait();
-    await _assertCursorAnimation(true);
-    iText.moveCursorDown({ shiftKey: false});
-    assert.equal(selection, 2, 'should fire once on moveCursorDown');
-    assert.equal(iText.selectionStart, 31, 'should be at end of text');
-    assert.equal(iText.selectionEnd, 31, 'should be at end of text');
-    await wait();
-    await _assertCursorAnimation(true);
-    selection = 0;
-
-    await setSelection(22, 22);
-    iText.moveCursorUp({ shiftKey: false});
-    assert.equal(selection, 1, 'should fire once on moveCursorUp');
-    assert.equal(iText.selectionStart, 2, 'should be back to first line');
-    assert.equal(iText.selectionEnd, 2, 'should be back on first line');
-    await wait();
-    await _assertCursorAnimation(true);
-    iText.moveCursorUp({ shiftKey: false});
-    assert.equal(selection, 2, 'should fire once on moveCursorUp');
-    assert.equal(iText.selectionStart, 0, 'should be back to first line');
-    assert.equal(iText.selectionEnd, 0, 'should be back on first line');
-    await wait();
-    await _assertCursorAnimation(true);
-    selection = 0;
-
-    await setSelection(0, 1);
-    await wait();
-    await _assertCursorAnimation(iText);
-    iText._selectionDirection = 'left';
-    iText.moveCursorLeft({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
-    assert.equal(iText.selectionStart, 0, 'should not move');
-    assert.equal(iText.selectionEnd, 1, 'should not move');
-    await wait();
-    await _assertCursorAnimation(iText);
-    iText.moveCursorUp({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
-    assert.equal(iText.selectionStart, 0, 'should not move');
-    assert.equal(iText.selectionEnd, 1, 'should not move');
-    await wait();
-    await _assertCursorAnimation(iText);
-    selection = 0;
-
-
-    await setSelection(30, 31);
-    await wait();
-    await _assertCursorAnimation(iText);
-    iText._selectionDirection = 'right';
-    iText.moveCursorRight({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
-    assert.equal(iText.selectionStart, 30, 'should not move');
-    assert.equal(iText.selectionEnd, 31, 'should not move');
-    await wait();
-    await _assertCursorAnimation(iText);
-    iText.moveCursorDown({ shiftKey: true});
-    assert.equal(selection, 0, 'should not fire with no change');
-    assert.equal(iText.selectionStart, 30, 'should not move');
-    assert.equal(iText.selectionEnd, 31, 'should not move');
-    await wait();
-    await _assertCursorAnimation(iText);
-    selection = 0;
-    // needed or test hangs
-    iText.abortCursorAnimation();
-    await _assertCursorAnimation(iText);
-    done();
   });
 
   QUnit.test('mousedown calls key maps', function (assert) {
