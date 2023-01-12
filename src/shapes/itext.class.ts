@@ -1,5 +1,5 @@
 // @ts-nocheck
-import type { Canvas } from '../canvas/canvas_events';
+import { Canvas } from '../canvas/canvas_events';
 import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
