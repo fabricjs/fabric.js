@@ -8,7 +8,7 @@ import { removeFromArray } from '../util/internals';
  */
 export class TextEditingManager {
   private targets: (IText | Textbox)[] = [];
-  private target?: IText | Textbox;
+  declare private target?: IText | Textbox;
 
   exitTextEditing() {
     this.target = undefined;

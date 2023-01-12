@@ -20,11 +20,11 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
   /**
    * edge point
    */
-  A: Point;
+  declare A: Point;
   /**
    * point next to edge point
    */
-  T: Point;
+  declare T: Point;
 
   constructor(A: IPoint, T: IPoint, options: TProjectStrokeOnPointsOptions) {
     super(options);
