@@ -540,7 +540,7 @@ export abstract class ITextBehaviorMixin<
       e.dataTransfer.effectAllowed = 'copyMove';
       this.setDragImage(e, data);
     }
-    this.abortCursorAnimation(true);
+    this.abortCursorAnimation();
     return this.__isDragging;
   }
 
