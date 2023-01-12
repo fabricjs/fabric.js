@@ -466,7 +466,7 @@ export class Canvas extends SelectableCanvas {
     const { target, targets } = this.findDragTargets(e);
     const dragSource = this._dragSource as FabricObject;
     const options = {
-      e: e,
+      e,
       target,
       subTargets: targets,
       dragSource,
