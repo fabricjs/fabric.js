@@ -1,9 +1,14 @@
 // @ts-nocheck
 
+import type { Canvas } from '../canvas/canvas_events';
 import { getEnv } from '../env';
 import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
+import { animate } from '../util/animation/animate';
+import { TOnAnimationChangeCallback } from '../util/animation/types';
+import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
@@ -35,13 +40,8 @@ export abstract class ITextBehaviorMixin<
   protected declare inCompositionMode: boolean;
 
   protected declare _reSpace: RegExp;
-  private declare _currentTickState: { isAborted: boolean; abort: () => void };
-  private declare _cursorTimeout1: number;
-  private declare _cursorTimeout2: number;
-  private declare _currentTickCompleteState: {
-    isAborted: boolean;
-    abort: () => void;
-  };
+  private declare _currentTickState?: ValueAnimation;
+  private declare _currentTickCompleteState?: ValueAnimation;
   protected declare _currentCursorOpacity: number;
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
@@ -90,6 +90,8 @@ export abstract class ITextBehaviorMixin<
   initBehavior() {
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
+    this._tick = this._tick.bind(this);
+    this._onTickComplete = this._onTickComplete.bind(this);
     this.updateSelectionOnMouseMove =
       this.updateSelectionOnMouseMove.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
@@ -104,98 +106,86 @@ export abstract class ITextBehaviorMixin<
     this.on('drop', this.dropHandler);
   }
 
-  onDeselect() {
+  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }) {
     this.isEditing && this.exitEditing();
     this.selected = false;
+    return super.onDeselect(options);
   }
 
   /**
    * @private
    */
-  _tick() {
-    this._currentTickState = this._animateCursor(
-      this,
-      1,
-      this.cursorDuration,
-      '_onTickComplete'
-    );
-  }
-
-  /**
-   * @private
-   */
-  _animateCursor(obj, targetOpacity, duration, completeMethod) {
-    const tickState = {
-      isAborted: false,
-      abort: function () {
-        this.isAborted = true;
+  _animateCursor({
+    toValue,
+    duration,
+    delay,
+    onComplete,
+  }: {
+    toValue: number;
+    duration: number;
+    delay?: number;
+    onComplete?: TOnAnimationChangeCallback<number, void>;
+  }) {
+    return animate({
+      startValue: this._currentCursorOpacity,
+      endValue: toValue,
+      duration,
+      delay,
+      onComplete,
+      abort: () => {
+        return (
+          !this.canvas ||
+          // we do not want to animate a selection, only cursor
+          this.selectionStart !== this.selectionEnd
+        );
       },
-    };
-
-    obj._animate('_currentCursorOpacity', targetOpacity, {
-      duration: duration,
-      onComplete: function () {
-        if (!tickState.isAborted) {
-          obj[completeMethod]();
-        }
-      },
-      onChange: function () {
-        // we do not want to animate a selection, only cursor
-        if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
-          obj.renderCursorOrSelection();
-        }
-      },
-      abort: function () {
-        return tickState.isAborted;
+      onChange: (value) => {
+        this._currentCursorOpacity = value;
+        this.renderCursorOrSelection();
       },
     });
-    return tickState;
   }
 
-  /**
-   * @private
-   */
-  _onTickComplete() {
-    if (this._cursorTimeout1) {
-      clearTimeout(this._cursorTimeout1);
-    }
-    this._cursorTimeout1 = setTimeout(() => {
-      this._currentTickCompleteState = this._animateCursor(
-        this,
-        0,
-        this.cursorDuration / 2,
-        '_tick'
-      );
-    }, 100);
+  private _tick(delay?: number) {
+    this._currentTickState = this._animateCursor({
+      toValue: 1,
+      duration: this.cursorDuration,
+      delay,
+      onComplete: this._onTickComplete,
+    });
+  }
+
+  private _onTickComplete() {
+    this._currentTickCompleteState?.abort();
+    this._currentTickCompleteState = this._animateCursor({
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: 100,
+      onComplete: this._tick,
+    });
   }
 
   /**
    * Initializes delayed cursor
    */
   initDelayedCursor(restart?: boolean) {
-    const delay = restart ? 0 : this.cursorDelay;
-
     this.abortCursorAnimation();
-    if (delay) {
-      this._cursorTimeout2 = setTimeout(() => {
-        this._tick();
-      }, delay);
-    } else {
-      this._tick();
-    }
+    this._tick(restart ? 0 : this.cursorDelay);
   }
 
   /**
    * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
    */
   abortCursorAnimation() {
-    const shouldClear =
-      this._currentTickState || this._currentTickCompleteState;
-    this._currentTickState && this._currentTickState.abort();
-    this._currentTickCompleteState && this._currentTickCompleteState.abort();
-
-    clearTimeout(this._cursorTimeout1);
-    clearTimeout(this._cursorTimeout2);
+    let shouldClear = false;
+    [this._currentTickState, this._currentTickCompleteState].forEach(
+      (cursorAnimation) => {
+        if (cursorAnimation && !cursorAnimation.isDone()) {
+          shouldClear = true;
+          cursorAnimation.abort();
+        }
+      }
+    );
 
     this._currentCursorOpacity = 1;
 
@@ -207,10 +197,9 @@ export abstract class ITextBehaviorMixin<
 
   restartCursorIfNeeded() {
     if (
-      !this._currentTickState ||
-      this._currentTickState.isAborted ||
-      !this._currentTickCompleteState ||
-      this._currentTickCompleteState.isAborted
+      [this._currentTickState, this._currentTickCompleteState].some(
+        (cursorAnimation) => !cursorAnimation || cursorAnimation.isDone()
+      )
     ) {
       this.initDelayedCursor();
     }
@@ -953,15 +942,12 @@ export abstract class ITextBehaviorMixin<
   }
 
   /**
-   * Exits from editing state
+   * runs the actual logic that exits from editing state, see {@link exitEditing}
    */
-  exitEditing() {
-    const isTextChanged = this._textBeforeEdit !== this.text;
+  protected _exitEditing() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
-
-    this.selectionEnd = this.selectionStart;
 
     if (hiddenTextarea) {
       hiddenTextarea.blur && hiddenTextarea.blur();
@@ -970,6 +956,15 @@ export abstract class ITextBehaviorMixin<
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
+  }
+
+  /**
+   * Exits from editing state and fires relevant events
+   */
+  exitEditing() {
+    const isTextChanged = this._textBeforeEdit !== this.text;
+    this.selectionEnd = this.selectionStart;
+    this._exitEditing();
     this._restoreEditingProps();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();
