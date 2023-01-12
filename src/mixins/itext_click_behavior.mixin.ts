@@ -112,7 +112,7 @@ export abstract class ITextClickBehaviorMixin<
       return;
     }
 
-    this.__isMousedown = true;
+    this.canvas.textEditingManager.register(this);
 
     if (this.selected) {
       this.inCompositionMode = false;
@@ -174,7 +174,18 @@ export abstract class ITextClickBehaviorMixin<
    */
   mouseUpHandler(options: TransformEvent) {
     const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
-    this.__isMousedown = this.__isDragging = false;
+    this.__isDragging = false;
+    if (this.canvas) {
+      this.canvas.textEditingManager.unregister(this);
+
+      const activeObject = this.canvas._activeObject;
+      if (activeObject && activeObject !== this) {
+        // avoid running this logic when there is an active object
+        // this because is possible with shift click and fast clicks,
+        // to rapidly deselect and reselect this object and trigger an enterEdit
+        return;
+      }
+    }
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
@@ -184,16 +195,8 @@ export abstract class ITextClickBehaviorMixin<
       return;
     }
 
-    if (this.canvas) {
-      const currentActive = this.canvas._activeObject;
-      if (currentActive && currentActive !== this) {
-        // avoid running this logic when there is an active object
-        // this because is possible with shift click and fast clicks,
-        // to rapidly deselect and reselect this object and trigger an enterEdit
-        return;
-      }
-    }
     shouldSetCursor && this.setCursorByClick(options.e);
+
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;
       this.__lastSelected = false;

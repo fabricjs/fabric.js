@@ -1,4 +1,5 @@
 // @ts-nocheck
+import type { Canvas } from '../canvas/canvas_events';
 import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
@@ -7,9 +8,8 @@ import {
   keysMap,
   keysMapRtl,
 } from '../mixins/itext_key_const';
-import { classRegistry } from '../util/class_registry';
 import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
-import type { Canvas } from '../canvas/canvas_events';
+import { classRegistry } from '../util/class_registry';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
@@ -167,10 +167,14 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
-    } else {
-      super._set(key, value);
+      return this;
     }
-    return this;
+    if (key === 'canvas') {
+      this.canvas instanceof Canvas &&
+        this.canvas.textEditingManager.remove(this);
+      value instanceof Canvas && value.textEditingManager.add(this);
+    }
+    return super._set(key, value);
   }
 
   /**
@@ -442,7 +446,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     ctx.fillStyle =
       this.cursorColor ||
       this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+    ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
       topOffset + boundaries.top + dy,
@@ -610,6 +614,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
       charIndex =
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
+  }
+
+  dispose() {
+    this._exitEditing();
+    super.dispose();
   }
 }
 
