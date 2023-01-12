@@ -11,6 +11,7 @@
 - fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 \- chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
+- refactor(Canvas, IText): Handle cross instance text editing states to an EditingManager class [#8543](https://github.com/fabricjs/fabric.js/pull/8543)
 - chore(TS): move to export, babel, new rollup, change import statement for fabric. [#8585](https://github.com/fabricjs/fabric.js/pull/8585);
 - chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
 - refactor(Animation): BREAKING: Animation api reduction and semplification (byValue is removed, '+=' syntax is removed, callbacks fired 100%) [#8547](https://github.com/fabricjs/fabric.js/pull/8547)

@@ -9,6 +9,7 @@ import {
 } from '../mixins/itext_key_const';
 import { classRegistry } from '../util/class_registry';
 import { TClassProperties, TFiller } from '../typedefs';
+import { Canvas } from '../canvas/canvas_events';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
@@ -166,10 +167,14 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
-    } else {
-      super._set(key, value);
+      return this;
     }
-    return this;
+    if (key === 'canvas') {
+      this.canvas instanceof Canvas &&
+        this.canvas.textEditingManager.remove(this);
+      value instanceof Canvas && value.textEditingManager.add(this);
+    }
+    return super._set(key, value);
   }
 
   /**
@@ -429,7 +434,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     ctx.fillStyle =
       this.cursorColor ||
       this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+    ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
       topOffset + boundaries.top + dy,
