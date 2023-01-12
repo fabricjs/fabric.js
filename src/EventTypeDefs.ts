@@ -156,7 +156,7 @@ export type DragEventData = TEvent<DragEvent> & {
   dropTarget?: FabricObject;
 };
 
-type DropEventData = DragEventData & { pointer: Point };
+export type DropEventData = DragEventData & { pointer: Point };
 
 type DnDEvents = {
   dragstart: TEventWithTarget<DragEvent>;

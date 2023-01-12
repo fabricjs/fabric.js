@@ -1,7 +1,13 @@
 // @ts-nocheck
 
 import { getEnv } from '../env';
-import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
+import {
+  DragEventData,
+  DropEventData,
+  ObjectEvents,
+  TEvent,
+  TPointerEvent,
+} from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
@@ -573,7 +579,7 @@ export abstract class ITextBehaviorMixin<
    * @param {object} options
    * @param {DragEvent} options.e
    */
-  dragEnterHandler({ e }: TEvent<DragEvent>) {
+  dragEnterHandler({ e }: DragEventData) {
     const canDrop = !e.defaultPrevented && this.canDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
@@ -586,7 +592,7 @@ export abstract class ITextBehaviorMixin<
    * @param {object} options
    * @param {DragEvent} options.e
    */
-  dragOverHandler(ev: TEvent<DragEvent>) {
+  dragOverHandler(ev: DragEventData) {
     const { e } = ev;
     const canDrop = !e.defaultPrevented && this.canDrop(e);
     if (!this.__isDraggingOver && canDrop) {
@@ -624,7 +630,7 @@ export abstract class ITextBehaviorMixin<
    * @param {object} options
    * @param {DragEvent} options.e
    */
-  dragEndHandler({ e }: TEvent<DragEvent>) {
+  dragEndHandler({ e }: DragEventData) {
     if (this.__isDragging && this.__dragStartFired) {
       //  once the drop event finishes we check if we need to change the drag source
       //  if the drag source received the drop we bail out
@@ -671,7 +677,7 @@ export abstract class ITextBehaviorMixin<
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
    * @private
    */
-  dropHandler(ev: TEvent<DragEvent>) {
+  dropHandler(ev: DropEventData) {
     const { e } = ev;
     const didDrop = e.defaultPrevented;
     this.__isDraggingOver = false;
