@@ -518,7 +518,7 @@
   tests.push({
     test: 'Draggable text drag image',
     code: dragImage.bind(null, {}),
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'drag_image.png',
     width: 120,
     height: 220,
@@ -529,7 +529,7 @@
   tests.push({
     test: 'Draggable text drag image + retina scaling',
     code: dragImage.bind(null, { retinaScaling: 3 }),
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'drag_image.png',
     width: 110,
     height: 250,
@@ -540,7 +540,7 @@
   tests.push({
     test: 'Draggable text drag image + vpt',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250] }),
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
@@ -551,7 +551,7 @@
   tests.push({
     test: 'Draggable text drag image + vpt + retina',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250], retinaScaling: 1.25 }),
-    disabled: fabric.isLikelyNode,
+    disabled: fabric.getEnv().isLikelyNode,
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
