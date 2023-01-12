@@ -22,6 +22,7 @@ import {
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './canvas.class';
+import { TextEditingManager } from './TextEditingManager';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -123,6 +124,8 @@ export class Canvas extends SelectableCanvas {
    */
   declare _previousPointer: Point;
 
+  textEditingManager = new TextEditingManager();
+
   /**
    * Adds mouse listeners to canvas
    * @private
@@ -133,7 +136,6 @@ export class Canvas extends SelectableCanvas {
     // this is a workaround to having double listeners.
     this.removeListeners();
     this._bindEvents();
-    // @ts-ginore
     this.addOrRemove(addListener, 'add');
   }
 
@@ -1225,6 +1227,7 @@ export class Canvas extends SelectableCanvas {
     } else {
       this._transformObject(e);
     }
+    this.textEditingManager.onMouseMove(e);
     this._handleEvent(e, 'move');
     this._resetTransformEventData();
   }
@@ -1638,6 +1641,26 @@ export class Canvas extends SelectableCanvas {
     this.setCursor(this.defaultCursor);
     // clear selection and current transformation
     this._groupSelector = null;
+  }
+
+  exitTextEditing() {
+    this.textEditingManager.exitTextEditing();
+  }
+
+  /**
+   * @override clear {@link textEditingManager}
+   */
+  clear() {
+    this.textEditingManager.dispose();
+    super.clear();
+  }
+
+  /**
+   * @override clear {@link textEditingManager}
+   */
+  destroy() {
+    super.destroy();
+    this.textEditingManager.dispose();
   }
 
   /**
