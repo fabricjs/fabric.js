@@ -10,7 +10,6 @@ import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
-import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
@@ -45,7 +44,6 @@ export abstract class ITextBehaviorMixin<
   private declare _currentTickCompleteState?: ValueAnimation;
   protected declare _currentCursorOpacity: number;
   private declare _textBeforeEdit: string;
-  protected declare __isMousedown: boolean;
   protected declare __selectionStartOnMouseDown: number;
   private declare __dragImageDisposer: VoidFunction;
   private declare __dragStartFired: boolean;
@@ -90,13 +88,12 @@ export abstract class ITextBehaviorMixin<
    * Initializes all the interactive behavior of IText
    */
   initBehavior() {
-    this.initAddedHandler();
-    this.initRemovedHandler();
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
     this._tick = this._tick.bind(this);
     this._onTickComplete = this._onTickComplete.bind(this);
-    this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+    this.updateSelectionOnMouseMove =
+      this.updateSelectionOnMouseMove.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
     this.dragOverHandler = this.dragOverHandler.bind(this);
     this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
@@ -113,62 +110,6 @@ export abstract class ITextBehaviorMixin<
     this.isEditing && this.exitEditing();
     this.selected = false;
     return super.onDeselect(options);
-  }
-
-  /**
-   * Initializes "added" event handler
-   */
-  initAddedHandler() {
-    this.on('added', (opt) => {
-      //  make sure we listen to the canvas added event
-      const canvas = opt.target;
-      if (canvas) {
-        if (!canvas._hasITextHandlers) {
-          canvas._hasITextHandlers = true;
-          this._initCanvasHandlers(canvas);
-        }
-        canvas._iTextInstances = canvas._iTextInstances || [];
-        canvas._iTextInstances.push(this);
-      }
-    });
-  }
-
-  initRemovedHandler() {
-    this.on('removed', (opt) => {
-      //  make sure we listen to the canvas removed event
-      const canvas = opt.target;
-      if (canvas) {
-        canvas._iTextInstances = canvas._iTextInstances || [];
-        removeFromArray(canvas._iTextInstances, this);
-        if (canvas._iTextInstances.length === 0) {
-          canvas._hasITextHandlers = false;
-          this._removeCanvasHandlers(canvas);
-        }
-      }
-    });
-  }
-
-  /**
-   * register canvas event to manage exiting on other instances
-   * @private
-   */
-  _initCanvasHandlers(canvas: Canvas) {
-    canvas._mouseUpITextHandler = function () {
-      if (canvas._iTextInstances) {
-        canvas._iTextInstances.forEach((tObj) => {
-          tObj.__isMousedown = false;
-        });
-      }
-    };
-    canvas.on('mouse:up', canvas._mouseUpITextHandler);
-  }
-
-  /**
-   * remove canvas event to manage exiting on other instances
-   * @private
-   */
-  _removeCanvasHandlers(canvas: Canvas) {
-    canvas.off('mouse:up', canvas._mouseUpITextHandler);
   }
 
   /**
@@ -435,7 +376,7 @@ export abstract class ITextBehaviorMixin<
     }
     if (this.canvas) {
       this.canvas.calcOffset();
-      this.exitEditingOnOthers(this.canvas);
+      this.canvas.textEditingManager.exitTextEditing();
     }
 
     this.isEditing = true;
@@ -451,46 +392,21 @@ export abstract class ITextBehaviorMixin<
     this._tick();
     this.fire('editing:entered');
     this._fireSelectionChanged();
-    if (!this.canvas) {
-      return this;
-    }
-    this.canvas.fire('text:editing:entered', { target: this });
-    this.initMouseMoveHandler();
-    this.canvas.requestRenderAll();
-    return this;
-  }
-
-  exitEditingOnOthers(canvas: Canvas) {
-    if (canvas._iTextInstances) {
-      canvas._iTextInstances.forEach((obj) => {
-        obj.selected = false;
-        if (obj.isEditing) {
-          obj.exitEditing();
-        }
-      });
+    if (this.canvas) {
+      this.canvas.fire('text:editing:entered', { target: this });
+      this.canvas.requestRenderAll();
     }
   }
 
   /**
-   * Initializes "mousemove" event handler
+   * called by {@link canvas#textEditingManager}
    */
-  initMouseMoveHandler() {
-    this.canvas.on('mouse:move', this.mouseMoveHandler);
-  }
-
-  /**
-   * @private
-   */
-  mouseMoveHandler(options) {
-    if (!this.__isMousedown || !this.isEditing) {
-      return;
-    }
-
+  updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
     getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
 
-    const newSelectionStart = this.getSelectionStartFromPointer(options.e),
+    const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
       currentEnd = this.selectionEnd;
     if (
@@ -511,7 +427,6 @@ export abstract class ITextBehaviorMixin<
       this.selectionStart !== currentStart ||
       this.selectionEnd !== currentEnd
     ) {
-      this.restartCursorIfNeeded();
       this._fireSelectionChanged();
       this._updateTextarea();
       this.renderCursorOrSelection();
@@ -1058,7 +973,6 @@ export abstract class ITextBehaviorMixin<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
-      this.canvas.off('mouse:move', this.mouseMoveHandler);
       this.canvas.fire('text:editing:exited', { target: this });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
