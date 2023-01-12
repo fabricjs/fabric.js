@@ -150,7 +150,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  actionHandler: TransformActionHandler;
+  declare actionHandler: TransformActionHandler;
 
   /**
    * The control handler for mouse down, provide one to handle mouse down on control
@@ -160,7 +160,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseDownHandler?: ControlActionHandler;
+  declare mouseDownHandler?: ControlActionHandler;
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -170,7 +170,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseUpHandler?: ControlActionHandler;
+  declare mouseUpHandler?: ControlActionHandler;
 
   /**
    * Returns control actionHandler

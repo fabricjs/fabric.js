@@ -1,11 +1,11 @@
 import { Color } from '../color/color.class';
-import type { Point } from '../point.class';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
+import { Canvas } from '../canvas.class';
 
 export type TBrushEventData = TEvent & { pointer: Point };
 
@@ -77,9 +77,9 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
    * The clip path is positioned relative to the top left corner of the viewport.
    * The `absolutePositioned` property renders the clip path w/o viewport transform.
    */
-  clipPath?: FabricObject;
+  declare clipPath?: FabricObject;
 
-  readonly canvas: Canvas;
+  declare readonly canvas: Canvas;
 
   active = false;
 

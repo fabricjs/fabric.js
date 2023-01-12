@@ -22,7 +22,7 @@ export class CircleBrush extends BaseBrush<FabricObject> {
    */
   width = 10;
 
-  points: CircleBrushPoint[];
+  declare points: CircleBrushPoint[];
 
   constructor(canvas: Canvas) {
     super(canvas);

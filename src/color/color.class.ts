@@ -24,7 +24,7 @@ export type TColorArg = string | TRGBColorSource | TRGBAColorSource | Color;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
-  private _source: TRGBAColorSource;
+  private declare _source: TRGBAColorSource;
 
   /**
    *

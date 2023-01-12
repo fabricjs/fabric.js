@@ -15,24 +15,24 @@ const defaultAbort = () => false;
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
-  readonly startValue: T;
-  readonly endValue: T;
-  readonly duration: number;
-  readonly delay: number;
+  declare readonly startValue: T;
+  declare readonly endValue: T;
+  declare readonly duration: number;
+  declare readonly delay: number;
 
-  protected readonly byValue: T;
-  protected readonly easing: TEasingFunction<T>;
+  protected declare readonly byValue: T;
+  protected declare readonly easing: TEasingFunction<T>;
 
-  private readonly _onStart: VoidFunction;
-  private readonly _onChange: TOnAnimationChangeCallback<T, void>;
-  private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
-  private readonly _abort: TAbortCallback<T>;
+  private declare readonly _onStart: VoidFunction;
+  private declare readonly _onChange: TOnAnimationChangeCallback<T, void>;
+  private declare readonly _onComplete: TOnAnimationChangeCallback<T, void>;
+  private declare readonly _abort: TAbortCallback<T>;
 
   /**
    * Used to register the animation to a target object
    * so that it can be cancelled within the object context
    */
-  readonly target?: unknown;
+  declare readonly target?: unknown;
 
   private _state: AnimationState = 'pending';
   /**
@@ -47,11 +47,11 @@ export abstract class AnimationBase<
   /**
    * Current value
    */
-  value: T;
+  declare value: T;
   /**
    * Animation start time ms
    */
-  private startTime!: number;
+  private declare startTime: number;
 
   constructor({
     startValue,
