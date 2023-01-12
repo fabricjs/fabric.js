@@ -86,6 +86,10 @@ export abstract class AnimationBase<
     return this._state;
   }
 
+  isDone() {
+    return this._state === 'aborted' || this._state === 'completed';
+  }
+
   /**
    * Calculate the current value based on the easing parameters
    * @param timeElapsed in ms

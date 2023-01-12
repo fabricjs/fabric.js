@@ -269,8 +269,9 @@
 
     assert.ok(typeof object.animate === 'function');
 
-    object.animate({ left: 40 });
-    assert.ok(true, 'animate without options does not crash');
+    const context = object.animate({ left: 40 });
+    assert.deepEqual(Object.keys(context), ['left'], 'should return a map of animation classes');
+    assert.equal(context.left.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
     assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
     assert.equal(fabric.runningAnimations[0].target, object, 'animation.target should be set');
 
@@ -347,7 +348,10 @@
   QUnit.test('animate multiple properties', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
-    object.animate({ left: 223, top: 224 });
+    const context = object.animate({ left: 223, top: 224 });
+    assert.deepEqual(Object.keys(context), ['left', 'top'], 'should return a map of animation classes');
+    assert.equal(context.left.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
+    assert.equal(context.top.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
     setTimeout(function() {
       assert.equal(223, Math.round(object.get('left')));
       assert.equal(224, Math.round(object.get('top')));
