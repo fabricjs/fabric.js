@@ -607,7 +607,6 @@ export abstract class ITextBehaviorMixin<
       //  inform event subscribers
       ev.canDrop = true;
       ev.dropTarget = this;
-      // find cursor under the drag part.
     }
   }
 
