@@ -157,28 +157,3 @@ QUnit.assert.strictEqual = function (actual, expected, message) {
     message
   });
 };
-/**
-   * Checks that the first two arguments are equal, or are numbers close enough to be considered equal
-   * based on a specified maximum allowable difference.
-   * Credits: https://github.com/JamesMGreene/qunit-assert-close/blob/master/qunit-assert-close.js
-   *
-   * @example assert.close(3.141, Math.PI, 0.001);
-   *
-   * @param Number actual
-   * @param Number expected
-   * @param Number maxDifference (the maximum inclusive difference allowed between the actual and expected numbers)
-   * @param String message (optional)
-   */
-QUnit.assert.close = function(actual, expected, maxDifference, message) {
-  const actualDiff = (actual === expected) ? 0 : Math.abs(actual - expected),
-      result = actualDiff <= maxDifference;
-
-  message = message || (actual + " should be within " + maxDifference + " (inclusive) of " + expected + (result ? "" : ". Actual: " + actualDiff));
-
-  this.pushResult({
-    result,
-    actual: actualDiff,
-    expected: maxDifference,
-    message
-  })
-};
