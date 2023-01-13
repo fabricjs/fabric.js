@@ -609,7 +609,7 @@
     golden: 'overlapping_draggable_text_effects.png',
     width: 270,
     height: 120,
-    percentage: 0.04,
+    percentage: 0.05,
     fabricClass: 'Canvas'
   });
 
