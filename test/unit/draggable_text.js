@@ -1,3 +1,14 @@
+function assertDragEventStream(name, a, b) {
+    QUnit.assert.equal(a.length, b.length, `${name} event stream should be same in size`);
+    a.forEach(({ target, dragSource, dropTarget, ..._a }, index) => {
+        const { target: targetB, dragSource: dragSourceB, dropTarget: dropTargetB, ..._b } = b[index];
+        QUnit.assert.equal(target, targetB, `target should match ${index}`);
+        QUnit.assert.equal(dragSource, dragSourceB, `dragSource should match ${index}`);
+        QUnit.assert.equal(dropTarget, dropTargetB, `dropTarget should match ${index}`);
+        QUnit.assert.deepEqual(_a, _b, `event ${index} should match`);
+    });
+}
+
 (fabric.getEnv().isLikelyNode ? QUnit.module.skip : QUnit.module)('draggable text', function (hooks) {
     let canvas;
     hooks.before(function () {
@@ -102,6 +113,19 @@
                 return e;
             }
 
+            function createDragEvent(x = eventData.clientX, y = eventData.clientY) {
+                return {
+                    ...eventData,
+                    defaultPrevented: false,
+                    clientX: x,
+                    clientY: y,
+                };
+            }
+
+            function fireDragOver(x = eventData.clientX, y = eventData.clientY) {
+                canvas._onDragOver(createDragEvent(x, y));
+            }
+
             QUnit.test('click sets cursor', function (assert) {
                 assert.equal(count, 0, 'selection:changed fired');
                 assert.equal(countCanvas, 0, 'text:selection:changed fired');
@@ -156,20 +180,180 @@
                 assert.deepEqual(eventStream.canvas, eventStream.source, 'events should match');
             });
 
-            QUnit.test.skip('drag over', function (assert) {
+            QUnit.test('drag over: source', function (assert) {
                 const e = startDragging(eventData);
-                for (let index = 0; index < 350; index++) {
-                    canvas._onDragOver({
-                        ...eventData,
-                        defaultPrevented: false,
-                        clientX: eventData.clientX + index * (enableRetinaScaling ? canvas._getRetinaScaling() : 1)
-                    });
+                const dragEvents = [];
+                let index;
+                for (index = 0; index < 100; index++) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const dragEnd = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                canvas._onDragEnd(dragEnd);
+                assertDragEventStream('source', eventStream.source, [
+                    { e, target: iText, type: 'dragstart' },
+                    {
+                        e: dragEvents[0],
+                        target: iText,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(30, 15),
+                        absolutePointer: new fabric.Point(30, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 32).map(e => ({
+                        e,
+                        target: iText,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false
+                    })),
+                    ...dragEvents.slice(32, 93).map(e => ({
+                        e,
+                        target: iText,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText,
+                        canDrop: true
+                    })),
+                    {
+                        e: dragEvents[93],
+                        target: iText,
+                        type: 'dragleave',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(123, 15),
+                        absolutePointer: new fabric.Point(123, 15),
+                        isClick: false,
+                        nextTarget: undefined
+                    },
+                    {
+                        e: dragEnd,
+                        target: iText,
+                        type: 'dragend',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        didDrop: false,
+                    }
+                ]);
+            });
+            
+            QUnit.test('drag over: target', function (assert) {
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 180; index < 190; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                for (index = 0; index <= 20; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + 190 * canvas.getRetinaScaling(), eventData.clientY - index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const dragEnd = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                canvas._onDragEnd(dragEnd);
+                assertDragEventStream('source in target test', eventStream.source, [
+                    { e, target: iText, type: 'dragstart' },
+                    {
+                        e: dragEnd,
+                        target: iText,
+                        type: 'dragend',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        didDrop: false,
+                    }
+                ]);
+                assertDragEventStream('target', eventStream.target, [
+                    {
+                        e: dragEvents[0],
+                        target: iText2,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(210, 15),
+                        absolutePointer: new fabric.Point(210, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 5).map(e => ({
+                        e,
+                        target: iText2,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText2,
+                        canDrop: true
+                    })),
+                    {
+                        e: dragEvents[5],
+                        target: iText2,
+                        type: 'dragleave',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(220, 0),
+                        absolutePointer: new fabric.Point(220, 0),
+                        isClick: false,
+                        nextTarget: undefined
+                    },
+                ]);
+                assert.deepEqual(renderEffects, [
+                    ...dragEvents.slice(0, 5).map(e => ({ e, source: iText, target: iText2 })),
+                    ...dragEvents.slice(5).map(e => ({ e, source: iText, target: undefined })),
+                ], 'render effects');
+            });
+
+            QUnit.test('drag over: canvas', function (assert) {
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 0; index < 10; index++) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
                 }
                 // canvas._onDrop(dragEvent);
-                // canvas._onDragEnd(dragEvent);
-                console.log(eventStream)
-                // assert.deepEqual(renderEffects, [{ e: eventData, source: iText, target: iText }]);
-            })
+                const dragEnd = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                canvas._onDragEnd(dragEnd);
+                assertDragEventStream('canvas', eventStream.canvas, [
+                    { e, target: iText, type: 'dragstart' },
+                    ...dragEvents.map(e => ({
+                        e,
+                        target: iText,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false
+                    })),
+                    {
+                        e: dragEnd,
+                        target: iText,
+                        type: 'dragend',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        didDrop: false,
+                    }
+                ]);
+            });
         });
     });
 });
