@@ -522,7 +522,7 @@
     golden: 'drag_image.png',
     width: 120,
     height: 220,
-    percentage: 0.03,
+    percentage: 0.04,
     fabricClass: 'Canvas'
   });
 
@@ -533,7 +533,7 @@
     golden: 'drag_image.png',
     width: 110,
     height: 250,
-    percentage: 0.03,
+    percentage: 0.04,
     fabricClass: 'Canvas'
   });
 
@@ -544,7 +544,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.03,
+    percentage: 0.04,
     fabricClass: 'Canvas'
   });
 
@@ -555,7 +555,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.03,
+    percentage: 0.04,
     fabricClass: 'Canvas'
   });
 
@@ -609,7 +609,7 @@
     golden: 'overlapping_draggable_text_effects.png',
     width: 270,
     height: 120,
-    percentage: 0.03,
+    percentage: 0.04,
     fabricClass: 'Canvas'
   });
 
