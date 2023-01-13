@@ -377,6 +377,9 @@ function assertDragEventStream(name, a, b) {
                 const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'move' });
                 canvas._onDrop(drop);
                 canvas._onDragEnd(drop);
+                assert.equal(iText.text, ' testestt', 'text after drop');
+                assert.equal(iText.selectionStart, 4, 'selection after drop');
+                assert.equal(iText.selectionEnd, 8, 'selection after drop');
                 assertDragEventStream('drop on drag source', eventStream.source, [
                     { e, target: iText, type: 'dragstart' },
                     {
@@ -425,6 +428,62 @@ function assertDragEventStream(name, a, b) {
                         dropTarget: iText,
                         didDrop: true,
                     }
+                ]);
+            });
+
+            QUnit.test('drop', function (assert) {
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 200; index < 210; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'move' });
+                canvas._onDrop(drop);
+                canvas._onDragEnd(drop);
+                assert.equal(iText2.text, 'testestt2 test2', 'text after drop');
+                assert.equal(iText2.selectionStart, 3, 'selection after drop');
+                assert.equal(iText2.selectionEnd, 7, 'selection after drop');
+                assertDragEventStream('drop', eventStream.target, [
+                    {
+                        e: dragEvents[0],
+                        target: iText2,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(230, 15),
+                        absolutePointer: new fabric.Point(230, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 2).map(e => ({
+                        e,
+                        target: iText2,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText2,
+                        canDrop: true
+                    })),
+                    {
+                        action: 'drop',
+                        index: 3,
+                        type: 'changed'
+                    },
+                    {
+                        e: drop,
+                        target: iText2,
+                        type: 'drop',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText2,
+                        didDrop: true,
+                        pointer: new fabric.Point(240, 15),
+                    },
                 ]);
             });
         });
