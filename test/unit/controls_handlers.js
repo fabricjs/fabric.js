@@ -9,10 +9,11 @@
       transform = prepareTransform(target, 'mr');
     });
     hooks.afterEach(function () {
+      canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
       canvas.off();
       canvas.clear();
     });
-    function prepareTransform(target, corner) {
+    var prepareTransform = function(target, corner) {
       var origin = canvas._getOriginFromCorner(target, corner);
       return {
         target,
@@ -318,5 +319,128 @@
         assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
       });
     });
+    // Poly custom controls
+    (function() {
+      const originPoints = [ 
+          { x: 0, y: 0 },    //p0
+          { x: 10, y: 0 },   //p1  
+          { x: 10, y: 10 },  //p2
+          { x: 0, y: 10 }    //p3
+        ],
+        polyControls = new fabric.controlsUtils.createPolyControls(originPoints.length),
+        createPoly = (points, options = {}) => {
+          const poly = new fabric.Polygon(
+            points.slice(),
+            {
+              scaleX: options.scaleX ?? 1,
+              scaleY: options.scaleY ?? 1,
+              skewX: options.skewX ?? 0,
+              skewY: options.skewY ?? 0,
+              flipX: options.flipX ?? false,
+              flipY: options.flipY ?? false,
+              angle: 0
+            }
+          );
+          poly.controls = polyControls;
+          return poly
+        },
+        polyPrepareTransform = (target) => {
+          const transform = prepareTransform(target, 'p3');
+          transform.pointIndex = 3;
+          return transform;
+        },
+        polyPositionHandler = polyControls['p3'].positionHandler,
+        polyActionHandler = polyControls['p3'].actionHandler,
+        maxDiffAllowed = 0.000000009;
+      [
+        {
+          name: 'Canvas: no transformation, Object: no transformation',
+          objectOptions: {},
+          canvasOptions: {},
+          expectedObjPosition: new fabric.Point(-0.536585365853659, -0.3606557377049171),
+          expectedControlPoint: new fabric.Point(18.636363636363637, 27.727272727272727),
+          expectedRenderPoint: new fabric.Point(0, 10)
+        },
+        {
+          name: 'Canvas: scaled, Object: scaled',
+          objectOptions: { scaleX: 2, scaleY: 3 },
+          canvasOptions: { scaleX: 3, scaleY: 4 },
+          expectedObjPosition: new fabric.Point(-1.5, -1.9999999999999964),
+          expectedControlPoint: new fabric.Point(9.318181818181818, 9.242424242424242),
+          expectedRenderPoint: new fabric.Point(1.5, 124)
+        },
+        {
+          name: 'Canvas: scaled, Object: rotated',
+          objectOptions: { angle: 30 },
+          canvasOptions: { scaleX: 3, scaleY: 4 },
+          expectedObjPosition: new fabric.Point(-0.536585365853659, -0.3606557377049171),
+          expectedControlPoint: new fabric.Point(18.636363636363637, 27.727272727272727),
+          expectedRenderPoint: new fabric.Point(0, 40)
+        },
+        {
+          name: 'Canvas: scaled, Object: flipped',
+          objectOptions: { flipX: true, flipY: true },
+          canvasOptions: { scaleX: 3, scaleY: 4 },
+          expectedObjPosition: new fabric.Point(0, 0),
+          expectedControlPoint: new fabric.Point(-8.636363636363637, -17.727272727272727),
+          expectedRenderPoint: new fabric.Point(30, 0)
+        },
+        {
+          name: 'Canvas: scaled, Object: scaled, rotated and flipped',
+          objectOptions: { scaleX: 2, scaleY: 3, angle: 30, flipX: true, flipY: true },
+          canvasOptions: { scaleX: 3, scaleY: 4 },
+          expectedObjPosition: new fabric.Point(0.5, 1),
+          expectedControlPoint: new fabric.Point(0.6818181818181817, 0.7575757575757578),
+          expectedRenderPoint: new fabric.Point(61.5, 4)
+        }
+      ].forEach(testCase => {
+        QUnit.test(`polyActionHandler: keeps object in same position. ${testCase.name}`, function (assert) {
+          const target = createPoly(originPoints, testCase.objectOptions),
+            transform = polyPrepareTransform(target),
+            mousePosition = new fabric.Point(20, 30),
+            vpt = fabric.util.composeMatrix(testCase.canvasOptions);
+          canvas.setViewportTransform(vpt);
+          canvas.add(target);
+          assert.ok(polyActionHandler(eventData, transform, mousePosition.x, mousePosition.y));
+          assert.close(target.left, testCase.expectedObjPosition.x, maxDiffAllowed);
+          assert.close(target.top, testCase.expectedObjPosition.y, maxDiffAllowed);
+        });
+        QUnit.test(`polyActionHandler: set control point at the mouse position. ${testCase.name}`, function (assert) {
+          const target = createPoly(originPoints, testCase.objectOptions),
+            transform = polyPrepareTransform(target),
+            pointIndex = transform.pointIndex,
+            mousePosition = new fabric.Point(20, 30),
+            vpt = fabric.util.composeMatrix(testCase.canvasOptions);
+          canvas.setViewportTransform(vpt);
+          canvas.add(target);
+          assert.ok(polyActionHandler(eventData, transform, mousePosition.x, mousePosition.y));
+          assert.close(target.points[pointIndex].x, testCase.expectedControlPoint.x, maxDiffAllowed);
+          assert.close(target.points[pointIndex].y, testCase.expectedControlPoint.y, maxDiffAllowed);
+        });
+        QUnit.test(`polyPositionHandler: locates the control. ${testCase.name}`, function (assert) {
+          const target = createPoly(originPoints, testCase.objectOptions),
+            dim = new fabric.Point(),
+            finalMatrix = [],
+            vpt = fabric.util.composeMatrix(testCase.canvasOptions);
+          canvas.setViewportTransform(vpt);
+          canvas.add(target);
+          const renderPoint = polyPositionHandler(dim, finalMatrix, target);
+          assert.close(renderPoint.x, testCase.expectedRenderPoint.x, maxDiffAllowed);
+          assert.close(renderPoint.y, testCase.expectedRenderPoint.y, maxDiffAllowed);
+        });
+      });
+      QUnit.test('createPolyControls options override default values', function (assert) {
+        const cursorStyle = 'pointer',
+          customControls = new fabric.controlsUtils.createPolyControls(
+            originPoints.length,
+            {
+              cursorStyle
+            }
+          );
+        Object.values(customControls).forEach(corner =>
+          assert.equal(corner.cursorStyle, cursorStyle)   
+        );
+      });
+    })();
   });
 })();
