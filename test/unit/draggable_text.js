@@ -54,7 +54,13 @@ function assertDragEventStream(name, a, b) {
                     },
                     dataTransfer: {
                         data: {},
+                        get types() {
+                            return Object.keys(this.data);
+                        },
                         dropEffect: 'none',
+                        getData(type) {
+                            return this.data[type];
+                        },
                         setData(type, value) {
                             this.data[type] = value;
                         },
@@ -90,7 +96,7 @@ function assertDragEventStream(name, a, b) {
                     source: [],
                     target: [],
                 };
-                ['dragstart', 'dragover', 'drag', 'dragenter', 'dragleave', 'drop', 'dragend'].forEach(type => {
+                ['dragstart', 'dragover', 'drag', 'dragenter', 'dragleave', 'drop', 'dragend', 'changed', 'text:changed'].forEach(type => {
                     canvas.on(type, (ev) => {
                         eventStream.canvas.push({ ...ev, type });
                     });
@@ -113,12 +119,16 @@ function assertDragEventStream(name, a, b) {
                 return e;
             }
 
-            function createDragEvent(x = eventData.clientX, y = eventData.clientY) {
+            function createDragEvent(x = eventData.clientX, y = eventData.clientY, dataTransfer = {}) {
                 return {
                     ...eventData,
                     defaultPrevented: false,
                     clientX: x,
                     clientY: y,
+                    dataTransfer: {
+                        ...eventData.dataTransfer,
+                        ...dataTransfer
+                    }
                 };
             }
 
@@ -351,6 +361,69 @@ function assertDragEventStream(name, a, b) {
                         dragSource: iText,
                         dropTarget: undefined,
                         didDrop: false,
+                    }
+                ]);
+            });
+
+            QUnit.test('drop on drag source', function (assert) {
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 70; index < 80; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'move' });
+                canvas._onDrop(drop);
+                canvas._onDragEnd(drop);
+                assertDragEventStream('drop on drag source', eventStream.source, [
+                    { e, target: iText, type: 'dragstart' },
+                    {
+                        e: dragEvents[0],
+                        target: iText,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(100, 15),
+                        absolutePointer: new fabric.Point(100, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 2).map(e => ({
+                        e,
+                        target: iText,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText,
+                        canDrop: true
+                    })),
+                    {
+                        action: 'drop',
+                        index: 4,
+                        type: 'changed'
+                    },
+                    {
+                        e: drop,
+                        target: iText,
+                        type: 'drop',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText,
+                        didDrop: true,
+                        pointer: new fabric.Point(110, 15),
+                    },
+                    {
+                        e: drop,
+                        target: iText,
+                        type: 'dragend',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: iText,
+                        didDrop: true,
                     }
                 ]);
             });
