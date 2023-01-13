@@ -9,6 +9,7 @@ import {
 } from '../mixins/itext_key_const';
 import { classRegistry } from '../util/class_registry';
 import { TClassProperties, TFiller } from '../typedefs';
+import { Canvas } from '../canvas/canvas_events';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
@@ -67,53 +68,53 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @type Number
    * @default
    */
-  selectionStart: number;
+  declare selectionStart: number;
 
   /**
    * Index where text selection ends
    * @type Number
    * @default
    */
-  selectionEnd: number;
+  declare selectionEnd: number;
 
-  compositionStart: number;
+  declare compositionStart: number;
 
-  compositionEnd: number;
+  declare compositionEnd: number;
 
   /**
    * Color of text selection
    * @type String
    * @default
    */
-  selectionColor: string;
+  declare selectionColor: string;
 
   /**
    * Indicates whether text is in editing mode
    * @type Boolean
    * @default
    */
-  isEditing: boolean;
+  declare isEditing: boolean;
 
   /**
    * Indicates whether a text can be edited
    * @type Boolean
    * @default
    */
-  editable: boolean;
+  declare editable: boolean;
 
   /**
    * Border color of text object while it's in editing mode
    * @type String
    * @default
    */
-  editingBorderColor: string;
+  declare editingBorderColor: string;
 
   /**
    * Width of cursor (in px)
    * @type Number
    * @default
    */
-  cursorWidth: number;
+  declare cursorWidth: number;
 
   /**
    * Color of text cursor color in editing mode.
@@ -123,28 +124,28 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @type String
    * @default
    */
-  cursorColor: string;
+  declare cursorColor: string;
 
   /**
    * Delay between cursor blink (in ms)
    * @type Number
    * @default
    */
-  cursorDelay: number;
+  declare cursorDelay: number;
 
   /**
    * Duration of cursor fade in (in ms)
    * @type Number
    * @default
    */
-  cursorDuration: number;
+  declare cursorDuration: number;
 
   /**
    * Indicates whether internal text char widths can be cached
    * @type Boolean
    * @default
    */
-  caching: boolean;
+  declare caching: boolean;
 
   /**
 
@@ -166,10 +167,14 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
       this._savedProps[key] = value;
-    } else {
-      super._set(key, value);
+      return this;
     }
-    return this;
+    if (key === 'canvas') {
+      this.canvas instanceof Canvas &&
+        this.canvas.textEditingManager.remove(this);
+      value instanceof Canvas && value.textEditingManager.add(this);
+    }
+    return super._set(key, value);
   }
 
   /**
@@ -429,7 +434,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     ctx.fillStyle =
       this.cursorColor ||
       this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
-    ctx.globalAlpha = this.__isMousedown ? 1 : this._currentCursorOpacity;
+    ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
       topOffset + boundaries.top + dy,
@@ -603,6 +608,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
   }
+
+  dispose() {
+    this._exitEditing();
+    super.dispose();
+  }
 }
 
 export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
@@ -619,9 +629,9 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _reSpace: /\s|\n/,
   _currentCursorOpacity: 1,
   _selectionDirection: null,
+  _reSpace: /\s|\n/,
   inCompositionMode: false,
   keysMap,
   keysMapRtl,

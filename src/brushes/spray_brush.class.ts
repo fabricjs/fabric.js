@@ -76,9 +76,9 @@ export class SprayBrush extends BaseBrush {
    */
   optimizeOverlapping = true;
 
-  private sprayChunks: SprayBrushPoint[][];
+  private declare sprayChunks: SprayBrushPoint[][];
 
-  private sprayChunk: SprayBrushPoint[];
+  private declare sprayChunk: SprayBrushPoint[];
 
   /**
    * Constructor

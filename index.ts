@@ -150,18 +150,18 @@ import {
 } from './src/util/dom_misc';
 import { isTransparent } from './src/util/misc/isTransparent';
 import { mergeClipPaths } from './src/util/misc/mergeClipPaths';
+import { animate, animateColor } from './src/util/animation/animate';
+import * as ease from './src/util/animation/easing';
 import {
-  animate,
-  animateColor,
-  ease,
   requestAnimFrame,
   cancelAnimFrame,
-} from './src/util/animation';
+} from './src/util/animation/AnimationFrameProvider';
 import { classRegistry } from './src/util/class_registry';
 import { removeFromArray } from './src/util/internals/removeFromArray';
 import { getRandomInt } from './src/util/internals/getRandomInt';
 import { wrapElement } from './src/util/dom_misc';
 import { request } from './src/util/dom_request';
+import { removeTransformMatrixForSvgParsing } from './src/util/transform_matrix_removal';
 import { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
 const util = {
@@ -254,6 +254,8 @@ const util = {
   requestAnimFrame,
   cancelAnimFrame,
   classRegistry,
+  // for test compatibility. We don't want to export it.
+  removeTransformMatrixForSvgParsing,
 };
 
 // CONTROLS UTILS
@@ -429,13 +431,4 @@ const fabric = {
   getCSSRules,
 };
 
-if (typeof exports !== 'undefined') {
-  exports.fabric = fabric;
-} else if (typeof define === 'function' && define.amd) {
-  /* _AMD_START_ */
-  define([], function () {
-    return fabric;
-  });
-} else if (typeof window !== 'undefined') {
-  window.fabric = fabric;
-}
+export default fabric;

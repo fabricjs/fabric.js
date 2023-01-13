@@ -1,15 +1,17 @@
 // @ts-nocheck
 
+import type { Canvas } from '../canvas/canvas_events';
 import { getEnv } from '../env';
-import { ObjectEvents, TEvent } from '../EventTypeDefs';
+import { ObjectEvents, TEvent, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
+import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
-import { TPointerEvent } from '../typedefs';
+import { animate } from '../util/animation/animate';
+import { TOnAnimationChangeCallback } from '../util/animation/types';
+import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
-import { removeFromArray } from '../util/internals';
 import { createCanvasElement } from '../util/misc/dom';
 import { transformPoint } from '../util/misc/matrix';
-import type { Canvas } from '../canvas/canvas_events';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
@@ -18,46 +20,43 @@ const reNonWord = /[ \n\.,;!\?\-]/;
 export abstract class ITextBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends Text<EventSpec> {
-  abstract isEditing: boolean;
-  abstract cursorDelay: number;
-  abstract selectionStart: number;
-  abstract selectionEnd: number;
-  abstract cursorDuration: number;
-  abstract editable: boolean;
-  abstract editingBorderColor: string;
+  declare abstract isEditing: boolean;
+  declare abstract cursorDelay: number;
+  declare abstract selectionStart: number;
+  declare abstract selectionEnd: number;
+  declare abstract cursorDuration: number;
+  declare abstract editable: boolean;
+  declare abstract editingBorderColor: string;
 
-  abstract compositionStart: number;
-  abstract compositionEnd: number;
+  declare abstract compositionStart: number;
+  declare abstract compositionEnd: number;
 
-  abstract hiddenTextarea: HTMLTextAreaElement;
+  declare abstract hiddenTextarea: HTMLTextAreaElement;
 
   /**
    * Helps determining when the text is in composition, so that the cursor
    * rendering is altered.
    */
-  protected inCompositionMode: boolean;
+  protected declare inCompositionMode: boolean;
 
-  protected _reSpace: RegExp;
-  private _currentTickState: { isAborted: boolean; abort: () => void };
-  private _cursorTimeout1: number;
-  private _cursorTimeout2: number;
-  private _currentTickCompleteState: { isAborted: boolean; abort: () => void };
-  protected _currentCursorOpacity: number;
-  private _textBeforeEdit: string;
-  protected __isMousedown: boolean;
-  protected __selectionStartOnMouseDown: number;
-  private __dragImageDisposer: VoidFunction;
-  private __dragStartFired: boolean;
-  protected __isDragging: boolean;
-  protected __dragStartSelection: {
+  protected declare _reSpace: RegExp;
+  private declare _currentTickState?: ValueAnimation;
+  private declare _currentTickCompleteState?: ValueAnimation;
+  protected declare _currentCursorOpacity: number;
+  private declare _textBeforeEdit: string;
+  protected declare __selectionStartOnMouseDown: number;
+  private declare __dragImageDisposer: VoidFunction;
+  private declare __dragStartFired: boolean;
+  protected declare __isDragging: boolean;
+  protected declare __dragStartSelection: {
     selectionStart: number;
     selectionEnd: number;
   };
-  protected __isDraggingOver: boolean;
-  protected selected: boolean;
-  protected __lastSelected: boolean;
-  protected cursorOffsetCache: { left?: number; top?: number } = {};
-  protected _savedProps: {
+  protected declare __isDraggingOver: boolean;
+  protected declare selected: boolean;
+  protected declare __lastSelected: boolean;
+  protected declare cursorOffsetCache: { left?: number; top?: number };
+  protected declare _savedProps: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
@@ -67,7 +66,7 @@ export abstract class ITextBehaviorMixin<
     defaultCursor: string;
     moveCursor: CSSStyleDeclaration['cursor'];
   };
-  protected _selectionDirection: 'left' | 'right' | null;
+  protected declare _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
   abstract initCursorSelectionHandlers(): void;
@@ -89,11 +88,12 @@ export abstract class ITextBehaviorMixin<
    * Initializes all the interactive behavior of IText
    */
   initBehavior() {
-    this.initAddedHandler();
-    this.initRemovedHandler();
     this.initCursorSelectionHandlers();
     this.initDoubleClickSimulation();
-    this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+    this._tick = this._tick.bind(this);
+    this._onTickComplete = this._onTickComplete.bind(this);
+    this.updateSelectionOnMouseMove =
+      this.updateSelectionOnMouseMove.bind(this);
     this.dragEnterHandler = this.dragEnterHandler.bind(this);
     this.dragOverHandler = this.dragOverHandler.bind(this);
     this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
@@ -106,154 +106,86 @@ export abstract class ITextBehaviorMixin<
     this.on('drop', this.dropHandler);
   }
 
-  onDeselect() {
+  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }) {
     this.isEditing && this.exitEditing();
     this.selected = false;
+    return super.onDeselect(options);
   }
 
   /**
-   * Initializes "added" event handler
+   * @private
    */
-  initAddedHandler() {
-    this.on('added', (opt) => {
-      //  make sure we listen to the canvas added event
-      const canvas = opt.target;
-      if (canvas) {
-        if (!canvas._hasITextHandlers) {
-          canvas._hasITextHandlers = true;
-          this._initCanvasHandlers(canvas);
-        }
-        canvas._iTextInstances = canvas._iTextInstances || [];
-        canvas._iTextInstances.push(this);
-      }
+  _animateCursor({
+    toValue,
+    duration,
+    delay,
+    onComplete,
+  }: {
+    toValue: number;
+    duration: number;
+    delay?: number;
+    onComplete?: TOnAnimationChangeCallback<number, void>;
+  }) {
+    return animate({
+      startValue: this._currentCursorOpacity,
+      endValue: toValue,
+      duration,
+      delay,
+      onComplete,
+      abort: () => {
+        return (
+          !this.canvas ||
+          // we do not want to animate a selection, only cursor
+          this.selectionStart !== this.selectionEnd
+        );
+      },
+      onChange: (value) => {
+        this._currentCursorOpacity = value;
+        this.renderCursorOrSelection();
+      },
+    });
+  }
+
+  private _tick(delay?: number) {
+    this._currentTickState = this._animateCursor({
+      toValue: 1,
+      duration: this.cursorDuration,
+      delay,
+      onComplete: this._onTickComplete,
     });
   }
 
-  initRemovedHandler() {
-    this.on('removed', (opt) => {
-      //  make sure we listen to the canvas removed event
-      const canvas = opt.target;
-      if (canvas) {
-        canvas._iTextInstances = canvas._iTextInstances || [];
-        removeFromArray(canvas._iTextInstances, this);
-        if (canvas._iTextInstances.length === 0) {
-          canvas._hasITextHandlers = false;
-          this._removeCanvasHandlers(canvas);
-        }
-      }
+  private _onTickComplete() {
+    this._currentTickCompleteState?.abort();
+    this._currentTickCompleteState = this._animateCursor({
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: 100,
+      onComplete: this._tick,
     });
-  }
-
-  /**
-   * register canvas event to manage exiting on other instances
-   * @private
-   */
-  _initCanvasHandlers(canvas: Canvas) {
-    canvas._mouseUpITextHandler = function () {
-      if (canvas._iTextInstances) {
-        canvas._iTextInstances.forEach((tObj) => {
-          tObj.__isMousedown = false;
-        });
-      }
-    };
-    canvas.on('mouse:up', canvas._mouseUpITextHandler);
-  }
-
-  /**
-   * remove canvas event to manage exiting on other instances
-   * @private
-   */
-  _removeCanvasHandlers(canvas: Canvas) {
-    canvas.off('mouse:up', canvas._mouseUpITextHandler);
-  }
-
-  /**
-   * @private
-   */
-  _tick() {
-    this._currentTickState = this._animateCursor(
-      this,
-      1,
-      this.cursorDuration,
-      '_onTickComplete'
-    );
-  }
-
-  /**
-   * @private
-   */
-  _animateCursor(obj, targetOpacity, duration, completeMethod) {
-    const tickState = {
-      isAborted: false,
-      abort: function () {
-        this.isAborted = true;
-      },
-    };
-
-    obj.animate('_currentCursorOpacity', targetOpacity, {
-      duration: duration,
-      onComplete: function () {
-        if (!tickState.isAborted) {
-          obj[completeMethod]();
-        }
-      },
-      onChange: function () {
-        // we do not want to animate a selection, only cursor
-        if (obj.canvas && obj.selectionStart === obj.selectionEnd) {
-          obj.renderCursorOrSelection();
-        }
-      },
-      abort: function () {
-        return tickState.isAborted;
-      },
-    });
-    return tickState;
-  }
-
-  /**
-   * @private
-   */
-  _onTickComplete() {
-    if (this._cursorTimeout1) {
-      clearTimeout(this._cursorTimeout1);
-    }
-    this._cursorTimeout1 = setTimeout(() => {
-      this._currentTickCompleteState = this._animateCursor(
-        this,
-        0,
-        this.cursorDuration / 2,
-        '_tick'
-      );
-    }, 100);
   }
 
   /**
    * Initializes delayed cursor
    */
   initDelayedCursor(restart?: boolean) {
-    const delay = restart ? 0 : this.cursorDelay;
-
     this.abortCursorAnimation();
-    if (delay) {
-      this._cursorTimeout2 = setTimeout(() => {
-        this._tick();
-      }, delay);
-    } else {
-      this._tick();
-    }
+    this._tick(restart ? 0 : this.cursorDelay);
   }
 
   /**
    * Aborts cursor animation, clears all timeouts and clear textarea context if necessary
    */
   abortCursorAnimation() {
-    const shouldClear =
-      this._currentTickState || this._currentTickCompleteState;
-    this._currentTickState && this._currentTickState.abort();
-    this._currentTickCompleteState && this._currentTickCompleteState.abort();
-
-    clearTimeout(this._cursorTimeout1);
-    clearTimeout(this._cursorTimeout2);
+    let shouldClear = false;
+    [this._currentTickState, this._currentTickCompleteState].forEach(
+      (cursorAnimation) => {
+        if (cursorAnimation && !cursorAnimation.isDone()) {
+          shouldClear = true;
+          cursorAnimation.abort();
+        }
+      }
+    );
 
     this._currentCursorOpacity = 1;
 
@@ -265,10 +197,9 @@ export abstract class ITextBehaviorMixin<
 
   restartCursorIfNeeded() {
     if (
-      !this._currentTickState ||
-      this._currentTickState.isAborted ||
-      !this._currentTickCompleteState ||
-      this._currentTickCompleteState.isAborted
+      [this._currentTickState, this._currentTickCompleteState].some(
+        (cursorAnimation) => !cursorAnimation || cursorAnimation.isDone()
+      )
     ) {
       this.initDelayedCursor();
     }
@@ -445,7 +376,7 @@ export abstract class ITextBehaviorMixin<
     }
     if (this.canvas) {
       this.canvas.calcOffset();
-      this.exitEditingOnOthers(this.canvas);
+      this.canvas.textEditingManager.exitTextEditing();
     }
 
     this.isEditing = true;
@@ -461,46 +392,21 @@ export abstract class ITextBehaviorMixin<
     this._tick();
     this.fire('editing:entered');
     this._fireSelectionChanged();
-    if (!this.canvas) {
-      return this;
-    }
-    this.canvas.fire('text:editing:entered', { target: this });
-    this.initMouseMoveHandler();
-    this.canvas.requestRenderAll();
-    return this;
-  }
-
-  exitEditingOnOthers(canvas: Canvas) {
-    if (canvas._iTextInstances) {
-      canvas._iTextInstances.forEach((obj) => {
-        obj.selected = false;
-        if (obj.isEditing) {
-          obj.exitEditing();
-        }
-      });
+    if (this.canvas) {
+      this.canvas.fire('text:editing:entered', { target: this });
+      this.canvas.requestRenderAll();
     }
   }
 
   /**
-   * Initializes "mousemove" event handler
+   * called by {@link canvas#textEditingManager}
    */
-  initMouseMoveHandler() {
-    this.canvas.on('mouse:move', this.mouseMoveHandler);
-  }
-
-  /**
-   * @private
-   */
-  mouseMoveHandler(options) {
-    if (!this.__isMousedown || !this.isEditing) {
-      return;
-    }
-
+  updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
     getEnv().document.activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea.focus();
 
-    const newSelectionStart = this.getSelectionStartFromPointer(options.e),
+    const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
       currentEnd = this.selectionEnd;
     if (
@@ -521,7 +427,6 @@ export abstract class ITextBehaviorMixin<
       this.selectionStart !== currentStart ||
       this.selectionEnd !== currentEnd
     ) {
-      this.restartCursorIfNeeded();
       this._fireSelectionChanged();
       this._updateTextarea();
       this.renderCursorOrSelection();
@@ -1037,15 +942,12 @@ export abstract class ITextBehaviorMixin<
   }
 
   /**
-   * Exits from editing state
+   * runs the actual logic that exits from editing state, see {@link exitEditing}
    */
-  exitEditing() {
-    const isTextChanged = this._textBeforeEdit !== this.text;
+  protected _exitEditing() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
-
-    this.selectionEnd = this.selectionStart;
 
     if (hiddenTextarea) {
       hiddenTextarea.blur && hiddenTextarea.blur();
@@ -1054,6 +956,15 @@ export abstract class ITextBehaviorMixin<
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
+  }
+
+  /**
+   * Exits from editing state and fires relevant events
+   */
+  exitEditing() {
+    const isTextChanged = this._textBeforeEdit !== this.text;
+    this.selectionEnd = this.selectionStart;
+    this._exitEditing();
     this._restoreEditingProps();
     if (this._shouldClearDimensionCache()) {
       this.initDimensions();
@@ -1062,7 +973,6 @@ export abstract class ITextBehaviorMixin<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
-      this.canvas.off('mouse:move', this.mouseMoveHandler);
       this.canvas.fire('text:editing:exited', { target: this });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
