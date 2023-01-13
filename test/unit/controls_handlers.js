@@ -13,7 +13,7 @@
       canvas.off();
       canvas.clear();
     });
-    var prepareTransform = function(target, corner) {
+    function prepareTransform(target, corner) {
       var origin = canvas._getOriginFromCorner(target, corner);
       return {
         target,
