@@ -2,6 +2,7 @@
 
 ## [next]
 
+-test(polyControls): add tests for custom controls for poly [#8595](https://github.com/fabricjs/fabric.js/pull/8595)
 - chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
 - refactor(IText): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
 - refactor(Canvas, IText): Handle cross instance text editing states to an EditingManager class [#8543](https://github.com/fabricjs/fabric.js/pull/8543)
