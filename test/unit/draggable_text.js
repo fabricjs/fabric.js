@@ -132,10 +132,6 @@ function assertDragEventStream(name, a, b) {
                 };
             }
 
-            function fireDragOver(x = eventData.clientX, y = eventData.clientY) {
-                canvas._onDragOver(createDragEvent(x, y));
-            }
-
             QUnit.test('click sets cursor', function (assert) {
                 assert.equal(count, 0, 'selection:changed fired');
                 assert.equal(countCanvas, 0, 'text:selection:changed fired');
@@ -166,7 +162,6 @@ function assertDragEventStream(name, a, b) {
                     'text/plain': "test"
                 }, 'should set dataTransfer');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');
-                // assert.equal(eventData.defaultPrevented, true, 'drag event default prevented');
                 assert.ok(e.dataTransfer.dragImageData.img instanceof HTMLCanvasElement, 'drag image was set');
                 assert.equal(e.dataTransfer.dragImageData.x, 30, 'drag image position');
                 assert.equal(e.dataTransfer.dragImageData.y, 15, 'drag image position');
