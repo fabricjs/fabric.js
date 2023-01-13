@@ -559,6 +559,60 @@
     fabricClass: 'Canvas'
   });
 
+  function draggableTextEffects(canvas, callback) {
+    const source = new fabric.IText('A draggable text\nSecond line');
+    const target = new fabric.Textbox('A draggable textbox, Second line', { width: 200, left: 20, top: 20, fill: 'red' });
+    canvas.add(source, target);
+    canvas.setActiveObject(source);
+    source.enterEditing();
+    source.selectAll();
+    canvas._onMouseDown({
+      clientX: 5,
+      clientY: 5,
+    });
+    canvas._onDragStart({
+      clientX: 5,
+      clientY: 5,
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      },
+      dataTransfer: {
+        setData() {
+          
+        },
+        setDragImage(imageSource, x, y) {
+          
+        }
+      }
+    });
+    canvas._onDragOver({
+      clientX: 25,
+      clientY: 25,
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      },
+    });
+    canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'Overlapping draggable text effects',
+    code: draggableTextEffects,
+    disabled: fabric.getEnv().isLikelyNode,
+    golden: 'overlapping_draggable_text_effects.png',
+    width: 270,
+    height: 120,
+    percentage: 0.03,
+    fabricClass: 'Canvas'
+  });
+
   // sinon could have spied this w/o effort and in one line
   class TestTextbox extends fabric.Textbox {
     __calledInitDimensions = 0;
