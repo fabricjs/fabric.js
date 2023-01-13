@@ -93,15 +93,6 @@ export class InteractiveFabricObject<
   declare isMoving?: boolean;
 
   /**
-   * internal boolean to signal the code that the object is
-   * part of the draggin action.
-   * @TODO: discuss isMoving and isDragging being not adequate enough
-   * they need to be either both private or more generic
-   * Canvas class needs to see this variable
-   */
-  declare __isDragging?: boolean;
-
-  /**
    * A boolean used from the gesture module to keep tracking of a scaling
    * action when there is no scaling transform in place.
    * This is an edge case and is used twice in all codebase.

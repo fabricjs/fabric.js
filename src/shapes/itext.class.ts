@@ -346,12 +346,15 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {number} index index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundariesOffsets(index: number, skipCaching?: boolean) {
+  _getCursorBoundariesOffsets(
+    index: number,
+    skipCaching?: boolean
+  ): { left: number; top: number } {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
     }
     if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
-      return this.cursorOffsetCache;
+      return this.cursorOffsetCache as { left: number; top: number };
     }
     return (this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index));
   }
@@ -476,10 +479,12 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Renders drag start text selection
    */
   renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+    const dragStartSelection =
+      this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
       this.canvas.contextTop,
-      this.__dragStartSelection,
-      this._getCursorBoundaries(this.__dragStartSelection.selectionStart, true)
+      dragStartSelection,
+      this._getCursorBoundaries(dragStartSelection.selectionStart, true)
     );
   }
 

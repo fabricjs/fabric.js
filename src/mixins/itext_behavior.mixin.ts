@@ -18,6 +18,7 @@ import { setStyle } from '../util/dom_style';
 import { clone } from '../util/lang_object';
 import { createCanvasElement } from '../util/misc/dom';
 import { isIdentityMatrix } from '../util/misc/matrix';
+import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
@@ -51,14 +52,9 @@ export abstract class ITextBehaviorMixin<
   protected declare _currentCursorOpacity: number;
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
-  private declare __dragImageDisposer: VoidFunction;
-  private declare __dragStartFired: boolean;
-  protected declare __isDragging: boolean;
-  protected declare __dragStartSelection: {
-    selectionStart: number;
-    selectionEnd: number;
-  };
-  protected declare __isDraggingOver: boolean;
+
+  protected draggableTextDelegate = new DraggableTextDelegate(this);
+
   protected declare selected: boolean;
   protected declare __lastSelected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };

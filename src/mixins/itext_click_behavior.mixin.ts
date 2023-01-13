@@ -106,7 +106,7 @@ export abstract class ITextClickBehaviorMixin<
     if (
       !this.canvas ||
       !this.editable ||
-      this.__isDragging ||
+      this.draggableTextDelegate.isActive() ||
       (options.e.button && options.e.button !== 1)
     ) {
       return;
@@ -133,24 +133,15 @@ export abstract class ITextClickBehaviorMixin<
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore(options: TransformEvent) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      (options.e.button && options.e.button !== 1)
-    ) {
+  _mouseDownHandlerBefore({ e }: TransformEvent) {
+    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
     // text dragging logic
-    const newSelection = this.getSelectionStartFromPointer(options.e);
-    this.__isDragging =
-      this.isEditing &&
-      newSelection >= this.selectionStart &&
-      newSelection <= this.selectionEnd &&
-      this.selectionStart < this.selectionEnd;
+    this.draggableTextDelegate.start(e);
   }
 
   /**
@@ -173,8 +164,9 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
-    this.__isDragging = false;
+    const shouldSetCursor =
+      this.draggableTextDelegate.isActive() && options.isClick; // false positive drag event, is actually a click
+    this.draggableTextDelegate.end();
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
