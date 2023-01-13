@@ -377,7 +377,7 @@ export abstract class ITextBehaviorMixin<
 
     this.isEditing = true;
 
-    this.initHiddenTextarea(e);
+    this.initHiddenTextarea();
     this.hiddenTextarea.focus();
     this.hiddenTextarea.value = this.text;
     this._updateTextarea();
@@ -386,10 +386,10 @@ export abstract class ITextBehaviorMixin<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered');
+    this.fire('editing:entered', { e });
     this._fireSelectionChanged();
     if (this.canvas) {
-      this.canvas.fire('text:editing:entered', { target: this });
+      this.canvas.fire('text:editing:entered', { target: this, e });
       this.canvas.requestRenderAll();
     }
   }
@@ -847,7 +847,7 @@ export abstract class ITextBehaviorMixin<
     lineIndex: number,
     charIndex: number,
     quantity: number,
-    copiedStyle: TextStyleDeclaration[]
+    copiedStyle?: TextStyleDeclaration[]
   ) {
     if (!this.styles) {
       this.styles = {};
@@ -908,7 +908,7 @@ export abstract class ITextBehaviorMixin<
   insertNewStyleBlock(
     insertedText: string[],
     start: number,
-    copiedStyle: TextStyleDeclaration[]
+    copiedStyle?: TextStyleDeclaration[]
   ) {
     let cursorLoc = this.get2DCursorLocation(start, true),
       addedLines = [0],
@@ -1004,13 +1004,10 @@ export abstract class ITextBehaviorMixin<
    */
   insertChars(
     text: string,
-    style: TextStyleDeclaration[],
+    style: TextStyleDeclaration[] | undefined,
     start: number,
-    end: number
+    end: number = start
   ) {
-    if (typeof end === 'undefined') {
-      end = start;
-    }
     if (end > start) {
       this.removeStyleFromTo(start, end);
     }
