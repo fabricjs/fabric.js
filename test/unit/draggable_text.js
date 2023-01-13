@@ -252,6 +252,11 @@ function assertDragEventStream(name, a, b) {
                         didDrop: false,
                     }
                 ]);
+                assert.deepEqual(renderEffects, [
+                    ...dragEvents.slice(0, 32).map(e => ({ e, source: iText, target: undefined })),
+                    ...dragEvents.slice(32, 93).map(e => ({ e, source: iText, target: iText })),
+                    ...dragEvents.slice(93).map(e => ({ e, source: iText, target: undefined })),
+                ], 'render effects');
             });
             
             QUnit.test('drag over: target', function (assert) {
