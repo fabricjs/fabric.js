@@ -16,7 +16,7 @@ export abstract class ITextClickBehaviorMixin<
   private declare __lastPointer: IPoint | Record<string, never>;
   private declare __newClickTime: number;
 
-  protected draggableTextDelegate = new DraggableTextDelegate(this);
+  protected draggableTextDelegate: DraggableTextDelegate;
 
   initBehavior() {
     // Initializes event handlers related to cursor or selection
@@ -30,6 +30,14 @@ export abstract class ITextClickBehaviorMixin<
     this.__lastLastClickTime = +new Date();
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
+
+    // TODO: replace this with a standard assignment when shitty `clone` is removed
+    Object.defineProperty(this, 'draggableTextDelegate', {
+      value: new DraggableTextDelegate(this),
+      configurable: false,
+      enumerable: false,
+      writable: false,
+    });
 
     super.initBehavior();
   }
