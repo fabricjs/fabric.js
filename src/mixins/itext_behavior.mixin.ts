@@ -57,8 +57,6 @@ export abstract class ITextBehaviorMixin<
   protected declare _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
-  abstract initCursorSelectionHandlers(): void;
-  abstract initDoubleClickSimulation(): void;
   abstract _fireSelectionChanged(): void;
   abstract renderCursorOrSelection(): void;
   abstract getSelectionStartFromPointer(e: TPointerEvent): number;
@@ -76,8 +74,6 @@ export abstract class ITextBehaviorMixin<
    * Initializes all the interactive behavior of IText
    */
   initBehavior() {
-    this.initCursorSelectionHandlers();
-    this.initDoubleClickSimulation();
     this._tick = this._tick.bind(this);
     this._onTickComplete = this._onTickComplete.bind(this);
     this.updateSelectionOnMouseMove =

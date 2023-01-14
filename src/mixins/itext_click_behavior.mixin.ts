@@ -18,6 +18,22 @@ export abstract class ITextClickBehaviorMixin<
 
   protected draggableTextDelegate = new DraggableTextDelegate(this);
 
+  initBehavior() {
+    // Initializes event handlers related to cursor or selection
+    this.initMousedownHandler();
+    this.initMouseupHandler();
+    this.initClicks();
+
+    // Initializes "dbclick" event handler
+    this.__lastClickTime = +new Date();
+    // for triple click
+    this.__lastLastClickTime = +new Date();
+    this.__lastPointer = {};
+    this.on('mousedown', this.onMouseDown);
+
+    super.initBehavior();
+  }
+
   shouldStartDragging() {
     return this.draggableTextDelegate.isActive();
   }
@@ -28,20 +44,6 @@ export abstract class ITextClickBehaviorMixin<
 
   canDrop(e: DragEvent) {
     return this.draggableTextDelegate.canDrop(e);
-  }
-
-  /**
-   * Initializes "dbclick" event handler
-   */
-  initDoubleClickSimulation() {
-    this.__lastClickTime = +new Date();
-
-    // for triple click
-    this.__lastLastClickTime = +new Date();
-
-    this.__lastPointer = {};
-
-    this.on('mousedown', this.onMouseDown);
   }
 
   /**
@@ -71,15 +73,6 @@ export abstract class ITextClickBehaviorMixin<
       this.__lastPointer.x === newPointer.x &&
       this.__lastPointer.y === newPointer.y
     );
-  }
-
-  /**
-   * Initializes event handlers related to cursor or selection
-   */
-  initCursorSelectionHandlers() {
-    this.initMousedownHandler();
-    this.initMouseupHandler();
-    this.initClicks();
   }
 
   /**
