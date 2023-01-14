@@ -61,7 +61,6 @@ export class DraggableTextDelegate {
 
   /**
    * Ends interaction and sets cursor in case of a click
-   * @param e
    * @returns true if was active
    */
   end(e: TPointerEvent) {
@@ -160,8 +159,6 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * @private
-   * @param {DragEvent} e
    * @returns {boolean} should handle event
    */
   onDragStart(e: DragEvent): boolean {
@@ -197,9 +194,6 @@ export class DraggableTextDelegate {
 
   /**
    * Override to customize drag and drop behavior
-   * @public
-   * @param {DragEvent} e
-   * @returns {boolean}
    */
   canDrop(e: DragEvent): boolean {
     if (this.target.editable && !this.target.__corner) {
@@ -220,9 +214,6 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
    */
   dragEnterHandler({ e }: DragEventData) {
     const canDrop = !e.defaultPrevented && this.canDrop(e);
@@ -233,9 +224,6 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
    */
   dragOverHandler(ev: DragEventData) {
     const { e } = ev;
@@ -257,7 +245,6 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * @private
    */
   dragLeaveHandler() {
     if (this.__isDraggingOver || this.__mouseDownInPlace) {

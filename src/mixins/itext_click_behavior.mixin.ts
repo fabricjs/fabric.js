@@ -46,10 +46,17 @@ export abstract class ITextClickBehaviorMixin<
     return this.draggableTextDelegate.isActive();
   }
 
+  /**
+   * @public override this method to control whether instance should become a drag source
+   * @returns {boolean} should handle event
+   */
   onDragStart(e: DragEvent) {
     return this.draggableTextDelegate.onDragStart(e);
   }
 
+  /**
+   * @public override this method to control whether instance should become a drop target
+   */
   canDrop(e: DragEvent) {
     return this.draggableTextDelegate.canDrop(e);
   }
