@@ -57,6 +57,8 @@ export class DraggableTextDelegate {
 
   start(e: TPointerEvent) {
     this.__isDragging = this.isPointerOverSelection(e);
+    this.__dragStartFired = false;
+    this.__isDraggingOver = false;
   }
 
   /**
@@ -69,6 +71,7 @@ export class DraggableTextDelegate {
     if (active && !this.__dragStartFired) {
       // false positive `active`, is actually a click
       this.target.setCursorByClick(e);
+      this.target.initDelayedCursor(true);
     }
     this.__isDragging = false;
     return active;
@@ -92,46 +95,40 @@ export class DraggableTextDelegate {
       selectionEnd: number;
     }
   ) {
-    const flipFactor = new Point(
-      this.target.flipX ? -1 : 1,
-      this.target.flipY ? -1 : 1
-    );
-    const boundaries = this.target._getCursorBoundaries(selectionStart);
+    const target = this.target;
+    const canvas = target.canvas!;
+    const flipFactor = new Point(target.flipX ? -1 : 1, target.flipY ? -1 : 1);
+    const boundaries = target._getCursorBoundaries(selectionStart);
     const selectionPosition = new Point(
       boundaries.left + boundaries.leftOffset,
       boundaries.top + boundaries.topOffset
     ).multiply(flipFactor);
-    const pos = selectionPosition.transform(this.target.calcTransformMatrix());
-    const canvas = this.target.canvas!;
+    const pos = selectionPosition.transform(target.calcTransformMatrix());
     const pointer = canvas.getPointer(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = canvas._isRetinaScaling();
-    const retinaScaling = this.target.getCanvasRetinaScaling();
-    const bbox = this.target.getBoundingRect(true);
+    const retinaScaling = target.getCanvasRetinaScaling();
+    const bbox = target.getBoundingRect(true);
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
     const vpt = canvas.viewportTransform;
     const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
-    const bgc = this.target.backgroundColor;
-    const styles = clone(this.target.styles, true);
-    this.target.backgroundColor = '';
+    const bgc = target.backgroundColor;
+    const styles = clone(target.styles, true);
+    target.backgroundColor = '';
     const styleOverride = {
       stroke: 'transparent',
       fill: 'transparent',
       textBackgroundColor: 'transparent',
     };
-    this.target.setSelectionStyles(styleOverride, 0, selectionStart);
-    this.target.setSelectionStyles(
-      styleOverride,
-      selectionEnd,
-      this.target.text.length
-    );
-    let dragImage = this.target.toCanvasElement({
+    target.setSelectionStyles(styleOverride, 0, selectionStart);
+    target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
+    let dragImage = target.toCanvasElement({
       enableRetinaScaling,
     });
     // restore values
-    this.target.backgroundColor = bgc;
-    this.target.styles = styles;
+    target.backgroundColor = bgc;
+    target.styles = styles;
     //  handle retina scaling and vpt
     if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
       const dragImageCanvas = createCanvasElement();
@@ -169,21 +166,22 @@ export class DraggableTextDelegate {
    */
   onDragStart(e: DragEvent): boolean {
     this.__dragStartFired = true;
+    const target = this.target;
     if (this.__isDragging && e.dataTransfer) {
       const selection = (this.__dragStartSelection = {
-        selectionStart: this.target.selectionStart,
-        selectionEnd: this.target.selectionEnd,
+        selectionStart: target.selectionStart,
+        selectionEnd: target.selectionEnd,
       });
-      const value = this.target._text
+      const value = target._text
         .slice(selection.selectionStart, selection.selectionEnd)
         .join('');
-      const data = { text: this.target.text, value, ...selection };
+      const data = { text: target.text, value, ...selection };
       e.dataTransfer.setData('text/plain', value);
       e.dataTransfer.setData(
         'application/fabric',
         JSON.stringify({
           value: value,
-          styles: this.target.getSelectionStyles(
+          styles: target.getSelectionStyles(
             selection.selectionStart,
             selection.selectionEnd,
             true
@@ -193,7 +191,7 @@ export class DraggableTextDelegate {
       e.dataTransfer.effectAllowed = 'copyMove';
       this.setDragImage(e, data);
     }
-    this.target.abortCursorAnimation();
+    target.abortCursorAnimation();
     return this.__isDragging;
   }
 
