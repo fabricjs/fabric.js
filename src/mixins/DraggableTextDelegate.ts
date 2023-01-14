@@ -40,7 +40,7 @@ export class DraggableTextDelegate {
     };
   }
 
-  isPointerOnSelection(e: TPointerEvent) {
+  isPointerOverSelection(e: TPointerEvent) {
     const target = this.target;
     const newSelection = target.getSelectionStartFromPointer(e);
     return (
@@ -56,7 +56,7 @@ export class DraggableTextDelegate {
   }
 
   start(e: TPointerEvent) {
-    this.__isDragging = this.isPointerOnSelection(e);
+    this.__isDragging = this.isPointerOverSelection(e);
   }
 
   /**

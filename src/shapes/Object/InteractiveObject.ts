@@ -21,7 +21,7 @@ type TOCoord = IPoint & {
 type TControlSet = Record<string, Control>;
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & {
-  isDragging: () => boolean;
+  shouldStartDragging: () => boolean;
   onDragStart: (e: DragEvent) => boolean;
 };
 
