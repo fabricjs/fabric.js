@@ -632,15 +632,17 @@ export abstract class ITextBehaviorMixin<
   dragEndHandler({ e }: DragEventData) {
     if (this.__isDragging && this.__dragStartFired) {
       //  once the drop event finishes we check if we need to change the drag source
-      //  if the drag source received the drop we bail out
+      //  if the drag source received the drop we bail out since the drop handler has already handled logic
       if (this.__dragStartSelection) {
         const selectionStart = this.__dragStartSelection.selectionStart;
         const selectionEnd = this.__dragStartSelection.selectionEnd;
         const dropEffect = e.dataTransfer.dropEffect;
         if (dropEffect === 'none') {
+          // pointer is back over selection
           this.selectionStart = selectionStart;
           this.selectionEnd = selectionEnd;
           this._updateTextarea();
+          this.hiddenTextarea.focus();
         } else {
           this.clearContextTop();
           if (dropEffect === 'move') {
@@ -729,6 +731,7 @@ export abstract class ITextBehaviorMixin<
       );
       this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
       this._updateTextarea();
+      this.hiddenTextarea.focus();
       this.fire('changed', {
         index: insertAt + selectionStartOffset,
         action: 'drop',
