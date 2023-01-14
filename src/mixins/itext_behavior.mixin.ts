@@ -1,23 +1,13 @@
 /// @ts-nocheck
 
 import { getEnv } from '../env';
-import {
-  DragEventData,
-  DropEventData,
-  ObjectEvents,
-  TEvent,
-  TPointerEvent,
-} from '../EventTypeDefs';
+import { ObjectEvents, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
 import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
-import { setStyle } from '../util/dom_style';
-import { clone } from '../util/lang_object';
-import { createCanvasElement } from '../util/misc/dom';
-import { isIdentityMatrix } from '../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { TextStyleDeclaration } from './text_style.mixin';
 
