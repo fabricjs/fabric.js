@@ -1,6 +1,10 @@
 // @ts-nocheck
 import { Canvas } from '../canvas/canvas_events';
-import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
+import {
+  ObjectEvents,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -13,9 +17,9 @@ import { classRegistry } from '../util/class_registry';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
-  changed: never;
+  changed: never | { index: number; action: string };
   tripleclick: TPointerEventInfo;
-  'editing:entered': never;
+  'editing:entered': never | { e: TPointerEvent };
   'editing:exited': never;
 };
 
@@ -623,6 +627,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
 
   dispose() {
     this._exitEditing();
+    this.draggableTextDelegate.dispose();
     super.dispose();
   }
 }
