@@ -43,8 +43,6 @@ export abstract class ITextBehaviorMixin<
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
 
-  protected draggableTextDelegate = new DraggableTextDelegate(this);
-
   protected declare selected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps: {
@@ -91,18 +89,6 @@ export abstract class ITextBehaviorMixin<
     this.isEditing && this.exitEditing();
     this.selected = false;
     return super.onDeselect(options);
-  }
-
-  shouldStartDragging() {
-    return this.draggableTextDelegate.isActive();
-  }
-
-  onDragStart(e: DragEvent) {
-    return this.draggableTextDelegate.onDragStart(e);
-  }
-
-  canDrop(e: DragEvent) {
-    return this.draggableTextDelegate.canDrop(e);
   }
 
   /**

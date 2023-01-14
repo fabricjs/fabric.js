@@ -4,6 +4,7 @@ import { IPoint, Point } from '../point.class';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
 export abstract class ITextClickBehaviorMixin<
@@ -14,6 +15,20 @@ export abstract class ITextClickBehaviorMixin<
   private declare __lastLastClickTime: number;
   private declare __lastPointer: IPoint | Record<string, never>;
   private declare __newClickTime: number;
+
+  protected draggableTextDelegate = new DraggableTextDelegate(this);
+
+  shouldStartDragging() {
+    return this.draggableTextDelegate.isActive();
+  }
+
+  onDragStart(e: DragEvent) {
+    return this.draggableTextDelegate.onDragStart(e);
+  }
+
+  canDrop(e: DragEvent) {
+    return this.draggableTextDelegate.canDrop(e);
+  }
 
   /**
    * Initializes "dbclick" event handler
