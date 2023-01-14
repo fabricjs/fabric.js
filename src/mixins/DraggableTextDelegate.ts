@@ -10,14 +10,14 @@ import { TextStyleDeclaration } from './text_style.mixin';
 
 export class DraggableTextDelegate {
   readonly target: IText;
-  private __dragImageDisposer?: VoidFunction;
-  private __dragStartFired: boolean;
-  private __isDragging: boolean;
+  private __isDragging = false;
+  private __dragStartFired = false;
+  private __isDraggingOver = false;
   private __dragStartSelection?: {
     selectionStart: number;
     selectionEnd: number;
   };
-  private __isDraggingOver: boolean;
+  private __dragImageDisposer?: VoidFunction;
   private _dispose?: () => void;
 
   constructor(target: IText) {
@@ -57,8 +57,6 @@ export class DraggableTextDelegate {
 
   start(e: TPointerEvent) {
     this.__isDragging = this.isPointerOverSelection(e);
-    this.__dragStartFired = false;
-    this.__isDraggingOver = false;
   }
 
   /**
@@ -74,6 +72,8 @@ export class DraggableTextDelegate {
       this.target.initDelayedCursor(true);
     }
     this.__isDragging = false;
+    this.__dragStartFired = false;
+    this.__isDraggingOver = false;
     return active;
   }
 
