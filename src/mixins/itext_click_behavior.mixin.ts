@@ -9,6 +9,7 @@ import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 export abstract class ITextClickBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends ITextKeyBehaviorMixin<EventSpec> {
+  private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
   private declare __lastPointer: IPoint | Record<string, never>;
@@ -164,9 +165,7 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    const shouldSetCursor =
-      this.draggableTextDelegate.isActive() && options.isClick; // false positive drag event, is actually a click
-    this.draggableTextDelegate.end();
+    const didDrag = this.draggableTextDelegate.end(options.e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
@@ -182,12 +181,11 @@ export abstract class ITextClickBehaviorMixin<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (options.transform && options.transform.actionPerformed) ||
-      (options.e.button && options.e.button !== 1)
+      (options.e.button && options.e.button !== 1) ||
+      didDrag
     ) {
       return;
     }
-
-    shouldSetCursor && this.setCursorByClick(options.e);
 
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;

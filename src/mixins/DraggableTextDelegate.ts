@@ -59,8 +59,19 @@ export class DraggableTextDelegate {
     this.__isDragging = this.isPointerOnSelection(e);
   }
 
-  end() {
+  /**
+   * Ends interaction and sets cursor in case of a click
+   * @param e
+   * @returns true if was active
+   */
+  end(e: TPointerEvent) {
+    const active = this.__isDragging;
+    if (active && !this.__dragStartFired) {
+      // false positive `active`, is actually a click
+      this.target.setCursorByClick(e);
+    }
     this.__isDragging = false;
+    return active;
   }
 
   getDragStartSelection() {
@@ -296,8 +307,6 @@ export class DraggableTextDelegate {
             canvas.requestRenderAll();
           }
           target.exitEditing();
-          //  disable mouse up logic
-          target.__lastSelected = false;
         }
       }
     }

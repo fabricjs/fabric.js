@@ -46,7 +46,6 @@ export abstract class ITextBehaviorMixin<
   protected draggableTextDelegate = new DraggableTextDelegate(this);
 
   protected declare selected: boolean;
-  protected declare __lastSelected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps: {
     hasControls: boolean;
