@@ -53,7 +53,7 @@ export class DraggableTextDelegate {
   }
 
   isActive() {
-    this.__isDragging;
+    return this.__isDragging;
   }
 
   start(e: TPointerEvent) {
