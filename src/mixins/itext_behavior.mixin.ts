@@ -104,6 +104,10 @@ export abstract class ITextBehaviorMixin<
     return super.onDeselect(options);
   }
 
+  isDragging() {
+    return this.draggableTextDelegate.isActive();
+  }
+
   onDragStart(e: DragEvent) {
     return this.draggableTextDelegate.onDragStart(e);
   }

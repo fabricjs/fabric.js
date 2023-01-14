@@ -780,7 +780,9 @@ export class Canvas extends SelectableCanvas {
   _onMouseMove(e: TPointerEvent) {
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
-      (!activeObject || !activeObject.__isDragging) &&
+      (!activeObject ||
+        (isFabricObjectWithDragSupport(activeObject) &&
+          !activeObject.isDragging())) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
