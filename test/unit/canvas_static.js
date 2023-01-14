@@ -195,7 +195,6 @@
     assert.ok('backgroundImage' in canvas);
     assert.ok('overlayImage' in canvas);
     assert.ok('includeDefaultValues' in canvas);
-    assert.ok('stateful' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
     assert.ok('allowTouchScrolling' in canvas);
@@ -206,7 +205,6 @@
     assert.equal(canvas._objects.length, 0, 'is empty array');
 
     assert.equal(canvas.includeDefaultValues, true);
-    assert.equal(canvas.stateful, false);
     assert.equal(canvas.renderOnAddRemove, true);
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.allowTouchScrolling, false);

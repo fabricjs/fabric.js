@@ -8,7 +8,6 @@ import {
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
-import { ObjectGeometry } from './ObjectGeometry';
 import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
@@ -37,7 +36,18 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  oCoords: Record<string, TOCoord> = {};
+  declare oCoords: Record<string, TOCoord>;
+
+  /**
+   * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
+   * too much and will be redrawn with correct details at the end of scaling.
+   * this setting is performance and application dependant.
+   * default to true
+   * since 1.7.0
+   * @type Boolean
+   * @default true
+   */
+  declare noScaleCache: boolean;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -48,39 +58,39 @@ export class InteractiveFabricObject<
    * @type number|string|any
    * @default 0
    */
-  __corner: 0 | string;
+  declare __corner: 0 | string;
 
   /**
    * a map of control visibility for this object.
    * this was left when controls were introduced to do not brea the api too much
    * this takes priority over the generic control visibility
    */
-  _controlsVisibility: Record<string, boolean>;
+  declare _controlsVisibility: Record<string, boolean>;
 
   /**
    * The angle that an object will lock to while rotating.
    * @type [TDegree]
    */
-  snapAngle?: TDegree;
+  declare snapAngle?: TDegree;
 
   /**
    * The angle difference from the current snapped angle in which snapping should occur.
    * When undefined, the snapThreshold will default to the snapAngle.
    * @type [TDegree]
    */
-  snapThreshold?: TDegree;
+  declare snapThreshold?: TDegree;
 
   /**
    * holds the controls for the object.
    * controls are added by default_controls.js
    */
-  controls: TControlSet;
+  declare controls: TControlSet;
 
   /**
    * internal boolean to signal the code that the object is
    * part of the move action.
    */
-  isMoving?: boolean;
+  declare isMoving?: boolean;
 
   /**
    * internal boolean to signal the code that the object is
@@ -89,7 +99,7 @@ export class InteractiveFabricObject<
    * they need to be either both private or more generic
    * Canvas class needs to see this variable
    */
-  __isDragging?: boolean;
+  declare __isDragging?: boolean;
 
   /**
    * A boolean used from the gesture module to keep tracking of a scaling
@@ -99,7 +109,7 @@ export class InteractiveFabricObject<
    * @TODO use git blame to investigate why it was added
    * DON'T USE IT. WE WILL TRY TO REMOVE IT
    */
-  _scaling?: boolean;
+  declare _scaling?: boolean;
 
   declare canvas?: Canvas;
 
@@ -109,6 +119,27 @@ export class InteractiveFabricObject<
    */
   constructor(options?: Record<string, unknown>) {
     super(options);
+  }
+
+  /**
+   * Update width and height of the canvas for cache
+   * returns true or false if canvas needed resize.
+   * @private
+   * @return {Boolean} true if the canvas has been resized
+   */
+  _updateCacheCanvas() {
+    const targetCanvas = this.canvas;
+    if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+      const target = targetCanvas._currentTransform.target,
+        action = targetCanvas._currentTransform.action;
+      if (
+        this === (target as InteractiveFabricObject) &&
+        action.startsWith('scale')
+      ) {
+        return false;
+      }
+    }
+    return super._updateCacheCanvas();
   }
 
   /**
@@ -221,11 +252,7 @@ export class InteractiveFabricObject<
    * @return {void}
    */
   setCoords(): void {
-    if (this.callSuper) {
-      ObjectGeometry.prototype.setCoords.call(this);
-    } else {
-      super.setCoords();
-    }
+    super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.oCoords = this.calcOCoords();
     this._setCornerCoords();
@@ -512,7 +539,7 @@ export class InteractiveFabricObject<
    * Clears the canvas.contextTop in a specific area that corresponds to the object's bounding box
    * that is in the canvas.contextContainer.
    * This function is used to clear pieces of contextTop where we render ephemeral effects on top of the object.
-   * Example: blinking cursror text selection, drag effects.
+   * Example: blinking cursor text selection, drag effects.
    * @todo discuss swapping restoreManually with a renderCallback, but think of async issues
    * @param {Boolean} [restoreManually] When true won't restore the context after clear, in order to draw something else.
    * @return {CanvasRenderingContext2D|undefined} canvas.contextTop that is either still transformed

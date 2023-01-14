@@ -19,11 +19,10 @@ import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
-  isInteractiveTextObject,
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -62,7 +61,7 @@ type TDestroyedCanvas = Omit<
  * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
  *
- * @fires object:modified at the end of a transform or any change when statefull is true
+ * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
  * @fires object:scaling while an object is being scaled by controls
  * @fires object:moving while an object is being dragged
@@ -160,7 +159,7 @@ export class SelectableCanvas<
    * @default
    * @since fabric 4.0 // changed name and default value
    */
-  uniformScaling: boolean;
+  declare uniformScaling: boolean;
 
   /**
    * Indicates which key switches uniform scaling.
@@ -174,7 +173,7 @@ export class SelectableCanvas<
    * @type ModifierKey
    * @default
    */
-  uniScaleKey: TOptionalModifierKey;
+  declare uniScaleKey: TOptionalModifierKey;
 
   /**
    * When true, objects use center point as the origin of scale transformation.
@@ -183,7 +182,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  centeredScaling: boolean;
+  declare centeredScaling: boolean;
 
   /**
    * When true, objects use center point as the origin of rotate transformation.
@@ -192,7 +191,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  centeredRotation: boolean;
+  declare centeredRotation: boolean;
 
   /**
    * Indicates which key enable centered Transform
@@ -203,7 +202,7 @@ export class SelectableCanvas<
    * @type ModifierKey
    * @default
    */
-  centeredKey: TOptionalModifierKey;
+  declare centeredKey: TOptionalModifierKey;
 
   /**
    * Indicates which key enable alternate action on corner
@@ -214,7 +213,7 @@ export class SelectableCanvas<
    * @type ModifierKey
    * @default
    */
-  altActionKey: TOptionalModifierKey;
+  declare altActionKey: TOptionalModifierKey;
 
   /**
    * Indicates that canvas is interactive. This property should not be changed.
@@ -228,7 +227,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  selection: boolean;
+  declare selection: boolean;
 
   /**
    * Indicates which key or keys enable multiple click selection
@@ -240,7 +239,7 @@ export class SelectableCanvas<
    * @type ModifierKey|ModifierKey[]
    * @default
    */
-  selectionKey: TOptionalModifierKey | ModifierKey[];
+  declare selectionKey: TOptionalModifierKey | ModifierKey[];
 
   /**
    * Indicates which key enable alternative selection
@@ -254,70 +253,70 @@ export class SelectableCanvas<
    * @type null|ModifierKey
    * @default
    */
-  altSelectionKey: TOptionalModifierKey;
+  declare altSelectionKey: TOptionalModifierKey;
 
   /**
    * Color of selection
    * @type String
    * @default
    */
-  selectionColor: string;
+  declare selectionColor: string;
 
   /**
    * Default dash array pattern
    * If not empty the selection border is dashed
    * @type Array
    */
-  selectionDashArray: number[];
+  declare selectionDashArray: number[];
 
   /**
    * Color of the border of selection (usually slightly darker than color of selection itself)
    * @type String
    * @default
    */
-  selectionBorderColor: string;
+  declare selectionBorderColor: string;
 
   /**
    * Width of a line used in object/group selection
    * @type Number
    * @default
    */
-  selectionLineWidth: number;
+  declare selectionLineWidth: number;
 
   /**
    * Select only shapes that are fully contained in the dragged selection rectangle.
    * @type Boolean
    * @default
    */
-  selectionFullyContained: boolean;
+  declare selectionFullyContained: boolean;
 
   /**
    * Default cursor value used when hovering over an object on canvas
    * @type CSSStyleDeclaration['cursor']
    * @default move
    */
-  hoverCursor: CSSStyleDeclaration['cursor'];
+  declare hoverCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used when moving an object on canvas
    * @type CSSStyleDeclaration['cursor']
    * @default move
    */
-  moveCursor: CSSStyleDeclaration['cursor'];
+  declare moveCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used for the entire canvas
    * @type String
    * @default default
    */
-  defaultCursor: CSSStyleDeclaration['cursor'];
+  declare defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used during free drawing
    * @type String
    * @default crosshair
    */
-  freeDrawingCursor: CSSStyleDeclaration['cursor'];
+  declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
@@ -325,28 +324,28 @@ export class SelectableCanvas<
    * @since 2.0.0
    * @default not-allowed
    */
-  notAllowedCursor: CSSStyleDeclaration['cursor'];
+  declare notAllowedCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default element class that's given to wrapper (div) element of canvas
    * @type String
    * @default
    */
-  containerClass: string;
+  declare containerClass: string;
 
   /**
    * When true, object detection happens on per-pixel basis rather than on per-bounding-box
    * @type Boolean
    * @default
    */
-  perPixelTargetFind: boolean;
+  declare perPixelTargetFind: boolean;
 
   /**
    * Number of pixels around target pixel to tolerate (consider active) during object detection
    * @type Number
    * @default
    */
-  targetFindTolerance: number;
+  declare targetFindTolerance: number;
 
   /**
    * When true, target detection is skipped. Target detection will return always undefined.
@@ -357,7 +356,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  skipTargetFind: boolean;
+  declare skipTargetFind: boolean;
 
   /**
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
@@ -367,7 +366,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  isDrawingMode: boolean;
+  declare isDrawingMode: boolean;
 
   /**
    * Indicates whether objects should remain in current stack position when selected.
@@ -375,7 +374,7 @@ export class SelectableCanvas<
    * @type Boolean
    * @default
    */
-  preserveObjectStacking: boolean;
+  declare preserveObjectStacking: boolean;
 
   /**
    * Indicates if the right click on canvas can output the context menu or not
@@ -383,7 +382,7 @@ export class SelectableCanvas<
    * @since 1.6.5
    * @default
    */
-  stopContextMenu: boolean;
+  declare stopContextMenu: boolean;
 
   /**
    * Indicates if the canvas can fire right click events
@@ -391,7 +390,7 @@ export class SelectableCanvas<
    * @since 1.6.5
    * @default
    */
-  fireRightClick: boolean;
+  declare fireRightClick: boolean;
 
   /**
    * Indicates if the canvas can fire middle click events
@@ -399,7 +398,7 @@ export class SelectableCanvas<
    * @since 1.7.8
    * @default
    */
-  fireMiddleClick: boolean;
+  declare fireMiddleClick: boolean;
 
   /**
    * Keep track of the subTargets for Mouse Events
@@ -412,7 +411,7 @@ export class SelectableCanvas<
    * @type FabricObject | null
    * @private
    */
-  _hoveredTarget?: FabricObject;
+  declare _hoveredTarget?: FabricObject;
 
   /**
    * hold the list of nested targets hovered
@@ -460,7 +459,7 @@ export class SelectableCanvas<
    * @type CanvasRenderingContext2D
    * @private
    */
-  contextCache: CanvasRenderingContext2D;
+  declare contextCache: CanvasRenderingContext2D;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
@@ -469,7 +468,7 @@ export class SelectableCanvas<
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected _absolutePointer?: Point;
+  protected declare _absolutePointer?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
@@ -478,7 +477,7 @@ export class SelectableCanvas<
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected _pointer?: Point;
+  protected declare _pointer?: Point;
 
   /**
    * During a mouse event we may need the target multiple times in multiple functions.
@@ -486,17 +485,15 @@ export class SelectableCanvas<
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * @type {FabricObject}
    */
-  protected _target?: FabricObject;
+  protected declare _target?: FabricObject;
 
-  upperCanvasEl: HTMLCanvasElement;
-  contextTop: CanvasRenderingContext2D;
-  wrapperEl: HTMLDivElement;
-  cacheCanvasEl: HTMLCanvasElement;
-  protected _isCurrentlyDrawing: boolean;
-  freeDrawingBrush?: BaseBrush;
-  _activeObject?: FabricObject;
-  _hasITextHandlers?: boolean;
-  _iTextInstances: (IText | Textbox)[];
+  declare upperCanvasEl: HTMLCanvasElement;
+  declare contextTop: CanvasRenderingContext2D;
+  declare wrapperEl: HTMLDivElement;
+  declare cacheCanvasEl: HTMLCanvasElement;
+  protected declare _isCurrentlyDrawing: boolean;
+  declare freeDrawingBrush?: BaseBrush;
+  declare _activeObject?: FabricObject;
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -1491,7 +1488,6 @@ export class SelectableCanvas<
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this._iTextInstances = [];
     this.contextCache = null;
     this.contextTop = null;
     cleanUpJsdomNode(upperCanvasEl);
@@ -1511,12 +1507,6 @@ export class SelectableCanvas<
     // this.discardActiveGroup();
     this.discardActiveObject();
     this.clearContext(this.contextTop);
-    if (this._hasITextHandlers) {
-      // @ts-ignore
-      this.off('mouse:up', this._mouseUpITextHandler);
-      this._iTextInstances = [];
-      this._hasITextHandlers = false;
-    }
     super.clear();
   }
 
@@ -1597,17 +1587,6 @@ export class SelectableCanvas<
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
-  }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
   }
 }
 

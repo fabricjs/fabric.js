@@ -20,30 +20,30 @@ export class Resize extends BaseFilter {
    * bilinear, hermite, sliceHack, lanczos.
    * @default
    */
-  resizeType: 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
+  declare resizeType: 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
   /**
    * Scale factor for resizing, x axis
    * @param {Number} scaleX
    * @default
    */
-  scaleX: number;
+  declare scaleX: number;
 
   /**
    * Scale factor for resizing, y axis
    * @param {Number} scaleY
    * @default
    */
-  scaleY: number;
+  declare scaleY: number;
 
   /**
    * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
    * @param {Number} lanczosLobes
    * @default
    */
-  lanczosLobes: number;
+  declare lanczosLobes: number;
 
-  fragmentSourceTOP: string;
+  declare fragmentSourceTOP: string;
 
   /**
    * Return WebGL uniform locations for this filter's shader.

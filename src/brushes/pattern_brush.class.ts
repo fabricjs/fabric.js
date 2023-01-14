@@ -5,7 +5,7 @@ import type { Canvas } from '../canvas/canvas_events';
 import { PencilBrush } from './pencil_brush.class';
 
 export class PatternBrush extends PencilBrush {
-  source?: CanvasImageSource;
+  declare source?: CanvasImageSource;
 
   constructor(canvas: Canvas) {
     super(canvas);

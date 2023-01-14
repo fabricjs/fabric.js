@@ -22,7 +22,10 @@ import {
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
-import { cancelAnimFrame, requestAnimFrame } from '../util/animation';
+import {
+  cancelAnimFrame,
+  requestAnimFrame,
+} from '../util/animation/AnimationFrameProvider';
 import {
   cleanUpJsdomNode,
   getElementOffset,
@@ -85,7 +88,7 @@ export class StaticCanvas<
    * @type {(String|TFiller)}
    * @default
    */
-  backgroundColor: TFiller | string;
+  declare backgroundColor: TFiller | string;
 
   /**
    * Background image of canvas instance.
@@ -95,7 +98,7 @@ export class StaticCanvas<
    * @type FabricObject
    * @default
    */
-  backgroundImage: FabricObject | null;
+  declare backgroundImage: FabricObject | null;
 
   /**
    * Overlay color of canvas instance.
@@ -103,7 +106,7 @@ export class StaticCanvas<
    * @type {(String|TFiller)}
    * @default
    */
-  overlayColor: TFiller | string;
+  declare overlayColor: TFiller | string;
 
   /**
    * Overlay image of canvas instance.
@@ -113,7 +116,7 @@ export class StaticCanvas<
    * @type FabricObject
    * @default
    */
-  overlayImage: FabricObject | null;
+  declare overlayImage: FabricObject | null;
 
   /**
    * Indicates whether toObject/toDatalessObject should include default values
@@ -121,15 +124,7 @@ export class StaticCanvas<
    * @type Boolean
    * @default
    */
-  includeDefaultValues: boolean;
-
-  /**
-   * Indicates whether objects' state should be saved
-   * @type Boolean
-   * @deprecated
-   * @default
-   */
-  stateful: boolean;
+  declare includeDefaultValues: boolean;
 
   /**
    * Indicates whether {@link add}, {@link insertAt} and {@link remove},
@@ -141,28 +136,28 @@ export class StaticCanvas<
    * @type Boolean
    * @default
    */
-  renderOnAddRemove: boolean;
+  declare renderOnAddRemove: boolean;
 
   /**
    * Indicates whether object controls (borders/controls) are rendered above overlay image
    * @type Boolean
    * @default
    */
-  controlsAboveOverlay: boolean;
+  declare controlsAboveOverlay: boolean;
 
   /**
    * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
    * @type Boolean
    * @default
    */
-  allowTouchScrolling: boolean;
+  declare allowTouchScrolling: boolean;
 
   /**
    * Indicates whether this canvas will use image smoothing, this is on by default in browsers
    * @type Boolean
    * @default
    */
-  imageSmoothingEnabled: boolean;
+  declare imageSmoothingEnabled: boolean;
 
   /**
    * The transformation (a Canvas 2D API transform matrix) which focuses the viewport
@@ -173,7 +168,7 @@ export class StaticCanvas<
    * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
    * @default
    */
-  viewportTransform: TMat2D;
+  declare viewportTransform: TMat2D;
 
   /**
    * if set to false background image is not affected by viewport transform
@@ -182,7 +177,7 @@ export class StaticCanvas<
    * @todo we should really find a different way to do this
    * @default
    */
-  backgroundVpt: boolean;
+  declare backgroundVpt: boolean;
 
   /**
    * if set to false overlya image is not affected by viewport transform
@@ -191,14 +186,14 @@ export class StaticCanvas<
    * @todo we should really find a different way to do this
    * @default
    */
-  overlayVpt: boolean;
+  declare overlayVpt: boolean;
 
   /**
    * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
    * @type Boolean
    * @default
    */
-  enableRetinaScaling: boolean;
+  declare enableRetinaScaling: boolean;
 
   /**
    * Describe canvas element extension over design
@@ -208,7 +203,7 @@ export class StaticCanvas<
    * of canvas element in plain untrasformed coordinates
    * The coordinates get updated with @method calcViewportBoundaries.
    */
-  vptCoords: TCornerPoint;
+  declare vptCoords: TCornerPoint;
 
   /**
    * Based on vptCoords and object.aCoords, skip rendering of objects that
@@ -219,7 +214,7 @@ export class StaticCanvas<
    * @type Boolean
    * @default
    */
-  skipOffscreen: boolean;
+  declare skipOffscreen: boolean;
 
   /**
    * a fabricObject that, without stroke define a clipping area with their shape. filled in black
@@ -228,66 +223,69 @@ export class StaticCanvas<
    * clipPath will clip away controls, if you do not want this to happen use controlsAboveOverlay = true
    * @type FabricObject
    */
-  clipPath: FabricObject;
+  declare clipPath: FabricObject;
 
   /**
    * A reference to the canvas actual HTMLCanvasElement.
    * Can be use to read the raw pixels, but never write or manipulate
    * @type HTMLCanvasElement
    */
-  lowerCanvasEl: HTMLCanvasElement;
+  declare lowerCanvasEl: HTMLCanvasElement;
 
-  contextContainer: CanvasRenderingContext2D;
+  declare contextContainer: CanvasRenderingContext2D;
 
   /**
    * Width in virtual/logical pixels of the canvas.
    * The canvas can be larger than width if retina scaling is active
    * @type number
    */
-  width: number;
+  declare width: number;
 
   /**
    * Height in virtual/logical pixels of the canvas.
    * The canvas can be taller than width if retina scaling is active
    * @type height
    */
-  height: number;
+  declare height: number;
 
   /**
    * If true the Canvas is in the process or has been disposed/destroyed.
    * No more rendering operation will be executed on this canvas.
    * @type boolean
    */
-  destroyed?: boolean;
+  declare destroyed?: boolean;
 
   /**
    * Started the process of disposing but not done yet.
    * WIll likely complete the render cycle already scheduled but stopping adding more.
    * @type boolean
    */
-  disposed?: boolean;
+  declare disposed?: boolean;
 
   /**
    * Keeps a copy of the canvas style before setting retina scaling and other potions
    * in order to return it to original state on dispose
    * @type string
    */
-  private _originalCanvasStyle?: string;
+  declare _originalCanvasStyle?: string;
 
-  _offset: { left: number; top: number };
-  protected hasLostContext: boolean;
-  protected nextRenderHandle: number;
+  declare renderAndResetBound: () => void;
+  declare requestRenderAllBound: () => void;
+
+  declare _offset: { left: number; top: number };
+  protected declare hasLostContext: boolean;
+  protected declare nextRenderHandle: number;
 
   // reference to
-  protected __cleanupTask?: {
+  protected declare __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this.renderAndReset = this.renderAndReset.bind(this);
-    this.requestRenderAll = this.requestRenderAll.bind(this);
+    this.renderAndResetBound = this.renderAndReset.bind(this);
+    this.requestRenderAllBound = this.requestRenderAll.bind(this);
     this.set(options);
     this.initElements(el);
     this.setDimensions(
@@ -325,8 +323,6 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    // @ts-ignore;
-    this.stateful && obj.saveState();
     if (obj.canvas && obj.canvas !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
@@ -1123,7 +1119,7 @@ export class StaticCanvas<
    * @type Boolean
    * @default
    */
-  svgViewportTransformation: boolean;
+  declare svgViewportTransformation: boolean;
 
   /**
    * Returns SVG representation of canvas
@@ -1723,7 +1719,6 @@ Object.assign(StaticCanvas.prototype, {
   overlayColor: '',
   overlayImage: null,
   includeDefaultValues: true,
-  stateful: false,
   renderOnAddRemove: true,
   controlsAboveOverlay: false,
   allowTouchScrolling: false,
