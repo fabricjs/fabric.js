@@ -269,16 +269,18 @@ export class DraggableTextDelegate {
   dragEndHandler({ e }: DragEventData) {
     if (this.__isDragging && this.__dragStartFired) {
       //  once the drop event finishes we check if we need to change the drag source
-      //  if the drag source received the drop we bail out
+      //  if the drag source received the drop we bail out since the drop handler has already handled logic
       if (this.__dragStartSelection) {
         const target = this.target;
         const canvas = this.target.canvas!;
         const { selectionStart, selectionEnd } = this.__dragStartSelection;
         const dropEffect = e.dataTransfer?.dropEffect;
         if (dropEffect === 'none') {
+          // pointer is back over selection
           target.selectionStart = selectionStart;
           target.selectionEnd = selectionEnd;
           target._updateTextarea();
+          target.hiddenTextarea.focus();
         } else {
           target.clearContextTop();
           if (dropEffect === 'move') {
@@ -372,6 +374,7 @@ export class DraggableTextDelegate {
       );
       target.hiddenTextarea && (target.hiddenTextarea.value = target.text);
       target._updateTextarea();
+      target.hiddenTextarea.focus();
       target.fire('changed', {
         index: insertAt + selectionStartOffset,
         action: 'drop',
