@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getEnv } from '../env';
 import { DragEventData, DropEventData, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
@@ -280,7 +279,7 @@ export class DraggableTextDelegate {
           target.selectionStart = selectionStart;
           target.selectionEnd = selectionEnd;
           target._updateTextarea();
-          target.hiddenTextarea.focus();
+          target.hiddenTextarea!.focus();
         } else {
           target.clearContextTop();
           if (dropEffect === 'move') {
@@ -293,7 +292,7 @@ export class DraggableTextDelegate {
               index: selectionStart,
               action: 'dragend',
             });
-            canvas.fire('text:changed', { target: target });
+            canvas.fire('text:changed', { target });
             canvas.requestRenderAll();
           }
           target.exitEditing();
@@ -372,9 +371,9 @@ export class DraggableTextDelegate {
         target.selectionStart + insert.length,
         target._text.length
       );
-      target.hiddenTextarea && (target.hiddenTextarea.value = target.text);
+      target.hiddenTextarea!.value = target.text;
       target._updateTextarea();
-      target.hiddenTextarea.focus();
+      target.hiddenTextarea!.focus();
       target.fire('changed', {
         index: insertAt + selectionStartOffset,
         action: 'drop',
