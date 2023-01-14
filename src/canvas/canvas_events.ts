@@ -780,7 +780,10 @@ export class Canvas extends SelectableCanvas {
   _onMouseMove(e: TPointerEvent) {
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
-      (!activeObject || !activeObject.__isDragging) &&
+      (!activeObject ||
+        // active object will flag itself on mousedown/mousedown:before
+        // we need to prevent default so the window starts the drag event sequence and stop mousemove
+        !activeObject.__isDragging) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
