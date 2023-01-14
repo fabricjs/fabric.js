@@ -29,6 +29,10 @@ function assertDragEventStream(name, a, b) {
         assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
+    function wait(ms = 16) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     [true, false].forEach(enableRetinaScaling => {
         QUnit.module(`enableRetinaScaling = ${enableRetinaScaling}`, function (hooks) {
             let canvas, eventData, iText, iText2, eventStream, renderEffects;
@@ -132,7 +136,7 @@ function assertDragEventStream(name, a, b) {
                 };
             }
 
-            QUnit.test('click sets cursor', function (assert) {
+            QUnit.test('click sets cursor', async function (assert) {
                 assert.equal(count, 0, 'selection:changed fired');
                 assert.equal(countCanvas, 0, 'text:selection:changed fired');
                 let called = 0;
@@ -140,9 +144,14 @@ function assertDragEventStream(name, a, b) {
                 // iText.setCursorByClick = () => called++;
                 canvas._onMouseDown(eventData);
                 assert.ok(iText.draggableTextDelegate.isActive(), 'flagged as dragging');
+                assert.ok(iText.shouldStartDragging(), 'flagged as dragging');
+                
+                await wait();
+                assertCursorAnimation(assert, iText);
                 // assert.equal(called, 0, 'should not set cursor on mouse up');
                 canvas._onMouseUp(eventData);
                 assert.ok(!iText.draggableTextDelegate.isActive(), 'unflagged as dragging');
+                assert.ok(!iText.shouldStartDragging(), 'unflagged as dragging');
                 // assert.equal(called, 1, 'should set cursor on mouse up');
                 assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
                 assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
