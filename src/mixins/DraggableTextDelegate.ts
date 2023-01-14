@@ -343,7 +343,7 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * fired only on the drag source
+   * fired only on the drag source after drop (if occurred)
    * handle changes to the drag source in case of a drop on another object or a cancellation
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
    * @private
