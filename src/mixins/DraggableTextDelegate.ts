@@ -345,7 +345,7 @@ export class DraggableTextDelegate {
         const target = this.target;
         const canvas = this.target.canvas!;
         const { selectionStart, selectionEnd } = this.__dragStartSelection;
-        const dropEffect = e.dataTransfer?.dropEffect;
+        const dropEffect = e.dataTransfer?.dropEffect || 'none';
         if (dropEffect === 'none') {
           // pointer is back over selection
           target.selectionStart = selectionStart;
