@@ -591,7 +591,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  canDrop(e?: DragEvent): boolean {
+  canDrop(e: DragEvent): boolean {
     return false;
   }
 

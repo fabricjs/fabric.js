@@ -104,6 +104,14 @@ export abstract class ITextBehaviorMixin<
     return super.onDeselect(options);
   }
 
+  onDragStart(e: DragEvent) {
+    return this.draggableTextDelegate.onDragStart(e);
+  }
+
+  canDrop(e: DragEvent) {
+    return this.draggableTextDelegate.canDrop(e);
+  }
+
   /**
    * @private
    */
