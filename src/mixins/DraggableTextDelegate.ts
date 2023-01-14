@@ -8,6 +8,16 @@ import { createCanvasElement } from '../util/misc/dom';
 import { isIdentityMatrix } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
 
+/**
+ * #### Dragging IText/Textbox Lifecycle
+ * - {@link start} is called from `mousedown:before` {@link IText#_mouseDownHandlerBefore} and determines if dragging should start by testing {@link isPointerOverSelection}
+ * - if true `mousedown` {@link IText#_mouseDownHandler} is blocked to keep selection
+ * - canvas fires numerous mousemove that we make sure **aren't** prevented in order for the window to start a drag session
+ * - once/if the session starts canvas calls {@link onDragStart} on the active object to determine if dragging should occur
+ * - canvas fires relevant events that are handled by the handlers defined in this scope
+ * - {@link end} is called from `mouseup` {@link IText#mouseUpHandler}, blocking IText default click behavior
+ * - {@link end} handles a click in case the drag session didn't occur since logic to do so was blocked during `mousedown`
+ */
 export class DraggableTextDelegate {
   readonly target: IText;
   private __mouseDownInPlace = false;
@@ -51,12 +61,12 @@ export class DraggableTextDelegate {
     );
   }
 
-  isActive() {
-    return this.__mouseDownInPlace;
-  }
-
   start(e: TPointerEvent) {
     this.__mouseDownInPlace = this.isPointerOverSelection(e);
+  }
+
+  isActive() {
+    return this.__mouseDownInPlace;
   }
 
   /**
