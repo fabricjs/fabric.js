@@ -16,7 +16,7 @@ export abstract class ITextClickBehaviorMixin<
   private declare __lastPointer: IPoint | Record<string, never>;
   private declare __newClickTime: number;
 
-  protected readonly draggableTextDelegate: DraggableTextDelegate;
+  protected draggableTextDelegate: DraggableTextDelegate;
 
   initBehavior() {
     // Initializes event handlers related to cursor or selection
@@ -36,7 +36,7 @@ export abstract class ITextClickBehaviorMixin<
       value: new DraggableTextDelegate(this),
       configurable: false,
       enumerable: false,
-      writable: false,
+      writable: true,
     });
 
     super.initBehavior();
