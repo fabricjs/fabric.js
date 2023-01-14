@@ -139,10 +139,10 @@ function assertDragEventStream(name, a, b) {
                 // sinon spy!!
                 // iText.setCursorByClick = () => called++;
                 canvas._onMouseDown(eventData);
-                assert.ok(iText.__isDragging, 'flagged as dragging');
+                assert.ok(iText.draggableTextDelegate.isActive(), 'flagged as dragging');
                 // assert.equal(called, 0, 'should not set cursor on mouse up');
                 canvas._onMouseUp(eventData);
-                assert.ok(!iText.__isDragging, 'unflagged as dragging');
+                assert.ok(!iText.draggableTextDelegate.isActive(), 'unflagged as dragging');
                 // assert.equal(called, 1, 'should set cursor on mouse up');
                 assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
                 assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
