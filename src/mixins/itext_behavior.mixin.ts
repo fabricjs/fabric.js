@@ -8,7 +8,6 @@ import { Text } from '../shapes/text.class';
 import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
-import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages

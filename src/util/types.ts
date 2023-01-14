@@ -72,6 +72,8 @@ export const isFabricObjectWithDragSupport = (
   return (
     !!fabricObject &&
     typeof (fabricObject as FabricObjectWithDragSupport).onDragStart ===
+      'function' &&
+    typeof (fabricObject as FabricObjectWithDragSupport).shouldStartDragging ===
       'function'
   );
 };
