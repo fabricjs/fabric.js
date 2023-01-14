@@ -267,56 +267,6 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
-   * fired only on the drag source
-   * handle changes to the drag source in case of a drop on another object or a cancellation
-   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
-   */
-  dragEndHandler({ e }: DragEventData) {
-    if (this.__mouseDownInPlace && this.__dragStartFired) {
-      //  once the drop event finishes we check if we need to change the drag source
-      //  if the drag source received the drop we bail out since the drop handler has already handled logic
-      if (this.__dragStartSelection) {
-        const target = this.target;
-        const canvas = this.target.canvas!;
-        const { selectionStart, selectionEnd } = this.__dragStartSelection;
-        const dropEffect = e.dataTransfer?.dropEffect;
-        if (dropEffect === 'none') {
-          // pointer is back over selection
-          target.selectionStart = selectionStart;
-          target.selectionEnd = selectionEnd;
-          target._updateTextarea();
-          target.hiddenTextarea!.focus();
-        } else {
-          target.clearContextTop();
-          if (dropEffect === 'move') {
-            target.insertChars('', undefined, selectionStart, selectionEnd);
-            target.selectionStart = target.selectionEnd = selectionStart;
-            target.hiddenTextarea &&
-              (target.hiddenTextarea.value = target.text);
-            target._updateTextarea();
-            target.fire('changed', {
-              index: selectionStart,
-              action: 'dragend',
-            });
-            canvas.fire('text:changed', { target });
-            canvas.requestRenderAll();
-          }
-          target.exitEditing();
-        }
-      }
-    }
-
-    this.__dragImageDisposer && this.__dragImageDisposer();
-    delete this.__dragImageDisposer;
-    delete this.__dragStartSelection;
-    this.__isDraggingOver = false;
-  }
-
-  /**
-   * support native like text dragging
    *
    * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
    * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
@@ -389,6 +339,56 @@ export class DraggableTextDelegate {
       canvas.contextTopDirty = true;
       canvas.requestRenderAll();
     }
+  }
+
+  /**
+   * support native like text dragging
+   * fired only on the drag source
+   * handle changes to the drag source in case of a drop on another object or a cancellation
+   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
+   * @private
+   * @param {object} options
+   * @param {DragEvent} options.e
+   */
+  dragEndHandler({ e }: DragEventData) {
+    if (this.__mouseDownInPlace && this.__dragStartFired) {
+      //  once the drop event finishes we check if we need to change the drag source
+      //  if the drag source received the drop we bail out since the drop handler has already handled logic
+      if (this.__dragStartSelection) {
+        const target = this.target;
+        const canvas = this.target.canvas!;
+        const { selectionStart, selectionEnd } = this.__dragStartSelection;
+        const dropEffect = e.dataTransfer?.dropEffect;
+        if (dropEffect === 'none') {
+          // pointer is back over selection
+          target.selectionStart = selectionStart;
+          target.selectionEnd = selectionEnd;
+          target._updateTextarea();
+          target.hiddenTextarea!.focus();
+        } else {
+          target.clearContextTop();
+          if (dropEffect === 'move') {
+            target.insertChars('', undefined, selectionStart, selectionEnd);
+            target.selectionStart = target.selectionEnd = selectionStart;
+            target.hiddenTextarea &&
+              (target.hiddenTextarea.value = target.text);
+            target._updateTextarea();
+            target.fire('changed', {
+              index: selectionStart,
+              action: 'dragend',
+            });
+            canvas.fire('text:changed', { target });
+            canvas.requestRenderAll();
+          }
+          target.exitEditing();
+        }
+      }
+    }
+
+    this.__dragImageDisposer && this.__dragImageDisposer();
+    delete this.__dragImageDisposer;
+    delete this.__dragStartSelection;
+    this.__isDraggingOver = false;
   }
 
   dispose() {
