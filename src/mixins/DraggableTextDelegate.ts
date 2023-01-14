@@ -66,6 +66,9 @@ export class DraggableTextDelegate {
     this.__mouseDownInPlace = this.isPointerOverSelection(e);
   }
 
+  /**
+   * @public override this method to disable dragging
+   */
   isActive() {
     return this.__mouseDownInPlace;
   }
@@ -75,7 +78,7 @@ export class DraggableTextDelegate {
    * @returns true if was active
    */
   end(e: TPointerEvent) {
-    const active = this.__mouseDownInPlace;
+    const active = this.isActive();
     if (active && !this.__dragStartFired) {
       // false positive `active`, is actually a click
       this.target.setCursorByClick(e);
@@ -175,7 +178,8 @@ export class DraggableTextDelegate {
   onDragStart(e: DragEvent): boolean {
     this.__dragStartFired = true;
     const target = this.target;
-    if (this.__mouseDownInPlace && e.dataTransfer) {
+    const active = this.isActive();
+    if (active && e.dataTransfer) {
       const selection = (this.__dragStartSelection = {
         selectionStart: target.selectionStart,
         selectionEnd: target.selectionEnd,
@@ -200,7 +204,7 @@ export class DraggableTextDelegate {
       this.setDragImage(e, data);
     }
     target.abortCursorAnimation();
-    return this.__mouseDownInPlace;
+    return active;
   }
 
   /**
@@ -208,7 +212,7 @@ export class DraggableTextDelegate {
    */
   canDrop(e: DragEvent): boolean {
     if (this.target.editable && !this.target.__corner) {
-      if (this.__mouseDownInPlace && this.__dragStartSelection) {
+      if (this.isActive() && this.__dragStartSelection) {
         //  drag source trying to drop over itself
         //  allow dropping only outside of drag start selection
         const index = this.target.getSelectionStartFromPointer(e);
@@ -258,7 +262,7 @@ export class DraggableTextDelegate {
    * support native like text dragging
    */
   dragLeaveHandler() {
-    if (this.__isDraggingOver || this.__mouseDownInPlace) {
+    if (this.__isDraggingOver || this.isActive()) {
       this.__isDraggingOver = false;
     }
   }
@@ -349,7 +353,7 @@ export class DraggableTextDelegate {
    * @param {DragEvent} options.e
    */
   dragEndHandler({ e }: DragEventData) {
-    if (this.__mouseDownInPlace && this.__dragStartFired) {
+    if (this.isActive() && this.__dragStartFired) {
       //  once the drop event finishes we check if we need to change the drag source
       //  if the drag source received the drop we bail out since the drop handler has already handled logic
       if (this.__dragStartSelection) {

@@ -47,7 +47,7 @@ export abstract class ITextClickBehaviorMixin<
   }
 
   /**
-   * @public override this method to control whether instance should/shouldn't become a drag source
+   * @public override this method to control whether instance should/shouldn't become a drag source, @see also {@link DraggableTextDelegate#isActive}
    * @returns {boolean} should handle event
    */
   onDragStart(e: DragEvent) {
