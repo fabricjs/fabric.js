@@ -781,8 +781,8 @@ export class Canvas extends SelectableCanvas {
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
       (!activeObject ||
-        // active object will flag itself on mousedown/mousedown:before
-        // we need to prevent default so the window starts the drag event sequence and stop mousemove
+        // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
+        // we must not prevent the event's default behavior in order for the window to start the drag event sequence
         !activeObject.__isDragging) &&
       e.preventDefault &&
       e.preventDefault();
