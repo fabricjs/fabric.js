@@ -4,6 +4,12 @@ import type {
 } from '../../mixins/text_style.mixin';
 import { cloneDeep } from '../internals/cloneDeep';
 
+export type TextStyleArray = {
+  start: number;
+  end: number;
+  style: TextStyleDeclaration;
+}[];
+
 /**
  * @param {Object} prevStyle first style to compare
  * @param {Object} thisStyle second style to compare
@@ -37,7 +43,10 @@ export const hasStyleChanged = (
  * @param {String} text the text string that the styles are applied to
  * @return {{start: number, end: number, style: object}[]}
  */
-export const stylesToArray = (styles: TextStyle, text: string) => {
+export const stylesToArray = (
+  styles: TextStyle,
+  text: string
+): TextStyleArray => {
   const textLines = text.split('\n'),
     stylesArray = [];
   let charIndex = -1,
@@ -84,9 +93,9 @@ export const stylesToArray = (styles: TextStyle, text: string) => {
  * @return {Object}
  */
 export const stylesFromArray = (
-  styles: (TextStyleDeclaration & { start: number; end: number })[] | TextStyle,
+  styles: TextStyleArray | TextStyle,
   text: string
-) => {
+): TextStyle => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
     return cloneDeep(styles);
