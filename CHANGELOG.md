@@ -3,7 +3,6 @@
 ## [next]
 
 - chore(TS): finalize interactivity/controls [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
-- fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 - chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
 - refactor(IText): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
