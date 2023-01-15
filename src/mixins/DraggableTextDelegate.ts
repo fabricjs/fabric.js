@@ -173,6 +173,7 @@ export class DraggableTextDelegate {
 
   /**
    * support native like text dragging
+   * @public override this method to control whether IText should/shouldn't become a drag source, @see also {@link isActive}
    * @returns {boolean} should handle event
    */
   onDragStart(e: DragEvent): boolean {
@@ -208,7 +209,7 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * Override to customize drag and drop behavior
+   * @public override this method to control whether IText should/shouldn't become a drop target
    */
   canDrop(e: DragEvent): boolean {
     if (this.target.editable && !this.target.__corner) {
