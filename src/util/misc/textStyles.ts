@@ -83,7 +83,10 @@ export const stylesToArray = (styles: TextStyle, text: string) => {
  * @param {String} text the text string that the styles are applied to
  * @return {Object}
  */
-export const stylesFromArray = (styles: any, text: string) => {
+export const stylesFromArray = (
+  styles: TextStyle | (TextStyleDeclaration & { start: number; end: number })[],
+  text: string
+) => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
     return cloneDeep(styles);
