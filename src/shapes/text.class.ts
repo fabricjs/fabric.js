@@ -1859,7 +1859,7 @@ export class Text<
     return this._fromObject(
       {
         ...object,
-        styles: stylesFromArray(object.styles, object.text),
+        styles: stylesFromArray(object.styles || {}, object.text),
       },
       {
         extraParam: 'text',
