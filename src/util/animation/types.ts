@@ -5,13 +5,14 @@ export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 /**
  * Callback called every frame
  * @param {number | number[]} value current value of the animation.
- * @param valueRatio ∈ [0, 1], current value / end value.
- * @param durationRatio ∈ [0, 1], time passed / duration.
+ * @param {number} valueProgress ∈ [0, 1], the current animation progress reflected on value, normalized.
+ * 0 is the starting value and 1 is the ending value.
+ * @param {number} durationProgress ∈ [0, 1], the current animation duration normalized to 1.
  */
 export type TOnAnimationChangeCallback<T, R = void> = (
   value: T,
-  valueRatio: number,
-  durationRatio: number
+  valueProgress: number,
+  durationProgress: number
 ) => R;
 
 /**
@@ -50,19 +51,19 @@ export type TAnimationBaseOptions<T> = {
    * Duration of the animation in ms
    * @default 500
    */
-  duration?: number;
+  duration: number;
 
   /**
    * Delay to start the animation in ms
    * @default 0
    */
-  delay?: number;
+  delay: number;
 
   /**
    * Easing function
    * @default {defaultEasing}
    */
-  easing?: TEasingFunction<T>;
+  easing: TEasingFunction<T>;
 
   /**
    * The object this animation is being performed on
@@ -93,41 +94,31 @@ export type TAnimationCallbacks<T> = {
   abort: TAbortCallback<T>;
 };
 
-export type TAnimationValues<T> =
-  | {
+export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
+  TAnimationBaseOptions<TEasing> & TAnimationCallbacks<TCallback>
+> & {
+  startValue: T;
+  byValue: T;
+};
+
+export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
+  TAnimationBaseOptions<TEasing> &
+    TAnimationCallbacks<TCallback> & {
       /**
        * Starting value(s)
        * @default 0
        */
       startValue: T;
-    } & (
-      | {
-          /**
-           * Ending value(s)
-           * Ignored if `byValue` exists
-           * @default 100
-           */
-          endValue: T;
-          byValue?: never;
-        }
-      | {
-          /**
-           * Difference between the start value(s) to the end value(s)
-           * Overrides `endValue`
-           * @default [endValue - startValue]
-           */
-          byValue: T;
-          endValue?: never;
-        }
-    );
 
-export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
-  TAnimationBaseOptions<TEasing> &
-    TAnimationValues<T> &
-    TAnimationCallbacks<TCallback>
+      /**
+       * Ending value(s)
+       * @default 100
+       */
+      endValue: T;
+    }
 >;
 
-export type AnimationOptions = TAnimationOptions<number>;
+export type ValueAnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 
@@ -136,3 +127,10 @@ export type ColorAnimationOptions = TAnimationOptions<
   string,
   number[]
 >;
+
+export type AnimationOptions<T extends number | number[] | TColorArg> =
+  T extends TColorArg
+    ? ColorAnimationOptions
+    : T extends number[]
+    ? ArrayAnimationOptions
+    : ValueAnimationOptions;

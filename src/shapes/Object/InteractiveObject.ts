@@ -13,7 +13,6 @@ import {
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { FabricObject } from './Object';
-import { ObjectGeometry } from './ObjectGeometry';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -49,7 +48,18 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  oCoords: Record<string, TOCoord> = {};
+  declare oCoords: Record<string, TOCoord>;
+
+  /**
+   * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
+   * too much and will be redrawn with correct details at the end of scaling.
+   * this setting is performance and application dependant.
+   * default to true
+   * since 1.7.0
+   * @type Boolean
+   * @default true
+   */
+  declare noScaleCache: boolean;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -59,39 +69,39 @@ export class InteractiveFabricObject<
    * this isn't cleaned automatically. Non selected objects may have wrong values
    * @type [string]
    */
-  __corner?: string;
+  declare __corner: string;
 
   /**
    * a map of control visibility for this object.
    * this was left when controls were introduced to not break the api too much
    * this takes priority over the generic control visibility
    */
-  _controlsVisibility: Record<string, boolean>;
+  declare _controlsVisibility: Record<string, boolean>;
 
   /**
    * The angle that an object will lock to while rotating.
    * @type [TDegree]
    */
-  snapAngle?: TDegree;
+  declare snapAngle?: TDegree;
 
   /**
    * The angle difference from the current snapped angle in which snapping should occur.
    * When undefined, the snapThreshold will default to the snapAngle.
    * @type [TDegree]
    */
-  snapThreshold?: TDegree;
+  declare snapThreshold?: TDegree;
 
   /**
    * holds the controls for the object.
    * controls are added by default_controls.js
    */
-  controls: TControlSet;
+  declare controls: TControlSet;
 
   /**
    * internal boolean to signal the code that the object is
    * part of the move action.
    */
-  isMoving?: boolean;
+  declare isMoving?: boolean;
 
   /**
    * internal boolean to signal the code that the object is
@@ -100,7 +110,7 @@ export class InteractiveFabricObject<
    * they need to be either both private or more generic
    * Canvas class needs to see this variable
    */
-  __isDragging?: boolean;
+  declare __isDragging?: boolean;
 
   /**
    * A boolean used from the gesture module to keep tracking of a scaling
@@ -110,7 +120,7 @@ export class InteractiveFabricObject<
    * @TODO use git blame to investigate why it was added
    * DON'T USE IT. WE WILL TRY TO REMOVE IT
    */
-  _scaling?: boolean;
+  declare _scaling?: boolean;
 
   declare canvas?: Canvas;
 
@@ -120,6 +130,27 @@ export class InteractiveFabricObject<
    */
   constructor(options?: Record<string, unknown>) {
     super(options);
+  }
+
+  /**
+   * Update width and height of the canvas for cache
+   * returns true or false if canvas needed resize.
+   * @private
+   * @return {Boolean} true if the canvas has been resized
+   */
+  _updateCacheCanvas() {
+    const targetCanvas = this.canvas;
+    if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+      const target = targetCanvas._currentTransform.target,
+        action = targetCanvas._currentTransform.action;
+      if (
+        this === (target as InteractiveFabricObject) &&
+        action.startsWith('scale')
+      ) {
+        return false;
+      }
+    }
+    return super._updateCacheCanvas();
   }
 
   /**
@@ -259,11 +290,7 @@ export class InteractiveFabricObject<
    * @return {void}
    */
   setCoords(): void {
-    if (this.callSuper) {
-      ObjectGeometry.prototype.setCoords.call(this);
-    } else {
-      super.setCoords();
-    }
+    super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.oCoords = this.calcOCoords();
   }

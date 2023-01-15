@@ -8,5 +8,7 @@
   "markdown.validate.ignoredLinks": [
     // github links
     "../../**"
-  ]
+  ],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true
 }

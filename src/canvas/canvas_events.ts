@@ -22,6 +22,7 @@ import {
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './canvas.class';
+import { TextEditingManager } from './TextEditingManager';
 
 const RIGHT_CLICK = 3,
   MIDDLE_CLICK = 2,
@@ -74,46 +75,46 @@ export class Canvas extends SelectableCanvas {
    * @type Number
    * @private
    */
-  mainTouchId: null | number;
+  declare mainTouchId: null | number;
 
   /**
    * When the option is enabled, PointerEvent is used instead of TPointerEvent.
    * @type Boolean
    * @default
    */
-  enablePointerEvents: boolean;
+  declare enablePointerEvents: boolean;
 
   /**
    * an internal flag that is used to remember if we already bound the events
    * @type Boolean
    * @private
    */
-  private eventsBound: boolean;
+  private declare eventsBound: boolean;
 
   /**
    * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
    */
-  private _willAddMouseDown: number;
+  private declare _willAddMouseDown: number;
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
    * @type FabricObject
    * @private
    */
-  private _draggedoverTarget?: FabricObject;
+  private declare _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
    */
-  private _dragSource?: FabricObject;
+  private declare _dragSource?: FabricObject;
 
-  currentTarget?: FabricObject;
+  declare currentTarget?: FabricObject;
 
-  currentSubTargets?: FabricObject[];
+  declare currentSubTargets?: FabricObject[];
 
   /**
    * Holds a reference to a pointer during mousedown to compare on mouse up and determine
@@ -121,7 +122,9 @@ export class Canvas extends SelectableCanvas {
    * @type FabricObject
    * @private
    */
-  _previousPointer: Point;
+  declare _previousPointer: Point;
+
+  textEditingManager = new TextEditingManager();
 
   /**
    * Adds mouse listeners to canvas
@@ -133,7 +136,6 @@ export class Canvas extends SelectableCanvas {
     // this is a workaround to having double listeners.
     this.removeListeners();
     this._bindEvents();
-    // @ts-ginore
     this.addOrRemove(addListener, 'add');
   }
 
@@ -342,10 +344,12 @@ export class Canvas extends SelectableCanvas {
     source?: FabricObject,
     target?: FabricObject
   ) {
+    let dirty = false;
     const ctx = this.contextTop;
     if (source) {
       source.clearContextTop(true);
       source.renderDragSourceEffect(e);
+      dirty = true;
     }
     if (target) {
       if (target !== source) {
@@ -354,8 +358,10 @@ export class Canvas extends SelectableCanvas {
         target.clearContextTop(true);
       }
       target.renderDropTargetEffect(e);
+      dirty = true;
     }
     ctx.restore();
+    dirty && (this.contextTopDirty = true);
   }
 
   /**
@@ -985,11 +991,7 @@ export class Canvas extends SelectableCanvas {
 
     target.setCoords();
 
-    if (
-      transform.actionPerformed ||
-      // @ts-ignore
-      (this.stateful && target.hasStateChanged())
-    ) {
+    if (transform.actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
     }
@@ -1180,8 +1182,6 @@ export class Canvas extends SelectableCanvas {
    */
   _beforeTransform(e: TPointerEvent) {
     const t = this._currentTransform!;
-    // @ts-ignore
-    this.stateful && t.target.saveState();
     this.fire('before:transform', {
       e,
       transform: t,
@@ -1227,6 +1227,7 @@ export class Canvas extends SelectableCanvas {
     } else {
       this._transformObject(e);
     }
+    this.textEditingManager.onMouseMove(e);
     this._handleEvent(e, 'move');
     this._resetTransformEventData();
   }
@@ -1640,6 +1641,26 @@ export class Canvas extends SelectableCanvas {
     this.setCursor(this.defaultCursor);
     // clear selection and current transformation
     this._groupSelector = null;
+  }
+
+  exitTextEditing() {
+    this.textEditingManager.exitTextEditing();
+  }
+
+  /**
+   * @override clear {@link textEditingManager}
+   */
+  clear() {
+    this.textEditingManager.dispose();
+    super.clear();
+  }
+
+  /**
+   * @override clear {@link textEditingManager}
+   */
+  destroy() {
+    super.destroy();
+    this.textEditingManager.dispose();
   }
 
   /**

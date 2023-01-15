@@ -21,7 +21,7 @@ export class Vibrance extends BaseFilter {
    * @param {Number} vibrance
    * @default
    */
-  vibrance: number;
+  declare vibrance: number;
 
   /**
    * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.

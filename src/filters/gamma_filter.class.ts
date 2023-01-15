@@ -20,8 +20,8 @@ export class Gamma extends BaseFilter {
    * @param {Array} gamma
    * @default
    */
-  gamma: GammaInput;
-  rgbValues?: {
+  declare gamma: GammaInput;
+  declare rgbValues?: {
     r: Uint8Array;
     g: Uint8Array;
     b: Uint8Array;

@@ -17,7 +17,7 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, stateProperties } from './Object/FabricObject';
 import { Rect } from './rect.class';
 import { classRegistry } from '../util/class_registry';
 
@@ -90,7 +90,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @type LayoutStrategy
    * @default
    */
-  layout: LayoutStrategy;
+  declare layout: LayoutStrategy;
 
   /**
    * Used to optimize performance
@@ -98,7 +98,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  subTargetCheck: boolean;
+  declare subTargetCheck: boolean;
 
   /**
    * Used to allow targeting of object inside groups.
@@ -107,7 +107,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  interactive: boolean;
+  declare interactive: boolean;
 
   /**
    * Used internally to optimize performance
@@ -130,7 +130,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects || [];
+    this._objects = objects;
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -141,7 +141,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       false
     );
     this._firstLayoutDone = false;
-    //  setting angle, skewX, skewY must occur after initial layout
+    // setting angle, skewX, skewY must occur after initial layout
     this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
@@ -486,30 +486,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       this._objects[i].render(ctx);
     }
     this._drawClipPath(ctx, this.clipPath);
-  }
-
-  /**
-   * Check if cache is dirty
-   */
-  isCacheDirty(skipCanvas?: boolean) {
-    if (super.isCacheDirty(skipCanvas)) {
-      return true;
-    }
-    if (!this.statefullCache) {
-      return false;
-    }
-    for (let i = 0; i < this._objects.length; i++) {
-      if (this._objects[i].isCacheDirty(true)) {
-        if (this._cacheCanvas) {
-          // if this group has not a cache canvas there is nothing to clean
-          const x = this.cacheWidth / this.zoomX,
-            y = this.cacheHeight / this.zoomY;
-          this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-        }
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -937,7 +913,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   __serializeObjects(
     method: 'toObject' | 'toDatalessObject',
-    propertiesToInclude?: (keyof this)[]
+    propertiesToInclude?: string[]
   ) {
     const _includeDefaultValues = this.includeDefaultValues;
     return this._objects
@@ -1065,10 +1041,13 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   type: 'group',
   layout: 'fit-content',
   strokeWidth: 0,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('layout'),
   subTargetCheck: false,
   interactive: false,
 };
 
-Object.assign(Group.prototype, groupDefaultValues);
+Object.assign(Group.prototype, {
+  ...groupDefaultValues,
+  stateProperties: [...stateProperties, 'layout'],
+});
+
 classRegistry.setClass(Group);

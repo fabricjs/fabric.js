@@ -3,7 +3,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
   /**
@@ -11,14 +11,14 @@ export class Ellipse extends FabricObject {
    * @type Number
    * @default
    */
-  rx: number;
+  declare rx: number;
 
   /**
    * Vertical radius
    * @type Number
    * @default
    */
-  ry: number;
+  declare ry: number;
 
   /**
    * Constructor
@@ -27,8 +27,6 @@ export class Ellipse extends FabricObject {
    */
   constructor(options: Record<string, unknown>) {
     super(options);
-    this.set('rx', (options && options.rx) || 0);
-    this.set('ry', (options && options.ry) || 0);
   }
 
   /**
@@ -74,7 +72,7 @@ export class Ellipse extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject(propertiesToInclude: string[] = []) {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 
@@ -145,10 +143,12 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   type: 'ellipse',
   rx: 0,
   ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 
-Object.assign(Ellipse.prototype, ellipseDefaultValues);
+Object.assign(Ellipse.prototype, {
+  ...ellipseDefaultValues,
+  cacheProperties: [...cacheProperties, 'rx', 'ry'],
+});
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);

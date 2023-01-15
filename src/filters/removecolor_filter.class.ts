@@ -20,19 +20,19 @@ export class RemoveColor extends BaseFilter {
    * @param {String} type
    * @default
    */
-  color: string;
+  declare color: string;
 
   /**
    * distance to actual color, as value up or down from each r,g,b
    * between 0 and 1
    **/
-  distance: number;
+  declare distance: number;
 
   /**
    * For color to remove inside distance, use alpha channel for a smoother deletion
    * NOT IMPLEMENTED YET
    **/
-  useAlpha: boolean;
+  declare useAlpha: boolean;
 
   /**
    * Applies filter to canvas element

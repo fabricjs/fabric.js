@@ -19,7 +19,7 @@ export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.
    */
-  rotation: number;
+  declare rotation: number;
 
   calculateMatrix() {
     const rad = this.rotation * Math.PI,
