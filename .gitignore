@@ -7,6 +7,5 @@ change-output.md
 before_commit
 /coverage/
 .idea/
-/dist/fabric.require.js
-/dist/fabric.min.js.gz
+/dist/
 /cli_output/
