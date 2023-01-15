@@ -69,7 +69,7 @@ export class InteractiveFabricObject<
    * this isn't cleaned automatically. Non selected objects may have wrong values
    * @type [string]
    */
-  declare __corner: string;
+  declare __corner?: string;
 
   /**
    * a map of control visibility for this object.
