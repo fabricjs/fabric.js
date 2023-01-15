@@ -494,34 +494,16 @@ export class SelectableCanvas<
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  /**
-   * Constructor
-   * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
-   * @param {Object} [options] Options object
-   * @return {Object} thisArg
-   */
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super(el, options);
-  }
 
-  _init(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
+  protected initElements(el: string | HTMLCanvasElement) {
+    super.initElements(el);
     this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
-    // @ts-ignore
-    this._initEventListeners();
-    this._isRetinaScaling() && this._initRetinaScaling();
-    this.calcOffset();
     this._createCacheCanvas();
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
+  protected _initRetinaScaling() {
     super._initRetinaScaling();
     this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
@@ -1183,19 +1165,16 @@ export class SelectableCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @return {Canvas} thisArg
+   * Internal use only
+   * @protected
    */
-  setDimensions(dimensions: TSize, options?: TCanvasSizeOptions) {
+  protected _setDimensionsImpl(
+    dimensions: TSize,
+    options?: TCanvasSizeOptions
+  ) {
     // @ts-ignore
     this._resetTransformEventData();
-    super.setDimensions(dimensions, options);
+    super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
         this.freeDrawingBrush._setBrushStyles(this.contextTop);
@@ -1230,7 +1209,7 @@ export class SelectableCanvas<
    * @private
    * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
    */
-  _createUpperCanvas() {
+  protected _createUpperCanvas() {
     const lowerCanvasEl = this.lowerCanvasEl;
 
     // if there is no upperCanvas (most common case) we create one.
@@ -1249,30 +1228,15 @@ export class SelectableCanvas<
     upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(upperCanvasEl);
     upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextTop = upperCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _createCacheCanvas() {
+  protected _createCacheCanvas() {
     this.cacheCanvasEl = this._createCanvasElement();
-    this.cacheCanvasEl.setAttribute('width', `${this.width}`);
-    this.cacheCanvasEl.setAttribute('height', `${this.height}`);
-    this.contextCache = this.cacheCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _initWrapperElement() {
-    if (this.wrapperEl) {
-      return;
-    }
+  protected _initWrapperElement() {
     const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
@@ -1289,7 +1253,7 @@ export class SelectableCanvas<
    * @private
    * @param {HTMLCanvasElement} element canvas element to apply styles on
    */
-  _applyCanvasStyle(element: HTMLCanvasElement) {
+  protected _applyCanvasStyle(element: HTMLCanvasElement) {
     const width = this.width || element.width,
       height = this.height || element.height;
 

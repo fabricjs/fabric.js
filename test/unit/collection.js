@@ -21,6 +21,14 @@
     }
   });
 
+  QUnit.test('init', function (assert) {
+    assert.ok(Array.isArray(collection._objects), 'is array');
+    assert.equal(collection._objects.length, 0, 'is empty array');
+    assert.ok(Array.isArray(collection2._objects), 'is array');
+    assert.equal(collection2._objects.length, 0, 'is empty array');
+    assert.notEqual(collection._objects, collection2._objects, 'different array');
+  });
+
   QUnit.test('add', function(assert) {
     var obj = { prop: 4 };
     assert.ok(typeof collection.add === 'function', 'has add method');
