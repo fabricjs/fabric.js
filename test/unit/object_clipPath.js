@@ -53,12 +53,16 @@
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.clipPath = new fabric.Object();
-    expected.clipPath = {
+    
+    assert.deepEqual({
       ...emptyObjectRepr,
-      inverted: cObj.clipPath.inverted,
+      clipPath: {
+        ...emptyObjectRepr,
+        inverted: cObj.clipPath.inverted,
       absolutePositioned: cObj.clipPath.absolutePositioned,
-    };
-    assert.deepEqual(emptyObjectRepr, cObj.toObject());
+      }
+    }, cObj.toObject());
+
     cObj.clipPath.excludeFromExport = true;
     assert.ok(cObj.toObject().clipPath === undefined);
   });
