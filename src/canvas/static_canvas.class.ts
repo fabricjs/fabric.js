@@ -282,12 +282,10 @@ export class StaticCanvas<
     super();
     this.set(options);
     this.initElements(el);
-    this._setDimensionsImpl(
-      {
-        width: this.width || this.lowerCanvasEl.width || 0,
-        height: this.height || this.lowerCanvasEl.height || 0,
-      },
-    );
+    this._setDimensionsImpl({
+      width: this.width || this.lowerCanvasEl.width || 0,
+      height: this.height || this.lowerCanvasEl.height || 0,
+    });
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
@@ -465,10 +463,7 @@ export class StaticCanvas<
    */
   protected _setDimensionsImpl(
     dimensions: Partial<TSize>,
-    {
-      cssOnly = false,
-      backstoreOnly = false,
-    }: TCanvasSizeOptions = {}
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
   ) {
     Object.entries(dimensions).forEach(([prop, value]) => {
       let cssValue = `${value}`;
@@ -499,15 +494,13 @@ export class StaticCanvas<
    */
   setDimensions(
     dimensions: Partial<TSize>,
-    {
-      cssOnly = false,
-      backstoreOnly = false,
-    }: TCanvasSizeOptions = {}
-    ) {
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+  ) {
     this._setDimensionsImpl(dimensions, {
-      cssOnly, backstoreOnly
+      cssOnly,
+      backstoreOnly,
     });
-    if (!cssOnly && !skipRendering) {
+    if (!cssOnly) {
       this.requestRenderAll();
     }
   }

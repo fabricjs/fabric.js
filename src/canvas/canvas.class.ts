@@ -1168,7 +1168,10 @@ export class SelectableCanvas<
    * Internal use only
    * @protected
    */
-  protected _setDimensionsImpl(dimensions: TSize, options?: TCanvasSizeOptions) {
+  protected _setDimensionsImpl(
+    dimensions: TSize,
+    options?: TCanvasSizeOptions
+  ) {
     // @ts-ignore
     this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
