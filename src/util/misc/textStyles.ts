@@ -1,4 +1,8 @@
-import { clone } from '../lang_object';
+import type {
+  TextStyle,
+  TextStyleDeclaration,
+} from '../../mixins/text_style.mixin';
+import { cloneDeep } from '../internals/cloneDeep';
 
 /**
  * @param {Object} prevStyle first style to compare
@@ -7,8 +11,8 @@ import { clone } from '../lang_object';
  * @return {boolean} true if the style changed
  */
 export const hasStyleChanged = (
-  prevStyle: any,
-  thisStyle: any,
+  prevStyle: TextStyleDeclaration,
+  thisStyle: TextStyleDeclaration,
   forTextSpans = false
 ) =>
   prevStyle.fill !== thisStyle.fill ||
@@ -33,13 +37,13 @@ export const hasStyleChanged = (
  * @param {String} text the text string that the styles are applied to
  * @return {{start: number, end: number, style: object}[]}
  */
-export const stylesToArray = (styles: any, text: string) => {
+export const stylesToArray = (styles: TextStyle, text: string) => {
   const textLines = text.split('\n'),
     stylesArray = [];
   let charIndex = -1,
     prevStyle = {};
   // clone style structure to prevent mutation
-  styles = clone(styles, true);
+  styles = cloneDeep(styles);
 
   //loop through each textLine
   for (let i = 0; i < textLines.length; i++) {
@@ -82,7 +86,7 @@ export const stylesToArray = (styles: any, text: string) => {
 export const stylesFromArray = (styles: any, text: string) => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
-    return clone(styles, true);
+    return cloneDeep(styles);
   }
   const textLines = text.split('\n'),
     stylesObject = {} as Record<
