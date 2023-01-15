@@ -2,6 +2,11 @@
 
 ## [next]
 
+- chore(): replace `clone(obj, true)` with `cloneDeep(obj)` and remove all `extend`, `clone` calls in favor of object spreads. [#8600](https://github.com/fabricjs/fabric.js/pull/8600)
+  BREAKING:
+  `clone` and `extend` are used in all examples unfortunately so the community must have adopted them.
+  Devs using `extend` on classes should mutate the prototype directly (or with `defineProperty`) or subclass.
+  Using `clone` or `extend` to assign to an object was always a bad idea. Use lodash or whatever.
 - chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
 - refactor(IText): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
 - refactor(Canvas, IText): Handle cross instance text editing states to an EditingManager class [#8543](https://github.com/fabricjs/fabric.js/pull/8543)
