@@ -13,7 +13,7 @@ import { classRegistry } from '../util/class_registry';
  * object.applyFilters();
  */
 export class Pixelate extends BaseFilter {
-  blocksize: number;
+  declare blocksize: number;
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.

@@ -188,7 +188,7 @@
           }
           await fabricCanvas.dispose();
           done();
-        });
+        }, assert);
       });
     }
   }

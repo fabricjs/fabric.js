@@ -32,8 +32,8 @@ type ResolverReturnValue<T extends object, S = true> = S extends true
   : T | undefined;
 
 export class ClassRegistry {
-  [JSON]: Map<string, TJSONResolver>;
-  [SVG]: Map<string, TSVGResolver>;
+  declare [JSON]: Map<string, TJSONResolver>;
+  declare [SVG]: Map<string, TSVGResolver>;
 
   constructor() {
     this[JSON] = new Map();

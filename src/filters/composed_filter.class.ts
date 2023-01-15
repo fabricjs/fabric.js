@@ -16,7 +16,7 @@ export class Composed extends BaseFilter {
   /**
    * A non sparse array of filters to apply
    */
-  subFilters: AbstractBaseFilter[];
+  declare subFilters: AbstractBaseFilter[];
 
   constructor({
     subFilters = [],

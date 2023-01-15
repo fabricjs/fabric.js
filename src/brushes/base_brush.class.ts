@@ -72,7 +72,7 @@ export abstract class BaseBrush {
   /**
    * @todo add type
    */
-  canvas: Canvas;
+  declare canvas: Canvas;
 
   constructor(canvas: Canvas) {
     this.canvas = canvas;
