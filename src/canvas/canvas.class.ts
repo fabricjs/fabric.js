@@ -1165,19 +1165,13 @@ export class SelectableCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @return {Canvas} thisArg
+   * Internal use only
+   * @protected
    */
-  setDimensions(dimensions: TSize, options?: TCanvasSizeOptions) {
+  protected _setDimensionsImpl(dimensions: TSize, options?: TCanvasSizeOptions) {
     // @ts-ignore
     this._resetTransformEventData();
-    super.setDimensions(dimensions, options);
+    super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
         this.freeDrawingBrush._setBrushStyles(this.contextTop);

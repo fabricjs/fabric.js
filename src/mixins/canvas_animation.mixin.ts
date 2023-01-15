@@ -116,7 +116,7 @@ fabric.util.object.extend(
      */
     fxStraightenObject: function (object: FabricObject) {
       return object.fxStraighten({
-        onChange: this.requestRenderAll,
+        onChange: () => this.requestRenderAll(),
       });
     },
   }

@@ -49,7 +49,6 @@ const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
   cssOnly?: boolean;
-  skipRendering?: boolean;
 };
 
 export type TSVGExportOptions = {
@@ -281,16 +280,13 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this.renderAndReset = this.renderAndReset.bind(this);
-    this.requestRenderAll = this.requestRenderAll.bind(this);
     this.set(options);
     this.initElements(el);
-    this.setDimensions(
+    this._setDimensionsImpl(
       {
         width: this.width || this.lowerCanvasEl.width || 0,
         height: this.height || this.lowerCanvasEl.height || 0,
       },
-      { skipRendering: true }
     );
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
@@ -464,20 +460,14 @@ export class StaticCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   * Internal use only
+   * @protected
    */
-  setDimensions(
+  protected _setDimensionsImpl(
     dimensions: Partial<TSize>,
     {
       cssOnly = false,
       backstoreOnly = false,
-      skipRendering = false,
     }: TCanvasSizeOptions = {}
   ) {
     Object.entries(dimensions).forEach(([prop, value]) => {
@@ -496,7 +486,27 @@ export class StaticCanvas<
 
     this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
+  }
 
+  /**
+   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+   * @param {Object}        dimensions                    Object with width/height properties
+   * @param {Number|String} [dimensions.width]            Width of canvas element
+   * @param {Number|String} [dimensions.height]           Height of canvas element
+   * @param {Object}        [options]                     Options object
+   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   */
+  setDimensions(
+    dimensions: Partial<TSize>,
+    {
+      cssOnly = false,
+      backstoreOnly = false,
+    }: TCanvasSizeOptions = {}
+    ) {
+    this._setDimensionsImpl(dimensions, {
+      cssOnly, backstoreOnly
+    });
     if (!cssOnly && !skipRendering) {
       this.requestRenderAll();
     }
@@ -683,7 +693,7 @@ export class StaticCanvas<
    */
   requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-      this.nextRenderHandle = requestAnimFrame(this.renderAndReset);
+      this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
   }
 
