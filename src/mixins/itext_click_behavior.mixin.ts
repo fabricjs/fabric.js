@@ -195,6 +195,9 @@ export abstract class ITextClickBehaviorMixin<
       return;
     }
 
+    // mousedown is going to early return if isDragging is true.
+    // this is here to recover the setCursorByClick in case the
+    // isDragging is a false positive.
     shouldSetCursor && this.setCursorByClick(options.e);
 
     if (this.__lastSelected && !this.__corner) {
