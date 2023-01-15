@@ -840,9 +840,9 @@ export class SelectableCanvas<
         )
       : this.getPointer(e);
     const corner = target.__corner || '',
-      control = target.controls[corner],
+      control = !!corner && target.controls[corner],
       actionHandler =
-        alreadySelected && corner
+        alreadySelected && control
           ? control.getActionHandler(e, target, control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
