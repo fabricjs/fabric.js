@@ -78,7 +78,7 @@ export class StatefulMixin {
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
     props.reduce((o, key) => {
-      o[key] = cloneDeep(this[key]);
+      o[key] = this[key] ? cloneDeep(this[key]) : this[key];
       return o;
     }, this[destination]);
   }
