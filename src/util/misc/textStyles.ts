@@ -84,7 +84,7 @@ export const stylesToArray = (styles: TextStyle, text: string) => {
  * @return {Object}
  */
 export const stylesFromArray = (
-  styles: TextStyle | (TextStyleDeclaration & { start: number; end: number })[],
+  styles: (TextStyleDeclaration & { start: number; end: number })[] | TextStyle,
   text: string
 ) => {
   if (!Array.isArray(styles)) {
