@@ -153,8 +153,8 @@ function assertDragEventStream(name, a, b) {
                 assert.ok(!iText.draggableTextDelegate.isActive(), 'unflagged as dragging');
                 assert.ok(!iText.shouldStartDragging(), 'unflagged as dragging');
                 // assert.equal(called, 1, 'should set cursor on mouse up');
-                assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
-                assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
+                assert.equal(iText.selectionStart, 2, 'set the selectionStart');
+                assert.equal(iText.selectionEnd, 2, 'set the selectionend');
                 assertCursorAnimation(assert, iText, true);
                 assert.equal(count, 1, 'selection:changed fired');
                 assert.equal(countCanvas, 1, 'text:selection:changed fired');
@@ -199,6 +199,29 @@ function assertDragEventStream(name, a, b) {
                     }
                 ], 'events should match');
                 assert.deepEqual(eventStream.canvas, eventStream.source, 'events should match');
+            });
+
+            QUnit.test('disabled drag start: onDragStart', async function (assert) {
+                iText.onDragStart = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), true, 'should not flag dragging');
+                assert.equal(iText.selectionStart, 0, 'selectionStart is kept');
+                assert.equal(iText.selectionEnd, 4, 'selectionEnd is kept');
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
+            });
+
+            QUnit.test('disabled drag start: isActive', async function (assert) {
+                iText.draggableTextDelegate.isActive = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), false, 'should not flag dragging');
+                assert.equal(iText.selectionStart, 2, 'selectionStart is set');
+                assert.equal(iText.selectionEnd, 2, 'selectionEnd is set');
+                assertCursorAnimation(assert, iText);
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
             });
 
             QUnit.test('drag over: source', function (assert) {
