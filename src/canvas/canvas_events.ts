@@ -86,13 +86,6 @@ export class Canvas extends SelectableCanvas {
   declare enablePointerEvents: boolean;
 
   /**
-   * an internal flag that is used to remember if we already bound the events
-   * @type Boolean
-   * @private
-   */
-  private declare eventsBound: boolean;
-
-  /**
    * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
@@ -138,16 +131,39 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager();
 
-  /**
-   * Adds mouse listeners to canvas
-   * @private
-   */
-  private _initEventListeners() {
-    // in case we initialized the class twice. This should not happen normally
-    // but in some kind of applications where the canvas element may be changed
-    // this is a workaround to having double listeners.
-    this.removeListeners();
-    this._bindEvents();
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
+    // bind event handlers
+    (
+      [
+        '_onMouseDown',
+        '_onTouchStart',
+        '_onMouseMove',
+        '_onMouseUp',
+        '_onTouchEnd',
+        '_onResize',
+        // '_onGesture',
+        // '_onDrag',
+        // '_onShake',
+        // '_onLongPress',
+        // '_onOrientationChange',
+        '_onMouseWheel',
+        '_onMouseOut',
+        '_onMouseEnter',
+        '_onContextMenu',
+        '_onDoubleClick',
+        '_onDragStart',
+        '_onDragEnd',
+        '_onDragProgress',
+        '_onDragOver',
+        '_onDragEnter',
+        '_onDragLeave',
+        '_onDrop',
+      ] as (keyof this)[]
+    ).forEach((eventHandler) => {
+      this[eventHandler] = (this[eventHandler] as Function).bind(this);
+    });
+    // register event handlers
     this.addOrRemove(addListener, 'add');
   }
 
@@ -227,47 +243,6 @@ export class Canvas extends SelectableCanvas {
       this._onMouseMove as EventListener,
       addEventOptions
     );
-  }
-
-  /**
-   * @private
-   */
-  private _bindEvents() {
-    if (this.eventsBound) {
-      // for any reason we pass here twice we do not want to bind events twice.
-      return;
-    }
-    (
-      [
-        '_onMouseDown',
-        '_onTouchStart',
-        '_onMouseMove',
-        '_onMouseUp',
-        '_onTouchEnd',
-        '_onResize',
-        // '_onGesture',
-        // '_onDrag',
-        // '_onShake',
-        // '_onLongPress',
-        // '_onOrientationChange',
-        '_onMouseWheel',
-        '_onMouseOut',
-        '_onMouseEnter',
-        '_onContextMenu',
-        '_onDoubleClick',
-        '_onDragStart',
-        '_onDragEnd',
-        '_onDragProgress',
-        '_onDragOver',
-        '_onDragEnter',
-        '_onDragLeave',
-        '_onDrop',
-      ] as const
-    ).forEach((eventHandler) => {
-      // @ts-expect-error dumb TS
-      this[eventHandler] = this[eventHandler].bind(this);
-    });
-    this.eventsBound = true;
   }
 
   /**
@@ -1713,8 +1688,3 @@ export class Canvas extends SelectableCanvas {
     return new Canvas(el);
   }
 }
-
-// there is an order execution bug if i put this as public property.
-Object.assign(Canvas.prototype, {
-  eventsBound: false,
-});

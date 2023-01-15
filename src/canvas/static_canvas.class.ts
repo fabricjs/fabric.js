@@ -268,9 +268,6 @@ export class StaticCanvas<
    */
   declare _originalCanvasStyle?: string;
 
-  declare renderAndResetBound: () => void;
-  declare requestRenderAllBound: () => void;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
@@ -283,7 +280,19 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this._init(el, options);
+    this.set(options);
+    this.initElements(el);
+    this._setDimensionsImpl({
+      width: this.width || this.lowerCanvasEl.width || 0,
+      height: this.height || this.lowerCanvasEl.height || 0,
+    });
+    this.viewportTransform = [...this.viewportTransform];
+    this.calcViewportBoundaries();
+  }
+
+  protected initElements(el: string | HTMLCanvasElement) {
+    this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
   }
 
   add(...objects: FabricObject[]) {
@@ -332,32 +341,6 @@ export class StaticCanvas<
 
   /**
    * @private
-   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
-   * @param {Object} [options] Options object
-   */
-  _init(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
-    this._isRetinaScaling() && this._initRetinaScaling();
-    this.calcViewportBoundaries();
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
-   * @param {Object} [options] Options object
-   */
-  _initStatic(el: string | HTMLCanvasElement, options = {}) {
-    this._objects = [];
-    this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-    this._initOptions(options);
-    this.calcOffset();
-  }
-
-  /**
-   * @private
    */
   _isRetinaScaling() {
     return config.devicePixelRatio > 1 && this.enableRetinaScaling;
@@ -371,14 +354,11 @@ export class StaticCanvas<
     return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
+  protected _initRetinaScaling() {
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
-  __initRetinaScaling(
+  protected __initRetinaScaling(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
@@ -399,7 +379,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _createCanvasElement() {
+  protected _createCanvasElement() {
     const element = createCanvasElement();
     if (!element) {
       throw new Error(CANVAS_INIT_ERROR);
@@ -411,33 +391,11 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   * @param {Object} [options] Options object
-   */
-  _initOptions(options = {}) {
-    const lowerCanvasEl = this.lowerCanvasEl;
-    this.set(options);
-
-    this.width = this.width || lowerCanvasEl.width || 0;
-    this.height = this.height || lowerCanvasEl.height || 0;
-    this.viewportTransform = [...this.viewportTransform];
-
-    if (!this.lowerCanvasEl.style) {
-      return;
-    }
-    lowerCanvasEl.width = this.width;
-    lowerCanvasEl.height = this.height;
-
-    lowerCanvasEl.style.width = this.width + 'px';
-    lowerCanvasEl.style.height = this.height + 'px';
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
    */
-  _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
+  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
     // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
     if (isHTMLCanvas(canvasEl)) {
       this.lowerCanvasEl = canvasEl;
@@ -500,15 +458,10 @@ export class StaticCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   * Internal use only
+   * @protected
    */
-  setDimensions(
+  protected _setDimensionsImpl(
     dimensions: Partial<TSize>,
     { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
   ) {
@@ -528,7 +481,25 @@ export class StaticCanvas<
 
     this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
+  }
 
+  /**
+   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+   * @param {Object}        dimensions                    Object with width/height properties
+   * @param {Number|String} [dimensions.width]            Width of canvas element
+   * @param {Number|String} [dimensions.height]           Height of canvas element
+   * @param {Object}        [options]                     Options object
+   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   */
+  setDimensions(
+    dimensions: Partial<TSize>,
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+  ) {
+    this._setDimensionsImpl(dimensions, {
+      cssOnly,
+      backstoreOnly,
+    });
     if (!cssOnly) {
       this.requestRenderAll();
     }
@@ -715,7 +686,7 @@ export class StaticCanvas<
    */
   requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-      this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
+      this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
   }
 
