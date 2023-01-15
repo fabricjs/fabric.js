@@ -1,8 +1,6 @@
 // @ts-nocheck
 
-import { getEnv } from '../env';
-
-fabric.util.object.extend(
+Object.assign(
   fabric.StaticCanvas.prototype,
   /** @lends fabric.StaticCanvas.prototype */ {
     /**
