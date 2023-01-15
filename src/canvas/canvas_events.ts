@@ -122,31 +122,33 @@ export class Canvas extends SelectableCanvas {
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
     // bind event handlers
-    ([
-      '_onMouseDown',
-      '_onTouchStart',
-      '_onMouseMove',
-      '_onMouseUp',
-      '_onTouchEnd',
-      '_onResize',
-      // '_onGesture',
-      // '_onDrag',
-      // '_onShake',
-      // '_onLongPress',
-      // '_onOrientationChange',
-      '_onMouseWheel',
-      '_onMouseOut',
-      '_onMouseEnter',
-      '_onContextMenu',
-      '_onDoubleClick',
-      '_onDragStart',
-      '_onDragEnd',
-      '_onDragProgress',
-      '_onDragOver',
-      '_onDragEnter',
-      '_onDragLeave',
-      '_onDrop',
-    ] as (keyof this)[]).forEach((eventHandler) => {
+    (
+      [
+        '_onMouseDown',
+        '_onTouchStart',
+        '_onMouseMove',
+        '_onMouseUp',
+        '_onTouchEnd',
+        '_onResize',
+        // '_onGesture',
+        // '_onDrag',
+        // '_onShake',
+        // '_onLongPress',
+        // '_onOrientationChange',
+        '_onMouseWheel',
+        '_onMouseOut',
+        '_onMouseEnter',
+        '_onContextMenu',
+        '_onDoubleClick',
+        '_onDragStart',
+        '_onDragEnd',
+        '_onDragProgress',
+        '_onDragOver',
+        '_onDragEnter',
+        '_onDragLeave',
+        '_onDrop',
+      ] as (keyof this)[]
+    ).forEach((eventHandler) => {
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers
