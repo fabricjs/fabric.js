@@ -269,9 +269,6 @@ export class StaticCanvas<
    */
   declare _originalCanvasStyle?: string;
 
-  declare renderAndResetBound: () => void;
-  declare requestRenderAllBound: () => void;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
@@ -284,8 +281,8 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
+    this.renderAndReset = this.renderAndReset.bind(this);
+    this.requestRenderAll = this.requestRenderAll.bind(this);
     this.set(options);
     this.initElements(el);
     this.setDimensions(
