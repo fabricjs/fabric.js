@@ -154,9 +154,9 @@
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
-  function makeRect(options) {
+  function makeRect(options={}) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect({ ...defaultOptions, ...options });
   }
 
   QUnit.module('fabric.StaticCanvas', {
