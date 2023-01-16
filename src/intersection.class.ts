@@ -1,3 +1,4 @@
+import { result } from 'lodash';
 import { Point } from './point.class';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
@@ -21,20 +22,21 @@ const isContainedInInterval = (T: Point, A: Point, B: Point) => {
 };
 
 export class Intersection {
-  points: Point[] = [];
+  declare points: Point[];
 
   declare status?: IntersectionType;
 
   constructor(status?: IntersectionType) {
     this.status = status;
+    this.points = [];
   }
 
   /**
    * Used to verify if a point is alredy in the collection
    * @param {Point} point
-   * @returns
+   * @returns {boolean}
    */
-  private includes(point: Point) {
+  private includes(point: Point): boolean {
     return this.points.some((p) => p.eq(point));
   }
 
@@ -44,7 +46,7 @@ export class Intersection {
    * @return {Intersection} thisArg
    * @chainable
    */
-  private append(...points: Point[]) {
+  private append(...points: Point[]): Intersection {
     this.points = this.points.concat(
       points.filter((point) => {
         return !this.includes(point);
@@ -64,11 +66,12 @@ export class Intersection {
    * @param {boolean} [bInfinite=true] check segment intersection by passing `false`
    * @return {Intersection}
    */
-  static intersectLineLine(a1: Point, a2: Point, b1: Point, b2: Point, aInfinite = true, bInfinite = true) {
-    let result;
-    const uaT = (b2.x - b1.x) * (a1.y - b1.y) - (b2.y - b1.y) * (a1.x - b1.x),
-      ubT = (a2.x - a1.x) * (a1.y - b1.y) - (a2.y - a1.y) * (a1.x - b1.x),
-      uB = (b2.y - b1.y) * (a2.x - a1.x) - (b2.x - b1.x) * (a2.y - a1.y);
+  static intersectLineLine(a1: Point, a2: Point, b1: Point, b2: Point, aInfinite = true, bInfinite = true): Intersection {
+    const b2xb1x = b2.x - b1.x, a1yb1y = a1.y - b1.y, b2yb1y = b2.y - b1.y,
+      a1xb1x = a1.x - b1.x, a2ya1y = a2.y - a1.y, a2xa1x = a2.x - a1.x,
+      uaT = b2xb1x * a1yb1y - b2yb1y * a1xb1x,
+      ubT = a2xa1x * a1yb1y - a2ya1y * a1xb1x,
+      uB = b2yb1y * a2xa1x - b2xb1x * a2ya1y;
     if (uB !== 0) {
       const ua = uaT / uB,
         ub = ubT / uB;
@@ -76,12 +79,13 @@ export class Intersection {
         (aInfinite || (0 <= ua && ua <= 1)) &&
         (bInfinite || (0 <= ub && ub <= 1))
       ) {
-        result = new Intersection('Intersection');
+        const result = new Intersection('Intersection');
         result.append(
-          new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y))
+          new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y)
         );
+        return result;
       } else {
-        result = new Intersection();
+        return new Intersection();
       }
     } else {
       if (uaT === 0 || ubT === 0) {
@@ -92,12 +96,11 @@ export class Intersection {
           isContainedInInterval(a2, b1, b2) ||
           isContainedInInterval(b1, a1, a2) ||
           isContainedInInterval(b2, a1, a2);
-        result = new Intersection(segmentsCoincide ? 'Coincident' : undefined);
+        return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
-        result = new Intersection('Parallel');
+        return new Intersection('Parallel');
       }
     }
-    return result;
   }
 
   /**
