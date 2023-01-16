@@ -11,7 +11,7 @@ import { TextStyleDeclaration } from './text_style.mixin';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
- * - {@link start} is called from `mousedown:before` {@link IText#_mouseDownHandlerBefore} and determines if dragging should start by testing {@link isPointerOverSelection}
+ * - {@link start} is called from `mousedown` {@link IText#_mouseDownHandler} and determines if dragging should start by testing {@link isPointerOverSelection}
  * - if true `mousedown` {@link IText#_mouseDownHandler} is blocked to keep selection
  * - if the pointer moves, canvas fires numerous mousemove {@link Canvas#_onMouseMove} that we make sure **aren't** prevented ({@link IText#shouldStartDragging}) in order for the window to start a drag session
  * - once/if the session starts canvas calls {@link onDragStart} on the active object to determine if dragging should occur
@@ -62,12 +62,15 @@ export class DraggableTextDelegate {
     );
   }
 
+  /**
+   * @public override this method to disable dragging and default to mousedown logic
+   */
   start(e: TPointerEvent) {
-    this.__mouseDownInPlace = this.isPointerOverSelection(e);
+    return (this.__mouseDownInPlace = this.isPointerOverSelection(e));
   }
 
   /**
-   * @public override this method to disable dragging
+   * @public override this method to disable dragging without discarding selection
    */
   isActive() {
     return this.__mouseDownInPlace;

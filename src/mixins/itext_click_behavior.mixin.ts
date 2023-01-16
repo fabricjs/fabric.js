@@ -1,15 +1,17 @@
 //@ts-nocheck
 import { ObjectEvents } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
+import type { DragMethods } from '../shapes/Object/InteractiveObject';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-export abstract class ITextClickBehaviorMixin<
-  EventSpec extends ObjectEvents
-> extends ITextKeyBehaviorMixin<EventSpec> {
+export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
+  extends ITextKeyBehaviorMixin<EventSpec>
+  implements DragMethods
+{
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
@@ -126,13 +128,12 @@ export abstract class ITextClickBehaviorMixin<
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler(options: TransformEvent) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      this.draggableTextDelegate.isActive() ||
-      (options.e.button && options.e.button !== 1)
-    ) {
+  _mouseDownHandler({ e }: TransformEvent) {
+    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
+      return;
+    }
+
+    if (this.draggableTextDelegate.start(e)) {
       return;
     }
 
@@ -140,7 +141,7 @@ export abstract class ITextClickBehaviorMixin<
 
     if (this.selected) {
       this.inCompositionMode = false;
-      this.setCursorByClick(options.e);
+      this.setCursorByClick(e);
     }
 
     if (this.isEditing) {
@@ -164,8 +165,6 @@ export abstract class ITextClickBehaviorMixin<
     // we want to avoid that an object that was selected and then becomes unselectable,
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
-    // text dragging logic
-    this.draggableTextDelegate.start(e);
   }
 
   /**

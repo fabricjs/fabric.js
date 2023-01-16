@@ -201,10 +201,10 @@ function assertDragEventStream(name, a, b) {
                 assert.deepEqual(eventStream.canvas, eventStream.source, 'events should match');
             });
 
-            QUnit.test('disabled drag start: onDragStart', async function (assert) {
+            QUnit.test('disable drag start: onDragStart', async function (assert) {
                 iText.onDragStart = () => false;
                 const e = startDragging(eventData);
-                assert.equal(iText.shouldStartDragging(), true, 'should not flag dragging');
+                assert.equal(iText.shouldStartDragging(), true, 'should flag dragging');
                 assert.equal(iText.selectionStart, 0, 'selectionStart is kept');
                 assert.equal(iText.selectionEnd, 4, 'selectionEnd is kept');
                 assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
@@ -212,12 +212,23 @@ function assertDragEventStream(name, a, b) {
                 assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
             });
 
-            QUnit.test('disabled drag start: isActive', async function (assert) {
-                iText.draggableTextDelegate.isActive = () => false;
+            QUnit.test('disable drag start: start', async function (assert) {
+                iText.draggableTextDelegate.start = () => false;
                 const e = startDragging(eventData);
                 assert.equal(iText.shouldStartDragging(), false, 'should not flag dragging');
                 assert.equal(iText.selectionStart, 2, 'selectionStart is set');
                 assert.equal(iText.selectionEnd, 2, 'selectionEnd is set');
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
+            });
+
+            QUnit.test('disable drag start: isActive', async function (assert) {
+                iText.draggableTextDelegate.isActive = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), false, 'should not flag dragging');
+                assert.equal(iText.selectionStart, 0, 'selectionStart is kept');
+                assert.equal(iText.selectionEnd, 4, 'selectionEnd is kept');
                 assertCursorAnimation(assert, iText);
                 assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
                 assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');

@@ -20,10 +20,12 @@ type TOCoord = IPoint & {
 
 type TControlSet = Record<string, Control>;
 
-export type FabricObjectWithDragSupport = InteractiveFabricObject & {
-  shouldStartDragging: () => boolean;
-  onDragStart: (e: DragEvent) => boolean;
-};
+export interface DragMethods {
+  shouldStartDragging(): boolean;
+  onDragStart(e: DragEvent): boolean;
+}
+
+export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
