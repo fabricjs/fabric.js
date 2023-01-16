@@ -172,9 +172,7 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * support native like text dragging
-   * @public override this method to control whether IText should/shouldn't become a drag source, @see also {@link isActive}
-   * @returns {boolean} should handle event
+   * @returns {boolean} determines whether {@link target} should/shouldn't become a drag source
    */
   onDragStart(e: DragEvent): boolean {
     this.__dragStartFired = true;
@@ -209,7 +207,7 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * @public override this method to control whether IText should/shouldn't become a drop target
+   * @returns {boolean} determines whether {@link target} should/shouldn't become a drop target
    */
   canDrop(e: DragEvent): boolean {
     if (this.target.editable && !this.target.__corner) {
@@ -228,22 +226,16 @@ export class DraggableTextDelegate {
     return false;
   }
 
-  /**
-   * support native like text dragging
-   */
   dragEnterHandler({ e }: DragEventData) {
-    const canDrop = !e.defaultPrevented && this.canDrop(e);
+    const canDrop = !e.defaultPrevented && this.target.canDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
     }
   }
 
-  /**
-   * support native like text dragging
-   */
   dragOverHandler(ev: DragEventData) {
     const { e } = ev;
-    const canDrop = !e.defaultPrevented && this.canDrop(e);
+    const canDrop = !e.defaultPrevented && this.target.canDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
     } else if (this.__isDraggingOver && !canDrop) {
@@ -259,9 +251,6 @@ export class DraggableTextDelegate {
     }
   }
 
-  /**
-   * support native like text dragging
-   */
   dragLeaveHandler() {
     if (this.__isDraggingOver || this.isActive()) {
       this.__isDraggingOver = false;
@@ -269,12 +258,9 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * support native like text dragging
-   *
    * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
    * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
-   * @private
    */
   dropHandler(ev: DropEventData) {
     const { e } = ev;
@@ -345,13 +331,9 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * support native like text dragging
    * fired only on the drag source after drop (if occurred)
    * handle changes to the drag source in case of a drop on another object or a cancellation
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
    */
   dragEndHandler({ e }: DragEventData) {
     if (this.isActive() && this.__dragStartFired) {

@@ -543,7 +543,7 @@ function assertDragEventStream(name, a, b) {
             });
 
             QUnit.test('disable drop', function (assert) {
-                iText2.draggableTextDelegate.canDrop = () => false;
+                iText2.canDrop = () => false;
                 const e = startDragging(eventData);
                 const dragEvents = [];
                 let index;
