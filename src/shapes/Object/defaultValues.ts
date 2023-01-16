@@ -101,7 +101,6 @@ export const fabricObjectDefaultValues = {
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,
-  __corner: 0,
   paintFirst: 'fill',
   activeOn: 'down',
   colorProperties: ['fill', 'stroke', 'backgroundColor'],
