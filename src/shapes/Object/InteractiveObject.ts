@@ -2,8 +2,9 @@ import type { Canvas } from '../../canvas/canvas_events';
 import type { Control } from '../../controls/control.class';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { Point } from '../../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+
 import {
   calcRotateMatrix,
   multiplyTransformMatrices,
@@ -631,7 +632,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect(e: DragEvent) {
+  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 
@@ -644,7 +645,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 }
