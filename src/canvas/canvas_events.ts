@@ -460,7 +460,7 @@ export class Canvas extends SelectableCanvas {
     //  propagate the event to subtargets
     for (let i = 0; i < targets.length; i++) {
       const subTarget = targets[i];
-      // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform the event is taken)
+      // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform that the event is taken)
       // TODO: verify if those should loop in inverse order then?
       // what is the order of subtargets?
       if (subTarget.canDrop(e)) {
