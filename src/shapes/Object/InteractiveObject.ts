@@ -234,6 +234,9 @@ export class InteractiveFabricObject<
 
     this.forEachControl((control, key) => {
       const position = control.positionHandler(dim, finalMatrix, this, control);
+      // coords[key] are sometimes used as points. Those are points to which we add
+      // the property corner and touchCorner from `_calcCornerCoords`.
+      // don't remove this assign for an object spread.
       coords[key] = Object.assign(
         position,
         this._calcCornerCoords(control, position)
