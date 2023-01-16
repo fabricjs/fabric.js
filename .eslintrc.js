@@ -15,6 +15,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/ban-types': 1,
     '@typescript-eslint/ban-ts-comment': 1,
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'no-restricted-globals': [
       'error',
       {
