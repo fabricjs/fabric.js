@@ -5,7 +5,6 @@ import {
   DragEventData,
   DropEventData,
   ObjectEvents,
-  TEvent,
   TPointerEvent,
 } from '../EventTypeDefs';
 import { Point } from '../point.class';
@@ -15,7 +14,7 @@ import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
 import { setStyle } from '../util/dom_style';
-import { clone } from '../util/lang_object';
+import { cloneDeep } from '../util/internals/cloneDeep';
 import { createCanvasElement } from '../util/misc/dom';
 import { isIdentityMatrix } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
@@ -470,7 +469,7 @@ export abstract class ITextBehaviorMixin<
     const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = this.backgroundColor;
-    const styles = clone(this.styles, true);
+    const styles = cloneDeep(this.styles);
     delete this.backgroundColor;
     const styleOverride = {
       stroke: 'transparent',
