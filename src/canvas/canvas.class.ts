@@ -101,7 +101,7 @@ type TDestroyedCanvas = Omit<
  *  flag = this.canDrop(opt.e);
  * });
  * b.canDrop = function(e) {
- *  !flag && this.callSuper('canDrop', e);
+ *  !flag && this.draggableTextDelegate.canDrop(e);
  * }
  * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
  * a.on('drop', opt => {
