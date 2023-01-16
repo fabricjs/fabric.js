@@ -293,7 +293,7 @@
   });
 
 
-  QUnit.test('mouse:up isClick = true', function(assert) {
+  QUnit.test('mouse:up, isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
@@ -302,6 +302,39 @@
     canvas.__onMouseDown(e);
     canvas.__onMouseUp(e);
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
+  });
+
+  QUnit.test('mouse:up after move, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('mouse:up after dragging, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas._onDragStart({
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      }
+    });
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('setDimensions and active brush', function(assert) {
@@ -318,19 +351,6 @@
     canva.renderAll();
     assert.equal(rendered, true, 'the brush called the _render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
-  });
-
-  QUnit.test('mouse:up isClick = false', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
-    var e2 = { clientX: 31, clientY: 31, which: 1 };
-    var isClick = true;
-    canvas.on('mouse:up', function(opt) {
-      isClick = opt.isClick;
-    });
-    canvas.__onMouseDown(e);
-    canvas.__onMouseMove(e2);
-    canvas.__onMouseUp(e2);
-    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {

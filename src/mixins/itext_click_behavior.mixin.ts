@@ -106,6 +106,7 @@ export abstract class ITextClickBehaviorMixin<
     if (
       !this.canvas ||
       !this.editable ||
+      this.__isDragging ||
       (options.e.button && options.e.button !== 1)
     ) {
       return;
@@ -172,6 +173,8 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
+    const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
+    this.__isDragging = false;
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
@@ -191,6 +194,11 @@ export abstract class ITextClickBehaviorMixin<
     ) {
       return;
     }
+
+    // mousedown is going to early return if isDragging is true.
+    // this is here to recover the setCursorByClick in case the
+    // isDragging is a false positive.
+    shouldSetCursor && this.setCursorByClick(options.e);
 
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;

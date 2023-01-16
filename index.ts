@@ -82,6 +82,7 @@ import {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  isIdentityMatrix,
 } from './src/util/misc/matrix';
 import {
   stylesFromArray,
@@ -190,6 +191,7 @@ const util = {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  isIdentityMatrix,
   stylesFromArray,
   stylesToArray,
   hasStyleChanged,
