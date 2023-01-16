@@ -207,10 +207,11 @@ export class DraggableTextDelegate {
   }
 
   /**
+   * use {@link targetCanDrop} to respect overriding
    * @returns {boolean} determines whether {@link target} should/shouldn't become a drop target
    */
   canDrop(e: DragEvent): boolean {
-    if (this.target.editable && !this.target.__corner) {
+    if (this.target.editable && !this.target.__corner && !e.defaultPrevented) {
       if (this.isActive() && this.__dragStartSelection) {
         //  drag source trying to drop over itself
         //  allow dropping only outside of drag start selection
@@ -226,8 +227,15 @@ export class DraggableTextDelegate {
     return false;
   }
 
+  /**
+   * in order to respect overriding {@link IText#canDrop} we call that instead of calling {@link canDrop} directly
+   */
+  protected targetCanDrop(e: DragEvent) {
+    return this.target.canDrop(e);
+  }
+
   dragEnterHandler({ e }: DragEventData) {
-    const canDrop = !e.defaultPrevented && this.target.canDrop(e);
+    const canDrop = this.targetCanDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
     }
@@ -235,7 +243,7 @@ export class DraggableTextDelegate {
 
   dragOverHandler(ev: DragEventData) {
     const { e } = ev;
-    const canDrop = !e.defaultPrevented && this.target.canDrop(e);
+    const canDrop = this.targetCanDrop(e);
     if (!this.__isDraggingOver && canDrop) {
       this.__isDraggingOver = true;
     } else if (this.__isDraggingOver && !canDrop) {
