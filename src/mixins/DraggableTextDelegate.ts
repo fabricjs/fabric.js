@@ -33,17 +33,12 @@ export class DraggableTextDelegate {
 
   constructor(target: IText) {
     this.target = target;
-    this.dragEnterHandler = this.dragEnterHandler.bind(this);
-    this.dragOverHandler = this.dragOverHandler.bind(this);
-    this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
-    this.dragEndHandler = this.dragEndHandler.bind(this);
-    this.dropHandler = this.dropHandler.bind(this);
     const disposers = [
-      this.target.on('dragenter', this.dragEnterHandler),
-      this.target.on('dragover', this.dragOverHandler),
-      this.target.on('dragleave', this.dragLeaveHandler),
-      this.target.on('dragend', this.dragEndHandler),
-      this.target.on('drop', this.dropHandler),
+      this.target.on('dragenter', this.dragEnterHandler.bind(this)),
+      this.target.on('dragover', this.dragOverHandler.bind(this)),
+      this.target.on('dragleave', this.dragLeaveHandler.bind(this)),
+      this.target.on('dragend', this.dragEndHandler.bind(this)),
+      this.target.on('drop', this.dropHandler.bind(this)),
     ];
     this._dispose = () => {
       disposers.forEach((d) => d());
