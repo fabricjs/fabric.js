@@ -76,12 +76,12 @@ export class Intersection {
         (aInfinite || (0 <= ua && ua <= 1)) &&
         (bInfinite || (0 <= ub && ub <= 1))
       ) {
-        result = new this('Intersection');
+        result = new Intersection('Intersection');
         result.append(
           new Point(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y))
         );
       } else {
-        result = new this();
+        result = new Intersection();
       }
     } else {
       if (uaT === 0 || ubT === 0) {
@@ -92,9 +92,9 @@ export class Intersection {
           isContainedInInterval(a2, b1, b2) ||
           isContainedInInterval(b1, a1, a2) ||
           isContainedInInterval(b2, a1, a2);
-        result = new this(segmentsCoincide ? 'Coincident' : undefined);
+        result = new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
-        result = new this('Parallel');
+        result = new Intersection('Parallel');
       }
     }
     return result;
@@ -111,7 +111,7 @@ export class Intersection {
    * @return {Intersection}
    */
   static intersectSegmentLine(s1: Point, s2: Point, l1: Point, l2: Point) {
-    return this.intersectLineLine(s1, s2, l1, l2, false, true);
+    return Intersection.intersectLineLine(s1, s2, l1, l2, false, true);
   }
 
   /**
@@ -125,7 +125,7 @@ export class Intersection {
    * @return {Intersection}
    */
   static intersectSegmentSegment(a1: Point, a2: Point, b1: Point, b2: Point) {
-    return this.intersectLineLine(a1, a2, b1, b2, false, false);
+    return Intersection.intersectLineLine(a1, a2, b1, b2, false, false);
   }
 
   /**
@@ -142,13 +142,13 @@ export class Intersection {
    * @return {Intersection}
    */
   static intersectLinePolygon(a1: Point, a2: Point, points: Point[], infinite = true) {
-    const result = new this();
+    const result = new Intersection();
     const length = points.length;
 
     for (let i = 0, b1, b2, inter; i < length; i++) {
       b1 = points[i];
       b2 = points[(i + 1) % length];
-      inter = this.intersectLineLine(a1, a2, b1, b2, infinite, false);
+      inter = Intersection.intersectLineLine(a1, a2, b1, b2, infinite, false);
       if (inter.status === 'Coincident') {
         return inter;
       }
@@ -172,7 +172,7 @@ export class Intersection {
    * @return {Intersection}
    */
   static intersectSegmentPolygon(a1: Point, a2: Point, points: Point[]) {
-    return this.intersectLinePolygon(a1, a2, points, false);
+    return Intersection.intersectLinePolygon(a1, a2, points, false);
   }
 
   /**
@@ -186,14 +186,14 @@ export class Intersection {
    * @return {Intersection}
    */
   static intersectPolygonPolygon(points1: Point[], points2: Point[]) {
-    const result = new this(),
+    const result = new Intersection(),
       length = points1.length;
     const coincidences = [];
 
     for (let i = 0; i < length; i++) {
       const a1 = points1[i],
         a2 = points1[(i + 1) % length],
-        inter = this.intersectSegmentPolygon(a1, a2, points2);
+        inter = Intersection.intersectSegmentPolygon(a1, a2, points2);
       if (inter.status === 'Coincident') {
         coincidences.push(inter);
         result.append(a1, a2);
@@ -203,7 +203,7 @@ export class Intersection {
     }
 
     if (coincidences.length > 0 && coincidences.length === points1.length) {
-      return new this('Coincident');
+      return new Intersection('Coincident');
     } else if (result.points.length > 0) {
       result.status = 'Intersection';
     }
@@ -226,7 +226,7 @@ export class Intersection {
       topRight = new Point(max.x, min.y),
       bottomLeft = new Point(min.x, max.y);
 
-    return this.intersectPolygonPolygon(points, [
+    return Intersection.intersectPolygonPolygon(points, [
       min,
       topRight,
       max,
