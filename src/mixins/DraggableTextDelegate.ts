@@ -81,7 +81,7 @@ export class DraggableTextDelegate {
     const active = this.isActive();
     if (active && !this.__dragStartFired) {
       // mousedown has been blocked since `active` is true => cursor has not been set.
-      // `__dragStartFired` is false => dragging didn't occur, pointer didn't move, pointer is over selection.
+      // `__dragStartFired` is false => dragging didn't occur, pointer didn't move and is over selection.
       // meaning this is actually a click, `active` is a false positive.
       this.target.setCursorByClick(e);
       this.target.initDelayedCursor(true);
