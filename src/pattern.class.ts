@@ -102,14 +102,16 @@ export class Pattern {
    * @returns true if {@link source} is an <img> element
    */
   isImageSource(): this is TImageSource {
-    return !!this.source && (typeof (this.source as HTMLImageElement).src === 'string');
+    return (
+      !!this.source && typeof (this.source as HTMLImageElement).src === 'string'
+    );
   }
 
   /**
    * @returns true if {@link source} is a <canvas> element
    */
   isCanvasSource(): this is TCanvasSource {
-    return !!this.source && (!!(this.source as HTMLCanvasElement).toDataURL);
+    return !!this.source && !!(this.source as HTMLCanvasElement).toDataURL;
   }
 
   sourceToString(): string {
@@ -173,11 +175,11 @@ export class Pattern {
       patternWidth =
         repeat === 'repeat-y' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetX || 0)
-          : ifNaN(patternSource.width as number / width, 0),
+          : ifNaN((patternSource.width as number) / width, 0),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN(patternSource.height as number / height, 0);
+          : ifNaN((patternSource.height as number) / height, 0);
 
     return [
       `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
