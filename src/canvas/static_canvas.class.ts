@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
@@ -8,7 +7,7 @@ import { createCollectionMixin } from '../mixins/collection.mixin';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
 import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/Object';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/rect.class';
 import {
@@ -401,8 +400,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        getEnv().document.getElementById(canvasEl) ||
-        canvasEl ||
+        getEnv().document.getElementById(canvasEl) as HTMLCanvasElement ||
         this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
@@ -1503,7 +1501,6 @@ export class StaticCanvas<
   clone(properties: string[]): Promise<this> {
     const data = this.toObject(properties);
     const canvas = this.cloneWithoutData();
-    // @ts-ignore
     return canvas.loadFromJSON(data);
   }
 
