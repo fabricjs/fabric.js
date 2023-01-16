@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(TS): finalize interactivity/controls [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
+- chore(TS): Followup for interactivy and controls migration to TS [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
 - refactor(IText): Fixes Draggable Text for retina and viewport transform #8534
 - chore(TS): refactor canvas init, fix `_initRetinaScaling` regression #8520
 - chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
