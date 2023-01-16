@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(IText): extract draggable text logic to a delegate [#8598](https://github.com/fabricjs/fabric.js/pull/8598)
 - chore(TS): Followup for interactivy and controls migration to TS [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
 - refactor(IText): Fixes Draggable Text for retina and viewport transform #8534
 - chore(TS): refactor canvas init, fix `_initRetinaScaling` regression #8520
