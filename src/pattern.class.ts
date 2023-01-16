@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { config } from './config';
 import { TCrossOrigin, TMat2D, TSize } from './typedefs';
 import { ifNaN } from './util/internals';
@@ -78,7 +77,7 @@ export class Pattern {
   /**
    * The actual pixel source of the pattern
    */
-  declare source!: CanvasImageSource;
+  declare source: CanvasImageSource;
 
   /**
    * If true, this object will not be exported during the serialization of a canvas
@@ -95,13 +94,7 @@ export class Pattern {
    */
   constructor(options: TPatternOptions = {}) {
     this.id = uid();
-    this.setOptions(options);
-  }
-
-  setOptions<K extends TExportedKeys>(options: Record<K, this[K]>) {
-    for (const prop in options) {
-      this[prop] = options[prop];
-    }
+    Object.assign(this, options);
   }
 
   /**
@@ -152,7 +145,7 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude?: (keyof this | string)[]) {
+  toObject(propertiesToInclude: string[] = []) {
     return {
       ...pick(this, propertiesToInclude),
       type: 'pattern',
