@@ -13,6 +13,7 @@ import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { Group } from '../shapes/group.class';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -85,13 +86,6 @@ export class Canvas extends SelectableCanvas {
   declare enablePointerEvents: boolean;
 
   /**
-   * an internal flag that is used to remember if we already bound the events
-   * @type Boolean
-   * @private
-   */
-  private declare eventsBound: boolean;
-
-  /**
    * Holds a reference to a setTimeout timer for event synchronization
    * @type number
    * @private
@@ -112,6 +106,15 @@ export class Canvas extends SelectableCanvas {
    */
   private declare _dragSource?: FabricObject;
 
+  /**
+   * Holds a reference to an object on the canvas that is the current drop target
+   * May differ from {@link _draggedoverTarget}
+   * @todo inspect whether {@link _draggedoverTarget} and {@link _dropTarget} should be merged somehow
+   * @type FabricObject
+   * @private
+   */
+  private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
+
   declare currentTarget?: FabricObject;
 
   declare currentSubTargets?: FabricObject[];
@@ -124,18 +127,43 @@ export class Canvas extends SelectableCanvas {
    */
   declare _previousPointer: Point;
 
+  private _isClick: boolean;
+
   textEditingManager = new TextEditingManager();
 
-  /**
-   * Adds mouse listeners to canvas
-   * @private
-   */
-  private _initEventListeners() {
-    // in case we initialized the class twice. This should not happen normally
-    // but in some kind of applications where the canvas element may be changed
-    // this is a workaround to having double listeners.
-    this.removeListeners();
-    this._bindEvents();
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
+    // bind event handlers
+    (
+      [
+        '_onMouseDown',
+        '_onTouchStart',
+        '_onMouseMove',
+        '_onMouseUp',
+        '_onTouchEnd',
+        '_onResize',
+        // '_onGesture',
+        // '_onDrag',
+        // '_onShake',
+        // '_onLongPress',
+        // '_onOrientationChange',
+        '_onMouseWheel',
+        '_onMouseOut',
+        '_onMouseEnter',
+        '_onContextMenu',
+        '_onDoubleClick',
+        '_onDragStart',
+        '_onDragEnd',
+        '_onDragProgress',
+        '_onDragOver',
+        '_onDragEnter',
+        '_onDragLeave',
+        '_onDrop',
+      ] as (keyof this)[]
+    ).forEach((eventHandler) => {
+      this[eventHandler] = (this[eventHandler] as Function).bind(this);
+    });
+    // register event handlers
     this.addOrRemove(addListener, 'add');
   }
 
@@ -219,47 +247,6 @@ export class Canvas extends SelectableCanvas {
 
   /**
    * @private
-   */
-  private _bindEvents() {
-    if (this.eventsBound) {
-      // for any reason we pass here twice we do not want to bind events twice.
-      return;
-    }
-    (
-      [
-        '_onMouseDown',
-        '_onTouchStart',
-        '_onMouseMove',
-        '_onMouseUp',
-        '_onTouchEnd',
-        '_onResize',
-        // '_onGesture',
-        // '_onDrag',
-        // '_onShake',
-        // '_onLongPress',
-        // '_onOrientationChange',
-        '_onMouseWheel',
-        '_onMouseOut',
-        '_onMouseEnter',
-        '_onContextMenu',
-        '_onDoubleClick',
-        '_onDragStart',
-        '_onDragEnd',
-        '_onDragProgress',
-        '_onDragOver',
-        '_onDragEnter',
-        '_onDragLeave',
-        '_onDrop',
-      ] as const
-    ).forEach((eventHandler) => {
-      // @ts-expect-error dumb TS
-      this[eventHandler] = this[eventHandler].bind(this);
-    });
-    this.eventsBound = true;
-  }
-
-  /**
-   * @private
    * @param {Event} [e] Event object fired on wheel event
    */
   private _onMouseWheel(e: MouseEvent) {
@@ -317,6 +304,7 @@ export class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   private _onDragStart(e: DragEvent) {
+    this._isClick = false;
     const activeObject = this.getActiveObject();
     if (
       isFabricObjectWithDragSupport(activeObject) &&
@@ -337,6 +325,9 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
+   * First we clear top context where the effects are being rendered.
+   * Then we render the effects.
+   * Doing so will render the correct effect for all cases including an overlap between `source` and `target`.
    * @private
    */
   private _renderDragEffects(
@@ -345,19 +336,30 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ) {
     let dirty = false;
+    // clear top context
+    const dropTarget = this._dropTarget;
+    if (dropTarget && dropTarget !== source && dropTarget !== target) {
+      dropTarget.clearContextTop();
+      dirty = true;
+    }
+    source?.clearContextTop();
+    target !== source && target?.clearContextTop();
+    // render effects
     const ctx = this.contextTop;
+    ctx.save();
+    ctx.transform(...this.viewportTransform);
     if (source) {
-      source.clearContextTop(true);
-      source.renderDragSourceEffect(e);
+      ctx.save();
+      source.transform(ctx);
+      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      ctx.restore();
       dirty = true;
     }
     if (target) {
-      if (target !== source) {
-        ctx.restore();
-        ctx.save();
-        target.clearContextTop(true);
-      }
-      target.renderDropTargetEffect(e);
+      ctx.save();
+      target.transform(ctx);
+      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      ctx.restore();
       dirty = true;
     }
     ctx.restore();
@@ -410,23 +412,39 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
+   * As opposed to {@link findTarget} we want the top most object to be returned w/o the active object cutting in line.
+   * Override at will
+   */
+  protected findDragTargets(e: DragEvent) {
+    this.targets = [];
+    const target = this._searchPossibleTargets(
+      this._objects,
+      this.getPointer(e, true)
+    );
+    return {
+      target,
+      targets: [...this.targets],
+    };
+  }
+
+  /**
    * prevent default to allow drop event to be fired
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
    * @private
    * @param {DragEvent} [e] Event object fired on Event.js shake
    */
   private _onDragOver(e: DragEvent) {
-    const eventType = 'dragover',
-      target = this.findTarget(e),
-      targets = this.targets,
-      options = {
-        e: e,
-        target,
-        subTargets: targets,
-        dragSource: this._dragSource as FabricObject,
-        canDrop: false,
-        dropTarget: undefined,
-      };
+    const eventType = 'dragover';
+    const { target, targets } = this.findDragTargets(e);
+    const dragSource = this._dragSource as FabricObject;
+    const options = {
+      e,
+      target,
+      subTargets: targets,
+      dragSource,
+      canDrop: false,
+      dropTarget: undefined,
+    };
     let dropTarget;
     //  fire on canvas
     this.fire(eventType, options);
@@ -434,7 +452,6 @@ export class Canvas extends SelectableCanvas {
     //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
     this._fireEnterLeaveEvents(target, options);
     if (target) {
-      // render drag selection before rendering target cursor for correct visuals
       if (target.canDrop(e)) {
         dropTarget = target;
       }
@@ -452,7 +469,8 @@ export class Canvas extends SelectableCanvas {
       subTarget.fire(eventType, options);
     }
     //  render drag effects now that relations between source and target is clear
-    this._renderDragEffects(e, this._dragSource, dropTarget);
+    this._renderDragEffects(e, dragSource, dropTarget);
+    this._dropTarget = dropTarget;
   }
 
   /**
@@ -461,11 +479,11 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragEnter(e: DragEvent) {
-    const target = this.findTarget(e);
+    const { target, targets } = this.findDragTargets(e);
     const options = {
       e,
-      target: target as FabricObject,
-      subTargets: this.targets,
+      target,
+      subTargets: targets,
       dragSource: this._dragSource,
     };
     this.fire('dragenter', options);
@@ -486,8 +504,11 @@ export class Canvas extends SelectableCanvas {
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
+
     //  fire dragleave on targets
     this._fireEnterLeaveEvents(undefined, options);
+    this._renderDragEffects(e, this._dragSource);
+    this._dropTarget = undefined;
     //  clear targets
     this.targets = [];
     this._hoveredTargets = [];
@@ -502,8 +523,11 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e
    */
   private _onDrop(e: DragEvent) {
-    const options = this._simpleEventHandler('drop:before', {
+    const { target, targets } = this.findDragTargets(e);
+    const options = this._basicEventHandler('drop:before', {
       e,
+      target,
+      subTargets: targets,
       dragSource: this._dragSource,
       pointer: this.getPointer(e),
     });
@@ -524,7 +548,13 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   private _onContextMenu(e: TPointerEvent): false {
-    const options = this._simpleEventHandler('contextmenu:before', { e });
+    const target = this.findTarget(e),
+      subTargets = this.targets || [];
+    const options = this._basicEventHandler('contextmenu:before', {
+      e,
+      target,
+      subTargets,
+    });
     // TODO: this line is silly because the dev can subscribe to the event and prevent it themselves
     this.stopContextMenu && stopEvent(e);
     this._basicEventHandler('contextmenu', options);
@@ -722,7 +752,10 @@ export class Canvas extends SelectableCanvas {
   _onMouseMove(e: TPointerEvent) {
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
-      (!activeObject || !activeObject.__isDragging) &&
+      (!activeObject ||
+        // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
+        // we must not prevent the event's default behavior in order for the window to start the drag event sequence
+        !activeObject.__isDragging) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
@@ -768,12 +801,10 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    const transform = this._currentTransform,
-      groupSelector = this._groupSelector,
-      isClick =
-        !groupSelector || (groupSelector.left === 0 && groupSelector.top === 0);
+    const transform = this._currentTransform;
     this._cacheTransformEventData(e);
     const target = this._target;
+    const isClick = this._isClick;
     this._handleEvent(e, 'up:before');
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
@@ -862,42 +893,18 @@ export class Canvas extends SelectableCanvas {
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
-    target && (target.__corner = 0);
+    target && (target.__corner = undefined);
     if (shouldRender) {
       this.requestRenderAll();
-    } else if (!isClick) {
+    } else if (
+      !isClick &&
+      !(
+        isInteractiveTextObject(this._activeObject) &&
+        this._activeObject.isEditing
+      )
+    ) {
       this.renderTop();
     }
-  }
-
-  /**
-   * @private
-   * Handle event firing for target and subtargets
-   * @param {String} eventType event to fire (up, down or move)
-   * @param {Event} e event from mouse
-   * @param {object} [data] event data overrides
-   * @return {object} options
-   */
-  _simpleEventHandler<
-    T extends keyof (CanvasEvents | ObjectEvents),
-    E extends TPointerEvent | DragEvent
-  >(
-    eventType: T,
-    {
-      e,
-      ...data
-    }: Omit<(CanvasEvents & ObjectEvents)[T], 'target' | 'subTargets'> &
-      TEvent<E>
-  ) {
-    const target = this.findTarget(e),
-      subTargets = this.targets || [];
-    // @ts-expect-error TODO fix generic e
-    return this._basicEventHandler(eventType, {
-      e,
-      target,
-      subTargets,
-      ...data,
-    });
   }
 
   _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
@@ -1056,6 +1063,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   __onMouseDown(e: TPointerEvent) {
+    this._isClick = true;
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
     let target: FabricObject | undefined = this._target;
@@ -1198,6 +1206,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousemove
    */
   __onMouseMove(e: TPointerEvent) {
+    this._isClick = false;
     this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
 
@@ -1676,8 +1685,3 @@ export class Canvas extends SelectableCanvas {
     return new Canvas(el);
   }
 }
-
-// there is an order execution bug if i put this as public property.
-Object.assign(Canvas.prototype, {
-  eventsBound: false,
-});

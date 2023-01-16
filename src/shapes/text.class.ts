@@ -1435,9 +1435,8 @@ export class Text<
    * @private
    */
   _shouldClearDimensionCache() {
-    let shouldClear = this._forceClearCache;
-    shouldClear ||
-      (shouldClear = this.hasStateChanged('_dimensionAffectingProps'));
+    const shouldClear =
+      this._forceClearCache || this.hasStateChanged('_dimensionAffectingProps');
     if (shouldClear) {
       this.dirty = true;
       this._forceClearCache = false;

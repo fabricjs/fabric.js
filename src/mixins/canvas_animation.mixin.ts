@@ -115,7 +115,7 @@ Object.assign(StaticCanvas.prototype, {
    */
   fxStraightenObject: function (object: FabricObject) {
     return object.fxStraighten({
-      onChange: this.requestRenderAllBound,
+      onChange: () => this.requestRenderAll(),
     });
   },
 });
