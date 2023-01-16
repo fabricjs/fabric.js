@@ -338,11 +338,7 @@ export class Canvas extends SelectableCanvas {
     let dirty = false;
     // clear top context
     const dropTarget = this._dropTarget;
-    if (
-      dropTarget &&
-      dropTarget !== source &&
-      dropTarget !== target
-    ) {
+    if (dropTarget && dropTarget !== source && dropTarget !== target) {
       dropTarget.clearContextTop();
       dirty = true;
     }
