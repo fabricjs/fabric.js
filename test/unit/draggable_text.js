@@ -541,6 +541,49 @@ function assertDragEventStream(name, a, b) {
                 ]);
                 assert.equal(fabric.getDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
             });
+
+            QUnit.test('disable drop', function (assert) {
+                iText2.draggableTextDelegate.canDrop = () => false;
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 200; index < 210; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'none' });
+                // the window will not invoke a drop event so we call drag end to simulate correctly
+                canvas._onDragEnd(drop);
+                assert.equal(iText2.text, 'test2 test2', 'text after drop');
+                assert.equal(iText2.selectionStart, 0, 'selection after drop');
+                assert.equal(iText2.selectionEnd, 0, 'selection after drop');
+                assertDragEventStream('drop', eventStream.target, [
+                    {
+                        e: dragEvents[0],
+                        target: iText2,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(230, 15),
+                        absolutePointer: new fabric.Point(230, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 2).map(e => ({
+                        e,
+                        target: iText2,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false
+                    })),
+                ]);
+                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+            });
         });
     });
 });
