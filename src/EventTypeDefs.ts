@@ -137,10 +137,10 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
     currentTarget?: FabricObject | null;
   };
 
-type SimpleEventHandler<T extends Event = TPointerEvent> =
-  TEventWithTarget<T> & {
-    subTargets: FabricObject[];
-  };
+type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
+  target?: FabricObject;
+  subTargets: FabricObject[];
+};
 
 type InEvent = {
   previousTarget?: FabricObject;
@@ -159,7 +159,7 @@ export type DragEventData = TEvent<DragEvent> & {
   dropTarget?: FabricObject;
 };
 
-type DropEventData = DragEventData & { pointer: Point };
+export type DropEventData = DragEventData & { pointer: Point };
 
 type DnDEvents = {
   dragstart: TEventWithTarget<DragEvent>;

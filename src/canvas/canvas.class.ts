@@ -637,6 +637,9 @@ export class SelectableCanvas<
     return this;
   }
 
+  /**
+   * text selection is rendered by the active text instance during the rendering cycle
+   */
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isCurrentlyDrawing()) {
@@ -654,6 +657,7 @@ export class SelectableCanvas<
   /**
    * Method to render only the top canvas.
    * Also used to render the group selection box.
+   * Does not render text selection.
    */
   renderTop() {
     const ctx = this.contextTop;

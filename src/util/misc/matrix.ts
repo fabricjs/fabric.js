@@ -30,6 +30,10 @@ export type TComposeMatrixArgs = TTranslateMatrixArgs &
 export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
+
+export const isIdentityMatrix = (mat: TMat2D) =>
+  mat.every((value, index) => value === iMatrix[index]);
+
 /**
  * Apply transform t to point p
  * @param  {Point | IPoint} p The point to transform
