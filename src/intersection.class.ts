@@ -1,4 +1,3 @@
-import { result } from 'lodash';
 import { Point } from './point.class';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
@@ -90,9 +89,9 @@ export class Intersection {
         (aInfinite || (0 <= ua && ua <= 1)) &&
         (bInfinite || (0 <= ub && ub <= 1))
       ) {
-        const result = new Intersection('Intersection');
-        result.append(new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y));
-        return result;
+        return new Intersection('Intersection').append(
+          new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y)
+        );
       } else {
         return new Intersection();
       }
