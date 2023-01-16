@@ -1,19 +1,18 @@
-import type { Canvas } from '../../canvas/canvas_events';
-import type { Control } from '../../controls/control.class';
-import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
-import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
-import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { Point } from '../../point.class';
-
+import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import { FabricObject } from './Object';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
   calcRotateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
+import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { FabricObject } from './Object';
+import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { Canvas } from '../../canvas/canvas_events';
+import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
