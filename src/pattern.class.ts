@@ -69,6 +69,7 @@ export class Pattern {
 
   /**
    * transform matrix to change the pattern, imported from svgs.
+   * @todo verify if using the identity matrix as default makes the rest of the code more easy
    * @type Array
    * @default
    */
@@ -101,17 +102,17 @@ export class Pattern {
    * @returns true if {@link source} is an <img> element
    */
   isImageSource(): this is TImageSource {
-    return typeof this.source.src === 'string';
+    return !!this.source && (typeof (this.source as HTMLImageElement).src === 'string');
   }
 
   /**
    * @returns true if {@link source} is a <canvas> element
    */
   isCanvasSource(): this is TCanvasSource {
-    return typeof this.source === 'object' && this.source.toDataURL;
+    return !!this.source && (!!(this.source as HTMLCanvasElement).toDataURL);
   }
 
-  sourceToString() {
+  sourceToString(): string {
     return this.isImageSource()
       ? this.source.src
       : this.isCanvasSource()
@@ -124,7 +125,7 @@ export class Pattern {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D): CanvasPattern | string {
+  toLive(ctx: CanvasRenderingContext2D): CanvasPattern | null {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -134,7 +135,7 @@ export class Pattern {
           this.source.naturalWidth === 0 ||
           this.source.naturalHeight === 0))
     ) {
-      return '';
+      return null;
     }
 
     return ctx.createPattern(this.source, this.repeat);
@@ -145,17 +146,18 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude: string[] = []) {
+  toObject(propertiesToInclude: string[] = []): Record<string, any> {
+    const { repeat, crossOrigin } = this;
     return {
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       type: 'pattern',
       source: this.sourceToString(),
-      repeat: this.repeat,
-      crossOrigin: this.crossOrigin,
+      repeat,
+      crossOrigin,
       offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
       offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
       patternTransform: this.patternTransform
-        ? this.patternTransform.concat()
+        ? [...this.patternTransform]
         : null,
     };
   }
@@ -164,21 +166,21 @@ export class Pattern {
   /**
    * Returns SVG representation of a pattern
    */
-  toSVG({ width, height }: TSize) {
-    const patternSource = this.source,
+  toSVG({ width, height }: TSize): string {
+    const { source: patternSource, repeat, id } = this,
       patternOffsetX = ifNaN(this.offsetX / width, 0),
       patternOffsetY = ifNaN(this.offsetY / height, 0),
       patternWidth =
-        this.repeat === 'repeat-y' || this.repeat === 'no-repeat'
+        repeat === 'repeat-y' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetX || 0)
-          : ifNaN(patternSource.width / width, 0),
+          : ifNaN(patternSource.width as number / width, 0),
       patternHeight =
-        this.repeat === 'repeat-x' || this.repeat === 'no-repeat'
+        repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN(patternSource.height / height, 0);
+          : ifNaN(patternSource.height as number / height, 0);
 
     return [
-      `<pattern id="SVGID_${this.id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
+      `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
       `<image x="0" y="0" width="${patternSource.width}" height="${
         patternSource.height
       }" xlink:href="${this.sourceToString()}"></image>`,
@@ -191,7 +193,7 @@ export class Pattern {
   static async fromObject(
     { source, ...serialized }: TPatternSerialized,
     options: TPatternHydrationOptions
-  ) {
+  ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,
       crossOrigin: serialized.crossOrigin,
