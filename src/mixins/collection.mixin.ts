@@ -1,39 +1,43 @@
-import type { FabricObject } from '../shapes/Object/Object';
+import { CollectionEvents } from '../EventTypeDefs';
+import { FabricObject } from '../shapes/Object/Object';
 import type { Constructor } from '../typedefs';
 import { removeFromArray } from '../util/internals';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
+export interface BaseFabricObject<EventSpec extends CollectionEvents = CollectionEvents>
+  extends FabricObject {}
 
-
-export function createCollectionMixin<TBase extends Constructor, TObjectType extends FabricObject>(Base: TBase) {
+export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
+
     /**
-     * @type {FabricObject[]}
+     * @type {BaseFabricObject[]}
      * @TODO needs to end up in the constructor too
      */
-    _objects: TObjectType[] = [];
+    _objects: BaseFabricObject[] = [];
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _onObjectAdded(object: TObjectType) {
+    _onObjectAdded(object: BaseFabricObject) {
       // subclasses should override this method
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _onObjectRemoved(object: TObjectType) {
+    _onObjectRemoved(object: BaseFabricObject) {
       // subclasses should override this method
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _onStackOrderChanged(object: TObjectType) {
+    _onStackOrderChanged(object: BaseFabricObject) {
       // subclasses should override this method
     }
 
     /**
      * Adds objects to collection
-     * Objects should be instances of (or inherit from) FabricObject
-     * @param {...TObjectType[]} objects to add
+     * Objects should be instances of (or inherit from) BaseFabricObject
+     * @param {...BaseFabricObject[]} objects to add
      * @returns {number} new array length
      */
-    add(...objects: TObjectType[]): number {
+    add(...objects: BaseFabricObject[]): number {
       const size = this._objects.push(...objects);
       objects.forEach((object) => this._onObjectAdded(object));
       return size;
@@ -42,10 +46,10 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
     /**
      * Inserts an object into collection at specified index
      * @param {number} index Index to insert object at
-     * @param {...FabricObject[]} objects Object(s) to insert
+     * @param {...BaseFabricObject[]} objects Object(s) to insert
      * @returns {number} new array length
      */
-    insertAt(index: number, ...objects: TObjectType[]) {
+    insertAt(index: number, ...objects: BaseFabricObject[]) {
       this._objects.splice(index, 0, ...objects);
       objects.forEach((object) => this._onObjectAdded(object));
       return this._objects.length;
@@ -54,12 +58,12 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
     /**
      * Removes objects from a collection, then renders canvas (if `renderOnAddRemove` is not `false`)
      * @private
-     * @param {...FabricObject[]} objects objects to remove
-     * @returns {FabricObject[]} removed objects
+     * @param {...BaseFabricObject[]} objects objects to remove
+     * @returns {BaseFabricObject[]} removed objects
      */
-    remove(...objects: TObjectType[]) {
+    remove(...objects: BaseFabricObject[]) {
       const array = this._objects,
-        removed: FabricObject[] = [];
+        removed: BaseFabricObject[] = [];
       objects.forEach((object) => {
         const index = array.indexOf(object);
         // only call onObjectRemoved if an object was actually removed
@@ -82,9 +86,9 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      */
     forEachObject(
       callback: (
-        object: FabricObject,
+        object: BaseFabricObject,
         index: number,
-        array: FabricObject[]
+        array: BaseFabricObject[]
       ) => any
     ) {
       this.getObjects().forEach((object, index, objects) =>
@@ -131,13 +135,13 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
 
     /**
      * Returns true if collection contains an object.\
-     * **Prefer using {@link `FabricObject#isDescendantOf`} for performance reasons**
+     * **Prefer using {@link `BaseFabricObject#isDescendantOf`} for performance reasons**
      * instead of `a.contains(b)` use `b.isDescendantOf(a)`
      * @param {Object} object Object to check against
      * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
      * @return {Boolean} `true` if collection contains an object
      */
-    contains(object: TObjectType, deep?: boolean): boolean {
+    contains(object: BaseFabricObject, deep?: boolean): boolean {
       if (this._objects.includes(object)) {
         return true;
       } else if (deep) {
@@ -167,7 +171,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      * @param {fabric.Object} object Object to send to back
      * @returns {boolean} true if change occurred
      */
-    sendObjectToBack(object: TObjectType) {
+    sendObjectToBack(object: BaseFabricObject) {
       if (!object || object === this._objects[0]) {
         return false;
       }
@@ -183,7 +187,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      * @param {fabric.Object} object Object to send
      * @returns {boolean} true if change occurred
      */
-    bringObjectToFront(object: TObjectType) {
+    bringObjectToFront(object: BaseFabricObject) {
       if (!object || object === this._objects[this._objects.length - 1]) {
         return false;
       }
@@ -203,7 +207,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      * @param {boolean} [intersecting] If `true`, send object behind next lower intersecting object
      * @returns {boolean} true if change occurred
      */
-    sendObjectBackwards(object: TObjectType, intersecting?: boolean) {
+    sendObjectBackwards(object: BaseFabricObject, intersecting?: boolean) {
       if (!object) {
         return false;
       }
@@ -229,7 +233,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      * @param {boolean} [intersecting] If `true`, send object in front of next upper intersecting object
      * @returns {boolean} true if change occurred
      */
-    bringObjectForward(object: TObjectType, intersecting?: boolean) {
+    bringObjectForward(object: BaseFabricObject, intersecting?: boolean) {
       if (!object) {
         return false;
       }
@@ -251,7 +255,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
      * @param {number} index Position to move to
      * @returns {boolean} true if change occurred
      */
-    moveObjectTo(object: TObjectType, index: number) {
+    moveObjectTo(object: BaseFabricObject, index: number) {
       if (object === this._objects[index]) {
         return false;
       }
@@ -262,7 +266,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
     }
 
     findNewLowerIndex(
-      object: TObjectType,
+      object: BaseFabricObject,
       idx: number,
       intersecting?: boolean
     ) {
@@ -285,7 +289,7 @@ export function createCollectionMixin<TBase extends Constructor, TObjectType ext
     }
 
     findNewUpperIndex(
-      object: TObjectType,
+      object: BaseFabricObject,
       idx: number,
       intersecting?: boolean
     ) {

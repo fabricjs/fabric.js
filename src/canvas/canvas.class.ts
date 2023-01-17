@@ -22,7 +22,7 @@ import {
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TOriginX, TOriginY, TSize } from '../typedefs';
+import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -152,6 +152,8 @@ type TDestroyedCanvas = Omit<
 export class SelectableCanvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
+
+  declare _objects: FabricObject[];
   /**
    * When true, objects can be transformed by one side (unproportionally)
    * when dragged on the corners that normally would not do that.
@@ -1058,7 +1060,7 @@ export class SelectableCanvas<
         target = objects[i];
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
-            target._objects,
+            target._objects as FabricObject[],
             pointer
           );
           subTarget && this.targets.push(subTarget);
@@ -1465,6 +1467,18 @@ export class SelectableCanvas<
     }
     this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
+  }
+
+  /**
+   * Sets viewport transformation of this canvas instance
+   * @param {Array} vpt a Canvas 2D API transform matrix
+   */
+  setViewportTransform(vpt: TMat2D) {
+    super.setViewportTransform(vpt);
+    const activeObject = this._activeObject;
+    if (activeObject) {
+      activeObject.setCoords();
+    }
   }
 
   /**

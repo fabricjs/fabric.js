@@ -1,6 +1,7 @@
 import type { Control } from './controls/control.class';
 import type { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';
+import type { FabricObject as StaticFabricObject } from './shapes/Object/Object';
 import type { Group } from './shapes/group.class';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
@@ -192,8 +193,8 @@ type CanvasSelectionEvents = {
 };
 
 export type CollectionEvents = {
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
+  'object:added': { target: StaticFabricObject };
+  'object:removed': { target: StaticFabricObject };
 };
 
 type BeforeSuffix<T extends string> = `${T}:before`;

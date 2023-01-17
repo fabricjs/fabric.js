@@ -539,8 +539,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const activeObject = this._activeObject,
-      backgroundObject = this.backgroundImage,
+    const  backgroundObject = this.backgroundImage,
       overlayObject = this.overlayImage,
       len = this._objects.length;
 
@@ -548,9 +547,6 @@ export class StaticCanvas<
     for (let i = 0; i < len; i++) {
       const object = this._objects[i];
       object.group || object.setCoords();
-    }
-    if (activeObject) {
-      activeObject.setCoords();
     }
     if (backgroundObject) {
       backgroundObject.setCoords();
