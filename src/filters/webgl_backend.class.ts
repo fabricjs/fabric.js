@@ -1,7 +1,7 @@
 import { getEnv } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import { TWebGLPipelineState, TProgramCache, TTextureCache } from './typedefs';
+import { TWebGLPipelineState, TProgramCache, TTextureCache, TPipelineResources } from './typedefs';
 
 export class WebGLFilterBackend {
   declare tileSize: number;
@@ -46,7 +46,7 @@ export class WebGLFilterBackend {
    * in this object there will be appended some canvases, created once, resized sometimes
    * cleared never. Clearing is left to the developer.
    **/
-  resources = {};
+  resources: TPipelineResources = {};
 
   constructor({ tileSize = config.textureSize } = {}) {
     this.tileSize = tileSize;

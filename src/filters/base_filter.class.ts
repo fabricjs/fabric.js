@@ -19,6 +19,9 @@ export type AbstractBaseFilterOptions<T> = {
 
 export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface AnyFilter extends AbstractBaseFilter<string | Record<string, string>> {};
+
 export abstract class AbstractBaseFilter<T> {
   /**
    * Filter type
@@ -47,15 +50,7 @@ export abstract class AbstractBaseFilter<T> {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Partial<AbstractBaseFilterOptions<T>> = {}) {
-    this.setOptions(options);
-  }
-
-  /**
-   * Sets filter's properties from options
-   * @param {Object} [options] Options object
-   */
-  setOptions(options: Record<string, any>) {
+  constructor(options: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}) {
     Object.assign(this, options);
   }
 
