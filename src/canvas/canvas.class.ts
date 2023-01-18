@@ -22,7 +22,7 @@ import {
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { TMat2D, TOriginX, TOriginY, TSize, TToCanvasElementOptions } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -33,7 +33,6 @@ import {
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
-import type { Textbox } from '../shapes/textbox.class';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';

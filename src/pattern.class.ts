@@ -86,6 +86,10 @@ export class Pattern {
    */
   declare excludeFromExport?: boolean;
 
+  /**
+   * ID used for SVG export functionalities
+   * @type number
+   */
   declare readonly id: number;
 
   /**

@@ -1,11 +1,6 @@
-import { CollectionEvents } from '../EventTypeDefs';
-import { FabricObject } from '../shapes/Object/Object';
 import type { Constructor } from '../typedefs';
+import type { BaseFabricObject } from '../EventTypeDefs';
 import { removeFromArray } from '../util/internals';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
-export interface BaseFabricObject<EventSpec extends CollectionEvents = CollectionEvents>
-  extends FabricObject {}
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {

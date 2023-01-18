@@ -1,4 +1,5 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
+import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { Point } from './point.class';
@@ -105,7 +106,7 @@ export type TToCanvasElementOptions = {
   top?: number;
   width?: number;
   height?: number;
-  filter?: (object: FabricObject) => boolean;
+  filter?: (object: BaseFabricObject) => boolean;
 };
 
 export type TDataUrlOptions = TToCanvasElementOptions & {
