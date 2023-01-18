@@ -65,7 +65,10 @@ export class Composed extends BaseFilter {
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Composed>}
    */
-  static fromObject(object: Record<string, any>, options: { signal: AbortSignal }) {
+  static fromObject(
+    object: Record<string, any>,
+    options: { signal: AbortSignal }
+  ) {
     return Promise.all(
       ((object.subFilters || []) as AnyFilter[]).map((filter) =>
         classRegistry.getClass(filter.type).fromObject(filter, options)

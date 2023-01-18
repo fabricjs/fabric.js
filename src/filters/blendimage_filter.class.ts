@@ -193,7 +193,10 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<BlendImage>}
    */
-  static fromObject(object: Record<string, any>, options: { signal: AbortSignal }) {
+  static fromObject(
+    object: Record<string, any>,
+    options: { signal: AbortSignal }
+  ) {
     return Image.fromObject(object.image, options).then(
       (image) => new BlendImage({ ...object, image })
     );

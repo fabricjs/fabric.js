@@ -1,7 +1,12 @@
 import { getEnv } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import { TWebGLPipelineState, TProgramCache, TTextureCache, TPipelineResources } from './typedefs';
+import {
+  TWebGLPipelineState,
+  TProgramCache,
+  TTextureCache,
+  TPipelineResources,
+} from './typedefs';
 
 export class WebGLFilterBackend {
   declare tileSize: number;
