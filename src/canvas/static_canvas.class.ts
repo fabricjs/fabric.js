@@ -615,7 +615,7 @@ export class StaticCanvas<
    * Returns &lt;canvas> element corresponding to this instance
    * @return {HTMLCanvasElement}
    */
-  getElement() {
+  getElement(): HTMLCanvasElement {
     return this.lowerCanvasEl;
   }
 
@@ -631,7 +631,7 @@ export class StaticCanvas<
    * Returns context of canvas where objects are drawn
    * @return {CanvasRenderingContext2D}
    */
-  getContext() {
+  getContext(): CanvasRenderingContext2D {
     return this.contextContainer;
   }
 
