@@ -400,7 +400,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        getEnv().document.getElementById(canvasEl) as HTMLCanvasElement ||
+        (getEnv().document.getElementById(canvasEl) as HTMLCanvasElement) ||
         this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
@@ -539,7 +539,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const  backgroundObject = this.backgroundImage,
+    const backgroundObject = this.backgroundImage,
       overlayObject = this.overlayImage,
       len = this._objects.length;
 
@@ -1382,7 +1382,7 @@ export class StaticCanvas<
       return;
     }
     if (isFiller(filler)) {
-      const repeat =  (filler as Pattern).repeat || '',
+      const repeat = (filler as Pattern).repeat || '',
         finalWidth = this.width,
         finalHeight = this.height,
         shouldInvert = this[`${property}Vpt`],
@@ -1597,7 +1597,9 @@ export class StaticCanvas<
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
       canvasEl = createCanvasElement(),
-      objectsToRender = filter ? this._objects.filter((obj) => filter(obj)) : this._objects;
+      objectsToRender = filter
+        ? this._objects.filter((obj) => filter(obj))
+        : this._objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;

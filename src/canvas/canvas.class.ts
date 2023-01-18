@@ -22,7 +22,13 @@ import {
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize, TToCanvasElementOptions } from '../typedefs';
+import {
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TToCanvasElementOptions,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -151,7 +157,6 @@ type TDestroyedCanvas = Omit<
 export class SelectableCanvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
-
   declare _objects: FabricObject[];
   /**
    * When true, objects can be transformed by one side (unproportionally)

@@ -11,7 +11,9 @@ import type { IText } from './shapes/itext.class';
 import type { StaticCanvas } from './canvas/static_canvas.class';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
-export interface BaseFabricObject extends StaticFabricObject, FabricObjectSVGExportMixin {}
+export interface BaseFabricObject
+  extends StaticFabricObject,
+    FabricObjectSVGExportMixin {}
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,

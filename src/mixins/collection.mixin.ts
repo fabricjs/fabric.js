@@ -4,7 +4,6 @@ import { removeFromArray } from '../util/internals';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
-
     /**
      * @type {BaseFabricObject[]}
      * @TODO needs to end up in the constructor too
