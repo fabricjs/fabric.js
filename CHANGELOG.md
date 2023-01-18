@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(TS): Update StaticCanvas to remove ts-nocheck [#8606](https://github.com/fabricjs/fabric.js/pull/8606)
+- chore(TS): Intersection class, finalize TS [#8603](https://github.com/fabricjs/fabric.js/pull/8603)
 - chore(TS): Update Pattern to remove ts-nocheck and added types where missing [#8605](https://github.com/fabricjs/fabric.js/pull/8605)
 - chore(TS): Followup for interactivy and controls migration to TS [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
 - refactor(IText): Fixes Draggable Text for retina and viewport transform #8534
