@@ -1,3 +1,4 @@
+import { RIGHT_CLICK } from '../constants';
 import { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import type { DragMethods } from '../shapes/Object/InteractiveObject';
@@ -6,6 +7,10 @@ import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './itext_behavior.mixin';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
+
+function isRightClick(button?: number) {
+  return button === RIGHT_CLICK;
+}
 
 export abstract class ITextClickBehaviorMixin<
     EventSpec extends ITextEvents = ITextEvents
@@ -124,12 +129,8 @@ export abstract class ITextClickBehaviorMixin<
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler({ e }: TPointerEventInfo) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      ((e as MouseEvent).button && (e as MouseEvent).button !== 1)
-    ) {
+  _mouseDownHandler({ e, button }: TPointerEventInfo) {
+    if (!this.canvas || !this.editable || isRightClick(button)) {
       return;
     }
 
@@ -158,12 +159,8 @@ export abstract class ITextClickBehaviorMixin<
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      ((e as MouseEvent).button && (e as MouseEvent).button !== 1)
-    ) {
+  _mouseDownHandlerBefore({ button }: TPointerEventInfo) {
+    if (!this.canvas || !this.editable || isRightClick(button)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -175,8 +172,8 @@ export abstract class ITextClickBehaviorMixin<
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler(options: TPointerEventInfo) {
-    const didDrag = this.draggableTextDelegate.end(options.e);
+  mouseUpHandler({ e, transform, button }: TPointerEventInfo) {
+    const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
@@ -191,8 +188,8 @@ export abstract class ITextClickBehaviorMixin<
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
-      (options.transform && options.transform.actionPerformed) ||
-      (options.e.button && options.e.button !== 1) ||
+      (transform && transform.actionPerformed) ||
+      isRightClick(button) ||
       didDrag
     ) {
       return;
@@ -201,7 +198,7 @@ export abstract class ITextClickBehaviorMixin<
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;
       this.__lastSelected = false;
-      this.enterEditing(options.e);
+      this.enterEditing(e);
       if (this.selectionStart === this.selectionEnd) {
         this.initDelayedCursor(true);
       } else {

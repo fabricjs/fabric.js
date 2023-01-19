@@ -1,3 +1,4 @@
+import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
 import { getEnv } from '../env';
 import {
   CanvasEvents,
@@ -25,10 +26,7 @@ import {
 import { SelectableCanvas } from './canvas.class';
 import { TextEditingManager } from './TextEditingManager';
 
-const RIGHT_CLICK = 3,
-  MIDDLE_CLICK = 2,
-  LEFT_CLICK = 1,
-  addEventOptions = { passive: false } as EventListenerOptions;
+const addEventOptions = { passive: false } as EventListenerOptions;
 
 function checkClick(e: TPointerEvent, value: number) {
   return !!(e as MouseEvent).button && (e as MouseEvent).button === value - 1;
