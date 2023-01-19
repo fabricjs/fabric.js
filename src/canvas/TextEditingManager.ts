@@ -1,14 +1,13 @@
 import { TPointerEvent } from '../EventTypeDefs';
-import type { IText } from '../shapes/itext.class';
-import type { Textbox } from '../shapes/textbox.class';
+import type { ITextBehaviorMixin } from '../mixins/itext_behavior.mixin';
 import { removeFromArray } from '../util/internals';
 
 /**
  * In charge of synchronizing all interactive text instances of a canvas
  */
 export class TextEditingManager {
-  private targets: (IText | Textbox)[] = [];
-  private declare target?: IText | Textbox;
+  private targets: ITextBehaviorMixin[] = [];
+  private declare target?: ITextBehaviorMixin;
 
   exitTextEditing() {
     this.target = undefined;
@@ -19,20 +18,20 @@ export class TextEditingManager {
     });
   }
 
-  add(target: IText | Textbox) {
+  add(target: ITextBehaviorMixin) {
     this.targets.push(target);
   }
 
-  remove(target: IText | Textbox) {
+  remove(target: ITextBehaviorMixin) {
     this.unregister(target);
     removeFromArray(this.targets, target);
   }
 
-  register(target: IText | Textbox) {
+  register(target: ITextBehaviorMixin) {
     this.target = target;
   }
 
-  unregister(target: IText | Textbox) {
+  unregister(target: ITextBehaviorMixin) {
     if (target === this.target) {
       this.target = undefined;
     }

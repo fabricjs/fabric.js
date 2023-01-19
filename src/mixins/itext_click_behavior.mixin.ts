@@ -1,14 +1,15 @@
-//@ts-nocheck
-import { ObjectEvents } from '../EventTypeDefs';
+import { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import type { DragMethods } from '../shapes/Object/InteractiveObject';
-import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
+import { ITextEvents } from './itext_behavior.mixin';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
+export abstract class ITextClickBehaviorMixin<
+    EventSpec extends ITextEvents = ITextEvents
+  >
   extends ITextKeyBehaviorMixin<EventSpec>
   implements DragMethods
 {
@@ -22,9 +23,11 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
 
   initBehavior() {
     // Initializes event handlers related to cursor or selection
-    this.initMousedownHandler();
-    this.initMouseupHandler();
-    this.initClicks();
+    this.on('mousedown', this._mouseDownHandler);
+    this.on('mousedown:before', this._mouseDownHandlerBefore);
+    this.on('mouseup', this.mouseUpHandler);
+    this.on('mousedblclick', this.doubleClickHandler);
+    this.on('tripleclick', this.tripleClickHandler);
 
     // Initializes "dbclick" event handler
     this.__lastClickTime = +new Date();
@@ -35,6 +38,7 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
 
     // TODO: replace this with a standard assignment when shitty `clone` is removed
     Object.defineProperty(this, 'draggableTextDelegate', {
+      // @ts-expect-error in reality it is an IText instance
       value: new DraggableTextDelegate(this),
       configurable: false,
       enumerable: false,
@@ -67,7 +71,7 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
    * Default event handler to simulate triple click
    * @private
    */
-  onMouseDown(options: TransformEvent) {
+  onMouseDown(options: TPointerEventInfo) {
     if (!this.canvas) {
       return;
     }
@@ -95,7 +99,7 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
   /**
    * Default handler for double click, select a word
    */
-  doubleClickHandler(options: TransformEvent) {
+  doubleClickHandler(options: TPointerEventInfo) {
     if (!this.isEditing) {
       return;
     }
@@ -105,19 +109,11 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
   /**
    * Default handler for triple click, select a line
    */
-  tripleClickHandler(options: TransformEvent) {
+  tripleClickHandler(options: TPointerEventInfo) {
     if (!this.isEditing) {
       return;
     }
     this.selectLine(this.getSelectionStartFromPointer(options.e));
-  }
-
-  /**
-   * Initializes double and triple click event handlers
-   */
-  initClicks() {
-    this.on('mousedblclick', this.doubleClickHandler);
-    this.on('tripleclick', this.tripleClickHandler);
   }
 
   /**
@@ -128,8 +124,12 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler({ e }: TransformEvent) {
-    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
+  _mouseDownHandler({ e }: TPointerEventInfo) {
+    if (
+      !this.canvas ||
+      !this.editable ||
+      ((e as MouseEvent).button && (e as MouseEvent).button !== 1)
+    ) {
       return;
     }
 
@@ -158,8 +158,12 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore({ e }: TransformEvent) {
-    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
+  _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
+    if (
+      !this.canvas ||
+      !this.editable ||
+      ((e as MouseEvent).button && (e as MouseEvent).button !== 1)
+    ) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -168,25 +172,10 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
   }
 
   /**
-   * Initializes "mousedown" event handler
-   */
-  initMousedownHandler() {
-    this.on('mousedown', this._mouseDownHandler);
-    this.on('mousedown:before', this._mouseDownHandlerBefore);
-  }
-
-  /**
-   * Initializes "mouseup" event handler
-   */
-  initMouseupHandler() {
-    this.on('mouseup', this.mouseUpHandler);
-  }
-
-  /**
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler(options: TransformEvent) {
+  mouseUpHandler(options: TPointerEventInfo) {
     const didDrag = this.draggableTextDelegate.end(options.e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
@@ -245,13 +234,12 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
 
   /**
    * Returns coordinates of a pointer relative to object's top left corner in object's plane
-   * @param {TPointerEvent} e Event to operate upon
-   * @param {IPoint} [pointer] Pointer to operate upon (instead of event)
+   * @param {Point} [pointer] Pointer to operate upon
    * @return {Point} Coordinates of a pointer (x, y)
    */
-  getLocalPointer(e: TPointerEvent, pointer: IPoint): Point {
+  getLocalPointer(pointer: Point): Point {
     return transformPoint(
-      pointer || this.canvas.getPointer(e),
+      pointer,
       invertTransform(this.calcTransformMatrix())
     ).add(new Point(this.width / 2, this.height / 2));
   }
@@ -262,7 +250,7 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.getLocalPointer(e);
+    const mouseOffset = this.getLocalPointer(this.canvas!.getPointer(e));
     let height = 0,
       charIndex = 0,
       lineIndex = 0;

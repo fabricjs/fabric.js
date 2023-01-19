@@ -1,10 +1,6 @@
 // @ts-nocheck
 import { Canvas } from '../canvas/canvas_events';
-import {
-  ObjectEvents,
-  TPointerEvent,
-  TPointerEventInfo,
-} from '../EventTypeDefs';
+import { ITextEvents } from '../mixins/itext_behavior.mixin';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -14,14 +10,6 @@ import {
 } from '../mixins/itext_key_const';
 import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-
-export type ITextEvents = ObjectEvents & {
-  'selection:changed': never;
-  changed: never | { index: number; action: string };
-  tripleclick: TPointerEventInfo;
-  'editing:entered': never | { e: TPointerEvent };
-  'editing:exited': never;
-};
 
 /**
  * @fires changed
@@ -66,7 +54,9 @@ export type ITextEvents = ObjectEvents & {
  *   Select line:                    triple click
  * ```
  */
-export class IText extends ITextClickBehaviorMixin<ITextEvents> {
+export class IText<
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextClickBehaviorMixin<EventSpec> {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
