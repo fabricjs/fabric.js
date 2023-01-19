@@ -195,7 +195,7 @@
     assert.equal(source.x, 2);
   });
 
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
+  QUnit.test('fabric.util.object.extend deep is not supported anymore', function(assert) {
     var extend = fabric.util.object.extend;
     var d = function() { };
     var destination = { x: 1 },
@@ -205,10 +205,7 @@
 
     assert.equal(destination.x, 1, 'x is still in destination');
     assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
+    assert.equal(destination.a, source.a, 'a is the same object');
   });
 
   QUnit.test('fabric.util.object.clone', function(assert) {
