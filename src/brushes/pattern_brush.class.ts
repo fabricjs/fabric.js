@@ -1,12 +1,11 @@
-import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { PencilBrush } from './pencil_brush.class';
 
 export class PatternBrush extends PencilBrush {
-  source?: CanvasImageSource;
+  declare source?: CanvasImageSource;
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -69,5 +68,3 @@ export class PatternBrush extends PencilBrush {
     return path;
   }
 }
-
-fabric.PatternBrush = PatternBrush;

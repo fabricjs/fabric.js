@@ -1,6 +1,4 @@
 //@ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
@@ -15,7 +13,8 @@ import {
   parsePath,
   type TPathSegmentsInfo,
 } from '../util/path';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Path extends FabricObject {
   /**
@@ -23,15 +22,15 @@ export class Path extends FabricObject {
    * @type Array
    * @default
    */
-  path: PathData;
+  declare path: PathData;
 
-  pathOffset: Point;
+  declare pathOffset: Point;
 
-  fromSVG?: boolean;
+  declare fromSVG?: boolean;
 
-  sourcePath?: string;
+  declare sourcePath?: string;
 
-  segmentsInfo?: TPathSegmentsInfo[];
+  declare segmentsInfo?: TPathSegmentsInfo[];
 
   /**
    * Constructor
@@ -44,7 +43,6 @@ export class Path extends FabricObject {
     { path: _, left, top, ...options }: any = {}
   ) {
     super(options);
-
     const pathTL = this._setPath(path || []);
     const origin = this.translateToGivenOrigin(
       new Point(left ?? pathTL.x, top ?? pathTL.y),
@@ -353,7 +351,7 @@ export class Path extends FabricObject {
    * @returns {Promise<Path>}
    */
   static fromObject(object) {
-    return FabricObject._fromObject(Path, object, {
+    return this._fromObject(object, {
       extraParam: 'path',
     });
   }
@@ -368,9 +366,9 @@ export class Path extends FabricObject {
    * @param {Function} [callback] Options callback invoked after parsing is finished
    */
   static fromElement(element, callback, options) {
-    const parsedAttributes = parseAttributes(element, Path.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
     callback(
-      new Path(parsedAttributes.d, {
+      new this(parsedAttributes.d, {
         ...parsedAttributes,
         ...options,
         // we pass undefined to instruct the constructor to position the object using the bbox
@@ -384,16 +382,14 @@ export class Path extends FabricObject {
 
 export const pathDefaultValues: Partial<TClassProperties<Path>> = {
   type: 'path',
-  path: null,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'path',
-    'fillRule'
-  ),
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('path'),
 };
 
-Object.assign(Path.prototype, pathDefaultValues);
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Path = Path;
+Object.assign(Path.prototype, {
+  ...pathDefaultValues,
+  cacheProperties: [...cacheProperties, 'path', 'fillRule'],
+});
+
+classRegistry.setClass(Path);
+classRegistry.setSVGClass(Path);
 
 /* _FROM_SVG_START_ */

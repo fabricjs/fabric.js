@@ -1,7 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 /**
  * Brightness filter class
  * @example
@@ -19,7 +19,7 @@ export class Brightness extends BaseFilter {
    * @param {Number} brightness
    * @default
    */
-  brightness: number;
+  declare brightness: number;
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
@@ -90,3 +90,4 @@ export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
 };
 
 Object.assign(Brightness.prototype, brightnessDefaultValues);
+classRegistry.setClass(Brightness);

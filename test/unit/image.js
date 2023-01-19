@@ -24,8 +24,8 @@
     return element;
   }
 
-  var IMG_SRC     = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_SRC_REL = fabric.isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
+  var IMG_SRC     = fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_SRC_REL = fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
@@ -71,7 +71,7 @@
   };
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function _createImageObject(width, height, callback, options, src) {
@@ -195,14 +195,14 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toObject === 'function');
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
+      var filter = new fabric.filters.Resize({resizeType: 'bilinear', scaleX: 0.3, scaleY: 0.3});
       image.resizeFilter = filter;
-      assert.ok(image.resizeFilter instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      assert.ok(image.resizeFilter instanceof fabric.filters.Resize, 'should inherit from fabric.filters.Resize');
       var toObject = image.toObject();
       assert.deepEqual(toObject.resizeFilter, filter.toObject(), 'the filter is in object form now');
       fabric.Image.fromObject(toObject).then(function(imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
-        assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        assert.ok(filterFromObj instanceof fabric.filters.Resize, 'should inherit from fabric.filters.Resize');
         assert.deepEqual(filterFromObj, filter,  'the filter has been restored');
         assert.equal(filterFromObj.scaleX, 0.3);
         assert.equal(filterFromObj.scaleY, 0.3);
@@ -215,9 +215,9 @@
   QUnit.test('toObject with normal filter and resize filter', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear' });
+      var filter = new fabric.filters.Resize({resizeType: 'bilinear' });
       image.resizeFilter = filter;
-      var filterBg = new fabric.Image.filters.Brightness({ brightness: 0.8 });
+      var filterBg = new fabric.filters.Brightness({ brightness: 0.8 });
       image.filters = [filterBg];
       image.scaleX = 0.3;
       image.scaleY = 0.3;
@@ -227,8 +227,8 @@
       fabric.Image.fromObject(toObject).then(function(imageFromObject) {
         var filterFromObj = imageFromObject.resizeFilter;
         var brightnessFromObj = imageFromObject.filters[0];
-        assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
-        assert.ok(brightnessFromObj instanceof fabric.Image.filters.Brightness, 'should inherit from fabric.Image.filters.Resize');
+        assert.ok(filterFromObj instanceof fabric.filters.Resize, 'should inherit from fabric.filters.Resize');
+        assert.ok(brightnessFromObj instanceof fabric.filters.Brightness, 'should inherit from fabric.filters.Resize');
         done();
       });
     });
@@ -238,10 +238,10 @@
     var done = assert.async();
     createImageObject(function(image) {
       assert.ok(typeof image.toObject === 'function');
-      var filter = new fabric.Image.filters.Resize({resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2});
+      var filter = new fabric.filters.Resize({resizeType: 'bilinear', scaleX: 0.2, scaleY: 0.2});
       image.filters.push(filter);
       var width = image.width, height = image.height;
-      assert.ok(image.filters[0] instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+      assert.ok(image.filters[0] instanceof fabric.filters.Resize, 'should inherit from fabric.filters.Resize');
       image.applyFilters();
       assert.equal(image.width, Math.floor(width), 'width is not changed');
       assert.equal(image.height, Math.floor(height), 'height is not changed');
@@ -253,7 +253,7 @@
       assert.equal(toObject.height, height, 'height is stored as before filters');
       fabric.Image.fromObject(toObject).then(function(_imageFromObject) {
         var filterFromObj = _imageFromObject.filters[0];
-        assert.ok(filterFromObj instanceof fabric.Image.filters.Resize, 'should inherit from fabric.Image.filters.Resize');
+        assert.ok(filterFromObj instanceof fabric.filters.Resize, 'should inherit from fabric.filters.Resize');
         assert.equal(filterFromObj.scaleY, 0.2);
         assert.equal(filterFromObj.scaleX, 0.2);
         done();
@@ -377,23 +377,33 @@
     });
   });
 
-  QUnit.test('setElement resets the webgl cache', function(assert) {
-    var done = assert.async();
-    var fabricBackend = fabric.filterBackend;
-    createImageObject(function(image) {
-      fabric.filterBackend = {
-        textureCache: {},
-        evictCachesForKey: function(key) {
-          delete this.textureCache[key];
-        }
-      };
-      var elImage = _createImageElement();
-      fabric.filterBackend.textureCache[image.cacheKey] = 'something';
-      image.setElement(elImage);
-      assert.equal(fabric.filterBackend.textureCache[image.cacheKey], undefined);
-      fabric.filterBackend = fabricBackend;
+  QUnit.test('setElement calls `removeTexture`', function (assert) {
+    const done = assert.async();
+    const keys = [];
+    createImageObject((image) => {
+      image.cacheKey = 'TEST';
+      // use sinon replace or something one day
+      image.removeTexture = (key) => keys.push(key);
+      image.setElement(_createImageElement());
+      assert.deepEqual(keys, ['TEST', 'TEST_filtered'], 'should try to remove caches');
       done();
     });
+  });
+
+  QUnit.test('setElement resets the webgl cache', function (assert) {
+    const backend = fabric.getFilterBackend();
+    if (backend instanceof fabric.WebGLFilterBackend) {
+      const done = assert.async();
+      createImageObject((image) => {
+        backend.textureCache[image.cacheKey] = backend.createTexture(backend.gl, 50, 50);
+        assert.ok(backend.textureCache[image.cacheKey]);
+        image.setElement(_createImageElement());
+        assert.equal(backend.textureCache[image.cacheKey], undefined);
+        done();
+      });
+    } else {
+      assert.expect(0);
+    }
   });
 
   QUnit.test('crossOrigin', function(assert) {
@@ -417,7 +427,7 @@
       );
 
       // fromObject doesn't work on Node :/
-      if (fabric.isLikelyNode) {
+      if (fabric.getEnv().isLikelyNode) {
         done();
         return;
       }
@@ -467,16 +477,27 @@
     });
   });
 
-  QUnit.test('fromObject with clipPath', function(assert) {
+  QUnit.test('fromObject with clipPath and filters', function(assert) {
     var done = assert.async();
     // should not throw error when no callback is given
     var obj = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_IMG_OBJECT), {
       src: IMG_SRC,
       clipPath: (new fabric.Rect({ width: 100, height: 100 })).toObject(),
+      filters: [{
+        type: 'Brightness',
+        brightness: 0.1
+      }],
+      resizeFilter: {
+        type: 'Resize',
+      }
     });
     fabric.Image.fromObject(obj).then(function(instance){
       assert.ok(instance instanceof fabric.Image);
       assert.ok(instance.clipPath instanceof fabric.Rect);
+      assert.ok(Array.isArray(instance.filters), 'should enliven filters');
+      assert.equal(instance.filters.length, 1, 'should enliven filters');
+      assert.ok(instance.filters[0] instanceof fabric.filters.Brightness, 'should enliven filters');
+      assert.ok(instance.resizeFilter instanceof fabric.filters.Resize, 'should enliven resizeFilter');
       done();
     });
   });
@@ -592,7 +613,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -620,7 +641,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -649,7 +670,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -678,7 +699,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -707,7 +728,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 0, 'left');
@@ -736,7 +757,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 35, 'left');
@@ -765,7 +786,7 @@
     });
 
     fabric.Image.fromElement(imageEl, function(imgObject) {
-      imgObject._removeTransformMatrix(imgObject.parsePreserveAspectRatioAttribute());
+      fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('left'), 70, 'left');
@@ -794,7 +815,7 @@
     createImageObject(function(image) {
       var run = false;
       image.dirty = false;
-      var filter = new fabric.Image.filters.Brightness();
+      var filter = new fabric.filters.Brightness();
       image.filters = [filter];
       filter.isNeutralState = function() {
         run = true;
@@ -820,7 +841,7 @@
   QUnit.test('apply filters reset _element and _filteredEl', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
-      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
+      var contrast = new fabric.filters.Contrast({ contrast: 0.5 });
       image.applyFilters();
       var element = image._element;
       var filtered = image._filteredEl;
@@ -836,8 +857,8 @@
   QUnit.test('apply filters and resize filter', function(assert) {
     var done = assert.async();
     createImageObject(function(image) {
-      var contrast = new fabric.Image.filters.Contrast({ contrast: 0.5 });
-      var resizeFilter = new fabric.Image.filters.Resize();
+      var contrast = new fabric.filters.Contrast({ contrast: 0.5 });
+      var resizeFilter = new fabric.filters.Resize();
       image.filters = [contrast];
       image.resizeFilter = resizeFilter;
       var element = image._element;

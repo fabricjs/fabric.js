@@ -9,10 +9,10 @@ import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 export abstract class ITextClickBehaviorMixin<
   EventSpec extends ObjectEvents
 > extends ITextKeyBehaviorMixin<EventSpec> {
-  private __lastClickTime: number;
-  private __lastLastClickTime: number;
-  private __lastPointer: IPoint | Record<string, never>;
-  private __newClickTime: number;
+  private declare __lastClickTime: number;
+  private declare __lastLastClickTime: number;
+  private declare __lastPointer: IPoint | Record<string, never>;
+  private declare __newClickTime: number;
 
   /**
    * Initializes "dbclick" event handler
@@ -106,12 +106,13 @@ export abstract class ITextClickBehaviorMixin<
     if (
       !this.canvas ||
       !this.editable ||
+      this.__isDragging ||
       (options.e.button && options.e.button !== 1)
     ) {
       return;
     }
 
-    this.__isMousedown = true;
+    this.canvas.textEditingManager.register(this);
 
     if (this.selected) {
       this.inCompositionMode = false;
@@ -172,7 +173,19 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    this.__isMousedown = false;
+    const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
+    this.__isDragging = false;
+    if (this.canvas) {
+      this.canvas.textEditingManager.unregister(this);
+
+      const activeObject = this.canvas._activeObject;
+      if (activeObject && activeObject !== this) {
+        // avoid running this logic when there is an active object
+        // this because is possible with shift click and fast clicks,
+        // to rapidly deselect and reselect this object and trigger an enterEdit
+        return;
+      }
+    }
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
@@ -182,15 +195,10 @@ export abstract class ITextClickBehaviorMixin<
       return;
     }
 
-    if (this.canvas) {
-      const currentActive = this.canvas._activeObject;
-      if (currentActive && currentActive !== this) {
-        // avoid running this logic when there is an active object
-        // this because is possible with shift click and fast clicks,
-        // to rapidly deselect and reselect this object and trigger an enterEdit
-        return;
-      }
-    }
+    // mousedown is going to early return if isDragging is true.
+    // this is here to recover the setCursorByClick in case the
+    // isDragging is a false positive.
+    shouldSetCursor && this.setCursorByClick(options.e);
 
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;

@@ -1,4 +1,4 @@
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { createCanvasElement } from '../util/misc/dom';
 
 export enum WebGLPrecision {
@@ -11,9 +11,9 @@ export enum WebGLPrecision {
  * Lazy initialize WebGL constants
  */
 class WebGLProbe {
-  maxTextureSize?: number;
+  declare maxTextureSize?: number;
 
-  webGLPrecision: WebGLPrecision | undefined;
+  declare webGLPrecision: WebGLPrecision | undefined;
 
   /**
    * Tests if webgl supports certain precision
@@ -40,7 +40,7 @@ class WebGLProbe {
    * @returns config object if true
    */
   queryWebGL() {
-    if (fabric.isLikelyNode) {
+    if (getEnv().isLikelyNode) {
       return;
     }
     const canvas = createCanvasElement();

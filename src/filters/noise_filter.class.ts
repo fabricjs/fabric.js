@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Noise filter class
@@ -18,7 +19,7 @@ export class Noise extends BaseFilter {
    * @param {Number} noise
    * @default
    */
-  noise: number;
+  declare noise: number;
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
@@ -105,3 +106,4 @@ export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
 };
 
 Object.assign(Noise.prototype, noiseDefaultValues);
+classRegistry.setClass(Noise);

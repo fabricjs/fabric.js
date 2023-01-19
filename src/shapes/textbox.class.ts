@@ -1,11 +1,8 @@
 // @ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { TClassProperties } from '../typedefs';
-import { stylesFromArray } from '../util/misc/textStyles';
 import { IText } from './itext.class';
-import { FabricObject } from './object.class';
 import { textDefaultValues } from './text.class';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -19,7 +16,7 @@ export class Textbox extends IText {
    * @type Number
    * @default
    */
-  minWidth: number;
+  declare minWidth: number;
 
   /**
    * Minimum calculated width of a textbox, in pixels.
@@ -28,13 +25,7 @@ export class Textbox extends IText {
    * @type Number
    * @default
    */
-  dynamicMinWidth: number;
-
-  /**
-   * Cached array of text wrapping.
-   * @type Array
-   */
-  __cachedLines: Array<any> | null = null;
+  declare dynamicMinWidth: number;
 
   /**
    * Use this boolean property in order to split strings that have no white space concept.
@@ -42,7 +33,7 @@ export class Textbox extends IText {
    * @type Boolean
    * @since 2.6.0
    */
-  splitByGrapheme: boolean;
+  declare splitByGrapheme: boolean;
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -55,7 +46,6 @@ export class Textbox extends IText {
       return;
     }
     this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
     this._clearCache();
     // clear dynamicMinWidth as it will be different after we re-wrap line
     this.dynamicMinWidth = 0;
@@ -459,28 +449,11 @@ export class Textbox extends IText {
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );
   }
-
-  /**
-   * Returns Textbox instance from an object representation
-   * @static
-   * @memberOf Textbox
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Textbox>}
-   */
-  static fromObject(object: object): Promise<Textbox> {
-    return FabricObject._fromObject(
-      Textbox,
-      {
-        ...object,
-        styles: stylesFromArray(object.styles, object.text),
-      },
-      {
-        extraParam: 'text',
-      }
-    );
-  }
 }
 
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
 export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   type: 'textbox',
   minWidth: 20,
@@ -495,4 +468,4 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 Object.assign(Textbox.prototype, textboxDefaultValues);
 
-fabric.Textbox = Textbox;
+classRegistry.setClass(Textbox);

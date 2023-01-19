@@ -1,7 +1,8 @@
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Color Blend filter class
@@ -27,9 +28,9 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    * @type String
    * @default
    **/
-  color: string;
+  declare color: string;
 
-  mode:
+  declare mode:
     | 'multiply'
     | 'add'
     | 'diff'
@@ -47,7 +48,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    * @type Number
    * @default
    **/
-  alpha: number;
+  declare alpha: number;
 
   /**
    * build the fragment source for the filters, joining the common part with
@@ -254,3 +255,4 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
 };
 
 Object.assign(BlendColor.prototype, blendColorDefaultValues);
+classRegistry.setClass(BlendColor);

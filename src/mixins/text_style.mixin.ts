@@ -1,5 +1,5 @@
 import { ObjectEvents } from '../EventTypeDefs';
-import { FabricObject } from '../shapes/fabricObject.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 
 export type TextStyleDeclaration = Record<string, any>;
 
@@ -10,10 +10,10 @@ export type TextStyle = {
 export abstract class TextStyleMixin<
   EventSpec extends ObjectEvents
 > extends FabricObject<EventSpec> {
-  abstract styles: TextStyle;
-  protected abstract _textLines: string[][];
-  protected abstract _forceClearCache: boolean;
-  protected abstract _styleProperties: string[];
+  declare abstract styles: TextStyle;
+  protected declare abstract _textLines: string[][];
+  protected declare abstract _forceClearCache: boolean;
+  protected declare abstract _styleProperties: string[];
   abstract get2DCursorLocation(
     selectionStart: number,
     skipWrapping?: boolean

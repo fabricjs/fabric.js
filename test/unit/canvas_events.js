@@ -1,6 +1,6 @@
 (function() {
   var simulateEvent;
-  if (fabric.isLikelyNode) {
+  if (fabric.getEnv().isLikelyNode) {
     simulateEvent = global.simulateEvent;
   }
   else {
@@ -293,7 +293,7 @@
   });
 
 
-  QUnit.test('mouse:up isClick = true', function(assert) {
+  QUnit.test('mouse:up, isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
@@ -302,6 +302,39 @@
     canvas.__onMouseDown(e);
     canvas.__onMouseUp(e);
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
+  });
+
+  QUnit.test('mouse:up after move, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('mouse:up after dragging, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas._onDragStart({
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      }
+    });
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('setDimensions and active brush', function(assert) {
@@ -318,19 +351,6 @@
     canva.renderAll();
     assert.equal(rendered, true, 'the brush called the _render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
-  });
-
-  QUnit.test('mouse:up isClick = false', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
-    var e2 = { clientX: 31, clientY: 31, which: 1 };
-    var isClick = true;
-    canvas.on('mouse:up', function(opt) {
-      isClick = opt.isClick;
-    });
-    canvas.__onMouseDown(e);
-    canvas.__onMouseMove(e2);
-    canvas.__onMouseUp(e2);
-    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {
@@ -402,6 +422,52 @@
     canvas.__onMouseUp(e2);
     assert.equal(rect.scaleX, 3, 'rect scaled X');
     assert.equal(rect.scaleY, 3, 'rect scaled Y');
+  });
+
+  QUnit.test('scaling a nested target', function(assert) {
+    var e = { clientX: 3, clientY: 3, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
+    var mouseUpCalled = false;
+    var mouseDownCalled = false;
+    rect.controls = {
+      br: fabric.Object.prototype.controls.br,
+    };
+    rect.controls.br.mouseUpHandler = function() {
+      mouseUpCalled = true;
+    };
+    rect.controls.br.mouseDownHandler = function() {
+      mouseDownCalled = true;
+    };
+    const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(mouseUpCalled, true, 'mouse up handler for control has been called');
+    assert.equal(mouseDownCalled, true, 'mouse down handler for control has been called');
+    assert.deepEqual(rect.calcTransformMatrix(), [3, 0, 0, 3, 4.5, 4.5], 'transform matrix');
+    assert.deepEqual(rect.getXY(), new fabric.Point(), 'position is maintained');
+  });
+
+  QUnit.test('dragging a nested target', function (assert) {
+    var e = { clientX: 1, clientY: 1, which: 1 };
+    var e1 = { clientX: 6, clientY: 6, which: 1 };
+    var e2 = { clientX: 9, clientY: 9, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
+    rect.controls = {};
+    const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e1);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.deepEqual(rect.calcTransformMatrix(), [1, 0, 0, 1, 9.5, 9.5], 'transform matrix');
+    assert.deepEqual(rect.getXY(), new fabric.Point(8, 8), 'position changed by 8 pixels');
   });
 
   QUnit.test('A transform will call mouseup and mousedown on the control', function(assert) {
@@ -481,72 +547,6 @@
     assert.equal(mouseUpCalled2, true, 'mouse up handler for rect2 has been called');
   });
 
-
-  QUnit.test('avoid multiple bindings', function(assert) {
-    var c = new fabric.Canvas();
-    var eventsArray = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    // _initEventListeners canvas more than once
-    c._initEventListeners();
-    c._initEventListeners();
-    var eventsArray2 = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    assert.deepEqual(eventsArray, eventsArray2, 'after first _initEventListeners, functions do not change.');
-  });
-
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.document.createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
-  });
-
   QUnit.test('Fabric event fired - Drop', function (assert) {
     var eventNames = ['drop:before', 'drop'];
     var c = new fabric.Canvas();
@@ -556,7 +556,7 @@
         fired.push(eventName);
       });
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('drop', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
@@ -579,7 +579,7 @@
           assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
           canvasRegistry.push(eventName);
         });
-        var event = fabric.document.createEvent('HTMLEvents');
+        var event = fabric.getDocument().createEvent('HTMLEvents');
         event.initEvent(eventName, true, true);
         event.clientX = 5;
         event.clientY = 5;
@@ -623,7 +623,7 @@
         counter++;
         target = opt.target;
       });
-      var event = fabric.document.createEvent('HTMLEvents');
+      var event = fabric.getDocument().createEvent('HTMLEvents');
       event.initEvent(eventType, true, true);
       event.clientX = 5;
       event.clientY = 5;
@@ -640,7 +640,7 @@
     c.on(eventname, function () {
       counter++;
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('mouseenter', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(counter, 1, eventname + ' fabric event fired');
@@ -664,7 +664,7 @@
     c.on(canvasEventName, function (ev) {
       control.push(ev);
     });
-    var event = fabric.document.createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent(eventName, true, true);
 
     //  with targets
@@ -773,7 +773,7 @@
       setSubTargetCheckRecursive(activeSelection);
 
       // perform MouseOver event on a deeply nested subTarget
-      var moveEvent = fabric.document.createEvent('HTMLEvents');
+      var moveEvent = fabric.getDocument().createEvent('HTMLEvents');
       moveEvent.initEvent('mousemove', true, true);
       var target = canvas.item(1);
       canvas.targets = [
@@ -781,14 +781,14 @@
         target.item(1).item(1),
         target.item(1).item(1).item(1)
       ];
-      canvas._fireOverOutEvents(target, moveEvent);
+      canvas._fireOverOutEvents(moveEvent, target);
       assert.equal(counterOver, 4, 'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, target, 'activeSelection is _hoveredTarget');
       assert.equal(canvas._hoveredTargets.length, 3, '3 additional subTargets are captured as _hoveredTargets');
 
       // perform MouseOut even on all hoveredTargets
       canvas.targets = [];
-      canvas._fireOverOutEvents(null, moveEvent);
+      canvas._fireOverOutEvents(moveEvent, null);
       assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
       assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');
@@ -808,60 +808,8 @@
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'groupSelector is updated');
   });
 
-  ['MouseDown', 'MouseMove', 'MouseOut', 'MouseEnter', 'MouseWheel', 'DoubleClick'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      if (eventType === 'DoubleClick') {
-        eventName = 'dblclick';
-      }
-      if (eventType === 'MouseWheel') {
-        eventName = 'wheel';
-      }
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.document.createEvent('MouseEvent');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
-  });
-
-  QUnit.test('avoid multiple registration - mouseup', function(assert) {
-    var done = assert.async();
-    var originalMouseUp = fabric.Canvas.prototype._onMouseUp;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseUp = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-
-    // a mouse down is necessary to register mouse up.
-    var _event = fabric.document.createEvent('MouseEvent');
-    _event.initEvent('mousedown', true, true);
-    c.upperCanvasEl.dispatchEvent(_event);
-    setTimeout(function() {
-      var event = fabric.document.createEvent('MouseEvent');
-      event.initEvent('mouseup', true, true);
-      fabric.document.dispatchEvent(event);
-      assert.equal(counter, 1, 'listener executed once');
-      fabric.Canvas.prototype._onMouseUp = originalMouseUp;
-      c.cancelRequestedRender();
-      done();
-    }, 200);
-  });
-
   QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     c._hoveredTarget = new fabric.Object();
@@ -870,7 +818,7 @@
   });
 
   QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
@@ -881,7 +829,7 @@
   });
 
   QUnit.test('mouseEnter removes __corner', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object({ top: 100, left: 100 });
@@ -889,11 +837,11 @@
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
+    assert.equal(obj.__corner, undefined, '__corner has been resetted from activeObject');
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
-    var event = fabric.document.createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
@@ -902,23 +850,6 @@
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(obj.__corner, 'test', '__corner has not been reset');
-  });
-
-  QUnit.test('avoid multiple events on window', function(assert) {
-    var originalResize = fabric.Canvas.prototype._onResize;
-    var counter = 0;
-    fabric.Canvas.prototype._onResize = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-    var event = fabric.document.createEvent('UIEvents');
-    event.initUIEvent('resize', true, false, fabric.window, 0);
-    fabric.window.dispatchEvent(event);
-    assert.equal(counter, 1, 'listener on window executed once');
-    fabric.Canvas.prototype._onResize = originalResize;
   });
 
   // this test is important. As today we do not havenymore a unique function that give us the
@@ -1025,127 +956,267 @@
   //   assert.equal(!!canvas.actionIsDisabled('mtr', target, e), false, 'mtr action is not disabled lockSkewingX');
   // });
 
-  QUnit.test('getCornerCursor ', function(assert) {
-    assert.ok(typeof fabric.Canvas.prototype.getCornerCursor === 'function', 'getCornerCursor is a function');
+  QUnit.test('_setCursorFromEvent ', function(assert) {
     var key = canvas.altActionKey;
     var key2 = canvas.uniScaleKey;
-    var target = new fabric.Object({ canvas: canvas });
-    var e = { };
-    e[key] = false;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'crosshair action is not disabled');
+    var target = new fabric.Rect({ width: 100, height: 100 });
+    canvas.add(target);
+    canvas.setActiveObject(target);
+    target.setCoords();
+    const expected = {
+      mt: 'n-resize',
+      mb: 's-resize',
+      ml: 'w-resize',
+      mr: 'e-resize',
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expected[corner], `${expected[corner]} action is not disabled`);
+    })
 
-    target = new fabric.Object({ canvas: canvas });
+    const expectedLockScalinX = {
+      mt: 'n-resize',
+      mb: 's-resize',
+      ml: 'not-allowed',
+      mr: 'not-allowed',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
     target.lockScalingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingX');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingX');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingX key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingX key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinX[corner], `${corner} is ${expectedLockScalinX[corner]} for lockScalingX`);
+    });
+    // when triggering the uniscaleKey corners are ok
+    const expectedUniScale = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedUniScale[corner], `${corner} is ${expectedUniScale[corner]} for uniScaleKey pressed`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
+    const expectedLockScalinY = {
+      mt: 'not-allowed',
+      mb: 'not-allowed',
+      ml: 'w-resize',
+      mr: 'e-resize',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
+    target.lockScalingX = false;
     target.lockScalingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScalingY');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScalingY');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled lockScalingY key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled lockScalingY key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinY[corner], `${corner} is ${expectedLockScalinY[corner]} for lockScalingY`);
+    });
+    const expectedLockScalinYUniscaleKey = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockScalinYUniscaleKey[corner], `${corner} is ${expectedLockScalinYUniscaleKey[corner]} for lockScalingY + uniscaleKey`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
+    const expectedAllLock = {
+      mt: 'not-allowed',
+      mb: 'not-allowed',
+      ml: 'not-allowed',
+      mr: 'not-allowed',
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
     target.lockScalingY = true;
     target.lockScalingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled lockScaling');
-    e[key2] = true;
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'not-allowed', 'action is disabled lockScaling key2');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'not-allowed', 'action is disabled lockScaling key2');
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedAllLock[corner], `${corner} is ${expectedAllLock[corner]} for all locked`);
+    });
+    // when pressing uniscale key
+    const expectedAllLockUniscale = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'not-allowed',
+      tr: 'not-allowed',
+      bl: 'not-allowed',
+      br: 'not-allowed',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false, [key2]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedAllLockUniscale[corner], `${corner} is ${expectedAllLockUniscale[corner]} for all locked + uniscale`);
+    });
 
-    var e = { };
-    target = new fabric.Object({ canvas: canvas });
     target.lockRotation = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'n-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 's-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'w-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'e-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'nw-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'ne-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'sw-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'se-resize action is not disabled lockRotation');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'not-allowed', 'mtr action is disabled lockRotation');
+    target.lockScalingY = false;
+    target.lockScalingX = false;
+    const e = { clientX: target.oCoords.mtr.x, clientY: target.oCoords.mtr.y, [key]: false };
+    canvas._setCursorFromEvent(e, target);
+    assert.equal(canvas.upperCanvasEl.style.cursor, 'not-allowed', `mtr is not allowed for locked rotation`);
 
-    target = new fabric.Object({ canvas: canvas });
     target.lockSkewingX = true;
     target.lockSkewingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'n-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 's-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'w-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'e-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'action is not disabled');
+    target.lockRotation = false;
+    // with lock-skewing we are back at normal
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: false };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expected[corner], `${key} is ${expected[corner]} for both lockskewing`);
+    });
 
-    e[key] = true;
-    target = new fabric.Object({ canvas: canvas });
+    // trying to skew while lock skew Y
     target.lockSkewingY = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'ew-resize', 'lockSkewingY mt action is not disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'ew-resize', 'lockSkewingY mb action is not disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'not-allowed', 'lockSkewingY ml action is disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'not-allowed', 'lockSkewingY mr action is disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingY tl action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingY tr action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingY bl action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingY br action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingY mtr action is not disabled');
+    target.lockSkewingX = false;
+    const expectedLockSkewingY = {
+      mt: 'ew-resize', // skewing
+      mb: 'ew-resize', // skewing
+      ml: 'not-allowed', // skewing
+      mr: 'not-allowed', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingY[corner], `${corner} ${expectedLockSkewingY[corner]} for lockSkewingY`);
+    });
 
-    e[key] = true;
-    target = new fabric.Object({ canvas: canvas });
+    // trying to skew while lock skew X
+    target.lockSkewingY = false;
     target.lockSkewingX = true;
-    assert.equal(canvas.getCornerCursor('mt', target, e), 'not-allowed', 'lockSkewingX mt action is disabled');
-    assert.equal(canvas.getCornerCursor('mb', target, e), 'not-allowed', 'lockSkewingX mb action is disabled');
-    assert.equal(canvas.getCornerCursor('ml', target, e), 'ns-resize', 'lockSkewingX ml action is not disabled');
-    assert.equal(canvas.getCornerCursor('mr', target, e), 'ns-resize', 'lockSkewingX mr action is not disabled');
-    assert.equal(canvas.getCornerCursor('tl', target, e), 'nw-resize', 'lockSkewingX tl action is not disabled');
-    assert.equal(canvas.getCornerCursor('tr', target, e), 'ne-resize', 'lockSkewingX tr action is not disabled');
-    assert.equal(canvas.getCornerCursor('bl', target, e), 'sw-resize', 'lockSkewingX bl action is not disabled');
-    assert.equal(canvas.getCornerCursor('br', target, e), 'se-resize', 'lockSkewingX br action is not disabled');
-    assert.equal(canvas.getCornerCursor('mtr', target, e), 'crosshair', 'lockSkewingX mtr action is not disabled');
+    const expectedLockSkewingX = {
+      mt: 'not-allowed', // skewing
+      mb: 'not-allowed', // skewing
+      ml: 'ns-resize', // skewing
+      mr: 'ns-resize', // skewing
+      tl: 'nw-resize',
+      tr: 'ne-resize',
+      bl: 'sw-resize',
+      br: 'se-resize',
+      mtr: 'crosshair',
+    };
+    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+      const e = { clientX: coords.x, clientY: coords.y, [key]: true };
+      canvas._setCursorFromEvent(e, target);
+      assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingX[corner], `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`);
+    });
+  });
+
+  QUnit.test('text editing manager', async function (assert) {
+    const canvas = new fabric.Canvas();
+    const manager = canvas.textEditingManager;
+    assert.ok(manager, 'should exist');
+    assert.deepEqual(manager.targets, [], 'should be empty');
+
+    const a = new fabric.IText('test');
+    const b = new fabric.IText('test');
+    const e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
+
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.remove(a);
+    assert.deepEqual(manager.targets, []);
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [a, b]);
+    a.enterEditing();
+    assert.ok(a.isEditing);
+    b.enterEditing();
+    assert.ok(b.isEditing);
+    assert.ok(!a.isEditing, 'should have called exit editing');
+    manager.register(b);
+    manager.exitTextEditing();
+    assert.ok(!manager.target, 'should unregister b');
+    assert.ok(!b.isEditing, 'b should exit editing');
+    b.enterEditing();
+    b.fire('mousedown', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should register b');
+    const called = [];
+    a.updateSelectionOnMouseMove = () => called.push(a);
+    b.updateSelectionOnMouseMove = () => called.push(b);
+    canvas.__onMouseMove(e);
+    assert.deepEqual(called, [b], 'manager is called from mouse move');
+    manager.unregister(a);
+    assert.ok(manager.target === b, 'should not unregister b');
+    a.fire('mouseup', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should not unregister b');
+    canvas.__onMouseUp(e);
+    assert.ok(!manager.target, 'should unregister b');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(a);
+    assert.ok(!manager.target, 'should unregister a');
+    manager.dispose();
+    assert.ok(!manager.target, 'should have disposed ref');
+    assert.deepEqual(manager.targets, [], 'should have disposed refs');
+    const g = new fabric.Group([a]);
+    canvas.add(g);
+    assert.deepEqual(manager.targets, [a], 'should register an existing nested instance');
+    g.add(b);
+    assert.deepEqual(manager.targets, [a, b], 'should register an added nested instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    g.remove(b);
+    assert.ok(!manager.target, 'should unregister b');
+    assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(g);
+    assert.ok(!manager.target, 'should unregister a');
+    assert.deepEqual(manager.targets, [], 'should unregister nested instances upon group removal');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    canvas.clear();
+    assert.deepEqual(manager.targets, [], 'clear should clear instances');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    await canvas.dispose();
+    assert.deepEqual(manager.targets, [], 'dispose should clear instances');
+    assert.ok(!manager.target, 'should unregister b');
   });
 })();

@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Pixelate filter class
@@ -12,7 +13,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  */
 export class Pixelate extends BaseFilter {
-  blocksize: number;
+  declare blocksize: number;
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
@@ -110,3 +111,4 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
 };
 
 Object.assign(Pixelate.prototype, pixelateDefaultValues);
+classRegistry.setClass(Pixelate);

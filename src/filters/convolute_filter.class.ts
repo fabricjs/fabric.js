@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -46,12 +47,12 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   /*
    * Opaque value (true/false)
    */
-  opaque: boolean;
+  declare opaque: boolean;
 
   /*
    * matrix for the filter, max 9x9
    */
-  matrix: number[];
+  declare matrix: number[];
 
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
@@ -337,3 +338,4 @@ export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
 };
 
 Object.assign(Convolute.prototype, convoluteDefaultValues);
+classRegistry.setClass(Convolute);

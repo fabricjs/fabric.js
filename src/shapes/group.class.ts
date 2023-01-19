@@ -1,8 +1,7 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
@@ -18,8 +17,9 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { FabricObject, stateProperties } from './Object/FabricObject';
 import { Rect } from './rect.class';
+import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -90,7 +90,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @type LayoutStrategy
    * @default
    */
-  layout: LayoutStrategy;
+  declare layout: LayoutStrategy;
 
   /**
    * Used to optimize performance
@@ -98,7 +98,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  subTargetCheck: boolean;
+  declare subTargetCheck: boolean;
 
   /**
    * Used to allow targeting of object inside groups.
@@ -107,7 +107,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @default
    * @type boolean
    */
-  interactive: boolean;
+  declare interactive: boolean;
 
   /**
    * Used internally to optimize performance
@@ -130,7 +130,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects || [];
+    this._objects = objects;
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -141,7 +141,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       false
     );
     this._firstLayoutDone = false;
-    //  setting angle, skewX, skewY must occur after initial layout
+    // setting angle, skewX, skewY must occur after initial layout
     this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
@@ -259,6 +259,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       type: type,
       targets: targets,
     });
+    this._set('dirty', true);
+  }
+
+  _onStackOrderChanged() {
     this._set('dirty', true);
   }
 
@@ -485,30 +489,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 
   /**
-   * Check if cache is dirty
-   */
-  isCacheDirty(skipCanvas?: boolean) {
-    if (super.isCacheDirty(skipCanvas)) {
-      return true;
-    }
-    if (!this.statefullCache) {
-      return false;
-    }
-    for (let i = 0; i < this._objects.length; i++) {
-      if (this._objects[i].isCacheDirty(true)) {
-        if (this._cacheCanvas) {
-          // if this group has not a cache canvas there is nothing to clean
-          const x = this.cacheWidth / this.zoomX,
-            y = this.cacheHeight / this.zoomY;
-          this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-        }
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * @override
    * @return {Boolean}
    */
@@ -676,7 +656,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         (context.type === 'initialization' || context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        const clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());
@@ -933,7 +913,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   __serializeObjects(
     method: 'toObject' | 'toDatalessObject',
-    propertiesToInclude?: (keyof this)[]
+    propertiesToInclude?: string[]
   ) {
     const _includeDefaultValues = this.includeDefaultValues;
     return this._objects
@@ -1052,7 +1032,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new Group(objects, { ...options, ...hydratedOptions }, true)
+        new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
 }
@@ -1061,11 +1041,13 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   type: 'group',
   layout: 'fit-content',
   strokeWidth: 0,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('layout'),
   subTargetCheck: false,
   interactive: false,
 };
 
-Object.assign(Group.prototype, groupDefaultValues);
+Object.assign(Group.prototype, {
+  ...groupDefaultValues,
+  stateProperties: [...stateProperties, 'layout'],
+});
 
-fabric.Group = Group;
+classRegistry.setClass(Group);

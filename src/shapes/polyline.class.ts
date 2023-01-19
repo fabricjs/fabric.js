@@ -1,46 +1,15 @@
-import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { IPoint, Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
-
-export function polyFromElement<
-  T extends {
-    new (points: IPoint[], options: any): any;
-    ATTRIBUTE_NAMES: string[];
-  }
->(
-  klass: T,
-  element: SVGElement,
-  callback: (poly: InstanceType<T> | null) => any,
-  options = {}
-) {
-  if (!element) {
-    return callback(null);
-  }
-  const points = parsePointsAttribute(element.getAttribute('points')),
-    // we omit left and top to instruct the constructor to position the object using the bbox
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { left, top, ...parsedAttributes } = parseAttributes(
-      element,
-      klass.ATTRIBUTE_NAMES
-    );
-  callback(
-    new klass(points || [], {
-      ...parsedAttributes,
-      ...options,
-      fromSVG: true,
-    })
-  );
-}
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Polyline extends FabricObject {
   /**
@@ -48,7 +17,7 @@ export class Polyline extends FabricObject {
    * @type Array
    * @default
    */
-  points: IPoint[];
+  declare points: IPoint[];
 
   /**
    * WARNING: Feature in progress
@@ -58,23 +27,22 @@ export class Polyline extends FabricObject {
    * @deprecated
    * @type Boolean
    * @default false
-   * @todo set default to true and remove flag and related logic
    */
-  exactBoundingBox: boolean;
+  declare exactBoundingBox: boolean;
 
-  private initialized: true | undefined;
+  private declare initialized: true | undefined;
 
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
-  strokeBBoxAffectingProperties: (keyof this)[];
+  declare strokeBBoxAffectingProperties: (keyof this)[];
 
-  fromSVG: boolean;
+  declare fromSVG: boolean;
 
-  pathOffset: Point;
+  declare pathOffset: Point;
 
-  strokeOffset: Point;
+  declare strokeOffset: Point;
 
   /**
    * Constructor
@@ -180,7 +148,7 @@ export class Polyline extends FabricObject {
    *
    * @private
    */
-  _getTransformedDimensions(options: any) {
+  _getTransformedDimensions(options?: any) {
     return this.exactBoundingBox
       ? super._getTransformedDimensions({
           ...(options || {}),
@@ -218,7 +186,7 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: (keyof this)[]): object {
+  toObject(propertiesToInclude?: string[]): object {
     return {
       ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
@@ -306,7 +274,23 @@ export class Polyline extends FabricObject {
     callback: (poly: Polyline | null) => any,
     options?: any
   ) {
-    return polyFromElement(Polyline, element, callback, options);
+    if (!element) {
+      return callback(null);
+    }
+    const points = parsePointsAttribute(element.getAttribute('points')),
+      // we omit left and top to instruct the constructor to position the object using the bbox
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      { left, top, ...parsedAttributes } = parseAttributes(
+        element,
+        this.ATTRIBUTE_NAMES
+      );
+    callback(
+      new this(points || [], {
+        ...parsedAttributes,
+        ...options,
+        fromSVG: true,
+      })
+    );
   }
 
   /* _FROM_SVG_END_ */
@@ -318,8 +302,8 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: Record<string, unknown>): Promise<Polyline> {
-    return FabricObject._fromObject(Polyline, object, {
+  static fromObject(object: Record<string, unknown>) {
+    return this._fromObject(object, {
       extraParam: 'points',
     });
   }
@@ -328,7 +312,11 @@ export class Polyline extends FabricObject {
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   type: 'polyline',
   exactBoundingBox: false,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
+};
+
+Object.assign(Polyline.prototype, {
+  ...polylineDefaultValues,
+  cacheProperties: [...cacheProperties, 'points'],
   strokeBBoxAffectingProperties: [
     'skewX',
     'skewY',
@@ -339,9 +327,7 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
     'strokeUniform',
     'points',
   ],
-};
+});
 
-Object.assign(Polyline.prototype, polylineDefaultValues);
-
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Polyline = Polyline;
+classRegistry.setClass(Polyline);
+classRegistry.setSVGClass(Polyline);

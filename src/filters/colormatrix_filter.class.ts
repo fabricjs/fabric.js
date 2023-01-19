@@ -1,7 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 /**
    * Color Matrix filter class
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
@@ -27,7 +27,7 @@ export class ColorMatrix extends BaseFilter {
    * @param {Array} matrix array of 20 numbers.
    * @default
    */
-  matrix: number[];
+  declare matrix: number[];
 
   /**
    * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
@@ -35,7 +35,7 @@ export class ColorMatrix extends BaseFilter {
    * @type Boolean
    * @default true
    */
-  colorsOnly: boolean;
+  declare colorsOnly: boolean;
 
   setOptions({ matrix, ...options }: Record<string, any>) {
     if (matrix) {
@@ -153,3 +153,4 @@ export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   };
 
 Object.assign(ColorMatrix.prototype, colorMatrixDefaultValues);
+classRegistry.setClass(ColorMatrix);

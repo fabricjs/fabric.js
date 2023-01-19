@@ -1,9 +1,8 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/color.class';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
@@ -23,6 +22,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Gradient class
@@ -38,14 +38,14 @@ export class Gradient<
    * @type Number
    * @default 0
    */
-  offsetX = 0;
+  declare offsetX: number;
 
   /**
    * Vertical offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
    * @default 0
    */
-  offsetY = 0;
+  declare offsetY: number;
 
   /**
    * A transform matrix to apply to the gradient before painting.
@@ -55,7 +55,7 @@ export class Gradient<
    * @type Number[]
    * @default null
    */
-  gradientTransform: TMat2D | null = null;
+  declare gradientTransform: TMat2D | null;
 
   /**
    * coordinates units for coords.
@@ -66,35 +66,35 @@ export class Gradient<
    * @type GradientUnits
    * @default 'pixels'
    */
-  gradientUnits: GradientUnits;
+  declare gradientUnits: GradientUnits;
 
   /**
    * Gradient type linear or radial
    * @type GradientType
    * @default 'linear'
    */
-  type: T;
+  declare type: T;
 
   /**
    * Defines how the gradient is located in space and spread
    * @type GradientCoords
    */
-  coords: GradientCoords<T>;
+  declare coords: GradientCoords<T>;
 
   /**
    * Defines how many colors a gradient has and how they are located on the axis
    * defined by coords
    * @type GradientCoords
    */
-  colorStops: ColorStop[];
+  declare colorStops: ColorStop[];
 
   /**
    * If true, this object will not be exported during the serialization of a canvas
    * @type boolean
    */
-  excludeFromExport?: boolean;
+  declare excludeFromExport?: boolean;
 
-  private id: string | number;
+  private declare id: string | number;
 
   constructor({
     type = 'linear' as T,
@@ -103,13 +103,13 @@ export class Gradient<
     colorStops = [],
     offsetX = 0,
     offsetY = 0,
-    gradientTransform,
+    gradientTransform = null,
     id,
   }: GradientOptions<T>) {
     this.id = id ? `${id}_${uid()}` : uid();
     this.type = type;
     this.gradientUnits = gradientUnits;
-    this.gradientTransform = gradientTransform || null;
+    this.gradientTransform = gradientTransform;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.coords = {
@@ -368,7 +368,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
-    return new Gradient({
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
@@ -394,4 +394,4 @@ export class Gradient<
   /* _FROM_SVG_END_ */
 }
 
-fabric.Gradient = Gradient;
+classRegistry.setClass(Gradient, 'gradient');

@@ -1,8 +1,9 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { ColorMatrix } from './colormatrix_filter.class';
-import { TWebGLPipelineState, T2DPipelineState } from './typedefs';
+import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * HueRotation filter class
@@ -18,7 +19,7 @@ export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.
    */
-  rotation: number;
+  declare rotation: number;
 
   calculateMatrix() {
     const rad = this.rotation * Math.PI,
@@ -62,3 +63,4 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
   };
 
 Object.assign(HueRotation.prototype, hueRotationDefaultValues);
+classRegistry.setClass(HueRotation);

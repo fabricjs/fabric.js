@@ -1,10 +1,9 @@
-import { fabric } from '../../HEADER';
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
-import { FabricObject } from './fabricObject.class';
-import { fabricObjectDefaultValues } from './object.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
   /**
@@ -12,14 +11,14 @@ export class Ellipse extends FabricObject {
    * @type Number
    * @default
    */
-  rx: number;
+  declare rx: number;
 
   /**
    * Vertical radius
    * @type Number
    * @default
    */
-  ry: number;
+  declare ry: number;
 
   /**
    * Constructor
@@ -28,8 +27,6 @@ export class Ellipse extends FabricObject {
    */
   constructor(options: Record<string, unknown>) {
     super(options);
-    this.set('rx', (options && options.rx) || 0);
-    this.set('ry', (options && options.ry) || 0);
   }
 
   /**
@@ -75,7 +72,7 @@ export class Ellipse extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject(propertiesToInclude: string[] = []) {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 
@@ -132,34 +129,26 @@ export class Ellipse extends FabricObject {
     element: SVGElement,
     callback: (ellipse: Ellipse) => void
   ) {
-    const parsedAttributes = parseAttributes(element, Ellipse.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    callback(new Ellipse(parsedAttributes));
+    callback(new this(parsedAttributes));
   }
 
   /* _FROM_SVG_END_ */
-
-  /**
-   * Returns {@link Ellipse} instance from an object representation
-   * @static
-   * @memberOf Ellipse
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Ellipse>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Ellipse, object);
-  }
 }
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   type: 'ellipse',
   rx: 0,
   ry: 0,
-  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 
-Object.assign(Ellipse.prototype, ellipseDefaultValues);
+Object.assign(Ellipse.prototype, {
+  ...ellipseDefaultValues,
+  cacheProperties: [...cacheProperties, 'rx', 'ry'],
+});
 
-fabric.Ellipse = Ellipse;
+classRegistry.setClass(Ellipse);
+classRegistry.setSVGClass(Ellipse);

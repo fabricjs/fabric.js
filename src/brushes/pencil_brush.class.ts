@@ -1,11 +1,10 @@
-import { fabric } from '../../HEADER';
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Path } from '../shapes/path.class';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';
 
 /**
@@ -41,9 +40,9 @@ export class PencilBrush extends BaseBrush {
    */
   straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
-  private _points: Point[];
-  private _hasStraightLine: boolean;
-  private oldEnd?: Point;
+  private declare _points: Point[];
+  private declare _hasStraightLine: boolean;
+  private declare oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -299,5 +298,3 @@ export class PencilBrush extends BaseBrush {
     this.canvas.fire('path:created', { path: path });
   }
 }
-
-fabric.PencilBrush = PencilBrush;

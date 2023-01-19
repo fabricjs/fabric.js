@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Grayscale image filter class
@@ -10,7 +11,7 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  */
 export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
-  mode: 'average' | 'lightness' | 'luminosity';
+  declare mode: 'average' | 'lightness' | 'luminosity';
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -133,3 +134,4 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
 };
 
 Object.assign(Grayscale.prototype, grayscaleDefaultValues);
+classRegistry.setClass(Grayscale);

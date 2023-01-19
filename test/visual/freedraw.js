@@ -3,13 +3,14 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false) {
+  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
     setBrush(brush.canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
+      onMove && onMove(points[i], i, points);
     }
     if (fireUp) {
       brush.onMouseUp(options);
@@ -2031,7 +2032,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2255,6 +2256,31 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
+  function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
+  }
+
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    golden: 'withText.png',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+      compare: false
+    }
+  });
+
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
     if (options.top) {
@@ -2265,7 +2291,7 @@ QUnit.module('Free Drawing', hooks => {
           await test.build(canvas);
           callback(canvas.upperCanvasEl);
         },
-        disabled: fabric.isLikelyNode
+        disabled: fabric.getEnv().isLikelyNode
       }));
     }
     options.main && visualTester(Object.assign({}, test, {
@@ -2276,7 +2302,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: fabric.getEnv().isLikelyNode
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
@@ -2287,7 +2313,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: fabric.getEnv().isLikelyNode
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,

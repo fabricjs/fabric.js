@@ -1,7 +1,8 @@
-import { Color } from '../color';
-import { TClassProperties } from '../typedefs';
+import { Color } from '../color/color.class';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Remove white filter class
@@ -19,19 +20,19 @@ export class RemoveColor extends BaseFilter {
    * @param {String} type
    * @default
    */
-  color: string;
+  declare color: string;
 
   /**
    * distance to actual color, as value up or down from each r,g,b
    * between 0 and 1
    **/
-  distance: number;
+  declare distance: number;
 
   /**
    * For color to remove inside distance, use alpha channel for a smoother deletion
    * NOT IMPLEMENTED YET
    **/
-  useAlpha: boolean;
+  declare useAlpha: boolean;
 
   /**
    * Applies filter to canvas element
@@ -144,3 +145,4 @@ export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   };
 
 Object.assign(RemoveColor.prototype, removeColorDefaultValues);
+classRegistry.setClass(RemoveColor);

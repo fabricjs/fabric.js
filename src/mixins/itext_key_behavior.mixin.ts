@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { ObjectEvents } from '../EventTypeDefs';
 import { TPointerEvent } from '../typedefs';
@@ -22,21 +22,21 @@ export abstract class ITextKeyBehaviorMixin<
    * this.keysMap = Object.assign({}, this.keysMap);
    * The function must be in IText.prototype.myFunction And will receive event as args[0]
    */
-  keysMap: TKeyMapIText;
+  declare keysMap: TKeyMapIText;
 
-  keysMapRtl: TKeyMapIText;
+  declare keysMapRtl: TKeyMapIText;
 
   /**
    * For functionalities on keyUp + ctrl || cmd
    */
-  ctrlKeysMapUp: TKeyMapIText;
+  declare ctrlKeysMapUp: TKeyMapIText;
 
   /**
    * For functionalities on keyDown + ctrl || cmd
    */
-  ctrlKeysMapDown: TKeyMapIText;
+  declare ctrlKeysMapDown: TKeyMapIText;
 
-  hiddenTextarea: HTMLTextAreaElement | null;
+  declare hiddenTextarea: HTMLTextAreaElement | null;
 
   /**
    * DOM container to append the hiddenTextarea.
@@ -46,17 +46,17 @@ export abstract class ITextKeyBehaviorMixin<
    * @type HTMLElement
    * @default
    */
-  hiddenTextareaContainer?: HTMLElement | null;
+  declare hiddenTextareaContainer?: HTMLElement | null;
 
-  private _clickHandlerInitialized: boolean;
-  private _copyDone: boolean;
-  private fromPaste: boolean;
+  private declare _clickHandlerInitialized: boolean;
+  private declare _copyDone: boolean;
+  private declare fromPaste: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = fabric.document.createElement('textarea');
+    this.hiddenTextarea = getEnv().document.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -71,7 +71,7 @@ export abstract class ITextKeyBehaviorMixin<
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      fabric.document.body.appendChild(this.hiddenTextarea);
+      getEnv().document.body.appendChild(this.hiddenTextarea);
     }
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));

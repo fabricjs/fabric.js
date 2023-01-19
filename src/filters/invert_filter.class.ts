@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * @example
@@ -14,14 +15,14 @@ export class Invert extends BaseFilter {
    * @param {Boolean} alpha
    * @default
    **/
-  alpha: boolean;
+  declare alpha: boolean;
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
    * @default
    */
-  invert: boolean;
+  declare invert: boolean;
 
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.
@@ -113,3 +114,4 @@ export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
 };
 
 Object.assign(Invert.prototype, invertDefaultValues);
+classRegistry.setClass(Invert);

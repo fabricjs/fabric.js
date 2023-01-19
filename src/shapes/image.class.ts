@@ -1,6 +1,5 @@
 //@ts-nocheck
-import { fabric } from '../../HEADER';
-import * as filters from '../filters';
+import { getEnv } from '../env';
 import type { BaseFilter } from '../filters/base_filter.class';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -17,7 +16,8 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { FabricObject, fabricObjectDefaultValues } from './fabricObject.class';
+import { classRegistry } from '../util/class_registry';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export type ImageSource =
   | HTMLImageElement
@@ -33,9 +33,9 @@ export class Image extends FabricObject {
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
-   * @default
+   * @default false
    */
-  srcFromAttribute: boolean;
+  declare srcFromAttribute: boolean;
 
   /**
    * private
@@ -73,7 +73,7 @@ export class Image extends FabricObject {
    * number bigger than 1 are not implemented yet.
    * @type Number
    */
-  minimumScaleTrigger: number;
+  declare minimumScaleTrigger: number;
 
   /**
    * key used to retrieve the texture representing this image
@@ -81,7 +81,7 @@ export class Image extends FabricObject {
    * @type String
    * @default
    */
-  cacheKey: string;
+  declare cacheKey: string;
 
   /**
    * Image crop in pixels from original image size.
@@ -89,7 +89,7 @@ export class Image extends FabricObject {
    * @type Number
    * @default
    */
-  cropX: number;
+  declare cropX: number;
 
   /**
    * Image crop in pixels from original image size.
@@ -97,7 +97,7 @@ export class Image extends FabricObject {
    * @type Number
    * @default
    */
-  cropY: number;
+  declare cropY: number;
 
   /**
    * Indicates whether this canvas will use image smoothing when painting this image.
@@ -106,20 +106,18 @@ export class Image extends FabricObject {
    * @type Boolean
    * @default
    */
-  imageSmoothing: boolean;
+  declare imageSmoothing: boolean;
 
-  preserveAspectRatio: string;
+  declare preserveAspectRatio: string;
 
-  protected src: string;
+  protected declare src: string;
 
-  static filters = filters;
+  declare filters: BaseFilter[];
+  declare resizeFilter: BaseFilter;
 
-  filters: BaseFilter[];
-  resizeFilter: BaseFilter;
-
-  protected _element: ImageSource;
-  protected _originalElement: ImageSource;
-  protected _filteredEl: ImageSource;
+  protected declare _element: ImageSource;
+  protected declare _originalElement: ImageSource;
+  protected declare _filteredEl: ImageSource;
 
   /**
    * Constructor
@@ -133,12 +131,10 @@ export class Image extends FabricObject {
   constructor(elementId: string, options: any = {});
   constructor(element: ImageSource, options: any = {});
   constructor(arg0: ImageSource | string, options: any = {}) {
-    super();
-    this.filters = [];
+    super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
-    this.set(options);
     this.setElement(
-      (typeof arg0 === 'string' && fabric.document.getElementById(arg0)) ||
+      (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
         arg0,
       options
     );
@@ -181,7 +177,7 @@ export class Image extends FabricObject {
    * Delete a single texture if in webgl mode
    */
   removeTexture(key: string) {
-    const backend = fabric.filterBackend;
+    const backend = getFilterBackend(false);
     if (backend && backend.evictCachesForKey) {
       backend.evictCachesForKey(key);
     }
@@ -722,18 +718,16 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromObject(
-    { filters: f, resizeFilter, src, crossOrigin, ...object }: any,
+    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: any,
     options: { signal: AbortSignal }
   ): Promise<Image> {
-    const imageOptions = { ...options, crossOrigin },
-      filterOptions = { ...options, namespace: filters };
     return Promise.all([
-      loadImage(src, imageOptions),
-      f && enlivenObjects(f, filterOptions),
-      resizeFilter && enlivenObjects([resizeFilter], filterOptions),
+      loadImage(src, { ...options, crossOrigin }),
+      f && enlivenObjects(f, options),
+      rf && enlivenObjects([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
-      return new Image(el, {
+      return new this(el, {
         ...object,
         src,
         crossOrigin,
@@ -752,7 +746,7 @@ export class Image extends FabricObject {
    * @returns {Promise<Image>}
    */
   static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
-    return loadImage(url, options).then((img) => new Image(img, options));
+    return loadImage(url, options).then((img) => new this(img, options));
   }
 
   /**
@@ -768,8 +762,8 @@ export class Image extends FabricObject {
     callback: (image: Image) => any,
     options: { signal?: AbortSignal } = {}
   ) {
-    const parsedAttributes = parseAttributes(element, Image.ATTRIBUTE_NAMES);
-    Image.fromURL(parsedAttributes['xlink:href'], {
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
     }).then(callback);
@@ -781,19 +775,15 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat(
-    'cropX',
-    'cropY'
-  ),
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
-    'cropX',
-    'cropY'
-  ),
   cropX: 0,
   cropY: 0,
   imageSmoothing: true,
 };
 
-Object.assign(Image.prototype, imageDefaultValues);
+Object.assign(Image.prototype, {
+  ...imageDefaultValues,
+  cacheProperties: [...cacheProperties, 'cropX', 'cropY'],
+});
 
-fabric.Image = Image;
+classRegistry.setClass(Image);
+classRegistry.setSVGClass(Image);

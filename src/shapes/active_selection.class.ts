@@ -1,9 +1,8 @@
-import { fabric } from '../../HEADER';
-import { ControlRenderingStyleOverride } from '../controls';
+import { ControlRenderingStyleOverride } from '../controls/controls.render';
 import { TClassProperties } from '../typedefs';
-import { enlivenObjects } from '../util/misc/objectEnlive';
-import { FabricObject } from './fabricObject.class';
-import { Group, groupDefaultValues } from './group.class';
+import { classRegistry } from '../util/class_registry';
+import { Group } from './group.class';
+import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
   constructor(
@@ -61,7 +60,6 @@ export class ActiveSelection extends Group {
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
-    // @TODO figure out this change. This part wasn't here before migration.
     super._onAfterObjectsChange(type, targets);
     const groups: Group[] = [];
     targets.forEach((object) => {
@@ -144,31 +142,14 @@ export class ActiveSelection extends Group {
     }
     ctx.restore();
   }
-
-  /**
-   * Returns {@link ActiveSelection} instance from an object representation
-   * @static
-   * @memberOf ActiveSelection
-   * @param {Object} object Object to create a group from
-   * @returns {Promise<ActiveSelection>}
-   */
-  static fromObject({ objects = [], ...options }) {
-    return enlivenObjects(objects).then(
-      (enlivenedObjects) => new ActiveSelection(enlivenedObjects, options, true)
-    );
-  }
 }
 
 export const activeSelectionDefaultValues: Partial<
   TClassProperties<ActiveSelection>
 > = {
-  ...groupDefaultValues,
   type: 'activeSelection',
-  layout: 'fit-content',
-  subTargetCheck: false,
-  interactive: false,
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
 
-fabric.ActiveSelection = ActiveSelection;
+classRegistry.setClass(ActiveSelection);

@@ -1,6 +1,7 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 
 /**
  * Vibrance filter class
@@ -20,7 +21,7 @@ export class Vibrance extends BaseFilter {
    * @param {Number} vibrance
    * @default
    */
-  vibrance: number;
+  declare vibrance: number;
 
   /**
    * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
@@ -99,3 +100,4 @@ export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
 };
 
 Object.assign(Vibrance.prototype, vibranceDefaultValues);
+classRegistry.setClass(Vibrance);

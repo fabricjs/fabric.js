@@ -3,6 +3,38 @@
 ## [next]
 
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
+- chore(TS): Intersection class, finalize TS [#8603](https://github.com/fabricjs/fabric.js/pull/8603)
+- chore(TS): Update Pattern to remove ts-nocheck and added types where missing [#8605](https://github.com/fabricjs/fabric.js/pull/8605)
+- chore(TS): Followup for interactivy and controls migration to TS [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
+- refactor(IText): Fixes Draggable Text for retina and viewport transform #8534
+- chore(TS): refactor canvas init, fix `_initRetinaScaling` regression #8520
+- chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
+- refactor(IText): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
+- refactor(Canvas, IText): Handle cross instance text editing states to an EditingManager class [#8543](https://github.com/fabricjs/fabric.js/pull/8543)
+- chore(TS): move to export, babel, new rollup, change import statement for fabric. [#8585](https://github.com/fabricjs/fabric.js/pull/8585);
+- chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
+- refactor(Animation): BREAKING: Animation api reduction and semplification (byValue is removed, '+=' syntax is removed, callbacks fired 100%) [#8547](https://github.com/fabricjs/fabric.js/pull/8547)
+- feat(PolyControl): modify the shape of a poly with control points [#8556](https://github.com/fabricjs/fabric.js/pull/8556)
+- BREAKING: remove Object.stateful and Object.statefulCache [#8573](https://github.com/fabricjs/fabric.js/pull/8573)
+- fix(IText): refactor clearing context top logic of itext to align with brush pattern, using the canvas rendering cycle in order to guard from edge cases #8560
+- fix(Canvas): `_initRetinaScaling` initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
+- fix(Canvas): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
+- chore(TS): Use exports from files to build fabricJS, get rid of HEADER.js [#8549](https://github.com/fabricjs/fabric.js/pull/8549)
+- chore(): rm `fabric.filterBackend` => `getFilterBackend` [#8487](https://github.com/fabricjs/fabric.js/pull/8487)
+- chore(TS): migrate text SVG export mixin [#8486](https://github.com/fabricjs/fabric.js/pull/8486)
+- refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+  BREAKING:
+  - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
+  - change `animateColor` signature to match `animate`, removed `colorEasing`
+- fix(Object Stacking): 🔙 refactor logic to support Group 🔝
+- chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
+- chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)
+- chore(TS): Convert Canvas events mixin and grouping mixin [#8519](https://github.com/fabricjs/fabric.js/pull/8519)
+- chore(TS): Remove backward compatibility initialize methods [#8525](https://github.com/fabricjs/fabric.js/pull/8525/)
+- chore(TS): replace getKlass utility with a registry that doesn't require full fabricJS to work [#8500](https://github.com/fabricjs/fabric.js/pull/8500)
+- chore(): use context in static constructors [#8522](https://github.com/fabricjs/fabric.js/issues/8522)
+- chore(TS): Convert Canvas class #8510
+- chore(TS): Move object classes #8511
 - chore(TS): polish text [#8489](https://github.com/fabricjs/fabric.js/pull/8489)
 - chore(TS): fix import cycle, extract `groupSVGElements` [#8506](https://github.com/fabricjs/fabric.js/pull/8506)
 - chore(TS): permissive `Point` typings [#8434](https://github.com/fabricjs/fabric.js/pull/8434)
