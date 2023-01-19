@@ -2,7 +2,7 @@
  * Canvas 2D filter backend.
  */
 import type { BaseFilter } from './base_filter.class';
-import { T2DPipelineState } from './typedefs';
+import { T2DPipelineState, TPipelineResources } from './typedefs';
 
 export class Canvas2dFilterBackend {
   /**
@@ -12,7 +12,7 @@ export class Canvas2dFilterBackend {
    * in this object there will be appended some canvases, created once, resized sometimes
    * cleared never. Clearing is left to the developer.
    **/
-  resources = {};
+  resources: TPipelineResources = {};
 
   /**
    * Apply a set of filters against a source image and draw the filtered output

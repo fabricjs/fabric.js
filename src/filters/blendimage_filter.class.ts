@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Image } from '../shapes/image.class';
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
@@ -100,7 +99,7 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
       resources.blendImage = createCanvasElement();
     }
     const canvas1 = resources.blendImage;
-    const context = canvas1.getContext('2d');
+    const context = canvas1.getContext('2d')!;
     if (canvas1.width !== width || canvas1.height !== height) {
       canvas1.width = width;
       canvas1.height = height;
@@ -194,7 +193,10 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<BlendImage>}
    */
-  static fromObject(object, options) {
+  static fromObject(
+    object: Record<string, any>,
+    options: { signal: AbortSignal }
+  ) {
     return Image.fromObject(object.image, options).then(
       (image) => new BlendImage({ ...object, image })
     );

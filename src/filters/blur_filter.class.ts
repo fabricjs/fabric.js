@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './base_filter.class';
@@ -65,14 +64,14 @@ export class Blur extends BaseFilter {
       resources.blurLayer1 = createCanvasElement();
       resources.blurLayer2 = createCanvasElement();
     }
-    const canvas1 = resources.blurLayer1;
-    const canvas2 = resources.blurLayer2;
+    const canvas1 = resources.blurLayer1!;
+    const canvas2 = resources.blurLayer2!;
     if (canvas1.width !== width || canvas1.height !== height) {
       canvas2.width = canvas1.width = width;
       canvas2.height = canvas1.height = height;
     }
-    const ctx1 = canvas1.getContext('2d'),
-      ctx2 = canvas2.getContext('2d'),
+    const ctx1 = canvas1.getContext('2d')!,
+      ctx2 = canvas2.getContext('2d')!,
       nSamples = 15,
       blur = this.blur * 0.06 * 0.5;
     let random, percent, j, i;
