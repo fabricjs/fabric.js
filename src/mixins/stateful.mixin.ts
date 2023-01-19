@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type { FabricObject } from '../shapes/Object/Object';
-import { extend } from '../util/lang_object';
+import { clone } from '../util/lang_object';
 
 const originalSet = 'stateProperties';
 
@@ -77,11 +77,10 @@ export class StatefulMixin {
   }
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
-    const savedProps = props.reduce((o, key) => {
-      o[key] = this[key];
+    props.reduce((o, key) => {
+      o[key] = this[key] ? clone(this[key], true) : this[key];
       return o;
-    }, {});
-    extend(this[destination], savedProps, true);
+    }, this[destination]);
   }
 
   /**

@@ -298,12 +298,16 @@ export class Line extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
-  static fromObject(object: Record<string, any>) {
-    const options = clone(object, true);
-    options.points = [object.x1, object.y1, object.x2, object.y2];
-    return this._fromObject(options, {
-      extraParam: 'points',
-    }).then((fabricLine) => {
+  static fromObject({ x1, y1, x2, y2, ...object }: Record<string, any>) {
+    return this._fromObject(
+      {
+        ...object,
+        points: [x1, y1, x2, y2],
+      },
+      {
+        extraParam: 'points',
+      }
+    ).then((fabricLine) => {
       return fabricLine;
     });
   }
