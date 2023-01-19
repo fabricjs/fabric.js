@@ -5,6 +5,8 @@ import { Group } from './group.class';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
+  declare _objects: FabricObject[];
+
   constructor(
     objects?: FabricObject[],
     options?: any,
