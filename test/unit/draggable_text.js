@@ -29,6 +29,10 @@ function assertDragEventStream(name, a, b) {
         assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
+    function wait(ms = 32) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     [true, false].forEach(enableRetinaScaling => {
         QUnit.module(`enableRetinaScaling = ${enableRetinaScaling}`, function (hooks) {
             let canvas, eventData, iText, iText2, eventStream, renderEffects;
@@ -132,20 +136,25 @@ function assertDragEventStream(name, a, b) {
                 };
             }
 
-            QUnit.test('click sets cursor', function (assert) {
+            QUnit.test('click sets cursor', async function (assert) {
                 assert.equal(count, 0, 'selection:changed fired');
                 assert.equal(countCanvas, 0, 'text:selection:changed fired');
                 let called = 0;
                 // sinon spy!!
                 // iText.setCursorByClick = () => called++;
                 canvas._onMouseDown(eventData);
-                assert.ok(iText.__isDragging, 'flagged as dragging');
+                assert.ok(iText.draggableTextDelegate.isActive(), 'flagged as dragging');
+                assert.ok(iText.shouldStartDragging(), 'flagged as dragging');
+                
+                await wait();
+                assertCursorAnimation(assert, iText);
                 // assert.equal(called, 0, 'should not set cursor on mouse up');
                 canvas._onMouseUp(eventData);
-                assert.ok(!iText.__isDragging, 'unflagged as dragging');
+                assert.ok(!iText.draggableTextDelegate.isActive(), 'unflagged as dragging');
+                assert.ok(!iText.shouldStartDragging(), 'unflagged as dragging');
                 // assert.equal(called, 1, 'should set cursor on mouse up');
-                assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
-                assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
+                assert.equal(iText.selectionStart, 2, 'set the selectionStart');
+                assert.equal(iText.selectionEnd, 2, 'set the selectionend');
                 assertCursorAnimation(assert, iText, true);
                 assert.equal(count, 1, 'selection:changed fired');
                 assert.equal(countCanvas, 1, 'text:selection:changed fired');
@@ -190,6 +199,40 @@ function assertDragEventStream(name, a, b) {
                     }
                 ], 'events should match');
                 assert.deepEqual(eventStream.canvas, eventStream.source, 'events should match');
+            });
+
+            QUnit.test('disable drag start: onDragStart', async function (assert) {
+                iText.onDragStart = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), true, 'should flag dragging');
+                assert.equal(iText.selectionStart, 0, 'selectionStart is kept');
+                assert.equal(iText.selectionEnd, 4, 'selectionEnd is kept');
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
+            });
+
+            QUnit.test('disable drag start: start', async function (assert) {
+                iText.draggableTextDelegate.start = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), false, 'should not flag dragging');
+                assert.equal(iText.selectionStart, 2, 'selectionStart is set');
+                assert.equal(iText.selectionEnd, 2, 'selectionEnd is set');
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
+            });
+
+            QUnit.test('disable drag start: isActive', async function (assert) {
+                iText.draggableTextDelegate.isActive = () => false;
+                const e = startDragging(eventData);
+                assert.equal(iText.shouldStartDragging(), false, 'should not flag dragging');
+                assert.equal(iText.selectionStart, 0, 'selectionStart is kept');
+                assert.equal(iText.selectionEnd, 4, 'selectionEnd is kept');
+                assertCursorAnimation(assert, iText);
+                assert.deepEqual(e.dataTransfer.data, {}, 'should not set dataTransfer');
+                assert.equal(e.dataTransfer.effectAllowed, undefined, 'should not set effectAllowed');
+                assert.deepEqual(e.dataTransfer.dragImageData, undefined, 'should not set dataTransfer');
             });
 
             QUnit.test('drag over: source', function (assert) {
@@ -497,6 +540,49 @@ function assertDragEventStream(name, a, b) {
                     },
                 ]);
                 assert.equal(fabric.getDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
+            });
+
+            QUnit.test('disable drop', function (assert) {
+                iText2.canDrop = () => false;
+                const e = startDragging(eventData);
+                const dragEvents = [];
+                let index;
+                for (index = 200; index < 210; index = index + 5) {
+                    const dragOverEvent = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
+                    canvas._onDragOver(dragOverEvent);
+                    dragEvents.push(dragOverEvent);
+                }
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'none' });
+                // the window will not invoke a drop event so we call drag end to simulate correctly
+                canvas._onDragEnd(drop);
+                assert.equal(iText2.text, 'test2 test2', 'text after drop');
+                assert.equal(iText2.selectionStart, 0, 'selection after drop');
+                assert.equal(iText2.selectionEnd, 0, 'selection after drop');
+                assertDragEventStream('drop', eventStream.target, [
+                    {
+                        e: dragEvents[0],
+                        target: iText2,
+                        type: 'dragenter',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false,
+                        pointer: new fabric.Point(230, 15),
+                        absolutePointer: new fabric.Point(230, 15),
+                        isClick: false,
+                        previousTarget: undefined
+                    },
+                    ...dragEvents.slice(0, 2).map(e => ({
+                        e,
+                        target: iText2,
+                        type: 'dragover',
+                        subTargets: [],
+                        dragSource: iText,
+                        dropTarget: undefined,
+                        canDrop: false
+                    })),
+                ]);
+                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
         });
     });

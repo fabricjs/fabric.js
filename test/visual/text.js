@@ -509,7 +509,7 @@
         }
       }
     };
-    text.setDragImage(dragEventStub, {
+    text.draggableTextDelegate.setDragImage(dragEventStub, {
       selectionStart: 3,
       selectionEnd: 20
     });
