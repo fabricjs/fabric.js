@@ -177,6 +177,14 @@ http
 
 </details>
 
+## UI tests
+
+Run UI tests with Playwright in parallel in Chrome (headed mode).
+
+```bash
+$ npm run test:e2e
+```
+
 ---
 
 ## Other Solutions
