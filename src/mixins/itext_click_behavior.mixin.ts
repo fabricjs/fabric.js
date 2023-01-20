@@ -33,7 +33,7 @@ export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
 
-    // TODO: replace this with a standard assignment when shitty `clone` is removed
+    // TODO: replace this with a standard assignment `clone` is removed
     Object.defineProperty(this, 'draggableTextDelegate', {
       value: new DraggableTextDelegate(this),
       configurable: false,
