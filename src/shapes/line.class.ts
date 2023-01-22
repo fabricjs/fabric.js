@@ -1,10 +1,10 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point } from '../point.class';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { isFiller } from '../util/types';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { Point } from '../point.class';
+import { isFiller } from '../util/types';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
