@@ -41,14 +41,8 @@ export abstract class ITextClickBehaviorMixin<
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
 
-    // TODO: replace this with a standard assignment when shitty `clone` is removed
-    Object.defineProperty(this, 'draggableTextDelegate', {
-      // @ts-expect-error in reality it is an IText instance
-      value: new DraggableTextDelegate(this),
-      configurable: false,
-      enumerable: false,
-      writable: true,
-    });
+    // @ts-expect-error in reality it is an IText instance
+    this.draggableTextDelegate = new DraggableTextDelegate(this);
 
     super.initBehavior();
   }
