@@ -48,7 +48,7 @@ export abstract class ITextBehaviorMixin<
   protected declare _reSpace: RegExp;
   private declare _currentTickState?: ValueAnimation;
   private declare _currentTickCompleteState?: ValueAnimation;
-  protected declare _currentCursorOpacity: number;
+  protected _currentCursorOpacity = 1;
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
 
