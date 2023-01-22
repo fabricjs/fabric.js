@@ -32,9 +32,13 @@ type TStyleOverride = ControlRenderingStyleOverride &
       forActiveSelection: boolean;
     }
   >;
-export type FabricObjectWithDragSupport = InteractiveFabricObject & {
-  onDragStart: (e: DragEvent) => boolean;
-};
+
+export interface DragMethods {
+  shouldStartDragging(): boolean;
+  onDragStart(e: DragEvent): boolean;
+}
+
+export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -102,15 +106,6 @@ export class InteractiveFabricObject<
    * part of the move action.
    */
   declare isMoving?: boolean;
-
-  /**
-   * internal boolean to signal the code that the object is
-   * part of the draggin action.
-   * @TODO: discuss isMoving and isDragging being not adequate enough
-   * they need to be either both private or more generic
-   * Canvas class needs to see this variable
-   */
-  declare __isDragging?: boolean;
 
   /**
    * A boolean used from the gesture module to keep tracking of a scaling
@@ -619,7 +614,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  canDrop(e?: DragEvent): boolean {
+  canDrop(e: DragEvent): boolean {
     return false;
   }
 

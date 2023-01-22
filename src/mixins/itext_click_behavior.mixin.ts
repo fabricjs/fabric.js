@@ -1,31 +1,66 @@
 //@ts-nocheck
 import { ObjectEvents } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
+import type { DragMethods } from '../shapes/Object/InteractiveObject';
 import { TPointerEvent, TransformEvent } from '../typedefs';
 import { stopEvent } from '../util/dom_event';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-export abstract class ITextClickBehaviorMixin<
-  EventSpec extends ObjectEvents
-> extends ITextKeyBehaviorMixin<EventSpec> {
+export abstract class ITextClickBehaviorMixin<EventSpec extends ObjectEvents>
+  extends ITextKeyBehaviorMixin<EventSpec>
+  implements DragMethods
+{
+  private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
   private declare __lastPointer: IPoint | Record<string, never>;
   private declare __newClickTime: number;
 
-  /**
-   * Initializes "dbclick" event handler
-   */
-  initDoubleClickSimulation() {
-    this.__lastClickTime = +new Date();
+  protected draggableTextDelegate: DraggableTextDelegate;
 
+  initBehavior() {
+    // Initializes event handlers related to cursor or selection
+    this.initMousedownHandler();
+    this.initMouseupHandler();
+    this.initClicks();
+
+    // Initializes "dbclick" event handler
+    this.__lastClickTime = +new Date();
     // for triple click
     this.__lastLastClickTime = +new Date();
-
     this.__lastPointer = {};
-
     this.on('mousedown', this.onMouseDown);
+
+    // TODO: replace this with a standard assignment `clone` is removed
+    Object.defineProperty(this, 'draggableTextDelegate', {
+      value: new DraggableTextDelegate(this),
+      configurable: false,
+      enumerable: false,
+      writable: true,
+    });
+
+    super.initBehavior();
+  }
+
+  shouldStartDragging() {
+    return this.draggableTextDelegate.isActive();
+  }
+
+  /**
+   * @public override this method to control whether instance should/shouldn't become a drag source, @see also {@link DraggableTextDelegate#isActive}
+   * @returns {boolean} should handle event
+   */
+  onDragStart(e: DragEvent) {
+    return this.draggableTextDelegate.onDragStart(e);
+  }
+
+  /**
+   * @public override this method to control whether instance should/shouldn't become a drop target
+   */
+  canDrop(e: DragEvent) {
+    return this.draggableTextDelegate.canDrop(e);
   }
 
   /**
@@ -55,15 +90,6 @@ export abstract class ITextClickBehaviorMixin<
       this.__lastPointer.x === newPointer.x &&
       this.__lastPointer.y === newPointer.y
     );
-  }
-
-  /**
-   * Initializes event handlers related to cursor or selection
-   */
-  initCursorSelectionHandlers() {
-    this.initMousedownHandler();
-    this.initMouseupHandler();
-    this.initClicks();
   }
 
   /**
@@ -102,13 +128,12 @@ export abstract class ITextClickBehaviorMixin<
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler(options: TransformEvent) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      this.__isDragging ||
-      (options.e.button && options.e.button !== 1)
-    ) {
+  _mouseDownHandler({ e }: TransformEvent) {
+    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
+      return;
+    }
+
+    if (this.draggableTextDelegate.start(e)) {
       return;
     }
 
@@ -116,7 +141,7 @@ export abstract class ITextClickBehaviorMixin<
 
     if (this.selected) {
       this.inCompositionMode = false;
-      this.setCursorByClick(options.e);
+      this.setCursorByClick(e);
     }
 
     if (this.isEditing) {
@@ -133,24 +158,13 @@ export abstract class ITextClickBehaviorMixin<
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore(options: TransformEvent) {
-    if (
-      !this.canvas ||
-      !this.editable ||
-      (options.e.button && options.e.button !== 1)
-    ) {
+  _mouseDownHandlerBefore({ e }: TransformEvent) {
+    if (!this.canvas || !this.editable || (e.button && e.button !== 1)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
     // may trigger editing mode in some way.
     this.selected = this === this.canvas._activeObject;
-    // text dragging logic
-    const newSelection = this.getSelectionStartFromPointer(options.e);
-    this.__isDragging =
-      this.isEditing &&
-      newSelection >= this.selectionStart &&
-      newSelection <= this.selectionEnd &&
-      this.selectionStart < this.selectionEnd;
   }
 
   /**
@@ -173,8 +187,7 @@ export abstract class ITextClickBehaviorMixin<
    * @private
    */
   mouseUpHandler(options: TransformEvent) {
-    const shouldSetCursor = this.__isDragging && options.isClick; // false positive drag event, is actually a click
-    this.__isDragging = false;
+    const didDrag = this.draggableTextDelegate.end(options.e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
@@ -190,15 +203,11 @@ export abstract class ITextClickBehaviorMixin<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (options.transform && options.transform.actionPerformed) ||
-      (options.e.button && options.e.button !== 1)
+      (options.e.button && options.e.button !== 1) ||
+      didDrag
     ) {
       return;
     }
-
-    // mousedown is going to early return if isDragging is true.
-    // this is here to recover the setCursorByClick in case the
-    // isDragging is a false positive.
-    shouldSetCursor && this.setCursorByClick(options.e);
 
     if (this.__lastSelected && !this.__corner) {
       this.selected = false;

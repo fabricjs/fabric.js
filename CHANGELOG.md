@@ -7,6 +7,7 @@
   `clone` and `extend` are used in all examples unfortunately so the community must have adopted them.
   Devs using `extend` on classes should mutate the prototype directly (or with `defineProperty`) or subclass.
   Using `clone` or `extend` to assign to an object was always a bad idea. Use lodash or whatever.
+- refactor(IText): extract draggable text logic to a delegate [#8598](https://github.com/fabricjs/fabric.js/pull/8598)
 - chore(TS): Update StaticCanvas to remove ts-nocheck [#8606](https://github.com/fabricjs/fabric.js/pull/8606)
 - chore(TS): Update filters to remove ts-nocheck and added types where missing [#8609](https://github.com/fabricjs/fabric.js/pull/8609)
 - chore(TS): Intersection class, finalize TS [#8603](https://github.com/fabricjs/fabric.js/pull/8603)

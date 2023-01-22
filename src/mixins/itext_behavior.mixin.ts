@@ -1,22 +1,13 @@
-// @ts-nocheck
+/// @ts-nocheck
 
 import { getEnv } from '../env';
-import {
-  DragEventData,
-  DropEventData,
-  ObjectEvents,
-  TPointerEvent,
-} from '../EventTypeDefs';
+import { ObjectEvents, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
 import { animate } from '../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../util/animation/types';
 import type { ValueAnimation } from '../util/animation/ValueAnimation';
-import { setStyle } from '../util/dom_style';
-import { cloneDeep } from '../util/internals/cloneDeep';
-import { createCanvasElement } from '../util/misc/dom';
-import { isIdentityMatrix } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
 
 // extend this regex to support non english languages
@@ -50,16 +41,8 @@ export abstract class ITextBehaviorMixin<
   protected declare _currentCursorOpacity: number;
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
-  private declare __dragImageDisposer: VoidFunction;
-  private declare __dragStartFired: boolean;
-  protected declare __isDragging: boolean;
-  protected declare __dragStartSelection: {
-    selectionStart: number;
-    selectionEnd: number;
-  };
-  protected declare __isDraggingOver: boolean;
+
   protected declare selected: boolean;
-  protected declare __lastSelected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps: {
     hasControls: boolean;
@@ -74,8 +57,6 @@ export abstract class ITextBehaviorMixin<
   protected declare _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
-  abstract initCursorSelectionHandlers(): void;
-  abstract initDoubleClickSimulation(): void;
   abstract _fireSelectionChanged(): void;
   abstract renderCursorOrSelection(): void;
   abstract getSelectionStartFromPointer(e: TPointerEvent): number;
@@ -93,22 +74,10 @@ export abstract class ITextBehaviorMixin<
    * Initializes all the interactive behavior of IText
    */
   initBehavior() {
-    this.initCursorSelectionHandlers();
-    this.initDoubleClickSimulation();
     this._tick = this._tick.bind(this);
     this._onTickComplete = this._onTickComplete.bind(this);
     this.updateSelectionOnMouseMove =
       this.updateSelectionOnMouseMove.bind(this);
-    this.dragEnterHandler = this.dragEnterHandler.bind(this);
-    this.dragOverHandler = this.dragOverHandler.bind(this);
-    this.dragLeaveHandler = this.dragLeaveHandler.bind(this);
-    this.dragEndHandler = this.dragEndHandler.bind(this);
-    this.dropHandler = this.dropHandler.bind(this);
-    this.on('dragenter', this.dragEnterHandler);
-    this.on('dragover', this.dragOverHandler);
-    this.on('dragleave', this.dragLeaveHandler);
-    this.on('dragend', this.dragEndHandler);
-    this.on('drop', this.dropHandler);
   }
 
   onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }) {
@@ -386,7 +355,7 @@ export abstract class ITextBehaviorMixin<
 
     this.isEditing = true;
 
-    this.initHiddenTextarea(e);
+    this.initHiddenTextarea();
     this.hiddenTextarea.focus();
     this.hiddenTextarea.value = this.text;
     this._updateTextarea();
@@ -395,10 +364,10 @@ export abstract class ITextBehaviorMixin<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered');
+    this.fire('editing:entered', { e });
     this._fireSelectionChanged();
     if (this.canvas) {
-      this.canvas.fire('text:editing:entered', { target: this });
+      this.canvas.fire('text:editing:entered', { target: this, e });
       this.canvas.requestRenderAll();
     }
   }
@@ -435,309 +404,6 @@ export abstract class ITextBehaviorMixin<
       this._fireSelectionChanged();
       this._updateTextarea();
       this.renderCursorOrSelection();
-    }
-  }
-
-  /**
-   * Override to customize the drag image
-   * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
-   */
-  setDragImage(
-    e: DragEvent,
-    {
-      selectionStart,
-      selectionEnd,
-    }: {
-      selectionStart: number;
-      selectionEnd: number;
-    }
-  ) {
-    const flipFactor = new Point(this.flipX ? -1 : 1, this.flipY ? -1 : 1);
-    const boundaries = this._getCursorBoundaries(selectionStart);
-    const selectionPosition = new Point(
-      boundaries.left + boundaries.leftOffset,
-      boundaries.top + boundaries.topOffset
-    ).multiply(flipFactor);
-    const pos = selectionPosition.transform(this.calcTransformMatrix());
-    const pointer = this.canvas.getPointer(e);
-    const diff = pointer.subtract(pos);
-    const enableRetinaScaling = this.canvas._isRetinaScaling();
-    const retinaScaling = this.getCanvasRetinaScaling();
-    const bbox = this.getBoundingRect(true);
-    const correction = pos.subtract(new Point(bbox.left, bbox.top));
-    const vpt = this.canvas.viewportTransform;
-    const offset = correction.add(diff).transform(vpt, true);
-    //  prepare instance for drag image snapshot by making all non selected text invisible
-    const bgc = this.backgroundColor;
-    const styles = cloneDeep(this.styles);
-    delete this.backgroundColor;
-    const styleOverride = {
-      stroke: 'transparent',
-      fill: 'transparent',
-      textBackgroundColor: 'transparent',
-    };
-    this.setSelectionStyles(styleOverride, 0, selectionStart);
-    this.setSelectionStyles(styleOverride, selectionEnd, this.text.length);
-    let dragImage = this.toCanvasElement({
-      enableRetinaScaling,
-    });
-    // restore values
-    this.backgroundColor = bgc;
-    this.styles = styles;
-    //  handle retina scaling and vpt
-    if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
-      const dragImageCanvas = createCanvasElement();
-      const size = new Point(dragImage.width, dragImage.height)
-        .scalarDivide(retinaScaling)
-        .transform(vpt, true);
-      dragImageCanvas.width = size.x;
-      dragImageCanvas.height = size.y;
-      const ctx = dragImageCanvas.getContext('2d');
-      ctx.scale(1 / retinaScaling, 1 / retinaScaling);
-      const [a, b, c, d] = vpt;
-      ctx.transform(a, b, c, d, 0, 0);
-      ctx.drawImage(dragImage, 0, 0);
-      dragImage = dragImageCanvas;
-    }
-    this.__dragImageDisposer && this.__dragImageDisposer();
-    this.__dragImageDisposer = () => {
-      dragImage.remove();
-    };
-    //  position drag image offscreen
-    setStyle(dragImage, {
-      position: 'absolute',
-      left: -dragImage.width + 'px',
-      border: 'none',
-    });
-    getEnv().document.body.appendChild(dragImage);
-    e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
-  }
-
-  /**
-   * support native like text dragging
-   * @private
-   * @param {DragEvent} e
-   * @returns {boolean} should handle event
-   */
-  onDragStart(e: DragEvent): boolean {
-    this.__dragStartFired = true;
-    if (this.__isDragging) {
-      const selection = (this.__dragStartSelection = {
-        selectionStart: this.selectionStart,
-        selectionEnd: this.selectionEnd,
-      });
-      const value = this._text
-        .slice(selection.selectionStart, selection.selectionEnd)
-        .join('');
-      const data = { text: this.text, value, ...selection };
-      e.dataTransfer.setData('text/plain', value);
-      e.dataTransfer.setData(
-        'application/fabric',
-        JSON.stringify({
-          value: value,
-          styles: this.getSelectionStyles(
-            selection.selectionStart,
-            selection.selectionEnd,
-            true
-          ),
-        })
-      );
-      e.dataTransfer.effectAllowed = 'copyMove';
-      this.setDragImage(e, data);
-    }
-    this.abortCursorAnimation();
-    return this.__isDragging;
-  }
-
-  /**
-   * Override to customize drag and drop behavior
-   * @public
-   * @param {DragEvent} e
-   * @returns {boolean}
-   */
-  canDrop(e: DragEvent): boolean {
-    if (this.editable && !this.__corner) {
-      if (this.__isDragging && this.__dragStartSelection) {
-        //  drag source trying to drop over itself
-        //  allow dropping only outside of drag start selection
-        const index = this.getSelectionStartFromPointer(e);
-        const dragStartSelection = this.__dragStartSelection;
-        return (
-          index < dragStartSelection.selectionStart ||
-          index > dragStartSelection.selectionEnd
-        );
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * support native like text dragging
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
-   */
-  dragEnterHandler({ e }: DragEventData) {
-    const canDrop = !e.defaultPrevented && this.canDrop(e);
-    if (!this.__isDraggingOver && canDrop) {
-      this.__isDraggingOver = true;
-    }
-  }
-
-  /**
-   * support native like text dragging
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
-   */
-  dragOverHandler(ev: DragEventData) {
-    const { e } = ev;
-    const canDrop = !e.defaultPrevented && this.canDrop(e);
-    if (!this.__isDraggingOver && canDrop) {
-      this.__isDraggingOver = true;
-    } else if (this.__isDraggingOver && !canDrop) {
-      //  drop state has changed
-      this.__isDraggingOver = false;
-    }
-    if (this.__isDraggingOver) {
-      //  can be dropped, inform browser
-      e.preventDefault();
-      //  inform event subscribers
-      ev.canDrop = true;
-      ev.dropTarget = this;
-    }
-  }
-
-  /**
-   * support native like text dragging
-   * @private
-   */
-  dragLeaveHandler() {
-    if (this.__isDraggingOver || this.__isDragging) {
-      this.__isDraggingOver = false;
-    }
-  }
-
-  /**
-   * support native like text dragging
-   * fired only on the drag source
-   * handle changes to the drag source in case of a drop on another object or a cancellation
-   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
-   * @private
-   * @param {object} options
-   * @param {DragEvent} options.e
-   */
-  dragEndHandler({ e }: DragEventData) {
-    if (this.__isDragging && this.__dragStartFired) {
-      //  once the drop event finishes we check if we need to change the drag source
-      //  if the drag source received the drop we bail out since the drop handler has already handled logic
-      if (this.__dragStartSelection) {
-        const selectionStart = this.__dragStartSelection.selectionStart;
-        const selectionEnd = this.__dragStartSelection.selectionEnd;
-        const dropEffect = e.dataTransfer.dropEffect;
-        if (dropEffect === 'none') {
-          // pointer is back over selection
-          this.selectionStart = selectionStart;
-          this.selectionEnd = selectionEnd;
-          this._updateTextarea();
-          this.hiddenTextarea.focus();
-        } else {
-          this.clearContextTop();
-          if (dropEffect === 'move') {
-            this.insertChars('', null, selectionStart, selectionEnd);
-            this.selectionStart = this.selectionEnd = selectionStart;
-            this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
-            this._updateTextarea();
-            this.fire('changed', {
-              index: selectionStart,
-              action: 'dragend',
-            });
-            this.canvas.fire('text:changed', { target: this });
-            this.canvas.requestRenderAll();
-          }
-          this.exitEditing();
-          //  disable mouse up logic
-          this.__lastSelected = false;
-        }
-      }
-    }
-
-    this.__dragImageDisposer && this.__dragImageDisposer();
-    delete this.__dragImageDisposer;
-    delete this.__dragStartSelection;
-    this.__isDraggingOver = false;
-  }
-
-  /**
-   * support native like text dragging
-   *
-   * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
-   * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
-   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
-   * @private
-   */
-  dropHandler(ev: DropEventData) {
-    const { e } = ev;
-    const didDrop = e.defaultPrevented;
-    this.__isDraggingOver = false;
-    // inform browser that the drop has been accepted
-    e.preventDefault();
-    let insert = e.dataTransfer.getData('text/plain');
-    if (insert && !didDrop) {
-      let insertAt = this.getSelectionStartFromPointer(e);
-      const { styles } = e.dataTransfer.types.includes('application/fabric')
-        ? JSON.parse(e.dataTransfer.getData('application/fabric'))
-        : {};
-      const trailing = insert[Math.max(0, insert.length - 1)];
-      const selectionStartOffset = 0;
-      //  drag and drop in same instance
-      if (this.__dragStartSelection) {
-        const selectionStart = this.__dragStartSelection.selectionStart;
-        const selectionEnd = this.__dragStartSelection.selectionEnd;
-        if (insertAt > selectionStart && insertAt <= selectionEnd) {
-          insertAt = selectionStart;
-        } else if (insertAt > selectionEnd) {
-          insertAt -= selectionEnd - selectionStart;
-        }
-        this.insertChars('', null, selectionStart, selectionEnd);
-        // prevent `dragend` from handling event
-        delete this.__dragStartSelection;
-      }
-      //  remove redundant line break
-      if (
-        this._reNewline.test(trailing) &&
-        (this._reNewline.test(this._text[insertAt]) ||
-          insertAt === this._text.length)
-      ) {
-        insert = insert.trimEnd();
-      }
-      //  inform subscribers
-      ev.didDrop = true;
-      ev.dropTarget = this;
-      //  finalize
-      this.insertChars(insert, styles, insertAt);
-      // can this part be moved in an outside event? andrea to check.
-      this.canvas.setActiveObject(this);
-      this.enterEditing();
-      this.selectionStart = Math.min(
-        insertAt + selectionStartOffset,
-        this._text.length
-      );
-      this.selectionEnd = Math.min(
-        this.selectionStart + insert.length,
-        this._text.length
-      );
-      this.hiddenTextarea && (this.hiddenTextarea.value = this.text);
-      this._updateTextarea();
-      this.hiddenTextarea.focus();
-      this.fire('changed', {
-        index: insertAt + selectionStartOffset,
-        action: 'drop',
-      });
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.contextTopDirty = true;
-      this.canvas.requestRenderAll();
     }
   }
 
@@ -1159,7 +825,7 @@ export abstract class ITextBehaviorMixin<
     lineIndex: number,
     charIndex: number,
     quantity: number,
-    copiedStyle: TextStyleDeclaration[]
+    copiedStyle?: TextStyleDeclaration[]
   ) {
     if (!this.styles) {
       this.styles = {};
@@ -1220,7 +886,7 @@ export abstract class ITextBehaviorMixin<
   insertNewStyleBlock(
     insertedText: string[],
     start: number,
-    copiedStyle: TextStyleDeclaration[]
+    copiedStyle?: TextStyleDeclaration[]
   ) {
     let cursorLoc = this.get2DCursorLocation(start, true),
       addedLines = [0],
@@ -1316,13 +982,10 @@ export abstract class ITextBehaviorMixin<
    */
   insertChars(
     text: string,
-    style: TextStyleDeclaration[],
+    style: TextStyleDeclaration[] | undefined,
     start: number,
-    end: number
+    end: number = start
   ) {
-    if (typeof end === 'undefined') {
-      end = start;
-    }
     if (end > start) {
       this.removeStyleFromTo(start, end);
     }

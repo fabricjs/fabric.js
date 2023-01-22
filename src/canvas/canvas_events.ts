@@ -460,10 +460,10 @@ export class Canvas extends SelectableCanvas {
     //  propagate the event to subtargets
     for (let i = 0; i < targets.length; i++) {
       const subTarget = targets[i];
-      // accept event only if previous targets didn't
+      // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform that the event is taken)
       // TODO: verify if those should loop in inverse order then?
       // what is the order of subtargets?
-      if (!e.defaultPrevented && subTarget.canDrop(e)) {
+      if (subTarget.canDrop(e)) {
         dropTarget = subTarget;
       }
       subTarget.fire(eventType, options);
@@ -754,8 +754,9 @@ export class Canvas extends SelectableCanvas {
     !this.allowTouchScrolling &&
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
-        // we must not prevent the event's default behavior in order for the window to start the drag event sequence
-        !activeObject.__isDragging) &&
+        // we must not prevent the event's default behavior in order for the window to start dragging
+        (isFabricObjectWithDragSupport(activeObject) &&
+          !activeObject.shouldStartDragging())) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
