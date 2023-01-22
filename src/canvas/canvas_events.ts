@@ -3,7 +3,6 @@ import {
   CanvasEvents,
   DragEventData,
   ObjectEvents,
-  TEvent,
   TPointerEvent,
   TPointerEventInfo,
   TPointerEventNames,
@@ -1534,14 +1533,14 @@ export class Canvas extends SelectableCanvas {
       this._hoveredTargets = this.targets.concat();
       if (activeSelection.size() === 1) {
         // activate last remaining object
-        this._setActiveObject(activeSelection.item(0), e);
+        this._setActiveObject(activeSelection.item(0) as FabricObject, e);
       }
     } else {
       activeSelection.add(target);
       this._hoveredTarget = activeSelection;
       this._hoveredTargets = this.targets.concat();
     }
-    this._fireSelectionEvents(currentActiveObjects, e);
+    this._fireSelectionEvents(currentActiveObjects as FabricObject[], e);
   }
 
   /**
@@ -1589,7 +1588,7 @@ export class Canvas extends SelectableCanvas {
    * @private
    */
   _collectObjects(e: TPointerEvent) {
-    const group = [],
+    const group: FabricObject[] = [],
       _groupSelector = this._groupSelector,
       point1 = new Point(_groupSelector.ex, _groupSelector.ey),
       point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
