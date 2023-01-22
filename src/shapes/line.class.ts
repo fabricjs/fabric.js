@@ -2,7 +2,7 @@ import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../point.class';
 import { isFiller } from '../util/types';
 

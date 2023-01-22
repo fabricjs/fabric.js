@@ -1364,7 +1364,7 @@ export class FabricObject<
           this._applyPatternForTransformedGradient(ctx, stroke);
         } else {
           // is a simple gradient or pattern
-          ctx.strokeStyle = stroke.toLive(ctx);
+          ctx.strokeStyle = stroke.toLive(ctx)!;
           this._applyPatternGradientTransform(ctx, stroke);
         }
       } else {
@@ -1377,7 +1377,7 @@ export class FabricObject<
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
       if (isFiller(fill)) {
-        ctx.fillStyle = fill.toLive(ctx);
+        ctx.fillStyle = fill.toLive(ctx)!;
         this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
@@ -1583,7 +1583,7 @@ export class FabricObject<
       dims.zoomY / this.scaleY / retinaScaling
     );
     this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fillStyle = filler.toLive(ctx);
+    pCtx.fillStyle = filler.toLive(ctx)!;
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
