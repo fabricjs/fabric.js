@@ -638,7 +638,7 @@ export class IText<
   }
 }
 
-export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
+export const iTextDefaultValues = {
   type: 'i-text',
   selectionStart: 0,
   selectionEnd: 0,
