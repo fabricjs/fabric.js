@@ -1,22 +1,19 @@
 import { cache } from '../../cache';
-import type { Canvas } from '../../canvas/canvas_events';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
-import type { Gradient } from '../../gradient/gradient.class';
-import type { Pattern } from '../../pattern.class';
+import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../point.class';
 import { Shadow } from '../../shadow.class';
 import type {
-  TCacheCanvasDimensions,
   TClassProperties,
   TDegree,
   TFiller,
   TSize,
+  TCacheCanvasDimensions,
 } from '../../typedefs';
-import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { classRegistry } from '../../util/class_registry';
+import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
@@ -29,15 +26,19 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
 import type { Group } from '../group.class';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
+import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
 import { Image } from '../image.class';
-import { AnimatableObject } from './AnimatableObject';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
   stateProperties,
 } from './defaultValues';
+import type { Gradient } from '../../gradient/gradient.class';
+import type { Pattern } from '../../pattern.class';
+import type { Canvas } from '../../canvas/canvas_events';
+import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -1363,7 +1364,7 @@ export class FabricObject<
           this._applyPatternForTransformedGradient(ctx, stroke);
         } else {
           // is a simple gradient or pattern
-          ctx.strokeStyle = stroke.toLive(ctx)!;
+          ctx.strokeStyle = stroke.toLive(ctx);
           this._applyPatternGradientTransform(ctx, stroke);
         }
       } else {
@@ -1376,7 +1377,7 @@ export class FabricObject<
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
       if (isFiller(fill)) {
-        ctx.fillStyle = fill.toLive(ctx)!;
+        ctx.fillStyle = fill.toLive(ctx);
         this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
@@ -1582,7 +1583,7 @@ export class FabricObject<
       dims.zoomY / this.scaleY / retinaScaling
     );
     this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fillStyle = filler.toLive(ctx)!;
+    pCtx.fillStyle = filler.toLive(ctx);
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
