@@ -1214,7 +1214,7 @@ export class Text<
     pCtx.lineTo(0, height);
     pCtx.closePath();
     pCtx.translate(width / 2, height / 2);
-    pCtx.fillStyle = filler.toLive(pCtx) || '';
+    pCtx.fillStyle = filler.toLive(pCtx)!;
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fill();
     return pCtx.createPattern(pCanvas, 'no-repeat')!;
@@ -1243,7 +1243,7 @@ export class Text<
         return { offsetX: offsetX, offsetY: offsetY };
       } else {
         // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx, this) || '';
+        ctx[property] = filler.toLive(ctx, this)!;
         return this._applyPatternGradientTransform(ctx, filler);
       }
     } else {
@@ -1858,7 +1858,7 @@ export class Text<
     return this._fromObject(
       {
         ...object,
-        styles: stylesFromArray(object.styles, object.text),
+        styles: stylesFromArray(object.styles || {}, object.text),
       },
       {
         extraParam: 'text',
