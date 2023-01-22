@@ -929,7 +929,8 @@ export abstract class ITextBehaviorMixin<
         cursorLoc.charIndex + addedLines[0],
         linesLength
       );
-    for (let i = 1; i < linesLength; i++) {
+    let i;
+    for (i = 1; i < linesLength; i++) {
       if (addedLines[i] > 0) {
         this.insertCharStyleObject(
           cursorLoc.lineIndex + i,
@@ -948,11 +949,11 @@ export abstract class ITextBehaviorMixin<
       }
       copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
     }
-    if (addedLines[linesLength] > 0) {
+    if (addedLines[i] > 0) {
       this.insertCharStyleObject(
-        cursorLoc.lineIndex + linesLength,
+        cursorLoc.lineIndex + i,
         0,
-        addedLines[linesLength],
+        addedLines[i],
         copiedStyle
       );
     }
