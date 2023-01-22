@@ -19,7 +19,7 @@
       assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
-    function wait(ms = 16) {
+    function wait(ms = 32) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
