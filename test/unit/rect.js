@@ -78,10 +78,12 @@
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), REFERENCE_RECT);
 
-      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-      expectedObject.fill = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
-      expectedObject.stroke = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
-      return fabric.Rect.fromObject(expectedObject).then(function(rect2) {
+      var expectedObject = {
+        ...REFERENCE_RECT,
+        fill: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 },
+        stroke: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 }
+      };
+      return fabric.Rect.fromObject(expectedObject).then(function (rect2) {
         assert.ok(rect2.fill instanceof fabric.Gradient);
         assert.ok(rect2.stroke instanceof fabric.Gradient);
         done();
@@ -106,10 +108,8 @@
 
     var elRect = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
     fabric.Rect.fromElement(elRect, function(rect) {
-      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-      expectedObject.visible = false;
       assert.ok(rect instanceof fabric.Rect);
-      assert.deepEqual(rect.toObject(), expectedObject);
+      assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
     });
   });
 
@@ -136,7 +136,8 @@
     fabric.Rect.fromElement(elRectWithAttrs, function(rectWithAttrs) {
       assert.ok(rectWithAttrs instanceof fabric.Rect);
       assert.equal(rectWithAttrs.strokeUniform, true, 'strokeUniform is parsed');
-      var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
+      var expectedObject = {
+        ...REFERENCE_RECT,
         left:             10,
         top:              20,
         width:            222,
@@ -152,7 +153,7 @@
         rx:               11,
         ry:               12,
         strokeUniform:    true
-      });
+      };
       assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
     });
   });

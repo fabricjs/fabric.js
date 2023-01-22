@@ -141,10 +141,11 @@
       return el;
     }
 
-    function getOptions(options) {
-      return fabric.util.object.extend(fabric.util.object.clone({
-        left: 10, top: 20, width: 30, height: 40
-      }), options || { });
+    function getOptions(options = {}) {
+      return {
+        left: 10, top: 20, width: 30, height: 40,
+        ...options,
+      }
     }
 
     var elements = [

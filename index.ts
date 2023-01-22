@@ -89,7 +89,6 @@ import {
   stylesToArray,
   hasStyleChanged,
 } from './src/util/misc/textStyles';
-import { clone, extend } from './src/util/lang_object';
 import {
   createCanvasElement,
   createImage,
@@ -196,10 +195,6 @@ const util = {
   stylesToArray,
   hasStyleChanged,
   getElementOffset,
-  object: {
-    clone,
-    extend,
-  },
   createCanvasElement,
   createImage,
   copyCanvasElement,

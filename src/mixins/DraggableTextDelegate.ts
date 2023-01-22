@@ -4,7 +4,7 @@ import { DragEventData, DropEventData, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { IText } from '../shapes/itext.class';
 import { setStyle } from '../util/dom_style';
-import { clone } from '../util/lang_object';
+import { cloneDeep } from '../util/internals/cloneDeep';
 import { createCanvasElement } from '../util/misc/dom';
 import { isIdentityMatrix } from '../util/misc/matrix';
 import { TextStyleDeclaration } from './text_style.mixin';
@@ -127,7 +127,7 @@ export class DraggableTextDelegate {
     const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = target.backgroundColor;
-    const styles = clone(target.styles, true);
+    const styles = cloneDeep(target.styles);
     target.backgroundColor = '';
     const styleOverride = {
       stroke: 'transparent',
