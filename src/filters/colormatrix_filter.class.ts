@@ -42,7 +42,7 @@ export class ColorMatrix extends BaseFilter {
       // safeguard against mutation
       this.matrix = [...matrix];
     }
-    super.setOptions(options);
+    Object.assign(this, options);
   }
 
   /**

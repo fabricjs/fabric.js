@@ -101,7 +101,7 @@ export class Line extends FabricObject {
     // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
     const origStrokeStyle = ctx.strokeStyle;
     if (isFiller(this.stroke)) {
-      ctx.strokeStyle = this.stroke.toLive(ctx);
+      ctx.strokeStyle = this.stroke.toLive(ctx)!;
     } else {
       ctx.strokeStyle = this.stroke ?? ctx.fillStyle;
     }

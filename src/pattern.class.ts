@@ -144,7 +144,7 @@ export class Pattern {
       return null;
     }
 
-    return ctx.createPattern(this.source, this.repeat);
+    return ctx.createPattern(this.source, this.repeat)!;
   }
 
   /**
