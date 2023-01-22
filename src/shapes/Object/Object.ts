@@ -14,7 +14,7 @@ import type {
 } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
-import { clone } from '../../util/lang_object';
+import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
@@ -1850,7 +1850,7 @@ export class FabricObject<
       ...options
     }: { extraParam?: string; signal?: AbortSignal } = {}
   ): Promise<FabricObject> {
-    return enlivenObjectEnlivables<any>(clone(object, true), options).then(
+    return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
         const allOptions = { ...options, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0
