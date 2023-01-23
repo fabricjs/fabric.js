@@ -1455,9 +1455,9 @@ export class StaticCanvas<
     const {
       objects = [],
       backgroundImage,
-      background,
+      background: backgroundColor,
       overlayImage,
-      overlay,
+      overlay: overlayColor,
       clipPath,
     } = serialized;
     const renderOnAddRemove = this.renderOnAddRemove;
@@ -1471,9 +1471,9 @@ export class StaticCanvas<
       enlivenObjectEnlivables(
         {
           backgroundImage,
-          backgroundColor: background,
+          backgroundColor,
           overlayImage,
-          overlayColor: overlay,
+          overlayColor,
           clipPath,
         },
         { signal }
@@ -1481,7 +1481,7 @@ export class StaticCanvas<
     ]).then(([enlived, enlivedMap]) => {
       this.clear();
       this.add(...enlived);
-      this.set(serialized);
+      this.set({ ...serialized, backgroundColor, overlayColor });
       this.set(enlivedMap);
       this.renderOnAddRemove = renderOnAddRemove;
       return this;
