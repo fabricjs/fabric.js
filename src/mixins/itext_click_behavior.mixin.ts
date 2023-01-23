@@ -1,4 +1,4 @@
-import { RIGHT_CLICK } from '../constants';
+import { LEFT_CLICK } from '../constants';
 import { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import type { DragMethods } from '../shapes/Object/InteractiveObject';
@@ -8,8 +8,8 @@ import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './itext_behavior.mixin';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-function isRightClick(button?: number) {
-  return button === RIGHT_CLICK;
+function isLeftClick(button?: number) {
+  return button === LEFT_CLICK;
 }
 
 export abstract class ITextClickBehaviorMixin<
@@ -124,7 +124,7 @@ export abstract class ITextClickBehaviorMixin<
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler({ e, button }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || isRightClick(button)) {
+    if (!this.canvas || !this.editable || !isLeftClick(button)) {
       return;
     }
 
@@ -154,7 +154,7 @@ export abstract class ITextClickBehaviorMixin<
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
   _mouseDownHandlerBefore({ button }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || isRightClick(button)) {
+    if (!this.canvas || !this.editable || !isLeftClick(button)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -183,7 +183,7 @@ export abstract class ITextClickBehaviorMixin<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (transform && transform.actionPerformed) ||
-      isRightClick(button) ||
+      !isLeftClick(button) ||
       didDrag
     ) {
       return;
