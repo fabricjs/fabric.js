@@ -379,7 +379,11 @@ export class Gradient<
     callback: (instance: Gradient<'linear' | 'radial'>) => any,
     {
       object: { left, top },
-      ...svgOptions
+      width,
+      height,
+      viewBoxWidth,
+      viewBoxHeight,
+      opacity,
     }: SVGOptions & { object: FabricObject }
   ) {
     const gradientUnits = parseGradientUnits(el);
@@ -387,10 +391,10 @@ export class Gradient<
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
-        width: svgOptions.viewBoxWidth || svgOptions.width,
-        height: svgOptions.viewBoxHeight || svgOptions.height,
+        width: viewBoxWidth || width,
+        height: viewBoxHeight || height,
       }),
-      colorStops: parseColorStops(el, svgOptions.opacity),
+      colorStops: parseColorStops(el, opacity),
       gradientUnits,
       gradientTransform: parseTransformAttribute(
         el.getAttribute('gradientTransform') || ''
