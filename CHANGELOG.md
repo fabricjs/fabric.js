@@ -12,6 +12,7 @@
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 \- chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
 - refactor(Animation): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
+- chore(TS): type IText, IText behavior, IText click behavior [#8610](https://github.com/fabricjs/fabric.js/pull/8610)
 - BREAKING: refactor `clone(obj, true)` with `cloneDeep(obj)` and remove all `extend`, `clone` calls in favor of object spreads. [#8600](https://github.com/fabricjs/fabric.js/pull/8600)
 - chore(TS): Fix some error caused by ts-nocheck removals [#8615](https://github.com/fabricjs/fabric.js/pull/8615)
 - refactor(IText): extract draggable text logic to a delegate [#8598](https://github.com/fabricjs/fabric.js/pull/8598)
