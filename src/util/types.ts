@@ -10,6 +10,7 @@ import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
 import type { IText } from '../shapes/itext.class';
 import type { Textbox } from '../shapes/textbox.class';
+import type { Path } from '../shapes/path.class';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -75,4 +76,10 @@ export const isFabricObjectWithDragSupport = (
     typeof (fabricObject as FabricObjectWithDragSupport).shouldStartDragging ===
       'function'
   );
+};
+
+export const isPathObject = (
+  fabricObject: FabricObject
+): fabricObject is Path => {
+  return !!fabricObject && fabricObject.type === 'path';
 };

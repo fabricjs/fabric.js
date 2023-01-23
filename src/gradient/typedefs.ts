@@ -70,7 +70,7 @@ export type GradientOptions<T extends GradientType> = {
   /**
    * @todo rename?
    */
-  gradientTransform?: TMat2D;
+  gradientTransform?: TMat2D | null;
   id?: string;
   /**
    * SVG import compatibility

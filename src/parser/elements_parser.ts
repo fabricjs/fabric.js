@@ -100,13 +100,13 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = classRegistry
+      classRegistry
         .getSVGClass('gradient')
-        .fromElement(gradientDef, obj, {
+        .fromElement(gradientDef, (gradient) => obj.set(property, gradient), {
           ...this.options,
           opacity: opacityAttr,
+          object: obj,
         });
-      obj.set(property, gradient);
     }
   };
 
