@@ -1,4 +1,3 @@
-import { LEFT_CLICK } from '../constants';
 import type { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import type { DragMethods } from '../shapes/Object/InteractiveObject';
@@ -8,8 +7,8 @@ import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './itext_behavior.mixin';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
-function isLeftClick(button?: number) {
-  return button === LEFT_CLICK;
+function notALeftClick(e: MouseEvent) {
+  return e.button && e.button !== 1;
 }
 
 export abstract class ITextClickBehaviorMixin<
@@ -123,8 +122,8 @@ export abstract class ITextClickBehaviorMixin<
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler({ e, button }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || !isLeftClick(button)) {
+  _mouseDownHandler({ e }: TPointerEventInfo) {
+    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
       return;
     }
 
@@ -153,8 +152,8 @@ export abstract class ITextClickBehaviorMixin<
    * can be overridden to do something different.
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
-  _mouseDownHandlerBefore({ button }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || !isLeftClick(button)) {
+  _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
+    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -183,7 +182,7 @@ export abstract class ITextClickBehaviorMixin<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (transform && transform.actionPerformed) ||
-      !isLeftClick(button) ||
+      notALeftClick(e as MouseEvent) ||
       didDrag
     ) {
       return;
