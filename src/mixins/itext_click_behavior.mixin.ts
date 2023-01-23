@@ -7,6 +7,9 @@ import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './itext_behavior.mixin';
 import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
 
+// TODO: this code seems wrong.
+// e.button for a left click is `0` and so different than `1` is more
+// not a right click. PR 3888 introduced this code and was about left clicks.
 function notALeftClick(e: MouseEvent) {
   return e.button && e.button !== 1;
 }
