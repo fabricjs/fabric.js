@@ -1,7 +1,9 @@
-/// @ts-nocheck
-
 import { getEnv } from '../env';
-import { ObjectEvents, TPointerEvent } from '../EventTypeDefs';
+import {
+  ObjectEvents,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../EventTypeDefs';
 import { Point } from '../point.class';
 import type { FabricObject } from '../shapes/Object/Object';
 import { Text } from '../shapes/text.class';
@@ -13,8 +15,16 @@ import { TextStyleDeclaration } from './text_style.mixin';
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
 
+export type ITextEvents = ObjectEvents & {
+  'selection:changed': never;
+  changed: never | { index: number; action: string };
+  tripleclick: TPointerEventInfo;
+  'editing:entered': never | { e: TPointerEvent };
+  'editing:exited': never;
+};
+
 export abstract class ITextBehaviorMixin<
-  EventSpec extends ObjectEvents
+  EventSpec extends ITextEvents = ITextEvents
 > extends Text<EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
@@ -27,7 +37,7 @@ export abstract class ITextBehaviorMixin<
   declare abstract compositionStart: number;
   declare abstract compositionEnd: number;
 
-  declare abstract hiddenTextarea: HTMLTextAreaElement;
+  declare abstract hiddenTextarea: HTMLTextAreaElement | null;
 
   /**
    * Helps determining when the text is in composition, so that the cursor
@@ -38,21 +48,21 @@ export abstract class ITextBehaviorMixin<
   protected declare _reSpace: RegExp;
   private declare _currentTickState?: ValueAnimation;
   private declare _currentTickCompleteState?: ValueAnimation;
-  protected declare _currentCursorOpacity: number;
+  protected _currentCursorOpacity = 1;
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
 
   protected declare selected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
-  protected declare _savedProps: {
+  protected declare _savedProps?: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
     lockMovementY: boolean;
     selectable: boolean;
-    hoverCursor: string | null;
-    defaultCursor: string;
-    moveCursor: CSSStyleDeclaration['cursor'];
+    hoverCursor: CSSStyleDeclaration['cursor'] | null;
+    defaultCursor?: CSSStyleDeclaration['cursor'];
+    moveCursor?: CSSStyleDeclaration['cursor'];
   };
   protected declare _selectionDirection: 'left' | 'right' | null;
 
@@ -62,7 +72,7 @@ export abstract class ITextBehaviorMixin<
   abstract getSelectionStartFromPointer(e: TPointerEvent): number;
   abstract _getCursorBoundaries(
     index: number,
-    skipCaching: boolean
+    skipCaching?: boolean
   ): {
     left: number;
     top: number;
@@ -344,7 +354,7 @@ export abstract class ITextBehaviorMixin<
   /**
    * Enters editing state
    */
-  enterEditing(e) {
+  enterEditing(e: TPointerEvent) {
     if (this.isEditing || !this.editable) {
       return;
     }
@@ -356,8 +366,8 @@ export abstract class ITextBehaviorMixin<
     this.isEditing = true;
 
     this.initHiddenTextarea();
-    this.hiddenTextarea.focus();
-    this.hiddenTextarea.value = this.text;
+    this.hiddenTextarea!.focus();
+    this.hiddenTextarea!.value = this.text;
     this._updateTextarea();
     this._saveEditingProps();
     this._setEditingProps();
@@ -367,6 +377,7 @@ export abstract class ITextBehaviorMixin<
     this.fire('editing:entered', { e });
     this._fireSelectionChanged();
     if (this.canvas) {
+      // @ts-expect-error in reality it is an IText instance
       this.canvas.fire('text:editing:entered', { target: this, e });
       this.canvas.requestRenderAll();
     }
@@ -378,7 +389,7 @@ export abstract class ITextBehaviorMixin<
   updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
     getEnv().document.activeElement !== this.hiddenTextarea &&
-      this.hiddenTextarea.focus();
+      this.hiddenTextarea!.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
@@ -425,7 +436,7 @@ export abstract class ITextBehaviorMixin<
   /**
    * convert from textarea to grapheme indexes
    */
-  fromStringToGraphemeSelection(start, end, text) {
+  fromStringToGraphemeSelection(start: number, end: number, text: string) {
     const smallerTextStart = text.slice(0, start),
       graphemeStart = this.graphemeSplit(smallerTextStart).length;
     if (start === end) {
@@ -442,13 +453,17 @@ export abstract class ITextBehaviorMixin<
   /**
    * convert from fabric to textarea values
    */
-  fromGraphemeToStringSelection(start, end, _text) {
-    const smallerTextStart = _text.slice(0, start),
+  fromGraphemeToStringSelection(
+    start: number,
+    end: number,
+    graphemes: string[]
+  ) {
+    const smallerTextStart = graphemes.slice(0, start),
       graphemeStart = smallerTextStart.join('').length;
     if (start === end) {
       return { selectionStart: graphemeStart, selectionEnd: graphemeStart };
     }
-    const smallerTextEnd = _text.slice(start, end),
+    const smallerTextEnd = graphemes.slice(start, end),
       graphemeEnd = smallerTextEnd.join('').length;
     return {
       selectionStart: graphemeStart,
@@ -507,8 +522,8 @@ export abstract class ITextBehaviorMixin<
   updateTextareaPosition() {
     if (this.selectionStart === this.selectionEnd) {
       const style = this._calcTextareaPosition();
-      this.hiddenTextarea.style.left = style.left;
-      this.hiddenTextarea.style.top = style.top;
+      this.hiddenTextarea!.style.left = style.left;
+      this.hiddenTextarea!.style.top = style.top;
     }
   }
 
@@ -518,7 +533,7 @@ export abstract class ITextBehaviorMixin<
    */
   _calcTextareaPosition() {
     if (!this.canvas) {
-      return { left: 1, top: 1 };
+      return { left: '1px', top: '1px' };
     }
     const desiredPosition = this.inCompositionMode
         ? this.compositionStart
@@ -569,9 +584,9 @@ export abstract class ITextBehaviorMixin<
     p.y += this.canvas._offset.top;
 
     return {
-      left: p.x + 'px',
-      top: p.y + 'px',
-      fontSize: charHeight + 'px',
+      left: `${p.x}px`,
+      top: `${p.y}px`,
+      fontSize: `${charHeight}px`,
       charHeight: charHeight,
     };
   }
@@ -608,8 +623,10 @@ export abstract class ITextBehaviorMixin<
     this.lockMovementY = this._savedProps.lockMovementY;
 
     if (this.canvas) {
-      this.canvas.defaultCursor = this._savedProps.defaultCursor;
-      this.canvas.moveCursor = this._savedProps.moveCursor;
+      this.canvas.defaultCursor =
+        this._savedProps.defaultCursor || this.canvas.defaultCursor;
+      this.canvas.moveCursor =
+        this._savedProps.moveCursor || this.canvas.moveCursor;
     }
 
     delete this._savedProps;
@@ -647,6 +664,7 @@ export abstract class ITextBehaviorMixin<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
+      // @ts-expect-error in reality it is an IText instance
       this.canvas.fire('text:editing:exited', { target: this });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
@@ -658,7 +676,7 @@ export abstract class ITextBehaviorMixin<
    */
   _removeExtraneousStyles() {
     for (const prop in this.styles) {
-      if (!this._textLines[prop]) {
+      if (!this._textLines[prop as unknown as number]) {
         delete this.styles[prop];
       }
     }
@@ -670,19 +688,17 @@ export abstract class ITextBehaviorMixin<
    * @param {Number} end linear end position for removal ( excluded from removal )
    */
   removeStyleFromTo(start: number, end: number) {
-    let cursorStart = this.get2DCursorLocation(start, true),
-      cursorEnd = this.get2DCursorLocation(end, true),
-      lineStart = cursorStart.lineIndex,
-      charStart = cursorStart.charIndex,
-      lineEnd = cursorEnd.lineIndex,
-      charEnd = cursorEnd.charIndex,
-      i,
-      styleObj;
+    const { lineIndex: lineStart, charIndex: charStart } =
+        this.get2DCursorLocation(start, true),
+      { lineIndex: lineEnd, charIndex: charEnd } = this.get2DCursorLocation(
+        end,
+        true
+      );
     if (lineStart !== lineEnd) {
       // step1 remove the trailing of lineStart
       if (this.styles[lineStart]) {
         for (
-          i = charStart;
+          let i = charStart;
           i < this._unwrappedTextLines[lineStart].length;
           i++
         ) {
@@ -691,8 +707,12 @@ export abstract class ITextBehaviorMixin<
       }
       // step2 move the trailing of lineEnd to lineStart if needed
       if (this.styles[lineEnd]) {
-        for (i = charEnd; i < this._unwrappedTextLines[lineEnd].length; i++) {
-          styleObj = this.styles[lineEnd][i];
+        for (
+          let i = charEnd;
+          i < this._unwrappedTextLines[lineEnd].length;
+          i++
+        ) {
+          const styleObj = this.styles[lineEnd][i];
           if (styleObj) {
             this.styles[lineStart] || (this.styles[lineStart] = {});
             this.styles[lineStart][charStart + i - charEnd] = styleObj;
@@ -700,7 +720,7 @@ export abstract class ITextBehaviorMixin<
         }
       }
       // step3 detects lines will be completely removed.
-      for (i = lineStart + 1; i <= lineEnd; i++) {
+      for (let i = lineStart + 1; i <= lineEnd; i++) {
         delete this.styles[i];
       }
       // step4 shift remaining lines.
@@ -708,18 +728,16 @@ export abstract class ITextBehaviorMixin<
     } else {
       // remove and shift left on the same line
       if (this.styles[lineStart]) {
-        styleObj = this.styles[lineStart];
-        let diff = charEnd - charStart,
-          numericChar,
-          _char;
-        for (i = charStart; i < charEnd; i++) {
+        const styleObj = this.styles[lineStart];
+        const diff = charEnd - charStart;
+        for (let i = charStart; i < charEnd; i++) {
           delete styleObj[i];
         }
-        for (_char in this.styles[lineStart]) {
-          numericChar = parseInt(_char, 10);
+        for (const char in this.styles[lineStart]) {
+          const numericChar = parseInt(char, 10);
           if (numericChar >= charEnd) {
-            styleObj[numericChar - diff] = styleObj[_char];
-            delete styleObj[_char];
+            styleObj[numericChar - diff] = styleObj[char];
+            delete styleObj[char];
           }
         }
       }
@@ -758,19 +776,18 @@ export abstract class ITextBehaviorMixin<
     lineIndex: number,
     charIndex: number,
     qty: number,
-    copiedStyle
+    copiedStyle?: { [index: number]: TextStyleDeclaration }
   ) {
-    let currentCharStyle,
-      newLineStyles = {},
-      somethingAdded = false,
-      isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
-
+    const newLineStyles: { [index: number]: TextStyleDeclaration } = {};
+    const isEndOfLine =
+      this._unwrappedTextLines[lineIndex].length === charIndex;
+    let somethingAdded = false;
     qty || (qty = 1);
     this.shiftLineStyles(lineIndex, qty);
-    if (this.styles[lineIndex]) {
-      currentCharStyle =
-        this.styles[lineIndex][charIndex === 0 ? charIndex : charIndex - 1];
-    }
+    const currentCharStyle = this.styles[lineIndex]
+      ? this.styles[lineIndex][charIndex === 0 ? charIndex : charIndex - 1]
+      : undefined;
+
     // we clone styles of all chars
     // after cursor onto the current line
     for (const index in this.styles[lineIndex]) {
@@ -800,11 +817,11 @@ export abstract class ITextBehaviorMixin<
     while (qty > 0) {
       if (copiedStyle && copiedStyle[qty - 1]) {
         this.styles[lineIndex + qty] = {
-          0: Object.assign({}, copiedStyle[qty - 1]),
+          0: { ...copiedStyle[qty - 1] },
         };
       } else if (currentCharStyle) {
         this.styles[lineIndex + qty] = {
-          0: Object.assign({}, currentCharStyle),
+          0: { ...currentCharStyle },
         };
       } else {
         delete this.styles[lineIndex + qty];
@@ -832,7 +849,7 @@ export abstract class ITextBehaviorMixin<
     }
     const currentLineStyles = this.styles[lineIndex],
       currentLineStylesCloned = currentLineStyles
-        ? Object.assign({}, currentLineStyles)
+        ? { ...currentLineStyles }
         : {};
 
     quantity || (quantity = 1);
@@ -858,10 +875,9 @@ export abstract class ITextBehaviorMixin<
         if (!this.styles[lineIndex]) {
           this.styles[lineIndex] = {};
         }
-        this.styles[lineIndex][charIndex + quantity] = Object.assign(
-          {},
-          copiedStyle[quantity]
-        );
+        this.styles[lineIndex][charIndex + quantity] = {
+          ...copiedStyle[quantity],
+        };
       }
       return;
     }
@@ -870,10 +886,7 @@ export abstract class ITextBehaviorMixin<
     }
     const newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
     while (newStyle && quantity--) {
-      this.styles[lineIndex][charIndex + quantity] = Object.assign(
-        {},
-        newStyle
-      );
+      this.styles[lineIndex][charIndex + quantity] = { ...newStyle };
     }
   }
 
@@ -888,11 +901,11 @@ export abstract class ITextBehaviorMixin<
     start: number,
     copiedStyle?: TextStyleDeclaration[]
   ) {
-    let cursorLoc = this.get2DCursorLocation(start, true),
-      addedLines = [0],
-      linesLength = 0;
+    const cursorLoc = this.get2DCursorLocation(start, true),
+      addedLines = [0];
+    let linesLength = 0;
     // get an array of how many char per lines are being added.
-    for (var i = 0; i < insertedText.length; i++) {
+    for (let i = 0; i < insertedText.length; i++) {
       if (insertedText[i] === '\n') {
         linesLength++;
         addedLines[linesLength] = 0;
@@ -916,7 +929,8 @@ export abstract class ITextBehaviorMixin<
         cursorLoc.charIndex + addedLines[0],
         linesLength
       );
-    for (var i = 1; i < linesLength; i++) {
+    let i;
+    for (i = 1; i < linesLength; i++) {
       if (addedLines[i] > 0) {
         this.insertCharStyleObject(
           cursorLoc.lineIndex + i,
@@ -935,7 +949,6 @@ export abstract class ITextBehaviorMixin<
       }
       copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
     }
-    // we use i outside the loop to get it like linesLength
     if (addedLines[i] > 0) {
       this.insertCharStyleObject(
         cursorLoc.lineIndex + i,
@@ -1009,7 +1022,11 @@ export abstract class ITextBehaviorMixin<
    * Set the selectionStart and selectionEnd according to the new position of cursor
    * mimic the key - mouse navigation when shift is pressed.
    */
-  setSelectionStartEndWithShift(start, end, newSelection) {
+  setSelectionStartEndWithShift(
+    start: number,
+    end: number,
+    newSelection: number
+  ) {
     if (newSelection <= start) {
       if (end === start) {
         this._selectionDirection = 'left';
