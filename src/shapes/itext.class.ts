@@ -1,5 +1,10 @@
 // @ts-nocheck
-import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
+import { Canvas } from '../canvas/canvas_events';
+import {
+  ObjectEvents,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -7,15 +12,14 @@ import {
   keysMap,
   keysMapRtl,
 } from '../mixins/itext_key_const';
+import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { TClassProperties, TFiller } from '../typedefs';
-import { Canvas } from '../canvas/canvas_events';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
-  changed: never;
+  changed: never | { index: number; action: string };
   tripleclick: TPointerEventInfo;
-  'editing:entered': never;
+  'editing:entered': never | { e: TPointerEvent };
   'editing:exited': never;
 };
 
@@ -284,6 +288,18 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 
   /**
+   * @override block cursor/selection logic while rendering the exported canvas
+   * @todo this workaround should be replaced with a more robust solution
+   */
+  toCanvasElement(options?: any): HTMLCanvasElement {
+    const isEditing = this.isEditing;
+    this.isEditing = false;
+    const canvas = super.toCanvasElement(options);
+    this.isEditing = isEditing;
+    return canvas;
+  }
+
+  /**
    * Renders cursor or selection (depending on what exists)
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
@@ -334,12 +350,15 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {number} index index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundariesOffsets(index: number, skipCaching?: boolean) {
+  _getCursorBoundariesOffsets(
+    index: number,
+    skipCaching?: boolean
+  ): { left: number; top: number } {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
     }
     if (this.cursorOffsetCache && 'top' in this.cursorOffsetCache) {
-      return this.cursorOffsetCache;
+      return this.cursorOffsetCache as { left: number; top: number };
     }
     return (this.cursorOffsetCache = this.__getCursorBoundariesOffsets(index));
   }
@@ -463,20 +482,17 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
    * Renders drag start text selection
    */
-  renderDragSourceEffect() {
-    if (this.__isDragging && this.__dragStartSelection) {
-      this._renderSelection(
-        this.canvas.contextTop,
-        this.__dragStartSelection,
-        this._getCursorBoundaries(
-          this.__dragStartSelection.selectionStart,
-          true
-        )
-      );
-    }
+  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+    const dragStartSelection =
+      this.draggableTextDelegate.getDragStartSelection()!;
+    this._renderSelection(
+      this.canvas.contextTop,
+      dragStartSelection,
+      this._getCursorBoundaries(dragStartSelection.selectionStart, true)
+    );
   }
 
-  renderDropTargetEffect(e) {
+  renderDropTargetEffect(e: DragEvent) {
     const dragSelection = this.getSelectionStartFromPointer(e);
     this.renderCursorAt(dragSelection);
   }
@@ -611,6 +627,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
 
   dispose() {
     this._exitEditing();
+    this.draggableTextDelegate.dispose();
     super.dispose();
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
@@ -8,7 +7,7 @@ import { createCollectionMixin } from '../mixins/collection.mixin';
 import { CommonMethods } from '../mixins/shared_methods.mixin';
 import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/rect.class';
 import {
@@ -42,7 +41,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isTextObject } from '../util/types';
+import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -268,9 +267,6 @@ export class StaticCanvas<
    */
   declare _originalCanvasStyle?: string;
 
-  declare renderAndResetBound: () => void;
-  declare requestRenderAllBound: () => void;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
@@ -283,7 +279,19 @@ export class StaticCanvas<
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    this._init(el, options);
+    this.set(options);
+    this.initElements(el);
+    this._setDimensionsImpl({
+      width: this.width || this.lowerCanvasEl.width || 0,
+      height: this.height || this.lowerCanvasEl.height || 0,
+    });
+    this.viewportTransform = [...this.viewportTransform];
+    this.calcViewportBoundaries();
+  }
+
+  protected initElements(el: string | HTMLCanvasElement) {
+    this._createLowerCanvas(el);
+    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
   }
 
   add(...objects: FabricObject[]) {
@@ -332,32 +340,6 @@ export class StaticCanvas<
 
   /**
    * @private
-   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
-   * @param {Object} [options] Options object
-   */
-  _init(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
-    this._isRetinaScaling() && this._initRetinaScaling();
-    this.calcViewportBoundaries();
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement | String} el <canvas> element to initialize instance on
-   * @param {Object} [options] Options object
-   */
-  _initStatic(el: string | HTMLCanvasElement, options = {}) {
-    this._objects = [];
-    this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
-    this._initOptions(options);
-    this.calcOffset();
-  }
-
-  /**
-   * @private
    */
   _isRetinaScaling() {
     return config.devicePixelRatio > 1 && this.enableRetinaScaling;
@@ -371,14 +353,11 @@ export class StaticCanvas<
     return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
+  protected _initRetinaScaling() {
     this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
   }
 
-  __initRetinaScaling(
+  protected __initRetinaScaling(
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
@@ -399,7 +378,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _createCanvasElement() {
+  protected _createCanvasElement() {
     const element = createCanvasElement();
     if (!element) {
       throw new Error(CANVAS_INIT_ERROR);
@@ -411,40 +390,17 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   * @param {Object} [options] Options object
-   */
-  _initOptions(options = {}) {
-    const lowerCanvasEl = this.lowerCanvasEl;
-    this.set(options);
-
-    this.width = this.width || lowerCanvasEl.width || 0;
-    this.height = this.height || lowerCanvasEl.height || 0;
-    this.viewportTransform = [...this.viewportTransform];
-
-    if (!this.lowerCanvasEl.style) {
-      return;
-    }
-    lowerCanvasEl.width = this.width;
-    lowerCanvasEl.height = this.height;
-
-    lowerCanvasEl.style.width = this.width + 'px';
-    lowerCanvasEl.style.height = this.height + 'px';
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
    */
-  _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
+  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
     // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
     if (isHTMLCanvas(canvasEl)) {
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        getEnv().document.getElementById(canvasEl) ||
-        canvasEl ||
+        (getEnv().document.getElementById(canvasEl) as HTMLCanvasElement) ||
         this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
@@ -500,15 +456,10 @@ export class StaticCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   * Internal use only
+   * @protected
    */
-  setDimensions(
+  protected _setDimensionsImpl(
     dimensions: Partial<TSize>,
     { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
   ) {
@@ -528,7 +479,25 @@ export class StaticCanvas<
 
     this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
+  }
 
+  /**
+   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
+   * @param {Object}        dimensions                    Object with width/height properties
+   * @param {Number|String} [dimensions.width]            Width of canvas element
+   * @param {Number|String} [dimensions.height]           Height of canvas element
+   * @param {Object}        [options]                     Options object
+   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
+   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
+   */
+  setDimensions(
+    dimensions: Partial<TSize>,
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+  ) {
+    this._setDimensionsImpl(dimensions, {
+      cssOnly,
+      backstoreOnly,
+    });
     if (!cssOnly) {
       this.requestRenderAll();
     }
@@ -570,8 +539,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const activeObject = this._activeObject,
-      backgroundObject = this.backgroundImage,
+    const backgroundObject = this.backgroundImage,
       overlayObject = this.overlayImage,
       len = this._objects.length;
 
@@ -579,9 +547,6 @@ export class StaticCanvas<
     for (let i = 0; i < len; i++) {
       const object = this._objects[i];
       object.group || object.setCoords();
-    }
-    if (activeObject) {
-      activeObject.setCoords();
     }
     if (backgroundObject) {
       backgroundObject.setCoords();
@@ -650,7 +615,7 @@ export class StaticCanvas<
    * Returns &lt;canvas> element corresponding to this instance
    * @return {HTMLCanvasElement}
    */
-  getElement() {
+  getElement(): HTMLCanvasElement {
     return this.lowerCanvasEl;
   }
 
@@ -666,7 +631,7 @@ export class StaticCanvas<
    * Returns context of canvas where objects are drawn
    * @return {CanvasRenderingContext2D}
    */
-  getContext() {
+  getContext(): CanvasRenderingContext2D {
     return this.contextContainer;
   }
 
@@ -715,7 +680,7 @@ export class StaticCanvas<
    */
   requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-      this.nextRenderHandle = requestAnimFrame(this.renderAndResetBound);
+      this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
   }
 
@@ -751,6 +716,10 @@ export class StaticCanvas<
     }
   }
 
+  drawControls(ctx: CanvasRenderingContext2D) {
+    // Static canvas has no controls
+  }
+
   /**
    * Renders background, objects, overlay and controls.
    * @param {CanvasRenderingContext2D} ctx
@@ -766,10 +735,9 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    // node-canvas
-    // @ts-ignore
+    // @ts-ignore node-canvas stuff
     ctx.patternQuality = 'best';
-    this.fire('before:render', { ctx: ctx });
+    this.fire('before:render', { ctx });
     this._renderBackground(ctx);
 
     ctx.save();
@@ -777,7 +745,7 @@ export class StaticCanvas<
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this._renderObjects(ctx, objects);
     ctx.restore();
-    if (!this.controlsAboveOverlay && this.interactive) {
+    if (!this.controlsAboveOverlay) {
       this.drawControls(ctx);
     }
     if (path) {
@@ -789,10 +757,10 @@ export class StaticCanvas<
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
-    if (this.controlsAboveOverlay && this.interactive) {
+    if (this.controlsAboveOverlay) {
       this.drawControls(ctx);
     }
-    this.fire('after:render', { ctx: ctx });
+    this.fire('after:render', { ctx });
 
     if (this.__cleanupTask) {
       this.__cleanupTask();
@@ -860,7 +828,7 @@ export class StaticCanvas<
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = isAFiller ? fill.toLive(ctx /* this */) : fill;
+      ctx.fillStyle = isAFiller ? fill.toLive(ctx /* this */)! : fill;
       if (needsVpt) {
         ctx.transform(...v);
       }
@@ -1414,8 +1382,7 @@ export class StaticCanvas<
       return;
     }
     if (isFiller(filler)) {
-      // @ts-ignore TS is so stubbordn that i can't even check if a property exists.
-      const repeat = filler.repeat || '',
+      const repeat = (filler as Pattern).repeat || '',
         finalWidth = this.width,
         finalHeight = this.height,
         shouldInvert = this[`${property}Vpt`],
@@ -1428,16 +1395,13 @@ export class StaticCanvas<
         })" x="${filler.offsetX - finalWidth / 2}" y="${
           filler.offsetY - finalHeight / 2
         }" width="${
-          repeat === 'repeat-y' || repeat === 'no-repeat'
-            ? // @ts-ignore
-              filler.source.width
+          (repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler)
+            ? filler.source.width
             : finalWidth
         }" height="${
-          repeat === 'repeat-x' || repeat === 'no-repeat'
-            ? // @ts-ignore
-              filler.source.height
+          (repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler)
+            ? filler.source.height
             : finalHeight
-          // @ts-ignore
         }" fill="url(#SVGID_${filler.id})"></rect>\n`
       );
     } else {
@@ -1529,10 +1493,9 @@ export class StaticCanvas<
    * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
    * @returns {Promise<Canvas | StaticCanvas>}
    */
-  clone(properties: string[]): Promise<this> {
+  clone(properties: string[]): Promise<StaticCanvas> {
     const data = this.toObject(properties);
     const canvas = this.cloneWithoutData();
-    // @ts-ignore
     return canvas.loadFromJSON(data);
   }
 
@@ -1631,21 +1594,15 @@ export class StaticCanvas<
       vp = this.viewportTransform,
       translateX = (vp[4] - (left || 0)) * multiplier,
       translateY = (vp[5] - (top || 0)) * multiplier,
-      // @ts-ignore
-      originalInteractive = this.interactive,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
       canvasEl = createCanvasElement(),
-      // @ts-ignore
-      originalContextTop = this.contextTop,
-      objectsToRender = filter ? this._objects.filter(filter) : this._objects;
+      objectsToRender = filter
+        ? this._objects.filter((obj) => filter(obj))
+        : this._objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
-    // @ts-ignore
-    this.contextTop = null;
     this.enableRetinaScaling = false;
-    // @ts-ignore
-    this.interactive = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
@@ -1655,11 +1612,7 @@ export class StaticCanvas<
     this.width = originalWidth;
     this.height = originalHeight;
     this.calcViewportBoundaries();
-    // @ts-ignore
-    this.interactive = originalInteractive;
     this.enableRetinaScaling = originalRetina;
-    // @ts-ignore
-    this.contextTop = originalContextTop;
     return canvasEl;
   }
 

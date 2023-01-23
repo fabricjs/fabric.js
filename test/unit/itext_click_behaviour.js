@@ -1,11 +1,12 @@
 (function(){
-  var canvas;
   QUnit.module('iText click interaction', function (hooks) {
-    hooks.beforeEach(function () {
+    var canvas;
+    hooks.before(function () {
       canvas = new fabric.Canvas(null, {
         enableRetinaScaling: false
       });
     });
+    hooks.after(() => canvas.dispose());
     hooks.afterEach(function () {
       canvas.clear();
       canvas.cancelRequestedRender();
@@ -18,7 +19,7 @@
       assert.equal(cursorState, active, `cursor animation state should be ${active}`);
     }
 
-    function wait(ms = 16) {
+    function wait(ms = 32) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -276,47 +277,47 @@
       canvas.renderAll();
     });
 
-    QUnit.module('iText click interaction', function (hooks) {
-      let enableRetinaScaling = false, canvas, eventData;
-      hooks.before(function () {
-        fabric.config.configure({ devicePixelRatio: 2 });
-      });
-      hooks.after(function () {
-        fabric.config.restoreDefaults();
-      });
-      hooks.beforeEach(function () {
-        canvas = new fabric.Canvas(null, {
-          enableRetinaScaling,
+    [true, false].forEach(enableRetinaScaling => {
+      QUnit.module(`enableRetinaScaling = ${enableRetinaScaling}`, function (hooks) {
+        let canvas, eventData, iText;
+        let count = 0, countCanvas = 0;
+        hooks.before(() => {
+          fabric.config.configure({ devicePixelRatio: 2 });
         });
-        eventData = {
-          which: 1,
-          target: canvas.upperCanvasEl,
-          ...(enableRetinaScaling ? {
-            clientX: 60,
-            clientY: 30
-          } : {
-            clientX: 30,
-            clientY: 10
-          })
-        };
-      });
-      hooks.afterEach(() => canvas.dispose());
-
-      [true, false].forEach(shouldScale => {
-        enableRetinaScaling = shouldScale;
-        QUnit.test(`click on editing itext make selection:changed fire (enableRetinaScaling = ${enableRetinaScaling})`, function (assert) {
-          var done = assert.async();
-          var count = 0;
-          var countCanvas = 0;
-          var iText = new fabric.IText('test test');
-          canvas.on('text:selection:changed', function () {
+        hooks.after(() => {
+          fabric.config.restoreDefaults();
+        });
+        hooks.beforeEach(() => {
+          canvas = new fabric.Canvas(null, {
+            enableRetinaScaling,
+          });
+          eventData = {
+            which: 1,
+            target: canvas.upperCanvasEl,
+            ...(enableRetinaScaling ? {
+              clientX: 60,
+              clientY: 30
+            } : {
+              clientX: 30,
+              clientY: 15
+            })
+          };
+          count = 0;
+          countCanvas = 0;
+          iText = new fabric.IText('test test');
+          canvas.add(iText);
+          canvas.on('text:selection:changed', () => {
             countCanvas++;
           });
-          iText.on('selection:changed', function () {
+          iText.on('selection:changed', () => {
             count++;
           });
+        });
+        hooks.afterEach(() => canvas.dispose());
+
+        QUnit.test(`click on editing itext make selection:changed fire`, function (assert) {
+          var done = assert.async();
           assert.equal(canvas._isRetinaScaling(), enableRetinaScaling, 'test state is correct');
-          canvas.add(iText);
           assert.equal(canvas.getActiveObject(), null, 'no active object exist');
           assert.equal(count, 0, 'no selection:changed fired yet');
           assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');

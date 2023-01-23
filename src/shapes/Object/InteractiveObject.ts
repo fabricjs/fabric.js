@@ -1,5 +1,5 @@
-import { IPoint, Point } from '../../point.class';
-import type { TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import { Point } from '../../point.class';
+import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
@@ -12,17 +12,33 @@ import type { Control } from '../../controls/control.class';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/canvas_events';
+import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 
-type TOCoord = IPoint & {
+type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
 
 type TControlSet = Record<string, Control>;
 
-export type FabricObjectWithDragSupport = InteractiveFabricObject & {
-  onDragStart: (e: DragEvent) => boolean;
-};
+type TBorderRenderingStyleOverride = Partial<
+  Pick<FabricObject, 'borderColor' | 'borderDashArray'>
+>;
+
+type TStyleOverride = ControlRenderingStyleOverride &
+  TBorderRenderingStyleOverride &
+  Partial<
+    Pick<FabricObject, 'hasBorders' | 'hasControls'> & {
+      forActiveSelection: boolean;
+    }
+  >;
+
+export interface DragMethods {
+  shouldStartDragging(): boolean;
+  onDragStart(e: DragEvent): boolean;
+}
+
+export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -55,14 +71,13 @@ export class InteractiveFabricObject<
    * It should be private, but there is no harm in using it as
    * a read-only property.
    * this isn't cleaned automatically. Non selected objects may have wrong values
-   * @type number|string|any
-   * @default 0
+   * @type [string]
    */
-  declare __corner: 0 | string;
+  declare __corner?: string;
 
   /**
    * a map of control visibility for this object.
-   * this was left when controls were introduced to do not brea the api too much
+   * this was left when controls were introduced to not break the api too much
    * this takes priority over the generic control visibility
    */
   declare _controlsVisibility: Record<string, boolean>;
@@ -91,15 +106,6 @@ export class InteractiveFabricObject<
    * part of the move action.
    */
   declare isMoving?: boolean;
-
-  /**
-   * internal boolean to signal the code that the object is
-   * part of the draggin action.
-   * @TODO: discuss isMoving and isDragging being not adequate enough
-   * they need to be either both private or more generic
-   * Canvas class needs to see this variable
-   */
-  declare __isDragging?: boolean;
 
   /**
    * A boolean used from the gesture module to keep tracking of a scaling
@@ -158,7 +164,7 @@ export class InteractiveFabricObject<
       return 0;
     }
 
-    this.__corner = 0;
+    this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
@@ -221,11 +227,16 @@ export class InteractiveFabricObject<
       dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
-    this.forEachControl(
-      (control: any, key: string, fabricObject: InteractiveFabricObject) => {
-        coords[key] = control.positionHandler(dim, finalMatrix, fabricObject);
-      }
-    );
+    this.forEachControl((control, key) => {
+      const position = control.positionHandler(dim, finalMatrix, this, control);
+      // coords[key] are sometimes used as points. Those are points to which we add
+      // the property corner and touchCorner from `_calcCornerCoords`.
+      // don't remove this assign for an object spread.
+      coords[key] = Object.assign(
+        position,
+        this._calcCornerCoords(control, position)
+      );
+    });
 
     // debug code
     /*
@@ -244,6 +255,31 @@ export class InteractiveFabricObject<
   }
 
   /**
+   * Sets the coordinates that determine the interaction area of each control
+   * note: if we would switch to ROUND corner area, all of this would disappear.
+   * everything would resolve to a single point and a pythagorean theorem for the distance
+   * @todo evaluate simplification of code switching to circle interaction area at runtime
+   * @private
+   */
+  private _calcCornerCoords(control: Control, position: Point) {
+    const corner = control.calcCornerCoords(
+      this.angle,
+      this.cornerSize,
+      position.x,
+      position.y,
+      false
+    );
+    const touchCorner = control.calcCornerCoords(
+      this.angle,
+      this.touchCornerSize,
+      position.x,
+      position.y,
+      true
+    );
+    return { corner, touchCorner };
+  }
+
+  /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
    * oCoords are used to find the corners
    * aCoords are used to quickly find an object on the canvas
@@ -255,7 +291,6 @@ export class InteractiveFabricObject<
     super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.oCoords = this.calcOCoords();
-    this._setCornerCoords();
   }
 
   /**
@@ -265,7 +300,7 @@ export class InteractiveFabricObject<
    */
   forEachControl(
     fn: (
-      control: any,
+      control: Control,
       key: string,
       fabricObject: InteractiveFabricObject
     ) => any
@@ -273,33 +308,6 @@ export class InteractiveFabricObject<
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
     }
-  }
-
-  /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  _setCornerCoords(): void {
-    Object.entries(this.oCoords).forEach(([controlKey, control]) => {
-      const controlObject = this.controls[controlKey];
-      control.corner = controlObject.calcCornerCoords(
-        this.angle,
-        this.cornerSize,
-        control.x,
-        control.y,
-        false
-      );
-      control.touchCorner = controlObject.calcCornerCoords(
-        this.angle,
-        this.touchCornerSize,
-        control.x,
-        control.y,
-        true
-      );
-    });
   }
 
   /**
@@ -346,12 +354,12 @@ export class InteractiveFabricObject<
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {Point} size
-   * @param {Object} styleOverride object to override the object style
+   * @param {TStyleOverride} styleOverride object to override the object style
    */
   _drawBorders(
     ctx: CanvasRenderingContext2D,
     size: Point,
-    styleOverride: Record<string, any> = {}
+    styleOverride: TStyleOverride = {}
   ): void {
     const options = {
       hasControls: this.hasControls,
@@ -372,9 +380,12 @@ export class InteractiveFabricObject<
    * the context here is not transformed
    * @todo move to interactivity
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [styleOverride] properties to override the object style
+   * @param {TStyleOverride} [styleOverride] properties to override the object style
    */
-  _renderControls(ctx: CanvasRenderingContext2D, styleOverride: any = {}) {
+  _renderControls(
+    ctx: CanvasRenderingContext2D,
+    styleOverride: TStyleOverride = {}
+  ) {
     const { hasBorders, hasControls } = this;
     const styleOptions = {
       hasBorders,
@@ -407,12 +418,12 @@ export class InteractiveFabricObject<
    * Requires public options: padding, borderColor
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {object} options object representing current object parameters
-   * @param {Object} [styleOverride] object to override the object style
+   * @param {TStyleOverride} [styleOverride] object to override the object style
    */
   drawBorders(
     ctx: CanvasRenderingContext2D,
     options: TQrDecomposeOut,
-    styleOverride: any
+    styleOverride: TStyleOverride
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
@@ -447,10 +458,10 @@ export class InteractiveFabricObject<
     let shouldStroke = false;
 
     ctx.beginPath();
-    this.forEachControl(function (control, key, fabricObject) {
+    this.forEachControl((control, key) => {
       // in this moment, the ctx is centered on the object.
       // width and height of the above function are the size of the bbox.
-      if (control.withConnection && control.getVisibility(fabricObject, key)) {
+      if (control.withConnection && control.getVisibility(this, key)) {
         // reset movement for each control
         shouldStroke = true;
         ctx.moveTo(control.x * size.x, control.y * size.y);
@@ -468,9 +479,12 @@ export class InteractiveFabricObject<
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
    * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Object} styleOverride object to override the object style
+   * @param {ControlRenderingStyleOverride} styleOverride object to override the object style
    */
-  drawControls(ctx: CanvasRenderingContext2D, styleOverride = {}) {
+  drawControls(
+    ctx: CanvasRenderingContext2D,
+    styleOverride: ControlRenderingStyleOverride = {}
+  ) {
     ctx.save();
     const retinaScaling = this.getCanvasRetinaScaling();
     const { cornerStrokeColor, cornerDashArray, cornerColor } = this;
@@ -487,10 +501,10 @@ export class InteractiveFabricObject<
     }
     this._setLineDash(ctx, options.cornerDashArray);
     this.setCoords();
-    this.forEachControl(function (control, key, fabricObject) {
-      if (control.getVisibility(fabricObject, key)) {
-        const p = fabricObject.oCoords[key];
-        control.render(ctx, p.x, p.y, options, fabricObject);
+    this.forEachControl((control, key) => {
+      if (control.getVisibility(this, key)) {
+        const p = this.oCoords[key];
+        control.render(ctx, p.x, p.y, options, this);
       }
     });
     ctx.restore();
@@ -525,7 +539,7 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Sets the visibility state of object controls, this is hust a bulk option for setControlVisible;
+   * Sets the visibility state of object controls, this is just a bulk option for setControlVisible;
    * @param {Record<string, boolean>} [options] with an optional key per control
    * example: {Boolean} [options.bl] true to enable the bottom-left control, false to disable it
    */
@@ -600,7 +614,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  canDrop(e?: DragEvent): boolean {
+  canDrop(e: DragEvent): boolean {
     return false;
   }
 
@@ -612,7 +626,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect(e: DragEvent) {
+  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 
@@ -625,7 +639,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
   }
 }

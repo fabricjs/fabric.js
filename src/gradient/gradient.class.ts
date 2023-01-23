@@ -95,7 +95,11 @@ export class Gradient<
    */
   declare excludeFromExport?: boolean;
 
-  private declare id: string | number;
+  /**
+   * ID used for SVG export functionalities
+   * @type number | string
+   */
+  declare readonly id: string | number;
 
   constructor({
     type = 'linear' as T,

@@ -10,7 +10,6 @@ import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
 import type { IText } from '../shapes/itext.class';
 import type { Textbox } from '../shapes/textbox.class';
-import type { Gradient } from '../gradient/gradient.class';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -72,6 +71,8 @@ export const isFabricObjectWithDragSupport = (
   return (
     !!fabricObject &&
     typeof (fabricObject as FabricObjectWithDragSupport).onDragStart ===
+      'function' &&
+    typeof (fabricObject as FabricObjectWithDragSupport).shouldStartDragging ===
       'function'
   );
 };

@@ -5,6 +5,12 @@ export type TProgramCache = any;
 
 export type TTextureCache = any;
 
+export type TPipelineResources = {
+  blendImage?: HTMLCanvasElement;
+  blurLayer1?: HTMLCanvasElement;
+  blurLayer2?: HTMLCanvasElement;
+} & Record<string, unknown>;
+
 export type TWebGLPipelineState = {
   filterBackend: WebGLFilterBackend;
   originalWidth: number;

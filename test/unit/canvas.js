@@ -84,14 +84,14 @@
   var upperCanvasEl = canvas.upperCanvasEl;
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
-  function makeRect(options) {
+  function makeRect(options = {}) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect({ ...defaultOptions, ...options });
   }
 
-  function makeTriangle(options) {
+  function makeTriangle(options = {}) {
     var defaultOptions = { width: 30, height: 30 };
-    return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Triangle({ ...defaultOptions, ...options });
   }
 
   let ORIGINAL_DPR;
@@ -193,8 +193,7 @@
     assert.ok(canvas.selection, 'default is true');
   });
 
-  QUnit.test('_initInteractive', function(assert) {
-    assert.ok(typeof canvas._init === 'function');
+  QUnit.test('init', function(assert) {
     assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
     assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
     assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');

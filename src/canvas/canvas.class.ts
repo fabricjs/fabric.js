@@ -22,7 +22,13 @@ import {
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TOriginX, TOriginY, TSize } from '../typedefs';
+import {
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TToCanvasElementOptions,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/itext.class';
@@ -33,7 +39,6 @@ import {
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/base_brush.class';
-import type { Textbox } from '../shapes/textbox.class';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -101,7 +106,7 @@ type TDestroyedCanvas = Omit<
  *  flag = this.canDrop(opt.e);
  * });
  * b.canDrop = function(e) {
- *  !flag && this.callSuper('canDrop', e);
+ *  !flag && this.draggableTextDelegate.canDrop(e);
  * }
  * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
  * a.on('drop', opt => {
@@ -152,6 +157,7 @@ type TDestroyedCanvas = Omit<
 export class SelectableCanvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
+  declare _objects: FabricObject[];
   /**
    * When true, objects can be transformed by one side (unproportionally)
    * when dragged on the corners that normally would not do that.
@@ -494,34 +500,16 @@ export class SelectableCanvas<
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  /**
-   * Constructor
-   * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
-   * @param {Object} [options] Options object
-   * @return {Object} thisArg
-   */
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super(el, options);
-  }
 
-  _init(el: string | HTMLCanvasElement, options = {}) {
-    this.renderAndResetBound = this.renderAndReset.bind(this);
-    this.requestRenderAllBound = this.requestRenderAll.bind(this);
-    this._initStatic(el, options);
+  protected initElements(el: string | HTMLCanvasElement) {
+    super.initElements(el);
     this._applyCanvasStyle(this.lowerCanvasEl);
     this._initWrapperElement();
     this._createUpperCanvas();
-    // @ts-ignore
-    this._initEventListeners();
-    this._isRetinaScaling() && this._initRetinaScaling();
-    this.calcOffset();
     this._createCacheCanvas();
   }
 
-  /**
-   * @private
-   */
-  _initRetinaScaling() {
+  protected _initRetinaScaling() {
     super._initRetinaScaling();
     this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
@@ -620,6 +608,9 @@ export class SelectableCanvas<
     this.renderCanvas(this.contextContainer, this._objectsToRender);
   }
 
+  /**
+   * text selection is rendered by the active text instance during the rendering cycle
+   */
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
@@ -637,6 +628,7 @@ export class SelectableCanvas<
   /**
    * Method to render only the top canvas.
    * Also used to render the group selection box.
+   * Does not render text selection.
    */
   renderTop() {
     const ctx = this.contextTop;
@@ -840,9 +832,9 @@ export class SelectableCanvas<
         )
       : this.getPointer(e);
     const corner = target.__corner || '',
-      control = target.controls[corner],
+      control = !!corner && target.controls[corner],
       actionHandler =
-        alreadySelected && corner
+        alreadySelected && control
           ? control.getActionHandler(e, target, control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
@@ -1072,7 +1064,7 @@ export class SelectableCanvas<
         target = objects[i];
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
-            target._objects,
+            target._objects as FabricObject[],
             pointer
           );
           subTarget && this.targets.push(subTarget);
@@ -1183,19 +1175,16 @@ export class SelectableCanvas<
   }
 
   /**
-   * Sets dimensions (width, height) of this canvas instance. when options.cssOnly flag active you should also supply the unit of measure (px/%/em)
-   * @param {Object}        dimensions                    Object with width/height properties
-   * @param {Number|String} [dimensions.width]            Width of canvas element
-   * @param {Number|String} [dimensions.height]           Height of canvas element
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @return {Canvas} thisArg
+   * Internal use only
+   * @protected
    */
-  setDimensions(dimensions: TSize, options?: TCanvasSizeOptions) {
+  protected _setDimensionsImpl(
+    dimensions: TSize,
+    options?: TCanvasSizeOptions
+  ) {
     // @ts-ignore
     this._resetTransformEventData();
-    super.setDimensions(dimensions, options);
+    super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
         this.freeDrawingBrush._setBrushStyles(this.contextTop);
@@ -1230,7 +1219,7 @@ export class SelectableCanvas<
    * @private
    * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
    */
-  _createUpperCanvas() {
+  protected _createUpperCanvas() {
     const lowerCanvasEl = this.lowerCanvasEl;
 
     // if there is no upperCanvas (most common case) we create one.
@@ -1249,30 +1238,15 @@ export class SelectableCanvas<
     upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
     this._applyCanvasStyle(upperCanvasEl);
     upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextTop = upperCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _createCacheCanvas() {
+  protected _createCacheCanvas() {
     this.cacheCanvasEl = this._createCanvasElement();
-    this.cacheCanvasEl.setAttribute('width', `${this.width}`);
-    this.cacheCanvasEl.setAttribute('height', `${this.height}`);
-    this.contextCache = this.cacheCanvasEl.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D;
+    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
   }
 
-  /**
-   * @private
-   */
-  _initWrapperElement() {
-    if (this.wrapperEl) {
-      return;
-    }
+  protected _initWrapperElement() {
     const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
@@ -1289,7 +1263,7 @@ export class SelectableCanvas<
    * @private
    * @param {HTMLCanvasElement} element canvas element to apply styles on
    */
-  _applyCanvasStyle(element: HTMLCanvasElement) {
+  protected _applyCanvasStyle(element: HTMLCanvasElement) {
     const width = this.width || element.width,
       height = this.height || element.height;
 
@@ -1497,6 +1471,18 @@ export class SelectableCanvas<
     }
     this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
+  }
+
+  /**
+   * Sets viewport transformation of this canvas instance
+   * @param {Array} vpt a Canvas 2D API transform matrix
+   */
+  setViewportTransform(vpt: TMat2D) {
+    super.setViewportTransform(vpt);
+    const activeObject = this._activeObject;
+    if (activeObject) {
+      activeObject.setCoords();
+    }
   }
 
   /**

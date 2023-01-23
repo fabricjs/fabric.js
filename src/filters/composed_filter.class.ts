@@ -1,9 +1,8 @@
-// @ts-nocheck
 import type { TClassProperties } from '../typedefs';
 import {
-  AbstractBaseFilter,
+  type AnyFilter,
   BaseFilter,
-  BaseFilterOptions,
+  type BaseFilterOptions,
 } from './base_filter.class';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
@@ -12,16 +11,17 @@ import { classRegistry } from '../util/class_registry';
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
+// @ts-expect-error
 export class Composed extends BaseFilter {
   /**
    * A non sparse array of filters to apply
    */
-  declare subFilters: AbstractBaseFilter[];
+  declare subFilters: AnyFilter[];
 
   constructor({
     subFilters = [],
     ...options
-  }: Partial<BaseFilterOptions & { subFilters: AbstractBaseFilter[] }> = {}) {
+  }: Partial<BaseFilterOptions & { subFilters: AnyFilter[] }> = {}) {
     super(options);
     this.subFilters = subFilters;
   }
@@ -65,9 +65,12 @@ export class Composed extends BaseFilter {
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Composed>}
    */
-  static fromObject(object, options) {
+  static fromObject(
+    object: Record<string, any>,
+    options: { signal: AbortSignal }
+  ) {
     return Promise.all(
-      ((object.subFilters || []) as AbstractBaseFilter[]).map((filter) =>
+      ((object.subFilters || []) as AnyFilter[]).map((filter) =>
         classRegistry
           .getJSONClass<BaseFilter>(filter.type)
           .fromObject(filter, options)

@@ -82,13 +82,13 @@ import {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  isIdentityMatrix,
 } from './src/util/misc/matrix';
 import {
   stylesFromArray,
   stylesToArray,
   hasStyleChanged,
 } from './src/util/misc/textStyles';
-import { clone, extend } from './src/util/lang_object';
 import {
   createCanvasElement,
   createImage,
@@ -190,14 +190,11 @@ const util = {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  isIdentityMatrix,
   stylesFromArray,
   stylesToArray,
   hasStyleChanged,
   getElementOffset,
-  object: {
-    clone,
-    extend,
-  },
   createCanvasElement,
   createImage,
   copyCanvasElement,
