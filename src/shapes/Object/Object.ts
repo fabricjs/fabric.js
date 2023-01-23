@@ -1850,18 +1850,20 @@ export class FabricObject<
     }: { extraParam?: string; signal?: AbortSignal } = {}
   ): Promise<FabricObject> {
     const data = cloneDeep(object);
-    return enlivenObjectEnlivables<any>(data as any, options).then((enlivedMap) => {
-      const allOptions = { ...data, ...enlivedMap };
-      // from the resulting enlived options, extract options.extraParam to arg0
-      // to avoid accidental overrides later
-      if (extraParam) {
-        const { [extraParam]: arg0, ...rest } = allOptions;
-        // @ts-ignore;
-        return new this(arg0, rest);
-      } else {
-        return new this(allOptions);
+    return enlivenObjectEnlivables<any>(data as any, options).then(
+      (enlivedMap) => {
+        const allOptions = { ...data, ...enlivedMap };
+        // from the resulting enlived options, extract options.extraParam to arg0
+        // to avoid accidental overrides later
+        if (extraParam) {
+          const { [extraParam]: arg0, ...rest } = allOptions;
+          // @ts-ignore;
+          return new this(arg0, rest);
+        } else {
+          return new this(allOptions);
+        }
       }
-    });
+    );
   }
 
   /**
