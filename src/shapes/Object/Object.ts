@@ -11,7 +11,6 @@ import type {
   TDegree,
   TFiller,
   TSize,
-  TCacheCanvasDimensions,
 } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -39,7 +38,6 @@ import {
 import type { Gradient } from '../../gradient/gradient.class';
 import type { Pattern } from '../../pattern.class';
 import type { Canvas } from '../../canvas/canvas_events';
-import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &
   Required<
