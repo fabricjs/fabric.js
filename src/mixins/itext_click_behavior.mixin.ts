@@ -1,5 +1,5 @@
 import { LEFT_CLICK } from '../constants';
-import { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
+import type { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
 import { IPoint, Point } from '../point.class';
 import type { DragMethods } from '../shapes/Object/InteractiveObject';
 import { stopEvent } from '../util/dom_event';
