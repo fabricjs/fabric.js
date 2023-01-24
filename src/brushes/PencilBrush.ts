@@ -5,7 +5,7 @@ import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import type { Canvas } from '../canvas/CanvasEvents';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush } from './BaseBrush';
 
 /**
  * @private

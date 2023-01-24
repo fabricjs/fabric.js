@@ -5,7 +5,7 @@ import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/CanvasEvents';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush } from './BaseBrush';
 
 export type CircleBrushPoint = {
   x: number;

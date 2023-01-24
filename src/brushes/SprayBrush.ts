@@ -4,7 +4,7 @@ import { Shadow } from '../Shadow';
 import { Rect } from '../shapes/Rect';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/CanvasEvents';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush } from './BaseBrush';
 
 export type SprayBrushPoint = {
   x: number;

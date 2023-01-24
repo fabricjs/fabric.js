@@ -38,7 +38,7 @@ import {
   wrapElement,
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/base_brush.class';
+import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
