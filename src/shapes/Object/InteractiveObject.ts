@@ -11,7 +11,7 @@ import {
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/CanvasEvents';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 
 type TOCoord = Point & {

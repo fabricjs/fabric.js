@@ -27,7 +27,7 @@ import {
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
 import { Image } from '../Image';
 import {
@@ -37,7 +37,7 @@ import {
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/CanvasEvents';
 import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &

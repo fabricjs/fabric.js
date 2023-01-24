@@ -6,9 +6,9 @@ import type { FabricObjectSVGExportMixin } from './shapes/Object/FabricObjectSVG
 import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
-import type { Canvas } from './canvas/canvas_events';
+import type { Canvas } from './canvas/CanvasEvents';
 import type { IText } from './shapes/IText/IText';
-import type { StaticCanvas } from './canvas/static_canvas.class';
+import type { StaticCanvas } from './canvas/StaticCanvas';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
 export interface BaseFabricObject

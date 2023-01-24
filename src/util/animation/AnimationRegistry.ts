@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/CanvasEvents';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { AnimationBase } from './AnimationBase';
 

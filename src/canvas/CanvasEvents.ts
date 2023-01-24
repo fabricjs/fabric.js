@@ -22,7 +22,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
-import { SelectableCanvas } from './canvas.class';
+import { SelectableCanvas } from './Canvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;

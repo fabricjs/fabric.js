@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/CanvasEvents';
 import { getEnv } from '../../env';
 import {
   DragEventData,

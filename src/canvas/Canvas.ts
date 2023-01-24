@@ -14,7 +14,7 @@ import {
   addTransformToObject,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
+import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import {
   isActiveSelection,
   isCollection,

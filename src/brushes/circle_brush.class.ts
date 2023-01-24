@@ -4,7 +4,7 @@ import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';
-import type { Canvas } from '../canvas/canvas_events';
+import type { Canvas } from '../canvas/CanvasEvents';
 import { BaseBrush } from './base_brush.class';
 
 export type CircleBrushPoint = {
