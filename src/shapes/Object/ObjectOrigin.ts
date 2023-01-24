@@ -1,5 +1,5 @@
 import { Point } from '../../point.class';
-import type { Group } from '../group.class';
+import type { Group } from '../Group';
 import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';

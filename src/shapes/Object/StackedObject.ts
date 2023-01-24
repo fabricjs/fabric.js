@@ -1,5 +1,5 @@
 import { ObjectEvents } from '../../EventTypeDefs';
-import type { Group } from '../group.class';
+import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/canvas_events';
 import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { ObjectGeometry } from './ObjectGeometry';

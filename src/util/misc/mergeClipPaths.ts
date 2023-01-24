@@ -1,6 +1,6 @@
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendObjectToPlane } from './planeChange';
-import { Group } from '../../shapes/group.class';
+import { Group } from '../../shapes/Group';
 /**
  * Merges 2 clip paths into one visually equal clip path
  *

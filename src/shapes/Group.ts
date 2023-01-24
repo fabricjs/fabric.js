@@ -18,7 +18,7 @@ import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, stateProperties } from './Object/FabricObject';
-import { Rect } from './rect.class';
+import { Rect } from './Rect';
 import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =

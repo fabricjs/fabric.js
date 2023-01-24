@@ -1,7 +1,7 @@
 import { ControlRenderingStyleOverride } from '../controls/controls.render';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { Group } from './group.class';
+import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {

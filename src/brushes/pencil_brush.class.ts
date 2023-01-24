@@ -1,7 +1,7 @@
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import { Path } from '../shapes/path.class';
+import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import type { Canvas } from '../canvas/canvas_events';

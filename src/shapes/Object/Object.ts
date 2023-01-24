@@ -26,10 +26,10 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import type { Group } from '../group.class';
+import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
-import { Image } from '../image.class';
+import { Image } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,

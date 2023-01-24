@@ -21,7 +21,7 @@ import {
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
-import { Path } from '../path.class';
+import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
 

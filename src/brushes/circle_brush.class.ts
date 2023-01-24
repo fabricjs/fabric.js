@@ -1,8 +1,8 @@
 import { Color } from '../color/color.class';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
-import { Circle } from '../shapes/circle.class';
-import { Group } from '../shapes/group.class';
+import { Circle } from '../shapes/Circle';
+import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';

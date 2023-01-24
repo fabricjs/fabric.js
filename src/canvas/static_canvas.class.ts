@@ -9,7 +9,7 @@ import type { Pattern } from '../pattern.class';
 import { Point } from '../point.class';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
-import type { Rect } from '../shapes/rect.class';
+import type { Rect } from '../shapes/Rect';
 import {
   ImageFormat,
   TCornerPoint,

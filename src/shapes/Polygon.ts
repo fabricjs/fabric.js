@@ -1,6 +1,6 @@
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
-import { Polyline, polylineDefaultValues } from './polyline.class';
+import { Polyline, polylineDefaultValues } from './Polyline';
 
 export class Polygon extends Polyline {
   protected isOpen() {

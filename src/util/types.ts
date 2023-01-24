@@ -1,5 +1,5 @@
-import type { ActiveSelection } from '../shapes/active_selection.class';
-import type { Group } from '../shapes/group.class';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
+import type { Group } from '../shapes/Group';
 import type {
   FabricObject,
   TCachedFabricObject,
@@ -9,7 +9,7 @@ import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../pattern.class';
 import type { IText } from '../shapes/IText/IText';
-import type { Textbox } from '../shapes/textbox.class';
+import type { Textbox } from '../shapes/Textbox';
 
 export const isFiller = (
   filler: TFiller | string | null

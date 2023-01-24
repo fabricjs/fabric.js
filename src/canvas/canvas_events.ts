@@ -10,8 +10,8 @@ import {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../point.class';
-import { ActiveSelection } from '../shapes/active_selection.class';
-import { Group } from '../shapes/group.class';
+import { ActiveSelection } from '../shapes/ActiveSelection';
+import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';

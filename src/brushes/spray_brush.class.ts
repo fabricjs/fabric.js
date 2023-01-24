@@ -1,7 +1,7 @@
 import { Point } from '../point.class';
-import { Group } from '../shapes/group.class';
+import { Group } from '../shapes/Group';
 import { Shadow } from '../shadow.class';
-import { Rect } from '../shapes/rect.class';
+import { Rect } from '../shapes/Rect';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';

@@ -3,7 +3,7 @@ import type { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import type { FabricObject as StaticFabricObject } from './shapes/Object/Object';
 import type { FabricObjectSVGExportMixin } from './shapes/Object/FabricObjectSVGExportMixin';
-import type { Group } from './shapes/group.class';
+import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/canvas_events';

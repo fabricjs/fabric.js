@@ -1,4 +1,4 @@
-import { Image } from '../shapes/image.class';
+import { Image } from '../shapes/Image';
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { AbstractBaseFilter } from './base_filter.class';
