@@ -36,7 +36,7 @@ import {
   stateProperties,
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
-import type { Pattern } from '../../pattern.class';
+import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/canvas_events';
 import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 

@@ -1,7 +1,7 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
-import type { Pattern } from './pattern.class';
+import type { Pattern } from './Pattern';
 import type { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';
 

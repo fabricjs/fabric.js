@@ -1,4 +1,4 @@
-import { Pattern } from '../pattern.class';
+import { Pattern } from '../Pattern';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import type { Canvas } from '../canvas/canvas_events';

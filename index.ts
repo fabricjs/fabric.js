@@ -335,7 +335,7 @@ import { Intersection } from './src/Intersection';
 import { Color } from './src/color/Color';
 import { Control } from './src/controls/Control';
 import { Gradient } from './src/gradient/Gradient';
-import { Pattern } from './src/pattern.class';
+import { Pattern } from './src/Pattern';
 import { Shadow } from './src/shadow.class';
 import { BaseBrush } from './src/brushes/base_brush.class';
 import { PencilBrush } from './src/brushes/pencil_brush.class';

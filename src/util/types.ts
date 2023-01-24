@@ -7,7 +7,7 @@ import type {
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
-import type { Pattern } from '../pattern.class';
+import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
 
