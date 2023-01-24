@@ -1,6 +1,6 @@
 import { Color } from '../color/Color';
 import { Point } from '../Point';
-import { Shadow } from '../shadow.class';
+import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';

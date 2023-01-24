@@ -1,6 +1,6 @@
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { Shadow } from '../shadow.class';
+import { Shadow } from '../Shadow';
 import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';

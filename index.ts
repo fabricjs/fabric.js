@@ -336,7 +336,7 @@ import { Color } from './src/color/Color';
 import { Control } from './src/controls/Control';
 import { Gradient } from './src/gradient/Gradient';
 import { Pattern } from './src/Pattern';
-import { Shadow } from './src/shadow.class';
+import { Shadow } from './src/Shadow';
 import { BaseBrush } from './src/brushes/base_brush.class';
 import { PencilBrush } from './src/brushes/pencil_brush.class';
 import { CircleBrush } from './src/brushes/circle_brush.class';

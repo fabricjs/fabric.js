@@ -1,7 +1,7 @@
 import { Color } from '../color/Color';
 import type { Point } from '../Point';
 import { TEvent } from '../EventTypeDefs';
-import type { Shadow } from '../shadow.class';
+import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/canvas_events';
 
 type TBrushEventData = TEvent & { pointer: Point };
