@@ -6,9 +6,9 @@ import type {
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
-import type { Text } from '../shapes/text.class';
+import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../pattern.class';
-import type { IText } from '../shapes/itext.class';
+import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/textbox.class';
 
 export const isFiller = (

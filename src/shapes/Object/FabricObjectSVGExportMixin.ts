@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { TSVGReviver } from '../typedefs';
-import { uid } from '../util/internals/uid';
-import { colorPropToSVG, matrixToSVG } from '../util/misc/svgParsing';
+import { TSVGReviver } from '../../typedefs';
+import { uid } from '../../util/internals/uid';
+import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
 
 export class FabricObjectSVGExportMixin {
   /**

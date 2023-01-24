@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { TClassProperties } from '../typedefs';
-import { IText } from './itext.class';
-import { textDefaultValues } from './text.class';
+import { IText } from './IText/IText';
+import { textDefaultValues } from './Text/Text';
 import { classRegistry } from '../util/class_registry';
 
 /**

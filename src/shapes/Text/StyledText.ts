@@ -1,5 +1,5 @@
-import { ObjectEvents } from '../EventTypeDefs';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import { ObjectEvents } from '../../EventTypeDefs';
+import { FabricObject } from '../Object/FabricObject';
 
 export type TextStyleDeclaration = Record<string, any>;
 
@@ -7,7 +7,7 @@ export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
 };
 
-export abstract class TextStyleMixin<
+export abstract class StyledText<
   EventSpec extends ObjectEvents
 > extends FabricObject<EventSpec> {
   declare abstract styles: TextStyle;

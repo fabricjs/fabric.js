@@ -1,33 +1,29 @@
 // @ts-nocheck
-import { cache } from '../cache';
-import { DEFAULT_SVG_FONT_SIZE } from '../constants';
-import { ObjectEvents } from '../EventTypeDefs';
-import {
-  TextStyle,
-  TextStyleDeclaration,
-  TextStyleMixin,
-} from '../mixins/text_style.mixin';
-import { SHARED_ATTRIBUTES } from '../parser/attributes';
-import { parseAttributes } from '../parser/parseAttributes';
-import type { Point } from '../point.class';
+import { cache } from '../../cache';
+import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { ObjectEvents } from '../../EventTypeDefs';
+import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
+import { SHARED_ATTRIBUTES } from '../../parser/attributes';
+import { parseAttributes } from '../../parser/parseAttributes';
+import type { Point } from '../../point.class';
 import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
-} from '../typedefs';
-import { classRegistry } from '../util/class_registry';
-import { graphemeSplit } from '../util/lang_string';
-import { createCanvasElement } from '../util/misc/dom';
+} from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
+import { graphemeSplit } from '../../util/lang_string';
+import { createCanvasElement } from '../../util/misc/dom';
 import {
   hasStyleChanged,
   stylesFromArray,
   stylesToArray,
-} from '../util/misc/textStyles';
-import { getPathSegmentsInfo, getPointOnPath } from '../util/path';
-import { cacheProperties } from './Object/FabricObject';
-import { Path } from './path.class';
-import { TextSVGExportMixin } from '../mixins/text.svg_export';
-import { applyMixins } from '../util/applyMixins';
+} from '../../util/misc/textStyles';
+import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
+import { cacheProperties } from '../Object/FabricObject';
+import { Path } from '../path.class';
+import { TextSVGExportMixin } from './TextSVGExportMixin';
+import { applyMixins } from '../../util/applyMixins';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -89,7 +85,7 @@ const additionalProps = [
  */
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
-> extends TextStyleMixin<EventSpec> {
+> extends StyledText<EventSpec> {
   /**
    * Properties which when set cause object to change dimensions
    * @type Array
