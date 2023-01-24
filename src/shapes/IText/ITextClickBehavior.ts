@@ -3,7 +3,7 @@ import { IPoint, Point } from '../../point.class';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';
-import { DraggableTextDelegate } from '../../mixins/DraggableTextDelegate';
+import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
 
