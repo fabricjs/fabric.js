@@ -1,6 +1,6 @@
 import { config } from '../config';
-import { Canvas2dFilterBackend } from './2d_backend.class';
-import { WebGLFilterBackend } from './webgl_backend.class';
+import { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
+import { WebGLFilterBackend } from './WebGLFilterBackend';
 import { webGLProbe } from './WebGLProbe';
 
 export type FilterBackend = WebGLFilterBackend | Canvas2dFilterBackend;

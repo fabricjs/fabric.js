@@ -4,7 +4,7 @@ import {
   TPointerEvent,
   TPointerEventInfo,
 } from '../../EventTypeDefs';
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { FabricObject } from '../Object/Object';
 import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';

@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../point.class';
+import { IPoint, Point } from '../../Point';
 import { TBBox } from '../../typedefs';
 
 /**

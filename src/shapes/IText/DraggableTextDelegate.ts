@@ -1,11 +1,11 @@
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Canvas } from '../../canvas/Canvas';
 import { getEnv } from '../../env';
 import {
   DragEventData,
   DropEventData,
   TPointerEvent,
 } from '../../EventTypeDefs';
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';

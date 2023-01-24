@@ -1,5 +1,5 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
-import { IPoint, Point } from '../../point.class';
+import { IPoint, Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';

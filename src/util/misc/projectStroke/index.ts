@@ -1,4 +1,4 @@
-import { IPoint } from '../../../point.class';
+import { IPoint } from '../../../Point';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';

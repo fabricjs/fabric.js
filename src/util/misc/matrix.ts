@@ -1,5 +1,5 @@
 import { iMatrix } from '../../constants';
-import { IPoint, Point } from '../../point.class';
+import { IPoint, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
