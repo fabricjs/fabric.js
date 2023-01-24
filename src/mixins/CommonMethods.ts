@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Observable } from './observable.mixin';
+import { Observable } from './Observable';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   /**

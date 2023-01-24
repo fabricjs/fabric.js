@@ -4,7 +4,7 @@ import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { CommonMethods } from '../../mixins/shared_methods.mixin';
+import { CommonMethods } from '../../mixins/CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {

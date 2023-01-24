@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
-import { createCollectionMixin } from '../mixins/collection.mixin';
+import { createCollectionMixin } from '../mixins/Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../point.class';
 import type { TClassProperties } from '../typedefs';
