@@ -1,10 +1,10 @@
-import { Point } from '../../point.class';
-import type { Group } from '../group.class';
+import { Point } from '../../Point';
+import type { Group } from '../Group';
 import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { CommonMethods } from '../../mixins/shared_methods.mixin';
+import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {

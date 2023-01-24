@@ -1,5 +1,5 @@
 import { noop } from '../../constants';
-import type { BaseFilter } from '../../filters/base_filter.class';
+import type { BaseFilter } from '../../filters/BaseFilter';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { classRegistry } from '../class_registry';

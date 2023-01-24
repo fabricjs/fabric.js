@@ -1,7 +1,6 @@
 //@ts-nocheck
-
-import { Group } from '../shapes/group.class';
-import { Image } from '../shapes/image.class';
+import { Group } from '../shapes/Group';
+import { Image } from '../shapes/Image';
 import { classRegistry } from '../util/class_registry';
 import {
   invertTransform,

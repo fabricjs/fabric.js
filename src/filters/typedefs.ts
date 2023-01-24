@@ -1,5 +1,5 @@
-import type { WebGLFilterBackend } from './webgl_backend.class';
-import type { Canvas2dFilterBackend } from './2d_backend.class';
+import type { WebGLFilterBackend } from './WebGLFilterBackend';
+import type { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 
 export type TProgramCache = any;
 
