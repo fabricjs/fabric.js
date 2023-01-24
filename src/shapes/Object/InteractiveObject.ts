@@ -8,7 +8,7 @@ import {
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
-import type { Control } from '../../controls/control.class';
+import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/canvas_events';

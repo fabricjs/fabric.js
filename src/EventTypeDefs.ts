@@ -1,4 +1,4 @@
-import type { Control } from './controls/control.class';
+import type { Control } from './controls/Control';
 import type { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import type { FabricObject as StaticFabricObject } from './shapes/Object/Object';

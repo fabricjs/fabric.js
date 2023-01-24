@@ -12,7 +12,7 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import type { Control } from './control.class';
+import type { Control } from './Control';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 

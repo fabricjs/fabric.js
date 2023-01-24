@@ -9,7 +9,7 @@ import {
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './scaleSkew';
-import { Control } from './control.class';
+import { Control } from './Control';
 
 // use this function if you want to generate new controls for every instance
 export const createObjectDefaultControls = () => ({
