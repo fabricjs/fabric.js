@@ -1,15 +1,14 @@
 //@ts-nocheck
 
-import { getEnv } from '../env';
 import { config } from '../config';
-import { ObjectEvents } from '../EventTypeDefs';
-import { TPointerEvent } from '../typedefs';
+import { getEnv } from '../env';
+import { TPointerEvent } from '../EventTypeDefs';
 import { capValue } from '../util/misc/capValue';
-import { ITextBehaviorMixin } from './itext_behavior.mixin';
+import { ITextBehaviorMixin, ITextEvents } from './itext_behavior.mixin';
 import type { TKeyMapIText } from './itext_key_const';
 
 export abstract class ITextKeyBehaviorMixin<
-  EventSpec extends ObjectEvents
+  EventSpec extends ITextEvents = ITextEvents
 > extends ITextBehaviorMixin<EventSpec> {
   /**
    * For functionalities on keyDown

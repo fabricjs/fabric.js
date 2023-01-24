@@ -1,10 +1,5 @@
-// @ts-nocheck
 import { Canvas } from '../canvas/canvas_events';
-import {
-  ObjectEvents,
-  TPointerEvent,
-  TPointerEventInfo,
-} from '../EventTypeDefs';
+import { ITextEvents } from '../mixins/itext_behavior.mixin';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
 import {
   ctrlKeysMapDown,
@@ -15,12 +10,11 @@ import {
 import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 
-export type ITextEvents = ObjectEvents & {
-  'selection:changed': never;
-  changed: never | { index: number; action: string };
-  tripleclick: TPointerEventInfo;
-  'editing:entered': never | { e: TPointerEvent };
-  'editing:exited': never;
+type CursorBoundaries = {
+  left: number;
+  top: number;
+  leftOffset: number;
+  topOffset: number;
 };
 
 /**
@@ -66,7 +60,9 @@ export type ITextEvents = ObjectEvents & {
  *   Select line:                    triple click
  * ```
  */
-export class IText extends ITextClickBehaviorMixin<ITextEvents> {
+export class IText<
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextClickBehaviorMixin<EventSpec> {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -144,6 +140,8 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    */
   declare cursorDuration: number;
 
+  declare compositionColor: string;
+
   /**
    * Indicates whether internal text char widths can be cached
    * @type Boolean
@@ -170,6 +168,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    */
   _set(key: string, value: any) {
     if (this.isEditing && this._savedProps && key in this._savedProps) {
+      // @ts-expect-error irritating TS
       this._savedProps[key] = value;
       return this;
     }
@@ -204,7 +203,10 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {String} property 'selectionStart' or 'selectionEnd'
    * @param {Number} index new position of property
    */
-  _updateAndFire(property: string, index: number) {
+  protected _updateAndFire(
+    property: 'selectionStart' | 'selectionEnd',
+    index: number
+  ) {
     if (this[property] !== index) {
       this._fireSelectionChanged();
       this[property] = index;
@@ -329,10 +331,10 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {number} [index] index from start
    * @param {boolean} [skipCaching]
    */
-  _getCursorBoundaries(index: number, skipCaching?: boolean) {
-    if (typeof index === 'undefined') {
-      index = this.selectionStart;
-    }
+  _getCursorBoundaries(
+    index: number = this.selectionStart,
+    skipCaching?: boolean
+  ): CursorBoundaries {
     const left = this._getLeftOffset(),
       top = this._getTopOffset(),
       offsets = this._getCursorBoundariesOffsets(index, skipCaching);
@@ -418,7 +420,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    */
   renderCursorAt(selectionStart: number) {
     const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
+    this._renderCursor(this.canvas!.contextTop, boundaries, selectionStart);
   }
 
   /**
@@ -426,17 +428,21 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {Object} boundaries
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  renderCursor(ctx: CanvasRenderingContext2D, boundaries: object) {
+  renderCursor(ctx: CanvasRenderingContext2D, boundaries: CursorBoundaries) {
     this._renderCursor(ctx, boundaries, this.selectionStart);
   }
 
-  _renderCursor(ctx, boundaries, selectionStart) {
+  _renderCursor(
+    ctx: CanvasRenderingContext2D,
+    boundaries: CursorBoundaries,
+    selectionStart: number
+  ) {
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
-      multiplier = this.scaleX * this.canvas.getZoom(),
+      multiplier = this.scaleX * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =
@@ -467,13 +473,13 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {Object} boundaries Object with left/top/leftOffset/topOffset
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
-  renderSelection(ctx: CanvasRenderingContext2D, boundaries: object) {
+  renderSelection(ctx: CanvasRenderingContext2D, boundaries: CursorBoundaries) {
     const selection = {
       selectionStart: this.inCompositionMode
-        ? this.hiddenTextarea.selectionStart
+        ? this.hiddenTextarea!.selectionStart
         : this.selectionStart,
       selectionEnd: this.inCompositionMode
-        ? this.hiddenTextarea.selectionEnd
+        ? this.hiddenTextarea!.selectionEnd
         : this.selectionEnd,
     };
     this._renderSelection(ctx, selection, boundaries);
@@ -507,7 +513,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   _renderSelection(
     ctx: CanvasRenderingContext2D,
     selection: { selectionStart: number; selectionEnd: number },
-    boundaries: object
+    boundaries: CursorBoundaries
   ) {
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
@@ -632,7 +638,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 }
 
-export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
+export const iTextDefaultValues = {
   type: 'i-text',
   selectionStart: 0,
   selectionEnd: 0,
@@ -646,7 +652,6 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _currentCursorOpacity: 1,
   _selectionDirection: null,
   _reSpace: /\s|\n/,
   inCompositionMode: false,
