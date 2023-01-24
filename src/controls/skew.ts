@@ -5,7 +5,7 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,

@@ -1,4 +1,4 @@
-import { Point } from './point.class';
+import { Point } from './Point';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 

@@ -330,7 +330,7 @@ import { Canvas2dFilterBackend } from './src/filters/2d_backend.class';
 import { WebGLFilterBackend } from './src/filters/webgl_backend.class';
 import { runningAnimations } from './src/util/animation/AnimationRegistry';
 import { Observable } from './src/Observable';
-import { Point } from './src/point.class';
+import { Point } from './src/Point';
 import { Intersection } from './src/Intersection';
 import { Color } from './src/color/Color';
 import { Control } from './src/controls/Control';

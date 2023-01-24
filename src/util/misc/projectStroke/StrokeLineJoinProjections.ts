@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../../point.class';
+import { IPoint, Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';

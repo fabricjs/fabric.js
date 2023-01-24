@@ -3,7 +3,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { isFiller } from '../util/types';
 
 // @TODO this code is terrible and Line should be a special case of polyline.

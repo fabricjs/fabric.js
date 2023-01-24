@@ -5,7 +5,7 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
-import type { Point } from '../../point.class';
+import type { Point } from '../../Point';
 import type {
   TCacheCanvasDimensions,
   TClassProperties,

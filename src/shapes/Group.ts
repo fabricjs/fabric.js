@@ -2,7 +2,7 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import {

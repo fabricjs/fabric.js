@@ -5,7 +5,7 @@ import {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';

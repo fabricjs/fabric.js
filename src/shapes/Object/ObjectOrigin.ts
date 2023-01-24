@@ -1,4 +1,4 @@
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { Group } from '../Group';
 import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';

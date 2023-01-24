@@ -1,5 +1,5 @@
 import { iMatrix } from '../../constants';
-import type { Point } from '../../point.class';
+import type { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TMat2D } from '../../typedefs';
 import type { StaticCanvas } from '../../canvas/static_canvas.class';

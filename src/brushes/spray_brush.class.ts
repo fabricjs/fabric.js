@@ -1,4 +1,4 @@
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { Group } from '../shapes/Group';
 import { Shadow } from '../shadow.class';
 import { Rect } from '../shapes/Rect';

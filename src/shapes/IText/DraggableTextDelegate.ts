@@ -5,7 +5,7 @@ import {
   DropEventData,
   TPointerEvent,
 } from '../../EventTypeDefs';
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';

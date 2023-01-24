@@ -1,4 +1,4 @@
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';

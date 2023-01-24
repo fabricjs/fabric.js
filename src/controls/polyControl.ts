@@ -1,4 +1,4 @@
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { Control } from './Control';
 import { TMat2D } from '../typedefs';
 import { iMatrix } from '../constants';

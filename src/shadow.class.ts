@@ -1,6 +1,6 @@
 import { Color } from './color/Color';
 import { config } from './config';
-import { Point } from './point.class';
+import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';

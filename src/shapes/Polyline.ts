@@ -2,7 +2,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import { IPoint, Point } from '../point.class';
+import { IPoint, Point } from '../Point';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';

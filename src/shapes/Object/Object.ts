@@ -3,7 +3,7 @@ import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import { Shadow } from '../../shadow.class';
 import type {
   TClassProperties,

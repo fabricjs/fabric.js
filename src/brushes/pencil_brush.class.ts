@@ -1,5 +1,5 @@
 import { ModifierKey, TEvent } from '../EventTypeDefs';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { Shadow } from '../shadow.class';
 import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';

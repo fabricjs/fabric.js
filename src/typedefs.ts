@@ -2,7 +2,7 @@
 import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
-import type { Point } from './point.class';
+import type { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 
 interface NominalTag<T> {

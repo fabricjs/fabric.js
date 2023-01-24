@@ -1,7 +1,7 @@
 import { getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
