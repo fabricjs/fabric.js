@@ -6,11 +6,11 @@ import {
 } from '../../EventTypeDefs';
 import { Point } from '../../point.class';
 import type { FabricObject } from '../Object/Object';
-import { Text } from '../text.class';
+import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
-import { TextStyleDeclaration } from '../../mixins/text_style.mixin';
+import { TextStyleDeclaration } from '../Text/StyledText';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;

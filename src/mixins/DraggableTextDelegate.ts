@@ -7,7 +7,7 @@ import { setStyle } from '../util/dom_style';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { createCanvasElement } from '../util/misc/dom';
 import { isIdentityMatrix } from '../util/misc/matrix';
-import { TextStyleDeclaration } from './text_style.mixin';
+import { TextStyleDeclaration } from '../shapes/Text/StyledText';
 
 /**
  * #### Dragging IText/Textbox Lifecycle

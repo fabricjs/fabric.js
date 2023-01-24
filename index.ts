@@ -351,7 +351,7 @@ import { Rect } from './src/shapes/rect.class';
 import { Path } from './src/shapes/path.class';
 import { Polyline } from './src/shapes/polyline.class';
 import { Polygon } from './src/shapes/polygon.class';
-import { Text } from './src/shapes/text.class';
+import { Text } from './src/shapes/Text/Text';
 import { IText } from './src/shapes/IText/IText';
 import { Textbox } from './src/shapes/textbox.class';
 import { Group } from './src/shapes/group.class';
