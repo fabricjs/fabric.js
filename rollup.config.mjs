@@ -17,6 +17,12 @@ export default [
         format: 'umd',
         sourcemap: true,
       },
+      {
+        file: process.env.BUILD_OUTPUT || './dist/fabric.es.js',
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
       Number(process.env.MINIFY)
         ? {
             file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
