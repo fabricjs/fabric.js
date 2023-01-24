@@ -6,7 +6,7 @@ import type { FabricObjectSVGExportMixin } from './shapes/Object/FabricObjectSVG
 import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
-import type { Canvas } from './canvas/CanvasEvents';
+import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
 

@@ -6,7 +6,7 @@ import {
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxis } from '../typedefs';
-import type { Canvas } from '../canvas/CanvasEvents';
+import type { Canvas } from '../canvas/Canvas';
 import {
   findCornerQuadrant,
   getLocalPoint,

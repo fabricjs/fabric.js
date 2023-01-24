@@ -1,4 +1,4 @@
-import { Canvas } from '../../canvas/CanvasEvents';
+import { Canvas } from '../../canvas/Canvas';
 import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import {

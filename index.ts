@@ -321,7 +321,7 @@ const controlsUtils = {
 import { cache } from './src/cache';
 import { VERSION as version, iMatrix } from './src/constants';
 import { StaticCanvas } from './src/canvas/StaticCanvas';
-import { Canvas } from './src/canvas/CanvasEvents';
+import { Canvas } from './src/canvas/Canvas';
 import { config } from './src/config';
 import { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 import { loadSVGFromString } from './src/parser/loadSVGFromString';

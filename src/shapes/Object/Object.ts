@@ -37,7 +37,7 @@ import {
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
-import type { Canvas } from '../../canvas/CanvasEvents';
+import type { Canvas } from '../../canvas/Canvas';
 import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &

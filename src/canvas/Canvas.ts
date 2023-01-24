@@ -1,1641 +1,1685 @@
+import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
 import { getEnv } from '../env';
-import { dragHandler } from '../controls/drag';
-import { getActionFromCorner } from '../controls/util';
-import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
-  ModifierKey,
-  TOptionalModifierKey,
+  DragEventData,
+  ObjectEvents,
   TPointerEvent,
+  TPointerEventInfo,
+  TPointerEventNames,
   Transform,
 } from '../EventTypeDefs';
-import {
-  addTransformToObject,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
+import { Point } from '../Point';
+import { ActiveSelection } from '../shapes/ActiveSelection';
+import { Group } from '../shapes/Group';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { AssertKeys } from '../typedefs';
+import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { createCanvasElement } from '../util/misc/dom';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
+  isFabricObjectWithDragSupport,
+  isInteractiveTextObject,
 } from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import {
-  TMat2D,
-  TOriginX,
-  TOriginY,
-  TSize,
-  TToCanvasElementOptions,
-} from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
-import type { IText } from '../shapes/IText/IText';
-import {
-  cleanUpJsdomNode,
-  makeElementUnselectable,
-  wrapElement,
-} from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/BaseBrush';
-import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
-import { sendPointToPlane } from '../util/misc/planeChange';
+import { SelectableCanvas } from './SelectableCanvas';
+import { TextEditingManager } from './TextEditingManager';
 
-type TDestroyedCanvas = Omit<
-  SelectableCanvas<CanvasEvents>,
-  | 'contextTop'
-  | 'contextCache'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'cacheCanvasEl'
-  | 'wrapperEl'
-> & {
-  wrapperEl?: HTMLDivElement;
-  cacheCanvasEl?: HTMLCanvasElement;
-  upperCanvasEl?: HTMLCanvasElement;
-  lowerCanvasEl?: HTMLCanvasElement;
-  contextCache?: CanvasRenderingContext2D | null;
-  contextTop?: CanvasRenderingContext2D | null;
+const addEventOptions = { passive: false } as EventListenerOptions;
+
+function checkClick(e: TPointerEvent, value: number) {
+  return !!(e as MouseEvent).button && (e as MouseEvent).button === value - 1;
+}
+
+// just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
+// because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
+// few bytes but why give it away.
+const addListener = (
+  el: HTMLElement | Document,
+  ...args: Parameters<HTMLElement['addEventListener']>
+) => el.addEventListener(...args);
+const removeListener = (
+  el: HTMLElement | Document,
+  ...args: Parameters<HTMLElement['removeEventListener']>
+) => el.removeEventListener(...args);
+
+const syntheticEventConfig = {
+  mouse: {
+    in: 'over',
+    out: 'out',
+    targetIn: 'mouseover',
+    targetOut: 'mouseout',
+    canvasIn: 'mouse:over',
+    canvasOut: 'mouse:out',
+  },
+  drag: {
+    in: 'enter',
+    out: 'leave',
+    targetIn: 'dragenter',
+    targetOut: 'dragleave',
+    canvasIn: 'drag:enter',
+    canvasOut: 'drag:leave',
+  },
+} as const;
+
+type TSyntheticEventContext = {
+  mouse: { e: TPointerEvent };
+  drag: DragEventData;
 };
 
-/**
- * Canvas class
- * @class Canvas
- * @extends StaticCanvas
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
- *
- * @fires object:modified at the end of a transform
- * @fires object:rotating while an object is being rotated from the control
- * @fires object:scaling while an object is being scaled by controls
- * @fires object:moving while an object is being dragged
- * @fires object:skewing while an object is being skewed from the controls
- *
- * @fires before:transform before a transform is is started
- * @fires before:selection:cleared
- * @fires selection:cleared
- * @fires selection:updated
- * @fires selection:created
- *
- * @fires path:created after a drawing operation ends and the path is added
- * @fires mouse:down
- * @fires mouse:move
- * @fires mouse:up
- * @fires mouse:down:before  on mouse down, before the inner fabric logic runs
- * @fires mouse:move:before on mouse move, before the inner fabric logic runs
- * @fires mouse:up:before on mouse up, before the inner fabric logic runs
- * @fires mouse:over
- * @fires mouse:out
- * @fires mouse:dblclick whenever a native dbl click event fires on the canvas.
- *
- * @fires dragover
- * @fires dragenter
- * @fires dragleave
- * @fires drag:enter object drag enter
- * @fires drag:leave object drag leave
- * @fires drop:before before drop event. Prepare for the drop event (same native event).
- * @fires drop
- * @fires drop:after after drop event. Run logic on canvas after event has been accepted/declined (same native event).
- * @example
- * let a: fabric.Object, b: fabric.Object;
- * let flag = false;
- * canvas.add(a, b);
- * a.on('drop:before', opt => {
- *  //  we want a to accept the drop even though it's below b in the stack
- *  flag = this.canDrop(opt.e);
- * });
- * b.canDrop = function(e) {
- *  !flag && this.draggableTextDelegate.canDrop(e);
- * }
- * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
- * a.on('drop', opt => {
- *  opt.e.defaultPrevented  //  drop occurred
- *  opt.didDrop             //  drop occurred on canvas
- *  opt.target              //  drop target
- *  opt.target !== a && a.set('text', 'I lost');
- * });
- * canvas.on('drop:after', opt => {
- *  //  inform user who won
- *  if(!opt.e.defaultPrevented) {
- *    // no winners
- *  }
- *  else if(!opt.didDrop) {
- *    //  my objects didn't win, some other lucky object
- *  }
- *  else {
- *    //  we have a winner it's opt.target!!
- *  }
- * })
- *
- * @fires after:render at the end of the render process, receives the context in the callback
- * @fires before:render at start the render process, receives the context in the callback
- *
- * @fires contextmenu:before
- * @fires contextmenu
- * @example
- * let handler;
- * targets.forEach(target => {
- *   target.on('contextmenu:before', opt => {
- *     //  decide which target should handle the event before canvas hijacks it
- *     if (someCaseHappens && opt.targets.includes(target)) {
- *       handler = target;
- *     }
- *   });
- *   target.on('contextmenu', opt => {
- *     //  do something fantastic
- *   });
- * });
- * canvas.on('contextmenu', opt => {
- *   if (!handler) {
- *     //  no one takes responsibility, it's always left to me
- *     //  let's show them how it's done!
- *   }
- * });
- *
- */
-export class SelectableCanvas<
-  EventSpec extends CanvasEvents = CanvasEvents
-> extends StaticCanvas<EventSpec> {
-  declare _objects: FabricObject[];
+export class Canvas extends SelectableCanvas {
   /**
-   * When true, objects can be transformed by one side (unproportionally)
-   * when dragged on the corners that normally would not do that.
-   * @type Boolean
-   * @default
-   * @since fabric 4.0 // changed name and default value
-   */
-  declare uniformScaling: boolean;
-
-  /**
-   * Indicates which key switches uniform scaling.
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled.
-   * totally wrong named. this sounds like `uniform scaling`
-   * if Canvas.uniformScaling is true, pressing this will set it to false
-   * and viceversa.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
-  declare uniScaleKey: TOptionalModifierKey;
-
-  /**
-   * When true, objects use center point as the origin of scale transformation.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  declare centeredScaling: boolean;
-
-  /**
-   * When true, objects use center point as the origin of rotate transformation.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  declare centeredRotation: boolean;
-
-  /**
-   * Indicates which key enable centered Transform
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled feature disabled.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
-  declare centeredKey: TOptionalModifierKey;
-
-  /**
-   * Indicates which key enable alternate action on corner
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled feature disabled.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
-  declare altActionKey: TOptionalModifierKey;
-
-  /**
-   * Indicates that canvas is interactive. This property should not be changed.
-   * @type Boolean
-   * @default
-   */
-  interactive = true;
-
-  /**
-   * Indicates whether group selection should be enabled
-   * @type Boolean
-   * @default
-   */
-  declare selection: boolean;
-
-  /**
-   * Indicates which key or keys enable multiple click selection
-   * Pass value as a string or array of strings
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or empty or containing any other string that is not a modifier key
-   * feature is disabled.
-   * @since 1.6.2
-   * @type ModifierKey|ModifierKey[]
-   * @default
-   */
-  declare selectionKey: TOptionalModifierKey | ModifierKey[];
-
-  /**
-   * Indicates which key enable alternative selection
-   * in case of target overlapping with active object
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * For a series of reason that come from the general expectations on how
-   * things should work, this feature works only for preserveObjectStacking true.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled.
-   * @since 1.6.5
-   * @type null|ModifierKey
-   * @default
-   */
-  declare altSelectionKey: TOptionalModifierKey;
-
-  /**
-   * Color of selection
-   * @type String
-   * @default
-   */
-  declare selectionColor: string;
-
-  /**
-   * Default dash array pattern
-   * If not empty the selection border is dashed
-   * @type Array
-   */
-  declare selectionDashArray: number[];
-
-  /**
-   * Color of the border of selection (usually slightly darker than color of selection itself)
-   * @type String
-   * @default
-   */
-  declare selectionBorderColor: string;
-
-  /**
-   * Width of a line used in object/group selection
+   * Contains the id of the touch event that owns the fabric transform
    * @type Number
-   * @default
-   */
-  declare selectionLineWidth: number;
-
-  /**
-   * Select only shapes that are fully contained in the dragged selection rectangle.
-   * @type Boolean
-   * @default
-   */
-  declare selectionFullyContained: boolean;
-
-  /**
-   * Default cursor value used when hovering over an object on canvas
-   * @type CSSStyleDeclaration['cursor']
-   * @default move
-   */
-  declare hoverCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Default cursor value used when moving an object on canvas
-   * @type CSSStyleDeclaration['cursor']
-   * @default move
-   */
-  declare moveCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Default cursor value used for the entire canvas
-   * @type String
-   * @default default
-   */
-  declare defaultCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Cursor value used during free drawing
-   * @type String
-   * @default crosshair
-   */
-  declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Cursor value used for disabled elements ( corners with disabled action )
-   * @type String
-   * @since 2.0.0
-   * @default not-allowed
-   */
-  declare notAllowedCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Default element class that's given to wrapper (div) element of canvas
-   * @type String
-   * @default
-   */
-  declare containerClass: string;
-
-  /**
-   * When true, object detection happens on per-pixel basis rather than on per-bounding-box
-   * @type Boolean
-   * @default
-   */
-  declare perPixelTargetFind: boolean;
-
-  /**
-   * Number of pixels around target pixel to tolerate (consider active) during object detection
-   * @type Number
-   * @default
-   */
-  declare targetFindTolerance: number;
-
-  /**
-   * When true, target detection is skipped. Target detection will return always undefined.
-   * click selection won't work anymore, events will fire with no targets.
-   * if something is selected before setting it to true, it will be deselected at the first click.
-   * area selection will still work. check the `selection` property too.
-   * if you deactivate both, you should look into staticCanvas.
-   * @type Boolean
-   * @default
-   */
-  declare skipTargetFind: boolean;
-
-  /**
-   * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
-   * After mousedown, mousemove creates a shape,
-   * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
-   * @type Boolean
-   * @default
-   */
-  declare isDrawingMode: boolean;
-
-  /**
-   * Indicates whether objects should remain in current stack position when selected.
-   * When false objects are brought to top and rendered as part of the selection group
-   * @type Boolean
-   * @default
-   */
-  declare preserveObjectStacking: boolean;
-
-  /**
-   * Indicates if the right click on canvas can output the context menu or not
-   * @type Boolean
-   * @since 1.6.5
-   * @default
-   */
-  declare stopContextMenu: boolean;
-
-  /**
-   * Indicates if the canvas can fire right click events
-   * @type Boolean
-   * @since 1.6.5
-   * @default
-   */
-  declare fireRightClick: boolean;
-
-  /**
-   * Indicates if the canvas can fire middle click events
-   * @type Boolean
-   * @since 1.7.8
-   * @default
-   */
-  declare fireMiddleClick: boolean;
-
-  /**
-   * Keep track of the subTargets for Mouse Events
-   * @type FabricObject[]
-   */
-  targets: FabricObject[] = [];
-
-  /**
-   * Keep track of the hovered target
-   * @type FabricObject | null
    * @private
    */
-  declare _hoveredTarget?: FabricObject;
+  declare mainTouchId: null | number;
 
   /**
-   * hold the list of nested targets hovered
-   * @type FabricObject[]
+   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
+   * @type Boolean
+   * @default
+   */
+  declare enablePointerEvents: boolean;
+
+  /**
+   * Holds a reference to a setTimeout timer for event synchronization
+   * @type number
    * @private
    */
-  _hoveredTargets: FabricObject[] = [];
+  private declare _willAddMouseDown: number;
 
   /**
-   * hold the list of objects to render
-   * @type FabricObject[]
+   * Holds a reference to an object on the canvas that is receiving the drag over event.
+   * @type FabricObject
    * @private
    */
-  _objectsToRender?: FabricObject[] = [];
+  private declare _draggedoverTarget?: FabricObject;
 
   /**
-   * hold a referenfce to a data structure that contains information
-   * on the current on going transform
-   * @type
+   * Holds a reference to an object on the canvas from where the drag operation started
+   * @type FabricObject
    * @private
    */
-  _currentTransform: Transform | null = null;
+  private declare _dragSource?: FabricObject;
 
   /**
-   * hold a reference to a data structure used to track the selecion
-   * box on canvas drag
-   * on the current on going transform
-   * @type
+   * Holds a reference to an object on the canvas that is the current drop target
+   * May differ from {@link _draggedoverTarget}
+   * @todo inspect whether {@link _draggedoverTarget} and {@link _dropTarget} should be merged somehow
+   * @type FabricObject
    * @private
    */
-  _groupSelector: any = null;
+  private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
+
+  declare currentTarget?: FabricObject;
+
+  declare currentSubTargets?: FabricObject[];
 
   /**
-   * internal flag used to understand if the context top requires a cleanup
-   * in case this is true, the contextTop will be cleared at the next render
-   * @type boolean
+   * Holds a reference to a pointer during mousedown to compare on mouse up and determine
+   * if it was a click event
+   * @type FabricObject
    * @private
    */
-  contextTopDirty = false;
+  declare _previousPointer: Point;
 
-  /**
-   * a reference to the context of an additional canvas that is used for scratch operations
-   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
-   * and is a memory waste. We should either have one that gets added/deleted
-   * @type CanvasRenderingContext2D
-   * @private
-   */
-  declare contextCache: CanvasRenderingContext2D;
+  private _isClick: boolean;
 
-  /**
-   * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
-   * @type {Point}
-   */
-  protected declare _absolutePointer?: Point;
+  textEditingManager = new TextEditingManager();
 
-  /**
-   * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _pointer holds a reference to the pointer in html coordinates that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
-   * @type {Point}
-   */
-  protected declare _pointer?: Point;
-
-  /**
-   * During a mouse event we may need the target multiple times in multiple functions.
-   * _target holds a reference to the target that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {FabricObject}
-   */
-  protected declare _target?: FabricObject;
-
-  declare upperCanvasEl: HTMLCanvasElement;
-  declare contextTop: CanvasRenderingContext2D;
-  declare wrapperEl: HTMLDivElement;
-  declare cacheCanvasEl: HTMLCanvasElement;
-  protected declare _isCurrentlyDrawing: boolean;
-  declare freeDrawingBrush?: BaseBrush;
-  declare _activeObject?: FabricObject;
-
-  protected initElements(el: string | HTMLCanvasElement) {
-    super.initElements(el);
-    this._applyCanvasStyle(this.lowerCanvasEl);
-    this._initWrapperElement();
-    this._createUpperCanvas();
-    this._createCacheCanvas();
-  }
-
-  protected _initRetinaScaling() {
-    super._initRetinaScaling();
-    this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
+    // bind event handlers
+    (
+      [
+        '_onMouseDown',
+        '_onTouchStart',
+        '_onMouseMove',
+        '_onMouseUp',
+        '_onTouchEnd',
+        '_onResize',
+        // '_onGesture',
+        // '_onDrag',
+        // '_onShake',
+        // '_onLongPress',
+        // '_onOrientationChange',
+        '_onMouseWheel',
+        '_onMouseOut',
+        '_onMouseEnter',
+        '_onContextMenu',
+        '_onDoubleClick',
+        '_onDragStart',
+        '_onDragEnd',
+        '_onDragProgress',
+        '_onDragOver',
+        '_onDragEnter',
+        '_onDragLeave',
+        '_onDrop',
+      ] as (keyof this)[]
+    ).forEach((eventHandler) => {
+      this[eventHandler] = (this[eventHandler] as Function).bind(this);
+    });
+    // register event handlers
+    this.addOrRemove(addListener, 'add');
   }
 
   /**
+   * return an event prefix pointer or mouse.
    * @private
-   * @param {FabricObject} obj Object that was added
    */
-  _onObjectAdded(obj: FabricObject) {
-    this._objectsToRender = undefined;
-    super._onObjectAdded(obj);
+  private _getEventPrefix() {
+    return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
 
-  /**
-   * @private
-   * @param {FabricObject} obj Object that was removed
-   */
-  _onObjectRemoved(obj: FabricObject) {
-    this._objectsToRender = undefined;
-    // removing active object should fire "selection:cleared" events
-    if (obj === this._activeObject) {
-      this.fire('before:selection:cleared', { deselected: [obj] });
-      this._discardActiveObject();
-      this.fire('selection:cleared', { deselected: [obj] });
-      obj.fire('deselected', {
-        target: obj,
-      });
+  addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
+    const canvasElement = this.upperCanvasEl,
+      eventTypePrefix = this._getEventPrefix();
+    functor(getEnv().window, 'resize', this._onResize);
+    functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
+    functor(
+      canvasElement,
+      `${eventTypePrefix}move`,
+      this._onMouseMove,
+      addEventOptions
+    );
+    functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
+    functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
+    functor(canvasElement, 'wheel', this._onMouseWheel);
+    functor(canvasElement, 'contextmenu', this._onContextMenu);
+    functor(canvasElement, 'dblclick', this._onDoubleClick);
+    functor(canvasElement, 'dragstart', this._onDragStart);
+    functor(canvasElement, 'dragend', this._onDragEnd);
+    functor(canvasElement, 'dragover', this._onDragOver);
+    functor(canvasElement, 'dragenter', this._onDragEnter);
+    functor(canvasElement, 'dragleave', this._onDragLeave);
+    functor(canvasElement, 'drop', this._onDrop);
+    if (!this.enablePointerEvents) {
+      functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
-    if (obj === this._hoveredTarget) {
+    // if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
+    //   eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
+    //   eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
+    //   eventjs[eventjsFunctor](
+    //     canvasElement,
+    //     'orientation',
+    //     this._onOrientationChange
+    //   );
+    //   eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
+    //   eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
+    // }
+  }
+
+  /**
+   * Removes all event listeners
+   */
+  removeListeners() {
+    this.addOrRemove(removeListener, 'remove');
+    // if you dispose on a mouseDown, before mouse up, you need to clean document to...
+    const eventTypePrefix = this._getEventPrefix();
+    removeListener(
+      getEnv().document,
+      `${eventTypePrefix}up`,
+      this._onMouseUp as EventListener
+    );
+    removeListener(
+      getEnv().document,
+      'touchend',
+      this._onTouchEnd as EventListener,
+      addEventOptions
+    );
+    removeListener(
+      getEnv().document,
+      `${eventTypePrefix}move`,
+      this._onMouseMove as EventListener,
+      addEventOptions
+    );
+    removeListener(
+      getEnv().document,
+      'touchmove',
+      this._onMouseMove as EventListener,
+      addEventOptions
+    );
+  }
+
+  /**
+   * @private
+   * @param {Event} [e] Event object fired on wheel event
+   */
+  private _onMouseWheel(e: MouseEvent) {
+    this.__onMouseWheel(e);
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousedown
+   */
+  private _onMouseOut(e: TPointerEvent) {
+    const target = this._hoveredTarget;
+    const shared = {
+      e,
+      isClick: false,
+      pointer: this.getPointer(e),
+      absolutePointer: this.getPointer(e, true),
+    };
+    this.fire('mouse:out', { ...shared, target });
+    this._hoveredTarget = undefined;
+    target && target.fire('mouseout', { ...shared });
+    this._hoveredTargets.forEach((nestedTarget) => {
+      this.fire('mouse:out', { ...shared, target: nestedTarget });
+      nestedTarget && nestedTarget.fire('mouseout', { ...shared });
+    });
+    this._hoveredTargets = [];
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mouseenter
+   */
+  private _onMouseEnter(e: TPointerEvent) {
+    // This find target and consequent 'mouse:over' is used to
+    // clear old instances on hovered target.
+    // calling findTarget has the side effect of killing target.__corner.
+    // as a short term fix we are not firing this if we are currently transforming.
+    // as a long term fix we need to separate the action of finding a target with the
+    // side effects we added to it.
+    if (!this._currentTransform && !this.findTarget(e)) {
+      this.fire('mouse:over', {
+        e,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
+      });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
-    super._onObjectRemoved(obj);
   }
 
   /**
-   * Divides objects in two groups, one to render immediately
-   * and one to render as activeGroup.
-   * @return {Array} objects to render immediately and pushes the other in the activeGroup.
+   * supports native like text dragging
+   * @private
+   * @param {DragEvent} e
    */
-  _chooseObjectsToRender(): FabricObject[] {
-    const activeObjects = this.getActiveObjects();
-    let objsToRender, activeGroupObjects;
-
-    if (!this.preserveObjectStacking && activeObjects.length > 1) {
-      objsToRender = [];
-      activeGroupObjects = [];
-      for (let i = 0, length = this._objects.length; i < length; i++) {
-        const object = this._objects[i];
-        if (activeObjects.indexOf(object) === -1) {
-          objsToRender.push(object);
-        } else {
-          activeGroupObjects.push(object);
-        }
-      }
-      if (activeObjects.length > 1 && isCollection(this._activeObject)) {
-        this._activeObject._objects = activeGroupObjects;
-      }
-      objsToRender.push(...activeGroupObjects);
-    }
-    //  in case a single object is selected render it's entire parent above the other objects
-    else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-      const target = activeObjects[0],
-        ancestors = target.getAncestors(true);
-      const topAncestor = (
-        ancestors.length === 0 ? target : ancestors.pop()
-      ) as FabricObject;
-      objsToRender = this._objects.slice();
-      const index = objsToRender.indexOf(topAncestor);
-      index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
-      objsToRender.push(topAncestor);
-    } else {
-      objsToRender = this._objects;
-    }
-    return objsToRender;
-  }
-
-  /**
-   * Renders both the top canvas and the secondary container canvas.
-   */
-  renderAll() {
-    this.cancelRequestedRender();
-    if (this.destroyed) {
+  private _onDragStart(e: DragEvent) {
+    this._isClick = false;
+    const activeObject = this.getActiveObject();
+    if (
+      isFabricObjectWithDragSupport(activeObject) &&
+      activeObject.onDragStart(e)
+    ) {
+      this._dragSource = activeObject;
+      const options = { e, target: activeObject };
+      this.fire('dragstart', options);
+      activeObject.fire('dragstart', options);
+      addListener(
+        this.upperCanvasEl,
+        'drag',
+        this._onDragProgress as EventListener
+      );
       return;
     }
-    if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
-      this.clearContext(this.contextTop);
-      this.contextTopDirty = false;
-    }
-    if (this.hasLostContext) {
-      this.renderTopLayer(this.contextTop);
-      this.hasLostContext = false;
-    }
-    !this._objectsToRender &&
-      (this._objectsToRender = this._chooseObjectsToRender());
-    this.renderCanvas(this.contextContainer, this._objectsToRender);
+    stopEvent(e);
   }
 
   /**
-   * text selection is rendered by the active text instance during the rendering cycle
+   * First we clear top context where the effects are being rendered.
+   * Then we render the effects.
+   * Doing so will render the correct effect for all cases including an overlap between `source` and `target`.
+   * @private
    */
-  renderTopLayer(ctx: CanvasRenderingContext2D): void {
-    ctx.save();
-    if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush._render();
-      this.contextTopDirty = true;
+  private _renderDragEffects(
+    e: DragEvent,
+    source?: FabricObject,
+    target?: FabricObject
+  ) {
+    let dirty = false;
+    // clear top context
+    const dropTarget = this._dropTarget;
+    if (dropTarget && dropTarget !== source && dropTarget !== target) {
+      dropTarget.clearContextTop();
+      dirty = true;
     }
-    // we render the top context - last object
-    if (this.selection && this._groupSelector) {
-      this._drawSelection(ctx);
-      this.contextTopDirty = true;
-    }
-    ctx.restore();
-  }
-
-  /**
-   * Method to render only the top canvas.
-   * Also used to render the group selection box.
-   * Does not render text selection.
-   */
-  renderTop() {
+    source?.clearContextTop();
+    target !== source && target?.clearContextTop();
+    // render effects
     const ctx = this.contextTop;
-    this.clearContext(ctx);
-    this.renderTopLayer(ctx);
-    // todo: how do i know if the after:render is for the top or normal contex?
-    this.fire('after:render', { ctx });
+    ctx.save();
+    ctx.transform(...this.viewportTransform);
+    if (source) {
+      ctx.save();
+      source.transform(ctx);
+      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      ctx.restore();
+      dirty = true;
+    }
+    if (target) {
+      ctx.save();
+      target.transform(ctx);
+      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      ctx.restore();
+      dirty = true;
+    }
+    ctx.restore();
+    dirty && (this.contextTopDirty = true);
   }
 
   /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the opinter in
+   * supports native like text dragging
+   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#finishing_a_drag
    * @private
+   * @param {DragEvent} e
    */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
+  private _onDragEnd(e: DragEvent) {
+    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== 'none',
+      dropTarget = didDrop ? this._activeObject : undefined,
+      options = {
+        e,
+        target: this._dragSource as FabricObject,
+        subTargets: this.targets,
+        dragSource: this._dragSource as FabricObject,
+        didDrop,
+        dropTarget: dropTarget as FabricObject,
+      };
+    removeListener(
+      this.upperCanvasEl,
+      'drag',
+      this._onDragProgress as EventListener
     );
+    this.fire('dragend', options);
+    this._dragSource && this._dragSource.fire('dragend', options);
+    delete this._dragSource;
+    // we need to call mouse up synthetically because the browser won't
+    this._onMouseUp(e);
   }
 
   /**
-   * Returns true if object is transparent at a certain location
-   * Clarification: this is `is target transparent at location X or are controls there`
-   * @TODO this seems dumb that we treat controls with transparency. we can find controls
-   * programmatically without painting them, the cache canvas optimization is always valid
-   * @param {FabricObject} target Object to check
-   * @param {Number} x Left coordinate
-   * @param {Number} y Top coordinate
-   * @return {Boolean}
+   * fire `drag` event on canvas and drag source
+   * @private
+   * @param {DragEvent} e
    */
-  isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimizatio: we can reuse the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
+  private _onDragProgress(e: DragEvent) {
+    const options = {
+      e,
+      target: this._dragSource as FabricObject | undefined,
+      dragSource: this._dragSource as FabricObject | undefined,
+      dropTarget: this._draggedoverTarget as FabricObject,
+    };
+    this.fire('drag', options);
+    this._dragSource && this._dragSource.fire('drag', options);
+  }
 
-      return isTransparent(
-        target._cacheContext,
-        Math.round(targetRelativeX),
-        Math.round(targetRelativeY),
-        this.targetFindTolerance
-      );
+  /**
+   * As opposed to {@link findTarget} we want the top most object to be returned w/o the active object cutting in line.
+   * Override at will
+   */
+  protected findDragTargets(e: DragEvent) {
+    this.targets = [];
+    const target = this._searchPossibleTargets(
+      this._objects,
+      this.getPointer(e, true)
+    );
+    return {
+      target,
+      targets: [...this.targets],
+    };
+  }
+
+  /**
+   * prevent default to allow drop event to be fired
+   * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
+   * @private
+   * @param {DragEvent} [e] Event object fired on Event.js shake
+   */
+  private _onDragOver(e: DragEvent) {
+    const eventType = 'dragover';
+    const { target, targets } = this.findDragTargets(e);
+    const dragSource = this._dragSource as FabricObject;
+    const options = {
+      e,
+      target,
+      subTargets: targets,
+      dragSource,
+      canDrop: false,
+      dropTarget: undefined,
+    };
+    let dropTarget;
+    //  fire on canvas
+    this.fire(eventType, options);
+    //  make sure we fire dragenter events before dragover
+    //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
+    this._fireEnterLeaveEvents(target, options);
+    if (target) {
+      if (target.canDrop(e)) {
+        dropTarget = target;
+      }
+      target.fire(eventType, options);
+    }
+    //  propagate the event to subtargets
+    for (let i = 0; i < targets.length; i++) {
+      const subTarget = targets[i];
+      // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform that the event is taken)
+      // TODO: verify if those should loop in inverse order then?
+      // what is the order of subtargets?
+      if (subTarget.canDrop(e)) {
+        dropTarget = subTarget;
+      }
+      subTarget.fire(eventType, options);
+    }
+    //  render drag effects now that relations between source and target is clear
+    this._renderDragEffects(e, dragSource, dropTarget);
+    this._dropTarget = dropTarget;
+  }
+
+  /**
+   * fire `dragleave` on `dragover` targets
+   * @private
+   * @param {Event} [e] Event object fired on Event.js shake
+   */
+  private _onDragEnter(e: DragEvent) {
+    const { target, targets } = this.findDragTargets(e);
+    const options = {
+      e,
+      target,
+      subTargets: targets,
+      dragSource: this._dragSource,
+    };
+    this.fire('dragenter', options);
+    //  fire dragenter on targets
+    this._fireEnterLeaveEvents(target, options);
+  }
+
+  /**
+   * fire `dragleave` on `dragover` targets
+   * @private
+   * @param {Event} [e] Event object fired on Event.js shake
+   */
+  private _onDragLeave(e: DragEvent) {
+    const options = {
+      e,
+      target: this._draggedoverTarget,
+      subTargets: this.targets,
+      dragSource: this._dragSource,
+    };
+    this.fire('dragleave', options);
+
+    //  fire dragleave on targets
+    this._fireEnterLeaveEvents(undefined, options);
+    this._renderDragEffects(e, this._dragSource);
+    this._dropTarget = undefined;
+    //  clear targets
+    this.targets = [];
+    this._hoveredTargets = [];
+  }
+
+  /**
+   * `drop:before` is a an event that allows you to schedule logic
+   * before the `drop` event. Prefer `drop` event always, but if you need
+   * to run some drop-disabling logic on an event, since there is no way
+   * to handle event handlers ordering, use `drop:before`
+   * @private
+   * @param {Event} e
+   */
+  private _onDrop(e: DragEvent) {
+    const { target, targets } = this.findDragTargets(e);
+    const options = this._basicEventHandler('drop:before', {
+      e,
+      target,
+      subTargets: targets,
+      dragSource: this._dragSource,
+      pointer: this.getPointer(e),
+    });
+    //  will be set by the drop target
+    options.didDrop = false;
+    //  will be set by the drop target, used in case options.target refuses the drop
+    options.dropTarget = undefined;
+    //  fire `drop`
+    this._basicEventHandler('drop', options);
+    //  inform canvas of the drop
+    //  we do this because canvas was unaware of what happened at the time the `drop` event was fired on it
+    //  use for side effects
+    this.fire('drop:after', options);
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousedown
+   */
+  private _onContextMenu(e: TPointerEvent): false {
+    const target = this.findTarget(e),
+      subTargets = this.targets || [];
+    const options = this._basicEventHandler('contextmenu:before', {
+      e,
+      target,
+      subTargets,
+    });
+    // TODO: this line is silly because the dev can subscribe to the event and prevent it themselves
+    this.stopContextMenu && stopEvent(e);
+    this._basicEventHandler('contextmenu', options);
+    return false;
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousedown
+   */
+  private _onDoubleClick(e: TPointerEvent) {
+    this._cacheTransformEventData(e);
+    this._handleEvent(e, 'dblclick');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * Return a the id of an event.
+   * returns either the pointerId or the identifier or 0 for the mouse event
+   * @private
+   * @param {Event} evt Event object
+   */
+  getPointerId(evt: TouchEvent | PointerEvent): number {
+    const changedTouches = (evt as TouchEvent).changedTouches;
+
+    if (changedTouches) {
+      return changedTouches[0] && changedTouches[0].identifier;
     }
 
-    const ctx = this.contextCache,
-      originalColor = target.selectionBackgroundColor,
-      v = this.viewportTransform;
+    if (this.enablePointerEvents) {
+      return (evt as PointerEvent).pointerId;
+    }
 
-    target.selectionBackgroundColor = '';
-
-    this.clearContext(ctx);
-
-    ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
-    target.render(ctx);
-    ctx.restore();
-
-    target.selectionBackgroundColor = originalColor;
-
-    return isTransparent(ctx, x, y, this.targetFindTolerance);
+    return -1;
   }
 
   /**
-   * takes an event and determines if selection key has been pressed
+   * Determines if an event has the id of the event that is considered main
    * @private
-   * @param {TPointerEvent} e Event object
+   * @param {evt} event Event object
    */
-  _isSelectionKeyPressed(e: TPointerEvent): boolean {
-    const sKey = this.selectionKey;
-    if (!sKey) {
+  _isMainEvent(evt: TPointerEvent): boolean {
+    if ((evt as PointerEvent).isPrimary === true) {
+      return true;
+    }
+    if ((evt as PointerEvent).isPrimary === false) {
       return false;
     }
-    if (Array.isArray(sKey)) {
-      return !!sKey.find((key) => !!key && e[key] === true);
-    } else {
-      return e[sKey];
+    if (evt.type === 'touchend' && (evt as TouchEvent).touches.length === 0) {
+      return true;
     }
+    if ((evt as TouchEvent).changedTouches) {
+      return (
+        (evt as TouchEvent).changedTouches[0].identifier === this.mainTouchId
+      );
+    }
+    return true;
   }
 
   /**
    * @private
-   * @param {TPointerEvent} e Event object
-   * @param {FabricObject} target
+   * @param {Event} e Event object fired on mousedown
    */
-  _shouldClearSelection(e: TPointerEvent, target?: FabricObject): boolean {
-    const activeObjects = this.getActiveObjects(),
-      activeObject = this._activeObject;
-
-    return !!(
-      !target ||
-      (target &&
-        activeObject &&
-        activeObjects.length > 1 &&
-        activeObjects.indexOf(target) === -1 &&
-        activeObject !== target &&
-        !this._isSelectionKeyPressed(e)) ||
-      (target && !target.evented) ||
-      (target && !target.selectable && activeObject && activeObject !== target)
+  _onTouchStart(e: TouchEvent) {
+    e.preventDefault();
+    if (this.mainTouchId === null) {
+      this.mainTouchId = this.getPointerId(e);
+    }
+    this.__onMouseDown(e);
+    this._resetTransformEventData();
+    const canvasElement = this.upperCanvasEl,
+      eventTypePrefix = this._getEventPrefix();
+    addListener(
+      getEnv().document,
+      'touchend',
+      this._onTouchEnd as EventListener,
+      addEventOptions
+    );
+    addListener(
+      getEnv().document,
+      'touchmove',
+      this._onMouseMove as EventListener,
+      addEventOptions
+    );
+    // Unbind mousedown to prevent double triggers from touch devices
+    removeListener(
+      canvasElement,
+      eventTypePrefix + 'down',
+      this._onMouseDown as EventListener
     );
   }
 
   /**
-   * This method will take in consideration a modifier key pressed and the control we are
-   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
-   * This should be really in the realm of controls, and we should remove specific code for legacy
-   * embedded actions.
-   * @TODO this probably deserve discussion/rediscovery and change/refactor
    * @private
-   * @deprecated
-   * @param {FabricObject} target
-   * @param {string} action
-   * @param {boolean} altKey
-   * @returns {boolean} true if the transformation should be centered
+   * @param {Event} e Event object fired on mousedown
    */
-  private _shouldCenterTransform(
-    target: FabricObject,
-    action: string,
-    modifierKeyPressed: boolean
-  ) {
-    if (!target) {
-      return;
-    }
-
-    let centerTransform;
-
-    if (
-      action === 'scale' ||
-      action === 'scaleX' ||
-      action === 'scaleY' ||
-      action === 'resizing'
-    ) {
-      centerTransform = this.centeredScaling || target.centeredScaling;
-    } else if (action === 'rotate') {
-      centerTransform = this.centeredRotation || target.centeredRotation;
-    }
-
-    return centerTransform ? !modifierKeyPressed : modifierKeyPressed;
-  }
-
-  /**
-   * Given the control clicked, determine the origin of the transform.
-   * This is bad because controls can totally have custom names
-   * should disappear before release 4.0
-   * @private
-   * @deprecated
-   */
-  _getOriginFromCorner(
-    target: FabricObject,
-    controlName: string
-  ): { x: TOriginX; y: TOriginY } {
-    const origin = {
-      x: target.originX,
-      y: target.originY,
-    };
-    // is a left control ?
-    if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
-      // is a right control ?
-    } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
-    }
-    // is a top control ?
-    if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
-      // is a bottom control ?
-    } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
-    }
-    return origin;
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object
-   * @param {FaricObject} target
-   */
-  _setupCurrentTransform(
-    e: TPointerEvent,
-    target: FabricObject,
-    alreadySelected: boolean
-  ): void {
-    if (!target) {
-      return;
-    }
-    const pointer = target.group
-      ? // transform pointer to target's containing coordinate plane
-        sendPointToPlane(
-          this.getPointer(e),
-          undefined,
-          target.group.calcTransformMatrix()
-        )
-      : this.getPointer(e);
-    const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
-      actionHandler =
-        alreadySelected && control
-          ? control.getActionHandler(e, target, control)
-          : dragHandler,
-      action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
-      altKey = e[this.centeredKey as ModifierKey],
-      /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
-       **/
-      transform: Transform = {
-        target: target,
-        action: action,
-        actionHandler,
-        actionPerformed: false,
-        corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
-        originX: origin.x,
-        originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey: altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
-
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
-    }
-    this._currentTransform = transform;
-    // @ts-ignore
-    this._beforeTransform(e);
-  }
-
-  /**
-   * Set the cursor type of the canvas element
-   * @param {String} value Cursor type of the canvas element.
-   * @see http://www.w3.org/TR/css3-ui/#cursor
-   */
-  setCursor(value: CSSStyleDeclaration['cursor']): void {
-    this.upperCanvasEl.style.cursor = value;
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx to draw the selection on
-   */
-  _drawSelection(ctx: CanvasRenderingContext2D): void {
-    const { ex, ey, left, top } = this._groupSelector,
-      start = new Point(ex, ey).transform(this.viewportTransform),
-      extent = new Point(ex + left, ey + top).transform(this.viewportTransform),
-      strokeOffset = this.selectionLineWidth / 2;
-    let minX = Math.min(start.x, extent.x),
-      minY = Math.min(start.y, extent.y),
-      maxX = Math.max(start.x, extent.x),
-      maxY = Math.max(start.y, extent.y);
-
-    if (this.selectionColor) {
-      ctx.fillStyle = this.selectionColor;
-      ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
-    }
-
-    if (!this.selectionLineWidth || !this.selectionBorderColor) {
-      return;
-    }
-    ctx.lineWidth = this.selectionLineWidth;
-    ctx.strokeStyle = this.selectionBorderColor;
-
-    minX += strokeOffset;
-    minY += strokeOffset;
-    maxX -= strokeOffset;
-    maxY -= strokeOffset;
-    // selection border
-    // @TODO: is _setLineDash still necessary on modern canvas?
-    FabricObject.prototype._setLineDash.call(
-      this,
-      ctx,
-      this.selectionDashArray
+  _onMouseDown(e: TPointerEvent) {
+    this.__onMouseDown(e);
+    this._resetTransformEventData();
+    const canvasElement = this.upperCanvasEl,
+      eventTypePrefix = this._getEventPrefix();
+    removeListener(
+      canvasElement,
+      `${eventTypePrefix}move`,
+      this._onMouseMove as EventListener,
+      addEventOptions
     );
-    ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+    addListener(
+      getEnv().document,
+      `${eventTypePrefix}up`,
+      this._onMouseUp as EventListener
+    );
+    addListener(
+      getEnv().document,
+      `${eventTypePrefix}move`,
+      this._onMouseMove as EventListener,
+      addEventOptions
+    );
   }
 
   /**
-   * Method that determines what object we are clicking on
-   * the skipGroup parameter is for internal use, is needed for shift+click action
-   * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
-   * or the outside part of the corner.
-   * @param {Event} e mouse event
-   * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
-   * @return {FabricObject | null} the target found
+   * @private
+   * @param {Event} e Event object fired on mousedown
    */
-  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | undefined {
-    if (this.skipTargetFind) {
-      return undefined;
+  _onTouchEnd(e: TouchEvent) {
+    if (e.touches.length > 0) {
+      // if there are still touches stop here
+      return;
     }
-
-    const pointer = this.getPointer(e, true),
-      activeObject = this._activeObject,
-      aObjects = this.getActiveObjects(),
-      isTouch = isTouchEvent(e),
-      shouldLookForActive =
-        (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
-
-    // first check current group (if one exists)
-    // active group does not check sub targets like normal groups.
-    // if active group just exits.
-    this.targets = [];
-
-    // if we hit the corner of an activeObject, let's return that.
-    if (
-      // ts doesn't get that if shouldLookForActive is true, activeObject exists
-      activeObject &&
-      shouldLookForActive &&
-      activeObject._findTargetCorner(pointer, isTouch)
-    ) {
-      return activeObject;
+    this.__onMouseUp(e);
+    this._resetTransformEventData();
+    this.mainTouchId = null;
+    const eventTypePrefix = this._getEventPrefix();
+    removeListener(
+      getEnv().document,
+      'touchend',
+      this._onTouchEnd as EventListener,
+      addEventOptions
+    );
+    removeListener(
+      getEnv().document,
+      'touchmove',
+      this._onMouseMove as EventListener,
+      addEventOptions
+    );
+    if (this._willAddMouseDown) {
+      clearTimeout(this._willAddMouseDown);
     }
-    if (
-      aObjects.length > 1 &&
-      isActiveSelection(activeObject) &&
-      !skipGroup &&
-      this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      return activeObject;
-    }
-
-    let activeTarget;
-    let activeTargetSubs: FabricObject[] = [];
-    if (
-      // ts doesn't get that if aObjects has one object, activeObject exists
-      activeObject &&
-      aObjects.length === 1 &&
-      activeObject === this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      if (!this.preserveObjectStacking) {
-        return activeObject;
-      } else {
-        activeTarget = activeObject;
-        activeTargetSubs = this.targets;
-        this.targets = [];
-      }
-    }
-    const target = this.searchPossibleTargets(this._objects, pointer);
-    if (
-      e[this.altSelectionKey as ModifierKey] &&
-      target &&
-      activeTarget &&
-      target !== activeTarget
-    ) {
-      this.targets = activeTargetSubs;
-      return activeTarget;
-    }
-    return target;
+    this._willAddMouseDown = setTimeout(() => {
+      // Wait 400ms before rebinding mousedown to prevent double triggers
+      // from touch devices
+      addListener(
+        this.upperCanvasEl,
+        eventTypePrefix + 'down',
+        this._onMouseDown as EventListener
+      );
+      this._willAddMouseDown = 0;
+    }, 400) as unknown as number;
   }
 
   /**
-   * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
-   * @return {Boolean} true if point is contained within an area of given object
+   * @private
+   * @param {Event} e Event object fired on mouseup
+   */
+  _onMouseUp(e: TPointerEvent) {
+    this.__onMouseUp(e);
+    this._resetTransformEventData();
+    const canvasElement = this.upperCanvasEl,
+      eventTypePrefix = this._getEventPrefix();
+    if (this._isMainEvent(e)) {
+      removeListener(
+        getEnv().document,
+        `${eventTypePrefix}up`,
+        this._onMouseUp as EventListener
+      );
+      removeListener(
+        getEnv().document,
+        `${eventTypePrefix}move`,
+        this._onMouseMove as EventListener,
+        addEventOptions
+      );
+      addListener(
+        canvasElement,
+        `${eventTypePrefix}move`,
+        this._onMouseMove as EventListener,
+        addEventOptions
+      );
+    }
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousemove
+   */
+  _onMouseMove(e: TPointerEvent) {
+    const activeObject = this.getActiveObject();
+    !this.allowTouchScrolling &&
+      (!activeObject ||
+        // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
+        // we must not prevent the event's default behavior in order for the window to start dragging
+        (isFabricObjectWithDragSupport(activeObject) &&
+          !activeObject.shouldStartDragging())) &&
+      e.preventDefault &&
+      e.preventDefault();
+    this.__onMouseMove(e);
+  }
+
+  /**
    * @private
    */
-  _checkTarget(
-    pointer: Point,
-    obj: FabricObject,
-    globalPointer: Point
-  ): boolean {
+  _onResize() {
+    this.calcOffset();
+    this._resetTransformEventData();
+  }
+
+  /**
+   * Decides whether the canvas should be redrawn in mouseup and mousedown events.
+   * @private
+   * @param {Object} target
+   */
+  _shouldRender(target: FabricObject | undefined) {
+    const activeObject = this.getActiveObject();
+
+    // if just one of them is available or if they are both but are different objects
     if (
-      obj &&
-      obj.visible &&
-      obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(pointer)
+      !!activeObject !== !!target ||
+      (activeObject && target && activeObject !== target)
     ) {
-      if (
-        (this.perPixelTargetFind || obj.perPixelTargetFind) &&
-        !(obj as unknown as IText).isEditing
-      ) {
-        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
-          return true;
-        }
-      } else {
-        return true;
-      }
+      // this covers: switch of target, from target to no target, selection of target
+      // multiSelection with key and mouse
+      return true;
+    } else if (isInteractiveTextObject(activeObject)) {
+      // if we mouse up/down over a editing textbox a cursor change,
+      // there is no need to re render
+      return false;
     }
     return false;
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object from given `objects`** that contains pointer
+   * Method that defines the actions when mouse is released on canvas.
+   * The method resets the currentTransform parameters, store the image corner
+   * position in the image object and render the canvas on top.
    * @private
+   * @param {Event} e Event object fired on mouseup
    */
-  _searchPossibleTargets(
-    objects: FabricObject[],
-    pointer: Point
-  ): FabricObject | undefined {
-    // Cache all targets where their bounding box contains point.
-    let target,
-      i = objects.length;
-    // Do not check for currently grouped objects, since we check the parent group itself.
-    // until we call this function specifically to search inside the activeGroup
-    while (i--) {
-      const objToCheck = objects[i];
-      const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
-        : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
-        if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(
-            target._objects as FabricObject[],
-            pointer
-          );
-          subTarget && this.targets.push(subTarget);
-        }
-        break;
+  __onMouseUp(e: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._cacheTransformEventData(e);
+    const target = this._target;
+    const isClick = this._isClick;
+    this._handleEvent(e, 'up:before');
+    // if right/middle click just fire events and return
+    // target undefined will make the _handleEvent search the target
+    if (checkClick(e, RIGHT_CLICK)) {
+      if (this.fireRightClick) {
+        this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
+      }
+      return;
+    }
+
+    if (checkClick(e, MIDDLE_CLICK)) {
+      if (this.fireMiddleClick) {
+        this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
+      }
+      this._resetTransformEventData();
+      return;
+    }
+
+    if (this.isDrawingMode && this._isCurrentlyDrawing) {
+      this._onMouseUpInDrawingMode(e);
+      return;
+    }
+
+    if (!this._isMainEvent(e)) {
+      return;
+    }
+    let shouldRender = false;
+    if (transform) {
+      this._finalizeCurrentTransform(e);
+      shouldRender = transform.actionPerformed;
+    }
+    if (!isClick) {
+      const targetWasActive = target === this._activeObject;
+      this._maybeGroupObjects(e);
+      if (!shouldRender) {
+        shouldRender =
+          this._shouldRender(target) ||
+          (!targetWasActive && target === this._activeObject);
       }
     }
-    return target;
-  }
-
-  /**
-   * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link fabric.Canvas#_searchPossibleTargets}
-   * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object on screen** that contains pointer
-   */
-  searchPossibleTargets(
-    objects: FabricObject[],
-    pointer: Point
-  ): FabricObject | undefined {
-    const target = this._searchPossibleTargets(objects, pointer);
-    // if we found something in this.targets, and the group is interactive, return that subTarget
-    // TODO: reverify why interactive. the target should be returned always, but selected only
-    // if interactive.
-    return target &&
-      isCollection(target) &&
-      target.interactive &&
-      this.targets[0]
-      ? this.targets[0]
-      : target;
-  }
-
-  /**
-   * Returns pointer coordinates without the effect of the viewport
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
-   */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
-  }
-
-  /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
-   * @return {Point}
-   */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
-      return this._absolutePointer;
-    }
-    if (this._pointer && ignoreVpt) {
-      return this._pointer;
-    }
-
-    const upperCanvasEl = this.upperCanvasEl,
-      bounds = upperCanvasEl.getBoundingClientRect();
-    let pointer = getPointer(e),
-      boundsWidth = bounds.width || 0,
-      boundsHeight = bounds.height || 0;
-
-    if (!boundsWidth || !boundsHeight) {
-      if ('top' in bounds && 'bottom' in bounds) {
-        boundsHeight = Math.abs(bounds.top - bounds.bottom);
-      }
-      if ('right' in bounds && 'left' in bounds) {
-        boundsWidth = Math.abs(bounds.right - bounds.left);
-      }
-    }
-
-    this.calcOffset();
-    pointer.x = pointer.x - this._offset.left;
-    pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
-    }
-
-    const retinaScaling = this.getRetinaScaling();
-    if (retinaScaling !== 1) {
-      pointer.x /= retinaScaling;
-      pointer.y /= retinaScaling;
-    }
-
-    // If bounds are not available (i.e. not visible), do not apply scale.
-    const cssScale =
-      boundsWidth === 0 || boundsHeight === 0
-        ? new Point(1, 1)
-        : new Point(
-            upperCanvasEl.width / boundsWidth,
-            upperCanvasEl.height / boundsHeight
-          );
-
-    return pointer.multiply(cssScale);
-  }
-
-  /**
-   * Internal use only
-   * @protected
-   */
-  protected _setDimensionsImpl(
-    dimensions: TSize,
-    options?: TCanvasSizeOptions
-  ) {
-    // @ts-ignore
-    this._resetTransformEventData();
-    super._setDimensionsImpl(dimensions, options);
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
-  }
-
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    super._setBackstoreDimension(prop, value);
-    this.upperCanvasEl[prop] = value;
-    this.cacheCanvasEl[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    super._setCssDimension(prop, value);
-    this.upperCanvasEl.style[prop] = value;
-    this.wrapperEl.style[prop] = value;
-  }
-
-  /**
-   * @private
-   * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
-   */
-  protected _createUpperCanvas() {
-    const lowerCanvasEl = this.lowerCanvasEl;
-
-    // if there is no upperCanvas (most common case) we create one.
-    if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
-    }
-    const upperCanvasEl = this.upperCanvasEl;
-    // we assign the same classname of the lowerCanvas
-    upperCanvasEl.className = lowerCanvasEl.className;
-    // but then we remove the lower-canvas specific className
-    upperCanvasEl.classList.remove('lower-canvas');
-    // we add the specific upper-canvas class
-    upperCanvasEl.classList.add('upper-canvas');
-    upperCanvasEl.setAttribute('data-fabric', 'top');
-    this.wrapperEl.appendChild(upperCanvasEl);
-    upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
-    this._applyCanvasStyle(upperCanvasEl);
-    upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext('2d')!;
-  }
-
-  protected _createCacheCanvas() {
-    this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
-  }
-
-  protected _initWrapperElement() {
-    const container = getEnv().document.createElement('div');
-    container.classList.add(this.containerClass);
-    this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
-    this.wrapperEl.setAttribute('data-fabric', 'wrapper');
-    setStyle(this.wrapperEl, {
-      width: `${this.width}px`,
-      height: `${this.height}px`,
-      position: 'relative',
-    });
-    makeElementUnselectable(this.wrapperEl);
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  protected _applyCanvasStyle(element: HTMLCanvasElement) {
-    const width = this.width || element.width,
-      height = this.height || element.height;
-
-    setStyle(element, {
-      position: 'absolute',
-      width: width + 'px',
-      height: height + 'px',
-      left: 0,
-      top: 0,
-      'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-    });
-    element.width = width;
-    element.height = height;
-    makeElementUnselectable(element);
-  }
-
-  /**
-   * Returns context of top canvas where interactions are drawn
-   * @returns {CanvasRenderingContext2D}
-   */
-  getTopContext(): CanvasRenderingContext2D {
-    return this.contextTop;
-  }
-
-  /**
-   * Returns context of canvas where object selection is drawn
-   * @alias
-   * @return {CanvasRenderingContext2D}
-   */
-  getSelectionContext(): CanvasRenderingContext2D {
-    return this.contextTop;
-  }
-
-  /**
-   * Returns &lt;canvas> element on which object selection is drawn
-   * @return {HTMLCanvasElement}
-   */
-  getSelectionElement(): HTMLCanvasElement {
-    return this.upperCanvasEl;
-  }
-
-  /**
-   * Returns currently active object
-   * @return {FabricObject | null} active object
-   */
-  getActiveObject(): FabricObject | undefined {
-    return this._activeObject;
-  }
-
-  /**
-   * Returns an array with the current selected objects
-   * @return {FabricObject[]} active objects array
-   */
-  getActiveObjects(): FabricObject[] {
-    const active = this._activeObject;
-    if (active) {
-      if (isActiveSelection(active)) {
-        return [...active._objects];
+    let pointer, corner;
+    if (target) {
+      corner = target._findTargetCorner(
+        this.getPointer(e, true),
+        isTouchEvent(e)
+      );
+      if (
+        target.selectable &&
+        target !== this._activeObject &&
+        target.activeOn === 'up'
+      ) {
+        this.setActiveObject(target, e);
+        shouldRender = true;
       } else {
-        return [active];
+        const control = target.controls[corner as string];
+        const mouseUpHandler =
+          control && control.getMouseUpHandler(e, target, control);
+        if (mouseUpHandler) {
+          pointer = this.getPointer(e);
+          mouseUpHandler(e, transform!, pointer.x, pointer.y);
+        }
       }
+      target.isMoving = false;
     }
-    return [];
+    // if we are ending up a transform on a different control or a new object
+    // fire the original mouse up from the corner that started the transform
+    if (
+      transform &&
+      (transform.target !== target || transform.corner !== corner)
+    ) {
+      const originalControl =
+          transform.target && transform.target.controls[transform.corner],
+        originalMouseUpHandler =
+          originalControl &&
+          originalControl.getMouseUpHandler(
+            e,
+            transform.target,
+            originalControl
+          );
+      pointer = pointer || this.getPointer(e);
+      originalMouseUpHandler &&
+        originalMouseUpHandler(e, transform, pointer.x, pointer.y);
+    }
+    this._setCursorFromEvent(e, target);
+    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+    this._groupSelector = null;
+    this._currentTransform = null;
+    // reset the target information about which corner is selected
+    target && (target.__corner = undefined);
+    if (shouldRender) {
+      this.requestRenderAll();
+    } else if (
+      !isClick &&
+      !(
+        isInteractiveTextObject(this._activeObject) &&
+        this._activeObject.isEditing
+      )
+    ) {
+      this.renderTop();
+    }
+  }
+
+  _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
+    eventType: T,
+    options: (CanvasEvents & ObjectEvents)[T]
+  ) {
+    const { target, subTargets = [] } = options as {
+      target?: FabricObject;
+      subTargets: FabricObject[];
+    };
+    this.fire(eventType, options);
+    target && target.fire(eventType, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i].fire(eventType, options);
+    }
+    return options;
   }
 
   /**
    * @private
-   * Compares the old activeObject with the current one and fires correct events
-   * @param {FabricObject[]} oldObjects old activeObject
-   * @param {TPointerEvent} e mouse event triggering the selection events
+   * Handle event firing for target and subtargets
+   * @param {Event} e event from mouse
+   * @param {String} eventType event to fire (up, down or move)
+   * @param {fabric.Object} targetObj receiving event
+   * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
+   * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
    */
-  _fireSelectionEvents(oldObjects: FabricObject[], e?: TPointerEvent) {
-    let somethingChanged = false,
-      invalidate = false;
-    const objects = this.getActiveObjects(),
-      added: FabricObject[] = [],
-      removed: FabricObject[] = [];
-
-    oldObjects.forEach((target) => {
-      if (!objects.includes(target)) {
-        somethingChanged = true;
-        target.fire('deselected', {
-          e,
-          target,
-        });
-        removed.push(target);
-      }
-    });
-
-    objects.forEach((target) => {
-      if (!oldObjects.includes(target)) {
-        somethingChanged = true;
-        target.fire('selected', {
-          e,
-          target,
-        });
-        added.push(target);
-      }
-    });
-
-    if (oldObjects.length > 0 && objects.length > 0) {
-      invalidate = true;
-      somethingChanged &&
-        this.fire('selection:updated', {
-          e,
-          selected: added,
-          deselected: removed,
-        });
-    } else if (objects.length > 0) {
-      invalidate = true;
-      this.fire('selection:created', {
-        e,
-        selected: added,
-      });
-    } else if (oldObjects.length > 0) {
-      invalidate = true;
-      this.fire('selection:cleared', {
-        e,
-        deselected: removed,
-      });
+  _handleEvent(
+    e: TPointerEvent,
+    eventType: TPointerEventNames,
+    button = LEFT_CLICK,
+    isClick = false
+  ) {
+    const target = this._target,
+      targets = this.targets || [],
+      options: TPointerEventInfo = {
+        e: e,
+        target: target,
+        subTargets: targets,
+        button,
+        isClick,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
+        transform: this._currentTransform,
+      };
+    if (eventType === 'up') {
+      options.currentTarget = this.findTarget(e);
+      options.currentSubTargets = this.targets;
     }
+    this.fire(`mouse:${eventType}`, options);
+    // this may be a little be more complicated of what we want to handle
+    target && target.fire(`mouse${eventType}`, options);
+    for (let i = 0; i < targets.length; i++) {
+      targets[i].fire(`mouse${eventType}`, options);
+    }
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    if (target._scaling) {
+      target._scaling = false;
+    }
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousedown
+   */
+  _onMouseDownInDrawingMode(e: TPointerEvent) {
+    this._isCurrentlyDrawing = true;
+    if (this.getActiveObject()) {
+      this.discardActiveObject(e);
+      this.requestRenderAll();
+    }
+    const pointer = this.getPointer(e);
+    this.freeDrawingBrush &&
+      this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
+    this._handleEvent(e, 'down');
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mousemove
+   */
+  _onMouseMoveInDrawingMode(e: TPointerEvent) {
+    if (this._isCurrentlyDrawing) {
+      const pointer = this.getPointer(e);
+      this.freeDrawingBrush &&
+        this.freeDrawingBrush.onMouseMove(pointer, {
+          e,
+          pointer,
+        });
+    }
+    this.setCursor(this.freeDrawingCursor);
+    this._handleEvent(e, 'move');
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object fired on mouseup
+   */
+  _onMouseUpInDrawingMode(e: TPointerEvent) {
+    const pointer = this.getPointer(e);
+    if (this.freeDrawingBrush) {
+      this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
+        e: e,
+        pointer: pointer,
+      });
+    } else {
+      this._isCurrentlyDrawing = false;
+    }
+    this._handleEvent(e, 'up');
+  }
+
+  /**
+   * Method that defines the actions when mouse is clicked on canvas.
+   * The method inits the currentTransform parameters and renders all the
+   * canvas so the current image can be placed on the top canvas and the rest
+   * in on the container one.
+   * @private
+   * @param {Event} e Event object fired on mousedown
+   */
+  __onMouseDown(e: TPointerEvent) {
+    this._isClick = true;
+    this._cacheTransformEventData(e);
+    this._handleEvent(e, 'down:before');
+    let target: FabricObject | undefined = this._target;
+    // if right click just fire events
+    if (checkClick(e, RIGHT_CLICK)) {
+      if (this.fireRightClick) {
+        this._handleEvent(e, 'down', RIGHT_CLICK);
+      }
+      return;
+    }
+
+    if (checkClick(e, MIDDLE_CLICK)) {
+      if (this.fireMiddleClick) {
+        this._handleEvent(e, 'down', MIDDLE_CLICK);
+      }
+      return;
+    }
+
+    if (this.isDrawingMode) {
+      this._onMouseDownInDrawingMode(e);
+      return;
+    }
+
+    if (!this._isMainEvent(e)) {
+      return;
+    }
+
+    // ignore if some object is being transformed at this moment
+    if (this._currentTransform) {
+      return;
+    }
+
+    const pointer = this.getPointer(e, true);
+    // save pointer for check in __onMouseUp event
+    this._previousPointer = pointer;
+    const shouldRender = this._shouldRender(target),
+      shouldGroup = this._shouldGroup(e, target);
+    if (this._shouldClearSelection(e, target)) {
+      this.discardActiveObject(e);
+    } else if (shouldGroup) {
+      // in order for shouldGroup to be true, target needs to be true
+      this._handleGrouping(e, target!);
+      target = this._activeObject;
+    }
+    // we start a group selector rectangle if
+    // selection is enabled
+    // and there is no target, or the following 3 condition both apply
+    // target is not selectable ( otherwise we selected it )
+    // target is not editing
+    // target is not already selected ( otherwise we drage )
+    if (
+      this.selection &&
+      (!target ||
+        (!target.selectable &&
+          // @ts-ignore
+          !target.isEditing &&
+          target !== this._activeObject))
+    ) {
+      const p = this.getPointer(e);
+      this._groupSelector = {
+        ex: p.x,
+        ey: p.y,
+        top: 0,
+        left: 0,
+      };
+    }
+
+    if (target) {
+      const alreadySelected = target === this._activeObject;
+      if (target.selectable && target.activeOn === 'down') {
+        this.setActiveObject(target, e);
+      }
+      const corner = target._findTargetCorner(
+        this.getPointer(e, true),
+        isTouchEvent(e)
+      );
+      if (target === this._activeObject && (corner || !shouldGroup)) {
+        this._setupCurrentTransform(e, target, alreadySelected);
+        const control = target.controls[corner],
+          pointer = this.getPointer(e),
+          mouseDownHandler =
+            control && control.getMouseDownHandler(e, target, control);
+        if (mouseDownHandler) {
+          mouseDownHandler(e, this._currentTransform!, pointer.x, pointer.y);
+        }
+      }
+    }
+    const invalidate = shouldRender || shouldGroup;
+    //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
+    //  run before firing the `down` event to give the dev a chance to populate it themselves
     invalidate && (this._objectsToRender = undefined);
+    this._handleEvent(e, 'down');
+    // we must renderAll so that we update the visuals
+    invalidate && this.requestRenderAll();
   }
 
   /**
-   * Sets given object as the only active object on canvas
-   * @param {FabricObject} object Object to set as an active one
-   * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
-   * @chainable
-   */
-  setActiveObject(object: FabricObject, e?: TPointerEvent) {
-    // we can't inline this, since _setActiveObject will change what getActiveObjects returns
-    const currentActives = this.getActiveObjects();
-    this._setActiveObject(object, e);
-    this._fireSelectionEvents(currentActives, e);
-  }
-
-  /**
-   * This is a private method for now.
-   * This is supposed to be equivalent to setActiveObject but without firing
-   * any event. There is commitment to have this stay this way.
-   * This is the functional part of setActiveObject.
-   * @private
-   * @param {Object} object to set as active
-   * @param {Event} [e] Event (passed along when firing "object:selected")
-   * @return {Boolean} true if the selection happened
-   */
-  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
-    if (this._activeObject === object) {
-      return false;
-    }
-    if (!this._discardActiveObject(e, object)) {
-      return false;
-    }
-    if (object.onSelect({ e })) {
-      return false;
-    }
-    this._activeObject = object;
-    return true;
-  }
-
-  /**
-   * This is a private method for now.
-   * This is supposed to be equivalent to discardActiveObject but without firing
-   * any selection events ( can still fire object transformation events ). There is commitment to have this stay this way.
-   * This is the functional part of discardActiveObject.
-   * @param {Event} [e] Event (passed along when firing "object:deselected")
-   * @param {Object} object the next object to set as active, reason why we are discarding this
-   * @return {Boolean} true if the selection happened
+   * reset cache form common information needed during event processing
    * @private
    */
-  _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
-    const obj = this._activeObject;
-    if (obj) {
-      // onDeselect return TRUE to cancel selection;
-      if (obj.onDeselect({ e, object })) {
-        return false;
-      }
-      if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-ignore
-        this.endCurrentTransform(e);
-      }
-      this._activeObject = undefined;
-    }
-    return true;
+  _resetTransformEventData() {
+    this._target = undefined;
+    this._pointer = undefined;
+    this._absolutePointer = undefined;
   }
 
   /**
-   * Discards currently active object and fire events. If the function is called by fabric
-   * as a consequence of a mouse event, the event is passed as a parameter and
-   * sent to the fire function for the custom events. When used as a method the
-   * e param does not have any application.
-   * @param {event} e
-   * @chainable
+   * Cache common information needed during event processing
+   * @private
+   * @param {Event} e Event object fired on event
    */
-  discardActiveObject(e?: TPointerEvent) {
-    const currentActives = this.getActiveObjects(),
-      activeObject = this.getActiveObject();
-    if (currentActives.length) {
-      this.fire('before:selection:cleared', {
+  _cacheTransformEventData(e: TPointerEvent) {
+    // reset in order to avoid stale caching
+    this._resetTransformEventData();
+    this._pointer = this.getPointer(e, true);
+    this._absolutePointer = this.restorePointerVpt(this._pointer);
+    this._target = this._currentTransform
+      ? this._currentTransform.target
+      : this.findTarget(e);
+  }
+
+  /**
+   * @private
+   */
+  _beforeTransform(e: TPointerEvent) {
+    const t = this._currentTransform!;
+    this.fire('before:transform', {
+      e,
+      transform: t,
+    });
+  }
+
+  /**
+   * Method that defines the actions when mouse is hovering the canvas.
+   * The currentTransform parameter will define whether the user is rotating/scaling/translating
+   * an image or neither of them (only hovering). A group selection is also possible and would cancel
+   * all any other type of action.
+   * In case of an image transformation only the top canvas will be rendered.
+   * @private
+   * @param {Event} e Event object fired on mousemove
+   */
+  __onMouseMove(e: TPointerEvent) {
+    this._isClick = false;
+    this._handleEvent(e, 'move:before');
+    this._cacheTransformEventData(e);
+
+    if (this.isDrawingMode) {
+      this._onMouseMoveInDrawingMode(e);
+      return;
+    }
+
+    if (!this._isMainEvent(e)) {
+      return;
+    }
+
+    const groupSelector = this._groupSelector;
+
+    // We initially clicked in an empty area, so we draw a box for multiple selection
+    if (groupSelector) {
+      const pointer = this.getPointer(e);
+
+      groupSelector.left = pointer.x - groupSelector.ex;
+      groupSelector.top = pointer.y - groupSelector.ey;
+
+      this.renderTop();
+    } else if (!this._currentTransform) {
+      const target = this.findTarget(e);
+      this._setCursorFromEvent(e, target);
+      this._fireOverOutEvents(e, target);
+    } else {
+      this._transformObject(e);
+    }
+    this.textEditingManager.onMouseMove(e);
+    this._handleEvent(e, 'move');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * Manage the mouseout, mouseover events for the fabric object on the canvas
+   * @param {Fabric.Object} target the target where the target from the mousemove event
+   * @param {Event} e Event object fired on mousemove
+   * @private
+   */
+  _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
+    const _hoveredTarget = this._hoveredTarget,
+      _hoveredTargets = this._hoveredTargets,
+      targets = this.targets,
+      length = Math.max(_hoveredTargets.length, targets.length);
+
+    this.fireSyntheticInOutEvents('mouse', {
+      e,
+      target,
+      oldTarget: _hoveredTarget,
+      fireCanvas: true,
+    });
+    for (let i = 0; i < length; i++) {
+      this.fireSyntheticInOutEvents('mouse', {
         e,
-        deselected: [activeObject!],
+        target: targets[i],
+        oldTarget: _hoveredTargets[i],
       });
     }
-    this._discardActiveObject(e);
-    this._fireSelectionEvents(currentActives, e);
+    this._hoveredTarget = target;
+    this._hoveredTargets = this.targets.concat();
   }
 
   /**
-   * Sets viewport transformation of this canvas instance
-   * @param {Array} vpt a Canvas 2D API transform matrix
-   */
-  setViewportTransform(vpt: TMat2D) {
-    super.setViewportTransform(vpt);
-    const activeObject = this._activeObject;
-    if (activeObject) {
-      activeObject.setCoords();
-    }
-  }
-
-  /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
+   * Manage the dragEnter, dragLeave events for the fabric objects on the canvas
+   * @param {Fabric.Object} target the target where the target from the onDrag event
+   * @param {Object} data Event object fired on dragover
    * @private
    */
-  destroy(this: TDestroyedCanvas) {
-    const wrapperEl = this.wrapperEl as HTMLDivElement,
-      lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!;
-    // @ts-ignore
-    this.removeListeners();
-    super.destroy();
-    wrapperEl.removeChild(upperCanvasEl);
-    wrapperEl.removeChild(lowerCanvasEl);
-    this.contextCache = null;
-    this.contextTop = null;
-    cleanUpJsdomNode(upperCanvasEl);
-    this.upperCanvasEl = undefined;
-    cleanUpJsdomNode(cacheCanvasEl);
-    this.cacheCanvasEl = undefined;
-    if (wrapperEl.parentNode) {
-      wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
+  _fireEnterLeaveEvents(target: FabricObject | undefined, data: DragEventData) {
+    const draggedoverTarget = this._draggedoverTarget,
+      _hoveredTargets = this._hoveredTargets,
+      targets = this.targets,
+      length = Math.max(_hoveredTargets.length, targets.length);
+
+    this.fireSyntheticInOutEvents('drag', {
+      ...data,
+      target,
+      oldTarget: draggedoverTarget,
+      fireCanvas: true,
+    });
+    for (let i = 0; i < length; i++) {
+      this.fireSyntheticInOutEvents('drag', {
+        ...data,
+        target: targets[i],
+        oldTarget: _hoveredTargets[i],
+      });
     }
-    this.wrapperEl = undefined;
+    this._draggedoverTarget = target;
   }
 
   /**
-   * Clears all contexts (background, main, top) of an instance
+   * Manage the synthetic in/out events for the fabric objects on the canvas
+   * @param {Fabric.Object} target the target where the target from the supported events
+   * @param {Object} data Event object fired
+   * @param {Object} config configuration for the function to work
+   * @param {String} config.targetName property on the canvas where the old target is stored
+   * @param {String} [config.canvasEvtOut] name of the event to fire at canvas level for out
+   * @param {String} config.evtOut name of the event to fire for out
+   * @param {String} [config.canvasEvtIn] name of the event to fire at canvas level for in
+   * @param {String} config.evtIn name of the event to fire for in
+   * @private
+   */
+  fireSyntheticInOutEvents<T extends keyof TSyntheticEventContext>(
+    type: T,
+    {
+      target,
+      oldTarget,
+      fireCanvas,
+      e,
+      ...data
+    }: TSyntheticEventContext[T] & {
+      target?: FabricObject;
+      oldTarget?: FabricObject;
+      fireCanvas?: boolean;
+    }
+  ) {
+    const { targetIn, targetOut, canvasIn, canvasOut } =
+      syntheticEventConfig[type];
+    const targetChanged = oldTarget !== target;
+
+    if (oldTarget && targetChanged) {
+      const outOpt = {
+        ...data,
+        e,
+        target: oldTarget,
+        nextTarget: target,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
+      };
+      fireCanvas && this.fire(canvasIn, outOpt);
+      oldTarget.fire(targetOut, outOpt);
+    }
+    if (target && targetChanged) {
+      const inOpt: TPointerEventInfo = {
+        ...data,
+        e,
+        target,
+        previousTarget: oldTarget,
+        isClick: false,
+        pointer: this.getPointer(e),
+        absolutePointer: this.getPointer(e, true),
+      };
+      fireCanvas && this.fire(canvasOut, inOpt);
+      target.fire(targetIn, inOpt);
+    }
+  }
+
+  /**
+   * Method that defines actions when an Event Mouse Wheel
+   * @param {Event} e Event object fired on mouseup
+   */
+  __onMouseWheel(e: TPointerEvent) {
+    this._cacheTransformEventData(e);
+    this._handleEvent(e, 'wheel');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event fired on mousemove
+   */
+  _transformObject(e: TPointerEvent) {
+    const pointer = this.getPointer(e),
+      transform = this._currentTransform!,
+      target = transform.target,
+      //  transform pointer to target's containing coordinate plane
+      //  both pointer and object should agree on every point
+      localPointer = target.group
+        ? sendPointToPlane(
+            pointer,
+            undefined,
+            target.group.calcTransformMatrix()
+          )
+        : pointer;
+    // seems used only here.
+    // @TODO: investigate;
+    // @ts-ignore
+    transform.reset = false;
+    transform.shiftKey = e.shiftKey;
+    transform.altKey = !!this.centeredKey && e[this.centeredKey];
+
+    this._performTransformAction(e, transform, localPointer);
+    transform.actionPerformed && this.requestRenderAll();
+  }
+
+  /**
+   * @private
+   */
+  _performTransformAction(
+    e: TPointerEvent,
+    transform: Transform,
+    pointer: Point
+  ) {
+    const x = pointer.x,
+      y = pointer.y,
+      action = transform.action,
+      actionHandler = transform.actionHandler;
+    let actionPerformed = false;
+    // this object could be created from the function in the control handlers
+
+    if (actionHandler) {
+      actionPerformed = actionHandler(e, transform, x, y);
+    }
+    if (action === 'drag' && actionPerformed) {
+      transform.target.isMoving = true;
+      this.setCursor(transform.target.moveCursor || this.moveCursor);
+    }
+    transform.actionPerformed = transform.actionPerformed || actionPerformed;
+  }
+
+  /**
+   * Sets the cursor depending on where the canvas is being hovered.
+   * Note: very buggy in Opera
+   * @param {Event} e Event object
+   * @param {Object} target Object that the mouse is hovering, if so.
+   */
+  _setCursorFromEvent(e: TPointerEvent, target?: FabricObject) {
+    if (!target) {
+      this.setCursor(this.defaultCursor);
+      return;
+    }
+    let hoverCursor = target.hoverCursor || this.hoverCursor;
+    const activeSelection = isActiveSelection(this._activeObject)
+        ? this._activeObject
+        : null,
+      // only show proper corner when group selection is not active
+      corner =
+        (!activeSelection || !activeSelection.contains(target)) &&
+        // here we call findTargetCorner always with undefined for the touch parameter.
+        // we assume that if you are using a cursor you do not need to interact with
+        // the bigger touch area.
+        target._findTargetCorner(this.getPointer(e, true));
+
+    if (!corner) {
+      if ((target as Group).subTargetCheck) {
+        // hoverCursor should come from top-most subTarget,
+        // so we walk the array backwards
+        this.targets
+          .concat()
+          .reverse()
+          .map((_target) => {
+            hoverCursor = _target.hoverCursor || hoverCursor;
+          });
+      }
+      this.setCursor(hoverCursor);
+    } else {
+      const control = target.controls[corner];
+      this.setCursor(control.cursorStyleHandler(e, control, target));
+    }
+  }
+
+  // Grouping objects mixin
+
+  /**
+   * Return true if the current mouse event that generated a new selection should generate a group
+   * @private
+   * @param {TPointerEvent} e Event object
+   * @param {FabricObject} target
+   * @return {Boolean}
+   */
+  _shouldGroup(e: TPointerEvent, target?: FabricObject): boolean {
+    const activeObject = this._activeObject;
+    // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
+    return (
+      !!activeObject &&
+      this._isSelectionKeyPressed(e) &&
+      this.selection &&
+      // on top of that the user also has to hit a target that is selectable.
+      !!target &&
+      target.selectable &&
+      // if all pre-requisite pass, the target is either something different from the current
+      // activeObject or if an activeSelection already exists
+      // TODO at time of writing why `activeObject.type === 'activeSelection'` matter is unclear.
+      // is a very old condition uncertain if still valid.
+      (activeObject !== target || activeObject.type === 'activeSelection') &&
+      //  make sure `activeObject` and `target` aren't ancestors of each other
+      !target.isDescendantOf(activeObject) &&
+      !activeObject.isDescendantOf(target) &&
+      //  target accepts selection
+      !target.onSelect({ e: e })
+    );
+  }
+
+  /**
+   * Handles active selection creation for user event
+   * @private
+   * @param {TPointerEvent} e Event object
+   * @param {FabricObject} target
+   */
+  _handleGrouping(e: TPointerEvent, target: FabricObject) {
+    let groupingTarget: FabricObject | undefined = target;
+    // Called always a shouldGroup, meaning that we can trust this._activeObject exists.
+    const activeObject = this._activeObject!;
+    // avoid multi select when shift click on a corner
+    if (activeObject.__corner) {
+      return;
+    }
+    if (groupingTarget === activeObject) {
+      // if it's a group, find target again, using activeGroup objects
+      groupingTarget = this.findTarget(e, true);
+      // if even object is not found or we are on activeObjectCorner, bail out
+      if (!groupingTarget || !groupingTarget.selectable) {
+        return;
+      }
+    }
+    if (activeObject && activeObject.type === 'activeSelection') {
+      this._updateActiveSelection(e, groupingTarget);
+    } else {
+      this._createActiveSelection(e, groupingTarget);
+    }
+  }
+
+  /**
+   * @private
+   */
+  _updateActiveSelection(e: TPointerEvent, target: FabricObject) {
+    const activeSelection = this._activeObject! as ActiveSelection,
+      currentActiveObjects = activeSelection.getObjects();
+    if (target.group === activeSelection) {
+      activeSelection.remove(target);
+      this._hoveredTarget = target;
+      this._hoveredTargets = this.targets.concat();
+      if (activeSelection.size() === 1) {
+        // activate last remaining object
+        this._setActiveObject(activeSelection.item(0) as FabricObject, e);
+      }
+    } else {
+      activeSelection.add(target);
+      this._hoveredTarget = activeSelection;
+      this._hoveredTargets = this.targets.concat();
+    }
+    this._fireSelectionEvents(currentActiveObjects as FabricObject[], e);
+  }
+
+  /**
+   * Generates and set as active the active selection from user events
+   * @private
+   */
+  _createActiveSelection(e: TPointerEvent, target: FabricObject) {
+    const currentActive = this.getActiveObject()!;
+    const groupObjects = target.isInFrontOf(currentActive)
+      ? [currentActive, target]
+      : [target, currentActive];
+    // @ts-ignore
+    currentActive.isEditing && currentActive.exitEditing();
+    //  handle case: target is nested
+    const newActiveSelection = new ActiveSelection(groupObjects, {
+      canvas: this,
+    });
+    this._hoveredTarget = newActiveSelection;
+    // ISSUE 4115: should we consider subTargets here?
+    // this._hoveredTargets = [];
+    // this._hoveredTargets = this.targets.concat();
+    this._setActiveObject(newActiveSelection, e);
+    this._fireSelectionEvents([currentActive], e);
+  }
+
+  /**
+   * Finds objects inside the selection rectangle and group them
+   * @private
+   * @param {Event} e mouse event
+   */
+  _groupSelectedObjects(e: TPointerEvent) {
+    const group = this._collectObjects(e);
+    // do not create group for 1 element only
+    if (group.length === 1) {
+      this.setActiveObject(group[0], e);
+    } else if (group.length > 1) {
+      const aGroup = new ActiveSelection(group.reverse(), {
+        canvas: this,
+      });
+      this.setActiveObject(aGroup, e);
+    }
+  }
+
+  /**
+   * @private
+   */
+  _collectObjects(e: TPointerEvent) {
+    const group: FabricObject[] = [],
+      _groupSelector = this._groupSelector,
+      point1 = new Point(_groupSelector.ex, _groupSelector.ey),
+      point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
+      selectionX1Y1 = point1.min(point2),
+      selectionX2Y2 = point1.max(point2),
+      allowIntersect = !this.selectionFullyContained,
+      isClick = point1.eq(point2);
+    // we iterate reverse order to collect top first in case of click.
+    for (let i = this._objects.length; i--; ) {
+      const currentObject = this._objects[i];
+
+      if (
+        !currentObject ||
+        !currentObject.selectable ||
+        !currentObject.visible
+      ) {
+        continue;
+      }
+
+      if (
+        (allowIntersect &&
+          currentObject.intersectsWithRect(
+            selectionX1Y1,
+            selectionX2Y2,
+            true
+          )) ||
+        currentObject.isContainedWithinRect(
+          selectionX1Y1,
+          selectionX2Y2,
+          true
+        ) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX1Y1, undefined, true)) ||
+        (allowIntersect &&
+          currentObject.containsPoint(selectionX2Y2, undefined, true))
+      ) {
+        group.push(currentObject);
+        // only add one object if it's a click
+        if (isClick) {
+          break;
+        }
+      }
+    }
+
+    if (group.length > 1) {
+      return group.filter((object) => !object.onSelect({ e }));
+    }
+
+    return group;
+  }
+
+  /**
+   * @private
+   */
+  _maybeGroupObjects(e: TPointerEvent) {
+    if (this.selection && this._groupSelector) {
+      this._groupSelectedObjects(e);
+    }
+    this.setCursor(this.defaultCursor);
+    // clear selection and current transformation
+    this._groupSelector = null;
+  }
+
+  exitTextEditing() {
+    this.textEditingManager.exitTextEditing();
+  }
+
+  /**
+   * @override clear {@link textEditingManager}
    */
   clear() {
-    // this.discardActiveGroup();
-    this.discardActiveObject();
-    this.clearContext(this.contextTop);
+    this.textEditingManager.dispose();
     super.clear();
   }
 
   /**
-   * Draws objects' controls (borders/controls)
-   * @param {CanvasRenderingContext2D} ctx Context to render controls on
+   * @override clear {@link textEditingManager}
    */
-  drawControls(ctx: CanvasRenderingContext2D) {
-    const activeObject = this._activeObject;
-
-    if (activeObject) {
-      activeObject._renderControls(ctx);
-    }
+  destroy() {
+    super.destroy();
+    this.textEditingManager.dispose();
   }
 
   /**
-   * @private
+   * Clones canvas instance without cloning existing data.
+   * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
+   * @returns {StaticCanvas}
    */
-  _toObject(
-    instance: FabricObject,
-    methodName: 'toObject' | 'toDatalessObject',
-    propertiesToInclude: string[]
-  ): Record<string, any> {
-    // If the object is part of the current selection group, it should
-    // be transformed appropriately
-    // i.e. it should be serialised as it would appear if the selection group
-    // were to be destroyed.
-    const originalProperties = this._realizeGroupTransformOnObject(instance),
-      object = super._toObject(instance, methodName, propertiesToInclude);
-    //Undo the damage we did by changing all of its properties
-    instance.set(originalProperties);
-    return object;
-  }
-
-  /**
-   * Realises an object's group transformation on it
-   * @private
-   * @param {FabricObject} [instance] the object to transform (gets mutated)
-   * @returns the original values of instance which were changed
-   */
-  _realizeGroupTransformOnObject(
-    instance: FabricObject
-  ): Partial<typeof instance> {
-    if (
-      instance.group &&
-      isActiveSelection(instance.group) &&
-      this._activeObject === instance.group
-    ) {
-      const layoutProps = [
-        'angle',
-        'flipX',
-        'flipY',
-        'left',
-        'scaleX',
-        'scaleY',
-        'skewX',
-        'skewY',
-        'top',
-      ] as (keyof typeof instance)[];
-      const originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(instance, this._activeObject.calcOwnMatrix());
-      return originalValues;
-    } else {
-      return {};
-    }
-  }
-
-  /**
-   * @private
-   */
-  _setSVGObject(
-    markup: string[],
-    instance: FabricObject,
-    reviver: TSVGReviver
-  ) {
-    // If the object is in a selection group, simulate what would happen to that
-    // object when the group is deselected
-    const originalProperties = this._realizeGroupTransformOnObject(instance);
-    super._setSVGObject(markup, instance, reviver);
-    instance.set(originalProperties);
+  cloneWithoutData(): Canvas {
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
+    // this seems wrong. either Canvas or StaticCanvas
+    return new Canvas(el);
   }
 }
-
-Object.assign(SelectableCanvas.prototype, {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  altSelectionKey: null,
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-});

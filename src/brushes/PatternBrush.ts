@@ -1,7 +1,7 @@
 import { Pattern } from '../Pattern';
 import { PathData } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import type { Canvas } from '../canvas/CanvasEvents';
+import type { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';
 
 export class PatternBrush extends PencilBrush {

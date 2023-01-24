@@ -6,7 +6,7 @@ import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import { Canvas } from './CanvasEvents';
+import { Canvas } from './Canvas';
 
 /**
  * Adds support for multi-touch gestures using the Event.js library.
