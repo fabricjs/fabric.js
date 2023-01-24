@@ -1,4 +1,4 @@
-import { Color } from './color/color.class';
+import { Color } from './color/Color';
 import { config } from './config';
 import { Point } from './point.class';
 import type { FabricObject } from './shapes/Object/FabricObject';

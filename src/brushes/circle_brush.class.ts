@@ -1,4 +1,4 @@
-import { Color } from '../color/color.class';
+import { Color } from '../color/Color';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Circle } from '../shapes/Circle';

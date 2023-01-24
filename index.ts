@@ -332,7 +332,7 @@ import { runningAnimations } from './src/util/animation/AnimationRegistry';
 import { Observable } from './src/Observable';
 import { Point } from './src/point.class';
 import { Intersection } from './src/intersection.class';
-import { Color } from './src/color/color.class';
+import { Color } from './src/color/Color';
 import { Control } from './src/controls/Control';
 import { Gradient } from './src/gradient/Gradient';
 import { Pattern } from './src/pattern.class';

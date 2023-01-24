@@ -1,4 +1,4 @@
-import { Color } from '../color/color.class';
+import { Color } from '../color/Color';
 import type { Point } from '../point.class';
 import { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../shadow.class';

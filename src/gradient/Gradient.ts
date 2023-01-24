@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Color } from '../color/color.class';
+import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
