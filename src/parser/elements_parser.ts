@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Gradient } from '../gradient/gradient.class';
+import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
 import { classRegistry } from '../util/class_registry';

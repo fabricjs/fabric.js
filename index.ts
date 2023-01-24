@@ -334,7 +334,7 @@ import { Point } from './src/point.class';
 import { Intersection } from './src/intersection.class';
 import { Color } from './src/color/color.class';
 import { Control } from './src/controls/control.class';
-import { Gradient } from './src/gradient/gradient.class';
+import { Gradient } from './src/gradient/Gradient';
 import { Pattern } from './src/pattern.class';
 import { Shadow } from './src/shadow.class';
 import { BaseBrush } from './src/brushes/base_brush.class';

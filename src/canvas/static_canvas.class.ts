@@ -2,7 +2,7 @@ import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
-import type { Gradient } from '../gradient/gradient.class';
+import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../pattern.class';

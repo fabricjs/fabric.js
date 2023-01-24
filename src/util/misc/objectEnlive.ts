@@ -1,5 +1,5 @@
 import { noop } from '../../constants';
-import type { Gradient } from '../../gradient/gradient.class';
+import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../pattern.class';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
