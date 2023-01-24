@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { StaticCanvas } from '../canvas/static_canvas.class';
+import { StaticCanvas } from '../canvas/StaticCanvas';
 import { animate } from '../util/animation/animate';
 
 Object.assign(StaticCanvas.prototype, {

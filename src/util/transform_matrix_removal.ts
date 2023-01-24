@@ -1,4 +1,4 @@
-import { Image } from '../shapes/image.class';
+import { Image } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TMat2D } from '../typedefs';
 import { qrDecompose } from './misc/matrix';

@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { uid } from '../util/internals/uid';
 
 (function (global) {
