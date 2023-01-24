@@ -31,18 +31,7 @@ import {
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
-import type { IText } from '../shapes/itext.class';
-import { FabricObject } from '../shapes/Object/FabricObject';
-import type { Textbox } from '../shapes/textbox.class';
-import {
-  AssertKeys,
-  TMat2D,
-  TOriginX,
-  TOriginY,
-  TSize,
-  TSVGReviver,
-} from '../typedefs';
-import { getPointer, isTouchEvent } from '../util/dom_event';
+import type { IText } from '../shapes/IText/IText';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,

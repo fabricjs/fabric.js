@@ -1,16 +1,16 @@
-import { getEnv } from '../env';
+import { getEnv } from '../../env';
 import {
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
-} from '../EventTypeDefs';
-import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/Object/Object';
-import { Text } from '../shapes/text.class';
-import { animate } from '../util/animation/animate';
-import { TOnAnimationChangeCallback } from '../util/animation/types';
-import type { ValueAnimation } from '../util/animation/ValueAnimation';
-import { TextStyleDeclaration } from './text_style.mixin';
+} from '../../EventTypeDefs';
+import { Point } from '../../point.class';
+import type { FabricObject } from '../Object/Object';
+import { Text } from '../Text/Text';
+import { animate } from '../../util/animation/animate';
+import { TOnAnimationChangeCallback } from '../../util/animation/types';
+import type { ValueAnimation } from '../../util/animation/ValueAnimation';
+import { TextStyleDeclaration } from '../Text/StyledText';
 
 // extend this regex to support non english languages
 const reNonWord = /[ \n\.,;!\?\-]/;
@@ -23,7 +23,7 @@ export type ITextEvents = ObjectEvents & {
   'editing:exited': never;
 };
 
-export abstract class ITextBehaviorMixin<
+export abstract class ITextBehavior<
   EventSpec extends ITextEvents = ITextEvents
 > extends Text<EventSpec> {
   declare abstract isEditing: boolean;

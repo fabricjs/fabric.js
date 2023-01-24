@@ -1,4 +1,4 @@
-import type { IText } from '../shapes/itext.class';
+import type { IText } from './IText';
 export type TKeyMapIText = Record<KeyboardEvent['keyCode'], keyof IText>;
 
 // @TODO look into import { Key } from 'ts-key-enum';
