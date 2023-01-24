@@ -1,11 +1,11 @@
-import type { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
-import { IPoint, Point } from '../point.class';
-import type { DragMethods } from '../shapes/Object/InteractiveObject';
-import { stopEvent } from '../util/dom_event';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { DraggableTextDelegate } from './DraggableTextDelegate';
-import { ITextEvents } from './itext_behavior.mixin';
-import { ITextKeyBehaviorMixin } from './itext_key_behavior.mixin';
+import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
+import { IPoint, Point } from '../../point.class';
+import type { DragMethods } from '../Object/InteractiveObject';
+import { stopEvent } from '../../util/dom_event';
+import { invertTransform, transformPoint } from '../../util/misc/matrix';
+import { DraggableTextDelegate } from '../../mixins/DraggableTextDelegate';
+import { ITextEvents } from './ITextBehavior';
+import { ITextKeyBehavior } from './ITextKeyBehavior';
 
 // TODO: this code seems wrong.
 // e.button for a left click is `0` and so different than `1` is more
@@ -14,10 +14,10 @@ function notALeftClick(e: MouseEvent) {
   return e.button && e.button !== 1;
 }
 
-export abstract class ITextClickBehaviorMixin<
+export abstract class ITextClickBehavior<
     EventSpec extends ITextEvents = ITextEvents
   >
-  extends ITextKeyBehaviorMixin<EventSpec>
+  extends ITextKeyBehavior<EventSpec>
   implements DragMethods
 {
   private declare __lastSelected: boolean;

@@ -1,14 +1,14 @@
-import { Canvas } from '../canvas/canvas_events';
-import { ITextEvents } from '../mixins/itext_behavior.mixin';
-import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
+import { Canvas } from '../../canvas/canvas_events';
+import { ITextEvents } from './ITextBehavior';
+import { ITextClickBehavior } from './ITextClickBehavior';
 import {
   ctrlKeysMapDown,
   ctrlKeysMapUp,
   keysMap,
   keysMapRtl,
-} from '../mixins/itext_key_const';
-import { AssertKeys, TClassProperties, TFiller } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+} from './constants';
+import { AssertKeys, TFiller } from '../../typedefs';
+import { classRegistry } from '../../util/class_registry';
 
 type CursorBoundaries = {
   left: number;
@@ -62,7 +62,7 @@ type CursorBoundaries = {
  */
 export class IText<
   EventSpec extends ITextEvents = ITextEvents
-> extends ITextClickBehaviorMixin<EventSpec> {
+> extends ITextClickBehavior<EventSpec> {
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number

@@ -352,7 +352,7 @@ import { Path } from './src/shapes/path.class';
 import { Polyline } from './src/shapes/polyline.class';
 import { Polygon } from './src/shapes/polygon.class';
 import { Text } from './src/shapes/text.class';
-import { IText } from './src/shapes/itext.class';
+import { IText } from './src/shapes/IText/IText';
 import { Textbox } from './src/shapes/textbox.class';
 import { Group } from './src/shapes/group.class';
 import { ActiveSelection } from './src/shapes/active_selection.class';

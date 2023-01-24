@@ -2,7 +2,7 @@ import type { Canvas } from '../canvas/canvas_events';
 import { getEnv } from '../env';
 import { DragEventData, DropEventData, TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
-import type { IText } from '../shapes/itext.class';
+import type { IText } from '../shapes/IText/IText';
 import { setStyle } from '../util/dom_style';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { createCanvasElement } from '../util/misc/dom';

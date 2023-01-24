@@ -8,7 +8,7 @@ import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveOb
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/text.class';
 import type { Pattern } from '../pattern.class';
-import type { IText } from '../shapes/itext.class';
+import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/textbox.class';
 
 export const isFiller = (
