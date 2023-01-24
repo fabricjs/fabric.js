@@ -5,7 +5,7 @@ import { escapeXml } from '../../util/lang_string';
 import { createSVGRect } from '../../util/misc/svgParsing';
 import { hasStyleChanged } from '../../util/misc/textStyles';
 import { toFixed } from '../../util/misc/toFixed';
-import { FabricObjectSVGExportMixin } from '../../mixins/object.svg_export';
+import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import type { TextStyleDeclaration } from './StyledText';
 
 const multipleSpacesRegex = /  +/g;
