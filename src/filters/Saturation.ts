@@ -1,46 +1,44 @@
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter } from './base_filter.class';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../util/class_registry';
 
 /**
- * Vibrance filter class
+ * Saturate filter class
  * @example
- * const filter = new Vibrance({
- *   vibrance: 1
+ * const filter = new Saturation({
+ *   saturation: 1
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Vibrance extends BaseFilter {
+export class Saturation extends BaseFilter {
   /**
-   * Vibrance value, from -1 to 1.
-   * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
+   * Saturation value, from -1 to 1.
+   * Increases/decreases the color saturation.
    * A value of 0 has no effect.
    *
-   * @param {Number} vibrance
+   * @param {Number} saturation
    * @default
    */
-  declare vibrance: number;
+  declare saturation: number;
 
   /**
-   * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
+   * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.vibrance === 0) {
+    if (this.saturation === 0) {
       return;
     }
-    const adjust = -this.vibrance;
+    const adjust = -this.saturation;
     for (let i = 0; i < data.length; i += 4) {
       const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      const amt = ((Math.abs(max - avg) * 2) / 255) * adjust;
-      data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
+      data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
+      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
+      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
     }
   }
 
@@ -55,7 +53,7 @@ export class Vibrance extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uVibrance: gl.getUniformLocation(program, 'uVibrance'),
+      uSaturation: gl.getUniformLocation(program, 'uSaturation'),
     };
   }
 
@@ -69,35 +67,34 @@ export class Vibrance extends BaseFilter {
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
   ) {
-    gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
+    gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }
 
   static async fromObject(object: any) {
-    return new Vibrance(object);
+    return new Saturation(object);
   }
 }
 
-export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
-  type: 'Vibrance',
+export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
+  type: 'Saturation',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;
-    uniform float uVibrance;
+    uniform float uSaturation;
     varying vec2 vTexCoord;
     void main() {
       vec4 color = texture2D(uTexture, vTexCoord);
-      float max = max(color.r, max(color.g, color.b));
-      float avg = (color.r + color.g + color.b) / 3.0;
-      float amt = (abs(max - avg) * 2.0) * uVibrance;
-      color.r += max != color.r ? (max - color.r) * amt : 0.00;
-      color.g += max != color.g ? (max - color.g) * amt : 0.00;
-      color.b += max != color.b ? (max - color.b) * amt : 0.00;
+      float rgMax = max(color.r, color.g);
+      float rgbMax = max(rgMax, color.b);
+      color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
+      color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
+      color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
       gl_FragColor = color;
     }
   `,
-  vibrance: 0,
-  mainParameter: 'vibrance',
+  saturation: 0,
+  mainParameter: 'saturation',
 };
 
-Object.assign(Vibrance.prototype, vibranceDefaultValues);
-classRegistry.setClass(Vibrance);
+Object.assign(Saturation.prototype, saturationDefaultValues);
+classRegistry.setClass(Saturation);

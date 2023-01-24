@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { getEnv } from '../env';
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter } from './base_filter.class';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../util/class_registry';

@@ -1,13 +1,13 @@
 // FILTERS
-import { BaseFilter } from './src/filters/base_filter.class';
-import { BlendColor } from './src/filters/blendcolor_filter.class';
-import { BlendImage } from './src/filters/blendimage_filter.class';
-import { Blur } from './src/filters/blur_filter.class';
-import { Brightness } from './src/filters/brightness_filter.class';
-import { ColorMatrix } from './src/filters/colormatrix_filter.class';
-import { Composed } from './src/filters/composed_filter.class';
-import { Contrast } from './src/filters/contrast_filter.class';
-import { Convolute } from './src/filters/convolute_filter.class';
+import { BaseFilter } from './src/filters/BaseFilter';
+import { BlendColor } from './src/filters/BlendColor';
+import { BlendImage } from './src/filters/BlendImage';
+import { Blur } from './src/filters/Blur';
+import { Brightness } from './src/filters/Brightness';
+import { ColorMatrix } from './src/filters/ColorMatrix';
+import { Composed } from './src/filters/Composed';
+import { Contrast } from './src/filters/Contrast';
+import { Convolute } from './src/filters/Convolute';
 import {
   Sepia,
   Brownie,
@@ -16,17 +16,17 @@ import {
   Technicolor,
   Polaroid,
   BlackWhite,
-} from './src/filters/filter_generator';
-import { Gamma } from './src/filters/gamma_filter.class';
-import { Grayscale } from './src/filters/grayscale_filter.class';
-import { HueRotation } from './src/filters/hue_rotation.class';
-import { Invert } from './src/filters/invert_filter.class';
-import { Noise } from './src/filters/noise_filter.class';
-import { Pixelate } from './src/filters/pixelate_filter.class';
-import { RemoveColor } from './src/filters/removecolor_filter.class';
-import { Resize } from './src/filters/resize_filter.class';
-import { Saturation } from './src/filters/saturate_filter.class';
-import { Vibrance } from './src/filters/vibrance_filter.class';
+} from './src/filters/ColorMatrixFilters';
+import { Gamma } from './src/filters/Gamma';
+import { Grayscale } from './src/filters/Grayscale';
+import { HueRotation } from './src/filters/HueRotation';
+import { Invert } from './src/filters/Invert';
+import { Noise } from './src/filters/Noise';
+import { Pixelate } from './src/filters/Pixelate';
+import { RemoveColor } from './src/filters/RemoveColor';
+import { Resize } from './src/filters/Resize';
+import { Saturation } from './src/filters/Saturation';
+import { Vibrance } from './src/filters/Vibrance';
 
 const filters = {
   BaseFilter,
@@ -326,8 +326,8 @@ import { config } from './src/config';
 import { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 import { loadSVGFromString } from './src/parser/loadSVGFromString';
 import { initFilterBackend } from './src/filters/FilterBackend';
-import { Canvas2dFilterBackend } from './src/filters/2d_backend.class';
-import { WebGLFilterBackend } from './src/filters/webgl_backend.class';
+import { Canvas2dFilterBackend } from './src/filters/Canvas2dFilterBackend';
+import { WebGLFilterBackend } from './src/filters/WebGLFilterBackend';
 import { runningAnimations } from './src/util/animation/AnimationRegistry';
 import { Observable } from './src/Observable';
 import { Point } from './src/Point';

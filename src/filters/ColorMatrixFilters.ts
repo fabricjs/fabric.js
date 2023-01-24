@@ -1,4 +1,4 @@
-import { ColorMatrix } from './colormatrix_filter.class';
+import { ColorMatrix } from './ColorMatrix';
 import { classRegistry } from '../util/class_registry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {

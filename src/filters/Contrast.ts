@@ -1,41 +1,42 @@
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter } from './base_filter.class';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../util/class_registry';
+
 /**
- * Brightness filter class
+ * Contrast filter class
  * @example
- * const filter = new Brightness({
- *   brightness: 0.05
+ * const filter = new Contrast({
+ *   contrast: 0.25
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Brightness extends BaseFilter {
+export class Contrast extends BaseFilter {
   /**
-   * Brightness value, from -1 to 1.
-   * translated to -255 to 255 for 2d
-   * 0.0039215686 is the part of 1 that get translated to 1 in 2d
-   * @param {Number} brightness
-   * @default
+   * contrast value, range from -1 to 1.
+   * @param {Number} contrast
+   * @default 0
    */
-  declare brightness: number;
+  declare contrast: number;
 
   /**
-   * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
+   * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
    *
    * @param {Object} options
-   * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
+   * @param {ImageData} options.imageData The Uint8Array to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.brightness === 0) {
+    if (this.contrast === 0) {
       return;
     }
-    const brightness = Math.round(this.brightness * 255);
+    const contrast = Math.floor(this.contrast * 255),
+      contrastF = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = data[i] + brightness;
-      data[i + 1] = data[i + 1] + brightness;
-      data[i + 2] = data[i + 2] + brightness;
+      data[i] = contrastF * (data[i] - 128) + 128;
+      data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
+      data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
     }
   }
 
@@ -50,7 +51,7 @@ export class Brightness extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uBrightness: gl.getUniformLocation(program, 'uBrightness'),
+      uContrast: gl.getUniformLocation(program, 'uContrast'),
     };
   }
 
@@ -64,30 +65,30 @@ export class Brightness extends BaseFilter {
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
   ) {
-    gl.uniform1f(uniformLocations.uBrightness, this.brightness);
+    gl.uniform1f(uniformLocations.uContrast, this.contrast);
   }
 
   static async fromObject(object: any) {
-    return new Brightness(object);
+    return new Contrast(object);
   }
 }
 
-export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
-  type: 'Brightness',
+export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
+  type: 'Contrast',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;
-    uniform float uBrightness;
+    uniform float uContrast;
     varying vec2 vTexCoord;
     void main() {
       vec4 color = texture2D(uTexture, vTexCoord);
-      color.rgb += uBrightness;
+      float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));
+      color.rgb = contrastF * (color.rgb - 0.5) + 0.5;
       gl_FragColor = color;
-    }
-  `,
-  brightness: 0,
-  mainParameter: 'brightness',
+    }`,
+  contrast: 0,
+  mainParameter: 'contrast',
 };
 
-Object.assign(Brightness.prototype, brightnessDefaultValues);
-classRegistry.setClass(Brightness);
+Object.assign(Contrast.prototype, contrastDefaultValues);
+classRegistry.setClass(Contrast);

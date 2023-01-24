@@ -1,40 +1,41 @@
-import { TClassProperties } from '../typedefs';
-import { BaseFilter } from './base_filter.class';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-
+import type { TClassProperties } from '../typedefs';
+import { BaseFilter } from './BaseFilter';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import { classRegistry } from '../util/class_registry';
 /**
- * MyFilter filter class
+ * Brightness filter class
  * @example
- * const filter = new MyFilter({
- *   add here an example of how to use your filter
+ * const filter = new Brightness({
+ *   brightness: 0.05
  * });
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class MyFilter extends BaseFilter {
+export class Brightness extends BaseFilter {
   /**
-   * MyFilter value, from -1 to 1.
+   * Brightness value, from -1 to 1.
    * translated to -255 to 255 for 2d
    * 0.0039215686 is the part of 1 that get translated to 1 in 2d
-   * @param {Number} myParameter
+   * @param {Number} brightness
    * @default
    */
-  declare myParameter: number;
+  declare brightness: number;
 
   /**
-   * Apply the MyFilter operation to a Uint8ClampedArray representing the pixels of an image.
+   * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
-  applyTo2d(options: T2DPipelineState) {
-    if (this.myParameter === 0) {
-      // early return if the parameter value has a neutral value
+  applyTo2d({ imageData: { data } }: T2DPipelineState) {
+    if (this.brightness === 0) {
       return;
     }
-
-    for (let i = 0; i < options.imageData.data.length; i += 4) {
-      // insert here your code to modify data[i]
+    const brightness = Math.round(this.brightness * 255);
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = data[i] + brightness;
+      data[i + 1] = data[i + 1] + brightness;
+      data[i + 2] = data[i + 2] + brightness;
     }
   }
 
@@ -49,7 +50,7 @@ export class MyFilter extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uMyParameter: gl.getUniformLocation(program, 'uMyParameter'),
+      uBrightness: gl.getUniformLocation(program, 'uBrightness'),
     };
   }
 
@@ -63,29 +64,30 @@ export class MyFilter extends BaseFilter {
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
   ) {
-    gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
+    gl.uniform1f(uniformLocations.uBrightness, this.brightness);
   }
 
   static async fromObject(object: any) {
-    return new MyFilter(object);
+    return new Brightness(object);
   }
 }
 
-export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
-  type: 'MyFilter',
+export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
+  type: 'Brightness',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;
-    uniform float uMyParameter;
+    uniform float uBrightness;
     varying vec2 vTexCoord;
     void main() {
       vec4 color = texture2D(uTexture, vTexCoord);
-      // add your gl code here
+      color.rgb += uBrightness;
       gl_FragColor = color;
     }
   `,
-  myParameter: 0,
-  mainParameter: 'myParameter',
+  brightness: 0,
+  mainParameter: 'brightness',
 };
 
-Object.assign(MyFilter.prototype, myFilterDefaultValues);
+Object.assign(Brightness.prototype, brightnessDefaultValues);
+classRegistry.setClass(Brightness);

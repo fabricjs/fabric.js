@@ -1,44 +1,42 @@
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter } from './base_filter.class';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../util/class_registry';
 
 /**
- * Saturate filter class
+ * Noise filter class
  * @example
- * const filter = new Saturation({
- *   saturation: 1
+ * const filter = new Noise({
+ *   noise: 700
  * });
  * object.filters.push(filter);
  * object.applyFilters();
+ * canvas.renderAll();
  */
-export class Saturation extends BaseFilter {
+export class Noise extends BaseFilter {
   /**
-   * Saturation value, from -1 to 1.
-   * Increases/decreases the color saturation.
-   * A value of 0 has no effect.
-   *
-   * @param {Number} saturation
+   * Noise value, from
+   * @param {Number} noise
    * @default
    */
-  declare saturation: number;
+  declare noise: number;
 
   /**
-   * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
+   * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
    *
    * @param {Object} options
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.saturation === 0) {
+    if (this.noise === 0) {
       return;
     }
-    const adjust = -this.saturation;
+    const noise = this.noise;
     for (let i = 0; i < data.length; i += 4) {
-      const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+      const rand = (0.5 - Math.random()) * noise;
+      data[i] += rand;
+      data[i + 1] += rand;
+      data[i + 2] += rand;
     }
   }
 
@@ -53,7 +51,8 @@ export class Saturation extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uSaturation: gl.getUniformLocation(program, 'uSaturation'),
+      uNoise: gl.getUniformLocation(program, 'uNoise'),
+      uSeed: gl.getUniformLocation(program, 'uSeed'),
     };
   }
 
@@ -67,34 +66,44 @@ export class Saturation extends BaseFilter {
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
   ) {
-    gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
+    gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
+    gl.uniform1f(uniformLocations.uSeed, Math.random());
+  }
+
+  /**
+   * Returns object representation of an instance
+   * @return {Object} Object representation of an instance
+   */
+  toObject() {
+    return { ...super.toObject(), noise: this.noise };
   }
 
   static async fromObject(object: any) {
-    return new Saturation(object);
+    return new Noise(object);
   }
 }
 
-export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  type: 'Saturation',
+export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
+  type: 'Noise',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;
-    uniform float uSaturation;
+    uniform float uStepH;
+    uniform float uNoise;
+    uniform float uSeed;
     varying vec2 vTexCoord;
+    float rand(vec2 co, float seed, float vScale) {
+      return fract(sin(dot(co.xy * vScale ,vec2(12.9898 , 78.233))) * 43758.5453 * (seed + 0.01) / 2.0);
+    }
     void main() {
       vec4 color = texture2D(uTexture, vTexCoord);
-      float rgMax = max(color.r, color.g);
-      float rgbMax = max(rgMax, color.b);
-      color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
-      color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
-      color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
+      color.rgb += (0.5 - rand(vTexCoord, uSeed, 0.1 / uStepH)) * uNoise;
       gl_FragColor = color;
     }
-  `,
-  saturation: 0,
-  mainParameter: 'saturation',
+    `,
+  mainParameter: 'noise',
+  noise: 0,
 };
 
-Object.assign(Saturation.prototype, saturationDefaultValues);
-classRegistry.setClass(Saturation);
+Object.assign(Noise.prototype, noiseDefaultValues);
+classRegistry.setClass(Noise);

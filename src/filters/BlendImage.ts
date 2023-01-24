@@ -1,13 +1,13 @@
 import { Image } from '../shapes/Image';
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { AbstractBaseFilter } from './base_filter.class';
+import { AbstractBaseFilter } from './BaseFilter';
 import type {
   T2DPipelineState,
   TWebGLPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { WebGLFilterBackend } from './webgl_backend.class';
+import { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../util/class_registry';
 
 /**

@@ -1,5 +1,5 @@
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter, BaseFilterOptions } from './base_filter.class';
+import { BaseFilter, BaseFilterOptions } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../util/class_registry';
 

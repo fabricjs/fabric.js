@@ -1,6 +1,6 @@
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { BaseFilter } from './base_filter.class';
+import { BaseFilter } from './BaseFilter';
 import type {
   TWebGLPipelineState,
   T2DPipelineState,

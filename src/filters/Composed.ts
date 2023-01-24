@@ -3,7 +3,7 @@ import {
   type AnyFilter,
   BaseFilter,
   type BaseFilterOptions,
-} from './base_filter.class';
+} from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../util/class_registry';

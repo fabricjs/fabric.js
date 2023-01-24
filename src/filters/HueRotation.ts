@@ -1,7 +1,7 @@
 import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
-import { ColorMatrix } from './colormatrix_filter.class';
+import { ColorMatrix } from './ColorMatrix';
 import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 import { classRegistry } from '../util/class_registry';
 

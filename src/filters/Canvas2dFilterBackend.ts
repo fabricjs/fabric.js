@@ -1,7 +1,7 @@
 /**
  * Canvas 2D filter backend.
  */
-import type { BaseFilter } from './base_filter.class';
+import type { BaseFilter } from './BaseFilter';
 import { T2DPipelineState, TPipelineResources } from './typedefs';
 
 export class Canvas2dFilterBackend {

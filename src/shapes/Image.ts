@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { getEnv } from '../env';
-import type { BaseFilter } from '../filters/base_filter.class';
+import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
