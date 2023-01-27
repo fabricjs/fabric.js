@@ -1,5 +1,5 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
-import { Textbox } from '../shapes/textbox.class';
+import { Textbox } from '../shapes/Textbox';
 import { scaleCursorStyleHandler, scalingEqually } from './scale';
 import { changeWidth } from './changeWidth';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
@@ -9,7 +9,7 @@ import {
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './scaleSkew';
-import { Control } from './control.class';
+import { Control } from './Control';
 
 // use this function if you want to generate new controls for every instance
 export const createObjectDefaultControls = () => ({

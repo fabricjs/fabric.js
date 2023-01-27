@@ -1,5 +1,5 @@
 import { ObjectEvents } from '../../EventTypeDefs';
-import { FabricObjectSVGExportMixin } from '../../mixins/object.svg_export';
+import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
 import { applyMixins } from '../../util/applyMixins';
 import { StatefulMixin } from '../../mixins/stateful.mixin';
@@ -16,4 +16,4 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin, StatefulMixin]);
 
-export { fabricObjectDefaultValues } from './Object';
+export { cacheProperties, stateProperties } from './defaultValues';

@@ -72,11 +72,11 @@
   QUnit.test('toObject', function(assert) {
     var polyline = new fabric.Polyline(getPoints());
     assert.ok(typeof polyline.toObject === 'function');
-    var objectWithOriginalPoints = fabric.util.object.extend(polyline.toObject(), {
-      points: getPoints()
-    });
 
-    assert.deepEqual(objectWithOriginalPoints, REFERENCE_OBJECT);
+    assert.deepEqual({
+      ...polyline.toObject(),
+      points: getPoints()
+    }, REFERENCE_OBJECT);
   });
 
   QUnit.test('toSVG', function(assert) {
@@ -99,10 +99,8 @@
   QUnit.test('fromElement without points', function(assert) {
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
     var elPolylineWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
-    var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-    empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
-      assert.deepEqual(polyline.toObject(), empty_object);
+      assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
     });
   });
 
@@ -111,9 +109,7 @@
     var elPolylineWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
-      var empty_object = fabric.util.object.extend({}, REFERENCE_OBJECT);
-      empty_object = fabric.util.object.extend(empty_object, REFERENCE_EMPTY_OBJECT);
-      assert.deepEqual(polyline.toObject(), empty_object);
+      assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
     });
   });
 
@@ -124,10 +120,11 @@
     elPolyline.setAttributeNS(namespace, 'stroke-width', 1);
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
       assert.ok(polyline instanceof fabric.Polyline);
-      var obj = fabric.util.object.extend({}, REFERENCE_OBJECT);
-      obj.top = 12;
-      obj.left = 10;
-      assert.deepEqual(polyline.toObject(), obj);
+      assert.deepEqual(polyline.toObject(), {
+        ...REFERENCE_OBJECT,
+        left: 10,
+        top: 12
+      });
     });
   });
 
@@ -147,7 +144,8 @@
 
     fabric.Polyline.fromElement(elPolylineWithAttrs, function(polylineWithAttrs) {
       var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
-      assert.deepEqual(polylineWithAttrs.toObject(), fabric.util.object.extend(REFERENCE_OBJECT, {
+      assert.deepEqual(polylineWithAttrs.toObject(), {
+        ...REFERENCE_OBJECT,
         width: 20,
         height: 20,
         fill: 'rgb(255,255,255)',
@@ -161,7 +159,7 @@
         points: expectedPoints,
         left: 10,
         top: 10,
-      }));
+      });
     });
   });
 

@@ -1,10 +1,10 @@
-import { Point } from '../../point.class';
-import type { Group } from '../group.class';
+import { Point } from '../../Point';
+import type { Group } from '../Group';
 import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { CommonMethods } from '../../mixins/shared_methods.mixin';
+import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
@@ -13,56 +13,56 @@ export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
    * @type Number
    * @default 0
    */
-  top: number;
+  declare top: number;
 
   /**
    * Left position of an object. Note that by default it's relative to object left. You can change this by setting originX={left/center/right}
    * @type Number
    * @default 0
    */
-  left: number;
+  declare left: number;
 
   /**
    * Object width
    * @type Number
    * @default
    */
-  width: number;
+  declare width: number;
 
   /**
    * Object height
    * @type Number
    * @default
    */
-  height: number;
+  declare height: number;
 
   /**
    * Object scale factor (horizontal)
    * @type Number
    * @default 1
    */
-  scaleX: number;
+  declare scaleX: number;
 
   /**
    * Object scale factor (vertical)
    * @type Number
    * @default 1
    */
-  scaleY: number;
+  declare scaleY: number;
 
   /**
    * Angle of skew on x axes of an object (in degrees)
    * @type Number
    * @default 0
    */
-  skewX: number;
+  declare skewX: number;
 
   /**
    * Angle of skew on y axes of an object (in degrees)
    * @type Number
    * @default 0
    */
-  skewY: number;
+  declare skewY: number;
 
   /**
    * Horizontal origin of transformation of an object (one of "left", "right", "center")
@@ -70,7 +70,7 @@ export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
    * @type String
    * @default 'left'
    */
-  originX: TOriginX;
+  declare originX: TOriginX;
 
   /**
    * Vertical origin of transformation of an object (one of "top", "bottom", "center")
@@ -78,21 +78,21 @@ export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
    * @type String
    * @default 'top'
    */
-  originY: TOriginY;
+  declare originY: TOriginY;
 
   /**
    * Angle of rotation of an object (in degrees)
    * @type Number
    * @default 0
    */
-  angle: TDegree;
+  declare angle: TDegree;
 
   /**
    * Width of a stroke used to render this object
    * @type Number
    * @default 1
    */
-  strokeWidth: number;
+  declare strokeWidth: number;
 
   /**
    * When `false`, the stoke width will scale with the object.
@@ -105,17 +105,17 @@ export class ObjectOrigin<EventSpec> extends CommonMethods<EventSpec> {
    * @type Boolean
    * @default false
    */
-  strokeUniform: boolean;
+  declare strokeUniform: boolean;
 
   /**
    * Object containing this object.
    * can influence its size and position
    */
-  group?: Group;
+  declare group?: Group;
 
-  _originalOriginX?: TOriginX;
+  declare _originalOriginX?: TOriginX;
 
-  _originalOriginY?: TOriginY;
+  declare _originalOriginY?: TOriginY;
 
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
