@@ -1,7 +1,7 @@
 import type {
   TextStyle,
   TextStyleDeclaration,
-} from '../../mixins/text_style.mixin';
+} from '../../shapes/Text/StyledText';
 import { cloneDeep } from '../internals/cloneDeep';
 
 export type TextStyleArray = {

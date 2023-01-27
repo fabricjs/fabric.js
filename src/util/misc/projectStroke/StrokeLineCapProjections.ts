@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../../point.class';
+import { IPoint, Point } from '../../../Point';
 import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';

@@ -1,8 +1,8 @@
-import { Point } from '../point.class';
-import { Control } from './control.class';
+import { Point } from '../Point';
+import { Control } from './Control';
 import { TMat2D } from '../typedefs';
 import { iMatrix } from '../constants';
-import type { Polyline } from '../shapes/polyline.class';
+import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import {
   TPointerEvent,

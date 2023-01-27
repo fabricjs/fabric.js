@@ -1,7 +1,7 @@
 import { ObjectEvents } from '../../EventTypeDefs';
-import type { Group } from '../group.class';
-import type { Canvas } from '../../canvas/canvas_events';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
+import type { Group } from '../Group';
+import type { Canvas } from '../../canvas/Canvas';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;

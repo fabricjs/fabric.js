@@ -3,8 +3,8 @@ import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
-import { Point } from '../../point.class';
-import { Shadow } from '../../shadow.class';
+import { Point } from '../../Point';
+import { Shadow } from '../../Shadow';
 import type {
   TClassProperties,
   TDegree,
@@ -26,18 +26,18 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import type { Group } from '../group.class';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
+import type { Group } from '../Group';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
-import { Image } from '../image.class';
+import { Image } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
   stateProperties,
 } from './defaultValues';
-import type { Gradient } from '../../gradient/gradient.class';
-import type { Pattern } from '../../pattern.class';
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
+import type { Canvas } from '../../canvas/Canvas';
 import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &
