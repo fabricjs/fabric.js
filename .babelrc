@@ -1,6 +1,8 @@
 {
   "presets": [
-    "@babel/env",
+    [
+      "@babel/env"
+    ],
     [
       "@babel/typescript",
       {
