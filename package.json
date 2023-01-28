@@ -31,17 +31,6 @@
     "HTML5",
     "object model"
   ],
-  "browser": {
-    "canvas": false,
-    "fs": false,
-    "jsdom": false,
-    "jsdom/lib/jsdom/living/generated/utils": false,
-    "jsdom/lib/jsdom/utils": false,
-    "http": false,
-    "https": false,
-    "xmldom": false,
-    "url": false
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/fabricjs/fabric.js"
@@ -119,7 +108,7 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/fabric.es.js",
-  "main": "./dist/fabric.js",
+  "module": "./dist/fabric.js",
+  "main": "./dist/fabric.umd.js",
   "types": "./dist/index.d.ts"
 }

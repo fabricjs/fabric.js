@@ -99,5 +99,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "exclude": ["dist"],
-  "include": ["./", "index.ts", "src"]
+  "include": ["./", "src/index.ts", "src"]
 }
