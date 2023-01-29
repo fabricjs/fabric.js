@@ -110,5 +110,5 @@
   },
   "module": "./dist/fabric.js",
   "main": "./dist/fabric.umd.js",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/fabric.d.ts"
 }

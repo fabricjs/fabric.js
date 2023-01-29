@@ -9,7 +9,7 @@ const splitter = /\n|\s|,/g;
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./src/index.ts'],
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
     output: [
       {
         file: process.env.BUILD_OUTPUT || './dist/fabric.umd.js',
@@ -40,7 +40,7 @@ export default [
     ],
   },
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./src/fabric.ts'],
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
     output: [
       {
         file: process.env.BUILD_OUTPUT || './dist/fabric.js',
