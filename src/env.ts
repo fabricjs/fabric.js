@@ -3,8 +3,8 @@ import { config } from './config';
 import type { Canvas } from 'canvas';
 
 type TCopyPasteData = {
-  copiedText?: string,
-  copiedStyle?: Record<string, string>,
+  copiedText?: string;
+  copiedStyle?: Record<string, string>;
 };
 
 type TFabricEnv = {

@@ -61,5 +61,5 @@ export default [
         babelHelpers: 'bundled',
       }),
     ],
-  }
+  },
 ];
