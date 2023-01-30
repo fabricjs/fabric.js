@@ -9,5 +9,6 @@
         "allowDeclareFields": true
       }
     ]
-  ]
+  ],
+  "plugins": ["babel-plugin-import-json-value"]
 }

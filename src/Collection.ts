@@ -1,6 +1,6 @@
 import type { Constructor } from './typedefs';
 import type { BaseFabricObject } from './EventTypeDefs';
-import { removeFromArray } from './util/internals';
+import { removeFromArray } from './util/internals/removeFromArray';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
