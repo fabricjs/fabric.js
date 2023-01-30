@@ -3,8 +3,8 @@ import { config } from './config';
 import type { Canvas } from 'canvas';
 
 type TCopyPasteData = {
-  copiedText: string,
-  copiedStyle: Record<string, string>,
+  copiedText?: string,
+  copiedStyle?: Record<string, string>,
 };
 
 type TFabricEnv = {
@@ -23,7 +23,7 @@ let isTouchSupported: boolean;
 let isLikelyNode: boolean;
 let nodeCanvas: Canvas;
 let jsdomImplForWrapper: any;
-let copyPasteData: TCopyPasteData;
+const copyPasteData: TCopyPasteData = {};
 
 function setupEnv() {
   if (typeof document !== 'undefined' && typeof window !== 'undefined') {
