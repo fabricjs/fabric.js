@@ -83,8 +83,6 @@
     "abort-controller": "^3.0.0",
     "auto-changelog": "^2.3.0",
     "babel-plugin-import-json-value": "^0.1.2",
-    "babel-plugin-inline-json": "^2.1.0",
-    "babel-plugin-inline-json-import": "^0.3.2",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
