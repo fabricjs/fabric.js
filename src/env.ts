@@ -23,7 +23,7 @@ let isTouchSupported: boolean;
 let isLikelyNode: boolean;
 let nodeCanvas: Canvas;
 let jsdomImplForWrapper: any;
-const copyPasteData: TCopyPasteData = {};
+let copyPasteData: TCopyPasteData;
 
 function setupEnv() {
   if (typeof document !== 'undefined' && typeof window !== 'undefined') {
@@ -68,6 +68,7 @@ function setupEnv() {
   config.configure({
     devicePixelRatio: fabricWindow.devicePixelRatio || 1,
   });
+  copyPasteData = {};
 }
 
 setupEnv();
