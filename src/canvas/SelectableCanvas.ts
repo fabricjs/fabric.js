@@ -1503,6 +1503,7 @@ export class SelectableCanvas<
     wrapperEl.removeChild(lowerCanvasEl);
     this.contextCache = null;
     this.contextTop = null;
+    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
     cleanUpJsdomNode(upperCanvasEl);
     this.upperCanvasEl = undefined;
     cleanUpJsdomNode(cacheCanvasEl);
