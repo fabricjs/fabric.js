@@ -1,4 +1,4 @@
-import { Point } from '../../../point.class';
+import { Point } from '../../../Point';
 import { TDegree } from '../../../typedefs';
 import { getBisector } from '../vectors';
 

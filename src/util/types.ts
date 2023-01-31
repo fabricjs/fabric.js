@@ -1,16 +1,15 @@
-import type { ActiveSelection } from '../shapes/active_selection.class';
-import type { Group } from '../shapes/group.class';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
+import type { Group } from '../shapes/Group';
 import type {
   FabricObject,
   TCachedFabricObject,
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
-import type { Text } from '../shapes/text.class';
-import type { Pattern } from '../pattern.class';
-import type { IText } from '../shapes/itext.class';
-import type { Textbox } from '../shapes/textbox.class';
-import type { Gradient } from '../gradient/gradient.class';
+import type { Text } from '../shapes/Text/Text';
+import type { Pattern } from '../Pattern';
+import type { IText } from '../shapes/IText/IText';
+import type { Textbox } from '../shapes/Textbox';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -72,6 +71,8 @@ export const isFabricObjectWithDragSupport = (
   return (
     !!fabricObject &&
     typeof (fabricObject as FabricObjectWithDragSupport).onDragStart ===
+      'function' &&
+    typeof (fabricObject as FabricObjectWithDragSupport).shouldStartDragging ===
       'function'
   );
 };

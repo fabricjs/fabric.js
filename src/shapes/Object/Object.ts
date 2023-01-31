@@ -3,8 +3,8 @@ import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
-import { Point } from '../../point.class';
-import { Shadow } from '../../shadow.class';
+import { Point } from '../../Point';
+import { Shadow } from '../../Shadow';
 import type {
   TClassProperties,
   TDegree,
@@ -14,7 +14,7 @@ import type {
 } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
-import { clone } from '../../util/lang_object';
+import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
@@ -26,18 +26,18 @@ import {
 } from '../../util/misc/objectTransforms';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
-import type { Group } from '../group.class';
-import { StaticCanvas } from '../../canvas/static_canvas.class';
+import type { Group } from '../Group';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
-import { Image } from '../image.class';
+import { Image } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
   stateProperties,
 } from './defaultValues';
-import type { Gradient } from '../../gradient/gradient.class';
-import type { Pattern } from '../../pattern.class';
-import type { Canvas } from '../../canvas/canvas_events';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
+import type { Canvas } from '../../canvas/Canvas';
 import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
 
 export type TCachedFabricObject = FabricObject &
@@ -1364,7 +1364,7 @@ export class FabricObject<
           this._applyPatternForTransformedGradient(ctx, stroke);
         } else {
           // is a simple gradient or pattern
-          ctx.strokeStyle = stroke.toLive(ctx);
+          ctx.strokeStyle = stroke.toLive(ctx)!;
           this._applyPatternGradientTransform(ctx, stroke);
         }
       } else {
@@ -1377,7 +1377,7 @@ export class FabricObject<
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
       if (isFiller(fill)) {
-        ctx.fillStyle = fill.toLive(ctx);
+        ctx.fillStyle = fill.toLive(ctx)!;
         this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
@@ -1583,7 +1583,7 @@ export class FabricObject<
       dims.zoomY / this.scaleY / retinaScaling
     );
     this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fillStyle = filler.toLive(ctx);
+    pCtx.fillStyle = filler.toLive(ctx)!;
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
@@ -1850,7 +1850,7 @@ export class FabricObject<
       ...options
     }: { extraParam?: string; signal?: AbortSignal } = {}
   ): Promise<FabricObject> {
-    return enlivenObjectEnlivables<any>(clone(object, true), options).then(
+    return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
         const allOptions = { ...options, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0

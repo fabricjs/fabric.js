@@ -1,4 +1,4 @@
-import { TColorArg } from '../../color/color.class';
+import { TColorArg } from '../../color/Color';
 
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 

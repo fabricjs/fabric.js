@@ -1,5 +1,5 @@
 import { halfPI } from '../../../constants';
-import { IPoint, Point } from '../../../point.class';
+import { IPoint, Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,

@@ -1,5 +1,5 @@
-import { Color } from '../../color/color.class';
-import { TRGBAColorSource } from '../../color/color.class';
+import { Color } from '../../color/Color';
+import { TRGBAColorSource } from '../../color/Color';
 import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
