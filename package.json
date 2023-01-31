@@ -116,12 +116,11 @@
   "types": "./dist/fabric.d.ts",
   "exports": {
     ".": "./dist/fabric.mjs",
-    "node": "./dist/fabric.node.mjs",
-    "node.mjs": "./dist/fabric.node.mjs",
-    "node.cjs": "./dist/fabric.node.cjs",
-    "default": "./dist/fabric.mjs",
-    "import": "./dist/fabric.mjs",
-    "require": "./dist/fabric.cjs",
-    "types": "./dist/fabric.d.ts"
+    "./browser": "./dist/fabric.mjs",
+    "./browser.mjs": "./dist/fabric.mjs",
+    "./browser.cjs": "./dist/fabric.cjs",
+    "./node": "./dist/fabric.node.mjs",
+    "./node.mjs": "./dist/fabric.node.mjs",
+    "./node.cjs": "./dist/fabric.node.cjs"
   }
 }
