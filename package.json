@@ -112,7 +112,7 @@
     "node": ">=14.0.0"
   },
   "module": "./dist/fabric.mjs",
-  "main": "./dist/fabric.cjs",
+  "main": "./dist/fabric.node.cjs",
   "types": "./dist/fabric.d.ts",
   "exports": {
     ".": "./dist/fabric.mjs",
