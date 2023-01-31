@@ -2,6 +2,10 @@ import './src/env/node';
 
 import type { Canvas as NodeCanvas, JpegConfig, PngConfig } from 'canvas';
 import { getEnv, StaticCanvas as Canvas } from './fabric';
+import { FabricObject } from './src/shapes/Object/Object';
+
+// TODO: move back to default values when refactoring to method
+FabricObject.prototype.objectCaching = false;
 
 export * from './fabric';
 
