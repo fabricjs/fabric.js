@@ -73,6 +73,7 @@ export default [
       'jsdom',
       'jsdom/lib/jsdom/living/generated/utils',
       'jsdom/lib/jsdom/utils',
+      'canvas',
     ],
   },
 ];
