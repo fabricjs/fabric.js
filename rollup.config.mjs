@@ -26,7 +26,6 @@ export default [
           }
         : null,
     ],
-    // see list of plugins (not comprehensive): https://github.com/rollup/awesome
     plugins: [
       json(),
       ts({
@@ -49,7 +48,36 @@ export default [
         sourcemap: true,
       },
     ],
-    // see list of plugins (not comprehensive): https://github.com/rollup/awesome
+    plugins: [
+      json(),
+      ts({
+        noForceEmit: true,
+        tsconfig: './tsconfig.json',
+      }),
+      babel({
+        extensions: ['.ts', '.js'],
+        babelHelpers: 'bundled',
+      }),
+    ],
+  },
+  {
+    input: ['./node.ts'],
+    output: [
+      {
+        file: './dist/fabric.node.js',
+        name: 'fabric',
+        format: 'umd',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: './dist/fabric.node.min.js',
+            name: 'fabric',
+            format: 'umd',
+            plugins: [terser()],
+          }
+        : null,
+    ],
     plugins: [
       json(),
       ts({
