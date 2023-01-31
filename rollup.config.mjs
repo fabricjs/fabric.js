@@ -71,8 +71,8 @@ export default [
     plugins,
     external: [
       'jsdom',
-      'jsdom/lib/jsdom/living/generated/utils',
-      'jsdom/lib/jsdom/utils',
+      'jsdom/lib/jsdom/living/generated/utils.js',
+      'jsdom/lib/jsdom/utils.js',
       'canvas',
     ],
   },

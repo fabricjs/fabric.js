@@ -1,14 +1,17 @@
 /* eslint-disable no-restricted-globals */
 import { JSDOM } from 'jsdom';
-import { implForWrapper as jsdomImplForWrapper } from 'jsdom/lib/jsdom/living/generated/utils';
-import { Canvas as nodeCanvas } from 'jsdom/lib/jsdom/utils';
+import utils1 from 'jsdom/lib/jsdom/living/generated/utils.js';
+import utils2 from 'jsdom/lib/jsdom/utils.js';
 import { config } from '../config';
 import { setEnv } from './index';
 import { TCopyPasteData, TFabricEnv } from './types';
 
+const { implForWrapper: jsdomImplForWrapper } = utils1;
+const { Canvas: nodeCanvas } = utils2;
+
 const copyPasteData: TCopyPasteData = {};
 
-const virtualWindow = new JSDOM(
+const { window: virtualWindow } = new JSDOM(
   decodeURIComponent(
     '%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'
   ),
@@ -18,7 +21,7 @@ const virtualWindow = new JSDOM(
     },
     resources: 'usable',
   }
-).window;
+);
 
 const fabricDocument = virtualWindow.document;
 const fabricWindow = virtualWindow;
