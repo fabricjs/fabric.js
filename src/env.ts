@@ -11,6 +11,7 @@ type TFabricEnv = {
   jsdomImplForWrapper: any;
 };
 
+let initialized = false;
 let fabricDocument: Document;
 let fabricWindow: Window;
 let isTouchSupported: boolean;
@@ -19,6 +20,7 @@ let nodeCanvas: Canvas;
 let jsdomImplForWrapper: any;
 
 function setupEnv() {
+  initialized = true;
   if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     if (
       document instanceof
@@ -63,9 +65,8 @@ function setupEnv() {
   });
 }
 
-setupEnv();
-
 export const getEnv = (): TFabricEnv => {
+  !initialized && setupEnv();
   return {
     document: fabricDocument,
     window: fabricWindow,
