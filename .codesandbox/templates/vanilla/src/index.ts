@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import './styles.css';
 
 const el = document.getElementById('canvas');
@@ -14,15 +14,18 @@ const text = new fabric.Text('fabric.js sandbox', {
   top: 20,
 });
 canvas.add(text);
-text.centerH();
+canvas.centerObjectH(text);
 function animate(toState) {
-  text.animate('scaleX', Math.max(toState, 0.1) * 2, {
-    onChange: () => canvas.renderAll(),
-    onComplete: () => animate(!toState),
-    duration: 1000,
-    easing: toState
-      ? fabric.util.ease.easeInOutQuad
-      : fabric.util.ease.easeInOutSine,
-  });
+  text.animate(
+    { scaleX: Math.max(toState, 0.1) * 2 },
+    {
+      onChange: () => canvas.renderAll(),
+      onComplete: () => animate(!toState),
+      duration: 1000,
+      easing: toState
+        ? fabric.util.ease.easeInOutQuad
+        : fabric.util.ease.easeInOutSine,
+    }
+  );
 }
 animate(1);
