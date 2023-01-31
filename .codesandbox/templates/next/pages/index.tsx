@@ -1,6 +1,7 @@
 import { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useCallback } from 'react';
+import * as fabric from 'fabric';
 
 // https://nextjs.org/docs/advanced-features/dynamic-import#with-no-ssr
 const Canvas = dynamic(
@@ -11,11 +12,7 @@ const Canvas = dynamic(
 );
 
 const IndexPage: NextPage = () => {
-  const onLoad = useCallback(async (canvas, fabric) => {
-    // load fabric dynamically for it to load with a browser context
-    // regular importing will fail with SSR since fabric will think it is running in node
-    // const { fabric } = await import("fabric");
-    // UPDATE: it seems that dynamic importing also fails so we revert to passing fabric as an argument
+  const onLoad = useCallback(async (canvas: fabric.Canvas) => {
     canvas.setDimensions({
       width: 500,
       height: 500,
