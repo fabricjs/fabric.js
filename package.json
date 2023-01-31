@@ -76,6 +76,7 @@
     "@rollup/plugin-terser": "^0.3.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/jsdom": "^20.0.1",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
@@ -110,7 +111,17 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/fabric.js",
-  "main": "./dist/fabric.umd.js",
-  "types": "./dist/fabric.d.ts"
+  "module": "./dist/fabric.mjs",
+  "main": "./dist/fabric.cjs",
+  "types": "./dist/fabric.d.ts",
+  "exports": {
+    ".": "./dist/fabric.mjs",
+    "node": "./dist/fabric.node.mjs",
+    "node.mjs": "./dist/fabric.node.mjs",
+    "node.cjs": "./dist/fabric.node.cjs",
+    "default": "./dist/fabric.mjs",
+    "import": "./dist/fabric.mjs",
+    "require": "./dist/fabric.cjs",
+    "types": "./dist/fabric.d.ts"
+  }
 }
