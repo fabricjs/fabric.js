@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { fabric } from 'fabric';
+import * as fabric from 'fabric/node';
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   try {
