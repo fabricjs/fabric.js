@@ -42,6 +42,7 @@ import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
+import type { JpegConfig, PngConfig } from 'canvas';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -1693,6 +1694,24 @@ export class StaticCanvas<
       this._objects.length
     } }>`;
   }
+
+  /**
+   * node only method
+   * @throws when called from a browser environment
+   */
+  createPNGStream(opts?: PngConfig) {
+    const impl = getNodeCanvas(this.lowerCanvasEl);
+    return impl && impl.createPNGStream(opts);
+  }
+
+  /**
+   * node only method
+   * @throws when called from a browser environment
+   */
+  createJPEGStream(opts?: JpegConfig) {
+    const impl = getNodeCanvas(this.lowerCanvasEl);
+    return impl && impl.createJPEGStream(opts);
+  }
 }
 
 Object.assign(StaticCanvas.prototype, {
@@ -1713,20 +1732,3 @@ Object.assign(StaticCanvas.prototype, {
   skipOffscreen: true,
   clipPath: undefined,
 });
-
-if (getEnv().isLikelyNode) {
-  Object.assign(StaticCanvas.prototype, {
-    createPNGStream() {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createPNGStream();
-    },
-    createJPEGStream(opts: any) {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createJPEGStream(opts);
-    },
-  });
-}
