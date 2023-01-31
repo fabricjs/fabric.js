@@ -25,7 +25,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import { cleanUpJsdomNode, getElementOffset } from '../util/dom_misc';
+import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -1677,7 +1677,6 @@ export class StaticCanvas<
     canvasElement.setAttribute('height', `${this.height}`);
     canvasElement.style.cssText = this._originalCanvasStyle || '';
     this._originalCanvasStyle = undefined;
-    cleanUpJsdomNode(canvasElement);
   }
 
   /**
