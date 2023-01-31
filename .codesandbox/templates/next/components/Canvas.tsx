@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import * as fabric from 'fabric';
 import React from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { FabricContext } from './FabricContext';
