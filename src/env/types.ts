@@ -1,4 +1,4 @@
-import { Canvas } from 'canvas';
+import type { Canvas } from 'canvas';
 
 export type TCopyPasteData = {
   copiedText?: string;
