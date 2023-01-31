@@ -1,31 +1,28 @@
 /* eslint-disable no-restricted-globals */
-import { setEnv } from '.';
 import { config } from '../config';
 import { TCopyPasteData, TFabricEnv } from './types';
 
 const copyPasteData: TCopyPasteData = {};
 
-const fabricDocument =
-  document instanceof
-  (typeof HTMLDocument !== 'undefined' ? HTMLDocument : Document)
-    ? document
-    : document.implementation.createHTMLDocument('');
-
-config.configure({
-  devicePixelRatio: window.devicePixelRatio || 1,
-});
+let initialized = false;
+let isTouchSupported: boolean;
 
 export const getEnv = (): TFabricEnv => {
-  return {
-    document: fabricDocument,
-    window,
-    isTouchSupported:
+  if (!initialized) {
+    config.configure({
+      devicePixelRatio: window.devicePixelRatio || 1,
+    });
+    isTouchSupported =
       'ontouchstart' in window ||
-      'ontouchstart' in fabricDocument ||
-      (window && window.navigator && window.navigator.maxTouchPoints > 0),
+      'ontouchstart' in document ||
+      (window && window.navigator && window.navigator.maxTouchPoints > 0);
+    initialized = true;
+  }
+  return {
+    document,
+    window,
+    isTouchSupported,
     isLikelyNode: false,
     copyPasteData,
   };
 };
-
-setEnv(getEnv());
