@@ -25,7 +25,11 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import { cleanUpJsdomNode, getElementOffset } from '../util/dom_misc';
+import {
+  cleanUpJsdomNode,
+  getElementOffset,
+  getNodeCanvas,
+} from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -1500,12 +1504,12 @@ export class StaticCanvas<
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    * @returns {StaticCanvas}
    */
-  cloneWithoutData(): this {
+  cloneWithoutData(): StaticCanvas {
     const el = createCanvasElement();
     el.width = this.width;
     el.height = this.height;
-    // @ts-expect-error TS doesn't recognize this.constructor
-    return new this.constructor(el);
+    // this seems wrong. either Canvas or StaticCanvas
+    return new StaticCanvas(el);
   }
 
   /**
@@ -1709,3 +1713,20 @@ Object.assign(StaticCanvas.prototype, {
   skipOffscreen: true,
   clipPath: undefined,
 });
+
+if (getEnv().isLikelyNode) {
+  Object.assign(StaticCanvas.prototype, {
+    createPNGStream() {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createPNGStream();
+    },
+    createJPEGStream(opts: any) {
+      const impl = getNodeCanvas(
+        (this as unknown as StaticCanvas).lowerCanvasEl
+      );
+      return impl && impl.createJPEGStream(opts);
+    },
+  });
+}

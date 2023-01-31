@@ -1,1 +1,1 @@
-export * from './fabric';
+export * as default from './fabric';
