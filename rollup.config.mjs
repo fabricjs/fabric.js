@@ -53,7 +53,7 @@ export default [
     plugins,
   },
   {
-    input: ['./node.ts'],
+    input: ['./fabricNode.ts'],
     output: [
       {
         file: path.resolve(dirname, `${basename}.node.mjs`),
