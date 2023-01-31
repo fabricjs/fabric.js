@@ -4,7 +4,7 @@
   "description": "fabric.js on node",
   "main": "src/index.js",
   "scripts": {
-    "dev": "open-cli http://localhost:8080/ && nodemon --config nodemon.config.json src/index.js 8080",
+    "dev": "open-cli http://localhost:8080/ && nodemon --config nodemon.config.json src/index.mjs 8080",
     "start": "node src/index.js"
   },
   "dependencies": {

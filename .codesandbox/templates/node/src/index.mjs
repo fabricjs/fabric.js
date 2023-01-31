@@ -1,5 +1,5 @@
-const http = require('http');
-const fabric = require('fabric/node.cjs');
+import http from 'http';
+import * as fabric from 'fabric/node.cjs';
 
 const port = Number(process.argv[2]);
 
