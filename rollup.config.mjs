@@ -7,10 +7,10 @@ import path from 'path';
 
 const splitter = /\n|\s|,/g;
 
-const outputFilePath = process.env.BUILD_OUTPUT || './dist/fabric.js';
+const buildOutput = process.env.BUILD_OUTPUT || './dist/fabric.js';
 
-const dirname = path.dirname(outputFilePath);
-const basename = path.basename(outputFilePath, '.js');
+const dirname = path.dirname(buildOutput);
+const basename = path.basename(buildOutput, '.js');
 
 const plugins = [
   json(),
