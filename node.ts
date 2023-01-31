@@ -1,3 +1,3 @@
 import './src/env/node';
 
-export * as default from './fabric';
+export * from './fabric';

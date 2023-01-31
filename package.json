@@ -111,7 +111,7 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/fabric.js",
-  "main": "./dist/fabric.umd.js",
+  "module": "./dist/fabric.mjs",
+  "main": "./dist/fabric.cjs",
   "types": "./dist/fabric.d.ts"
 }
