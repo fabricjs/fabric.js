@@ -22203,6 +22203,70 @@ const ElementsParser = function (elements, callback, options, reviver, parsingOp
 })(ElementsParser.prototype);
 
 /**
+ * Wrap an action handler with firing an event if the action is performed
+ * @param {Function} actionHandler the function to wrap
+ * @return {Function} a function with an action handler signature
+ */
+const wrapWithFireEvent = (eventName, actionHandler) => {
+  return (eventData, transform, x, y) => {
+    const actionPerformed = actionHandler(eventData, transform, x, y);
+    if (actionPerformed) {
+      fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
+    }
+    return actionPerformed;
+  };
+};
+
+/**
+ * Wrap an action handler with saving/restoring object position on the transform.
+ * this is the code that permits to objects to keep their position while transforming.
+ * @param {Function} actionHandler the function to wrap
+ * @return {Function} a function with an action handler signature
+ */
+function wrapWithFixedAnchor(actionHandler) {
+  return (eventData, transform, x, y) => {
+    const {
+        target,
+        originX,
+        originY
+      } = transform,
+      centerPoint = target.getRelativeCenterPoint(),
+      constraint = target.translateToOriginPoint(centerPoint, originX, originY),
+      actionPerformed = actionHandler(eventData, transform, x, y);
+    target.setPositionByOrigin(constraint, originX, originY);
+    return actionPerformed;
+  };
+}
+
+/**
+ * Action handler to change object's width
+ * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if some change happened
+ */
+const changeObjectWidth = (eventData, transform, x, y) => {
+  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+  //  make sure the control changes width ONLY from it's side of target
+  if (transform.originX === 'center' || transform.originX === 'right' && localPoint.x < 0 || transform.originX === 'left' && localPoint.x > 0) {
+    const {
+        target
+      } = transform,
+      strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+      multiplier = isTransformCentered(transform) ? 2 : 1,
+      oldWidth = target.width,
+      newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
+    target.set('width', Math.max(newWidth, 0));
+    //  check against actual target width in case `newWidth` was rejected
+    return oldWidth !== target.width;
+  }
+  return false;
+};
+const changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeObjectWidth));
+
+/**
  * Render a round control, as per fabric features.
  * This function is written to respect object properties like transparentCorners, cornerSize
  * cornerColor, cornerStrokeColor
@@ -22569,70 +22633,6 @@ class Control {
     }
   }
 }
-
-/**
- * Wrap an action handler with firing an event if the action is performed
- * @param {Function} actionHandler the function to wrap
- * @return {Function} a function with an action handler signature
- */
-const wrapWithFireEvent = (eventName, actionHandler) => {
-  return (eventData, transform, x, y) => {
-    const actionPerformed = actionHandler(eventData, transform, x, y);
-    if (actionPerformed) {
-      fireEvent(eventName, commonEventInfo(eventData, transform, x, y));
-    }
-    return actionPerformed;
-  };
-};
-
-/**
- * Wrap an action handler with saving/restoring object position on the transform.
- * this is the code that permits to objects to keep their position while transforming.
- * @param {Function} actionHandler the function to wrap
- * @return {Function} a function with an action handler signature
- */
-function wrapWithFixedAnchor(actionHandler) {
-  return (eventData, transform, x, y) => {
-    const {
-        target,
-        originX,
-        originY
-      } = transform,
-      centerPoint = target.getRelativeCenterPoint(),
-      constraint = target.translateToOriginPoint(centerPoint, originX, originY),
-      actionPerformed = actionHandler(eventData, transform, x, y);
-    target.setPositionByOrigin(constraint, originX, originY);
-    return actionPerformed;
-  };
-}
-
-/**
- * Action handler to change object's width
- * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if some change happened
- */
-const changeObjectWidth = (eventData, transform, x, y) => {
-  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-  //  make sure the control changes width ONLY from it's side of target
-  if (transform.originX === 'center' || transform.originX === 'right' && localPoint.x < 0 || transform.originX === 'left' && localPoint.x > 0) {
-    const {
-        target
-      } = transform,
-      strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
-    target.set('width', Math.max(newWidth, 0));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
-  }
-  return false;
-};
-const changeWidth = wrapWithFireEvent('resizing', wrapWithFixedAnchor(changeObjectWidth));
 
 /**
  * Find the correct style for the control that is used for rotation.
@@ -24241,6 +24241,35 @@ const colorMatrixDefaultValues = {
 Object.assign(ColorMatrix.prototype, colorMatrixDefaultValues);
 classRegistry.setClass(ColorMatrix);
 
+function createColorMatrixFilter(key, matrix) {
+  return class GeneratedColorMatrix extends ColorMatrix {
+    constructor() {
+      super(...arguments);
+      _defineProperty(this, "type", key);
+      _defineProperty(this, "matrix", matrix);
+      _defineProperty(this, "mainParameter", undefined);
+      _defineProperty(this, "colorsOnly", true);
+    }
+    static async fromObject(object) {
+      return new GeneratedColorMatrix(object);
+    }
+  };
+}
+const Brownie = createColorMatrixFilter('Brownie', [0.5997, 0.34553, -0.27082, 0, 0.186, -0.0377, 0.86095, 0.15059, 0, -0.1449, 0.24113, -0.07441, 0.44972, 0, -0.02965, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Brownie);
+const Vintage = createColorMatrixFilter('Vintage', [0.62793, 0.32021, -0.03965, 0, 0.03784, 0.02578, 0.64411, 0.03259, 0, 0.02926, 0.0466, -0.08512, 0.52416, 0, 0.02023, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Vintage);
+const Kodachrome = createColorMatrixFilter('Kodachrome', [1.12855, -0.39673, -0.03992, 0, 0.24991, -0.16404, 1.08352, -0.05498, 0, 0.09698, -0.16786, -0.56034, 1.60148, 0, 0.13972, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Kodachrome);
+const Technicolor = createColorMatrixFilter('Technicolor', [1.91252, -0.85453, -0.09155, 0, 0.04624, -0.30878, 1.76589, -0.10601, 0, -0.27589, -0.2311, -0.75018, 1.84759, 0, 0.12137, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Technicolor);
+const Polaroid = createColorMatrixFilter('Polaroid', [1.438, -0.062, -0.062, 0, 0, -0.122, 1.378, -0.122, 0, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Polaroid);
+const Sepia = createColorMatrixFilter('Sepia', [0.393, 0.769, 0.189, 0, 0, 0.349, 0.686, 0.168, 0, 0, 0.272, 0.534, 0.131, 0, 0, 0, 0, 0, 1, 0]);
+classRegistry.setClass(Sepia);
+const BlackWhite = createColorMatrixFilter('BlackWhite', [1.5, 1.5, 1.5, 0, -1, 1.5, 1.5, 1.5, 0, -1, 1.5, 1.5, 1.5, 0, -1, 0, 0, 0, 1, 0]);
+classRegistry.setClass(BlackWhite);
+
 const _excluded$1 = ["subFilters"];
 
 /**
@@ -24558,35 +24587,6 @@ const convoluteDefaultValues = {
 };
 Object.assign(Convolute.prototype, convoluteDefaultValues);
 classRegistry.setClass(Convolute);
-
-function createColorMatrixFilter(key, matrix) {
-  return class GeneratedColorMatrix extends ColorMatrix {
-    constructor() {
-      super(...arguments);
-      _defineProperty(this, "type", key);
-      _defineProperty(this, "matrix", matrix);
-      _defineProperty(this, "mainParameter", undefined);
-      _defineProperty(this, "colorsOnly", true);
-    }
-    static async fromObject(object) {
-      return new GeneratedColorMatrix(object);
-    }
-  };
-}
-const Brownie = createColorMatrixFilter('Brownie', [0.5997, 0.34553, -0.27082, 0, 0.186, -0.0377, 0.86095, 0.15059, 0, -0.1449, 0.24113, -0.07441, 0.44972, 0, -0.02965, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Brownie);
-const Vintage = createColorMatrixFilter('Vintage', [0.62793, 0.32021, -0.03965, 0, 0.03784, 0.02578, 0.64411, 0.03259, 0, 0.02926, 0.0466, -0.08512, 0.52416, 0, 0.02023, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Vintage);
-const Kodachrome = createColorMatrixFilter('Kodachrome', [1.12855, -0.39673, -0.03992, 0, 0.24991, -0.16404, 1.08352, -0.05498, 0, 0.09698, -0.16786, -0.56034, 1.60148, 0, 0.13972, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Kodachrome);
-const Technicolor = createColorMatrixFilter('Technicolor', [1.91252, -0.85453, -0.09155, 0, 0.04624, -0.30878, 1.76589, -0.10601, 0, -0.27589, -0.2311, -0.75018, 1.84759, 0, 0.12137, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Technicolor);
-const Polaroid = createColorMatrixFilter('Polaroid', [1.438, -0.062, -0.062, 0, 0, -0.122, 1.378, -0.122, 0, 0, -0.016, -0.016, 1.483, 0, 0, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Polaroid);
-const Sepia = createColorMatrixFilter('Sepia', [0.393, 0.769, 0.189, 0, 0, 0.349, 0.686, 0.168, 0, 0, 0.272, 0.534, 0.131, 0, 0, 0, 0, 0, 1, 0]);
-classRegistry.setClass(Sepia);
-const BlackWhite = createColorMatrixFilter('BlackWhite', [1.5, 1.5, 1.5, 0, -1, 1.5, 1.5, 1.5, 0, -1, 1.5, 1.5, 1.5, 0, -1, 0, 0, 0, 1, 0]);
-classRegistry.setClass(BlackWhite);
 
 const _excluded = ["gamma"];
 /**
