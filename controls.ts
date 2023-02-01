@@ -1,4 +1,5 @@
 export { changeWidth } from './src/controls/changeWidth';
+export { Control } from './src/controls/Control';
 export {
   renderCircleControl,
   renderSquareControl,

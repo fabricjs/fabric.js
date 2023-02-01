@@ -52,8 +52,8 @@ export { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
 export * as util from './util';
 
-export { Control } from './src/controls/Control';
-export * as controlsUtils from './controlsUtils';
+export { Control } from './controls';
+export * as controlsUtils from './controls';
 import './src/controls/default_controls';
 
 export {
