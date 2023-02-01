@@ -50,10 +50,10 @@ export { parseTransformAttribute } from './src/parser/parseTransformAttribute';
 export { getCSSRules } from './src/parser/getCSSRules';
 export { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
-export * as util from './src/util/util';
+export * as util from './src/util';
 
-export { Control } from './src/controls/controls';
-export * as controlsUtils from './src/controls/controls';
+export { Control } from './src/controls';
+export * as controlsUtils from './src/controls';
 import './src/controls/default_controls';
 
 export {
@@ -61,5 +61,5 @@ export {
   initFilterBackend,
   Canvas2dFilterBackend,
   WebGLFilterBackend,
-} from './src/filters/filters';
-export * as filters from './src/filters/filters';
+} from './src/filters';
+export * as filters from './src/filters';
