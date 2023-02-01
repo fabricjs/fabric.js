@@ -30,5 +30,25 @@ QUnit.module('env', (hooks) => {
             }, 'env should match');
             done();
         });
+
+        QUnit.test('tree shaking', async assert => {
+            const done = assert.async();
+            const { execSync } = await import('child_process');
+            const { readFileSync } = await import('fs');
+            const external = [
+                'jsdom',
+                'jsdom/lib/jsdom/living/generated/utils.js',
+                'jsdom/lib/jsdom/utils.js',
+                'canvas',
+            ];
+            const output = 'cli_output/test_results/treeShakingOutput.mjs';
+            const diffOutput = 'cli_output/test_results/treeShakingDiff.txt';
+            execSync(`rollup --format=es --file ${output} --external ${external.join(',')} -- test/fixtures/treeShaking.mjs`, { stdio: 'ignore' });
+            try {
+                execSync(`git diff --no-index -w -b --output ${diffOutput} -- test/fixtures/treeShakingOutput.mjs ${output}`, { stdio: 'ignore' });
+            } catch (error) { }
+            assert.equal(readFileSync(diffOutput).toString(), '', 'bundle should match, diff should be empty');
+            done();
+        });
     });
 });
