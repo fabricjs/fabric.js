@@ -1,7 +1,11 @@
 import './src/env/node';
 
 import type { Canvas as NodeCanvas, JpegConfig, PngConfig } from 'canvas';
-import { getEnv, StaticCanvas as Canvas } from './fabric';
+import {
+  Canvas as CanvasBase,
+  getEnv,
+  StaticCanvas as StaticCanvasBase,
+} from './fabric';
 import { FabricObject } from './src/shapes/Object/Object';
 
 // TODO: move back to default values when refactoring to method
@@ -9,10 +13,26 @@ FabricObject.prototype.objectCaching = false;
 
 export * from './fabric';
 
-export class StaticCanvas extends Canvas {
+function getNodeCanvas(canvasEl: HTMLCanvasElement) {
+  const impl = getEnv().jsdomImplForWrapper(canvasEl);
+  return (impl._canvas || impl._image) as NodeCanvas;
+}
+
+export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {
-    const impl = getEnv().jsdomImplForWrapper(this.lowerCanvasEl);
-    return (impl._canvas || impl._image) as NodeCanvas;
+    return getNodeCanvas(this.lowerCanvasEl);
+  }
+  createPNGStream(opts?: PngConfig) {
+    return this.getNodeCanvas().createPNGStream(opts);
+  }
+  createJPEGStream(opts?: JpegConfig) {
+    return this.getNodeCanvas().createJPEGStream(opts);
+  }
+}
+
+export class Canvas extends CanvasBase {
+  getNodeCanvas() {
+    return getNodeCanvas(this.lowerCanvasEl);
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);
