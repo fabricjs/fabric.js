@@ -1,7 +1,7 @@
 // workaround next bug
 // https://stackoverflow.com/questions/67376052/error-when-running-next-js-typeerror-0-react-jsx-dev-runtime-webpack-impo
 
-const { spawnSync } = require('child_process');
+import { spawnSync } from 'child_process';
 
 // customize next server
 // https://nextjs.org/docs/advanced-features/custom-server
