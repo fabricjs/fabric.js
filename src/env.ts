@@ -2,6 +2,11 @@
 import { config } from './config';
 import type { Canvas } from 'canvas';
 
+type TCopyPasteData = {
+  copiedText?: string;
+  copiedStyle?: Record<string, string>;
+};
+
 type TFabricEnv = {
   document: Document;
   window: Window;
@@ -9,6 +14,7 @@ type TFabricEnv = {
   isLikelyNode: boolean;
   nodeCanvas: Canvas;
   jsdomImplForWrapper: any;
+  copyPasteData: TCopyPasteData;
 };
 
 let fabricDocument: Document;
@@ -17,6 +23,7 @@ let isTouchSupported: boolean;
 let isLikelyNode: boolean;
 let nodeCanvas: Canvas;
 let jsdomImplForWrapper: any;
+let copyPasteData: TCopyPasteData;
 
 function setupEnv() {
   if (typeof document !== 'undefined' && typeof window !== 'undefined') {
@@ -61,6 +68,7 @@ function setupEnv() {
   config.configure({
     devicePixelRatio: fabricWindow.devicePixelRatio || 1,
   });
+  copyPasteData = {};
 }
 
 setupEnv();
@@ -73,6 +81,7 @@ export const getEnv = (): TFabricEnv => {
     isLikelyNode,
     nodeCanvas,
     jsdomImplForWrapper,
+    copyPasteData,
   };
 };
 
