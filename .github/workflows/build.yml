@@ -19,8 +19,8 @@ jobs:
     name: Build stats
     runs-on: ubuntu-latest
     env:
-      minified: dist/fabric.min.js
-      bundled: dist/fabric.mjs
+      minified: dist/index.min.js
+      bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@v3
         with:

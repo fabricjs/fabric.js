@@ -7,7 +7,7 @@ import path from 'path';
 
 const splitter = /\n|\s|,/g;
 
-const buildOutput = process.env.BUILD_OUTPUT || './dist/fabric.js';
+const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');

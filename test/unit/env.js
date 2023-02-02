@@ -9,7 +9,7 @@ QUnit.module('env', (hooks) => {
             const done = assert.async();
             global.window = { devicePixelRatio: 1.25 };
             global.document = { foo: 'bar' };
-            const imported = await import('../../dist/fabric.node.cjs');
+            const imported = await import('../../dist/index.node.cjs');
             const required = require('../..');
             assert.equal(imported.getEnv().isLikelyNode, true, 'should be node env');
             assert.equal(required.getEnv().isLikelyNode, true, 'should be node env');
@@ -18,8 +18,8 @@ QUnit.module('env', (hooks) => {
 
         QUnit.test('SSR: importing fabric before window/document are defined', async assert => {
             const done = assert.async();
-            const imported = await import('../../dist/fabric.cjs');
-            const required = require('../../dist/fabric.cjs');
+            const imported = await import('../../dist/index.cjs');
+            const required = require('../../dist/index.cjs');
             assert.notOk(global.window, 'no window');
             assert.notOk(global.document, 'no document');
             global.window = { devicePixelRatio: 1.25 };

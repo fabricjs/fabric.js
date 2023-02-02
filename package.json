@@ -111,23 +111,23 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/fabric.mjs",
-  "main": "./dist/fabric.node.cjs",
-  "types": "./dist/fabric.d.ts",
+  "module": "./dist/index.mjs",
+  "main": "./dist/index.node.cjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/fabric.mjs",
-      "require": "./dist/fabric.cjs",
-      "default": "./dist/fabric.cjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs",
       "node": null,
-      "types": "./dist/fabric.d.ts"
+      "types": "./dist/index.d.ts"
     },
     "./node": {
-      "import": "./dist/fabric.node.mjs",
-      "require": "./dist/fabric.node.cjs",
-      "default": "./dist/fabric.node.cjs",
-      "node": "./dist/fabric.node.cjs",
-      "types": "./dist/fabric.node.d.ts"
+      "import": "./dist/index.node.mjs",
+      "require": "./dist/index.node.cjs",
+      "default": "./dist/index.node.cjs",
+      "node": "./dist/index.node.cjs",
+      "types": "./dist/index.node.d.ts"
     }
   }
 }
