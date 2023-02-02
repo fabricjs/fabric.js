@@ -1,12 +1,12 @@
 
 /**
- * common config 
+ * common config
  * @see https://github.com/testem/testem/blob/master/docs/config_file.md
  */
 module.exports = {
   framework: 'qunit',
   serve_files: [
-    'dist/fabric.js',
+    'dist/fabric.umd.js',
     'test/lib/assert.js'
   ],
   styles: [

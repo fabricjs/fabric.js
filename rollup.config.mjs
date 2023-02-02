@@ -12,14 +12,14 @@ export default [
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
     output: [
       {
-        file: process.env.BUILD_OUTPUT || './dist/fabric.js',
+        file: process.env.BUILD_OUTPUT || './dist/fabric.umd.js',
         name: 'fabric',
         format: 'umd',
         sourcemap: true,
       },
       Number(process.env.MINIFY)
         ? {
-            file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.min.js',
+            file: process.env.BUILD_MIN_OUTPUT || './dist/fabric.umd.min.js',
             name: 'fabric',
             format: 'umd',
             plugins: [terser()],
@@ -39,9 +39,27 @@ export default [
       }),
     ],
   },
-  // {
-  //   input: "./my-input/index.d.ts",
-  //   output: [{ file: "dist/my-library.d.ts", format: "es" }],
-  //   plugins: [dts()],
-  // },
+  {
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+    output: [
+      {
+        file: process.env.BUILD_OUTPUT || './dist/fabric.js',
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    // see list of plugins (not comprehensive): https://github.com/rollup/awesome
+    plugins: [
+      json(),
+      ts({
+        noForceEmit: true,
+        tsconfig: './tsconfig.json',
+      }),
+      babel({
+        extensions: ['.ts', '.js'],
+        babelHelpers: 'bundled',
+      }),
+    ],
+  },
 ];

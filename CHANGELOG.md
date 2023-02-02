@@ -12,6 +12,7 @@
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 \- chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
 - refactor(Animation): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
+- chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
 - chore(): move and rename text & itext files and organize as folders, rename mixins [#8620](https://github.com/fabricjs/fabric.js/pull/8620)
 - chore(TS): type IText, IText behavior, IText click behavior [#8610](https://github.com/fabricjs/fabric.js/pull/8610)

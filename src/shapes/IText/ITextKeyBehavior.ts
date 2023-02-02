@@ -255,12 +255,13 @@ export abstract class ITextKeyBehavior<
       this.removeStyleFromTo(removeFrom, removeTo);
     }
     if (insertedText.length) {
+      const { copyPasteData } = getEnv();
       if (
         fromPaste &&
-        insertedText.join('') === fabric.copiedText &&
+        insertedText.join('') === copyPasteData.copiedText &&
         !config.disableStyleCopyPaste
       ) {
-        copiedStyle = fabric.copiedTextStyle;
+        copiedStyle = copyPasteData.copiedTextStyle;
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
@@ -301,16 +302,16 @@ export abstract class ITextKeyBehavior<
       //do not cut-copy if no selection
       return;
     }
-
-    fabric.copiedText = this.getSelectedText();
+    const { copyPasteData } = getEnv();
+    copyPasteData.copiedText = this.getSelectedText();
     if (!config.disableStyleCopyPaste) {
-      fabric.copiedTextStyle = this.getSelectionStyles(
+      copyPasteData.copiedTextStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
         true
       );
     } else {
-      fabric.copiedTextStyle = null;
+      copyPasteData.copiedTextStyle = null;
     }
     this._copyDone = true;
   }
