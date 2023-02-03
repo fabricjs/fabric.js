@@ -98,7 +98,7 @@ jobs:
         with:
           node-version: 16.x
       - run: npm ci
-      - run: npm run build -- -f
+      - run: npm run build -- -f && npm run babel-fabric-node
       - run: npm run test:coverage && npm run test:visual:coverage
       - run: npm run coverage:report
       - uses: ShaMan123/lcov-reporter-action@v1.1.1

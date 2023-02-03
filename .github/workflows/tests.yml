@@ -48,6 +48,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - name: Build
-        run: npm run build -- -f
+        run: npm run babel-fabric-node
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}

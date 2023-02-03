@@ -25,7 +25,7 @@ QUnit.recreateVisualRefs = Number(process.env.QUNIT_RECREATE_VISUAL_REFS);
 QUnit.config.filter = process.env.QUNIT_FILTER;
 
 
-global.fabric = require('../dist/index.node.cjs');
+global.fabric = require('../dist/node/index.node.js');
 global.pixelmatch = require('pixelmatch');
 global.fs = require('fs');
 global.visualCallback = {

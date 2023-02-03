@@ -9,7 +9,7 @@ QUnit.module('env', (hooks) => {
             const done = assert.async();
             global.window = { devicePixelRatio: 1.25 };
             global.document = { foo: 'bar' };
-            const imported = await import('../../dist/index.node.cjs');
+            const imported = await import('../../dist/node/index.node.js');
             const required = require('../..');
             assert.equal(imported.getEnv().isLikelyNode, true, 'should be node env');
             assert.equal(required.getEnv().isLikelyNode, true, 'should be node env');
@@ -37,7 +37,7 @@ QUnit.module('env', (hooks) => {
         });
     });
 
-    (!fabric.getEnv().isLikelyNode ? QUnit.module : QUnit.module.skip)('browser', (hooks) => { 
+    (!fabric.getEnv().isLikelyNode ? QUnit.module : QUnit.module.skip)('browser', (hooks) => {
         QUnit.test('env', assert => {
             assert.equal(fabric.getWindow(), window, 'window should be set');
             assert.equal(fabric.getDocument(), document, 'window should be set');
