@@ -1,0 +1,22 @@
+{
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "modules": "cjs",
+        "useBuiltIns": "usage",
+        "loose": true,
+        "targets": {
+          "node": "14"
+        },
+        "corejs": "3"
+      }
+    ],
+    [
+      "@babel/typescript",
+      {
+        "allowDeclareFields": true
+      }
+    ]
+  ]
+}

@@ -59,8 +59,13 @@
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
+    "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt",
     "babel-constants": "babel --no-babelrc src/constants.ts --extensions '.ts' --out-dir dist/src/ --config-file ./.babelrcAlt --plugins=babel-plugin-import-json-value",
-    "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
+    "babel-node-index": "babel --source-maps --no-babelrc index.node.ts fabric.ts --extensions '.ts' --out-dir dist/node --config-file ./.babelrcAltNode",
+    "babel-node-src": "babel --source-maps --no-babelrc src --ignore 'src/constants.ts' --extensions '.ts' --out-dir dist/node/src --config-file ./.babelrcAltNode",
+    "babel-node-constants": "babel --source-maps --no-babelrc src/constants.ts --extensions '.ts' --out-dir dist/node/src --config-file ./.babelrcAltNode --plugins=babel-plugin-import-json-value",
+    "babel-fabric": "babel-constants && babel-src",
+    "babel-fabric-node": "tsc index.node.ts src/*.ts --resolveJsonModule --declaration --emitDeclarationOnly --declarationDir ./dist/node ; npm run babel-node-index && npm run babel-node-constants && npm run babel-node-src"
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
@@ -123,11 +128,14 @@
       "types": "./dist/index.d.ts"
     },
     "./node": {
-      "import": "./dist/index.node.mjs",
-      "require": "./dist/index.node.cjs",
-      "default": "./dist/index.node.cjs",
-      "node": "./dist/index.node.cjs",
+      "import": "./dist/node/index.node.js",
+      "require": "./dist/node/index.node.js",
+      "default": "./dist/node/index.node.js",
+      "node": "./dist/node/index.node.js",
       "types": "./dist/index.node.d.ts"
     }
+  },
+  "dependencies": {
+    "core-js": "^3.27.2"
   }
 }

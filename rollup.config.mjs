@@ -52,28 +52,4 @@ export default [
     ],
     plugins,
   },
-  {
-    input: ['./index.node.ts'],
-    output: [
-      {
-        file: path.resolve(dirname, `${basename}.node.mjs`),
-        name: 'fabric',
-        format: 'es',
-        sourcemap: true,
-      },
-      {
-        file: path.resolve(dirname, `${basename}.node.cjs`),
-        name: 'fabric',
-        format: 'cjs',
-        sourcemap: true,
-      },
-    ],
-    plugins,
-    external: [
-      'jsdom',
-      'jsdom/lib/jsdom/living/generated/utils.js',
-      'jsdom/lib/jsdom/utils.js',
-      'canvas',
-    ],
-  },
 ];
