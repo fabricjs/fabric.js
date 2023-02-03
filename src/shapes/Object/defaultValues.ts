@@ -97,7 +97,8 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  objectCaching: !getEnv().isLikelyNode,
+  // TODO: restore once default values are refactored to a method
+  objectCaching: true, //  !getEnv().isLikelyNode
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,

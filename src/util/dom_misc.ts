@@ -122,11 +122,6 @@ export function makeElementSelectable(element) {
   return element;
 }
 
-export function getNodeCanvas(element) {
-  const impl = getEnv().jsdomImplForWrapper(element);
-  return impl._canvas || impl._image;
-}
-
 export function cleanUpJsdomNode(element) {
   if (!getEnv().isLikelyNode) {
     return;
