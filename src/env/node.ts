@@ -24,13 +24,6 @@ const { window: virtualWindow } = new JSDOM(
 const fabricDocument = virtualWindow.document;
 const fabricWindow = virtualWindow;
 
-const isTouchSupported =
-  'ontouchstart' in fabricWindow ||
-  'ontouchstart' in fabricDocument ||
-  (fabricWindow &&
-    fabricWindow.navigator &&
-    fabricWindow.navigator.maxTouchPoints > 0);
-
 config.configure({
   devicePixelRatio: fabricWindow.devicePixelRatio || 1,
 });
@@ -39,7 +32,7 @@ export const getEnv = (): TFabricEnv => {
   return {
     document: fabricDocument,
     window: fabricWindow,
-    isTouchSupported,
+    isTouchSupported: false,
     isLikelyNode: true,
     dispose(element) {
       const impl = jsdomImplForWrapper(element);
