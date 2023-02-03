@@ -9,7 +9,7 @@ const { implForWrapper: jsdomImplForWrapper } = utils;
 
 const copyPasteData: TCopyPasteData = {};
 
-const { window: virtualWindow } = new JSDOM(
+const { window: fabricWindow } = new JSDOM(
   decodeURIComponent(
     '%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'
   ),
@@ -21,16 +21,13 @@ const { window: virtualWindow } = new JSDOM(
   }
 );
 
-const fabricDocument = virtualWindow.document;
-const fabricWindow = virtualWindow;
-
 config.configure({
   devicePixelRatio: fabricWindow.devicePixelRatio || 1,
 });
 
 export const getEnv = (): TFabricEnv => {
   return {
-    document: fabricDocument,
+    document: fabricWindow.document,
     window: fabricWindow,
     isTouchSupported: false,
     isLikelyNode: true,
