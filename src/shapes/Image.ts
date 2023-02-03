@@ -1,11 +1,10 @@
 //@ts-nocheck
-import { getDocument } from '../env';
+import { getDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
-import { cleanUpJsdomNode } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
@@ -192,7 +191,7 @@ export class Image extends FabricObject {
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
       (element) => {
-        cleanUpJsdomNode(this[element as keyof this]);
+        getEnv().dispose(this[element as keyof this]);
         // @ts-expect-error disposing
         this[element] = undefined;
       }

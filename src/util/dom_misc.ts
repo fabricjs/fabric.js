@@ -118,18 +118,3 @@ export function makeElementSelectable(element) {
   element.style.userSelect = '';
   return element;
 }
-
-export function cleanUpJsdomNode(element) {
-  if (!getEnv().isLikelyNode) {
-    return;
-  }
-  const impl = getEnv().jsdomImplForWrapper(element);
-  if (impl) {
-    impl._image = null;
-    impl._canvas = null;
-    // unsure if necessary
-    impl._currentSrc = null;
-    impl._attributes = null;
-    impl._classList = null;
-  }
-}

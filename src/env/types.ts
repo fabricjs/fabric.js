@@ -1,5 +1,3 @@
-import type { Canvas } from 'canvas';
-
 export type TCopyPasteData = {
   copiedText?: string;
   copiedStyle?: Record<string, string>;
@@ -9,7 +7,6 @@ export type TFabricEnv = {
   window: Window;
   isTouchSupported: boolean;
   isLikelyNode: boolean;
-  nodeCanvas?: Canvas;
-  jsdomImplForWrapper?: any;
+  dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
 };

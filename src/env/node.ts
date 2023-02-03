@@ -1,13 +1,11 @@
 /* eslint-disable no-restricted-globals */
 import { JSDOM } from 'jsdom';
-import utils1 from 'jsdom/lib/jsdom/living/generated/utils.js';
-import utils2 from 'jsdom/lib/jsdom/utils.js';
+import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { setEnv } from './index';
 import { TCopyPasteData, TFabricEnv } from './types';
 
-const { implForWrapper: jsdomImplForWrapper } = utils1;
-const { Canvas: nodeCanvas } = utils2;
+const { implForWrapper: jsdomImplForWrapper } = utils;
 
 const copyPasteData: TCopyPasteData = {};
 
@@ -43,8 +41,17 @@ export const getEnv = (): TFabricEnv => {
     window: fabricWindow,
     isTouchSupported,
     isLikelyNode: true,
-    nodeCanvas,
-    jsdomImplForWrapper,
+    dispose(element) {
+      const impl = jsdomImplForWrapper(element);
+      if (impl) {
+        impl._image = null;
+        impl._canvas = null;
+        // unsure if necessary
+        impl._currentSrc = null;
+        impl._attributes = null;
+        impl._classList = null;
+      }
+    },
     copyPasteData,
   };
 };

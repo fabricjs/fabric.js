@@ -23,6 +23,10 @@ export const getEnv = (): TFabricEnv => {
     window,
     isTouchSupported,
     isLikelyNode: false,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    dispose(element) {
+      // noop
+    },
     copyPasteData,
   };
 };
