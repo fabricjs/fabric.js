@@ -1,9 +1,9 @@
-import './src/env/node';
+// first we set the global env variable by importing the node env file
+import { getNodeCanvas } from './src/env/node';
 
-import type { Canvas as NodeCanvas, JpegConfig, PngConfig } from 'canvas';
+import type { JpegConfig, PngConfig } from 'canvas';
 import {
   Canvas as CanvasBase,
-  getEnv,
   StaticCanvas as StaticCanvasBase,
 } from './fabric';
 import { FabricObject } from './src/shapes/Object/Object';
@@ -12,11 +12,6 @@ import { FabricObject } from './src/shapes/Object/Object';
 FabricObject.prototype.objectCaching = false;
 
 export * from './fabric';
-
-function getNodeCanvas(canvasEl: HTMLCanvasElement) {
-  const impl = getEnv().jsdomImplForWrapper(canvasEl);
-  return (impl._canvas || impl._image) as NodeCanvas;
-}
 
 export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {

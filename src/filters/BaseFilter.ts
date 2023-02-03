@@ -1,3 +1,4 @@
+import { getEnv } from '../env';
 import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
@@ -7,9 +8,9 @@ import type {
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
-import { WebGLPrecision, webGLProbe } from './WebGLProbe';
+import { GLPrecision } from './GLProbes/GLProbe';
 
-const highPsourceCode = `precision ${WebGLPrecision.high} float`;
+const highPsourceCode = `precision ${GLPrecision.high} float`;
 
 export type AbstractBaseFilterOptions<T> = {
   mainParameter: string;
@@ -71,13 +72,11 @@ export abstract class AbstractBaseFilter<T> {
     fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
-    if (
-      webGLProbe.webGLPrecision &&
-      webGLProbe.webGLPrecision !== WebGLPrecision.high
-    ) {
+    const { GLProbe } = getEnv();
+    if (GLProbe.GLPrecision && GLProbe.GLPrecision !== GLPrecision.high) {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(WebGLPrecision.high, webGLProbe.webGLPrecision)
+        highPsourceCode.replace(GLPrecision.high, GLProbe.GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);

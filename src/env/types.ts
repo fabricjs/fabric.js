@@ -1,3 +1,5 @@
+import { GLProbe } from '../filters/GLProbes/GLProbe';
+
 export type TCopyPasteData = {
   copiedText?: string;
   copiedStyle?: Record<string, string>;
@@ -7,6 +9,7 @@ export type TFabricEnv = {
   window: Window;
   isTouchSupported: boolean;
   isLikelyNode: boolean;
+  GLProbe: GLProbe;
   dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
 };
