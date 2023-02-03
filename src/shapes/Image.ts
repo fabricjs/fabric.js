@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { getEnv } from '../env';
+import { getDocument } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -134,8 +134,7 @@ export class Image extends FabricObject {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
-      (typeof arg0 === 'string' && getEnv().document.getElementById(arg0)) ||
-        arg0,
+      (typeof arg0 === 'string' && getDocument().getElementById(arg0)) || arg0,
       options
     );
   }

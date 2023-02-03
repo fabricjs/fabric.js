@@ -20,7 +20,7 @@ export function initFilterBackend(): FilterBackend {
 }
 
 /**
- * Get the current fabricJS filter backend  or initialize one if not avaialble yet
+ * Get the current fabricJS filter backend  or initialize one if not available yet
  * @param [strict] pass `true` to create the backend if it wasn't created yet (default behavior),
  * pass `false` to get the backend ref without mutating it
  */

@@ -1,5 +1,3 @@
-import { getEnv } from '../../env';
-
 export const stateProperties = [
   'top',
   'left',

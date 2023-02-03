@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 
 /**
  * Wraps element with another element
@@ -26,8 +26,8 @@ export function getScrollLeftTop(element) {
   let left = 0,
     top = 0;
 
-  const docElement = getEnv().document.documentElement,
-    body = getEnv().document.body || {
+  const docElement = getDocument().documentElement,
+    body = getDocument().body || {
       scrollLeft: 0,
       scrollTop: 0,
     };
@@ -39,7 +39,7 @@ export function getScrollLeftTop(element) {
     // Set element to element parent, or 'host' in case of ShadowDOM
     element = element.parentNode || element.host;
 
-    if (element === getEnv().document) {
+    if (element === getDocument()) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
@@ -74,10 +74,7 @@ export function getElementOffset(element) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = getEnv().document.defaultView.getComputedStyle(
-    element,
-    null
-  );
+  const elemStyle = getDocument().defaultView.getComputedStyle(element, null);
   for (const attr in offsetAttributes) {
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }

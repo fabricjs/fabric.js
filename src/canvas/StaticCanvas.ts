@@ -1,4 +1,4 @@
-import { getEnv } from '../env';
+import { getDocument } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -397,7 +397,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        (getEnv().document.getElementById(canvasEl) as HTMLCanvasElement) ||
+        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
         this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
