@@ -132,7 +132,7 @@
       "require": "./dist/node/index.node.js",
       "default": "./dist/node/index.node.js",
       "node": "./dist/node/index.node.js",
-      "types": "./dist/index.node.d.ts"
+      "types": "./dist/node/index.node.d.ts"
     }
   },
   "dependencies": {
