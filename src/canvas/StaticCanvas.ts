@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import {
+  Constructor,
   ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
@@ -1487,9 +1488,8 @@ export class StaticCanvas<
   /**
    * Clones canvas instance
    * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
-   * @returns {Promise<Canvas | StaticCanvas>}
    */
-  clone(properties: string[]): Promise<StaticCanvas> {
+  clone(properties: string[]) {
     const data = this.toObject(properties);
     const canvas = this.cloneWithoutData();
     return canvas.loadFromJSON(data);
@@ -1498,14 +1498,12 @@ export class StaticCanvas<
   /**
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
-   * @returns {StaticCanvas}
    */
-  cloneWithoutData(): this {
+  cloneWithoutData() {
     const el = createCanvasElement();
     el.width = this.width;
     el.height = this.height;
-    // @ts-expect-error TS doesn't recognize this.constructor
-    return new this.constructor(el);
+    return new (this.constructor as Constructor<this>)(el);
   }
 
   /**
