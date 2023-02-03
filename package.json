@@ -64,7 +64,7 @@
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
-    "jsdom": "^19.0.0"
+    "jsdom": "^20.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
@@ -76,6 +76,7 @@
     "@rollup/plugin-terser": "^0.3.0",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/jsdom": "^20.0.1",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
@@ -110,7 +111,33 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/fabric.js",
-  "main": "./dist/fabric.umd.js",
-  "types": "./dist/fabric.d.ts"
+  "module": "./dist/index.mjs",
+  "main": "./dist/index.node.cjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    ">=4.2": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "node": [
+        "dist/index.node.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.cjs",
+      "node": null,
+      "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/index.node.mjs",
+      "require": "./dist/index.node.cjs",
+      "default": "./dist/index.node.cjs",
+      "node": "./dist/index.node.cjs",
+      "types": "./dist/index.node.d.ts"
+    }
+  }
 }
