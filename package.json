@@ -69,7 +69,7 @@
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
-    "jsdom": "^19.0.0"
+    "jsdom": "^20.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
@@ -119,6 +119,16 @@
   "module": "./dist/index.mjs",
   "main": "./dist/index.node.cjs",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    ">=4.2": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "node": [
+        "dist/index.node.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
