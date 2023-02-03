@@ -8,7 +8,6 @@ export type TFabricEnv = {
   document: Document;
   window: Window;
   isTouchSupported: boolean;
-  isLikelyNode: boolean;
   GLProbe: GLProbe;
   dispose(element: Element): void;
   copyPasteData: TCopyPasteData;

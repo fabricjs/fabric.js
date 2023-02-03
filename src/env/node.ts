@@ -37,7 +37,6 @@ export const getEnv = (): TFabricEnv => {
     document: fabricWindow.document,
     window: fabricWindow,
     isTouchSupported: false,
-    isLikelyNode: true,
     GLProbe: new NodeGLProbe(),
     dispose(element) {
       const impl = jsdomImplForWrapper(element);

@@ -23,7 +23,6 @@ export const getEnv = (): TFabricEnv => {
     document,
     window,
     isTouchSupported,
-    isLikelyNode: false,
     GLProbe: new WebGLProbe(),
     dispose() {
       // noop
