@@ -117,7 +117,7 @@
     "node": ">=14.0.0"
   },
   "module": "./dist/index.mjs",
-  "main": "./dist/index.node.cjs",
+  "main": "./dist/node/index.node.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     ">=4.2": {
