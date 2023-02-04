@@ -36,7 +36,7 @@ QUnit.test('fire event/object', function (assert) {
   fired = foo.fire('bar:baz', { foo: 'bar' });
   assert.ok(received instanceof fabric.Event, 'should be an event');
   assert.equal(received, fired, 'should be the same ref');
-  assert.deepEqual(received, { foo: 'bar' }, 'event should be empty');
+  assert.equal(received.foo, 'bar', 'object should be set');
   received = null;
 
   const ev = fabric.Event.init({ foo: 'bar' });
@@ -44,7 +44,7 @@ QUnit.test('fire event/object', function (assert) {
   assert.ok(received instanceof fabric.Event, 'should be an event');
   assert.equal(received, fired, 'should be the same ref');
   assert.equal(ev, fired, 'should be the same ref');
-  assert.deepEqual(received, { foo: 'bar' }, 'event should be empty');
+  assert.equal(received.foo, 'bar', 'object should be set');
   assert.equal(ev.defaultPrevented, false, 'default not prevented');
   assert.equal(ev.propagate, true, 'propagation not prevented');
 
