@@ -75,10 +75,17 @@ export class PencilBrush extends SimpleBrush<Path> {
     this.render();
   }
 
+  protected shouldHandleMoveEvent(ev: TPointerEventInfo) {
+    return this.active && this.shouldHandleEvent(ev);
+  }
+
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
     const { e, pointer } = ev;
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
+    if (this.limitedToCanvasSize && this._isOutSideCanvas(ev.pointer)) {
+      this.oldEnd = ev.pointer;
+    }
     if (this._addPoint(pointer) && this._points.length > 1) {
       if (this.needsFullRender()) {
         // redraw curve
