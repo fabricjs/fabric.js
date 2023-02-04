@@ -1,8 +1,7 @@
-import { getEnv } from '../env';
+import type { BaseBrush } from '../brushes/BaseBrush';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
-import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import { getEnv } from '../env';
 import {
   CanvasEvents,
   ModifierKey,
@@ -10,32 +9,39 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
-import {
-  addTransformToObject,
-  saveObjectTransform,
-} from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import {
-  isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
-} from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
+import { Point } from '../Point';
 import type { IText } from '../shapes/IText/IText';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TSVGReviver,
+} from '../typedefs';
+import { getPointer, isTouchEvent } from '../util/dom_event';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   wrapElement,
 } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/BaseBrush';
+import { isTransparent } from '../util/misc/isTransparent';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  addTransformToObject,
+  saveObjectTransform,
+} from '../util/misc/objectTransforms';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import {
+  isActiveSelection,
+  isCollection,
+  isFabricObjectCached,
+} from '../util/types';
+import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -72,7 +78,8 @@ type TDestroyedCanvas = Omit<
  * @fires selection:updated
  * @fires selection:created
  *
- * @fires path:created after a drawing operation ends and the path is added
+ * @fires interaction:completed after a drawing operation ends
+ *
  * @fires mouse:down
  * @fires mouse:move
  * @fires mouse:up
@@ -153,7 +160,7 @@ export class SelectableCanvas<
 > extends StaticCanvas<EventSpec> {
   declare _objects: FabricObject[];
   /**
-   * When true, objects can be transformed by one side (unproportionally)
+   * When true, objects can be transformed by one side (unproportionately)
    * when dragged on the corners that normally would not do that.
    * @type Boolean
    * @default
@@ -491,7 +498,7 @@ export class SelectableCanvas<
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
   declare cacheCanvasEl: HTMLCanvasElement;
-  protected declare _isCurrentlyDrawing: boolean;
+  protected declare shouldClearContextTop: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 
@@ -589,9 +596,18 @@ export class SelectableCanvas<
     if (this.destroyed) {
       return;
     }
-    if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+    if (
+      (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) ||
+      this.shouldClearContextTop
+    ) {
       this.clearContext(this.contextTop);
       this.contextTopDirty = false;
+      if (this.shouldClearContextTop) {
+        // in case we are rendering a requested render state might have changed
+        // so we render top layer to sync visuals
+        this.hasLostContext = true;
+        this.shouldClearContextTop = false;
+      }
     }
     if (this.hasLostContext) {
       this.renderTopLayer(this.contextTop);
@@ -607,8 +623,8 @@ export class SelectableCanvas<
    */
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush._render();
+    if (this.isCurrentlyDrawing()) {
+      this.freeDrawingBrush.render();
       this.contextTopDirty = true;
     }
     // we render the top context - last object
@@ -807,7 +823,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
@@ -1179,9 +1195,8 @@ export class SelectableCanvas<
     // @ts-ignore
     this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
+    if (this.isCurrentlyDrawing()) {
+      this.freeDrawingBrush._setBrushStyles(this.contextTop);
     }
   }
 
@@ -1298,6 +1313,10 @@ export class SelectableCanvas<
    */
   getSelectionElement(): HTMLCanvasElement {
     return this.upperCanvasEl;
+  }
+
+  isCurrentlyDrawing(): this is AssertKeys<this, 'freeDrawingBrush'> {
+    return !!(this.isDrawingMode && this.freeDrawingBrush?.active);
   }
 
   /**
