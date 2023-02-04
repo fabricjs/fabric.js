@@ -2,6 +2,7 @@
 
 ## [next]
 
+- patch(): Node entry point follow up [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
 - chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
