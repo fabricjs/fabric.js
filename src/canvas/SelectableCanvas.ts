@@ -1481,6 +1481,7 @@ export class SelectableCanvas<
     if (this.isCurrentlyDrawing()) {
       // force brush to redraw
       this.shouldClearContextTop = true;
+      this.freeDrawingBrush!.clipPath?.setCoords();
     }
     super.setViewportTransform(vpt);
     const activeObject = this._activeObject;
