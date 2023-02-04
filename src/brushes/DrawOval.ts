@@ -1,5 +1,5 @@
-import { Point } from '../point.class';
-import { Ellipse } from '../shapes/ellipse.class';
+import { Point } from '../Point';
+import { Ellipse } from '../shapes/Ellipse';
 import { DrawShape } from './DrawShape';
 
 export class DrawOval extends DrawShape<Ellipse> {
