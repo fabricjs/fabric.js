@@ -2271,7 +2271,6 @@ QUnit.module('Free Drawing', hooks => {
     percentage: 0.02,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
     targets: {
       top: true,
       main: false,
