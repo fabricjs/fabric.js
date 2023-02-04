@@ -337,7 +337,8 @@
     assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
-  QUnit.test('setDimensions and active brush', function(assert) {
+  QUnit.test('setDimensions and active brush', function (assert) {
+    var done = assert.async();
     var prepareFor = false;
     var rendered = false;
     var canvas = new fabric.Canvas(null, { width: 500, height: 500 });
@@ -345,12 +346,14 @@
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
     canvas.isCurrentlyDrawing = () => true;
-    brush.render = function() { rendered = true; };
-    brush._setBrushStyles = function() { prepareFor = true; };
+    brush.render = () => { rendered = true; };
+    brush._setBrushStyles = () => { prepareFor = true };
+    canvas.on('after:render', () => {
+      assert.equal(rendered, true, 'the brush called the render method');
+      assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
+      done();
+    });    
     canvas.setDimensions({ width: 200, height: 200 });
-    canvas.renderAll();
-    assert.equal(rendered, true, 'the brush called the render method');
-    assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
   });
 
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {
