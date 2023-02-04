@@ -894,7 +894,9 @@ export class Canvas extends SelectableCanvas {
       target?: FabricObject;
       subTargets: FabricObject[];
     };
-    const ev = this.fire(eventType, options);
+    const ev = this.fire(eventType, options) as TFabricEvent<
+      CanvasEvents[T] & ObjectEvents[T]
+    >;
     target && target.fire(eventType, ev);
     for (let i = 0; i < subTargets.length; i++) {
       subTargets[i].fire(eventType, ev);
