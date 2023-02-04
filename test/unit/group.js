@@ -208,6 +208,7 @@
       strokeUniform:            false,
       subTargetCheck:           false,
       interactive:              false,
+      erasable:                 true,
     };
 
     assert.deepEqual(clone, expectedObject);

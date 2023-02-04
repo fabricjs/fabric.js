@@ -87,7 +87,8 @@
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false,
-      objects:                  clone.objects
+      objects:                  clone.objects,
+      erasable:                 true,
     };
 
     assert.deepEqual(clone, expectedObject);

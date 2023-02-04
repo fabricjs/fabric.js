@@ -39,7 +39,8 @@
     globalCompositeOperation: 'source-over',
     skewX:                    0,
     skewY:                    0,
-    strokeUniform:              false
+    strokeUniform:            false,
+    erasable:                 true,
   };
 
   var REFERENCE_EMPTY_OBJECT = {

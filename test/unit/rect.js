@@ -33,7 +33,8 @@
     ry:                       0,
     skewX:                    0,
     skewY:                    0,
-    strokeUniform:            false
+    strokeUniform:            false,
+    erasable:                 true,
   };
 
   QUnit.module('fabric.Rect');

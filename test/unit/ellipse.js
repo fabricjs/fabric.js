@@ -57,6 +57,7 @@
       paintFirst:               'fill',
       globalCompositeOperation: 'source-over',
       strokeUniform:            false,
+      erasable:                 true,
     };
     assert.ok(typeof ellipse.toObject === 'function');
     assert.deepEqual(ellipse.toObject(), defaultProperties);
