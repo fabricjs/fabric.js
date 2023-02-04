@@ -98,6 +98,11 @@ export abstract class BaseBrush<
     };
   }
 
+  /**
+   * This method wires the internal lifecycle to canvas events,
+   * making it very easy to change the hooks that the brush responds to.
+   * @returns an array of disposers
+   */
   protected subscribe(): VoidFunction[] {
     return [this.on('resize', () => this._setBrushStyles())];
   }
