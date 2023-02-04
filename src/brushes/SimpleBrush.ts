@@ -15,6 +15,7 @@ export abstract class SimpleBrush<
 
   protected subscribe() {
     return [
+      ...super.subscribe(),
       this.on(
         'mouse:down:before',
         (ev) => this.shouldHandleEvent(ev) && this.down(ev)
