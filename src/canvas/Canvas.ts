@@ -29,7 +29,10 @@ import { TextEditingManager } from './TextEditingManager';
 const addEventOptions = { passive: false } as EventListenerOptions;
 
 function checkClick(e: TPointerEvent, value: number) {
-  return !!(e as MouseEvent).button && (e as MouseEvent).button === value - 1;
+  return (
+    typeof (e as MouseEvent).button === 'number' &&
+    (e as MouseEvent).button === value - 1
+  );
 }
 
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
@@ -782,7 +785,7 @@ export class Canvas extends SelectableCanvas {
   ) {
     return (
       !beforeEvent?.defaultPrevented &&
-      checkClick(e, LEFT_CLICK) &&
+      (checkClick(e, LEFT_CLICK) || !('button' in e)) &&
       this._isMainEvent(e)
     );
   }
