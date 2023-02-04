@@ -2,7 +2,7 @@ import type { Canvas } from '../canvas/Canvas';
 import { Color } from '../color/Color';
 import { TEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
-import type { Shadow } from '../Shadow';
+import { Shadow } from '../Shadow';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
