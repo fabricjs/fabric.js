@@ -3,8 +3,9 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
-    setBrush(brush.canvas, brush);
+function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
+  const { canvas } = brush;
+    setBrush(canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
