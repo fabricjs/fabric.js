@@ -41,7 +41,7 @@ export abstract class DrawShapeBase<
     return shape;
   }
 
-  _setBrushStyles() {
+  protected _setBrushStyles() {
     this.setStyles();
   }
 

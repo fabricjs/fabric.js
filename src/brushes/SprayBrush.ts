@@ -92,7 +92,9 @@ export class SprayBrush extends SimpleBrush<Group> {
     this.sprayChunk = [];
   }
 
-  _setBrushStyles(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     super._setBrushStyles(ctx);
     ctx.fillStyle = this.color;
   }
@@ -126,9 +128,6 @@ export class SprayBrush extends SimpleBrush<Group> {
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
     this.sprayChunks = [];
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._setBrushStyles();
-    this._setShadow();
     this.addSprayChunk(this.extractPointer(ev));
     this.renderChunk(this.sprayChunk);
   }

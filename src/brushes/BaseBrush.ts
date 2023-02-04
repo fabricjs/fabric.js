@@ -122,6 +122,8 @@ export abstract class BaseBrush<
   protected start() {
     this.active = true;
     this.canvas.setCursor(this.cursor);
+    this._setBrushStyles();
+    this._setShadow();
   }
 
   /**

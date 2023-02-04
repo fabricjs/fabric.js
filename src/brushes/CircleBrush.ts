@@ -91,8 +91,6 @@ export class CircleBrush extends SimpleBrush<FabricObject> {
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
     this.points = [];
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._setShadow();
     this.drawDot(this.extractPointer(ev));
   }
 
