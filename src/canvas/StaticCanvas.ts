@@ -727,7 +727,7 @@ export class StaticCanvas<
     objects: FabricObject[],
     {
       fireEvents = true,
-      drawControls: controls = this.interactive,
+      drawControls: controls = true,
     }: {
       fireEvents?: boolean;
       drawControls?: boolean;
