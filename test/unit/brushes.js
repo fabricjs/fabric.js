@@ -23,6 +23,7 @@
         }
       });
 
+      assert.ok(brush instanceof fabric.Observable, 'should inherit from fabric.Observable');
       assert.ok(brush instanceof fabric.BaseBrush, 'should inherit from fabric.BaseBrush');
       assert.ok(brush instanceof fabric.SimpleBrush, 'should inherit from fabric.SimpleBrush');
       assert.equal(brush.color, 'rgb(0, 0, 0)', 'default color is black');
@@ -40,6 +41,32 @@
       brush.cursor = 'testCursor';
       brush.start();
       assert.equal(setCursor, 'testCursor', 'should set canvas cursor');
+    });
+    QUnit.test('canvas event is fired on brush', function(assert) {
+      const done = assert.async();
+      const brush = new fabric.SimpleBrush(canvas);
+      canvas.freeDrawingBrush = brush;
+      let e;
+      const fired = [];
+      Promise.all([
+        new Promise(resolve => {
+          canvas.on('foo', ev => {
+            fired.push({ canvas: ev });
+            resolve();
+          });
+        }),
+        new Promise(resolve => {
+          brush.on('foo', ev => {
+            fired.push({ brush: ev });
+            resolve();
+          });
+        })
+      ]).then(() => {
+        assert.equal(fired[0].brush, e, 'same event ref, firing order is kept')
+        assert.equal(fired[1].canvas, e, 'same event ref, firing order is kept')
+        done();
+      })
+      e = canvas.fire('foo', { bar: 'baz' });
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);

@@ -112,7 +112,7 @@
 
     //  window resize
     cacheAndAssertTransformEvent();
-    canvas._onResize();
+    canvas._onWindowResize();
     assertTransformEventCacheIsReset();
   });
 
@@ -342,7 +342,7 @@
     var prepareFor = false;
     var rendered = false;
     var canvas = new fabric.Canvas(null, { width: 500, height: 500 });
-    var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
+    var brush = new fabric.SimpleBrush(canvas);
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
     canvas.isCurrentlyDrawing = () => true;
@@ -351,7 +351,7 @@
     await new Promise(resolve => {
       Promise.all([
         new Promise(resolve => canvas.on('resize', resolve)),
-        new Promise(resolve => canvas.on('after:render', resolve))
+        new Promise(resolve => canvas.on('after:render', resolve)),
       ]).then(resolve);
       canvas.setDimensions({ width: 200, height: 200 });
     });
