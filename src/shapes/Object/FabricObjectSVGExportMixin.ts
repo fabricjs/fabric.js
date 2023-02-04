@@ -276,7 +276,7 @@ export class FabricObjectSVGExportMixin {
    * use <mask> to achieve erasing for svg, credit: https://travishorn.com/removing-parts-of-shapes-in-svg-b539a89e5649
    * must be called before object markup creation as it relies on the `clipPathId` property of the mask
    */
-  _createEraserSVGMarkup(reviver: SVGReviver) {
+  _createEraserSVGMarkup(reviver: TSVGReviver) {
     if (this.eraser) {
       this.eraser.clipPathId = `MASK_${uid()}`;
       return `<mask id="${this.eraser.clipPathId}" >${this.eraser.toSVG(

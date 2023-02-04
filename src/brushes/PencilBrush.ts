@@ -1,10 +1,6 @@
 import type { Canvas } from '../canvas/Canvas';
-import {
-  ModifierKey,
-  TEvent,
-  TPointerEvent,
-  TPointerEventInfo,
-} from '../EventTypeDefs';
+import { Color } from '../color/Color';
+import { ModifierKey, TPointerEventInfo } from '../EventTypeDefs';
 import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Shadow } from '../Shadow';
