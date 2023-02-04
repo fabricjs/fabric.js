@@ -109,7 +109,7 @@ export abstract class BaseBrush<
 
   protected start() {
     this.active = true;
-    this.canvas.setCursor(this.canvas.freeDrawingCursor);
+    this.canvas.setCursor(this.cursor);
   }
 
   /**
