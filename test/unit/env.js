@@ -27,7 +27,7 @@ QUnit.module('env', (hooks) => {
             global.window = win;
             global.document = doc;
             [imported, required].forEach(fabric => {
-                assert.equal(fabric.getEnv().window, win, 'document should match');
+                assert.equal(fabric.getEnv().window, win, 'window should match');
                 assert.equal(fabric.getEnv().document, doc, 'document should match');
             });            
             done();
