@@ -3,8 +3,6 @@
 ## [next]
 
 - feat(): DrawShape, DrawOval, DrawPoly [#8430](https://github.com/fabricjs/fabric.js/pull/8430)
-- fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
-- fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
 - chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
