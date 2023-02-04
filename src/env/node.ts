@@ -11,7 +11,7 @@ const { implForWrapper: jsdomImplForWrapper } = utils;
 
 const copyPasteData: TCopyPasteData = {};
 
-const { window: fabricWindow } = new JSDOM(
+const { window: JSDOMWindow } = new JSDOM(
   decodeURIComponent(
     '%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'
   ),
@@ -26,7 +26,7 @@ const { window: fabricWindow } = new JSDOM(
 );
 
 config.configure({
-  devicePixelRatio: fabricWindow.devicePixelRatio || 1,
+  devicePixelRatio: JSDOMWindow.devicePixelRatio || 1,
 });
 
 export const getNodeCanvas = (canvasEl: HTMLCanvasElement) => {
@@ -36,8 +36,8 @@ export const getNodeCanvas = (canvasEl: HTMLCanvasElement) => {
 
 export const getEnv = (): TFabricEnv => {
   return {
-    document: fabricWindow.document,
-    window: fabricWindow,
+    document: JSDOMWindow.document,
+    window: JSDOMWindow,
     isTouchSupported: false,
     GLProbe: new NodeGLProbe(),
     dispose(element) {
