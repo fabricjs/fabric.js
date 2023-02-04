@@ -109,4 +109,5 @@ export const fabricObjectDefaultValues = {
   inverted: false,
   absolutePositioned: false,
   FX_DURATION: 500,
+  erasable: true,
 };
