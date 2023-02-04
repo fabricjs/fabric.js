@@ -592,6 +592,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         this.clipPath &&
         !this.clipPath.absolutePositioned &&
         this._adjustObjectPosition(this.clipPath, diff);
+      !isFirstLayout &&
+        this.eraser &&
+        !this.eraser.absolutePositioned &&
+        this._adjustObjectPosition(this.eraser, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
         this.setPositionByOrigin(newCenter, 'center', 'center');
