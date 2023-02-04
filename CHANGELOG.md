@@ -2,11 +2,13 @@
 
 ## [next]
 
-- feat(Brush): `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
+- feat(Brush): new API, extend `Observable`, support `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
   BREAKING:
   - brush doesn't add result to canvas anymore
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
+  - renamed `PencilBrush#convertPointsToSVGPath` => `getPathFromPoints`
+  - `Canvas#freeDrawingCursor` => `Brush#cursor`
 - feat(): DrawShape, DrawOval, DrawPoly [#8430](https://github.com/fabricjs/fabric.js/pull/8430)
 - fix(): `_initRetinaScaling`  initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
