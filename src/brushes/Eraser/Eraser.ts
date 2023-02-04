@@ -1,4 +1,4 @@
-import { Group } from '../../shapes/group.class';
+import { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { TClassProperties } from '../../typedefs';
 import {
