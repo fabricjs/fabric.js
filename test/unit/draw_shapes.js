@@ -1,5 +1,12 @@
-  let canvas;
+  
   QUnit.module('Draw Shapes', function (hooks) {
+    let canvas;
+    function createEvent(pointer) {
+      return fabric.Event.init({
+        e: {},
+        pointer
+      });
+    }
     hooks.before(() => {
       canvas = new fabric.Canvas();
     });
@@ -27,12 +34,12 @@
             var pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
             var pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
-            brush.onMouseDown(pointer, { e });
-            brush.onMouseMove(pointer2, { e });
-            brush.onMouseMove(pointer3, { e });
-            brush.onMouseMove(pointer2, { e });
-            brush.onMouseMove(pointer3, { e });
-            brush.onMouseUp({ e, pointer: pointer3 });
+            brush.down(createEvent(pointer));
+            brush.move(createEvent(pointer2));
+            brush.move(createEvent(pointer3));
+            brush.move(createEvent(pointer2));
+            brush.move(createEvent(pointer3));
+            brush.up(createEvent(pointer3));
           });
           assert.equal(fired, true, 'interaction:completed event should have fired');
           return result;
@@ -161,7 +168,6 @@
             const done = assert.async();
             const brush = new fabric.DrawPoly(canvas);
             brush.builder = builder;
-            const e = {};
             assert.expect(3);
             canvas.on('interaction:completed', ({ result: poly }) => {
               assert.ok(poly instanceof builder, `should create poly of type ${builder.name}`);
@@ -175,11 +181,11 @@
             const pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             const pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
             const pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
-            brush.onMouseDown(pointer, { e });
-            brush.onMouseMove(pointer3, { e });
-            brush.onMouseUp({ e, pointer: pointer2 });
-            brush.onMouseMove(pointer2, { e });
-            brush.onDoubleClick(pointer3);
+            brush.down(createEvent(pointer));
+            brush.move(createEvent(pointer3));
+            brush.up(createEvent(pointer2));
+            brush.move(createEvent(pointer2));
+            brush.end(createEvent(pointer3));
           });
         });
       });

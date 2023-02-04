@@ -1,6 +1,12 @@
 (function() {
   var canvas = new fabric.Canvas();
   var parsePath = fabric.util.parsePath;
+  function createEvent(pointer) {
+    return fabric.Event.init({
+      e: {},
+      pointer
+    });
+  }
   QUnit.module('fabric.BaseBrush', function(hooks) {
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
@@ -40,18 +46,18 @@
         QUnit.test('fabric pencil brush draw point', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
+          brush.down(createEvent(pointer));
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
+          brush.down(createEvent(pointer));
+          brush.move(createEvent(pointer));
+          brush.move(createEvent(pointer));
+          brush.move(createEvent(pointer));
+          brush.move(createEvent(pointer));
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
@@ -61,11 +67,11 @@
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
+          brush.down(createEvent(pointer));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -81,11 +87,11 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
+          brush.down(createEvent(pointer));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
+          brush.move(createEvent(pointer4));
+          brush.move(createEvent(pointer5));
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -102,11 +108,11 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
+          brush.down(createEvent(pointer));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
+          brush.move(createEvent(pointer4));
+          brush.move(createEvent(pointer5));
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -126,12 +132,12 @@
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseUp({ e: {} });
+          brush.down(createEvent(pointer));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
+          brush.move(createEvent(pointer2));
+          brush.move(createEvent(pointer3));
+          brush.up(createEvent(pointer3));
         });
       });
     });

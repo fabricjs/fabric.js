@@ -1,28 +1,33 @@
-  function setBrush(canvas, brush) {
-    canvas.isDrawingMode = true;
-    canvas.freeDrawingBrush = brush;
+function setBrush(canvas, brush) {
+  canvas.isDrawingMode = true;
+  canvas.freeDrawingBrush = brush;
+}
+function createEvent(pointer) {
+    return fabric.Event.init({
+      e: { pointerId: 1 },
+      pointer
+    });
   }
-  var options = { e: { pointerId: 1 } };
 function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
   const { canvas } = brush;
     setBrush(canvas, brush);
-    brush.onMouseDown(points[0], options);
+    brush.down(createEvent(points[0]));
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.onMouseMove(points[i], options);
+      brush.move(createEvent(points[i]));
       onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       canvas.once('interaction:completed', ({ result }) => {
         typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
       });
-      brush.onMouseUp(options);
+      brush.up(createEvent(points[points.length - 1]));
     }
   }
   
   function fireBrushUp(canvas) {
-    canvas.freeDrawingBrush.onMouseUp(options);
+    canvas.freeDrawingBrush.up(createEvent(new fabric.Point()));
   }
 
   // function eraserDrawer(points, brush, fireUp = false) {
