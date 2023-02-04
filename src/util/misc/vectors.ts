@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../point.class';
+import { IPoint, Point } from '../../Point';
 import { TRadian } from '../../typedefs';
 
 const unitVectorX = new Point(1, 0);

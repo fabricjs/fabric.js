@@ -1,9 +1,9 @@
 import { ModifierKey } from '../EventTypeDefs';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { Rect } from '../shapes/rect.class';
+import { Rect } from '../shapes/Rect';
 import { Constructor } from '../typedefs';
-import { TBrushEventData } from './base_brush.class';
+import { TBrushEventData } from './BaseBrush';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {

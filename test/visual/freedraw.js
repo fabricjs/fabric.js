@@ -3,8 +3,8 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  async function pointDrawer(points, brush, onComplete = false) {
-    const canvas = brush.canvas;
+  async function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
+    const { canvas } = brush;
     canvas.calcViewportBoundaries();
     setBrush(canvas, brush);
     brush.onMouseDown(points[0], options);
@@ -12,6 +12,7 @@
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
+      onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       await new Promise(resolve => {
@@ -2243,6 +2244,31 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
+    function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
+  }
+
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    golden: 'withText.png',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+      compare: false
+    }
+  });
+
   function generatePointsToCover(width, height, step) {
     const out = [];
     for (let y = -height, side = 0; y < height; y = y + step) {
@@ -2270,7 +2296,7 @@ QUnit.module('Free Drawing', hooks => {
                 inverted,
                 canvas
               });
-              clipPath.viewportCenter();
+              canvas.viewportCenterObject(clipPath);
               brush.clipPath = clipPath;
               canvas.freeDrawingBrush = brush;
               canvas.isDrawingMode = true;

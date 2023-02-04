@@ -14,8 +14,8 @@ export const JSON = 'json';
 export const SVG = 'svg';
 
 export class ClassRegistry {
-  [JSON]: Map<string, any>;
-  [SVG]: Map<string, any>;
+  declare [JSON]: Map<string, any>;
+  declare [SVG]: Map<string, any>;
 
   constructor() {
     this[JSON] = new Map();

@@ -1,4 +1,4 @@
-import { Color } from '../../color/color.class';
+import { Color } from '../../color/Color';
 import { parsePercent } from '../../parser/percent';
 import { ifNaN } from '../../util/internals';
 

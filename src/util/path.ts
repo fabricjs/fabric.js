@@ -4,7 +4,7 @@ import { cache } from '../cache';
 import { config } from '../config';
 import { halfPI, PiBy180 } from '../constants';
 import { commaWsp, rePathCommand } from '../parser/constants';
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import type { PathData, TMat2D } from '../typedefs';
 import { cos } from './misc/cos';
 import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
