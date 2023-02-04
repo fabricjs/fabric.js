@@ -1,9 +1,10 @@
 /**
  * This file is consumed by fabric.
- * The `./node` and `./browser` files define the environment object that is used by this module.
+ * The `./node` and `./browser` files define the env variable that is used by this module.
  * The `./node` module sets the env at import time.
- * The `./browser` module doesn't set the env and is defined to be the default env.
- * This is done in order to support SSR, where at time of import setting env will be wrong since window and document aren't defined.
+ * The `./browser` module is defined to be the default env and doesn't set the env at all.
+ * This is done in order to support SSR.
+ * Since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
  */
 
 import { TFabricEnv } from './types';
