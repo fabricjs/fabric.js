@@ -1478,6 +1478,10 @@ export class SelectableCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
+    if (this.isCurrentlyDrawing()) {
+      // force brush to redraw
+      this.shouldClearContextTop = true;
+    }
     super.setViewportTransform(vpt);
     const activeObject = this._activeObject;
     if (activeObject) {
