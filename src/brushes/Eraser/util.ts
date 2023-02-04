@@ -1,6 +1,6 @@
-import type { Group } from '../../shapes/group.class';
+import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { Path } from '../../shapes/path.class';
+import { Path } from '../../shapes/Path';
 import { TMat2D } from '../../typedefs';
 import {
   invertTransform,
