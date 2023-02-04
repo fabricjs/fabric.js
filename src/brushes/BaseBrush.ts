@@ -4,7 +4,7 @@ import { CanvasEvents, TEvent } from '../EventTypeDefs';
 import { Observable } from '../Observable';
 import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TCachedFabricObject } from '../shapes/Object/Object';
 import {
   invertTransform,
