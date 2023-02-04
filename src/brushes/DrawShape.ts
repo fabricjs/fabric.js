@@ -74,7 +74,6 @@ export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
 
   up(ev: TFabricEvent<TPointerEventInfo>) {
     super.up(ev);
-    this.setBounds(this.pointerStart, ev.pointer);
     this.finalize();
   }
 }
