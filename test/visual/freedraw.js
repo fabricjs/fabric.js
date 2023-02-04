@@ -2303,7 +2303,7 @@ QUnit.module('Free Drawing', hooks => {
                 inverted,
                 canvas
               });
-              clipPath.viewportCenter();
+              canvas.viewportCenterObject(clipPath);
               brush.clipPath = clipPath;
               canvas.freeDrawingBrush = brush;
               canvas.isDrawingMode = true;
