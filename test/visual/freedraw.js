@@ -2268,12 +2268,60 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-  tests.forEach(function (test) {
-    var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
-    if (options.top) {
-      visualTester(Object.assign({}, test, {
-        test: `${test.test} (top context)`,
-        golden: `top_ctx_${test.golden}`,
+  function generatePointsToCover(width, height, step) {
+    const out = [];
+    for (let y = -height, side = 0; y < height; y = y + step) {
+      side++;
+      out.push(new fabric.Point(side % 2 ? -width : width, y));
+    }
+    return out;
+  }
+
+  const pointsToCover = generatePointsToCover(500, 500, 30);
+
+  [fabric.PencilBrush, fabric.PatternBrush, /*fabric.CircleBrush, fabric.SprayBrush*/].forEach(builder => {
+    [true, false].forEach(vpt => {
+      [true, false].forEach(absolutePositioned => {
+        [true, false].forEach(inverted => {
+          tests.push({
+            test: `clipping ${builder.name}${vpt ? ' vpt' : ''}${absolutePositioned ? ' absolutePositioned' : ''}${inverted ? ' inverted' : ''}`,
+            build: canvas => {
+              const brush = new builder(canvas);
+              brush.width = 30;
+              brush.color = 'red';
+              const clipPath = new fabric.Circle({
+                radius: 50,
+                absolutePositioned,
+                inverted,
+                canvas
+              });
+              canvas.viewportCenterObject(clipPath);
+              brush.clipPath = clipPath;
+              canvas.freeDrawingBrush = brush;
+              canvas.isDrawingMode = true;
+              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
+              pointDrawer(pointsToCover, brush);
+            },
+            name: `clipping/${builder.name.toLowerCase().replace('brush', '')}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
+            percentage: 0.09,
+            width: 200,
+            height: 200,
+            targets: {
+              mesh: true
+            }
+          });
+        });
+      });
+    });
+  });
+
+  tests.forEach(({ name, targets, test: testName, ...test }) => {
+    const { top, main, mesh, result, onComplete = () => { }, ...options } = { ...freeDrawingTestDefaults, ...test, ...targets };
+    QUnit.module(testName, () => {
+      top && visualTester({
+        ...options,
+        test: 'top context',
+        golden: `freedrawing/${name}_top_ctx.png`,
         code: async function (canvas, callback) {
           canvas.on('interaction:completed', ({ result }) => {
             canvas.cancelRequestedRender();
