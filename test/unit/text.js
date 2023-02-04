@@ -41,6 +41,7 @@
     shadow:                    null,
     visible:                   true,
     backgroundColor:           '',
+    erasable:                 true,
     text:                      'x',
     fontSize:                  40,
     fontWeight:                'normal',

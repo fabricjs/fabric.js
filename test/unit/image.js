@@ -67,7 +67,8 @@
     crossOrigin:              null,
     cropX:                    0,
     cropY:                    0,
-    strokeUniform:            false
+    strokeUniform:            false,
+    erasable:                 true,
   };
 
   function _createImageElement() {

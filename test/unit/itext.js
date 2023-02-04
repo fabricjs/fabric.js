@@ -26,6 +26,7 @@
     opacity:                  1,
     shadow:                   null,
     visible:                  true,
+    erasable:                 true,
     text:                     'x',
     fontSize:                 40,
     fontWeight:               'normal',

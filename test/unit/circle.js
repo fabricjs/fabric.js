@@ -119,7 +119,8 @@
       endAngle:                 360,
       skewX:                    0,
       skewY:                    0,
-      strokeUniform:            false
+      strokeUniform:            false,
+      erasable:                 true,
     };
     assert.ok(typeof circle.toObject === 'function');
     assert.deepEqual(circle.toObject(), defaultProperties);

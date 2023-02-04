@@ -36,6 +36,7 @@
     opacity: 1,
     shadow: null,
     visible: true,
+    erasable: true,
     text: 'The quick \nbrown \nfox',
     fontSize: 40,
     fontWeight: 'normal',
