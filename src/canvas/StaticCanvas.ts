@@ -553,7 +553,7 @@ export class StaticCanvas<
       overlayObject.setCoords();
     }
     this.calcViewportBoundaries();
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.requestRenderAll();
   }
 
   /**
