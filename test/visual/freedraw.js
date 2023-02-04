@@ -1,16 +1,21 @@
-  function setBrush(canvas, brush) {
-    canvas.isDrawingMode = true;
-    canvas.freeDrawingBrush = brush;
-  }
-  var options = { e: { pointerId: 1 } };
+function setBrush(canvas, brush) {
+  canvas.isDrawingMode = true;
+  canvas.freeDrawingBrush = brush;
+}
+function fireBrushEvent(brush, type, pointer) {
+  brush.fire(`mouse:${type}:before`, fabric.Event.init({
+    e: { pointerId: 1 },
+    pointer
+  }));
+}
 function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
   const { canvas } = brush;
     setBrush(canvas, brush);
-    brush.onMouseDown(points[0], options);
+    fireBrushEvent(brush, 'down', points[0]);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.onMouseMove(points[i], options);
+      fireBrushEvent(brush, 'move', points[i]);
       onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
@@ -21,11 +26,12 @@ function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
         });
         brush.onMouseUp(options);
       });
+      fireBrushEvent(brush, 'up', points[points.length - 1]);
     }
   }
 
   function fireBrushUp(canvas) {
-    canvas.freeDrawingBrush.onMouseUp(options);
+    fireBrushEvent(canvas.freeDrawingBrush, 'up', new fabric.Point());
   }
 
   var points = [
@@ -2254,17 +2260,15 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'textbox should not clear brush',
     build: withText,
-    golden: 'withText.png',
+    name: 'withText',
     percentage: 0.02,
     width: 200,
     height: 250,
-    fabricClass: 'Canvas',
     targets: {
       top: true,
       main: false,
       mesh: true,
       result: false,
-      compare: false
     }
   });
 
