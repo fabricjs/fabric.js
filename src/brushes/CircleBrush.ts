@@ -1,11 +1,13 @@
 import type { Canvas } from '../canvas/Canvas';
 import { Color } from '../color/Color';
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { getRandomInt } from '../util/internals';
-import { BaseBrush, TBrushEventData } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 export type CircleBrushPoint = {
   x: number;
@@ -14,7 +16,7 @@ export type CircleBrushPoint = {
   fill: string;
 };
 
-export class CircleBrush extends BaseBrush<FabricObject> {
+export class CircleBrush extends SimpleBrush<FabricObject> {
   /**
    * Width of a brush
    * @type Number
@@ -86,21 +88,14 @@ export class CircleBrush extends BaseBrush<FabricObject> {
     return new Group(circles);
   }
 
-  /**
-   * Invoked on mouse down
-   */
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    super.onMouseDown(pointer, ev);
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
-    this.drawDot(pointer);
+    this.drawDot(ev.pointer);
   }
 
-  /**
-   * Render the full state of the brush
-   * @private
-   */
   protected _render(ctx: CanvasRenderingContext2D) {
     const points = this.points;
     for (let i = 0; i < points.length; i++) {
@@ -108,14 +103,9 @@ export class CircleBrush extends BaseBrush<FabricObject> {
     }
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
-      return;
-    }
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    const { pointer } = ev;
     if (this.needsFullRender()) {
       this.addPoint(pointer);
       this.render();
@@ -124,10 +114,8 @@ export class CircleBrush extends BaseBrush<FabricObject> {
     }
   }
 
-  /**
-   * Invoked on mouse up
-   */
-  onMouseUp() {
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
     this.finalize();
   }
 }

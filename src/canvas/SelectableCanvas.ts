@@ -9,6 +9,7 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import type { IText } from '../shapes/IText/IText';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -41,7 +42,7 @@ import {
   isCollection,
   isFabricObjectCached,
 } from '../util/types';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
+import { StaticCanvas } from './StaticCanvas';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -321,13 +322,6 @@ export class SelectableCanvas<
   declare defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
-   * Cursor value used during free drawing
-   * @type String
-   * @default crosshair
-   */
-  declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
-  /**
    * Cursor value used for disabled elements ( corners with disabled action )
    * @type String
    * @since 2.0.0
@@ -503,6 +497,14 @@ export class SelectableCanvas<
   declare shouldClearContextTop: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
+
+  fire<K extends keyof CanvasEvents>(
+    eventName: K,
+    options?: EventSpec[K] | TFabricEvent<EventSpec[K]>
+  ) {
+    const ev = this.freeDrawingBrush?.fire(eventName, options);
+    return super.fire(eventName, ev || options);
+  }
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -1187,22 +1189,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Internal use only
-   * @protected
-   */
-  protected _setDimensionsImpl(
-    dimensions: TSize,
-    options?: TCanvasSizeOptions
-  ) {
-    // @ts-ignore
-    this._resetTransformEventData();
-    super._setDimensionsImpl(dimensions, options);
-    if (this.isCurrentlyDrawing()) {
-      this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
-  }
-
-  /**
    * Helper for setting width/height
    * @private
    * @param {String} prop property (width|height)
@@ -1517,8 +1503,6 @@ export class SelectableCanvas<
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
       cacheCanvasEl = this.cacheCanvasEl!;
-    // @ts-ignore
-    this.removeListeners();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
@@ -1643,7 +1627,6 @@ Object.assign(SelectableCanvas.prototype, {
   hoverCursor: 'move',
   moveCursor: 'move',
   defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
   notAllowedCursor: 'not-allowed',
   containerClass: 'canvas-container',
   perPixelTargetFind: false,

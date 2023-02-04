@@ -1,0 +1,62 @@
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { BaseBrush } from './BaseBrush';
+
+export abstract class SimpleBrush<
+  T extends FabricObject = FabricObject
+> extends BaseBrush<T> {
+  /**
+   * When `true`, free drawing is limited to the canvas size
+   * @type Boolean
+   * @default false
+   */
+  limitedToCanvasSize = false;
+
+  protected subscribe() {
+    return [
+      ...super.subscribe(),
+      this.on(
+        'mouse:down:before',
+        (ev) => this.shouldHandleEvent(ev) && this.down(ev)
+      ),
+      this.on(
+        'mouse:move:before',
+        (ev) => this.shouldHandleMoveEvent(ev) && this.move(ev)
+      ),
+      this.on(
+        'mouse:up:before',
+        (ev) => this.shouldHandleEvent(ev) && this.up(ev)
+      ),
+    ];
+  }
+
+  protected shouldHandleEvent({ e }: TPointerEventInfo) {
+    return this.canvas._isMainEvent(e);
+  }
+
+  protected shouldHandleMoveEvent(ev: TPointerEventInfo) {
+    return (
+      this.active &&
+      this.shouldHandleEvent(ev) &&
+      (!this.limitedToCanvasSize || !this._isOutSideCanvas(ev.pointer))
+    );
+  }
+
+  protected down(ev: TFabricEvent<TPointerEventInfo>) {
+    ev.preventDefault();
+    this.start();
+    if (this.canvas.getActiveObject()) {
+      this.canvas.discardActiveObject(ev.e);
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  protected move(ev: TFabricEvent<TPointerEventInfo>) {
+    ev.preventDefault();
+  }
+
+  protected up(ev: TFabricEvent<TPointerEventInfo>) {
+    ev.preventDefault();
+  }
+}

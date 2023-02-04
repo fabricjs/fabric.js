@@ -1,14 +1,14 @@
 import { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { BaseBrush } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 /**
  * Declarative shape drawing using pointer events
  */
 export abstract class DrawShapeBase<
   T extends FabricObject
-> extends BaseBrush<T> {
+> extends SimpleBrush<T> {
   shape: T | undefined;
   stroke = '';
   fill = '';

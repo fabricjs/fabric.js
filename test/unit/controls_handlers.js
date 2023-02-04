@@ -90,15 +90,13 @@
       transform.target.canvas.on('object:resizing', function(options) {
         assert.equal(options.target, transform.target);
       });
-      transform.target.on('resizing', function(options) {
-        assert.deepEqual(options, {
-          e: eventData,
-          transform: transform,
-          pointer: new fabric.Point(
-            200,
-            300,
-          ),
-        });
+      transform.target.on('resizing', function (options) {
+        assert.equal(options.e, eventData);
+        assert.equal(options.transform, transform);
+        assert.deepEqual(options.pointer, new fabric.Point(
+          200,
+          300,
+        ));
         done();
       });
       fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
@@ -201,15 +199,13 @@
       transform.target.canvas.on('object:scaling', function(options) {
         assert.equal(options.target, transform.target);
       });
-      transform.target.on('scaling', function(options) {
-        assert.deepEqual(options, {
-          e: eventData,
-          transform: transform,
-          pointer: new fabric.Point(
-            200,
-            300,
-          ),
-        });
+      transform.target.on('scaling', function (options) {
+        assert.equal(options.e, eventData);
+        assert.equal(options.transform, transform);
+        assert.deepEqual(options.pointer, new fabric.Point(
+          200,
+          300,
+        ));
         done();
       });
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
