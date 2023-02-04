@@ -82,6 +82,7 @@ import {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrices2,
   isIdentityMatrix,
 } from './src/util/misc/matrix';
 import {
@@ -189,6 +190,7 @@ const util = {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrices2,
   isIdentityMatrix,
   stylesFromArray,
   stylesToArray,
@@ -344,7 +346,7 @@ import { DrawOval } from './src/brushes/DrawOval';
 import { DrawPoly } from './src/brushes/DrawPoly';
 import { DrawShape } from './src/brushes/DrawShape';
 import { DrawShapeBase } from './src/brushes/DrawShapeBase';
-import { EraserBrush } from './src/brushes/Eraser';
+import { EraserBrush, applyEraser } from './src/brushes/Eraser';
 import { FabricObject as Object } from './src/shapes/Object/FabricObject';
 import { Line } from './src/shapes/Line';
 import { Circle } from './src/shapes/Circle';
@@ -406,6 +408,7 @@ export {
   DrawShape,
   DrawShapeBase,
   EraserBrush,
+  applyEraser,
   Object,
   Line,
   Circle,

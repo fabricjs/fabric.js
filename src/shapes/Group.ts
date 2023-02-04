@@ -119,7 +119,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @type boolean | 'deep'
    * @default true
    */
-  erasable: boolean | 'deep';
+  declare erasable: boolean | 'deep';
 
   /**
    * Used internally to optimize performance
