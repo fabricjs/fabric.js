@@ -14,7 +14,7 @@ import { Point } from '../Point';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { AssertKeys } from '../typedefs';
+import { AssertKeys, TSize } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { createCanvasElement } from '../util/misc/dom';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -24,6 +24,7 @@ import {
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './SelectableCanvas';
+import { TCanvasSizeOptions } from './StaticCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
@@ -753,6 +754,15 @@ export class Canvas extends SelectableCanvas {
   _onResize() {
     this.calcOffset();
     this._resetTransformEventData();
+    this.fire('resize');
+  }
+
+  protected _setDimensionsImpl(
+    dimensions: TSize,
+    options?: TCanvasSizeOptions
+  ) {
+    this._resetTransformEventData();
+    super._setDimensionsImpl(dimensions, options);
   }
 
   /**

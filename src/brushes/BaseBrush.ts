@@ -97,7 +97,9 @@ export abstract class BaseBrush<
     };
   }
 
-  protected abstract subscribe(): VoidFunction[];
+  protected subscribe(): VoidFunction[] {
+    return [this.on('resize', () => this._setBrushStyles())];
+  }
 
   protected unsubscribe() {
     this._disposer && this._disposer();
@@ -117,7 +119,9 @@ export abstract class BaseBrush<
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;

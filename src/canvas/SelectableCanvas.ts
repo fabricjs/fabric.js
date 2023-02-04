@@ -1178,22 +1178,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Internal use only
-   * @protected
-   */
-  protected _setDimensionsImpl(
-    dimensions: TSize,
-    options?: TCanvasSizeOptions
-  ) {
-    // @ts-ignore
-    this._resetTransformEventData();
-    super._setDimensionsImpl(dimensions, options);
-    if (this.isCurrentlyDrawing()) {
-      this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
-  }
-
-  /**
    * Helper for setting width/height
    * @private
    * @param {String} prop property (width|height)

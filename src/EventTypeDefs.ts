@@ -259,6 +259,8 @@ export type StaticCanvasEvents = CollectionEvents & {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+
+  resize: never;
 };
 
 export type CanvasEvents = StaticCanvasEvents &
