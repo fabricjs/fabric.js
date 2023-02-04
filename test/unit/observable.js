@@ -21,6 +21,48 @@ QUnit.test('fire + on', function (assert) {
   assert.equal(eventFired, true);
 });
 
+QUnit.test('fire event/object', function (assert) {
+  let foo = new fabric.Observable();
+  let received;
+  foo.on('bar:baz', ev => {
+    received = ev;
+  });
+
+  let fired = foo.fire('bar:baz');
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  assert.deepEqual(received, {}, 'event should be empty');
+  received = null;
+
+  fired = foo.fire('bar:baz', { foo: 'bar' });
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  assert.deepEqual(received, { foo: 'bar' }, 'event should be empty');
+  received = null;
+
+  const ev = fabric.Event.init({ foo: 'bar' });
+  fired = foo.fire('bar:baz', ev);
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  assert.equal(ev, fired, 'should be the same ref');
+  assert.deepEqual(received, { foo: 'bar' }, 'event should be empty');
+  assert.equal(ev.defaultPrevented, false, 'default not prevented');
+  assert.equal(ev.propagate, true, 'propagation not prevented');
+
+  foo.on('bar:baz', ev => {
+    ev.preventDefault();
+  });
+  fired = foo.fire('bar:baz');
+  assert.equal(fired.defaultPrevented, true, 'default prevented');
+  assert.equal(fired.propagate, true, 'propagation not prevented');
+  foo.on('bar:baz', ev => {
+    ev.stopPropagation();
+  });
+  fired = foo.fire('bar:baz');
+  assert.equal(fired.defaultPrevented, true, 'default prevented');
+  assert.equal(fired.propagate, false, 'propagation prevented');
+});
+
 QUnit.test('fire once', function (assert) {
   var foo = new fabric.Observable();
 
@@ -51,7 +93,6 @@ QUnit.test('fire once multiple handlers', function (assert) {
     'blah:blah:bloo': (e) => {
       eventFired3++;
       assert.deepEqual(e, eventData);
-      assert.equal(e, eventData);
     }
   });
   foo.fire('bar:baz');
