@@ -20,6 +20,7 @@ const { window: fabricWindow } = new JSDOM(
       FetchExternalResources: ['img'],
     },
     resources: 'usable',
+    pretendToBeVisual: true,
   }
 );
 

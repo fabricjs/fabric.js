@@ -20,8 +20,3 @@ export const getEnv = () => env || getBrowserEnv();
 export const getDocument = (): Document => getEnv().document;
 
 export const getWindow = (): Window => getEnv().window;
-
-export const setEnvForTests = (window: Window) => {
-  env.document = window.document;
-  env.window = window;
-};
