@@ -61,14 +61,14 @@ export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
     this.build();
-    this.pointerStart = ev.pointer;
+    this.pointerStart = this.extractPointer(ev);
   }
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    const { e, pointer } = ev;
+    const { e } = ev;
     this.symmetric = this.modifierKey && e[this.modifierKey];
-    this.setBounds(this.pointerStart, pointer);
+    this.setBounds(this.pointerStart, this.extractPointer(ev));
     this.render();
   }
 

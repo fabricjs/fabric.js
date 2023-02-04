@@ -31,6 +31,10 @@ export abstract class SimpleBrush<
     ];
   }
 
+  protected extractPointer(ev: TFabricEvent<TPointerEventInfo>) {
+    return ev.pointer;
+  }
+
   protected shouldHandleEvent({ e }: TPointerEventInfo) {
     return this.canvas._isMainEvent(e);
   }
@@ -39,7 +43,7 @@ export abstract class SimpleBrush<
     return (
       this.active &&
       this.shouldHandleEvent(ev) &&
-      (!this.limitedToCanvasSize || !this._isOutSideCanvas(ev.pointer))
+      (!this.limitedToCanvasSize || !this._isOutSideCanvas(ev.absolutePointer))
     );
   }
 

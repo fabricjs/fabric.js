@@ -69,7 +69,8 @@ export class PencilBrush extends SimpleBrush<Path> {
 
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
-    const { e, pointer } = ev;
+    const { e } = ev;
+    const pointer = this.extractPointer(ev);
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
@@ -80,7 +81,8 @@ export class PencilBrush extends SimpleBrush<Path> {
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    const { e, pointer } = ev;
+    const { e } = ev;
+    const pointer = this.extractPointer(ev);
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     if (this._addPoint(pointer) && this._points.length > 1) {
       if (this.needsFullRender()) {
