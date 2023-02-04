@@ -171,59 +171,6 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  QUnit.test('fabric.util.object.extend', function(assert) {
-    var extend = fabric.util.object.extend;
-
-    assert.ok(typeof extend === 'function');
-
-    var destination = { x: 1 },
-        source = { y: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 1);
-    assert.equal(destination.y, 2);
-    assert.equal(source.x, undefined);
-    assert.equal(source.y, 2);
-
-    destination = { x: 1 };
-    source = { x: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 2);
-    assert.equal(source.x, 2);
-  });
-
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
-    var extend = fabric.util.object.extend;
-    var d = function() { };
-    var destination = { x: 1 },
-        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
-
-    extend(destination, source, true);
-
-    assert.equal(destination.x, 1, 'x is still in destination');
-    assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
-  });
-
-  QUnit.test('fabric.util.object.clone', function(assert) {
-    var clone = fabric.util.object.clone;
-
-    assert.ok(typeof clone === 'function');
-
-    var obj = { x: 1, y: [1, 2, 3] },
-        _clone = clone(obj);
-
-    assert.equal(_clone.x, 1);
-    assert.notEqual(obj, _clone);
-    assert.equal(_clone.y, obj.y);
-  });
-
   QUnit.test('Function.prototype.bind', function(assert) {
     assert.ok(typeof Function.prototype.bind === 'function');
 
@@ -619,6 +566,11 @@
     assert.equal(transform.flipX, true);
     assert.equal(transform.flipY, true);
     assert.equal(transform.angle, 30);
+  });
+
+  QUnit.test('isIdentityMatrix', function(assert) {
+    assert.equal(fabric.util.isIdentityMatrix([1, 0, 0, 1, 0, 0]), true, 'is identity');
+    assert.equal(fabric.util.isIdentityMatrix([1, 2, 3, 4, 5, 6]), false, 'is not identity');
   });
 
   QUnit.test('invertTransform', function(assert) {

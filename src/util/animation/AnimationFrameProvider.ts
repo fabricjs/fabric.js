@@ -1,13 +1,7 @@
 import { getEnv } from '../../env';
 
-const _requestAnimFrame: AnimationFrameProvider['requestAnimationFrame'] =
-  getEnv().window.requestAnimationFrame ||
-  function (callback: FrameRequestCallback) {
-    return getEnv().window.setTimeout(callback, 1000 / 60);
-  };
-
-const _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'] =
-  getEnv().window.cancelAnimationFrame || getEnv().window.clearTimeout;
+let _requestAnimFrame: AnimationFrameProvider['requestAnimationFrame'];
+let _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'];
 
 /**
  * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -15,9 +9,20 @@ const _cancelAnimFrame: AnimationFrameProvider['cancelAnimationFrame'] =
  * @param {Function} callback Callback to invoke
  */
 export function requestAnimFrame(callback: FrameRequestCallback): number {
+  if (!_requestAnimFrame) {
+    _requestAnimFrame =
+      getEnv().window.requestAnimationFrame ||
+      function requestAnimationFramePolyfill(callback: FrameRequestCallback) {
+        return getEnv().window.setTimeout(callback, 1000 / 60);
+      };
+  }
   return _requestAnimFrame.call(getEnv().window, callback);
 }
 
 export function cancelAnimFrame(handle: number): void {
+  if (!_cancelAnimFrame) {
+    _cancelAnimFrame =
+      getEnv().window.cancelAnimationFrame || getEnv().window.clearTimeout;
+  }
   return _cancelAnimFrame.call(getEnv().window, handle);
 }

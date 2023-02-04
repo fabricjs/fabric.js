@@ -1,4 +1,4 @@
-import { Color } from '../../color/color.class';
+import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import {

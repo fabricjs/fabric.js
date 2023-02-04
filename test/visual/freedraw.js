@@ -3,14 +3,14 @@
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, onComplete = false) {
-    const canvas = brush.canvas;
-    setBrush(canvas, brush);
+  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
+    setBrush(brush.canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
+      onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       canvas.once('interaction:completed', ({ result }) => {
@@ -2247,6 +2247,31 @@ QUnit.module('Free Drawing', hooks => {
     targets: {
       main: true,
       mesh: true
+    }
+  });
+
+    function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
+  }
+
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    golden: 'withText.png',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+      compare: false
     }
   });
 

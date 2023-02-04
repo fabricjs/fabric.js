@@ -1,9 +1,17 @@
 // @ts-nocheck
 import type { FabricObject } from '../shapes/Object/Object';
-import { extend } from '../util/lang_object';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
 const originalSet = 'stateProperties';
 
+/*
+ * This function was taking care of running isEqual over statePropertie.
+ * State properties included things that could reference a canvas or a group.
+ * FabricJS does not support stateful saving anymore apart for a very small number of props for
+ * Text cache invalidation temporarly.
+ * So you shouldn't use saveState or hasStateChanged for your own application
+ * @depreacted
+ */
 function _isEqual(origValue: any, currentValue: any, firstPass = false) {
   if (origValue === currentValue) {
     // if the objects are identical, return
@@ -57,7 +65,7 @@ export class StatefulMixin {
    * @param {String} [propertySet] optional name for the set of property we want to save
    * @return {Boolean} true if instance' state has changed since `{@link fabric.Object#saveState}` was called
    */
-  hasStateChanged(propertySet: string = originalSet): boolean {
+  private hasStateChanged(propertySet: string = originalSet): boolean {
     const dashedPropertySet = `_${propertySet}`;
     if (
       Object.keys(this[dashedPropertySet] || {}).length <
@@ -69,11 +77,10 @@ export class StatefulMixin {
   }
 
   private saveProps(destination: string, props: (keyof FabricObject)[]) {
-    const savedProps = props.reduce((o, key) => {
-      o[key] = this[key];
+    props.reduce((o, key) => {
+      o[key] = this[key] ? cloneDeep(this[key]) : this[key];
       return o;
-    }, {});
-    extend(this[destination], savedProps, true);
+    }, this[destination]);
   }
 
   /**
@@ -83,7 +90,7 @@ export class StatefulMixin {
    * @param {string} [options.propertySet] name for the property set to save
    * @return {fabric.Object} thisArg
    */
-  saveState(
+  private saveState(
     this: FabricObject,
     { propertySet = originalSet }: TSaveStateOptions = {}
   ): FabricObject {

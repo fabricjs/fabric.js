@@ -124,17 +124,18 @@
     assert.ok(typeof circle.toObject === 'function');
     assert.deepEqual(circle.toObject(), defaultProperties);
 
-    circle.set('left', 100).set('top', 200).set('radius', 15);
+    circle.set('left', 100);
+    circle.set('top', 200);
+    circle.set('radius', 15);
 
-    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
-      left:   100,
-      top:    200,
-      width:  30,
+    assert.deepEqual(circle.toObject(), {
+      ...defaultProperties,
+      left: 100,
+      top: 200,
+      width: 30,
       height: 30,
       radius: 15
     });
-
-    assert.deepEqual(circle.toObject(), augmentedProperties);
   });
 
   QUnit.test('toSVG with full circle', function(assert) {
