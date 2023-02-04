@@ -1,4 +1,4 @@
-// first we set the global env variable by importing the node env file
+// first we set the env variable by importing the node env file
 import { getNodeCanvas } from './src/env/node';
 
 import type { JpegConfig, PngConfig } from 'canvas';
