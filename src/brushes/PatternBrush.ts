@@ -46,7 +46,9 @@ export class PatternBrush extends PencilBrush {
    * Sets brush styles
    * @param {CanvasRenderingContext2D} ctx
    */
-  protected _setBrushStyles(ctx: CanvasRenderingContext2D) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     super._setBrushStyles(ctx);
     const pattern = this.getPattern(ctx);
     pattern && (ctx.strokeStyle = pattern);
