@@ -4,7 +4,8 @@
   function fireBrushEvent(brush, type, pointer) {
     brush.fire(`mouse:${type}:before`, fabric.Event.init({
       e: {},
-      pointer
+      pointer,
+      absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
     }));
   }
   QUnit.module('fabric.BaseBrush', function(hooks) {
@@ -35,7 +36,8 @@
       const brush = new fabric.SimpleBrush({
         setCursor(cursor) {
           setCursor = cursor;
-        }
+        },
+        contextTop: canvas.contextTop
       });
       assert.equal(brush.cursor, 'crosshair', 'default cursor');
       brush.cursor = 'testCursor';
