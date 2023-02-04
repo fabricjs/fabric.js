@@ -1,14 +1,15 @@
 import type { Canvas } from '../../canvas/Canvas';
 import { Color } from '../../color/Color';
-import { TEvent, TPointerEvent } from '../../EventTypeDefs';
+import { TPointerEventInfo } from '../../EventTypeDefs';
+import { TFabricEvent } from '../../FabricEvent';
 import { Point } from '../../Point';
 import type { Group } from '../../shapes/Group';
 import { FabricObject } from '../../shapes/Object/FabricObject';
 import type { Path } from '../../shapes/Path';
 import { createCanvasElement } from '../../util/misc/dom';
 import { multiplyTransformMatrices2 } from '../../util/misc/matrix';
+import { setRetinaScaling } from '../../util/misc/setRetinaScaling';
 import { isCollection } from '../../util/types';
-import { TBrushEventData } from '../BaseBrush';
 import { PencilBrush } from '../PencilBrush';
 import type { Eraser } from './Eraser';
 import { ErasingEventContext, ErasingEventContextData } from './types';
@@ -91,7 +92,7 @@ export class EraserBrush extends PencilBrush {
         //  traverse
         this.prepareCollectionTraversal(
           object,
-          object._objects,
+          object._objects as FabricObject[],
           restorationContext
         );
       } else if (!this.inverted && object.erasable && !object.isNotVisible()) {
@@ -140,7 +141,7 @@ export class EraserBrush extends PencilBrush {
     this.setImageSmoothing(patternCtx);
     // retina
     if (this.canvas._isRetinaScaling()) {
-      this.canvas.__initRetinaScaling(canvas, patternCtx);
+      setRetinaScaling(canvas, patternCtx, this.canvas);
     }
     // prepare tree
     const restorationContext: RestorationContext = {
@@ -204,16 +205,14 @@ export class EraserBrush extends PencilBrush {
   /**
    * @override prepare pattern, subscribe for updates and fire `erasing:start`
    */
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    if (this.shouldHandleEvent(ev.e)) {
-      //  prepare for erasing
-      this.preparePattern();
-      this.__disposer = this.canvas.on('after:render', () => {
-        this.updating && !this.blockUpdating && this.onUpdate();
-      });
-      this.canvas.fire('erasing:start');
-    }
-    super.onMouseDown(pointer, ev);
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    //  prepare for erasing
+    this.preparePattern();
+    this.__disposer = this.canvas.on('after:render', () => {
+      this.updating && !this.blockUpdating && this.onUpdate();
+    });
+    this.canvas.fire('erasing:start');
+    super.down(ev);
   }
 
   /**
@@ -231,8 +230,8 @@ export class EraserBrush extends PencilBrush {
   /**
    * @override dispose of update subscriber {@link __disposer}
    */
-  onMouseUp(ev: TEvent<TPointerEvent>) {
-    super.onMouseUp(ev);
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
     if (this.__disposer) {
       this.__disposer();
       this.__disposer = undefined;
@@ -325,7 +324,7 @@ export class EraserBrush extends PencilBrush {
   ) {
     const drawableKey = `${key}Image` as const;
     const drawableVpt = this.canvas[`${key}Vpt` as const];
-    const drawable = this.canvas[drawableKey];
+    const drawable = this.canvas[drawableKey] as FabricObject;
     const dContext: ErasingEventContextData = {
       targets: [],
       subTargets: [],

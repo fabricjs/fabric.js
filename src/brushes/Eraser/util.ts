@@ -105,7 +105,9 @@ export async function addPathToObjectEraser(
     }
     if (targets.length > 0) {
       await Promise.all(
-        targets.map((obj) => addPathToObjectEraser(obj, path, context))
+        targets.map((obj) =>
+          addPathToObjectEraser(obj as FabricObject, path, context)
+        )
       );
     }
     return;

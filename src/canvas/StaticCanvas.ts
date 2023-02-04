@@ -39,6 +39,7 @@ import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
+import { setRetinaScaling } from '../util/misc/setRetinaScaling';
 
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
@@ -358,10 +359,7 @@ export class StaticCanvas<
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D
   ) {
-    const scaleRatio = config.devicePixelRatio;
-    canvas.setAttribute('width', (this.width * scaleRatio).toString());
-    canvas.setAttribute('height', (this.height * scaleRatio).toString());
-    context.scale(scaleRatio, scaleRatio);
+    setRetinaScaling(canvas, context, this);
   }
 
   /**

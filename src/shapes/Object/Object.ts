@@ -291,8 +291,6 @@ export class FabricObject<
    */
   declare shadow: Shadow | null;
 
-  clipPath?: FabricObject;
-
   /**
    * Indicates whether this object can be erased by the {@link EraserBrush}
    * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
@@ -856,7 +854,7 @@ export class FabricObject<
           : null,
       eraserData =
         this.eraser && !this.eraser.excludeFromExport
-          ? this.eraser.toObject(propertiesToInclude)
+          ? this.eraser.toObject(propertiesToInclude as (keyof Eraser)[])
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
@@ -1646,7 +1644,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<FabricObject>}
    */
-  clone(propertiesToInclude?: (keyof this)[]): Promise<this> {
+  clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     // @ts-expect-error TS doesn't recognize `this.constructor`
     return this.constructor.fromObject(objectForm);
