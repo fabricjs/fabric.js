@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { config } from '../../config';
-import { getDocument } from '../../env';
+import { getDocument, getEnv } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
