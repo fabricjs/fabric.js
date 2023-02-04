@@ -32,7 +32,7 @@ export abstract class SimpleBrush<
   }
 
   protected extractPointer(ev: TFabricEvent<TPointerEventInfo>) {
-    return ev.pointer;
+    return ev.absolutePointer;
   }
 
   protected shouldHandleEvent({ e }: TPointerEventInfo) {

@@ -38,7 +38,7 @@ export class PatternBrush extends PencilBrush {
    * Creates "pattern" instance property
    * @param {CanvasRenderingContext2D} ctx
    */
-  getPattern(ctx: CanvasRenderingContext2D) {
+  protected getPattern(ctx: CanvasRenderingContext2D) {
     return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
   }
 

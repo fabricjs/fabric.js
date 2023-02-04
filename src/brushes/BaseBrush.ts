@@ -76,6 +76,7 @@ export abstract class BaseBrush<
    * Same as FabricObject `clipPath` property.
    * The clip path is positioned relative to the top left corner of the viewport.
    * The `absolutePositioned` property renders the clip path w/o viewport transform.
+   * The clip path is prone to the `setCoords` gotcha.
    */
   clipPath?: FabricObject;
 
@@ -143,7 +144,7 @@ export abstract class BaseBrush<
   }
 
   transform(ctx: CanvasRenderingContext2D) {
-    ctx.transform(...this.canvas.viewportTransform);
+    // noop
   }
 
   protected needsFullRender() {
@@ -213,8 +214,8 @@ export abstract class BaseBrush<
     ctx.globalCompositeOperation = clipPath.inverted
       ? 'destination-out'
       : 'destination-in';
-    if (clipPath.absolutePositioned) {
-      ctx.transform(...invertTransform(this.canvas.viewportTransform));
+    if (!clipPath.absolutePositioned) {
+      ctx.transform(...this.canvas.viewportTransform);
     }
     clipPath.transform(ctx);
     ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
@@ -260,8 +261,11 @@ export abstract class BaseBrush<
     sendObjectToPlane(
       clipPath,
       undefined,
-      this.clipPath.absolutePositioned
-        ? multiplyTransformMatrices(this.canvas.viewportTransform, t)
+      !this.clipPath.absolutePositioned
+        ? multiplyTransformMatrices(
+            invertTransform(this.canvas.viewportTransform),
+            t
+          )
         : t
     );
     return clipPath;
@@ -297,6 +301,7 @@ export abstract class BaseBrush<
         shadow: this.shadow ? new Shadow(this.shadow) : undefined,
         clipPath: await this.createClipPath(shape),
       });
+      sendObjectToPlane(shape, undefined, this.canvas.viewportTransform);
       shape.setCoords();
     }
     this.onEnd(shape);
