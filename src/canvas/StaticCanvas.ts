@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import {
+  Constructor,
   ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
@@ -25,11 +26,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import {
-  cleanUpJsdomNode,
-  getElementOffset,
-  getNodeCanvas,
-} from '../util/dom_misc';
+import { cleanUpJsdomNode, getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -1491,9 +1488,8 @@ export class StaticCanvas<
   /**
    * Clones canvas instance
    * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
-   * @returns {Promise<Canvas | StaticCanvas>}
    */
-  clone(properties: string[]): Promise<StaticCanvas> {
+  clone(properties: string[]) {
     const data = this.toObject(properties);
     const canvas = this.cloneWithoutData();
     return canvas.loadFromJSON(data);
@@ -1502,14 +1498,12 @@ export class StaticCanvas<
   /**
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
-   * @returns {StaticCanvas}
    */
-  cloneWithoutData(): StaticCanvas {
+  cloneWithoutData() {
     const el = createCanvasElement();
     el.width = this.width;
     el.height = this.height;
-    // this seems wrong. either Canvas or StaticCanvas
-    return new StaticCanvas(el);
+    return new (this.constructor as Constructor<this>)(el);
   }
 
   /**
@@ -1713,20 +1707,3 @@ Object.assign(StaticCanvas.prototype, {
   skipOffscreen: true,
   clipPath: undefined,
 });
-
-if (getEnv().isLikelyNode) {
-  Object.assign(StaticCanvas.prototype, {
-    createPNGStream() {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createPNGStream();
-    },
-    createJPEGStream(opts: any) {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createJPEGStream(opts);
-    },
-  });
-}

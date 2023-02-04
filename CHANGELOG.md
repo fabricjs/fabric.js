@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(TS): patch class registry [#8507](https://github.com/fabricjs/fabric.js/pull/8507)
+- feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
+- chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
 - chore(): move and rename text & itext files and organize as folders, rename mixins [#8620](https://github.com/fabricjs/fabric.js/pull/8620)
 - chore(TS): type IText, IText behavior, IText click behavior [#8610](https://github.com/fabricjs/fabric.js/pull/8610)

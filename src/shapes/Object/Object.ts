@@ -29,7 +29,7 @@ import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
-import { Image } from '../Image';
+import type { Image } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -1625,6 +1625,7 @@ export class FabricObject<
    * and format option. toCanvasElement is faster and produce no loss of quality.
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
+   * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
    * @param {Object} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
@@ -1639,7 +1640,8 @@ export class FabricObject<
   cloneAsImage(options: any): Image {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    return new Image(canvasEl);
+    const ImageClass = classRegistry.getClass('image');
+    return new ImageClass(canvasEl);
   }
 
   /**
