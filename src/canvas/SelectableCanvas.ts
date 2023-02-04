@@ -319,13 +319,6 @@ export class SelectableCanvas<
   declare defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
-   * Cursor value used during free drawing
-   * @type String
-   * @default crosshair
-   */
-  declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
-  /**
    * Cursor value used for disabled elements ( corners with disabled action )
    * @type String
    * @since 2.0.0
@@ -1641,7 +1634,6 @@ Object.assign(SelectableCanvas.prototype, {
   hoverCursor: 'move',
   moveCursor: 'move',
   defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
   notAllowedCursor: 'not-allowed',
   containerClass: 'canvas-container',
   perPixelTargetFind: false,

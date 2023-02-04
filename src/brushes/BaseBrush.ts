@@ -1,6 +1,7 @@
 import type { Canvas } from '../canvas/Canvas';
 import { Color } from '../color/Color';
-import { TEvent } from '../EventTypeDefs';
+import { CanvasEvents, TEvent } from '../EventTypeDefs';
+import { Observable } from '../Observable';
 import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -12,7 +13,9 @@ export type TBrushEventData = TEvent & { pointer: Point };
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush<T extends FabricObject = FabricObject> {
+export abstract class BaseBrush<
+  T extends FabricObject = FabricObject
+> extends Observable<CanvasEvents> {
   /**
    * Color of a brush
    * @type String
@@ -65,48 +68,49 @@ export abstract class BaseBrush<T extends FabricObject = FabricObject> {
   strokeDashArray: number[] | null = null;
 
   /**
-   * When `true`, the free drawing is limited to the whiteboard size. Default to false.
-   * @type Boolean
-   * @default false
-   */
-
-  limitedToCanvasSize = false;
-
-  /**
    * Same as FabricObject `clipPath` property.
    * The clip path is positioned relative to the top left corner of the viewport.
    * The `absolutePositioned` property renders the clip path w/o viewport transform.
    */
   clipPath?: FabricObject;
 
+  /**
+   * Cursor value used during free drawing
+   * @type String
+   * @default crosshair
+   */
+  cursor: CSSStyleDeclaration['cursor'] = 'crosshair';
+
   declare readonly canvas: Canvas;
 
   active = false;
 
+  private _disposer?: () => void;
+
   constructor(canvas: Canvas) {
+    super();
     this.canvas = canvas;
+    const subscribers = this.subscribe();
+    this._disposer = () => {
+      subscribers.forEach((d) => d());
+      this._disposer = undefined;
+    };
+  }
+
+  protected abstract subscribe(): VoidFunction[];
+
+  protected unsubscribe() {
+    this._disposer && this._disposer();
   }
 
   protected abstract _render(ctx: CanvasRenderingContext2D): void;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    this.active = true;
-  }
-
-  abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
-
-  /**
-   * @returns true if brush should continue blocking interaction
-   */
-  abstract onMouseUp(ev: TBrushEventData): void;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onDoubleClick(pointer: Point) {
-    // noop
-  }
-
   protected abstract finalizeShape(): T | undefined;
+
+  protected start() {
+    this.active = true;
+    this.canvas.setCursor(this.cursor);
+  }
 
   /**
    * Sets brush styles

@@ -1,10 +1,11 @@
 import type { Canvas } from '../canvas/Canvas';
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
-import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';
 import { getRandomInt } from '../util/internals';
-import { BaseBrush, TBrushEventData } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 export type SprayBrushPoint = {
   x: number;
@@ -33,7 +34,7 @@ function getUniqueRects(rects: Rect[]) {
   return uniqueRectsArray;
 }
 
-export class SprayBrush extends BaseBrush<FabricObject> {
+export class SprayBrush extends SimpleBrush<Group> {
   /**
    * Width of a spray
    * @type Number
@@ -122,36 +123,24 @@ export class SprayBrush extends BaseBrush<FabricObject> {
     });
   }
 
-  /**
-   * Invoked on mouse down
-   * @param {Point} pointer
-   */
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    super.onMouseDown(pointer, ev);
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setBrushStyles();
     this._setShadow();
-    this.addSprayChunk(pointer);
+    this.addSprayChunk(ev.pointer);
     this.renderChunk(this.sprayChunk);
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
-      return;
-    }
-    this.addSprayChunk(pointer);
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    this.addSprayChunk(ev.pointer);
     this.renderChunk(this.sprayChunk);
   }
 
-  /**
-   * Invoked on mouse up
-   */
-  onMouseUp() {
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
     this.finalize();
   }
 

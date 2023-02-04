@@ -1,9 +1,9 @@
-import { ModifierKey } from '../EventTypeDefs';
+import { ModifierKey, TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';
 import { Constructor } from '../typedefs';
-import { TBrushEventData } from './BaseBrush';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
@@ -27,7 +27,7 @@ export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
    */
   symmetric?: boolean;
 
-  protected start: Point;
+  protected pointerStart: Point;
 
   create() {
     return new this.builder();
@@ -58,20 +58,23 @@ export class DrawShape<T extends FabricObject = Rect> extends DrawShapeBase<T> {
     }
   }
 
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    super.onMouseDown(pointer, ev);
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
     this.build();
-    this.start = pointer;
+    this.pointerStart = ev.pointer;
   }
 
-  onMouseMove(pointer: Point, ev: TBrushEventData) {
-    this.symmetric = this.modifierKey && ev.e[this.modifierKey];
-    this.setBounds(this.start, pointer);
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    const { e, pointer } = ev;
+    this.symmetric = this.modifierKey && e[this.modifierKey];
+    this.setBounds(this.pointerStart, pointer);
     this.render();
   }
 
-  onMouseUp(ev: TBrushEventData) {
-    this.setBounds(this.start, ev.pointer);
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
+    this.setBounds(this.pointerStart, ev.pointer);
     this.finalize();
   }
 }
