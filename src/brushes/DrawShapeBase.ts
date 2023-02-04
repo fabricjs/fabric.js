@@ -1,7 +1,7 @@
-import { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import { Point } from '../Point';
+import { Shadow } from '../Shadow';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { BaseBrush } from './base_brush.class';
+import { BaseBrush } from './BaseBrush';
 
 /**
  * Declarative shape drawing using pointer events
