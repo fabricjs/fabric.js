@@ -1,7 +1,7 @@
 import type { Canvas } from '../canvas/Canvas';
 import { Color } from '../color/Color';
 import { TPointerEventInfo } from '../EventTypeDefs';
-import { TFabricEvent } from '../FabricEvents';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';

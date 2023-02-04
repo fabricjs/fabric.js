@@ -5,7 +5,7 @@ import {
   TPointerEvent,
   TPointerEventInfo,
 } from '../EventTypeDefs';
-import { TFabricEvent } from '../FabricEvents';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';

@@ -1,5 +1,5 @@
 import { ModifierKey, TPointerEventInfo } from '../EventTypeDefs';
-import { TFabricEvent } from '../FabricEvents';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';

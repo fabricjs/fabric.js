@@ -328,6 +328,7 @@ import { Canvas2dFilterBackend } from './src/filters/Canvas2dFilterBackend';
 import { WebGLFilterBackend } from './src/filters/WebGLFilterBackend';
 import { runningAnimations } from './src/util/animation/AnimationRegistry';
 import { Observable } from './src/Observable';
+import { FabricEvent } from './src/FabricEvent';
 import { Point } from './src/Point';
 import { Intersection } from './src/Intersection';
 import { Color } from './src/color/Color';
@@ -393,6 +394,7 @@ export {
   Color,
   Control,
   Observable,
+  FabricEvent,
   Gradient,
   Pattern,
   Shadow,

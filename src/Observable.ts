@@ -1,4 +1,4 @@
-import { FabricEvent, TFabricEvent } from './FabricEvents';
+import { FabricEvent, TFabricEvent } from './FabricEvent';
 
 export type TEventCallback<T = any> = (options: TFabricEvent<T>) => any;
 

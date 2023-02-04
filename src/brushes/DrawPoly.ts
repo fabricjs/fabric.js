@@ -1,5 +1,5 @@
 import { TPointerEventInfo } from '../EventTypeDefs';
-import { TFabricEvent } from '../FabricEvents';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Polygon } from '../shapes/Polygon';
 import { Polyline } from '../shapes/Polyline';

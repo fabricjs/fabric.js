@@ -1,5 +1,5 @@
 import { TPointerEventInfo } from '../EventTypeDefs';
-import { TFabricEvent } from '../FabricEvents';
+import { TFabricEvent } from '../FabricEvent';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { BaseBrush } from './BaseBrush';
 

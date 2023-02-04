@@ -9,7 +9,7 @@ import {
   TPointerEventNames,
   Transform,
 } from '../EventTypeDefs';
-import { FabricEvent, TFabricEvent } from '../FabricEvents';
+import { FabricEvent, TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Group } from '../shapes/Group';
