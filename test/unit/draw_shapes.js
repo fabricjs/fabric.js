@@ -1,11 +1,11 @@
   
   QUnit.module('Draw Shapes', function (hooks) {
     let canvas;
-    function createEvent(pointer) {
-      return fabric.Event.init({
-        e: {},
+    function fireBrushEvent(brush, type, pointer, { suffix = ':before', e = {} } = {}) {
+      brush.fire(`mouse:${type}${suffix}`, fabric.Event.init({
+        e,
         pointer
-      });
+      }));
     }
     hooks.before(() => {
       canvas = new fabric.Canvas();
@@ -24,7 +24,7 @@
         });
         hooks.afterEach(() => canvas.off());
 
-        async function runShapeBrushTest(brush, assert, e = {}) {
+        async function runShapeBrushTest(brush, assert, e) {
           let fired = false;
           const result = await new Promise(resolve => {
             canvas.on('interaction:completed', ({ result }) => {
@@ -34,12 +34,12 @@
             var pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
             var pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
-            brush.down(createEvent(pointer));
-            brush.move(createEvent(pointer2));
-            brush.move(createEvent(pointer3));
-            brush.move(createEvent(pointer2));
-            brush.move(createEvent(pointer3));
-            brush.up(createEvent(pointer3));
+            fireBrushEvent(brush, 'down', pointer, { e });
+            fireBrushEvent(brush, 'move', pointer2, { e });
+            fireBrushEvent(brush, 'move', pointer3, { e });
+            fireBrushEvent(brush, 'move', pointer2, { e });
+            fireBrushEvent(brush, 'move', pointer3, { e });
+            fireBrushEvent(brush, 'up', pointer3, { e });
           });
           assert.equal(fired, true, 'interaction:completed event should have fired');
           return result;
@@ -181,11 +181,11 @@
             const pointer = canvas.getPointer({ clientX: 10, clientY: 10 });
             const pointer2 = canvas.getPointer({ clientX: 15, clientY: 15 });
             const pointer3 = canvas.getPointer({ clientX: 20, clientY: 25 });
-            brush.down(createEvent(pointer));
-            brush.move(createEvent(pointer3));
-            brush.up(createEvent(pointer2));
-            brush.move(createEvent(pointer2));
-            brush.end(createEvent(pointer3));
+            fireBrushEvent(brush, 'down', pointer);
+            fireBrushEvent(brush, 'move', pointer3);
+            fireBrushEvent(brush, 'up', pointer2);
+            fireBrushEvent(brush, 'move', pointer2);
+            fireBrushEvent(brush, 'dblclick', pointer3, { suffix: '' });
           });
         });
       });

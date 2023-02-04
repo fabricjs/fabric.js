@@ -1,11 +1,11 @@
 (function() {
   var canvas = new fabric.Canvas();
   var parsePath = fabric.util.parsePath;
-  function createEvent(pointer) {
-    return fabric.Event.init({
+  function fireBrushEvent(brush, type, pointer) {
+    brush.fire(`mouse:${type}:before`, fabric.Event.init({
       e: {},
       pointer
-    });
+    }));
   }
   QUnit.module('fabric.BaseBrush', function(hooks) {
     hooks.afterEach(function() {
@@ -15,11 +15,31 @@
     QUnit.test('fabric brush constructor', function(assert) {
       assert.ok(fabric.BaseBrush);
 
-      var brush = new fabric.BaseBrush();
+      let setCursor;
+
+      var brush = new fabric.SimpleBrush({
+        setCursor(cursor) {
+          setCursor = cursor;
+        }
+      });
 
       assert.ok(brush instanceof fabric.BaseBrush, 'should inherit from fabric.BaseBrush');
+      assert.ok(brush instanceof fabric.SimpleBrush, 'should inherit from fabric.SimpleBrush');
       assert.equal(brush.color, 'rgb(0, 0, 0)', 'default color is black');
       assert.equal(brush.width, 1, 'default width is 1');
+      assert.equal(brush.cursor, 'crosshair', 'default cursor');
+    });
+    QUnit.test('start', function(assert) {
+      let setCursor;
+      const brush = new fabric.SimpleBrush({
+        setCursor(cursor) {
+          setCursor = cursor;
+        }
+      });
+      assert.equal(brush.cursor, 'crosshair', 'default cursor');
+      brush.cursor = 'testCursor';
+      brush.start();
+      assert.equal(setCursor, 'testCursor', 'should set canvas cursor');
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);
@@ -46,18 +66,18 @@
         QUnit.test('fabric pencil brush draw point', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.down(createEvent(pointer));
+          fireBrushEvent(brush, 'down', pointer);
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.down(createEvent(pointer));
-          brush.move(createEvent(pointer));
-          brush.move(createEvent(pointer));
-          brush.move(createEvent(pointer));
-          brush.move(createEvent(pointer));
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
@@ -67,11 +87,11 @@
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.down(createEvent(pointer));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -87,11 +107,11 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.down(createEvent(pointer));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
-          brush.move(createEvent(pointer4));
-          brush.move(createEvent(pointer5));
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer4);
+          fireBrushEvent(brush, 'move', pointer5);
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -108,11 +128,11 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.down(createEvent(pointer));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
-          brush.move(createEvent(pointer4));
-          brush.move(createEvent(pointer5));
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer4);
+          fireBrushEvent(brush, 'move', pointer5);
           var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
@@ -132,12 +152,12 @@
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.down(createEvent(pointer));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
-          brush.move(createEvent(pointer2));
-          brush.move(createEvent(pointer3));
-          brush.up(createEvent(pointer3));
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'up', pointer3);
         });
       });
     });

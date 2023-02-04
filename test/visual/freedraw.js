@@ -2,32 +2,32 @@ function setBrush(canvas, brush) {
   canvas.isDrawingMode = true;
   canvas.freeDrawingBrush = brush;
 }
-function createEvent(pointer) {
-    return fabric.Event.init({
-      e: { pointerId: 1 },
-      pointer
-    });
-  }
+function fireBrushEvent(brush, type, pointer) {
+  brush.fire(`mouse:${type}:before`, fabric.Event.init({
+    e: { pointerId: 1 },
+    pointer
+  }));
+}
 function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
   const { canvas } = brush;
     setBrush(canvas, brush);
-    brush.down(createEvent(points[0]));
+    fireBrushEvent(brush, 'down', points[0]);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.move(createEvent(points[i]));
+      fireBrushEvent(brush, 'move', points[i]);
       onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       canvas.once('interaction:completed', ({ result }) => {
         typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
       });
-      brush.up(createEvent(points[points.length - 1]));
+      fireBrushEvent(brush, 'up', points[points.length - 1]);
     }
   }
   
   function fireBrushUp(canvas) {
-    canvas.freeDrawingBrush.up(createEvent(new fabric.Point()));
+    fireBrushEvent(canvas.freeDrawingBrush, 'up', new fabric.Point());
   }
 
   // function eraserDrawer(points, brush, fireUp = false) {
@@ -2256,7 +2256,7 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
-    function withText(canvas) {
+  function withText(canvas) {
     canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
     const brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
@@ -2267,7 +2267,7 @@ QUnit.module('Free Drawing', hooks => {
   tests.push({
     test: 'textbox should not clear brush',
     build: withText,
-    golden: 'withText.png',
+    name: 'withText',
     percentage: 0.02,
     width: 200,
     height: 250,
@@ -2277,7 +2277,6 @@ QUnit.module('Free Drawing', hooks => {
       main: false,
       mesh: true,
       result: false,
-      compare: false
     }
   });
 
