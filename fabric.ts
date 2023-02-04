@@ -336,6 +336,7 @@ import { Gradient } from './src/gradient/Gradient';
 import { Pattern } from './src/Pattern';
 import { Shadow } from './src/Shadow';
 import { BaseBrush } from './src/brushes/BaseBrush';
+import { SimpleBrush } from './src/brushes/SimpleBrush';
 import { PencilBrush } from './src/brushes/PencilBrush';
 import { CircleBrush } from './src/brushes/CircleBrush';
 import { SprayBrush } from './src/brushes/SprayBrush';
@@ -396,6 +397,7 @@ export {
   Pattern,
   Shadow,
   BaseBrush,
+  SimpleBrush,
   PencilBrush,
   CircleBrush,
   SprayBrush,

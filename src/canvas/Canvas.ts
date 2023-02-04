@@ -9,6 +9,7 @@ import {
   TPointerEventNames,
   Transform,
 } from '../EventTypeDefs';
+import { FabricEvent, TFabricEvent } from '../FabricEvents';
 import { Point } from '../Point';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Group } from '../shapes/Group';
@@ -115,14 +116,6 @@ export class Canvas extends SelectableCanvas {
   declare currentTarget?: FabricObject;
 
   declare currentSubTargets?: FabricObject[];
-
-  /**
-   * Holds a reference to a pointer during mousedown to compare on mouse up and determine
-   * if it was a click event
-   * @type FabricObject
-   * @private
-   */
-  declare _previousPointer: Point;
 
   private _isClick: boolean;
 
@@ -521,7 +514,7 @@ export class Canvas extends SelectableCanvas {
    */
   private _onDrop(e: DragEvent) {
     const { target, targets } = this.findDragTargets(e);
-    const options = this._basicEventHandler('drop:before', {
+    const ev = this._basicEventHandler('drop:before', {
       e,
       target,
       subTargets: targets,
@@ -529,33 +522,32 @@ export class Canvas extends SelectableCanvas {
       pointer: this.getPointer(e),
     });
     //  will be set by the drop target
-    options.didDrop = false;
+    ev.didDrop = false;
     //  will be set by the drop target, used in case options.target refuses the drop
-    options.dropTarget = undefined;
+    ev.dropTarget = undefined;
     //  fire `drop`
-    this._basicEventHandler('drop', options);
+    this._basicEventHandler('drop', ev);
     //  inform canvas of the drop
     //  we do this because canvas was unaware of what happened at the time the `drop` event was fired on it
     //  use for side effects
-    this.fire('drop:after', options);
+    this.fire('drop:after', ev);
   }
 
   private _onContextMenu(e: TPointerEvent): false {
     const target = this.findTarget(e),
       subTargets = this.targets || [];
-    const options = this._basicEventHandler('contextmenu:before', {
+    const ev = this._basicEventHandler('contextmenu:before', {
       e,
       target,
       subTargets,
     });
     // TODO: this line is silly because the dev can subscribe to the event and prevent it themselves
     this.stopContextMenu && stopEvent(e);
-    this._basicEventHandler('contextmenu', options);
+    this._basicEventHandler('contextmenu', ev);
     return false;
   }
 
   private _onDoubleClick(e: TPointerEvent) {
-    this.freeDrawingBrush?.onDoubleClick(this.getPointer(e));
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'dblclick');
     this._resetTransformEventData();
@@ -784,6 +776,17 @@ export class Canvas extends SelectableCanvas {
     return false;
   }
 
+  protected shouldHandleDefaultEvent(
+    e: TPointerEvent,
+    beforeEvent?: TFabricEvent<TPointerEventInfo<TPointerEvent>>
+  ) {
+    return (
+      !beforeEvent?.defaultPrevented &&
+      checkClick(e, LEFT_CLICK) &&
+      this._isMainEvent(e)
+    );
+  }
+
   /**
    * Method that defines the actions when mouse is released on canvas.
    * The method resets the currentTransform parameters, store the image corner
@@ -792,46 +795,46 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    const transform = this._currentTransform;
     this._cacheTransformEventData(e);
     const target = this._target;
-    const isClick = this._isClick;
-    this._handleEvent(e, 'up:before');
-    // if right/middle click just fire events and return
-    // target undefined will make the _handleEvent search the target
-    if (checkClick(e, RIGHT_CLICK)) {
-      if (this.fireRightClick) {
-        this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
-      }
-      return;
+    const beforeEvent = this._handleEvent(e, 'up:before');
+    const shouldHandle = this.shouldHandleDefaultEvent(e, beforeEvent);
+    const invalidate = shouldHandle && this.performDefaultUp(e);
+    this._handleEvent(e, 'up', this._isClick);
+
+    if (shouldHandle) {
+      this._groupSelector = null;
+      this._currentTransform = null;
+      // reset the target information about which corner is selected
+      target && (target.__corner = undefined);
     }
 
-    if (checkClick(e, MIDDLE_CLICK)) {
-      if (this.fireMiddleClick) {
-        this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
-      }
-      this._resetTransformEventData();
-      return;
+    if (invalidate) {
+      this.requestRenderAll();
+    } else if (
+      !this._isClick &&
+      !(
+        isInteractiveTextObject(this._activeObject) &&
+        this._activeObject.isEditing
+      )
+    ) {
+      this.renderTop();
     }
+  }
 
-    if (this.isCurrentlyDrawing()) {
-      this._onMouseUpInDrawingMode(e);
-      return;
-    }
-
-    if (!this._isMainEvent(e)) {
-      return;
-    }
-    let shouldRender = false;
+  protected performDefaultUp(e: TPointerEvent) {
+    const transform = this._currentTransform;
+    const target = this._target;
+    let invalidate = false;
     if (transform) {
       this._finalizeCurrentTransform(e);
-      shouldRender = transform.actionPerformed;
+      invalidate = transform.actionPerformed;
     }
-    if (!isClick) {
+    if (!this._isClick) {
       const targetWasActive = target === this._activeObject;
       this._maybeGroupObjects(e);
-      if (!shouldRender) {
-        shouldRender =
+      if (!invalidate) {
+        invalidate =
           this._shouldRender(target) ||
           (!targetWasActive && target === this._activeObject);
       }
@@ -848,7 +851,7 @@ export class Canvas extends SelectableCanvas {
         target.activeOn === 'up'
       ) {
         this.setActiveObject(target, e);
-        shouldRender = true;
+        invalidate = true;
       } else {
         const control = target.controls[corner as string];
         const mouseUpHandler =
@@ -880,22 +883,7 @@ export class Canvas extends SelectableCanvas {
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
-    this._groupSelector = null;
-    this._currentTransform = null;
-    // reset the target information about which corner is selected
-    target && (target.__corner = undefined);
-    if (shouldRender) {
-      this.requestRenderAll();
-    } else if (
-      !isClick &&
-      !(
-        isInteractiveTextObject(this._activeObject) &&
-        this._activeObject.isEditing
-      )
-    ) {
-      this.renderTop();
-    }
+    return invalidate;
   }
 
   _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
@@ -906,12 +894,12 @@ export class Canvas extends SelectableCanvas {
       target?: FabricObject;
       subTargets: FabricObject[];
     };
-    this.fire(eventType, options);
-    target && target.fire(eventType, options);
+    const ev = this.fire(eventType, options);
+    target && target.fire(eventType, ev);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i].fire(eventType, options);
+      subTargets[i].fire(eventType, ev);
     }
-    return options;
+    return ev;
   }
 
   /**
@@ -920,37 +908,43 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e event from mouse
    * @param {String} eventType event to fire (up, down or move)
    * @param {fabric.Object} targetObj receiving event
-   * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
    * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
    */
   _handleEvent(
     e: TPointerEvent,
     eventType: TPointerEventNames,
-    button = LEFT_CLICK,
     isClick = false
   ) {
-    const target = this._target,
-      targets = this.targets || [],
-      options: TPointerEventInfo = {
-        e: e,
-        target: target,
-        subTargets: targets,
-        button,
-        isClick,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
-        transform: this._currentTransform,
-      };
-    if (eventType === 'up') {
-      options.currentTarget = this.findTarget(e);
-      options.currentSubTargets = this.targets;
+    if (
+      (!this.fireMiddleClick && checkClick(e, MIDDLE_CLICK)) ||
+      (!this.fireRightClick && checkClick(e, RIGHT_CLICK))
+    ) {
+      return;
     }
-    this.fire(`mouse:${eventType}`, options);
+    const target = this._target;
+    const targets = this.targets || [];
+    const ev = FabricEvent.init<TPointerEventInfo>({
+      e,
+      target,
+      subTargets: targets,
+      isClick,
+      pointer: this.getPointer(e),
+      absolutePointer: this.getPointer(e, true),
+      transform: this._currentTransform,
+      ...(eventType === 'up'
+        ? {
+            currentTarget: this.findTarget(e),
+            currentSubTargets: this.targets,
+          }
+        : {}),
+    });
+    this.fire(`mouse:${eventType}`, ev);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire(`mouse${eventType}`, options);
+    target && target.fire(`mouse${eventType}`, ev);
     for (let i = 0; i < targets.length; i++) {
-      targets[i].fire(`mouse${eventType}`, options);
+      targets[i].fire(`mouse${eventType}`, ev);
     }
+    return ev;
   }
 
   /**
@@ -996,54 +990,6 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * @private
-   * @param {Event} e Event object fired on mousedown
-   */
-  _onMouseDownInDrawingMode(e: TPointerEvent) {
-    let dirty = false;
-    if (this.getActiveObject()) {
-      this.discardActiveObject(e);
-      dirty = true;
-    }
-    const pointer = this.getPointer(e);
-    this.freeDrawingBrush?.onMouseDown(pointer, { e, pointer });
-    dirty && this.requestRenderAll();
-    this._handleEvent(e, 'down');
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object fired on mousemove
-   */
-  _onMouseMoveInDrawingMode(e: TPointerEvent) {
-    if (this.isCurrentlyDrawing()) {
-      const pointer = this.getPointer(e);
-      this.freeDrawingBrush!.onMouseMove(pointer, {
-        e,
-        pointer,
-      });
-    }
-    this.setCursor(this.freeDrawingCursor);
-    this._handleEvent(e, 'move');
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object fired on mouseup
-   */
-  _onMouseUpInDrawingMode(
-    this: AssertKeys<this, 'freeDrawingBrush'>,
-    e: TPointerEvent
-  ) {
-    const pointer = this.getPointer(e);
-    this.freeDrawingBrush.onMouseUp({
-      e,
-      pointer,
-    });
-    this._handleEvent(e, 'up');
-  }
-
-  /**
    * Method that defines the actions when mouse is clicked on canvas.
    * The method inits the currentTransform parameters and renders all the
    * canvas so the current image can be placed on the top canvas and the rest
@@ -1054,40 +1000,20 @@ export class Canvas extends SelectableCanvas {
   __onMouseDown(e: TPointerEvent) {
     this._isClick = true;
     this._cacheTransformEventData(e);
-    this._handleEvent(e, 'down:before');
+    const beforeEvent = this._handleEvent(e, 'down:before');
+    const invalidate =
+      this.shouldHandleDefaultEvent(e, beforeEvent) &&
+      // ignore if some object is being transformed at this moment
+      // TODO: check if this can ever happen (mouseup clears it)
+      !this._currentTransform &&
+      this.performDefaultDown(e);
+    this._handleEvent(e, 'down');
+    // we must renderAll so that we update the visuals
+    invalidate && this.requestRenderAll();
+  }
+
+  protected performDefaultDown(e: TPointerEvent) {
     let target: FabricObject | undefined = this._target;
-    // if right click just fire events
-    if (checkClick(e, RIGHT_CLICK)) {
-      if (this.fireRightClick) {
-        this._handleEvent(e, 'down', RIGHT_CLICK);
-      }
-      return;
-    }
-
-    if (checkClick(e, MIDDLE_CLICK)) {
-      if (this.fireMiddleClick) {
-        this._handleEvent(e, 'down', MIDDLE_CLICK);
-      }
-      return;
-    }
-
-    if (this.isDrawingMode) {
-      this._onMouseDownInDrawingMode(e);
-      return;
-    }
-
-    if (!this._isMainEvent(e)) {
-      return;
-    }
-
-    // ignore if some object is being transformed at this moment
-    if (this._currentTransform) {
-      return;
-    }
-
-    const pointer = this.getPointer(e, true);
-    // save pointer for check in __onMouseUp event
-    this._previousPointer = pointer;
     const shouldRender = this._shouldRender(target),
       shouldGroup = this._shouldGroup(e, target);
     if (this._shouldClearSelection(e, target)) {
@@ -1102,7 +1028,7 @@ export class Canvas extends SelectableCanvas {
     // and there is no target, or the following 3 condition both apply
     // target is not selectable ( otherwise we selected it )
     // target is not editing
-    // target is not already selected ( otherwise we drage )
+    // target is not already selected ( otherwise we drag )
     if (
       this.selection &&
       (!target ||
@@ -1144,9 +1070,7 @@ export class Canvas extends SelectableCanvas {
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
     //  run before firing the `down` event to give the dev a chance to populate it themselves
     invalidate && (this._objectsToRender = undefined);
-    this._handleEvent(e, 'down');
-    // we must renderAll so that we update the visuals
-    invalidate && this.requestRenderAll();
+    return invalidate;
   }
 
   /**
@@ -1196,27 +1120,20 @@ export class Canvas extends SelectableCanvas {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    const beforeEvent = this._handleEvent(e, 'move:before');
+    this.shouldHandleDefaultEvent(e, beforeEvent) && this.performDefaultMove(e);
+    this._handleEvent(e, 'move');
+    this._resetTransformEventData();
+  }
 
-    if (this.isDrawingMode) {
-      this._onMouseMoveInDrawingMode(e);
-      return;
-    }
-
-    if (!this._isMainEvent(e)) {
-      return;
-    }
-
+  protected performDefaultMove(e: TPointerEvent) {
     const groupSelector = this._groupSelector;
-
-    // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
+      // We initially clicked in an empty area, so we draw a box for multiple selection
       const pointer = this.getPointer(e);
-
       groupSelector.left = pointer.x - groupSelector.ex;
       groupSelector.top = pointer.y - groupSelector.ey;
-
       this.renderTop();
     } else if (!this._currentTransform) {
       const target = this.findTarget(e);
@@ -1226,8 +1143,6 @@ export class Canvas extends SelectableCanvas {
       this._transformObject(e);
     }
     this.textEditingManager.onMouseMove(e);
-    this._handleEvent(e, 'move');
-    this._resetTransformEventData();
   }
 
   /**

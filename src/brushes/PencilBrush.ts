@@ -1,10 +1,16 @@
 import type { Canvas } from '../canvas/Canvas';
-import { ModifierKey, TEvent } from '../EventTypeDefs';
+import {
+  ModifierKey,
+  TEvent,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvents';
 import { Point } from '../Point';
 import { Path } from '../shapes/Path';
 import { PathData } from '../typedefs';
 import { getSmoothPathFromPoints, joinPath } from '../util/path';
-import { BaseBrush, TBrushEventData } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 /**
  * @param {PathData} pathData
@@ -14,7 +20,7 @@ function isEmptyPath(pathData: PathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';
 }
 
-export class PencilBrush extends BaseBrush<Path> {
+export class PencilBrush extends SimpleBrush<Path> {
   /**
    * Discard points that are less than `decimate` pixel distant from each other
    * @type Number
@@ -58,21 +64,10 @@ export class PencilBrush extends BaseBrush<Path> {
     return midPoint;
   }
 
-  protected shouldHandleEvent(e: TPointerEvent) {
-    return this.canvas._isMainEvent(e);
-  }
-
-  /**
-   * Invoked on mouse down
-   * @param {Point} pointer
-   */
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    if (!this.shouldHandleEvent(ev.e)) {
-      return;
-    }
-    super.onMouseDown(pointer, ev);
-    this.drawStraightLine =
-      !!this.straightLineKey && ev.e[this.straightLineKey];
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
+    const { e, pointer } = ev;
+    this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
@@ -80,18 +75,10 @@ export class PencilBrush extends BaseBrush<Path> {
     this.render();
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point, { e }: TEvent) {
-    if (!this.shouldHandleEvent(e)) {
-      return;
-    }
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    const { e, pointer } = ev;
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
-      return;
-    }
     if (this._addPoint(pointer) && this._points.length > 1) {
       if (this.needsFullRender()) {
         // redraw curve
@@ -102,10 +89,8 @@ export class PencilBrush extends BaseBrush<Path> {
     }
   }
 
-  onMouseUp({ e }: TEvent) {
-    if (!this.shouldHandleEvent(e)) {
-      return;
-    }
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
     this.drawStraightLine = false;
     this.oldEnd = undefined;
     this.canvas.contextTop.closePath();
@@ -122,7 +107,6 @@ export class PencilBrush extends BaseBrush<Path> {
   }
 
   /**
-   * @private
    * @param {Point} point Point to be added to points array
    */
   protected _addPoint(point: Point) {
@@ -177,7 +161,6 @@ export class PencilBrush extends BaseBrush<Path> {
 
   /**
    * Draw a smooth path on the topCanvas using quadraticCurveTo
-   * @private
    * @param {CanvasRenderingContext2D} ctx
    */
   protected _render(ctx: CanvasRenderingContext2D) {
@@ -212,7 +195,7 @@ export class PencilBrush extends BaseBrush<Path> {
   /**
    * Decimate points array with the decimate value
    */
-  decimatePoints(points: Point[], distance: number) {
+  protected decimatePoints(points: Point[], distance: number) {
     if (points.length <= 2) {
       return points;
     }
