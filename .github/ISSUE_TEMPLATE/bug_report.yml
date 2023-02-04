@@ -8,8 +8,8 @@ body:
         Thank you for wanting to create an issue in this repository. 
 
         Before you do, please ensure you are filing the issue in the right
-        place. 
-        For anything else (such as questions) use [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+        place.  For anything else (such as questions) use
+        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
   - type: checkboxes
     id: terms
     attributes:
