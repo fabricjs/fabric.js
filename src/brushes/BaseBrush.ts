@@ -14,8 +14,9 @@ export type TBrushEventData = TEvent & { pointer: Point };
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
 export abstract class BaseBrush<
-  T extends FabricObject = FabricObject
-> extends Observable<CanvasEvents> {
+  T extends FabricObject = FabricObject,
+  EventSpec extends CanvasEvents = CanvasEvents
+> extends Observable<EventSpec> {
   /**
    * Color of a brush
    * @type String

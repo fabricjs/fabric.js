@@ -495,6 +495,7 @@ export class StaticCanvas<
       cssOnly,
       backstoreOnly,
     });
+    this.fire('resize');
     if (!cssOnly) {
       this.requestRenderAll();
     }

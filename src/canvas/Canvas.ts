@@ -135,7 +135,7 @@ export class Canvas extends SelectableCanvas {
         '_onMouseMove',
         '_onMouseUp',
         '_onTouchEnd',
-        '_onResize',
+        '_onWindowResize',
         // '_onGesture',
         // '_onDrag',
         // '_onShake',
@@ -161,6 +161,14 @@ export class Canvas extends SelectableCanvas {
     this.addOrRemove(addListener, 'add');
   }
 
+  protected _setDimensionsImpl(
+    dimensions: TSize,
+    options?: TCanvasSizeOptions
+  ) {
+    this._resetTransformEventData();
+    super._setDimensionsImpl(dimensions, options);
+  }
+
   /**
    * return an event prefix pointer or mouse.
    * @private
@@ -172,7 +180,7 @@ export class Canvas extends SelectableCanvas {
   addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    functor(getEnv().window, 'resize', this._onResize);
+    functor(getEnv().window, 'resize', this._onWindowResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     functor(
       canvasElement,
@@ -751,18 +759,9 @@ export class Canvas extends SelectableCanvas {
   /**
    * @private
    */
-  _onResize() {
+  _onWindowResize() {
     this.calcOffset();
     this._resetTransformEventData();
-    this.fire('resize');
-  }
-
-  protected _setDimensionsImpl(
-    dimensions: TSize,
-    options?: TCanvasSizeOptions
-  ) {
-    this._resetTransformEventData();
-    super._setDimensionsImpl(dimensions, options);
   }
 
   /**
@@ -1587,6 +1586,7 @@ export class Canvas extends SelectableCanvas {
    * @override clear {@link textEditingManager}
    */
   destroy() {
+    this.removeListeners();
     super.destroy();
     this.textEditingManager.dispose();
   }
