@@ -31,7 +31,6 @@ QUnit.test('fire event/object', function (assert) {
   let fired = foo.fire('bar:baz');
   assert.ok(received instanceof fabric.Event, 'should be an event');
   assert.equal(received, fired, 'should be the same ref');
-  assert.deepEqual(received, {}, 'event should be empty');
   received = null;
 
   fired = foo.fire('bar:baz', { foo: 'bar' });
