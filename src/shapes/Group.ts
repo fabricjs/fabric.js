@@ -20,6 +20,7 @@ import { sin } from '../util/misc/sin';
 import { FabricObject, stateProperties } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../util/class_registry';
+import type { EraserBrush, applyEraser } from '../brushes/Eraser';
 
 export type LayoutContextType =
   | 'initialization'
@@ -110,11 +111,11 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   declare interactive: boolean;
 
   /**
-   * Indicates whether this object can be erased by the {@link EraserBrush}
-   * The `deep` option introduces fine grained control over a group's `erasable` property.
-   * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
-   * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
-   * When set to `false` the eraser will leave all objects including the group untouched.
+   * Indicates whether this object can be erased by the {@link EraserBrush}\
+   * The `deep` option introduces fine grained control over a group's `erasable` property.\
+   * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.\
+   * When set to `true` the eraser will erase the entire group. Consider using {@link applyEraser} once the group changes in order to propagate the eraser to descendants.\
+   * When set to `false` the eraser will leave all objects including the group untouched.\
    * @tutorial {@link http://fabricjs.com/erasing#erasable_property}
    * @type boolean | 'deep'
    * @default true

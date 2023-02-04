@@ -174,7 +174,7 @@ export function cloneEraserFromObject(
 /**
  * Use when:
  * 1. switching the {@link Group#erasable} property from `true` to `deep` if you wish descendants to be erased by existing paths
- * 2. when removing objects from group with {@link Group#erasable} set to `true`
+ * 2. when adding/removing objects from group with {@link Group#erasable} set to `true`
  */
 export function applyEraser(
   from: FabricObject & Required<Pick<FabricObject, 'eraser'>>,
