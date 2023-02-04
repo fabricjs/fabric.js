@@ -1,8 +1,9 @@
 import { Color } from '../color/Color';
 import type { Point } from '../Point';
-import { TEvent } from '../EventTypeDefs';
-import type { Shadow } from '../Shadow';
-import type { Canvas } from '../canvas/Canvas';
+import { Shadow } from '../Shadow';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import { multiplyTransformMatrices } from '../util/misc/matrix';
+import { sendObjectToPlane } from '../util/misc/planeChange';
 
 export type TBrushEventData = TEvent & { pointer: Point };
 
