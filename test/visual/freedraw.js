@@ -5,7 +5,8 @@ function setBrush(canvas, brush) {
 function fireBrushEvent(brush, type, pointer) {
   brush.fire(`mouse:${type}:before`, fabric.Event.init({
     e: { pointerId: 1 },
-    pointer
+    pointer,
+    absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
   }));
 }
 function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
