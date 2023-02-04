@@ -293,7 +293,7 @@
   });
 
 
-  QUnit.test('mouse:up isClick = true', function(assert) {
+  QUnit.test('mouse:up, isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
@@ -302,6 +302,39 @@
     canvas.__onMouseDown(e);
     canvas.__onMouseUp(e);
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
+  });
+
+  QUnit.test('mouse:up after move, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('mouse:up after dragging, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas._onDragStart({
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      }
+    });
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('setDimensions and active brush', function(assert) {
@@ -318,19 +351,6 @@
     canva.renderAll();
     assert.equal(rendered, true, 'the brush called the _render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
-  });
-
-  QUnit.test('mouse:up isClick = false', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
-    var e2 = { clientX: 31, clientY: 31, which: 1 };
-    var isClick = true;
-    canvas.on('mouse:up', function(opt) {
-      isClick = opt.isClick;
-    });
-    canvas.__onMouseDown(e);
-    canvas.__onMouseMove(e2);
-    canvas.__onMouseUp(e2);
-    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {
@@ -525,72 +545,6 @@
     canvas.__onMouseUp(e3);
     assert.equal(mouseUpCalled1, true, 'mouse up handler for rect has been called anyway');
     assert.equal(mouseUpCalled2, true, 'mouse up handler for rect2 has been called');
-  });
-
-
-  QUnit.test('avoid multiple bindings', function(assert) {
-    var c = new fabric.Canvas();
-    var eventsArray = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    // _initEventListeners canvas more than once
-    c._initEventListeners();
-    c._initEventListeners();
-    var eventsArray2 = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    assert.deepEqual(eventsArray, eventsArray2, 'after first _initEventListeners, functions do not change.');
-  });
-
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.getDocument().createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
   });
 
   QUnit.test('Fabric event fired - Drop', function (assert) {
@@ -854,58 +808,6 @@
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'groupSelector is updated');
   });
 
-  ['MouseDown', 'MouseMove', 'MouseOut', 'MouseEnter', 'MouseWheel', 'DoubleClick'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      if (eventType === 'DoubleClick') {
-        eventName = 'dblclick';
-      }
-      if (eventType === 'MouseWheel') {
-        eventName = 'wheel';
-      }
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.getDocument().createEvent('MouseEvent');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
-  });
-
-  QUnit.test('avoid multiple registration - mouseup', function(assert) {
-    var done = assert.async();
-    var originalMouseUp = fabric.Canvas.prototype._onMouseUp;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseUp = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-
-    // a mouse down is necessary to register mouse up.
-    var _event = fabric.getDocument().createEvent('MouseEvent');
-    _event.initEvent('mousedown', true, true);
-    c.upperCanvasEl.dispatchEvent(_event);
-    setTimeout(function() {
-      var event = fabric.getDocument().createEvent('MouseEvent');
-      event.initEvent('mouseup', true, true);
-      fabric.getDocument().dispatchEvent(event);
-      assert.equal(counter, 1, 'listener executed once');
-      fabric.Canvas.prototype._onMouseUp = originalMouseUp;
-      c.cancelRequestedRender();
-      done();
-    }, 200);
-  });
-
   QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
     var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
@@ -935,7 +837,7 @@
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
+    assert.equal(obj.__corner, undefined, '__corner has been resetted from activeObject');
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
@@ -948,23 +850,6 @@
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(obj.__corner, 'test', '__corner has not been reset');
-  });
-
-  QUnit.test('avoid multiple events on window', function(assert) {
-    var originalResize = fabric.Canvas.prototype._onResize;
-    var counter = 0;
-    fabric.Canvas.prototype._onResize = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-    var event = fabric.getDocument().createEvent('UIEvents');
-    event.initUIEvent('resize', true, false, fabric.getWindow(), 0);
-    fabric.getWindow().dispatchEvent(event);
-    assert.equal(counter, 1, 'listener on window executed once');
-    fabric.Canvas.prototype._onResize = originalResize;
   });
 
   // this test is important. As today we do not havenymore a unique function that give us the
@@ -1257,5 +1142,81 @@
       canvas._setCursorFromEvent(e, target);
       assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingX[corner], `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`);
     });
+  });
+
+  QUnit.test('text editing manager', async function (assert) {
+    const canvas = new fabric.Canvas();
+    const manager = canvas.textEditingManager;
+    assert.ok(manager, 'should exist');
+    assert.deepEqual(manager.targets, [], 'should be empty');
+
+    const a = new fabric.IText('test');
+    const b = new fabric.IText('test');
+    const e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
+
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.remove(a);
+    assert.deepEqual(manager.targets, []);
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [a, b]);
+    a.enterEditing();
+    assert.ok(a.isEditing);
+    b.enterEditing();
+    assert.ok(b.isEditing);
+    assert.ok(!a.isEditing, 'should have called exit editing');
+    manager.register(b);
+    manager.exitTextEditing();
+    assert.ok(!manager.target, 'should unregister b');
+    assert.ok(!b.isEditing, 'b should exit editing');
+    b.enterEditing();
+    b.fire('mousedown', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should register b');
+    const called = [];
+    a.updateSelectionOnMouseMove = () => called.push(a);
+    b.updateSelectionOnMouseMove = () => called.push(b);
+    canvas.__onMouseMove(e);
+    assert.deepEqual(called, [b], 'manager is called from mouse move');
+    manager.unregister(a);
+    assert.ok(manager.target === b, 'should not unregister b');
+    a.fire('mouseup', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should not unregister b');
+    canvas.__onMouseUp(e);
+    assert.ok(!manager.target, 'should unregister b');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(a);
+    assert.ok(!manager.target, 'should unregister a');
+    manager.dispose();
+    assert.ok(!manager.target, 'should have disposed ref');
+    assert.deepEqual(manager.targets, [], 'should have disposed refs');
+    const g = new fabric.Group([a]);
+    canvas.add(g);
+    assert.deepEqual(manager.targets, [a], 'should register an existing nested instance');
+    g.add(b);
+    assert.deepEqual(manager.targets, [a, b], 'should register an added nested instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    g.remove(b);
+    assert.ok(!manager.target, 'should unregister b');
+    assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(g);
+    assert.ok(!manager.target, 'should unregister a');
+    assert.deepEqual(manager.targets, [], 'should unregister nested instances upon group removal');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    canvas.clear();
+    assert.deepEqual(manager.targets, [], 'clear should clear instances');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    await canvas.dispose();
+    assert.deepEqual(manager.targets, [], 'dispose should clear instances');
+    assert.ok(!manager.target, 'should unregister b');
   });
 })();

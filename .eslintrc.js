@@ -13,6 +13,7 @@ module.exports = {
     },
   ],
   rules: {
+    '@typescript-eslint/ban-types': 1,
     '@typescript-eslint/ban-ts-comment': 1,
     'no-restricted-globals': [
       'error',

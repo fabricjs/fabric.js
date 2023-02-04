@@ -1,0 +1,19 @@
+{
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "modules": false,
+        "useBuiltIns": false,
+        "loose": true,
+        "targets": "chrome > 100"
+      }
+    ],
+    [
+      "@babel/typescript",
+      {
+        "allowDeclareFields": true
+      }
+    ]
+  ]
+}

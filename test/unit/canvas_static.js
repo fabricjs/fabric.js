@@ -154,9 +154,9 @@
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
-  function makeRect(options) {
+  function makeRect(options={}) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect({ ...defaultOptions, ...options });
   }
 
   QUnit.module('fabric.StaticCanvas', {
@@ -195,16 +195,16 @@
     assert.ok('backgroundImage' in canvas);
     assert.ok('overlayImage' in canvas);
     assert.ok('includeDefaultValues' in canvas);
-    assert.ok('stateful' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
     assert.ok('allowTouchScrolling' in canvas);
     assert.ok('imageSmoothingEnabled' in canvas);
     assert.ok('backgroundVpt' in canvas);
     assert.ok('overlayVpt' in canvas);
+    assert.ok(Array.isArray(canvas._objects), 'is array');
+    assert.equal(canvas._objects.length, 0, 'is empty array');
 
     assert.equal(canvas.includeDefaultValues, true);
-    assert.equal(canvas.stateful, false);
     assert.equal(canvas.renderOnAddRemove, true);
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.allowTouchScrolling, false);

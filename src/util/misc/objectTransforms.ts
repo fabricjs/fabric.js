@@ -1,4 +1,4 @@
-import { Point } from '../../point.class';
+import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/Object';
 import { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
