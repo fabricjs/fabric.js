@@ -498,7 +498,7 @@ export class SelectableCanvas<
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
   declare cacheCanvasEl: HTMLCanvasElement;
-  protected declare shouldClearContextTop: boolean;
+  declare shouldClearContextTop: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 
