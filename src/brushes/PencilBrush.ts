@@ -64,10 +64,11 @@ export class PencilBrush extends SimpleBrush<Path> {
     const { e } = ev;
     const pointer = this.extractPointer(ev);
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
-    this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
-    this._addPoint(pointer);
+    this._points = [pointer, pointer];
+    this._hasStraightLine = false;
+    this.canvas.contextTop.moveTo(pointer.x, pointer.y);
     this.render();
   }
 
@@ -95,15 +96,6 @@ export class PencilBrush extends SimpleBrush<Path> {
   }
 
   /**
-   * @param {Point} pointer Actual mouse position related to the canvas.
-   */
-  protected _prepareForDrawing(pointer: Point) {
-    this._reset();
-    this._addPoint(pointer);
-    this.canvas.contextTop.moveTo(pointer.x, pointer.y);
-  }
-
-  /**
    * @param {Point} point Point to be added to points array
    */
   protected _addPoint(point: Point) {
@@ -119,17 +111,6 @@ export class PencilBrush extends SimpleBrush<Path> {
     }
     this._points.push(point);
     return true;
-  }
-
-  /**
-   * Clear points array and set contextTop canvas style.
-   * @private
-   */
-  _reset() {
-    this._points = [];
-    this._setBrushStyles(this.canvas.contextTop);
-    this._setShadow();
-    this._hasStraightLine = false;
   }
 
   /**
