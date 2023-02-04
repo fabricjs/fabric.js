@@ -41,7 +41,7 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
 
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
-    const { pointer } = ev;
+    const pointer = this.extractPointer(ev);
     if (this.shape) {
       this.addPoint(pointer);
     } else {
@@ -53,12 +53,12 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    this.replacePoint(ev.pointer);
+    this.replacePoint(this.extractPointer(ev));
   }
 
   up(ev: TFabricEvent<TPointerEventInfo>) {
     super.up(ev);
-    const { pointer } = ev;
+    const pointer = this.extractPointer(ev);
     this.replacePoint(pointer);
     this.addPoint(pointer);
     return true;
@@ -66,7 +66,7 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
 
   end(ev: TFabricEvent<TPointerEventInfo>) {
     ev.preventDefault();
-    this.shape && this.replacePoint(ev.pointer);
+    this.shape && this.replacePoint(this.extractPointer(ev));
     this.finalize();
   }
 }

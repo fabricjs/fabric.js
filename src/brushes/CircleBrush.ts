@@ -93,7 +93,7 @@ export class CircleBrush extends SimpleBrush<FabricObject> {
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
-    this.drawDot(ev.pointer);
+    this.drawDot(this.extractPointer(ev));
   }
 
   protected _render(ctx: CanvasRenderingContext2D) {
@@ -105,7 +105,7 @@ export class CircleBrush extends SimpleBrush<FabricObject> {
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    const { pointer } = ev;
+    const pointer = this.extractPointer(ev);
     if (this.needsFullRender()) {
       this.addPoint(pointer);
       this.render();

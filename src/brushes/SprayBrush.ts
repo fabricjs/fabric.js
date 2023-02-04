@@ -129,13 +129,13 @@ export class SprayBrush extends SimpleBrush<Group> {
     this.canvas.clearContext(this.canvas.contextTop);
     this._setBrushStyles();
     this._setShadow();
-    this.addSprayChunk(ev.pointer);
+    this.addSprayChunk(this.extractPointer(ev));
     this.renderChunk(this.sprayChunk);
   }
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    this.addSprayChunk(ev.pointer);
+    this.addSprayChunk(this.extractPointer(ev));
     this.renderChunk(this.sprayChunk);
   }
 
