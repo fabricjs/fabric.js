@@ -5,7 +5,11 @@ import { Observable } from '../Observable';
 import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { FabricObject } from '../shapes/Object/FabricObject';
-import { multiplyTransformMatrices } from '../util/misc/matrix';
+import { TCachedFabricObject } from '../shapes/Object/Object';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+} from '../util/misc/matrix';
 import { sendObjectToPlane } from '../util/misc/planeChange';
 
 export type TBrushEventData = TEvent & { pointer: Point };
@@ -195,11 +199,29 @@ export abstract class BaseBrush<
   }
 
   /**
-   * needed for `absolutePositioned` `clipPath`
    * @private
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {FabricObject} clipPath
    */
-  calcTransformMatrix() {
-    return this.canvas.viewportTransform;
+  private drawClipPathOnCache(
+    ctx: CanvasRenderingContext2D,
+    clipPath: TCachedFabricObject
+  ) {
+    ctx.save();
+    ctx.globalCompositeOperation = clipPath.inverted
+      ? 'destination-out'
+      : 'destination-in';
+    if (clipPath.absolutePositioned) {
+      ctx.transform(...invertTransform(this.canvas.viewportTransform));
+    }
+    clipPath.transform(ctx);
+    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
+    ctx.drawImage(
+      clipPath._cacheCanvas,
+      -clipPath.cacheTranslationX,
+      -clipPath.cacheTranslationY
+    );
+    ctx.restore();
   }
 
   /**
@@ -207,24 +229,21 @@ export abstract class BaseBrush<
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  drawClipPathOnCache(ctx: CanvasRenderingContext2D, clipPath: FabricObject) {
-    // TODO: no proto calls
-    FabricObject.prototype.drawClipPathOnCache.call(this, ctx, clipPath);
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {FabricObject} clipPath
-   */
-  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
+  protected _drawClipPath(
+    ctx: CanvasRenderingContext2D,
+    clipPath?: FabricObject
+  ) {
     if (!clipPath) {
       return;
     }
-    ctx.save();
-    // TODO: no proto calls
-    FabricObject.prototype._drawClipPath.call(this, ctx, clipPath);
-    ctx.restore();
+    // needed to setup a couple of variables
+    // path canvas gets overridden with this one.
+    // TODO find a better solution?
+    clipPath._set('canvas', this.canvas);
+    clipPath.shouldCache();
+    clipPath._transformDone = true;
+    clipPath.renderCache({ forClipping: true });
+    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
   }
 
   /**
@@ -240,7 +259,7 @@ export abstract class BaseBrush<
       clipPath,
       undefined,
       this.clipPath.absolutePositioned
-        ? multiplyTransformMatrices(this.calcTransformMatrix(), t)
+        ? multiplyTransformMatrices(this.canvas.viewportTransform, t)
         : t
     );
     return clipPath;
