@@ -2333,7 +2333,7 @@ QUnit.module('Free Drawing', hooks => {
         inverted: clip === 'inverted',
         canvas
       });
-      clipPath.center();
+      canvas.centerObject(clipPath);
       brush.clipPath = clipPath;
     }
     brush.width = 16;
