@@ -836,7 +836,17 @@ export class Canvas extends SelectableCanvas {
     }
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
-      this._maybeGroupObjects(e);
+      if (this.selection && this._groupSelector) {
+        const objects = this._collectObjects(e);
+        // do not create group for 1 element only
+        if (objects.length === 1) {
+          this.setActiveObject(objects[0], e);
+        } else if (objects.length > 1) {
+          this._activeSelection.add(...objects);
+          this.setActiveObject(this._activeSelection, e);
+        }
+      }
+      this._groupSelector = null;
       if (!shouldRender) {
         shouldRender =
           this._shouldRender(target) ||
@@ -1579,22 +1589,6 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * Finds objects inside the selection rectangle and group them
-   * @private
-   * @param {Event} e mouse event
-   */
-  _groupSelectedObjects(e: TPointerEvent) {
-    const objects = this._collectObjects(e);
-    // do not create group for 1 element only
-    if (objects.length === 1) {
-      this.setActiveObject(objects[0], e);
-    } else if (objects.length > 1) {
-      this._activeSelection.add(...objects);
-      this.setActiveObject(this._activeSelection, e);
-    }
-  }
-
-  /**
    * @private
    */
   _collectObjects(e: TPointerEvent) {
@@ -1646,18 +1640,6 @@ export class Canvas extends SelectableCanvas {
     return group.length > 1
       ? group.filter((object) => !object.onSelect({ e })).reverse()
       : group;
-  }
-
-  /**
-   * @private
-   */
-  _maybeGroupObjects(e: TPointerEvent) {
-    if (this.selection && this._groupSelector) {
-      this._groupSelectedObjects(e);
-    }
-    this.setCursor(this.defaultCursor);
-    // clear selection and current transformation
-    this._groupSelector = null;
   }
 
   exitTextEditing() {
