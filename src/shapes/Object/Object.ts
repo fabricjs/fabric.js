@@ -1640,7 +1640,7 @@ export class FabricObject<
   cloneAsImage(options: any): Image {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    const ImageClass = classRegistry.getClass('image');
+    const ImageClass = classRegistry.getJSONClass<Image>('image');
     return new ImageClass(canvasEl);
   }
 
