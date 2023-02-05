@@ -995,7 +995,8 @@ export class FabricObject<
   }
 
   /**
-   * @private
+   * Handles setting values on the instance and handling internal side effects
+   * @protected
    * @param {String} key
    * @param {*} value
    */
