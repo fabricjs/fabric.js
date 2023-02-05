@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getEnv } from '../env';
+import { getWindow } from '../env';
 import { noop } from '../constants';
 
 /**
@@ -17,7 +17,7 @@ import { noop } from '../constants';
 export function request(url, options = {}) {
   const method = options.method ? options.method.toUpperCase() : 'GET',
     onComplete = options.onComplete || noop,
-    xhr = new (getEnv().window.XMLHttpRequest)(),
+    xhr = new (getWindow().XMLHttpRequest)(),
     body = options.body || options.parameters,
     signal = options.signal,
     abort = function () {

@@ -652,7 +652,7 @@
       });
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
-      var parser = new DOMParser(),
+      var parser = new (fabric.getWindow().DOMParser)(),
           svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
@@ -691,7 +691,7 @@
       canvas.add(group);
       assert.equal(typeof iText1.toSVG, 'function');
       assert.equal(typeof iText2.toSVG, 'function');
-      var parser = new DOMParser();
+      var parser = new (fabric.getWindow().DOMParser)();
       var svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;

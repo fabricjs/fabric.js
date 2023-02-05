@@ -1,4 +1,4 @@
-import { getEnv } from '../env';
+import { getWindow } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
 import {
@@ -97,13 +97,13 @@ export class WebGLFilterBackend {
     targetCanvas.width = width;
     targetCanvas.height = height;
 
-    startTime = getEnv().window.performance.now();
+    startTime = getWindow().performance.now();
     this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
-    const drawImageTime = getEnv().window.performance.now() - startTime;
+    const drawImageTime = getWindow().performance.now() - startTime;
 
-    startTime = getEnv().window.performance.now();
+    startTime = getWindow().performance.now();
     copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
-    const putImageDataTime = getEnv().window.performance.now() - startTime;
+    const putImageDataTime = getWindow().performance.now() - startTime;
 
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;

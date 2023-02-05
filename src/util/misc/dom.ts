@@ -1,18 +1,18 @@
-import { getEnv } from '../../env';
+import { getDocument } from '../../env';
 import { ImageFormat } from '../../typedefs';
 /**
  * Creates canvas element
  * @return {CanvasElement} initialized canvas element
  */
 export const createCanvasElement = (): HTMLCanvasElement =>
-  getEnv().document.createElement('canvas');
+  getDocument().createElement('canvas');
 
 /**
  * Creates image element (works on client and node)
  * @return {HTMLImageElement} HTML image element
  */
 export const createImage = (): HTMLImageElement =>
-  getEnv().document.createElement('img');
+  getDocument().createElement('img');
 
 /**
  * Creates a canvas element that is a copy of another and is also painted

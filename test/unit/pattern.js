@@ -1,5 +1,5 @@
 (function() {
-  var IMG_SRC = fabric.getEnv().isLikelyNode ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
+  var IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function setSrc(img, src, callback) {
     img.onload = callback;

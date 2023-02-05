@@ -65,7 +65,7 @@
     return src;
   }
   var IMG_SRC =
-        fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif'))
+        isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif'))
           :
           getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
@@ -1885,7 +1885,7 @@
   });
 
   QUnit.test('createPNGStream', function(assert) {
-    if (!fabric.getEnv().isLikelyNode) {
+    if (!isNode()) {
       assert.ok(true, 'not supposed to run outside node');
     }
     else {
@@ -1894,7 +1894,7 @@
   });
 
   QUnit.test('createJPEGStream', function(assert) {
-    if (!fabric.getEnv().isLikelyNode) {
+    if (!isNode()) {
       assert.ok(true, 'not supposed to run outside node');
     }
     else {

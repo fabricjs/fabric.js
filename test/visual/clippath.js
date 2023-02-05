@@ -4,7 +4,7 @@
   });
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
-  if (fabric.getEnv().isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
   }
   else {

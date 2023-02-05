@@ -9,7 +9,7 @@ function assertDragEventStream(name, a, b) {
     });
 }
 
-(fabric.getEnv().isLikelyNode ? QUnit.module.skip : QUnit.module)('draggable text', function (hooks) {
+(isNode() ? QUnit.module.skip : QUnit.module)('draggable text', function (hooks) {
     let canvas;
     hooks.before(function () {
         canvas = new fabric.Canvas(null, {

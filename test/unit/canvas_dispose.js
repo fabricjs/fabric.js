@@ -196,7 +196,7 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
         assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
         assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-        if (!fabric.getEnv().isLikelyNode) {
+        if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
         }
         //looks like i cannot use parentNode
@@ -214,7 +214,7 @@ function testCanvasDisposing() {
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
         assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-        if (!fabric.getEnv().isLikelyNode) {
+        if (!isNode()) {
             assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
         }
         assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');

@@ -1,5 +1,5 @@
 import type { Canvas } from '../../canvas/Canvas';
-import { getEnv } from '../../env';
+import { getDocument } from '../../env';
 import {
   DragEventData,
   DropEventData,
@@ -171,7 +171,7 @@ export class DraggableTextDelegate {
       left: -dragImage.width + 'px',
       border: 'none',
     });
-    getEnv().document.body.appendChild(dragImage);
+    getDocument().body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
