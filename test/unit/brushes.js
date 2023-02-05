@@ -10,9 +10,7 @@
     }));
   }
   QUnit.module('fabric.BaseBrush', function (hooks) {
-    hooks.beforeEach(function() {
-      canvas.isDrawingMode = true;
-    });
+
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
     });
@@ -38,7 +36,6 @@
     QUnit.test('down should call start and discard active object', function(assert) {
       let called = false, discarded = false, rendered = false;
       const brush = new fabric.SimpleBrush({
-        isDrawingMode: true,
         contextTop: canvas.contextTop,
         _activeObject: {},
         _isMainEvent() {
@@ -79,7 +76,7 @@
       const brush = new fabric.SimpleBrush({
         _isMainEvent() {
           checked = true;
-          return true;
+          return false;
         },
         down() {
           called = true;
@@ -114,10 +111,14 @@
       })
       e = canvas.fire('foo', { bar: 'baz' });
     });
-    QUnit.test('respecting isDrawingMode', function(assert) {
+    QUnit.test('disabling brush', function(assert) {
       const brush = new fabric.SimpleBrush(canvas);
       canvas.freeDrawingBrush = brush;
-      canvas.isDrawingMode = false;
+      brush.active = true;
+      assert.ok(brush.enabled, 'disabled brush');
+      brush.disable();
+      assert.ok(!brush.enabled, 'disabled brush');
+      assert.ok(!brush.active, 'deactivated brush');
       let fired = false, called = false;
       brush.on('mouse:down:before', () => (fired = true));
       fireBrushEvent(brush, 'down', new fabric.Point());

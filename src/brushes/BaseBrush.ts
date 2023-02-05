@@ -90,6 +90,8 @@ export abstract class BaseBrush<
 
   active = false;
 
+  enabled = true;
+
   private _disposer?: () => void;
 
   constructor(canvas: Canvas) {
@@ -113,6 +115,18 @@ export abstract class BaseBrush<
 
   protected unsubscribe() {
     this._disposer && this._disposer();
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
+    if (this.active) {
+      this.canvas.clearContext(this.canvas.contextTop);
+      this.active = false;
+    }
   }
 
   protected abstract _render(ctx: CanvasRenderingContext2D): void;

@@ -125,7 +125,6 @@
     canvas.fireMiddleClick = false;
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
-    canvas.isDrawingMode = false;
     canvas.__onMouseDown({ button: 0, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse down fired');
     clickCount = 0;
@@ -151,7 +150,6 @@
     canvas.fireMiddleClick = false;
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
-    canvas.isDrawingMode = false;
     canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse:down:before fired');
     clickCount = 0;
@@ -343,9 +341,8 @@
     var rendered = false;
     var canvas = new fabric.Canvas(null, { width: 500, height: 500 });
     var brush = new fabric.SimpleBrush(canvas);
-    canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
-    canvas.isCurrentlyDrawing = () => true;
+    brush.active = true;
     brush.render = () => { rendered = true; };
     brush._setBrushStyles = () => { prepareFor = true };
     await new Promise(resolve => {
