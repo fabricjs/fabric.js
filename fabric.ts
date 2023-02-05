@@ -40,21 +40,12 @@ export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
 export { createCollectionMixin } from './src/Collection';
 
-export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
-export { loadSVGFromString } from './src/parser/loadSVGFromString';
-export { parseAttributes } from './src/parser/parseAttributes';
-export { parseElements } from './src/parser/parseElements';
-export { parseStyleAttribute } from './src/parser/parseStyleAttribute';
-export { parsePointsAttribute } from './src/parser/parsePointsAttribute';
-export { parseTransformAttribute } from './src/parser/parseTransformAttribute';
-export { getCSSRules } from './src/parser/getCSSRules';
-export { parseFontDeclaration } from './src/parser/parseFontDeclaration';
-
 export * as util from './src/util';
+
+export * from './src/parser';
 
 export { Control } from './src/controls';
 export * as controlsUtils from './src/controls';
-import './src/controls/default_controls';
 
 export {
   getFilterBackend,
