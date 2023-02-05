@@ -75,6 +75,7 @@ QUnit.module('event path', (hooks) => {
       targets.forEach(target => target.fire('foo', ev));
       assert.equal(ev.path.length, control.length, 'event path should match');
       ev.path.forEach((o, i) => assert.equal(o, control[i], `path[${i}] should match`));
+      assert.equal(ev.composedPath(), ev.path, 'just an alias method');
     });
   }
   fire([a, b], [], null, 'no registered event handlers');
@@ -98,6 +99,91 @@ QUnit.module('event path', (hooks) => {
     b.on('foo', () => { });
   }
   fire([b, a], [b, a], subscribeWithDisposing, 'respect disposing');
+});
+
+QUnit.module('event propagation', hooks => {
+  QUnit.test('stopped before firing', assert => {
+    const a = new fabric.Observable();
+    let fired = false;
+    a.on('foo', () => {
+      fired = true;
+    });
+    const ev = fabric.Event.init({ foo: 'bar' });
+    ev.stopPropagation();
+    assert.equal(ev.propagate, false, 'stopPropagation should have an effect');
+    a.fire('foo', ev);
+    assert.equal(fired, false, 'event should be skipped');
+  });
+  QUnit.test('stopPropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopPropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(bFired, 'b should fire');
+  });
+  QUnit.test('stopImmediatePropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopImmediatePropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(bFired, 'b should fire');
+  });
 });
 
 QUnit.test('fire once', function (assert) {
