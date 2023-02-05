@@ -79,7 +79,7 @@ const additionalProps = [
   'pathAlign',
 ] as const;
 
-const textMeasurementProperties: string[] = [
+const textLayoutProperties: string[] = [
   'fontSize',
   'fontWeight',
   'fontFamily',
@@ -107,7 +107,7 @@ export class Text<
    * @type string[]
    * @protected
    */
-  static textMeasurementProperties: string[] = textMeasurementProperties;
+  static textLayoutProperties: string[] = textLayoutProperties;
 
   /**
    * @private
@@ -1703,11 +1703,11 @@ export class Text<
           this.setPathInfo();
         }
         needsDims =
-          needsDims || this.constructor.textMeasurementProperties.includes(_key);
+          needsDims || this.constructor.textLayoutProperties.includes(_key);
         isAddingPath = isAddingPath || _key === 'path';
       }
     } else {
-      needsDims = this.constructor.textMeasurementProperties.includes(key);
+      needsDims = this.constructor.textLayoutProperties.includes(key);
       isAddingPath = key === 'path';
     }
     if (isAddingPath) {

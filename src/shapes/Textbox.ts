@@ -34,7 +34,7 @@ export class Textbox extends IText {
    */
   declare splitByGrapheme: boolean;
 
-  static textMeasurementProperties = [...IText.textMeasurementProperties, 'width'];
+  static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
   /**
    * Unlike superclass's version of this function, Textbox does not update

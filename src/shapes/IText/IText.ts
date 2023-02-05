@@ -150,7 +150,7 @@ export class IText<
    */
   declare caching: boolean;
 
-  static textMeasurementProperties = Text.textMeasurementProperties;
+  static textLayoutProperties = Text.textLayoutProperties;
 
   /**
 
