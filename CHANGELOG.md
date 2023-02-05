@@ -2,6 +2,7 @@
 
 ## [next]
 
+- docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
 - patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
