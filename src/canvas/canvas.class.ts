@@ -258,34 +258,6 @@ export class SelectableCanvas<
   altSelectionKey: TOptionalModifierKey;
 
   /**
-   * Color of selection
-   * @type String
-   * @default
-   */
-  selectionColor: string;
-
-  /**
-   * Default dash array pattern
-   * If not empty the selection border is dashed
-   * @type Array
-   */
-  selectionDashArray: number[];
-
-  /**
-   * Color of the border of selection (usually slightly darker than color of selection itself)
-   * @type String
-   * @default
-   */
-  selectionBorderColor: string;
-
-  /**
-   * Width of a line used in object/group selection
-   * @type Number
-   * @default
-   */
-  selectionLineWidth: number;
-
-  /**
    * Select only shapes that are fully contained in the dragged selection rectangle.
    * @type Boolean
    * @default
@@ -1614,6 +1586,7 @@ export class SelectableCanvas<
     ) {
       this._activeObject.clearContextTop();
     }
+    this.isCurrentlyDrawing() && (this.shouldClearContextTop = true);
     super.setViewportTransform(vpt);
   }
 }
@@ -1628,10 +1601,6 @@ Object.assign(SelectableCanvas.prototype, {
   selection: true,
   selectionKey: 'shiftKey',
   altSelectionKey: null,
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
   selectionFullyContained: false,
   hoverCursor: 'move',
   moveCursor: 'move',

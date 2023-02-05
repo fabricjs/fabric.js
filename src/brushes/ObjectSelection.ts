@@ -2,6 +2,7 @@ import { TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { ActiveSelection } from '../shapes/active_selection.class';
 import { TBBox } from '../typedefs';
+import { sendObjectToPlane } from '../util/misc/planeChange';
 import { TBrushEventData } from './base_brush.class';
 import { DrawShape } from './DrawShape';
 
@@ -19,12 +20,12 @@ export class ObjectSelection extends DrawShape {
   protected async finalize() {
     this.active = false;
     this._resetShadow();
+    sendObjectToPlane(this.shape!, undefined, this.canvas.viewportTransform);
   }
 
-  onMouseUp(ev: TBrushEventData): void {
-    const bbox = this.shape!.getBoundingRect(true, true);
+  onMouseUp(ev: TBrushEventData) {
     super.onMouseUp(ev);
-    this.groupSelectedObjects(bbox, ev.e);
+    this.groupSelectedObjects(this.shape!.getBoundingRect(true, true), ev.e);
     this.onEnd(this.shape);
     this.shape = undefined;
   }
