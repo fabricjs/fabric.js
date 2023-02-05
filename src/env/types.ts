@@ -1,4 +1,4 @@
-import type { Canvas } from 'canvas';
+import { GLProbe } from '../filters/GLProbes/GLProbe';
 import type { DOMWindow } from 'jsdom';
 
 export type TCopyPasteData = {
@@ -9,8 +9,7 @@ export type TFabricEnv = {
   document: Document;
   window: Window | DOMWindow;
   isTouchSupported: boolean;
-  isLikelyNode: boolean;
-  nodeCanvas?: Canvas;
-  jsdomImplForWrapper?: any;
+  WebGLProbe: GLProbe;
+  dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
 };

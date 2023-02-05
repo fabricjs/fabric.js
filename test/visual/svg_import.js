@@ -5,7 +5,7 @@
   fabric.Object.prototype.objectCaching = true;
   var visualTestLoop;
   var getAsset;
-  if (fabric.getEnv().isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAsset = global.getAsset;
   }
