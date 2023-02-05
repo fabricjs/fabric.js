@@ -36,7 +36,11 @@ export abstract class SimpleBrush<
   }
 
   protected shouldHandleEvent({ e }: TPointerEventInfo, mustBeActive: boolean) {
-    return this.canvas._isMainEvent(e) && (!mustBeActive || this.active);
+    return (
+      this.enabled &&
+      (!mustBeActive || this.active) &&
+      this.canvas._isMainEvent(e)
+    );
   }
 
   protected shouldHandleMoveEvent(ev: TPointerEventInfo) {
@@ -47,9 +51,6 @@ export abstract class SimpleBrush<
   }
 
   protected down(ev: TFabricEvent<TPointerEventInfo>) {
-    if (!this.canvas.isDrawingMode) {
-      return;
-    }
     ev.preventDefault();
     this.start();
     if (this.canvas.getActiveObject()) {

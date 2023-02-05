@@ -26,7 +26,7 @@ Object.assign(Canvas.prototype, {
    */
   __onTransformGesture: function (e, self) {
     if (
-      this.isDrawingMode ||
+      // this.isDrawingMode || // I don't know what to do here
       !e.touches ||
       e.touches.length !== 2 ||
       'gesture' !== self.gesture
