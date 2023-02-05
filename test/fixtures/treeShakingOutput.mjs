@@ -1,6 +1,5 @@
 import { JSDOM } from 'jsdom';
-import utils1 from 'jsdom/lib/jsdom/living/generated/utils.js';
-import utils2 from 'jsdom/lib/jsdom/utils.js';
+import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -133,63 +132,167 @@ class Configuration extends BaseConfiguration {
 }
 const config = new Configuration();
 
+let GLPrecision;
+(function (GLPrecision) {
+  GLPrecision["low"] = "lowp";
+  GLPrecision["medium"] = "mediump";
+  GLPrecision["high"] = "highp";
+})(GLPrecision || (GLPrecision = {}));
+class GLProbe {}
+
+/**
+ * @todo GL rendering in node is possible:
+ * - https://github.com/stackgl/headless-gl
+ * - https://github.com/akira-cn/node-canvas-webgl
+ */
+class NodeGLProbe extends GLProbe {
+  queryWebGL() {
+    // noop
+  }
+  isSupported() {
+    return false;
+  }
+}
+
+/**
+ * Creates canvas element
+ * @return {CanvasElement} initialized canvas element
+ */
+const createCanvasElement = () => getDocument().createElement('canvas');
+
+/**
+ * Creates image element (works on client and node)
+ * @return {HTMLImageElement} HTML image element
+ */
+const createImage = () => getDocument().createElement('img');
+
+/**
+ * since 2.6.0 moved from canvas instance to utility.
+ * possibly useless
+ * @param {CanvasElement} canvasEl to copy size and content of
+ * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
+ * @param {Number} quality <= 1 and > 0
+ * @return {String} data url
+ */
+const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL("image/".concat(format), quality);
+const isHTMLCanvas = canvas => {
+  return !!canvas && canvas.getContext !== undefined;
+};
+
+/**
+ * Lazy initialize WebGL constants
+ */
+class WebGLProbe extends GLProbe {
+  /**
+   * Tests if webgl supports certain precision
+   * @param {WebGL} Canvas WebGL context to test on
+   * @param {GLPrecision} Precision to test can be any of following
+   * @returns {Boolean} Whether the user's browser WebGL supports given precision.
+   */
+  testPrecision(gl, precision) {
+    const fragmentSource = "precision ".concat(precision, " float;\nvoid main(){}");
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    if (!fragmentShader) {
+      return false;
+    }
+    gl.shaderSource(fragmentShader, fragmentSource);
+    gl.compileShader(fragmentShader);
+    return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
+  }
+
+  /**
+   * query browser for WebGL
+   */
+  queryWebGL() {
+    const canvas = createCanvasElement();
+    const gl = canvas.getContext('webgl');
+    if (gl) {
+      this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+      this.GLPrecision = Object.values(GLPrecision).find(precision => this.testPrecision(gl, precision));
+      console.log("fabric: max texture size ".concat(this.maxTextureSize));
+    }
+  }
+  isSupported(textureSize) {
+    return !!this.maxTextureSize && this.maxTextureSize >= textureSize;
+  }
+}
+
 /* eslint-disable no-restricted-globals */
 const copyPasteData$1 = {};
 let initialized = false;
-let isTouchSupported$1;
+let isTouchSupported;
 const getEnv$2 = () => {
   if (!initialized) {
     config.configure({
       devicePixelRatio: window.devicePixelRatio || 1
     });
-    isTouchSupported$1 = 'ontouchstart' in window || 'ontouchstart' in document || window && window.navigator && window.navigator.maxTouchPoints > 0;
+    isTouchSupported = 'ontouchstart' in window || 'ontouchstart' in document || window && window.navigator && window.navigator.maxTouchPoints > 0;
     initialized = true;
   }
   return {
     document,
     window,
-    isTouchSupported: isTouchSupported$1,
-    isLikelyNode: false,
+    isTouchSupported,
+    WebGLProbe: new WebGLProbe(),
+    dispose() {
+      // noop
+    },
     copyPasteData: copyPasteData$1
   };
 };
 
+/**
+ * This file is consumed by fabric.
+ * The `./node` and `./browser` files define the env variable that is used by this module.
+ * The `./node` module sets the env at import time.
+ * The `./browser` module is defined to be the default env and doesn't set the env at all.
+ * This is done in order to support isomorphic usage for browser and node applications
+ * since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
+ */
 let env;
 const setEnv = value => {
   env = value;
 };
 const getEnv$1 = () => env || getEnv$2();
+const getDocument = () => getEnv$1().document;
+const getWindow = () => getEnv$1().window;
 
 /* eslint-disable no-restricted-globals */
 const {
   implForWrapper: jsdomImplForWrapper
-} = utils1;
-const {
-  Canvas: nodeCanvas
-} = utils2;
+} = utils;
 const copyPasteData = {};
 const {
-  window: virtualWindow
+  window: JSDOMWindow
 } = new JSDOM(decodeURIComponent('%3C!DOCTYPE%20html%3E%3Chtml%3E%3Chead%3E%3C%2Fhead%3E%3Cbody%3E%3C%2Fbody%3E%3C%2Fhtml%3E'), {
-  features: {
-    FetchExternalResources: ['img']
-  },
-  resources: 'usable'
+  resources: 'usable',
+  // needed for `requestAnimationFrame`
+  pretendToBeVisual: true
 });
-const fabricDocument = virtualWindow.document;
-const fabricWindow = virtualWindow;
-const isTouchSupported = 'ontouchstart' in fabricWindow || 'ontouchstart' in fabricDocument || fabricWindow && fabricWindow.navigator && fabricWindow.navigator.maxTouchPoints > 0;
 config.configure({
-  devicePixelRatio: fabricWindow.devicePixelRatio || 1
+  devicePixelRatio: JSDOMWindow.devicePixelRatio || 1
 });
+const getNodeCanvas = canvasEl => {
+  const impl = jsdomImplForWrapper(canvasEl);
+  return impl._canvas || impl._image;
+};
 const getEnv = () => {
   return {
-    document: fabricDocument,
-    window: fabricWindow,
-    isTouchSupported,
-    isLikelyNode: true,
-    nodeCanvas,
-    jsdomImplForWrapper,
+    document: JSDOMWindow.document,
+    window: JSDOMWindow,
+    isTouchSupported: false,
+    WebGLProbe: new NodeGLProbe(),
+    dispose(element) {
+      const impl = jsdomImplForWrapper(element);
+      if (impl) {
+        impl._image = null;
+        impl._canvas = null;
+        // unsure if necessary
+        impl._currentSrc = null;
+        impl._attributes = null;
+        impl._classList = null;
+      }
+    },
     copyPasteData
   };
 };
@@ -1281,30 +1384,12 @@ let SupportedSVGUnit;
   SupportedSVGUnit["em"] = "em";
 })(SupportedSVGUnit || (SupportedSVGUnit = {}));
 
-let _requestAnimFrame;
-let _cancelAnimFrame;
-
-/**
- * requestAnimationFrame polyfill based on http://paulirish.com/2011/requestanimationframe-for-smart-animating/
- * In order to get a precise start time, `requestAnimFrame` should be called as an entry into the method
- * @param {Function} callback Callback to invoke
- */
 function requestAnimFrame(callback) {
-  if (!_requestAnimFrame) {
-    _requestAnimFrame = getEnv$1().window.requestAnimationFrame || function requestAnimationFramePolyfill(callback) {
-      return getEnv$1().window.setTimeout(callback, 1000 / 60);
-    };
-  }
-  return _requestAnimFrame.call(getEnv$1().window, callback);
+  return getWindow().requestAnimationFrame(callback);
 }
 function cancelAnimFrame(handle) {
-  if (!_cancelAnimFrame) {
-    _cancelAnimFrame = getEnv$1().window.cancelAnimationFrame || getEnv$1().window.clearTimeout;
-  }
-  return _cancelAnimFrame.call(getEnv$1().window, handle);
+  return getWindow().cancelAnimationFrame(handle);
 }
-
-//@ts-nocheck
 
 /**
  * Wraps element with another element
@@ -1329,8 +1414,8 @@ function wrapElement(element, wrapper) {
 function getScrollLeftTop(element) {
   let left = 0,
     top = 0;
-  const docElement = getEnv$1().document.documentElement,
-    body = getEnv$1().document.body || {
+  const docElement = getDocument().documentElement,
+    body = getDocument().body || {
       scrollLeft: 0,
       scrollTop: 0
     };
@@ -1338,10 +1423,13 @@ function getScrollLeftTop(element) {
   //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
   //  but the .parentNode of a root ShadowDOM node will always be null, instead
   //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
+  // @ts-ignore
   while (element && (element.parentNode || element.host)) {
     // Set element to element parent, or 'host' in case of ShadowDOM
+    // @ts-ignore
     element = element.parentNode || element.host;
-    if (element === getEnv$1().document) {
+    // @ts-expect-error because element is typed as HTMLElement but it can go up to document
+    if (element === getDocument()) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
@@ -1382,8 +1470,9 @@ function getElementOffset(element) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = getEnv$1().document.defaultView.getComputedStyle(element, null);
+  const elemStyle = getDocument().defaultView.getComputedStyle(element, null);
   for (const attr in offsetAttributes) {
+    // @ts-expect-error TS learn to iterate!
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
   }
   const docElem = doc.documentElement;
@@ -1409,48 +1498,9 @@ function makeElementUnselectable(element) {
   element.style.userSelect = 'none';
   return element;
 }
-function cleanUpJsdomNode(element) {
-  if (!getEnv$1().isLikelyNode) {
-    return;
-  }
-  const impl = getEnv$1().jsdomImplForWrapper(element);
-  if (impl) {
-    impl._image = null;
-    impl._canvas = null;
-    // unsure if necessary
-    impl._currentSrc = null;
-    impl._attributes = null;
-    impl._classList = null;
-  }
-}
 
 let id = 0;
 const uid = () => id++;
-
-/**
- * Creates canvas element
- * @return {CanvasElement} initialized canvas element
- */
-const createCanvasElement = () => getEnv$1().document.createElement('canvas');
-
-/**
- * Creates image element (works on client and node)
- * @return {HTMLImageElement} HTML image element
- */
-const createImage = () => getEnv$1().document.createElement('img');
-
-/**
- * since 2.6.0 moved from canvas instance to utility.
- * possibly useless
- * @param {CanvasElement} canvasEl to copy size and content of
- * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
- * @param {Number} quality <= 1 and > 0
- * @return {String} data url
- */
-const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL("image/".concat(format), quality);
-const isHTMLCanvas = canvas => {
-  return !!canvas && canvas.getContext !== undefined;
-};
 
 /**
  * Transforms degrees to radians.
@@ -2823,7 +2873,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
     if (isHTMLCanvas(canvasEl)) {
       this.lowerCanvasEl = canvasEl;
     } else {
-      this.lowerCanvasEl = getEnv$1().document.getElementById(canvasEl) || this._createCanvasElement();
+      this.lowerCanvasEl = getDocument().getElementById(canvasEl) || this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */
@@ -3771,7 +3821,6 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
   /**
    * Clones canvas instance
    * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
-   * @returns {Promise<Canvas | StaticCanvas>}
    */
   clone(properties) {
     const data = this.toObject(properties);
@@ -3782,13 +3831,11 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
   /**
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
-   * @returns {StaticCanvas}
    */
   cloneWithoutData() {
     const el = createCanvasElement();
     el.width = this.width;
     el.height = this.height;
-    // @ts-expect-error TS doesn't recognize this.constructor
     return new this.constructor(el);
   }
 
@@ -3958,7 +4005,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
     canvasElement.setAttribute('height', "".concat(this.height));
     canvasElement.style.cssText = this._originalCanvasStyle || '';
     this._originalCanvasStyle = undefined;
-    cleanUpJsdomNode(canvasElement);
+    getEnv$1().dispose(canvasElement);
   }
 
   /**
@@ -6330,7 +6377,6 @@ const fabricObjectDefaultValues = {
   excludeFromExport: false,
   // TODO: restore once default values are refactored to a method
   objectCaching: true,
-  //  !getEnv().isLikelyNode
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,
@@ -11166,7 +11212,7 @@ class SelectableCanvas extends StaticCanvas$1 {
     this.contextCache = this.cacheCanvasEl.getContext('2d');
   }
   _initWrapperElement() {
-    const container = getEnv$1().document.createElement('div');
+    const container = getDocument().createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
@@ -11429,9 +11475,9 @@ class SelectableCanvas extends StaticCanvas$1 {
     this.contextCache = null;
     this.contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    cleanUpJsdomNode(upperCanvasEl);
+    getEnv$1().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    cleanUpJsdomNode(cacheCanvasEl);
+    getEnv$1().dispose(cacheCanvasEl);
     this.cacheCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
@@ -11616,7 +11662,7 @@ const syntheticEventConfig = {
     canvasOut: 'drag:leave'
   }
 };
-class Canvas extends SelectableCanvas {
+let Canvas$1 = class Canvas extends SelectableCanvas {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -11691,7 +11737,7 @@ class Canvas extends SelectableCanvas {
   addOrRemove(functor, eventjsFunctor) {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    functor(getEnv$1().window, 'resize', this._onResize);
+    functor(getWindow(), 'resize', this._onResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     functor(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
     functor(canvasElement, "".concat(eventTypePrefix, "out"), this._onMouseOut);
@@ -11728,10 +11774,10 @@ class Canvas extends SelectableCanvas {
     this.addOrRemove(removeListener, 'remove');
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
-    removeListener(getEnv$1().document, "".concat(eventTypePrefix, "up"), this._onMouseUp);
-    removeListener(getEnv$1().document, 'touchend', this._onTouchEnd, addEventOptions);
-    removeListener(getEnv$1().document, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
-    removeListener(getEnv$1().document, 'touchmove', this._onMouseMove, addEventOptions);
+    removeListener(getDocument(), "".concat(eventTypePrefix, "up"), this._onMouseUp);
+    removeListener(getDocument(), 'touchend', this._onTouchEnd, addEventOptions);
+    removeListener(getDocument(), "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+    removeListener(getDocument(), 'touchmove', this._onMouseMove, addEventOptions);
   }
 
   /**
@@ -12109,8 +12155,8 @@ class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    addListener(getEnv$1().document, 'touchend', this._onTouchEnd, addEventOptions);
-    addListener(getEnv$1().document, 'touchmove', this._onMouseMove, addEventOptions);
+    addListener(getDocument(), 'touchend', this._onTouchEnd, addEventOptions);
+    addListener(getDocument(), 'touchmove', this._onMouseMove, addEventOptions);
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
   }
@@ -12125,8 +12171,8 @@ class Canvas extends SelectableCanvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     removeListener(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
-    addListener(getEnv$1().document, "".concat(eventTypePrefix, "up"), this._onMouseUp);
-    addListener(getEnv$1().document, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+    addListener(getDocument(), "".concat(eventTypePrefix, "up"), this._onMouseUp);
+    addListener(getDocument(), "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
   }
 
   /**
@@ -12142,8 +12188,8 @@ class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     this.mainTouchId = null;
     const eventTypePrefix = this._getEventPrefix();
-    removeListener(getEnv$1().document, 'touchend', this._onTouchEnd, addEventOptions);
-    removeListener(getEnv$1().document, 'touchmove', this._onMouseMove, addEventOptions);
+    removeListener(getDocument(), 'touchend', this._onTouchEnd, addEventOptions);
+    removeListener(getDocument(), 'touchmove', this._onMouseMove, addEventOptions);
     if (this._willAddMouseDown) {
       clearTimeout(this._willAddMouseDown);
     }
@@ -12165,8 +12211,8 @@ class Canvas extends SelectableCanvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
-      removeListener(getEnv$1().document, "".concat(eventTypePrefix, "up"), this._onMouseUp);
-      removeListener(getEnv$1().document, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+      removeListener(getDocument(), "".concat(eventTypePrefix, "up"), this._onMouseUp);
+      removeListener(getDocument(), "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
       addListener(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
     }
   }
@@ -12975,7 +13021,7 @@ class Canvas extends SelectableCanvas {
     super.destroy();
     this.textEditingManager.dispose();
   }
-}
+};
 
 const linearDefaultCoords = {
   x1: 0,
@@ -17961,7 +18007,7 @@ class DraggableTextDelegate {
       left: -dragImage.width + 'px',
       border: 'none'
     });
-    getEnv$1().document.body.appendChild(dragImage);
+    getDocument().body.appendChild(dragImage);
     (_e$dataTransfer = e.dataTransfer) === null || _e$dataTransfer === void 0 ? void 0 : _e$dataTransfer.setDragImage(dragImage, offset.x, offset.y);
   }
 
@@ -18459,7 +18505,7 @@ class ITextBehavior extends Text {
    */
   updateSelectionOnMouseMove(e) {
     // regain focus
-    getEnv$1().document.activeElement !== this.hiddenTextarea && this.hiddenTextarea.focus();
+    getDocument().activeElement !== this.hiddenTextarea && this.hiddenTextarea.focus();
     const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
       currentEnd = this.selectionEnd;
@@ -19064,7 +19110,7 @@ class ITextKeyBehavior extends ITextBehavior {
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = getEnv$1().document.createElement('textarea');
+    this.hiddenTextarea = getDocument().createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -19078,7 +19124,7 @@ class ITextKeyBehavior extends ITextBehavior {
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      getEnv$1().document.body.appendChild(this.hiddenTextarea);
+      getDocument().body.appendChild(this.hiddenTextarea);
     }
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
     this.hiddenTextarea.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -20065,8 +20111,8 @@ class IText extends ITextClickBehavior {
       return this;
     }
     if (key === 'canvas') {
-      this.canvas instanceof Canvas && this.canvas.textEditingManager.remove(this);
-      value instanceof Canvas && value.textEditingManager.add(this);
+      this.canvas instanceof Canvas$1 && this.canvas.textEditingManager.remove(this);
+      value instanceof Canvas$1 && value.textEditingManager.add(this);
     }
     return super._set(key, value);
   }
@@ -21022,12 +21068,12 @@ class WebGLFilterBackend {
     let startTime;
     targetCanvas.width = width;
     targetCanvas.height = height;
-    startTime = getEnv$1().window.performance.now();
+    startTime = getWindow().performance.now();
     this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
-    const drawImageTime = getEnv$1().window.performance.now() - startTime;
-    startTime = getEnv$1().window.performance.now();
+    const drawImageTime = getWindow().performance.now() - startTime;
+    startTime = getWindow().performance.now();
     copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
-    const putImageDataTime = getEnv$1().window.performance.now() - startTime;
+    const putImageDataTime = getWindow().performance.now() - startTime;
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;
       this.copyGLTo2D = copyGLTo2DPutImageData;
@@ -21291,64 +21337,17 @@ function copyGLTo2DPutImageData(gl, pipelineState) {
   ctx.putImageData(imgData, 0, 0);
 }
 
-let WebGLPrecision;
-
-/**
- * Lazy initialize WebGL constants
- */
-(function (WebGLPrecision) {
-  WebGLPrecision["low"] = "lowp";
-  WebGLPrecision["medium"] = "mediump";
-  WebGLPrecision["high"] = "highp";
-})(WebGLPrecision || (WebGLPrecision = {}));
-class WebGLProbe {
-  /**
-   * Tests if webgl supports certain precision
-   * @param {WebGL} Canvas WebGL context to test on
-   * @param {WebGLPrecision} Precision to test can be any of following
-   * @returns {Boolean} Whether the user's browser WebGL supports given precision.
-   */
-  testPrecision(gl, precision) {
-    const fragmentSource = "precision ".concat(precision, " float;\nvoid main(){}");
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    if (!fragmentShader) {
-      return false;
-    }
-    gl.shaderSource(fragmentShader, fragmentSource);
-    gl.compileShader(fragmentShader);
-    return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
-  }
-
-  /**
-   * query browser for WebGL
-   * @returns config object if true
-   */
-  queryWebGL() {
-    if (getEnv$1().isLikelyNode) {
-      return;
-    }
-    const canvas = createCanvasElement();
-    const gl = canvas.getContext('webgl');
-    if (gl) {
-      this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this.webGLPrecision = Object.values(WebGLPrecision).find(precision => this.testPrecision(gl, precision));
-      console.log("fabric: max texture size ".concat(this.maxTextureSize));
-    }
-  }
-  isSupported(textureSize) {
-    return this.maxTextureSize && this.maxTextureSize >= textureSize;
-  }
-}
-const webGLProbe = new WebGLProbe();
-
 let filterBackend;
 
 /**
  * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
  */
 function initFilterBackend() {
-  webGLProbe.queryWebGL();
-  if (config.enableGLFiltering && webGLProbe.isSupported(config.textureSize)) {
+  const {
+    WebGLProbe
+  } = getEnv$1();
+  WebGLProbe.queryWebGL();
+  if (config.enableGLFiltering && WebGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({
       tileSize: config.textureSize
     });
@@ -21358,7 +21357,7 @@ function initFilterBackend() {
 }
 
 /**
- * Get the current fabricJS filter backend  or initialize one if not avaialble yet
+ * Get the current fabricJS filter backend  or initialize one if not available yet
  * @param [strict] pass `true` to create the backend if it wasn't created yet (default behavior),
  * pass `false` to get the backend ref without mutating it
  */
@@ -21449,7 +21448,7 @@ class Image extends FabricObject {
     _defineProperty(this, "_filterScalingX", 1);
     _defineProperty(this, "_filterScalingY", 1);
     this.cacheKey = "texture".concat(uid());
-    this.setElement(typeof arg0 === 'string' && getEnv$1().document.getElementById(arg0) || arg0, options);
+    this.setElement(typeof arg0 === 'string' && getDocument().getElementById(arg0) || arg0, options);
   }
 
   /**
@@ -21505,7 +21504,7 @@ class Image extends FabricObject {
     this.removeTexture("".concat(this.cacheKey, "_filtered"));
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(element => {
-      cleanUpJsdomNode(this[element]);
+      getEnv$1().dispose(this[element]);
       // @ts-expect-error disposing
       this[element] = undefined;
     });
@@ -23204,6 +23203,7 @@ const defaultControls = createObjectDefaultControls();
 
 // shared with the default object on purpose
 const textboxDefaultControls = _objectSpread2(_objectSpread2({}, defaultControls), createResizeControls());
+
 FabricObject.prototype.controls = _objectSpread2(_objectSpread2({}, FabricObject.prototype.controls || {}), defaultControls);
 if (Textbox) {
   // this is breaking the prototype inheritance, no time / ideas to fix it.
@@ -23218,7 +23218,7 @@ const isWebGLPipelineState = options => {
   return options.webgl !== undefined;
 };
 
-const highPsourceCode = "precision ".concat(WebGLPrecision.high, " float");
+const highPsourceCode = "precision ".concat(GLPrecision.high, " float");
 class AbstractBaseFilter {
   /**
    * Filter type
@@ -23256,8 +23256,11 @@ class AbstractBaseFilter {
   createProgram(gl) {
     let fragmentSource = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.getFragmentSource();
     let vertexSource = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.vertexSource;
-    if (webGLProbe.webGLPrecision && webGLProbe.webGLPrecision !== WebGLPrecision.high) {
-      fragmentSource = fragmentSource.replace(new RegExp(highPsourceCode, 'g'), highPsourceCode.replace(WebGLPrecision.high, webGLProbe.webGLPrecision));
+    const {
+      WebGLProbe
+    } = getEnv$1();
+    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
+      fragmentSource = fragmentSource.replace(new RegExp(highPsourceCode, 'g'), highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision));
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -25391,7 +25394,7 @@ class Resize extends BaseFilter {
       dX = oW,
       dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = getEnv$1().document.createElement('canvas');
+      resources.sliceByTwo = createCanvasElement();
     }
     const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {
@@ -25807,12 +25810,13 @@ const vibranceDefaultValues = {
 Object.assign(Vibrance.prototype, vibranceDefaultValues);
 classRegistry.setClass(Vibrance);
 
+// first we set the env variable by importing the node env file
+
 // TODO: move back to default values when refactoring to method
 FabricObject$1.prototype.objectCaching = false;
 class StaticCanvas extends StaticCanvas$1 {
   getNodeCanvas() {
-    const impl = getEnv$1().jsdomImplForWrapper(this.lowerCanvasEl);
-    return impl._canvas || impl._image;
+    return getNodeCanvas(this.lowerCanvasEl);
   }
   createPNGStream(opts) {
     return this.getNodeCanvas().createPNGStream(opts);
