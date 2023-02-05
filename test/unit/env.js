@@ -40,7 +40,6 @@ QUnit.module('env', (hooks) => {
             const external = [
                 'jsdom',
                 'jsdom/lib/jsdom/living/generated/utils.js',
-                'jsdom/lib/jsdom/utils.js',
                 'canvas',
             ];
             const output = 'cli_output/test_results/treeShakingOutput.mjs';
