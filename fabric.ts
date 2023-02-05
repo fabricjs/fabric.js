@@ -46,6 +46,7 @@ export * from './src/parser';
 
 export { Control } from './src/controls';
 export * as controlsUtils from './src/controls';
+import './src/controls/defaultControls';
 
 export {
   getFilterBackend,
