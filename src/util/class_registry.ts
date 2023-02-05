@@ -7,7 +7,7 @@
  * You can customize which classes get enlived from SVG parsing using this classRegistry.
  * The Registry start empty and gets filled in depending which files you import.
  * If you want to be able to parse arbitrary SVGs or JSON representation of canvases, coming from
- * differnet sources you will need to import all fabric because you may need all classes.
+ * different sources you will need to import all fabric because you may need all classes.
  */
 
 export const JSON = 'json';
