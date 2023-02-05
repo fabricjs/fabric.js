@@ -1519,6 +1519,8 @@ export class Canvas extends SelectableCanvas {
     if (activeObject.__corner) {
       return;
     }
+    // TODO: out of scope, move to somewhere else
+    isInteractiveTextObject(activeObject) && activeObject.exitEditing();
     let groupingTarget = target;
     if (groupingTarget === activeObject) {
       // if it's a group, find target again, using activeGroup objects
@@ -1530,69 +1532,48 @@ export class Canvas extends SelectableCanvas {
       groupingTarget = subTarget;
     }
     if (isActiveSelection(activeObject)) {
-      this._updateActiveSelection(e, groupingTarget);
-    } else {
-      this._createActiveSelection(e, groupingTarget);
-    }
-  }
-
-  /**
-   * @private
-   */
-  _updateActiveSelection(e: TPointerEvent, groupingTarget: FabricObject) {
-    const activeObject = this._activeObject! as ActiveSelection,
-      prevActiveObjects = activeObject.getObjects() as FabricObject[];
-    if (groupingTarget.group === activeObject) {
-      // clicked on a selected target => toggle selection
-      activeObject.remove(groupingTarget);
-      this._hoveredTarget = groupingTarget;
-      this._hoveredTargets = [...this.targets];
-      if (activeObject.size() === 1) {
-        // activate last remaining object
-        this._setActiveObject(activeObject.item(0) as FabricObject, e);
+      const prevActiveObjects = activeObject.getObjects() as FabricObject[];
+      if (groupingTarget.group === activeObject) {
+        // clicked on a selected target => toggle selection
+        activeObject.remove(groupingTarget);
+        this._hoveredTarget = groupingTarget;
+        this._hoveredTargets = [...this.targets];
+        if (activeObject.size() === 1) {
+          // activate last remaining object
+          this._setActiveObject(activeObject.item(0) as FabricObject, e);
+        }
+      } else {
+        //  respect object stacking in ActiveSelection
+        //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+        const index = activeObject._objects.findIndex((obj) =>
+          obj.isInFrontOf(groupingTarget)
+        );
+        const insertAt =
+          index === -1
+            ? //  groupingTarget is in front of all other objects
+              activeObject.size()
+            : index;
+        activeObject.insertAt(insertAt, groupingTarget);
+        this._hoveredTarget = activeObject;
+        this._hoveredTargets = [...this.targets];
       }
+      this._fireSelectionEvents(prevActiveObjects, e);
     } else {
-      //  respect object stacking in ActiveSelection
-      //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
-      const index = activeObject._objects.findIndex((obj) =>
-        obj.isInFrontOf(groupingTarget)
+      this._activeSelection.removeAll();
+      resetObjectTransform(this._activeSelection);
+      this._activeSelection.add(
+        ...(groupingTarget.isInFrontOf(activeObject)
+          ? [activeObject, groupingTarget]
+          : [groupingTarget, activeObject])
       );
-      const insertAt =
-        index === -1
-          ? //  groupingTarget is in front of all other objects
-            activeObject.size()
-          : index;
-      activeObject.insertAt(insertAt, groupingTarget);
-      this._hoveredTarget = activeObject;
-      this._hoveredTargets = [...this.targets];
+
+      this._hoveredTarget = this._activeSelection;
+      // ISSUE 4115: should we consider subTargets here?
+      // this._hoveredTargets = [];
+      // this._hoveredTargets = this.targets.concat();
+      this._setActiveObject(this._activeSelection, e);
+      this._fireSelectionEvents([activeObject], e);
     }
-    this._fireSelectionEvents(prevActiveObjects, e);
-  }
-
-  /**
-   * Generates and set as active the active selection from user events
-   * @private
-   */
-  _createActiveSelection(e: TPointerEvent, groupingTarget: FabricObject) {
-    const activeObject = this.getActiveObject()!;
-
-    // TODO: out of scope, move to somewhere else
-    isInteractiveTextObject(activeObject) && activeObject.exitEditing();
-
-    this._activeSelection.removeAll();
-    resetObjectTransform(this._activeSelection);
-    this._activeSelection.add(
-      ...(groupingTarget.isInFrontOf(activeObject)
-        ? [activeObject, groupingTarget]
-        : [groupingTarget, activeObject])
-    );
-
-    this._hoveredTarget = this._activeSelection;
-    // ISSUE 4115: should we consider subTargets here?
-    // this._hoveredTargets = [];
-    // this._hoveredTargets = this.targets.concat();
-    this._setActiveObject(this._activeSelection, e);
-    this._fireSelectionEvents([activeObject], e);
   }
 
   protected _collectObjects(e: TPointerEvent) {
