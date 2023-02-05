@@ -82,7 +82,6 @@ export { isTouchEvent, getPointer } from './dom_event';
 export {
   // getScrollLeftTop,
   getElementOffset,
-  cleanUpJsdomNode,
   makeElementUnselectable,
   makeElementSelectable,
 } from './dom_misc';
