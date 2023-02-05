@@ -2,7 +2,6 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
 import { applyMixins } from '../../util/applyMixins';
-import { StatefulMixin } from '../../mixins/stateful.mixin';
 
 // TODO somehow we have to make a tree-shakeable import
 
@@ -14,6 +13,6 @@ export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends InteractiveFabricObject<EventSpec> {}
 
-applyMixins(FabricObject, [FabricObjectSVGExportMixin, StatefulMixin]);
+applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
 export { cacheProperties, stateProperties } from './defaultValues';
