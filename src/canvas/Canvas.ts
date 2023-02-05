@@ -1596,54 +1596,31 @@ export class Canvas extends SelectableCanvas {
   }
 
   protected _collectObjects(e: TPointerEvent) {
-    const group: FabricObject[] = [],
-      _groupSelector = this._groupSelector,
+    const _groupSelector = this._groupSelector,
       point1 = new Point(_groupSelector.ex, _groupSelector.ey),
       point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
-      selectionX1Y1 = point1.min(point2),
-      selectionX2Y2 = point1.max(point2),
-      allowIntersect = !this.selectionFullyContained,
+      tl = point1.min(point2),
+      br = point1.max(point2),
+      size = br.subtract(tl),
       isClick = point1.eq(point2);
-    // we iterate reverse order to collect top first in case of click.
-    for (let i = this._objects.length; i--; ) {
-      const currentObject = this._objects[i];
 
-      if (
-        !currentObject ||
-        !currentObject.selectable ||
-        !currentObject.visible
-      ) {
-        continue;
-      }
+    const objects = super.collectObjects(
+      {
+        left: tl.x,
+        top: tl.y,
+        width: size.x,
+        height: size.y,
+      },
+      { includeIntersecting: !this.selectionFullyContained }
+    ) as FabricObject[];
 
-      if (
-        (allowIntersect &&
-          currentObject.intersectsWithRect(
-            selectionX1Y1,
-            selectionX2Y2,
-            true
-          )) ||
-        currentObject.isContainedWithinRect(
-          selectionX1Y1,
-          selectionX2Y2,
-          true
-        ) ||
-        (allowIntersect &&
-          currentObject.containsPoint(selectionX1Y1, undefined, true)) ||
-        (allowIntersect &&
-          currentObject.containsPoint(selectionX2Y2, undefined, true))
-      ) {
-        group.push(currentObject);
-        // only add one object if it's a click
-        if (isClick) {
-          break;
-        }
-      }
-    }
-
-    return group.length > 1
-      ? group.filter((object) => !object.onSelect({ e })).reverse()
-      : group;
+    return isClick
+      ? objects[0]
+        ? [objects[0]]
+        : []
+      : objects.length > 1
+      ? objects.filter((object) => !object.onSelect({ e })).reverse()
+      : objects;
   }
 
   exitTextEditing() {
