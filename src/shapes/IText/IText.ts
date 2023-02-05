@@ -9,6 +9,7 @@ import {
 } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
+import { Text } from '../Text/Text';
 
 type CursorBoundaries = {
   left: number;
@@ -148,6 +149,8 @@ export class IText<
    * @default
    */
   declare caching: boolean;
+
+  static textMeasurementProperties = Text.textMeasurementProperties;
 
   /**
 

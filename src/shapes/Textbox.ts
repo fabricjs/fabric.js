@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
-import { textDefaultValues } from './Text/Text';
 import { classRegistry } from '../util/class_registry';
 
 /**
@@ -35,6 +34,8 @@ export class Textbox extends IText {
    */
   declare splitByGrapheme: boolean;
 
+  static textMeasurementProperties = [...IText.textMeasurementProperties, 'width'];
+
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
@@ -61,7 +62,6 @@ export class Textbox extends IText {
     }
     // clear cache and re-calculate height
     this.height = this.calcTextHeight();
-    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**
@@ -460,8 +460,6 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   dynamicMinWidth: 2,
   lockScalingFlip: true,
   noScaleCache: false,
-  _dimensionAffectingProps:
-    textDefaultValues._dimensionAffectingProps!.concat('width'),
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
 };
