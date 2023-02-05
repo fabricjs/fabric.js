@@ -63,7 +63,7 @@ Fabric.js Does not use transpilation by default, the browser version we support 
 ## Migrating to v6
 
 v6 is a **MAJOR** effort including migrating to TS and es6, countless fixes, rewrites and features.\
-Currently in beta, refer to #8299 for guidance.
+Currently in beta, refer to [#8299](../../issues/8299) for guidance.
 
 ```bash
 $ npm install fabric@beta --save
