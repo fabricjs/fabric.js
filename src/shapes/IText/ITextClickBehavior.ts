@@ -168,7 +168,7 @@ export abstract class ITextClickBehavior<
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler({ e, transform, button }: TPointerEventInfo) {
+  mouseUpHandler({ e, transform }: TPointerEventInfo) {
     const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);

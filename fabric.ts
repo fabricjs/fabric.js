@@ -326,6 +326,7 @@ import { Canvas2dFilterBackend } from './src/filters/Canvas2dFilterBackend';
 import { WebGLFilterBackend } from './src/filters/WebGLFilterBackend';
 import { runningAnimations } from './src/util/animation/AnimationRegistry';
 import { Observable } from './src/Observable';
+import { FabricEvent as Event } from './src/FabricEvent';
 import { Point } from './src/Point';
 import { Intersection } from './src/Intersection';
 import { Color } from './src/color/Color';
@@ -334,10 +335,15 @@ import { Gradient } from './src/gradient/Gradient';
 import { Pattern } from './src/Pattern';
 import { Shadow } from './src/Shadow';
 import { BaseBrush } from './src/brushes/BaseBrush';
+import { SimpleBrush } from './src/brushes/SimpleBrush';
 import { PencilBrush } from './src/brushes/PencilBrush';
 import { CircleBrush } from './src/brushes/CircleBrush';
 import { SprayBrush } from './src/brushes/SprayBrush';
 import { PatternBrush } from './src/brushes/PatternBrush';
+import { DrawOval } from './src/brushes/DrawOval';
+import { DrawPoly } from './src/brushes/DrawPoly';
+import { DrawShape } from './src/brushes/DrawShape';
+import { DrawShapeBase } from './src/brushes/DrawShapeBase';
 import { FabricObject as Object } from './src/shapes/Object/FabricObject';
 import { Line } from './src/shapes/Line';
 import { Circle } from './src/shapes/Circle';
@@ -386,14 +392,20 @@ export {
   Color,
   Control,
   Observable,
+  Event,
   Gradient,
   Pattern,
   Shadow,
   BaseBrush,
+  SimpleBrush,
   PencilBrush,
   CircleBrush,
   SprayBrush,
   PatternBrush,
+  DrawOval,
+  DrawPoly,
+  DrawShape,
+  DrawShapeBase,
   Object,
   Line,
   Circle,

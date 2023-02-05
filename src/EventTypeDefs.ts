@@ -132,7 +132,6 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
   TEvent<E> & {
     target?: FabricObject;
     subTargets?: FabricObject[];
-    button?: number;
     isClick: boolean;
     pointer: Point;
     transform?: Transform | null;
@@ -260,6 +259,8 @@ export type StaticCanvasEvents = CollectionEvents & {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+
+  resize: never;
 };
 
 export type CanvasEvents = StaticCanvasEvents &
@@ -269,8 +270,7 @@ export type CanvasEvents = StaticCanvasEvents &
   CanvasModificationEvents &
   CanvasSelectionEvents & {
     // brushes
-    'before:path:created': { path: FabricObject };
-    'path:created': { path: FabricObject };
+    'interaction:completed': { result?: FabricObject };
 
     // erasing
     'erasing:start': never;

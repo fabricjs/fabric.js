@@ -25,7 +25,7 @@ export class Ellipse extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Ellipse} thisArg
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options?: Record<string, unknown>) {
     super(options);
   }
 

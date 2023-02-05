@@ -105,7 +105,7 @@
 
     //  window resize
     cacheAndAssertTransformEvent();
-    canvas._onResize();
+    canvas._onWindowResize();
     assertTransformEventCacheIsReset();
   });
 
@@ -118,7 +118,6 @@
     canvas.fireMiddleClick = false;
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
-    canvas.isDrawingMode = false;
     canvas.__onMouseDown({ button: 0, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse down fired');
     clickCount = 0;
@@ -144,7 +143,6 @@
     canvas.fireMiddleClick = false;
     canvas.fireRightClick = false;
     canvas._currentTransform = false;
-    canvas.isDrawingMode = false;
     canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl  });
     assert.equal(clickCount, 1, 'mouse:down:before fired');
     clickCount = 0;
@@ -330,22 +328,28 @@
     assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
-  QUnit.test('setDimensions and active brush', function(assert) {
+  QUnit.test('setDimensions and active brush', async function (assert) {
+    var done = assert.async();
     var prepareFor = false;
     var rendered = false;
-    var canva = new fabric.Canvas(null, { width: 500, height: 500 });
-    var brush = new fabric.PencilBrush({ color: 'red', width: 4 });
-    canva.isDrawingMode = true;
-    canva.freeDrawingBrush = brush;
-    canva._isCurrentlyDrawing = true;
-    brush._render = function() { rendered = true; };
-    brush._setBrushStyles = function() { prepareFor = true; };
-    canva.setDimensions({ width: 200, height: 200 });
-    canva.renderAll();
-    assert.equal(rendered, true, 'the brush called the _render method');
+    var canvas = new fabric.Canvas(null, { width: 500, height: 500 });
+    var brush = new fabric.SimpleBrush(canvas);
+    canvas.freeDrawingBrush = brush;
+    brush.active = true;
+    brush.render = () => { rendered = true; };
+    brush._setBrushStyles = () => { prepareFor = true };
+    await new Promise(resolve => {
+      Promise.all([
+        new Promise(resolve => canvas.on('resize', resolve)),
+        new Promise(resolve => canvas.on('after:render', resolve)),
+      ]).then(resolve);
+      canvas.setDimensions({ width: 200, height: 200 });
+    });
+    assert.equal(rendered, true, 'the brush called the render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
+    done();
   });
-
+  
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {
     var e1 = { clientX: 30, clientY: 30, which: 1 };
     var e2 = { clientX: 100, clientY: 100, which: 1 };

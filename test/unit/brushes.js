@@ -1,7 +1,16 @@
 (function() {
   var canvas = new fabric.Canvas();
   var parsePath = fabric.util.parsePath;
-  QUnit.module('fabric.BaseBrush', function(hooks) {
+  function fireBrushEvent(brush, type, pointer) {
+    const { canvas } = brush;
+    brush.fire(`mouse:${type}:before`, fabric.Event.init({
+      e: {},
+      pointer,
+      absolutePointer: canvas._isRetinaScaling && canvas._isRetinaScaling() ? canvas.restorePointerVpt(pointer) : pointer
+    }));
+  }
+  QUnit.module('fabric.BaseBrush', function (hooks) {
+
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
     });
@@ -9,11 +18,116 @@
     QUnit.test('fabric brush constructor', function(assert) {
       assert.ok(fabric.BaseBrush);
 
-      var brush = new fabric.BaseBrush();
+      let setCursor;
 
+      var brush = new fabric.SimpleBrush({
+        setCursor(cursor) {
+          setCursor = cursor;
+        }
+      });
+
+      assert.ok(brush instanceof fabric.Observable, 'should inherit from fabric.Observable');
       assert.ok(brush instanceof fabric.BaseBrush, 'should inherit from fabric.BaseBrush');
+      assert.ok(brush instanceof fabric.SimpleBrush, 'should inherit from fabric.SimpleBrush');
       assert.equal(brush.color, 'rgb(0, 0, 0)', 'default color is black');
       assert.equal(brush.width, 1, 'default width is 1');
+      assert.equal(brush.cursor, 'crosshair', 'default cursor');
+    });
+    QUnit.test('down should call start and discard active object', function(assert) {
+      let called = false, discarded = false, rendered = false;
+      const brush = new fabric.SimpleBrush({
+        contextTop: canvas.contextTop,
+        _activeObject: {},
+        _isMainEvent() {
+          return true;
+        },
+        getActiveObject() {
+          return this._activeObject;
+        },
+        discardActiveObject() {
+          discarded = true;
+        },
+        requestRenderAll() {
+          rendered = true;
+        }
+      });
+      brush.start = () => {
+        called = true;
+      }
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(called, 'should call start');
+      assert.ok(discarded && rendered, 'should discard active object');
+    });
+    QUnit.test('start sets cursor', function(assert) {
+      let setCursor;
+      const brush = new fabric.SimpleBrush({
+        contextTop: canvas.contextTop,
+        setCursor(cursor) {
+          setCursor = cursor;
+        }
+      });
+      assert.equal(brush.cursor, 'crosshair', 'default cursor');
+      brush.cursor = 'testCursor';
+      brush.start();
+      assert.equal(setCursor, 'testCursor', 'should set canvas cursor');
+    });
+    QUnit.test('down: not a respected event', function(assert) {
+      let called = false, checked = false;
+      const brush = new fabric.SimpleBrush({
+        _isMainEvent() {
+          checked = true;
+          return false;
+        },
+        down() {
+          called = true;
+        }
+      });
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(!called && checked, 'should not call down');
+    });
+    QUnit.test('canvas event is fired on brush', function(assert) {
+      const done = assert.async();
+      const brush = new fabric.SimpleBrush(canvas);
+      canvas.freeDrawingBrush = brush;
+      let e;
+      const fired = [];
+      Promise.all([
+        new Promise(resolve => {
+          canvas.on('foo', ev => {
+            fired.push({ canvas: ev });
+            resolve();
+          });
+        }),
+        new Promise(resolve => {
+          brush.on('foo', ev => {
+            fired.push({ brush: ev });
+            resolve();
+          });
+        })
+      ]).then(() => {
+        assert.equal(fired[0].brush, e, 'same event ref, firing order is kept')
+        assert.equal(fired[1].canvas, e, 'same event ref, firing order is kept')
+        done();
+      })
+      e = canvas.fire('foo', { bar: 'baz' });
+    });
+    QUnit.test('disabling brush', function(assert) {
+      const brush = new fabric.SimpleBrush(canvas);
+      canvas.freeDrawingBrush = brush;
+      brush.active = true;
+      assert.ok(brush.enabled, 'disabled brush');
+      brush.disable();
+      assert.ok(!brush.enabled, 'disabled brush');
+      assert.ok(!brush.active, 'deactivated brush');
+      let fired = false, called = false;
+      brush.on('mouse:down:before', () => (fired = true));
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(fired, 'should fire down on brush');
+      assert.ok(!brush.active, 'brush should not activate');
+      brush.move = brush.up = () => (called = true);
+      fireBrushEvent(brush, 'move', new fabric.Point());
+      fireBrushEvent(brush, 'up', new fabric.Point());
+      assert.ok(!called, 'brush methods should not be called');
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);
@@ -40,19 +154,19 @@
         QUnit.test('fabric pencil brush draw point', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          fireBrushEvent(brush, 'down', pointer);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          fireBrushEvent(brush, 'move', pointer);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
         });
@@ -61,12 +175,12 @@
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 12.5 Q 15 15 17.5 17.5 Q 20 20 17.5 17.5 Q 15 15 17.5 17.5 L 20.001 20.001'),
@@ -81,12 +195,12 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer4);
+          fireBrushEvent(brush, 'move', pointer5);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 17.5 130 Q 20 160 170 130 Q 320 100 210 100 L 99.999 100'),
@@ -102,12 +216,12 @@
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
           var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
           var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
-          var pathData = brush.convertPointsToSVGPath(brush._points);
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer4);
+          fireBrushEvent(brush, 'move', pointer5);
+          var pathData = brush.getPathFromPoints(brush._points);
           assert.deepEqual(
             pathData,
             parsePath('M 9.999 9.999 Q 10 10 12.5 55 Q 15 100 57.5 100 L 100.001 100'),
@@ -115,32 +229,23 @@
           );
           assert.equal(brush._points.length, 4, '2 points have been discarded');
         });
-        QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
-          var fireBeforePathCreatedEvent = false;
-          var firePathCreatedEvent = false;
-          var added = null;
-          canvas.on('before:path:created', function() {
-            fireBeforePathCreatedEvent = true;
-          });
-          canvas.on('path:created', function(opt) {
-            firePathCreatedEvent = true;
-            added = opt.path;
-          });
+        QUnit.test('fabric pencil brush multiple points not discarded', function (assert) {
+          assert.expect(2);
+          canvas.on('interaction:completed', ({ result }) => {
+              assert.ok(result instanceof fabric.Path, 'a path is added');
+              assert.ok(result.path.length, 6, 'path has 6 steps');
+              canvas.off();
+            });
           var brush = new fabric.PencilBrush(canvas);
           var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
           var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
           var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseUp({ e: {} });
-          assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
-          assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
-          assert.ok(added instanceof fabric.Path, 'a path is added');
-          assert.ok(added.path.length, 6, 'path has 6 steps');
-          canvas.off();
+          fireBrushEvent(brush, 'down', pointer);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'move', pointer2);
+          fireBrushEvent(brush, 'move', pointer3);
+          fireBrushEvent(brush, 'up', pointer3);
         });
       });
     });

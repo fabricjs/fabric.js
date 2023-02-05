@@ -1,15 +1,26 @@
-import { Color } from '../color/Color';
-import type { Point } from '../Point';
-import { TEvent } from '../EventTypeDefs';
-import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/Canvas';
+import { Color } from '../color/Color';
+import { CanvasEvents, TEvent } from '../EventTypeDefs';
+import { Observable } from '../Observable';
+import type { Point } from '../Point';
+import { Shadow } from '../Shadow';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TCachedFabricObject } from '../shapes/Object/Object';
+import {
+  invertTransform,
+  multiplyTransformMatrices,
+} from '../util/misc/matrix';
+import { sendObjectToPlane } from '../util/misc/planeChange';
 
-type TBrushEventData = TEvent & { pointer: Point };
+export type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
-export abstract class BaseBrush {
+export abstract class BaseBrush<
+  T extends FabricObject = FabricObject,
+  EventSpec extends CanvasEvents = CanvasEvents
+> extends Observable<EventSpec> {
   /**
    * Color of a brush
    * @type String
@@ -62,36 +73,82 @@ export abstract class BaseBrush {
   strokeDashArray: number[] | null = null;
 
   /**
-   * When `true`, the free drawing is limited to the whiteboard size. Default to false.
-   * @type Boolean
-   * @default false
+   * Same as FabricObject `clipPath` property.
+   * The clip path is positioned relative to the top left corner of the viewport.
+   * The `absolutePositioned` property renders the clip path w/o viewport transform.
+   * The clip path is prone to the `setCoords` gotcha.
    */
-
-  limitedToCanvasSize = false;
+  clipPath?: FabricObject;
 
   /**
-   * @todo add type
+   * Cursor value used during free drawing
+   * @type String
+   * @default crosshair
    */
-  declare canvas: Canvas;
+  cursor: CSSStyleDeclaration['cursor'] = 'crosshair';
+
+  declare readonly canvas: Canvas;
+
+  active = false;
+
+  enabled = true;
+
+  private _disposer?: () => void;
 
   constructor(canvas: Canvas) {
+    super();
     this.canvas = canvas;
+    const subscribers = this.subscribe();
+    this._disposer = () => {
+      subscribers.forEach((d) => d());
+      this._disposer = undefined;
+    };
   }
 
-  abstract _render(): void;
-  abstract onMouseDown(pointer: Point, ev: TBrushEventData): void;
-  abstract onMouseMove(pointer: Point, ev: TBrushEventData): void;
   /**
-   * @returns true if brush should continue blocking interaction
+   * This method wires the internal lifecycle to canvas events,
+   * making it very easy to change the hooks that the brush responds to.
+   * @returns an array of disposers
    */
-  abstract onMouseUp(ev: TBrushEventData): boolean | void;
+  protected subscribe(): VoidFunction[] {
+    return [this.on('resize', () => this._setBrushStyles())];
+  }
+
+  protected unsubscribe() {
+    this._disposer && this._disposer();
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
+    this.enabled = false;
+    if (this.active) {
+      this.canvas.clearContext(this.canvas.contextTop);
+      this.active = false;
+    }
+  }
+
+  protected abstract _render(ctx: CanvasRenderingContext2D): void;
+
+  protected abstract finalizeShape(): T | undefined;
+
+  protected start() {
+    this.active = true;
+    this.canvas.setCursor(this.cursor);
+    this._setBrushStyles();
+    this._setShadow();
+  }
 
   /**
    * Sets brush styles
    * @private
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles(ctx: CanvasRenderingContext2D) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width;
     ctx.lineCap = this.strokeLineCap;
@@ -100,20 +157,17 @@ export abstract class BaseBrush {
     ctx.setLineDash(this.strokeDashArray || []);
   }
 
-  /**
-   * Sets the transformation on given context
-   * @param {CanvasRenderingContext2D} ctx context to render on
-   * @private
-   */
-  protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
-    const v = this.canvas.viewportTransform;
-    ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+  transform(ctx: CanvasRenderingContext2D) {
+    // noop
   }
 
   protected needsFullRender() {
     const color = new Color(this.color);
-    return color.getAlpha() < 1 || !!this.shadow;
+    return (
+      color.getAlpha() < 1 ||
+      !!this.shadow ||
+      (this.clipPath && this.clipPath.isCacheDirty())
+    );
   }
 
   /**
@@ -140,9 +194,9 @@ export abstract class BaseBrush {
    * Removes brush shadow styles
    * @private
    */
-  protected _resetShadow() {
-    const ctx = this.canvas.contextTop;
-
+  protected _resetShadow(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     ctx.shadowColor = '';
     ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
   }
@@ -159,5 +213,111 @@ export abstract class BaseBrush {
       pointer.y < 0 ||
       pointer.y > this.canvas.getHeight()
     );
+  }
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {FabricObject} clipPath
+   */
+  private drawClipPathOnCache(
+    ctx: CanvasRenderingContext2D,
+    clipPath: TCachedFabricObject
+  ) {
+    ctx.save();
+    ctx.globalCompositeOperation = clipPath.inverted
+      ? 'destination-out'
+      : 'destination-in';
+    if (!clipPath.absolutePositioned) {
+      ctx.transform(...this.canvas.viewportTransform);
+    }
+    clipPath.transform(ctx);
+    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
+    ctx.drawImage(
+      clipPath._cacheCanvas,
+      -clipPath.cacheTranslationX,
+      -clipPath.cacheTranslationY
+    );
+    ctx.restore();
+  }
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {FabricObject} clipPath
+   */
+  protected _drawClipPath(
+    ctx: CanvasRenderingContext2D,
+    clipPath?: FabricObject
+  ) {
+    if (!clipPath) {
+      return;
+    }
+    // needed to setup a couple of variables
+    // path canvas gets overridden with this one.
+    // TODO find a better solution?
+    clipPath._set('canvas', this.canvas);
+    clipPath.shouldCache();
+    clipPath._transformDone = true;
+    clipPath.renderCache({ forClipping: true });
+    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+  }
+
+  /**
+   * clones the brush's clip path and prepares it for the resulting object
+   */
+  protected async createClipPath(result: FabricObject) {
+    if (!this.clipPath) {
+      return;
+    }
+    const t = result.calcTransformMatrix();
+    const clipPath = await this.clipPath.clone(['inverted']);
+    sendObjectToPlane(
+      clipPath,
+      undefined,
+      !this.clipPath.absolutePositioned
+        ? multiplyTransformMatrices(
+            invertTransform(this.canvas.viewportTransform),
+            t
+          )
+        : t
+    );
+    return clipPath;
+  }
+
+  /**
+   * Render the full state of the brush
+   */
+  render(ctx: CanvasRenderingContext2D = this.canvas.contextTop) {
+    this.canvas.clearContext(ctx);
+    ctx.save();
+    this.transform(ctx);
+    this._render(ctx);
+    this._drawClipPath(ctx, this.clipPath);
+    ctx.restore();
+  }
+
+  protected onEnd(result?: T) {
+    // in case 'interaction:completed' changes canvas visuals (which is likely to happen in 99% of the time)
+    // we request rendering so that there won't be a visual gap (flickering) between clearing the top context and the updated main context
+    this.canvas.shouldClearContextTop = true;
+    this.canvas.requestRenderAll();
+    this.canvas.fire('interaction:completed', { result });
+  }
+
+  protected async finalize() {
+    this.active = false;
+    this._resetShadow();
+    const shape = this.finalizeShape();
+    if (shape) {
+      shape.set({
+        canvas: this.canvas,
+        shadow: this.shadow ? new Shadow(this.shadow) : undefined,
+        clipPath: await this.createClipPath(shape),
+      });
+      sendObjectToPlane(shape, undefined, this.canvas.viewportTransform);
+      shape.setCoords();
+    }
+    this.onEnd(shape);
   }
 }

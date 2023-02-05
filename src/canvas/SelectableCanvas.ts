@@ -1,8 +1,7 @@
-import { getDocument, getEnv } from '../env';
+import type { BaseBrush } from '../brushes/BaseBrush';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
-import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import { getDocument, getEnv } from '../env';
 import {
   CanvasEvents,
   ModifierKey,
@@ -10,28 +9,36 @@ import {
   TPointerEvent,
   Transform,
 } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
+import { Point } from '../Point';
+import type { IText } from '../shapes/IText/IText';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TSVGReviver,
+} from '../typedefs';
+import { getPointer, isTouchEvent } from '../util/dom_event';
+import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
+import { setStyle } from '../util/dom_style';
+import { isTransparent } from '../util/misc/isTransparent';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
 import {
   addTransformToObject,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
+import { pick } from '../util/misc/pick';
+import { sendPointToPlane } from '../util/misc/planeChange';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
 } from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
-import type { IText } from '../shapes/IText/IText';
-import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/BaseBrush';
-import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
-import { sendPointToPlane } from '../util/misc/planeChange';
+import { StaticCanvas } from './StaticCanvas';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -68,7 +75,8 @@ type TDestroyedCanvas = Omit<
  * @fires selection:updated
  * @fires selection:created
  *
- * @fires path:created after a drawing operation ends and the path is added
+ * @fires interaction:completed after a drawing operation ends
+ *
  * @fires mouse:down
  * @fires mouse:move
  * @fires mouse:up
@@ -149,7 +157,7 @@ export class SelectableCanvas<
 > extends StaticCanvas<EventSpec> {
   declare _objects: FabricObject[];
   /**
-   * When true, objects can be transformed by one side (unproportionally)
+   * When true, objects can be transformed by one side (unproportionately)
    * when dragged on the corners that normally would not do that.
    * @type Boolean
    * @default
@@ -308,13 +316,6 @@ export class SelectableCanvas<
   declare defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
-   * Cursor value used during free drawing
-   * @type String
-   * @default crosshair
-   */
-  declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
-  /**
    * Cursor value used for disabled elements ( corners with disabled action )
    * @type String
    * @since 2.0.0
@@ -353,16 +354,6 @@ export class SelectableCanvas<
    * @default
    */
   declare skipTargetFind: boolean;
-
-  /**
-   * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
-   * After mousedown, mousemove creates a shape,
-   * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
-   * @type Boolean
-   * @default
-   */
-  declare isDrawingMode: boolean;
 
   /**
    * Indicates whether objects should remain in current stack position when selected.
@@ -487,9 +478,17 @@ export class SelectableCanvas<
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
   declare cacheCanvasEl: HTMLCanvasElement;
-  protected declare _isCurrentlyDrawing: boolean;
+  declare shouldClearContextTop: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
+
+  fire<K extends keyof CanvasEvents>(
+    eventName: K,
+    options?: EventSpec[K] | TFabricEvent<EventSpec[K]>
+  ) {
+    const ev = this.freeDrawingBrush?.fire(eventName, options);
+    return super.fire(eventName, ev || options);
+  }
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -585,9 +584,20 @@ export class SelectableCanvas<
     if (this.destroyed) {
       return;
     }
-    if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
+    if (
+      (this.contextTopDirty &&
+        !this._groupSelector &&
+        !this.isCurrentlyDrawing()) ||
+      this.shouldClearContextTop
+    ) {
       this.clearContext(this.contextTop);
       this.contextTopDirty = false;
+      if (this.shouldClearContextTop) {
+        // in case we are rendering a requested render state might have changed
+        // so we render top layer to sync visuals
+        this.hasLostContext = true;
+        this.shouldClearContextTop = false;
+      }
     }
     if (this.hasLostContext) {
       this.renderTopLayer(this.contextTop);
@@ -603,8 +613,8 @@ export class SelectableCanvas<
    */
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
-    if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush._render();
+    if (this.isCurrentlyDrawing()) {
+      this.freeDrawingBrush.render();
       this.contextTopDirty = true;
     }
     // we render the top context - last object
@@ -803,7 +813,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
@@ -1165,23 +1175,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Internal use only
-   * @protected
-   */
-  protected _setDimensionsImpl(
-    dimensions: TSize,
-    options?: TCanvasSizeOptions
-  ) {
-    // @ts-ignore
-    this._resetTransformEventData();
-    super._setDimensionsImpl(dimensions, options);
-    if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
-    }
-  }
-
-  /**
    * Helper for setting width/height
    * @private
    * @param {String} prop property (width|height)
@@ -1294,6 +1287,10 @@ export class SelectableCanvas<
    */
   getSelectionElement(): HTMLCanvasElement {
     return this.upperCanvasEl;
+  }
+
+  isCurrentlyDrawing(): this is AssertKeys<this, 'freeDrawingBrush'> {
+    return !!this.freeDrawingBrush?.active;
   }
 
   /**
@@ -1468,11 +1465,14 @@ export class SelectableCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    super.setViewportTransform(vpt);
-    const activeObject = this._activeObject;
-    if (activeObject) {
-      activeObject.setCoords();
+    const objects: (FabricObject | undefined)[] = [this._activeObject];
+    if (this.isCurrentlyDrawing()) {
+      // force brush to redraw
+      this.shouldClearContextTop = true;
+      objects.push(this.freeDrawingBrush.clipPath);
     }
+    super.setViewportTransform(vpt);
+    objects.forEach((object) => object?.setCoords());
   }
 
   /**
@@ -1492,8 +1492,6 @@ export class SelectableCanvas<
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
       cacheCanvasEl = this.cacheCanvasEl!;
-    // @ts-ignore
-    this.removeListeners();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
@@ -1618,7 +1616,6 @@ Object.assign(SelectableCanvas.prototype, {
   hoverCursor: 'move',
   moveCursor: 'move',
   defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
   notAllowedCursor: 'not-allowed',
   containerClass: 'canvas-container',
   perPixelTargetFind: false,

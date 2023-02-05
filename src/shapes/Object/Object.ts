@@ -1610,11 +1610,9 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<FabricObject>}
    */
-  clone(propertiesToInclude: string[]) {
+  clone(propertiesToInclude: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
-    // todo ok understand this. is static or it isn't?
-    // TS is more an issue here than an helper.
-    // @ts-ignore
+    // @ts-expect-error TS doesn't recognize `this.constructor`
     return this.constructor.fromObject(objectForm);
   }
 

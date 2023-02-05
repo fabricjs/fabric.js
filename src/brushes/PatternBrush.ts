@@ -1,7 +1,6 @@
-import { Pattern } from '../Pattern';
-import { PathData } from '../typedefs';
-import { createCanvasElement } from '../util/misc/dom';
 import type { Canvas } from '../canvas/Canvas';
+import { Pattern } from '../Pattern';
+import { createCanvasElement } from '../util/misc/dom';
 import { PencilBrush } from './PencilBrush';
 
 export class PatternBrush extends PencilBrush {
@@ -39,7 +38,7 @@ export class PatternBrush extends PencilBrush {
    * Creates "pattern" instance property
    * @param {CanvasRenderingContext2D} ctx
    */
-  getPattern(ctx: CanvasRenderingContext2D) {
+  protected getPattern(ctx: CanvasRenderingContext2D) {
     return ctx.createPattern(this.source || this.getPatternSrc(), 'repeat');
   }
 
@@ -47,7 +46,9 @@ export class PatternBrush extends PencilBrush {
    * Sets brush styles
    * @param {CanvasRenderingContext2D} ctx
    */
-  _setBrushStyles(ctx: CanvasRenderingContext2D) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     super._setBrushStyles(ctx);
     const pattern = this.getPattern(ctx);
     pattern && (ctx.strokeStyle = pattern);
@@ -56,15 +57,16 @@ export class PatternBrush extends PencilBrush {
   /**
    * Creates path
    */
-  createPath(pathData: PathData) {
-    const path = super.createPath(pathData),
-      topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
-
-    path.stroke = new Pattern({
-      source: this.source || this.getPatternSrc(),
-      offsetX: -topLeft.x,
-      offsetY: -topLeft.y,
-    });
+  protected finalizeShape() {
+    const path = super.finalizeShape();
+    if (path) {
+      const topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+      path.stroke = new Pattern({
+        source: this.source || this.getPatternSrc(),
+        offsetX: -topLeft.x,
+        offsetY: -topLeft.y,
+      });
+    }
     return path;
   }
 }

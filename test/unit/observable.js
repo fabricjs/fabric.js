@@ -21,6 +21,171 @@ QUnit.test('fire + on', function (assert) {
   assert.equal(eventFired, true);
 });
 
+QUnit.test('fire event/object', function (assert) {
+  let foo = new fabric.Observable();
+  let received;
+  foo.on('bar:baz', ev => {
+    received = ev;
+  });
+
+  let fired = foo.fire('bar:baz');
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  received = null;
+
+  fired = foo.fire('bar:baz', { foo: 'bar' });
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  assert.equal(received.foo, 'bar', 'object should be set');
+  received = null;
+
+  const ev = fabric.Event.init({ foo: 'bar' });
+  fired = foo.fire('bar:baz', ev);
+  assert.ok(received instanceof fabric.Event, 'should be an event');
+  assert.equal(received, fired, 'should be the same ref');
+  assert.equal(ev, fired, 'should be the same ref');
+  assert.equal(received.foo, 'bar', 'object should be set');
+  assert.equal(ev.defaultPrevented, false, 'default not prevented');
+  assert.equal(ev.propagate, true, 'propagation not prevented');
+
+  foo.on('bar:baz', ev => {
+    ev.preventDefault();
+  });
+  fired = foo.fire('bar:baz');
+  assert.equal(fired.defaultPrevented, true, 'default prevented');
+  assert.equal(fired.propagate, true, 'propagation not prevented');
+  foo.on('bar:baz', ev => {
+    ev.stopPropagation();
+  });
+  fired = foo.fire('bar:baz');
+  assert.equal(fired.defaultPrevented, true, 'default prevented');
+  assert.equal(fired.propagate, false, 'propagation prevented');
+});
+
+QUnit.module('event path', (hooks) => {
+  const a = new fabric.Observable(), b = new fabric.Observable();
+  hooks.afterEach(() => {
+    a.off();
+    b.off();
+  });
+  function fire(targets, control, subscribe, message) {
+    QUnit.test(message, assert => {
+      const ev = fabric.Event.init({ foo: 'bar' });
+      subscribe && subscribe();
+      targets.forEach(target => target.fire('foo', ev));
+      assert.equal(ev.path.length, control.length, 'event path should match');
+      ev.path.forEach((o, i) => assert.equal(o, control[i], `path[${i}] should match`));
+      assert.equal(ev.composedPath(), ev.path, 'just an alias method');
+    });
+  }
+  fire([a, b], [], null, 'no registered event handlers');
+  const subscribe = () => {
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([a], [a], subscribe, 'a only');
+  fire([a, b], [a, b], subscribe, 'a & b');
+  fire([a, b, b, a], [a, b, b, a], subscribe, 'multiple firing');
+  const multipleSubscriber = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], multipleSubscriber, 'multiple subscriptions');
+  const subscribeWithDisposing = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { })();
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], subscribeWithDisposing, 'respect disposing');
+});
+
+QUnit.module('event propagation', hooks => {
+  QUnit.test('stopped before firing', assert => {
+    const a = new fabric.Observable();
+    let fired = false;
+    a.on('foo', () => {
+      fired = true;
+    });
+    const ev = fabric.Event.init({ foo: 'bar' });
+    ev.stopPropagation();
+    assert.equal(ev.propagate, false, 'stopPropagation should have an effect');
+    a.fire('foo', ev);
+    assert.equal(fired, false, 'event should be skipped');
+  });
+  QUnit.test('stopPropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopPropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(bFired, 'b should fire');
+  });
+  QUnit.test('stopImmediatePropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopImmediatePropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(bFired, 'b should fire');
+  });
+});
+
 QUnit.test('fire once', function (assert) {
   var foo = new fabric.Observable();
 
@@ -40,7 +205,6 @@ QUnit.test('fire once multiple handlers', function (assert) {
   var eventFired = 0;
   var eventFired2 = 0;
   var eventFired3 = 0;
-  var eventData = { a: 'b', c: 'd' };
   foo.once({
     'bar:baz': () => {
       eventFired++;
@@ -50,8 +214,6 @@ QUnit.test('fire once multiple handlers', function (assert) {
     },
     'blah:blah:bloo': (e) => {
       eventFired3++;
-      assert.deepEqual(e, eventData);
-      assert.equal(e, eventData);
     }
   });
   foo.fire('bar:baz');
@@ -65,7 +227,6 @@ QUnit.test('fire once multiple handlers', function (assert) {
   assert.equal(eventFired, 1);
   assert.equal(eventFired2, 1);
   assert.equal(eventFired3, 0);
-  foo.fire('blah:blah:bloo', eventData);
 });
 
 QUnit.test('off', function (assert) {

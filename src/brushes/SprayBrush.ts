@@ -1,10 +1,11 @@
+import type { Canvas } from '../canvas/Canvas';
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
-import { Shadow } from '../Shadow';
 import { Rect } from '../shapes/Rect';
 import { getRandomInt } from '../util/internals';
-import type { Canvas } from '../canvas/Canvas';
-import { BaseBrush } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 export type SprayBrushPoint = {
   x: number;
@@ -33,7 +34,7 @@ function getUniqueRects(rects: Rect[]) {
   return uniqueRectsArray;
 }
 
-export class SprayBrush extends BaseBrush {
+export class SprayBrush extends SimpleBrush<Group> {
   /**
    * Width of a spray
    * @type Number
@@ -91,49 +92,24 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunk = [];
   }
 
-  /**
-   * Invoked on mouse down
-   * @param {Point} pointer
-   */
-  onMouseDown(pointer: Point) {
-    this.sprayChunks = [];
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._setShadow();
-
-    this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunk);
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
+    super._setBrushStyles(ctx);
+    ctx.fillStyle = this.color;
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
-      return;
-    }
-    this.addSprayChunk(pointer);
-    this.renderChunck(this.sprayChunk);
-  }
-
-  /**
-   * Invoked on mouse up
-   */
-  onMouseUp() {
-    const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-    this.canvas.renderOnAddRemove = false;
-
+  protected finalizeShape() {
     const rects = [];
-
     for (let i = 0; i < this.sprayChunks.length; i++) {
       const sprayChunk = this.sprayChunks[i];
       for (let j = 0; j < sprayChunk.length; j++) {
-        const chunck = sprayChunk[j];
+        const chunk = sprayChunk[j];
         const rect = new Rect({
-          width: chunck.width,
-          height: chunck.width,
-          left: chunck.x + 1,
-          top: chunck.y + 1,
+          width: chunk.width,
+          height: chunk.width,
+          left: chunk.x + 1,
+          top: chunk.y + 1,
           originX: 'center',
           originY: 'center',
           fill: this.color,
@@ -141,55 +117,59 @@ export class SprayBrush extends BaseBrush {
         rects.push(rect);
       }
     }
-
-    const group = new Group(
-      this.optimizeOverlapping ? getUniqueRects(rects) : rects,
-      {
-        objectCaching: true,
-        layout: 'fixed',
-        subTargetCheck: false,
-        interactive: false,
-      }
-    );
-    this.shadow && group.set('shadow', new Shadow(this.shadow));
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
+    return new Group(this.optimizeOverlapping ? getUniqueRects(rects) : rects, {
+      objectCaching: true,
+      layout: 'fixed',
+      subTargetCheck: false,
+      interactive: false,
+    });
   }
 
-  renderChunck(sprayChunck: SprayBrushPoint[]) {
-    const ctx = this.canvas.contextTop;
-    ctx.fillStyle = this.color;
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
+    this.sprayChunks = [];
+    this.addSprayChunk(this.extractPointer(ev));
+    this.renderChunk(this.sprayChunk);
+  }
 
-    this._saveAndTransform(ctx);
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    this.addSprayChunk(this.extractPointer(ev));
+    this.renderChunk(this.sprayChunk);
+  }
 
-    for (let i = 0; i < sprayChunck.length; i++) {
-      const point = sprayChunck[i];
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
+    this.finalize();
+  }
+
+  protected drawChunk(
+    ctx: CanvasRenderingContext2D,
+    sprayChunk: SprayBrushPoint[]
+  ) {
+    for (let i = 0; i < sprayChunk.length; i++) {
+      const point = sprayChunk[i];
       ctx.globalAlpha = point.opacity;
       ctx.fillRect(point.x, point.y, point.width, point.width);
     }
+  }
 
+  protected renderChunk(sprayChunk: SprayBrushPoint[]) {
+    const ctx = this.canvas.contextTop;
+    ctx.save();
+    this.transform(ctx);
+    this.drawChunk(ctx, sprayChunk);
+    this._drawClipPath(ctx, this.clipPath);
     ctx.restore();
   }
 
   /**
    * Render all spray chunks
    */
-  _render() {
-    const ctx = this.canvas.contextTop;
-    ctx.fillStyle = this.color;
-
-    this._saveAndTransform(ctx);
-
+  protected _render(ctx: CanvasRenderingContext2D) {
     for (let i = 0; i < this.sprayChunks.length; i++) {
-      this.renderChunck(this.sprayChunks[i]);
+      this.drawChunk(ctx, this.sprayChunks[i]);
     }
-    ctx.restore();
   }
 
   /**

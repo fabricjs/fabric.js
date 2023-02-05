@@ -495,6 +495,7 @@ export class StaticCanvas<
       cssOnly,
       backstoreOnly,
     });
+    this.fire('resize');
     if (!cssOnly) {
       this.requestRenderAll();
     }
@@ -552,7 +553,7 @@ export class StaticCanvas<
       overlayObject.setCoords();
     }
     this.calcViewportBoundaries();
-    this.renderOnAddRemove && this.requestRenderAll();
+    this.requestRenderAll();
   }
 
   /**

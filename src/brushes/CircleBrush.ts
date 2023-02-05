@@ -1,11 +1,13 @@
+import type { Canvas } from '../canvas/Canvas';
 import { Color } from '../color/Color';
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
 import { Point } from '../Point';
-import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { getRandomInt } from '../util/internals';
-import type { Canvas } from '../canvas/Canvas';
-import { BaseBrush } from './BaseBrush';
+import { SimpleBrush } from './SimpleBrush';
 
 export type CircleBrushPoint = {
   x: number;
@@ -14,7 +16,7 @@ export type CircleBrushPoint = {
   fill: string;
 };
 
-export class CircleBrush extends BaseBrush {
+export class CircleBrush extends SimpleBrush<FabricObject> {
   /**
    * Width of a brush
    * @type Number
@@ -27,103 +29,6 @@ export class CircleBrush extends BaseBrush {
   constructor(canvas: Canvas) {
     super(canvas);
     this.points = [];
-  }
-
-  /**
-   * Invoked inside on mouse down and mouse move
-   * @param {Point} pointer
-   */
-  drawDot(pointer: Point) {
-    const point = this.addPoint(pointer),
-      ctx = this.canvas.contextTop;
-    this._saveAndTransform(ctx);
-    this.dot(ctx, point);
-    ctx.restore();
-  }
-
-  dot(ctx: CanvasRenderingContext2D, point: CircleBrushPoint) {
-    ctx.fillStyle = point.fill;
-    ctx.beginPath();
-    ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  /**
-   * Invoked on mouse down
-   */
-  onMouseDown(pointer: Point) {
-    this.points = [];
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._setShadow();
-    this.drawDot(pointer);
-  }
-
-  /**
-   * Render the full state of the brush
-   * @private
-   */
-  _render() {
-    const ctx = this.canvas.contextTop,
-      points = this.points;
-    this._saveAndTransform(ctx);
-    for (let i = 0; i < points.length; i++) {
-      this.dot(ctx, points[i]);
-    }
-    ctx.restore();
-  }
-
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
-      return;
-    }
-    if (this.needsFullRender()) {
-      this.canvas.clearContext(this.canvas.contextTop);
-      this.addPoint(pointer);
-      this._render();
-    } else {
-      this.drawDot(pointer);
-    }
-  }
-
-  /**
-   * Invoked on mouse up
-   */
-  onMouseUp() {
-    const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
-    this.canvas.renderOnAddRemove = false;
-
-    const circles = [];
-
-    for (let i = 0; i < this.points.length; i++) {
-      const point = this.points[i],
-        circle = new Circle({
-          radius: point.radius,
-          left: point.x,
-          top: point.y,
-          originX: 'center',
-          originY: 'center',
-          fill: point.fill,
-        });
-
-      this.shadow && (circle.shadow = new Shadow(this.shadow));
-
-      circles.push(circle);
-    }
-    const group = new Group(circles, { canvas: this.canvas });
-
-    this.canvas.fire('before:path:created', { path: group });
-    this.canvas.add(group);
-    this.canvas.fire('path:created', { path: group });
-
-    this.canvas.clearContext(this.canvas.contextTop);
-    this._resetShadow();
-    this.canvas.renderOnAddRemove = originalRenderOnAddRemove;
-    this.canvas.requestRenderAll();
   }
 
   /**
@@ -141,5 +46,74 @@ export class CircleBrush extends BaseBrush {
     this.points.push(pointerPoint);
 
     return pointerPoint;
+  }
+
+  /**
+   * Invoked inside on mouse down and mouse move
+   * @param {Point} pointer
+   */
+  drawDot(pointer: Point) {
+    const point = this.addPoint(pointer),
+      ctx = this.canvas.contextTop;
+    ctx.save();
+    this.transform(ctx);
+    this.dot(ctx, point);
+    this._drawClipPath(ctx, this.clipPath);
+    ctx.restore();
+  }
+
+  dot(ctx: CanvasRenderingContext2D, point: CircleBrushPoint) {
+    ctx.fillStyle = point.fill;
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  protected finalizeShape() {
+    const circles = [];
+    for (let i = 0; i < this.points.length; i++) {
+      const point = this.points[i];
+      circles.push(
+        new Circle({
+          radius: point.radius,
+          left: point.x,
+          top: point.y,
+          originX: 'center',
+          originY: 'center',
+          fill: point.fill,
+        })
+      );
+    }
+    return new Group(circles);
+  }
+
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
+    this.points = [];
+    this.drawDot(this.extractPointer(ev));
+  }
+
+  protected _render(ctx: CanvasRenderingContext2D) {
+    const points = this.points;
+    for (let i = 0; i < points.length; i++) {
+      this.dot(ctx, points[i]);
+    }
+  }
+
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    const pointer = this.extractPointer(ev);
+    if (this.needsFullRender()) {
+      this.addPoint(pointer);
+      this.render();
+    } else {
+      this.drawDot(pointer);
+    }
+  }
+
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
+    this.finalize();
   }
 }

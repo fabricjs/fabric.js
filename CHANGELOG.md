@@ -2,6 +2,14 @@
 
 ## [next]
 
+- feat(Brush): new API, extend `Observable`, support `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
+  BREAKING:
+  - brush doesn't add result to canvas anymore
+  - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
+  - `_render` method is now protected, use `render` instead
+  - renamed `PencilBrush#convertPointsToSVGPath` => `getPathFromPoints`
+  - `Canvas#freeDrawingCursor` => `Brush#cursor`
+- feat(): DrawShape, DrawOval, DrawPoly [#8430](https://github.com/fabricjs/fabric.js/pull/8430)
 - patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)

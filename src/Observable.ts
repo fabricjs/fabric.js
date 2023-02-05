@@ -1,4 +1,6 @@
-export type TEventCallback<T = any> = (options: T) => any;
+import { FabricEvent, PropagationState, TFabricEvent } from './FabricEvent';
+
+export type TEventCallback<T = any> = (options: TFabricEvent<T>) => any;
 
 type EventRegistryObject<
   K extends string | number | symbol = string,
@@ -160,16 +162,31 @@ export class Observable<EventSpec> {
    * @param {String} eventName Event name to fire
    * @param {Object} [options] Options object
    */
-  fire<K extends keyof EventSpec>(eventName: K, options?: EventSpec[K]) {
-    if (!this.__eventListeners) {
-      return;
-    }
-
-    const listenersForEvent = this.__eventListeners[eventName]?.concat();
-    if (listenersForEvent) {
+  fire<K extends keyof EventSpec>(
+    eventName: K,
+    options?: EventSpec[K] | TFabricEvent<EventSpec[K]>
+  ): TFabricEvent<EventSpec[K]> {
+    const ev =
+      options instanceof FabricEvent ? options : FabricEvent.init(options);
+    if (
+      this.__eventListeners &&
+      this.__eventListeners[eventName] &&
+      ev.propagate === PropagationState.propagate
+    ) {
+      let called = false;
+      const listenersForEvent = this.__eventListeners[eventName].concat();
       for (let i = 0; i < listenersForEvent.length; i++) {
-        listenersForEvent[i].call(this, options || {});
+        if (
+          (ev.propagate as PropagationState) ===
+          PropagationState.stopImmediately
+        ) {
+          break;
+        }
+        called = true;
+        listenersForEvent[i].call(this, ev);
       }
+      called && ev.path.push(this);
     }
+    return ev;
   }
 }
