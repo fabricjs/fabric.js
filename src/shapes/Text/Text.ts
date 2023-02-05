@@ -79,7 +79,7 @@ const additionalProps = [
   'pathAlign',
 ] as const;
 
-const dimensionAffectingProps: string[] = [
+const textMeasurementProperties: string[] = [
   'fontSize',
   'fontWeight',
   'fontFamily',
@@ -107,7 +107,7 @@ export class Text<
    * @type string[]
    * @protected
    */
-  static textMeasurementProperties: string[] = dimensionAffectingProps;
+  static textMeasurementProperties: string[] = textMeasurementProperties;
 
   /**
    * @private
