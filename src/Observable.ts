@@ -169,10 +169,13 @@ export class Observable<EventSpec> {
     const ev =
       options instanceof FabricEvent ? options : FabricEvent.init(options);
     if (this.__eventListeners && this.__eventListeners[eventName]) {
+      let called = false;
       const listenersForEvent = this.__eventListeners[eventName].concat();
       for (let i = 0; i < listenersForEvent.length; i++) {
+        called = true;
         listenersForEvent[i].call(this, ev);
       }
+      called && ev.path.push(this);
     }
     return ev;
   }

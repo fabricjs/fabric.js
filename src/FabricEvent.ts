@@ -1,8 +1,11 @@
+import type { Observable } from './Observable';
+
 export type TFabricEvent<T> = FabricEvent<T> & T;
 
 export class FabricEvent<T> {
   declare defaultPrevented: boolean;
   declare propagate: boolean;
+  path: Observable<any>[] = [];
   static init<T>(data?: T) {
     return new FabricEvent<T>(data) as TFabricEvent<T>;
   }

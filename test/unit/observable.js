@@ -62,6 +62,44 @@ QUnit.test('fire event/object', function (assert) {
   assert.equal(fired.propagate, false, 'propagation prevented');
 });
 
+QUnit.module('event path', (hooks) => {
+  const a = new fabric.Observable(), b = new fabric.Observable();
+  hooks.afterEach(() => {
+    a.off();
+    b.off();
+  });
+  function fire(targets, control, subscribe, message) {
+    QUnit.test(message, assert => {
+      const ev = fabric.Event.init({ foo: 'bar' });
+      subscribe && subscribe();
+      targets.forEach(target => target.fire('foo', ev));
+      assert.equal(ev.path.length, control.length, 'event path should match');
+      ev.path.forEach((o, i) => assert.equal(o, control[i], `path[${i}] should match`));
+    });
+  }
+  fire([a, b], [], null, 'no registered event handlers');
+  const subscribe = () => {
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([a], [a], subscribe, 'a only');
+  fire([a, b], [a, b], subscribe, 'a & b');
+  fire([a, b, b, a], [a, b, b, a], subscribe, 'multiple firing');
+  const multipleSubscriber = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], multipleSubscriber, 'multiple subscriptions');
+  const subscribeWithDisposing = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { })();
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], subscribeWithDisposing, 'respect disposing');
+});
+
 QUnit.test('fire once', function (assert) {
   var foo = new fabric.Observable();
 
