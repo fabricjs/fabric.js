@@ -64,15 +64,9 @@
     var object = pattern.toObject(['id']);
     assert.equal(object.id, 'myId');
     assert.deepEqual(object.patternTransform, pattern.patternTransform);
-  });
 
-  QUnit.test('toObject with custom props', function(assert) {
-    var pattern = createPattern();
-    pattern.patternTransform = [1, 0, 0, 2, 0, 0];
-    pattern.id = 'myId';
-    var object = pattern.toObject(['id']);
-    assert.equal(object.id, 'myId');
-    assert.deepEqual(object.patternTransform, pattern.patternTransform);
+    var cObj = new fabric.Object({fill: pattern}).toObject(['id']);
+    assert.equal(cObj.fill.id, 'myId');
   });
 
   QUnit.test('toObject with crossOrigin', function(assert) {

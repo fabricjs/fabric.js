@@ -157,6 +157,9 @@
     gradient.id = 'myId';
     var object = gradient.toObject(['id']);
     assert.equal(object.id, 'myId');
+
+    var cObj = new fabric.Object({fill: gradient}).toObject(['id']);
+    assert.equal(cObj.fill.id, 'myId');
   });
 
   QUnit.test('toObject radialGradient', function(assert) {

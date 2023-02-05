@@ -839,6 +839,8 @@
      */
     toObject: function(propertiesToInclude) {
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          fillToObject = this.fill && this.fill.toObject,
+          strokeToObject = this.stroke && this.stroke.toObject,
 
           object = {
             type:                     this.type,
@@ -849,8 +851,8 @@
             top:                      toFixed(this.top, NUM_FRACTION_DIGITS),
             width:                    toFixed(this.width, NUM_FRACTION_DIGITS),
             height:                   toFixed(this.height, NUM_FRACTION_DIGITS),
-            fill:                     (this.fill && this.fill.toObject) ? this.fill.toObject(propertiesToInclude) : this.fill,
-            stroke:                   (this.stroke && this.stroke.toObject) ? this.stroke.toObject(propertiesToInclude) : this.stroke,
+            fill:                     fillToObject ? this.fill.toObject(propertiesToInclude) : this.fill,
+            stroke:                   strokeToObject ? this.stroke.toObject(propertiesToInclude) : this.stroke,
             strokeWidth:              toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
             strokeDashArray:          this.strokeDashArray ? this.strokeDashArray.concat() : this.strokeDashArray,
             strokeLineCap:            this.strokeLineCap,
