@@ -27,7 +27,6 @@ import os from 'os';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
-import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
 const program = new commander.Command();
 
@@ -389,42 +388,6 @@ function createChoiceData(type, file) {
   };
 }
 
-async function selectFileToTransform() {
-  const files = _.map(listFiles(), ({ dir, file }) =>
-    createChoiceData(
-      path.relative(path.resolve(wd, 'src'), dir).replaceAll('\\', '/'),
-      file
-    )
-  );
-  const { tests: filteredTests } = await inquirer.prompt([
-    {
-      type: 'test-selection',
-      name: 'tests',
-      message: 'Select files to transform to es6',
-      highlight: true,
-      searchable: true,
-      default: [],
-      pageSize: 10,
-      source(answersSoFar, input = '') {
-        return new Promise((resolve) => {
-          const value = _.map(this.getCurrentValue(), (value) =>
-            createChoiceData(value.type, value.file)
-          );
-          const res = fuzzy
-            .filter(input, files, {
-              extract: (item) => item.name,
-            })
-            .map((element) => element.original);
-          resolve(value.concat(_.differenceBy(res, value, 'name')));
-        });
-      },
-    },
-  ]);
-  return filteredTests.map(({ type, file }) =>
-    path.resolve(wd, 'src', type, file)
-  );
-}
-
 async function selectTestFile() {
   const selected = readCLIFile();
   const unitTests = listTestFiles('unit').map((file) =>
@@ -633,47 +596,5 @@ website
   )
   .option('-w, --watch')
   .action(exportToWebsite);
-
-program
-  .command('transform')
-  .description('transforms files into es6')
-  .option('-o, --overwrite', 'overwrite exisitng files', false)
-  .option('-x, --no-exports', 'do not use exports')
-  .option('-i, --index', 'create index files', false)
-  .option('-ts, --typescript', 'transform into typescript', false)
-  .option('-v, --verbose', 'verbose logging', true)
-  .option('-a, --all', 'transform all files', false)
-  .option(
-    '-d, --diff <branch>',
-    'compare against given branch (default: master) and transform all files with diff'
-  )
-  .action(
-    async ({
-      overwrite,
-      exports,
-      index,
-      typescript,
-      verbose,
-      all,
-      diff: gitRef,
-    } = {}) => {
-      let files = [];
-      if (gitRef) {
-        gitRef = gitRef === true ? 'master' : gitRef;
-        const { changes } = getGitInfo(gitRef);
-        files = changes.map((change) => path.resolve(wd, change));
-      } else if (!all) {
-        files = await selectFileToTransform();
-      }
-      transformFiles({
-        overwriteExisitingFiles: overwrite,
-        useExports: exports,
-        createIndex: index,
-        ext: typescript ? 'ts' : 'js',
-        verbose,
-        files,
-      });
-    }
-  );
 
 program.parse(process.argv);
