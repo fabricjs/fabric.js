@@ -80,17 +80,12 @@ $ yarn add fabric
 ```
 
 ```js
-// v6 es
+// v6
 import { Canvas, Rect } from 'fabric'; // browser
 import { StaticCanvas, Rect } from 'fabric/node'; // node
-// v6 cjs
-const fabric = require('fabric'); // browser
-const fabric = require('fabric/node'); // node
 
-// v5 es
+// v5
 import { fabric } from 'fabric';
-// v5 cjs
-const fabric = require('fabric').fabric;
 ```
 
 #### Browser
