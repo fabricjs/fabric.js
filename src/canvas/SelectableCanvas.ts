@@ -1,4 +1,4 @@
-import { getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -26,11 +26,7 @@ import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
-import {
-  cleanUpJsdomNode,
-  makeElementUnselectable,
-  wrapElement,
-} from '../util/dom_misc';
+import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
@@ -1241,7 +1237,7 @@ export class SelectableCanvas<
   }
 
   protected _initWrapperElement() {
-    const container = getEnv().document.createElement('div');
+    const container = getDocument().createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
@@ -1504,9 +1500,9 @@ export class SelectableCanvas<
     this.contextCache = null;
     this.contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    cleanUpJsdomNode(upperCanvasEl);
+    getEnv().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    cleanUpJsdomNode(cacheCanvasEl);
+    getEnv().dispose(cacheCanvasEl);
     this.cacheCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
