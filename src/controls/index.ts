@@ -1,6 +1,7 @@
 export { changeWidth } from './changeWidth';
 export { Control } from './Control';
 export { renderCircleControl, renderSquareControl } from './controls.render';
+export * from './defaultControls';
 export { dragHandler } from './drag';
 export { createPolyControls } from './polyControl';
 export { rotationStyleHandler, rotationWithSnapping } from './rotate';
