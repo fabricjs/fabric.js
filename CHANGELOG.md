@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): remove TS transformer [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
 - refactor(): BREAKING remove stateful mixin and functionality [#8663](https://github.com/fabricjs/fabric.js/pull/8663)
 - patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
