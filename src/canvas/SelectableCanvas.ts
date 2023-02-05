@@ -2,7 +2,7 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { dragHandler } from '../controls/drag';
 import { ObjectSelection } from '../brushes/ObjectSelection';
 import { getActionFromCorner } from '../controls/util';
-import { getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 import {
   CanvasEvents,
   ModifierKey,
@@ -23,11 +23,7 @@ import {
   TSVGReviver,
 } from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
-import {
-  cleanUpJsdomNode,
-  makeElementUnselectable,
-  wrapElement,
-} from '../util/dom_misc';
+import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import { isTransparent } from '../util/misc/isTransparent';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -326,16 +322,6 @@ export class SelectableCanvas<
   declare skipTargetFind: boolean;
 
   /**
-   * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
-   * After mousedown, mousemove creates a shape,
-   * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
-   * @type Boolean
-   * @default
-   */
-  declare isDrawingMode: boolean;
-
-  /**
    * Indicates whether objects should remain in current stack position when selected.
    * When false objects are brought to top and rendered as part of the selection group
    * @type Boolean
@@ -568,7 +554,7 @@ export class SelectableCanvas<
     if (
       (this.contextTopDirty &&
         !this._groupSelector.active &&
-        !this.isDrawingMode) ||
+        !this.isCurrentlyDrawing()) ||
       this.shouldClearContextTop
     ) {
       this.clearContext(this.contextTop);
@@ -1171,7 +1157,7 @@ export class SelectableCanvas<
   }
 
   protected _initWrapperElement() {
-    const container = getEnv().document.createElement('div');
+    const container = getDocument().createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
@@ -1231,7 +1217,7 @@ export class SelectableCanvas<
   }
 
   isCurrentlyDrawing(): this is AssertKeys<this, 'freeDrawingBrush'> {
-    return !!(this.isDrawingMode && this.freeDrawingBrush?.active);
+    return !!this.freeDrawingBrush?.active;
   }
 
   /**
@@ -1406,16 +1392,14 @@ export class SelectableCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
+    const objects: (FabricObject | undefined)[] = [this._activeObject];
     if (this.isCurrentlyDrawing()) {
       // force brush to redraw
       this.shouldClearContextTop = true;
-      this.freeDrawingBrush!.clipPath?.setCoords();
+      objects.push(this.freeDrawingBrush.clipPath);
     }
     super.setViewportTransform(vpt);
-    const activeObject = this._activeObject;
-    if (activeObject) {
-      activeObject.setCoords();
-    }
+    objects.forEach((object) => object?.setCoords());
   }
 
   /**
@@ -1441,9 +1425,9 @@ export class SelectableCanvas<
     this.contextCache = null;
     this.contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    cleanUpJsdomNode(upperCanvasEl);
+    getEnv().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    cleanUpJsdomNode(cacheCanvasEl);
+    getEnv().dispose(cacheCanvasEl);
     this.cacheCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
