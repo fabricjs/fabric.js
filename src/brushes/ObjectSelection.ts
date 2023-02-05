@@ -1,9 +1,9 @@
-import { TPointerEvent } from '../EventTypeDefs';
-import { Point } from '../point.class';
-import { ActiveSelection } from '../shapes/active_selection.class';
+import { TPointerEvent, TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
+import { Point } from '../Point';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 import { TBBox } from '../typedefs';
 import { sendObjectToPlane } from '../util/misc/planeChange';
-import { TBrushEventData } from './base_brush.class';
 import { DrawShape } from './DrawShape';
 
 export class ObjectSelection extends DrawShape {
@@ -23,8 +23,8 @@ export class ObjectSelection extends DrawShape {
     sendObjectToPlane(this.shape!, undefined, this.canvas.viewportTransform);
   }
 
-  onMouseUp(ev: TBrushEventData) {
-    super.onMouseUp(ev);
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
     this.groupSelectedObjects(this.shape!.getBoundingRect(true, true), ev.e);
     this.onEnd(this.shape);
     this.shape = undefined;
