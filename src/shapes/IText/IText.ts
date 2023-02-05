@@ -150,8 +150,6 @@ export class IText<
    */
   declare caching: boolean;
 
-  static textLayoutProperties = Text.textLayoutProperties;
-
   /**
 
    * Constructor
