@@ -68,18 +68,21 @@ export class PencilBrush extends SimpleBrush<Path> {
 
   down(ev: TFabricEvent<TPointerEventInfo>) {
     super.down(ev);
-    const { e, pointer } = ev;
+    const { e } = ev;
+    const pointer = this.extractPointer(ev);
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
-    this._prepareForDrawing(pointer);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
-    this._addPoint(pointer);
+    this._points = [pointer, pointer];
+    this._hasStraightLine = false;
+    this.canvas.contextTop.moveTo(pointer.x, pointer.y);
     this.render();
   }
 
   move(ev: TFabricEvent<TPointerEventInfo>) {
     super.move(ev);
-    const { e, pointer } = ev;
+    const { e } = ev;
+    const pointer = this.extractPointer(ev);
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     this.drawStraightLine && (this.oldEnd = undefined);
     this._addPoint(pointer) && this._points.length > 1 && this.onPointAdded();
@@ -91,15 +94,6 @@ export class PencilBrush extends SimpleBrush<Path> {
     this.oldEnd = undefined;
     this.canvas.contextTop.closePath();
     this.finalize();
-  }
-
-  /**
-   * @param {Point} pointer Actual mouse position related to the canvas.
-   */
-  protected _prepareForDrawing(pointer: Point) {
-    this._reset();
-    this._addPoint(pointer);
-    this.canvas.contextTop.moveTo(pointer.x, pointer.y);
   }
 
   /**
@@ -125,15 +119,6 @@ export class PencilBrush extends SimpleBrush<Path> {
     } else {
       this._renderCurve();
     }
-  }
-
-  /**
-   * Clear points array and set contextTop canvas style.
-   */
-  protected _reset() {
-    this._points = [];
-    this._setBrushStyles(this.canvas.contextTop);
-    this._setShadow();
   }
 
   /**

@@ -4,7 +4,8 @@
     function fireBrushEvent(brush, type, pointer, { suffix = ':before', e = {} } = {}) {
       brush.fire(`mouse:${type}${suffix}`, fabric.Event.init({
         e,
-        pointer
+        pointer,
+        absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
       }));
     }
     hooks.before(() => {

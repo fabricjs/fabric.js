@@ -1,4 +1,4 @@
-import { FabricEvent, TFabricEvent } from './FabricEvent';
+import { FabricEvent, PropagationState, TFabricEvent } from './FabricEvent';
 
 export type TEventCallback<T = any> = (options: TFabricEvent<T>) => any;
 
@@ -168,11 +168,24 @@ export class Observable<EventSpec> {
   ): TFabricEvent<EventSpec[K]> {
     const ev =
       options instanceof FabricEvent ? options : FabricEvent.init(options);
-    if (this.__eventListeners && this.__eventListeners[eventName]) {
+    if (
+      this.__eventListeners &&
+      this.__eventListeners[eventName] &&
+      ev.propagate === PropagationState.propagate
+    ) {
+      let called = false;
       const listenersForEvent = this.__eventListeners[eventName].concat();
       for (let i = 0; i < listenersForEvent.length; i++) {
+        if (
+          (ev.propagate as PropagationState) ===
+          PropagationState.stopImmediately
+        ) {
+          break;
+        }
+        called = true;
         listenersForEvent[i].call(this, ev);
       }
+      called && ev.path.push(this);
     }
     return ev;
   }

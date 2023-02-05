@@ -1,12 +1,12 @@
 function setBrush(canvas, brush) {
-  canvas.isDrawingMode = true;
   canvas.freeDrawingBrush = brush;
   canvas.calcViewportBoundaries();
 }
 function fireBrushEvent(brush, type, pointer) {
   brush.fire(`mouse:${type}:before`, fabric.Event.init({
     e: { pointerId: 1 },
-    pointer
+    pointer,
+    absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
   }));
 }
 async function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
@@ -2041,7 +2041,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2087,7 +2087,7 @@ QUnit.module('Free Drawing', hooks => {
 
     percentage: 0.06,
 
-    disabled: fabric.getEnv().isLikelyNode
+    disabled: isNode()
   };
 
   function freedrawing(canvas) {
@@ -2302,9 +2302,8 @@ QUnit.module('Free Drawing', hooks => {
               canvas.viewportCenterObject(clipPath);
               brush.clipPath = clipPath;
               canvas.freeDrawingBrush = brush;
-              canvas.isDrawingMode = true;
-              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100]);
-              return pointDrawer(pointsToCover, brush);
+              vpt && canvas.setViewportTransform([1, fabric.util.degreesToRadians(45), 0, 1, 0, -100])
+              pointDrawer(pointsToCover, brush);
             },
             name: `clipping/${builder.name.toLowerCase().replace('brush', '')}${vpt ? '_vpt' : ''}${vpt && absolutePositioned ? '_abs' : ''}${inverted ? '_inv' : ''}`,
             percentage: 0.09,

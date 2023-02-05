@@ -62,6 +62,130 @@ QUnit.test('fire event/object', function (assert) {
   assert.equal(fired.propagate, false, 'propagation prevented');
 });
 
+QUnit.module('event path', (hooks) => {
+  const a = new fabric.Observable(), b = new fabric.Observable();
+  hooks.afterEach(() => {
+    a.off();
+    b.off();
+  });
+  function fire(targets, control, subscribe, message) {
+    QUnit.test(message, assert => {
+      const ev = fabric.Event.init({ foo: 'bar' });
+      subscribe && subscribe();
+      targets.forEach(target => target.fire('foo', ev));
+      assert.equal(ev.path.length, control.length, 'event path should match');
+      ev.path.forEach((o, i) => assert.equal(o, control[i], `path[${i}] should match`));
+      assert.equal(ev.composedPath(), ev.path, 'just an alias method');
+    });
+  }
+  fire([a, b], [], null, 'no registered event handlers');
+  const subscribe = () => {
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([a], [a], subscribe, 'a only');
+  fire([a, b], [a, b], subscribe, 'a & b');
+  fire([a, b, b, a], [a, b, b, a], subscribe, 'multiple firing');
+  const multipleSubscriber = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    a.on('foo', () => { });
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], multipleSubscriber, 'multiple subscriptions');
+  const subscribeWithDisposing = () => {
+    a.on('foo', () => { });
+    a.on('foo', () => { })();
+    b.on('foo', () => { });
+  }
+  fire([b, a], [b, a], subscribeWithDisposing, 'respect disposing');
+});
+
+QUnit.module('event propagation', hooks => {
+  QUnit.test('stopped before firing', assert => {
+    const a = new fabric.Observable();
+    let fired = false;
+    a.on('foo', () => {
+      fired = true;
+    });
+    const ev = fabric.Event.init({ foo: 'bar' });
+    ev.stopPropagation();
+    assert.equal(ev.propagate, false, 'stopPropagation should have an effect');
+    a.fire('foo', ev);
+    assert.equal(fired, false, 'event should be skipped');
+  });
+  QUnit.test('stopPropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopPropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 4, 'last event should be skipped');
+    assert.ok(!skipped, 'last event should fire');
+    assert.ok(bFired, 'b should fire');
+  });
+  QUnit.test('stopImmediatePropagation', assert => {
+    const a = new fabric.Observable(), b = new fabric.Observable();
+    let fired = false, skipped = true, bFired = false;
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+    });
+    a.on('foo', (ev) => {
+      ev.stopImmediatePropagation();
+      fired++;
+    });
+    a.on('foo', () => {
+      fired++;
+      skipped = false;
+    });
+    b.on('foo', () => {
+      bFired = true;
+    });
+    let ev = fabric.Event.init({ foo: 'bar' });
+    a.fire('foo', ev);
+    b.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(!bFired, 'b should not fire');
+
+    fired = 0;
+    ev = fabric.Event.init({ foo: 'bar' });
+    b.fire('foo', ev);
+    a.fire('foo', ev);
+    assert.equal(fired, 3, 'last event should be skipped');
+    assert.ok(skipped, 'last event should be skipped');
+    assert.ok(bFired, 'b should fire');
+  });
+});
+
 QUnit.test('fire once', function (assert) {
   var foo = new fabric.Observable();
 

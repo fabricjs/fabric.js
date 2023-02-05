@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import { config } from '../config';
+import { WebGLProbe } from '../filters/GLProbes/WebGLProbe';
 import { TCopyPasteData, TFabricEnv } from './types';
 
 const copyPasteData: TCopyPasteData = {};
@@ -22,7 +23,10 @@ export const getEnv = (): TFabricEnv => {
     document,
     window,
     isTouchSupported,
-    isLikelyNode: false,
+    WebGLProbe: new WebGLProbe(),
+    dispose() {
+      // noop
+    },
     copyPasteData,
   };
 };

@@ -31,7 +31,7 @@
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 
-    assert.equal(cObj.objectCaching, !fabric.getEnv().isLikelyNode, 'object caching default value');
+    assert.equal(cObj.objectCaching, !isNode(), 'object caching default value');
   });
 
   QUnit.test('get', function(assert) {

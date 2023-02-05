@@ -41,14 +41,8 @@ export abstract class DrawShapeBase<
     return shape;
   }
 
-  _setBrushStyles() {
+  protected _setBrushStyles() {
     this.setStyles();
-  }
-
-  transform(ctx: CanvasRenderingContext2D) {
-    const t = this.canvas.viewportTransform;
-    const offset = new Point().transform(t);
-    ctx.transform(t[0], t[1], t[2], t[3], -offset.x, -offset.y);
   }
 
   protected _render(ctx: CanvasRenderingContext2D) {

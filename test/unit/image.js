@@ -24,8 +24,8 @@
     return element;
   }
 
-  var IMG_SRC     = fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
-      IMG_SRC_REL = fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
+  var IMG_SRC     = isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+      IMG_SRC_REL = isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
@@ -428,7 +428,7 @@
       );
 
       // fromObject doesn't work on Node :/
-      if (fabric.getEnv().isLikelyNode) {
+      if (isNode()) {
         done();
         return;
       }

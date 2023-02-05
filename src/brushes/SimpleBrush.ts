@@ -18,7 +18,7 @@ export abstract class SimpleBrush<
       ...super.subscribe(),
       this.on(
         'mouse:down:before',
-        (ev) => this.shouldHandleEvent(ev) && this.down(ev)
+        (ev) => this.shouldHandleEvent(ev, false) && this.down(ev)
       ),
       this.on(
         'mouse:move:before',
@@ -26,20 +26,27 @@ export abstract class SimpleBrush<
       ),
       this.on(
         'mouse:up:before',
-        (ev) => this.shouldHandleEvent(ev) && this.up(ev)
+        (ev) => this.shouldHandleEvent(ev, true) && this.up(ev)
       ),
     ];
   }
 
-  protected shouldHandleEvent({ e }: TPointerEventInfo) {
-    return this.canvas._isMainEvent(e);
+  protected extractPointer(ev: TFabricEvent<TPointerEventInfo>) {
+    return ev.absolutePointer;
+  }
+
+  protected shouldHandleEvent({ e }: TPointerEventInfo, mustBeActive: boolean) {
+    return (
+      this.enabled &&
+      (!mustBeActive || this.active) &&
+      this.canvas._isMainEvent(e)
+    );
   }
 
   protected shouldHandleMoveEvent(ev: TPointerEventInfo) {
     return (
-      this.active &&
-      this.shouldHandleEvent(ev) &&
-      (!this.limitedToCanvasSize || !this._isOutSideCanvas(ev.pointer))
+      this.shouldHandleEvent(ev, true) &&
+      (!this.limitedToCanvasSize || !this._isOutSideCanvas(ev.absolutePointer))
     );
   }
 
