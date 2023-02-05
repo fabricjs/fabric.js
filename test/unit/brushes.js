@@ -2,13 +2,17 @@
   var canvas = new fabric.Canvas();
   var parsePath = fabric.util.parsePath;
   function fireBrushEvent(brush, type, pointer) {
+    const { canvas } = brush;
     brush.fire(`mouse:${type}:before`, fabric.Event.init({
       e: {},
       pointer,
-      absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
+      absolutePointer: canvas._isRetinaScaling && canvas._isRetinaScaling() ? canvas.restorePointerVpt(pointer) : pointer
     }));
   }
-  QUnit.module('fabric.BaseBrush', function(hooks) {
+  QUnit.module('fabric.BaseBrush', function (hooks) {
+    hooks.beforeEach(function() {
+      canvas.isDrawingMode = true;
+    });
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
     });
@@ -31,18 +35,58 @@
       assert.equal(brush.width, 1, 'default width is 1');
       assert.equal(brush.cursor, 'crosshair', 'default cursor');
     });
-    QUnit.test('start', function(assert) {
+    QUnit.test('down should call start and discard active object', function(assert) {
+      let called = false, discarded = false, rendered = false;
+      const brush = new fabric.SimpleBrush({
+        isDrawingMode: true,
+        contextTop: canvas.contextTop,
+        _activeObject: {},
+        _isMainEvent() {
+          return true;
+        },
+        getActiveObject() {
+          return this._activeObject;
+        },
+        discardActiveObject() {
+          discarded = true;
+        },
+        requestRenderAll() {
+          rendered = true;
+        }
+      });
+      brush.start = () => {
+        called = true;
+      }
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(called, 'should call start');
+      assert.ok(discarded && rendered, 'should discard active object');
+    });
+    QUnit.test('start sets cursor', function(assert) {
       let setCursor;
       const brush = new fabric.SimpleBrush({
+        contextTop: canvas.contextTop,
         setCursor(cursor) {
           setCursor = cursor;
-        },
-        contextTop: canvas.contextTop
+        }
       });
       assert.equal(brush.cursor, 'crosshair', 'default cursor');
       brush.cursor = 'testCursor';
       brush.start();
       assert.equal(setCursor, 'testCursor', 'should set canvas cursor');
+    });
+    QUnit.test('down: not a respected event', function(assert) {
+      let called = false, checked = false;
+      const brush = new fabric.SimpleBrush({
+        _isMainEvent() {
+          checked = true;
+          return true;
+        },
+        down() {
+          called = true;
+        }
+      });
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(!called && checked, 'should not call down');
     });
     QUnit.test('canvas event is fired on brush', function(assert) {
       const done = assert.async();
@@ -69,6 +113,20 @@
         done();
       })
       e = canvas.fire('foo', { bar: 'baz' });
+    });
+    QUnit.test('respecting isDrawingMode', function(assert) {
+      const brush = new fabric.SimpleBrush(canvas);
+      canvas.freeDrawingBrush = brush;
+      canvas.isDrawingMode = false;
+      let fired = false, called = false;
+      brush.on('mouse:down:before', () => (fired = true));
+      fireBrushEvent(brush, 'down', new fabric.Point());
+      assert.ok(fired, 'should fire down on brush');
+      assert.ok(!brush.active, 'brush should not activate');
+      brush.move = brush.up = () => (called = true);
+      fireBrushEvent(brush, 'move', new fabric.Point());
+      fireBrushEvent(brush, 'up', new fabric.Point());
+      assert.ok(!called, 'brush methods should not be called');
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);
