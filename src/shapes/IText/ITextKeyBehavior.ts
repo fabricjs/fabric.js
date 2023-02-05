@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { config } from '../../config';
-import { getEnv } from '../../env';
+import { getDocument, getEnv } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
@@ -55,7 +55,7 @@ export abstract class ITextKeyBehavior<
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = getEnv().document.createElement('textarea');
+    this.hiddenTextarea = getDocument().createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -70,7 +70,7 @@ export abstract class ITextKeyBehavior<
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      getEnv().document.body.appendChild(this.hiddenTextarea);
+      getDocument().body.appendChild(this.hiddenTextarea);
     }
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));

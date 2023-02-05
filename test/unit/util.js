@@ -24,7 +24,7 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = fabric.getEnv().isLikelyNode
+  var IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -422,7 +422,7 @@
   });
 
   // element doesn't seem to have style on node
-  if (!fabric.getEnv().isLikelyNode) {
+  if (!isNode()) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
