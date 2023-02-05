@@ -79,6 +79,22 @@ const additionalProps = [
   'pathAlign',
 ] as const;
 
+const textLayoutProperties: string[] = [
+  'fontSize',
+  'fontWeight',
+  'fontFamily',
+  'fontStyle',
+  'lineHeight',
+  'text',
+  'charSpacing',
+  'textAlign',
+  'styles',
+  'path',
+  'pathStartOffset',
+  'pathSide',
+  'pathAlign',
+];
+
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
@@ -87,11 +103,11 @@ export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends StyledText<EventSpec> {
   /**
-   * Properties which when set cause object to change dimensions
-   * @type Array
-   * @private
+   * Properties that requires a text layout recalculation when changed
+   * @type string[]
+   * @protected
    */
-  declare _dimensionAffectingProps: string[];
+  static textLayoutProperties: string[] = textLayoutProperties;
 
   /**
    * @private
@@ -378,7 +394,6 @@ export class Text<
     }
     this.initDimensions();
     this.setCoords();
-    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**
@@ -425,7 +440,6 @@ export class Text<
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
-    this.saveState({ propertySet: '_dimensionAffectingProps' });
   }
 
   /**
@@ -1433,8 +1447,7 @@ export class Text<
    * @private
    */
   _shouldClearDimensionCache() {
-    const shouldClear =
-      this._forceClearCache || this.hasStateChanged('_dimensionAffectingProps');
+    const shouldClear = this._forceClearCache;
     if (shouldClear) {
       this.dirty = true;
       this._forceClearCache = false;
@@ -1692,11 +1705,11 @@ export class Text<
           this.setPathInfo();
         }
         needsDims =
-          needsDims || this._dimensionAffectingProps.indexOf(_key) !== -1;
+          needsDims || this.constructor.textLayoutProperties.includes(_key);
         isAddingPath = isAddingPath || _key === 'path';
       }
     } else {
-      needsDims = this._dimensionAffectingProps.indexOf(key) !== -1;
+      needsDims = this.constructor.textLayoutProperties.includes(key);
       isAddingPath = key === 'path';
     }
     if (isAddingPath) {
@@ -1869,21 +1882,6 @@ export class Text<
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
 export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _dimensionAffectingProps: [
-    'fontSize',
-    'fontWeight',
-    'fontFamily',
-    'fontStyle',
-    'lineHeight',
-    'text',
-    'charSpacing',
-    'textAlign',
-    'styles',
-    'path',
-    'pathStartOffset',
-    'pathSide',
-    'pathAlign',
-  ],
   _styleProperties: [
     'stroke',
     'strokeWidth',
