@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): remove TS transformer + remove PR lockdown notes for template [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
 - patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
