@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(TS): patch class registry [#8507](https://github.com/fabricjs/fabric.js/pull/8507)
+- patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
+- ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
 - chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
 - chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)

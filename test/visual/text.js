@@ -2,24 +2,20 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  var visualTestLoop;
-  if (fabric.getEnv().isLikelyNode) {
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
+  if (isNode()) {
+    const { registerFont } = require('canvas');
+    registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'normal'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'normal'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'italic'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'italic'
     });
-    visualTestLoop = global.visualTestLoop;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
   }
 
   var tests = [];
@@ -209,7 +205,7 @@
     test: 'Text with custom fonts',
     code: text6,
     golden: 'text6.png',
-    disabled: !fabric.getEnv().isLikelyNode,
+    disabled: !isNode(),
     percentage: 0.06,
   });
 
@@ -466,7 +462,7 @@
     code: text12,
     width: 400,
     height: 150,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'text12.png',
     percentage: 0.095,
   });
@@ -486,7 +482,7 @@
     code: text13,
     width: 232,
     height: 255,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'text13.png',
     percentage: 0.092,
   });
@@ -518,7 +514,7 @@
   tests.push({
     test: 'Draggable text drag image',
     code: dragImage.bind(null, {}),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image.png',
     width: 120,
     height: 220,
@@ -529,7 +525,7 @@
   tests.push({
     test: 'Draggable text drag image + retina scaling',
     code: dragImage.bind(null, { retinaScaling: 3 }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image.png',
     width: 110,
     height: 250,
@@ -540,7 +536,7 @@
   tests.push({
     test: 'Draggable text drag image + vpt',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250] }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
@@ -551,7 +547,7 @@
   tests.push({
     test: 'Draggable text drag image + vpt + retina',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250], retinaScaling: 1.25 }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
@@ -605,7 +601,7 @@
   tests.push({
     test: 'Overlapping draggable text effects',
     code: draggableTextEffects,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'overlapping_draggable_text_effects.png',
     width: 270,
     height: 120,
@@ -646,7 +642,7 @@
     code: selectionClearingEdgeCases,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing.png',
     percentage: 0.02,
     fabricClass: 'Canvas'
@@ -675,7 +671,7 @@
     code: selectionClearingEdgeCases2,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing2.png',
     percentage: 0.02,
     fabricClass: 'Canvas'
@@ -702,7 +698,7 @@
     code: selectionClearingEdgeCases3,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing3.png',
     percentage: 0.03,
     fabricClass: 'Canvas'

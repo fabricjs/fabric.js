@@ -1,10 +1,11 @@
 // @ts-nocheck
-import { getEnv } from '../env';
+
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../util/class_registry';
+import { createCanvasElement } from '../util/misc/dom';
 
 /**
  * Resize image filter class
@@ -240,7 +241,7 @@ export class Resize extends BaseFilter {
       dX = oW,
       dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = getEnv().document.createElement('canvas');
+      resources.sliceByTwo = createCanvasElement();
     }
     const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {

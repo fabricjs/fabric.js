@@ -4,7 +4,7 @@
   });
   var visualTestLoop;
   var getAssetName;
-  if (fabric.getEnv().isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAssetName = global.getAssetName;
   }
@@ -32,7 +32,7 @@
       callback(newCanvas);
     };
     image.onerror = console.log;
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
       image.src = dataUrl;
     }
     else {
