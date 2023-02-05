@@ -2086,7 +2086,7 @@ QUnit.module('Free Drawing', hooks => {
 
     fabricClass: 'Canvas',
 
-    disabled: fabric.getEnv().isLikelyNode
+    disabled: isNode()
   };
 
   function freedrawing(canvas) {
