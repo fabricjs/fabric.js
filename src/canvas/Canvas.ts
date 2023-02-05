@@ -837,7 +837,7 @@ export class Canvas extends SelectableCanvas {
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
       if (this.selection && this._groupSelector) {
-        const objects = this._collectObjects(e);
+        const objects = this._collectObjects(e).reverse();
         // do not create group for 1 element only
         if (objects.length === 1) {
           this.setActiveObject(objects[0], e);
