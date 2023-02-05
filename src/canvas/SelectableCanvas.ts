@@ -1477,16 +1477,14 @@ export class SelectableCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
+    const objects: (FabricObject | undefined)[] = [this._activeObject];
     if (this.isCurrentlyDrawing()) {
       // force brush to redraw
       this.shouldClearContextTop = true;
-      this.freeDrawingBrush!.clipPath?.setCoords();
+      objects.push(this.freeDrawingBrush!.clipPath);
     }
     super.setViewportTransform(vpt);
-    const activeObject = this._activeObject;
-    if (activeObject) {
-      activeObject.setCoords();
-    }
+    objects.forEach((object) => object?.setCoords());
   }
 
   /**
