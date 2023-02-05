@@ -11,6 +11,20 @@
         A strong community means a strong and better product for everyone.
 -->
 
+<!--
+        📣 IMPORTANT NOTICE - PR LOCK DOWN 🔒    04/2022
+        We are excited to announce that fabric is migrating to modern typescript/javascript 🤩.
+        This means we will ⛔ not be accepting any PRs out of scope with the migration.
+        We understand this might be annoying but wasted work is ever more so.
+        The migration will be extreme on the source code so PRs from before will probably become stale to the point of death after the migration.
+        It hurts us the throw away good work, effort and time put into fabric so please stay patient.
+        You are welcome to join the migration effort 🔨
+        https://github.com/fabricjs/fabric.js/issues/7596
+
+        If you remain strong minded about PRing and the fix is small you can submit a PR to the 5.x branch
+        During the migration we will port these changes to master
+-->
+
 ## Motivation
 
 <!-- Why you are proposing -->
