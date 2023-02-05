@@ -30,7 +30,7 @@ export class WebGLProbe extends GLProbe {
   /**
    * query browser for WebGL
    */
-  queryGL() {
+  queryWebGL() {
     const canvas = createCanvasElement();
     const gl = canvas.getContext('webgl');
     if (gl) {

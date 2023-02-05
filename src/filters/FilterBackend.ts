@@ -11,9 +11,9 @@ let filterBackend: FilterBackend;
  * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
  */
 export function initFilterBackend(): FilterBackend {
-  const { GLProbe } = getEnv();
-  GLProbe.queryGL();
-  if (config.enableGLFiltering && GLProbe.isSupported(config.textureSize)) {
+  const { WebGLProbe } = getEnv();
+  WebGLProbe.queryWebGL();
+  if (config.enableGLFiltering && WebGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({ tileSize: config.textureSize });
   } else {
     return new Canvas2dFilterBackend();

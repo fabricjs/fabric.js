@@ -72,11 +72,11 @@ export abstract class AbstractBaseFilter<T> {
     fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
-    const { GLProbe } = getEnv();
-    if (GLProbe.GLPrecision && GLProbe.GLPrecision !== GLPrecision.high) {
+    const { WebGLProbe } = getEnv();
+    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(GLPrecision.high, GLProbe.GLPrecision)
+        highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);

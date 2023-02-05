@@ -6,6 +6,6 @@ export enum GLPrecision {
 
 export abstract class GLProbe {
   declare GLPrecision: GLPrecision | undefined;
-  abstract queryGL(): void;
+  abstract queryWebGL(): void;
   abstract isSupported(textureSize: number): boolean;
 }

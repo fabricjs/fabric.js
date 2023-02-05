@@ -6,7 +6,7 @@ import { GLProbe } from './GLProbe';
  * - https://github.com/akira-cn/node-canvas-webgl
  */
 export class NodeGLProbe extends GLProbe {
-  queryGL() {
+  queryWebGL() {
     // noop
   }
   isSupported() {

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
+// @ts-ignore
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
@@ -36,7 +37,7 @@ export const getEnv = (): TFabricEnv => {
     document: JSDOMWindow.document,
     window: JSDOMWindow,
     isTouchSupported: false,
-    GLProbe: new NodeGLProbe(),
+    WebGLProbe: new NodeGLProbe(),
     dispose(element) {
       const impl = jsdomImplForWrapper(element);
       if (impl) {
