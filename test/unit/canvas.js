@@ -114,6 +114,7 @@
       canvas.off();
       canvas.calcOffset();
       canvas.cancelRequestedRender();
+      delete canvas._groupSelector;
       upperCanvasEl.style.display = 'none';
     }
   });
@@ -447,7 +448,12 @@
     assert.equal(isFired, true, 'switching active group fires deselected');
   });
 
-  QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
+  function runGroupSelector(canvas) {
+    canvas._groupSelector = {};
+    canvas.__onMouseUp({}); 
+  }
+
+  QUnit.test('group selected objects fires selected for objects', function(assert) {
     var fired = 0;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
@@ -457,13 +463,13 @@
     };
     rect1.on('selected', function() { fired++; });
     rect2.on('selected', function() { fired++; });
-    rect3.on('selected', function() { fired++; });
-    canvas._groupSelectedObjects({});
+    rect3.on('selected', function () { fired++; });
+    runGroupSelector(canvas);
     assert.equal(fired, 3, 'event fired for each of 3 rects');
     canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
   });
 
-  QUnit.test('_groupSelectedObjects fires selection:created if more than one object is returned', function(assert) {
+  QUnit.test('group selected objects fires selection:created if more than one object is returned', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
@@ -472,7 +478,7 @@
       return [rect1, rect2, rect3];
     };
     canvas.on('selection:created', function() { isFired = true; });
-    canvas._groupSelectedObjects({});
+    runGroupSelector(canvas);
     assert.equal(isFired, true, 'selection created fired');
     assert.equal(canvas.getActiveObject().type, 'activeSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[2], rect1, 'rect1 is first object');
@@ -482,15 +488,15 @@
     canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
   });
 
-  QUnit.test('_groupSelectedObjects fires selection:created if one only object is returned', function(assert) {
+  QUnit.test('group selected objects fires selection:created if one only object is returned', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     canvas._collectObjects = function() {
       return [rect1];
     };
     canvas.on('selection:created', function() { isFired = true; });
-    canvas._groupSelectedObjects({});
-    assert.equal(isFired, true, 'selection:created fired for _groupSelectedObjects');
+    runGroupSelector(canvas);
+    assert.equal(isFired, true, 'selection:created fired');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
