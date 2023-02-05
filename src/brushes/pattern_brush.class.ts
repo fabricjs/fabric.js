@@ -50,6 +50,7 @@ export class PatternBrush extends PencilBrush {
   _setBrushStyles(ctx: CanvasRenderingContext2D) {
     super._setBrushStyles(ctx);
     const pattern = this.getPattern(ctx);
+    pattern?.setTransform(new DOMMatrix(this.canvas.viewportTransform));
     pattern && (ctx.strokeStyle = pattern);
   }
 
