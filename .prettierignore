@@ -14,3 +14,4 @@ before_commit
 /dist/
 /lib/
 /test/
+/docs/
