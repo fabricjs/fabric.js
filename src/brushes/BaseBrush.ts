@@ -4,7 +4,7 @@ import { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/Canvas';
 
-type TBrushEventData = TEvent & { pointer: Point };
+export type TBrushEventData = TEvent & { pointer: Point };
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -85,6 +85,10 @@ export abstract class BaseBrush {
    * @returns true if brush should continue blocking interaction
    */
   abstract onMouseUp(ev: TBrushEventData): boolean | void;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onDoubleClick(pointer: Point) {
+    // noop
+  }
 
   /**
    * Sets brush styles
@@ -100,15 +104,16 @@ export abstract class BaseBrush {
     ctx.setLineDash(this.strokeDashArray || []);
   }
 
+  transform(ctx: CanvasRenderingContext2D) {
+    ctx.transform(...this.canvas.viewportTransform);
+  }
+
   /**
    * Sets the transformation on given context
-   * @param {CanvasRenderingContext2D} ctx context to render on
-   * @private
    */
   protected _saveAndTransform(ctx: CanvasRenderingContext2D) {
-    const v = this.canvas.viewportTransform;
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    this.transform(ctx);
   }
 
   protected needsFullRender() {

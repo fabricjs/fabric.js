@@ -539,10 +539,6 @@ export class Canvas extends SelectableCanvas {
     this.fire('drop:after', options);
   }
 
-  /**
-   * @private
-   * @param {Event} e Event object fired on mousedown
-   */
   private _onContextMenu(e: TPointerEvent): false {
     const target = this.findTarget(e),
       subTargets = this.targets || [];
@@ -557,11 +553,8 @@ export class Canvas extends SelectableCanvas {
     return false;
   }
 
-  /**
-   * @private
-   * @param {Event} e Event object fired on mousedown
-   */
   private _onDoubleClick(e: TPointerEvent) {
+    this.freeDrawingBrush?.onDoubleClick(this.getPointer(e));
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'dblclick');
     this._resetTransformEventData();
