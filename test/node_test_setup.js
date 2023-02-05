@@ -82,7 +82,7 @@ var virtualWindow = new jsdom.JSDOM(
     resources: new CustomResourceLoader(),
     pretendToBeVisual: true
   }).window;
-fabric.setEnv({ ...fabric.getEnv(), window: virtualWindow, document: virtualWindow.document });
+fabric.setEnvForTests(virtualWindow);
 
 
 //  QUnit Logging
