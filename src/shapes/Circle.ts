@@ -31,7 +31,12 @@ export class Circle extends FabricObject {
    */
   declare endAngle: number;
 
-  static cacheProperties = [...cacheProperties, 'radius', 'startAngle', 'endAngle'];
+  static cacheProperties = [
+    ...cacheProperties,
+    'radius',
+    'startAngle',
+    'endAngle',
+  ];
 
   /**
    * @private
