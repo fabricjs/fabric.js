@@ -32,6 +32,10 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import {
+  ActiveSelection,
+  activeSelectionDefaultValues,
+} from '../shapes/ActiveSelection';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -490,6 +494,12 @@ export class SelectableCanvas<
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
+  protected readonly _activeSelection: ActiveSelection;
+
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
+    this._activeSelection = new ActiveSelection([], { canvas: this });
+  }
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -541,40 +551,12 @@ export class SelectableCanvas<
    * @return {Array} objects to render immediately and pushes the other in the activeGroup.
    */
   _chooseObjectsToRender(): FabricObject[] {
-    const activeObjects = this.getActiveObjects();
-    let objsToRender, activeGroupObjects;
-
-    if (!this.preserveObjectStacking && activeObjects.length > 1) {
-      objsToRender = [];
-      activeGroupObjects = [];
-      for (let i = 0, length = this._objects.length; i < length; i++) {
-        const object = this._objects[i];
-        if (activeObjects.indexOf(object) === -1) {
-          objsToRender.push(object);
-        } else {
-          activeGroupObjects.push(object);
-        }
-      }
-      if (activeObjects.length > 1 && isCollection(this._activeObject)) {
-        this._activeObject._objects = activeGroupObjects;
-      }
-      objsToRender.push(...activeGroupObjects);
-    }
-    //  in case a single object is selected render it's entire parent above the other objects
-    else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-      const target = activeObjects[0],
-        ancestors = target.getAncestors(true);
-      const topAncestor = (
-        ancestors.length === 0 ? target : ancestors.pop()
-      ) as FabricObject;
-      objsToRender = this._objects.slice();
-      const index = objsToRender.indexOf(topAncestor);
-      index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
-      objsToRender.push(topAncestor);
-    } else {
-      objsToRender = this._objects;
-    }
-    return objsToRender;
+    const activeObject = this._activeObject;
+    return !this.preserveObjectStacking && activeObject
+      ? this._objects
+          .filter((object) => !object.group && object !== activeObject)
+          .concat(activeObject)
+      : this._objects;
   }
 
   /**
@@ -1302,6 +1284,13 @@ export class SelectableCanvas<
    */
   getActiveObject(): FabricObject | undefined {
     return this._activeObject;
+  }
+
+  /**
+   * Returns instance's active selection
+   */
+  getActiveSelection() {
+    return this._activeSelection;
   }
 
   /**
