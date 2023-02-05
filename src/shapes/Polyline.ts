@@ -44,6 +44,8 @@ export class Polyline extends FabricObject {
 
   declare strokeOffset: Point;
 
+  static cacheProperties = [...cacheProperties, 'points'];
+
   /**
    * Constructor
    * @param {Array} points Array of points (where each point is an object with x and y)
@@ -316,7 +318,6 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
 
 Object.assign(Polyline.prototype, {
   ...polylineDefaultValues,
-  cacheProperties: [...cacheProperties, 'points'],
   strokeBBoxAffectingProperties: [
     'skewX',
     'skewY',

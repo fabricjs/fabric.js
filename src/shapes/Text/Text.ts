@@ -368,6 +368,8 @@ export class Text<
 
   declare initialized?: true;
 
+  static cacheProperties = [...cacheProperties, ...additionalProps];
+
   constructor(text: string, options: any) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
@@ -1919,7 +1921,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     baseline: 0.11, // baseline-shift factor (downwards)
   },
   textBackgroundColor: '',
-  cacheProperties: [...cacheProperties, ...additionalProps],
   stroke: null,
   shadow: null,
   path: null,
