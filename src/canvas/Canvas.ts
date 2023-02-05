@@ -15,6 +15,7 @@ import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { resetObjectTransform } from '../util/misc/objectTransforms';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
@@ -1433,7 +1434,7 @@ export class Canvas extends SelectableCanvas {
         : null,
       // only show proper corner when group selection is not active
       corner =
-        (!activeSelection || !activeSelection.contains(target)) &&
+        (!activeSelection || target.group !== activeSelection) &&
         // here we call findTargetCorner always with undefined for the touch parameter.
         // we assume that if you are using a cursor you do not need to interact with
         // the bigger touch area.
@@ -1478,9 +1479,9 @@ export class Canvas extends SelectableCanvas {
       target.selectable &&
       // if all pre-requisite pass, the target is either something different from the current
       // activeObject or if an activeSelection already exists
-      // TODO at time of writing why `activeObject.type === 'activeSelection'` matter is unclear.
+      // TODO at time of writing why `isActiveSelection(activeObject)` matter is unclear.
       // is a very old condition uncertain if still valid.
-      (activeObject !== target || activeObject.type === 'activeSelection') &&
+      (activeObject !== target || isActiveSelection(activeObject)) &&
       //  make sure `activeObject` and `target` aren't ancestors of each other
       !target.isDescendantOf(activeObject) &&
       !activeObject.isDescendantOf(target) &&
@@ -1511,7 +1512,7 @@ export class Canvas extends SelectableCanvas {
         return;
       }
     }
-    if (activeObject && activeObject.type === 'activeSelection') {
+    if (isActiveSelection(activeObject)) {
       this._updateActiveSelection(e, groupingTarget);
     } else {
       this._createActiveSelection(e, groupingTarget);
@@ -1521,46 +1522,60 @@ export class Canvas extends SelectableCanvas {
   /**
    * @private
    */
-  _updateActiveSelection(e: TPointerEvent, target: FabricObject) {
-    const activeSelection = this._activeObject! as ActiveSelection,
-      currentActiveObjects = activeSelection.getObjects();
-    if (target.group === activeSelection) {
-      activeSelection.remove(target);
-      this._hoveredTarget = target;
-      this._hoveredTargets = this.targets.concat();
-      if (activeSelection.size() === 1) {
+  _updateActiveSelection(e: TPointerEvent, groupingTarget: FabricObject) {
+    const activeObject = this._activeObject! as ActiveSelection,
+      prevActiveObjects = activeObject.getObjects() as FabricObject[];
+    if (groupingTarget.group === activeObject) {
+      // clicked on a selected target => toggle selection
+      activeObject.remove(groupingTarget);
+      this._hoveredTarget = groupingTarget;
+      this._hoveredTargets = [...this.targets];
+      if (activeObject.size() === 1) {
         // activate last remaining object
-        this._setActiveObject(activeSelection.item(0) as FabricObject, e);
+        this._setActiveObject(activeObject.item(0) as FabricObject, e);
       }
     } else {
-      activeSelection.add(target);
-      this._hoveredTarget = activeSelection;
-      this._hoveredTargets = this.targets.concat();
+      //  respect object stacking in ActiveSelection
+      //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+      const index = activeObject._objects.findIndex((obj) =>
+        obj.isInFrontOf(groupingTarget)
+      );
+      const insertAt =
+        index === -1
+          ? //  groupingTarget is in front of all other objects
+            activeObject.size()
+          : index;
+      activeObject.insertAt(insertAt, groupingTarget);
+      this._hoveredTarget = activeObject;
+      this._hoveredTargets = [...this.targets];
     }
-    this._fireSelectionEvents(currentActiveObjects as FabricObject[], e);
+    this._fireSelectionEvents(prevActiveObjects, e);
   }
 
   /**
    * Generates and set as active the active selection from user events
    * @private
    */
-  _createActiveSelection(e: TPointerEvent, target: FabricObject) {
-    const currentActive = this.getActiveObject()!;
-    const groupObjects = target.isInFrontOf(currentActive)
-      ? [currentActive, target]
-      : [target, currentActive];
-    // @ts-ignore
-    currentActive.isEditing && currentActive.exitEditing();
-    //  handle case: target is nested
-    const newActiveSelection = new ActiveSelection(groupObjects, {
-      canvas: this,
-    });
-    this._hoveredTarget = newActiveSelection;
+  _createActiveSelection(e: TPointerEvent, groupingTarget: FabricObject) {
+    const activeObject = this.getActiveObject()!;
+
+    // TODO: out of scope, move to somewhere else
+    isInteractiveTextObject(activeObject) && activeObject.exitEditing();
+
+    this._activeSelection.removeAll();
+    resetObjectTransform(this._activeSelection);
+    this._activeSelection.add(
+      ...(groupingTarget.isInFrontOf(activeObject)
+        ? [activeObject, groupingTarget]
+        : [groupingTarget, activeObject])
+    );
+
+    this._hoveredTarget = this._activeSelection;
     // ISSUE 4115: should we consider subTargets here?
     // this._hoveredTargets = [];
     // this._hoveredTargets = this.targets.concat();
-    this._setActiveObject(newActiveSelection, e);
-    this._fireSelectionEvents([currentActive], e);
+    this._setActiveObject(this._activeSelection, e);
+    this._fireSelectionEvents([activeObject], e);
   }
 
   /**
@@ -1569,15 +1584,13 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e mouse event
    */
   _groupSelectedObjects(e: TPointerEvent) {
-    const group = this._collectObjects(e);
+    const objects = this._collectObjects(e);
     // do not create group for 1 element only
-    if (group.length === 1) {
-      this.setActiveObject(group[0], e);
-    } else if (group.length > 1) {
-      const aGroup = new ActiveSelection(group.reverse(), {
-        canvas: this,
-      });
-      this.setActiveObject(aGroup, e);
+    if (objects.length === 1) {
+      this.setActiveObject(objects[0], e);
+    } else if (objects.length > 1) {
+      this._activeSelection.add(...objects);
+      this.setActiveObject(this._activeSelection, e);
     }
   }
 
@@ -1630,11 +1643,9 @@ export class Canvas extends SelectableCanvas {
       }
     }
 
-    if (group.length > 1) {
-      return group.filter((object) => !object.onSelect({ e }));
-    }
-
-    return group;
+    return group.length > 1
+      ? group.filter((object) => !object.onSelect({ e })).reverse()
+      : group;
   }
 
   /**
