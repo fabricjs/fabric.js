@@ -1,6 +1,6 @@
 
 QUnit.module('WebGL', hooks => {
-    const isNode = fabric.isLikelyNode;
+    const isNode = fabric.getEnv().isLikelyNode;
 
     hooks.afterEach(() => {
         fabric.config.restoreDefaults();
@@ -16,7 +16,7 @@ QUnit.module('WebGL', hooks => {
 
     QUnit[!isNode ? 'test' : 'skip']('initFilterBackend browser', function (assert) {
         assert.ok(fabric.config.enableGLFiltering, 'enableGLFiltering should be enabled by default');
-        assert.ok(fabric.initFilterBackend() instanceof fabric.WebglFilterBackend, 'should init webGL backend on browser');
+        assert.ok(fabric.initFilterBackend() instanceof fabric.WebGLFilterBackend, 'should init webGL backend on browser');
         fabric.config.configure({ textureSize: Infinity });
         assert.ok(fabric.initFilterBackend() instanceof fabric.Canvas2dFilterBackend, 'should fallback to 2d backend if textureSize is too big');
         fabric.config.configure({ enableGLFiltering: false });

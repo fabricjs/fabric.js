@@ -37,7 +37,7 @@
 
   function getPathElement(path) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'path');
+    var el = fabric.getDocument().createElementNS(namespace, 'path');
     el.setAttributeNS(namespace, 'd', path);
     el.setAttributeNS(namespace, 'fill', 'red');
     el.setAttributeNS(namespace, 'stroke', 'blue');
@@ -127,12 +127,7 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var left = path.left;
-    var top = path.top;
-    path.center();
-    assert.equal(left, path.left);
-    assert.equal(top, path.top);
-    var opts = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+    var opts = { ...REFERENCE_PATH_OBJECT };
     delete opts.path;
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -231,7 +226,7 @@
     makePathObject(function(path) {
       var src = 'http://example.com/';
       path.sourcePath = src;
-      var clonedRef = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+      var clonedRef = { ...REFERENCE_PATH_OBJECT };
       clonedRef.sourcePath = src;
       delete clonedRef.path;
       assert.deepEqual(path.toDatalessObject(), clonedRef, 'if sourcePath the object looses path');
@@ -271,7 +266,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'fill', 'red');
@@ -290,12 +285,13 @@
     fabric.Path.fromElement(elPath, function(path) {
       assert.ok(path instanceof fabric.Path);
 
-      assert.deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+      assert.deepEqual(path.toObject(), {
+        ...REFERENCE_PATH_OBJECT,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
         strokeLineJoin:   'bevel',
         strokeMiterLimit: 5
-      }));
+      });
 
       var ANGLE_DEG = 90;
       elPath.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');
@@ -313,7 +309,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'transform', 'scale(.2)');

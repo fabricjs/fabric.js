@@ -1,12 +1,16 @@
-import { fabric } from '../../HEADER';
-import { Point } from '../point.class';
-import { Polygon } from '../shapes/polygon.class';
-import { Polyline } from '../shapes/polyline.class';
-import { TBrushEventData } from './base_brush.class';
+import { TPointerEventInfo } from '../EventTypeDefs';
+import { TFabricEvent } from '../FabricEvent';
+import { Point } from '../Point';
+import { Polygon } from '../shapes/Polygon';
+import { Polyline } from '../shapes/Polyline';
 import { DrawShapeBase } from './DrawShapeBase';
 
 export class DrawPoly extends DrawShapeBase<Polyline> {
   builder = Polygon;
+
+  protected subscribe() {
+    return [...super.subscribe(), this.on('mouse:dblclick', this.end)];
+  }
 
   private addPoint(pointer: Point) {
     this.shape!.points.push(pointer);
@@ -35,8 +39,9 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
     return shape;
   }
 
-  onMouseDown(pointer: Point, ev: TBrushEventData) {
-    super.onMouseDown(pointer, ev);
+  down(ev: TFabricEvent<TPointerEventInfo>) {
+    super.down(ev);
+    const pointer = this.extractPointer(ev);
     if (this.shape) {
       this.addPoint(pointer);
     } else {
@@ -46,20 +51,22 @@ export class DrawPoly extends DrawShapeBase<Polyline> {
     }
   }
 
-  onMouseMove(pointer: Point) {
-    this.replacePoint(pointer);
+  move(ev: TFabricEvent<TPointerEventInfo>) {
+    super.move(ev);
+    this.replacePoint(this.extractPointer(ev));
   }
 
-  onMouseUp({ pointer }: { pointer: Point }) {
+  up(ev: TFabricEvent<TPointerEventInfo>) {
+    super.up(ev);
+    const pointer = this.extractPointer(ev);
     this.replacePoint(pointer);
     this.addPoint(pointer);
     return true;
   }
 
-  onDoubleClick(pointer: Point) {
-    this.shape && this.replacePoint(pointer);
+  end(ev: TFabricEvent<TPointerEventInfo>) {
+    ev.preventDefault();
+    this.shape && this.replacePoint(this.extractPointer(ev));
     this.finalize();
   }
 }
-
-fabric.DrawPoly = DrawPoly;

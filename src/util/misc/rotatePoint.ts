@@ -1,4 +1,4 @@
-import type { Point } from '../../point.class';
+import type { Point } from '../../Point';
 import type { TRadian } from '../../typedefs';
 /**
  * Rotates `point` around `origin` with `radians`

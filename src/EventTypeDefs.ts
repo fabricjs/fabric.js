@@ -1,12 +1,19 @@
-import type { Control } from './controls/control.class';
-import type { Point } from './point.class';
+import type { Control } from './controls/Control';
+import type { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import type { Group } from './shapes/group.class';
+import type { FabricObject as StaticFabricObject } from './shapes/Object/Object';
+import type { FabricObjectSVGExportMixin } from './shapes/Object/FabricObjectSVGExportMixin';
+import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
-import type { Canvas } from './canvas/canvas_events';
-import type { IText } from './shapes/itext.class';
-import type { StaticCanvas } from './canvas/static_canvas.class';
+import type { Canvas } from './canvas/Canvas';
+import type { IText } from './shapes/IText/IText';
+import type { StaticCanvas } from './canvas/StaticCanvas';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
+export interface BaseFabricObject
+  extends StaticFabricObject,
+    FabricObjectSVGExportMixin {}
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -125,7 +132,6 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
   TEvent<E> & {
     target?: FabricObject;
     subTargets?: FabricObject[];
-    button?: number;
     isClick: boolean;
     pointer: Point;
     transform?: Transform | null;
@@ -134,10 +140,10 @@ export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
     currentTarget?: FabricObject | null;
   };
 
-type SimpleEventHandler<T extends Event = TPointerEvent> =
-  TEventWithTarget<T> & {
-    subTargets: FabricObject[];
-  };
+type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
+  target?: FabricObject;
+  subTargets: FabricObject[];
+};
 
 type InEvent = {
   previousTarget?: FabricObject;
@@ -156,7 +162,7 @@ export type DragEventData = TEvent<DragEvent> & {
   dropTarget?: FabricObject;
 };
 
-type DropEventData = DragEventData & { pointer: Point };
+export type DropEventData = DragEventData & { pointer: Point };
 
 type DnDEvents = {
   dragstart: TEventWithTarget<DragEvent>;
@@ -192,8 +198,8 @@ type CanvasSelectionEvents = {
 };
 
 export type CollectionEvents = {
-  'object:added': { target: FabricObject };
-  'object:removed': { target: FabricObject };
+  'object:added': { target: StaticFabricObject };
+  'object:removed': { target: StaticFabricObject };
 };
 
 type BeforeSuffix<T extends string> = `${T}:before`;
@@ -253,6 +259,8 @@ export type StaticCanvasEvents = CollectionEvents & {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+
+  resize: never;
 };
 
 export type CanvasEvents = StaticCanvasEvents &

@@ -1,7 +1,8 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import type { Gradient } from './gradient/gradient.class';
-import type { Pattern } from './pattern.class';
-import type { Point } from './point.class';
+import { BaseFabricObject } from './EventTypeDefs';
+import type { Gradient } from './gradient/Gradient';
+import type { Pattern } from './Pattern';
+import type { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 
 interface NominalTag<T> {
@@ -87,6 +88,8 @@ export type TCornerPoint = {
   br: Point;
 };
 
+export type TSVGReviver = (markup: string) => string;
+
 export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
 
 export type TCacheCanvasDimensions = {
@@ -103,7 +106,7 @@ export type TToCanvasElementOptions = {
   top?: number;
   width?: number;
   height?: number;
-  filter?: (object: FabricObject) => boolean;
+  filter?: (object: BaseFabricObject) => boolean;
 };
 
 export type TDataUrlOptions = TToCanvasElementOptions & {

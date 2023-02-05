@@ -30,6 +30,8 @@
     assert.equal(cObj.type, 'object');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
+
+    assert.equal(cObj.objectCaching, !fabric.getEnv().isLikelyNode, 'object caching default value');
   });
 
   QUnit.test('get', function(assert) {
@@ -511,7 +513,7 @@
     assert.equal(canvas.contextContainer.getLineDash().length, 6, 'bailed immediately as array empty');
   });
 
-  QUnit.test('straighten', function(assert) {
+  QUnit.skip('straighten', function(assert) {
     var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
     assert.ok(typeof object.straighten === 'function');
 
@@ -540,7 +542,7 @@
     assert.equal(object.get('angle'), 270);
   });
 
-  QUnit.test('fxStraighten', function(assert) {
+  QUnit.skip('fxStraighten', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
@@ -552,13 +554,13 @@
 
     var callbacks = { onComplete: onComplete, onChange: onChange };
     assert.ok(typeof object.fxStraighten === 'function');
-    assert.ok(typeof object.fxStraighten(callbacks) === 'function', 'should return animation abort function');
+    assert.ok(typeof object.fxStraighten(callbacks).abort === 'function', 'should return animation context');
     assert.equal(fabric.util.toFixed(object.get('angle'), 0), 43);
     setTimeout(function(){
       assert.ok(onCompleteFired);
       assert.ok(onChangeFired);
       assert.equal(object.get('angle'), 0, 'angle should be set to 0 by the end of animation');
-      assert.ok(typeof object.fxStraighten() === 'function', 'should work without callbacks');
+      assert.ok(typeof object.fxStraighten().abort === 'function', 'should work without callbacks');
       done();
     }, 1000);
   });
@@ -628,112 +630,6 @@
     canvas.remove(object);
 
     assert.ok(removedEventFired);
-  });
-
-  QUnit.test('center', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.center === 'function');
-
-    canvas.add(object);
-    assert.equal(object.center(), object, 'should be chainable');
-
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2);
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2);
-
-    canvas.setZoom(2);
-    object.center();
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2, 'object center.x is in canvas center when the canvas is transformed');
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2, 'object center.y is in canvas center when the canvas is transformed');
-
-  });
-
-  QUnit.test('centerH', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.centerH === 'function');
-    var oldY = object.top;
-
-    canvas.add(object);
-    assert.equal(object.centerH(), object, 'should be chainable');
-
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2);
-    assert.equal(object.top, oldY, 'object top did not change');
-    canvas.setZoom(2);
-    object.centerH();
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2, 'object center.x is in canvas center when the canvas is transformed');
-  });
-
-  QUnit.test('centerV', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.centerV === 'function');
-    var oldX = object.left;
-
-    canvas.add(object);
-    assert.equal(object.centerV(), object, 'should be chainable');
-    assert.equal(object.left, oldX, 'object top did not change');
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2);
-
-    canvas.setZoom(2);
-    object.centerV();
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2, 'object center.y is in canvas center when the canvas is transformed');
-  });
-
-  QUnit.test('viewportCenter', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.viewportCenter === 'function');
-
-    canvas.add(object);
-    assert.equal(object.viewportCenter(), object, 'should be chainable');
-
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2);
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2);
-
-    canvas.setZoom(2);
-    object.viewportCenter();
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / (2 * canvas.getZoom()));
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / (2 * canvas.getZoom()));
-  });
-
-  QUnit.test('viewportCenterH', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.viewportCenterH === 'function');
-
-    var oldY = object.top;
-    canvas.add(object);
-    assert.equal(object.viewportCenterH(), object, 'should be chainable');
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / 2);
-    assert.equal(object.top, oldY, 'object top did not change');
-    canvas.setZoom(2);
-    object.viewportCenterH();
-    assert.equal(object.getCenterPoint().x, canvas.getWidth() / (2 * canvas.getZoom()));
-    assert.equal(object.top, oldY, 'object top did not change');
-  });
-
-  QUnit.test('viewportCenterV', function(assert) {
-    var object = new fabric.Object();
-    object.strokeWidth = 0;
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    assert.ok(typeof object.viewportCenterV === 'function');
-
-    var oldX = object.left;
-
-    canvas.add(object);
-    assert.equal(object.viewportCenterV(), object, 'should be chainable');
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / 2);
-    assert.equal(object.left, oldX, 'object left did not change');
-    canvas.setZoom(2);
-    object.viewportCenterV();
-    assert.equal(object.getCenterPoint().y, canvas.getHeight() / (2 * canvas.getZoom()));
-    assert.equal(object.left, oldX, 'object left did not change');
   });
 
   QUnit.test('isDescendantOf', function (assert) {
@@ -1084,27 +980,14 @@
     assert.equal(object.dirty, true, 'object is dirty again if cache gets created');
   });
 
-  QUnit.test('isCacheDirty statefullCache disabled', function(assert) {
+  QUnit.test('isCacheDirty', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
     object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
-    object.statefullCache = false;
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
     object.dirty = true;
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
-  });
-
-  QUnit.test('isCacheDirty statefullCache enabled', function(assert) {
-    var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
-    object.cacheProperties = ['propA', 'propB'];
-    object.dirty = false;
-    object.statefullCache = true;
-    object.propA = 'A';
-    object.setupState({ propertySet: 'cacheProperties' });
-    assert.equal(object.isCacheDirty(), false, 'object is not dirty');
-    object.propA = 'B';
-    assert.equal(object.isCacheDirty(), true, 'object is dirty because change in propA is detected by statefullCache');
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {
@@ -1430,10 +1313,11 @@
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
     assert.ok(typeof object.dispose === 'function');
-    object.animate('fill', 'red');
-    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
+    object.animate({ fill: 'red' });
+    const findAnimationsByTarget = target => fabric.runningAnimations.filter(({ target: t }) => target === t);
+    assert.equal(findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
-    assert.equal(fabric.runningAnimations.findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
+    assert.equal(findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
   });
   QUnit.test('prototype changes', function (assert) {
     var object = new fabric.Object();

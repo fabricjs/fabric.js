@@ -124,17 +124,18 @@
     assert.ok(typeof circle.toObject === 'function');
     assert.deepEqual(circle.toObject(), defaultProperties);
 
-    circle.set('left', 100).set('top', 200).set('radius', 15);
+    circle.set('left', 100);
+    circle.set('top', 200);
+    circle.set('radius', 15);
 
-    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
-      left:   100,
-      top:    200,
-      width:  30,
+    assert.deepEqual(circle.toObject(), {
+      ...defaultProperties,
+      left: 100,
+      top: 200,
+      width: 30,
       height: 30,
       radius: 15
     });
-
-    assert.deepEqual(circle.toObject(), augmentedProperties);
   });
 
   QUnit.test('toSVG with full circle', function(assert) {
@@ -157,7 +158,7 @@
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elCircle         = fabric.document.createElementNS(namespace, 'circle'),
+    var elCircle         = fabric.getDocument().createElementNS(namespace, 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -194,7 +195,7 @@
       assert.equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var elFaultyCircle = fabric.document.createElementNS(namespace, 'circle');
+      var elFaultyCircle = fabric.getDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
 
       var error;

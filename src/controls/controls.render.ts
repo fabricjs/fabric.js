@@ -1,7 +1,7 @@
-import { PiBy180, twoMathPi } from '../constants';
+import { twoMathPi } from '../constants';
 import type { FabricObject } from '../shapes/Object/Object';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import type { Control } from './control.class';
+import type { Control } from './Control';
 
 export type ControlRenderingStyleOverride = Partial<
   Pick<

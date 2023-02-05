@@ -1,27 +1,34 @@
-  function setBrush(canvas, brush) {
-    canvas.isDrawingMode = true;
-    canvas.freeDrawingBrush = brush;
-  }
-  var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, onComplete = false) {
-    const canvas = brush.canvas;
+function setBrush(canvas, brush) {
+  canvas.isDrawingMode = true;
+  canvas.freeDrawingBrush = brush;
+}
+function fireBrushEvent(brush, type, pointer) {
+  brush.fire(`mouse:${type}:before`, fabric.Event.init({
+    e: { pointerId: 1 },
+    pointer,
+    absolutePointer: brush.canvas._isRetinaScaling() ? brush.canvas.restorePointerVpt(pointer) : pointer
+  }));
+}
+function pointDrawer(points, brush, onComplete = false, onMove = undefined) {
+  const { canvas } = brush;
     setBrush(canvas, brush);
-    brush.onMouseDown(points[0], options);
+    fireBrushEvent(brush, 'down', points[0]);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.onMouseMove(points[i], options);
+      fireBrushEvent(brush, 'move', points[i]);
+      onMove && onMove(points[i], i, points);
     }
     if (onComplete) {
       canvas.once('interaction:completed', ({ result }) => {
         typeof onComplete === 'function' ? onComplete(canvas, result) : canvas.add(result);
       });
-      brush.onMouseUp(options);
+      fireBrushEvent(brush, 'up', points[points.length - 1]);
     }
   }
   
   function fireBrushUp(canvas) {
-    canvas.freeDrawingBrush.onMouseUp(options);
+    fireBrushEvent(canvas.freeDrawingBrush, 'up', new fabric.Point());
   }
 
   // function eraserDrawer(points, brush, fireUp = false) {
@@ -2036,7 +2043,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.isLikelyNode) {
+    if (fabric.getEnv().isLikelyNode) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2080,7 +2087,7 @@ QUnit.module('Free Drawing', hooks => {
 
     fabricClass: 'Canvas',
 
-    disabled: fabric.isLikelyNode
+    disabled: fabric.getEnv().isLikelyNode
   };
 
   function freedrawing(canvas) {
@@ -2250,6 +2257,29 @@ QUnit.module('Free Drawing', hooks => {
     }
   });
 
+  function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
+  }
+
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    name: 'withText',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+    }
+  });
+
   function generatePointsToCover(width, height, step) {
     const out = [];
     for (let y = -height, side = 0; y < height; y = y + step) {
@@ -2277,7 +2307,7 @@ QUnit.module('Free Drawing', hooks => {
                 inverted,
                 canvas
               });
-              clipPath.viewportCenter();
+              canvas.viewportCenterObject(clipPath);
               brush.clipPath = clipPath;
               canvas.freeDrawingBrush = brush;
               canvas.isDrawingMode = true;

@@ -2,12 +2,47 @@
 
 ## [next]
 
-- feat(Brush): `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
+- feat(Brush): new API, extend `Observable`, support `clipPath` [#8476](https://github.com/fabricjs/fabric.js/pull/8476)
   BREAKING:
   - brush doesn't add result to canvas anymore
   - `path:created`, `before:path:created` events are deprecated, use `interaction:completed` instead
   - `_render` method is now protected, use `render` instead
+  - renamed `PencilBrush#convertPointsToSVGPath` => `getPathFromPoints`
+  - `Canvas#freeDrawingCursor` => `Brush#cursor`
 - feat(): DrawShape, DrawOval, DrawPoly [#8430](https://github.com/fabricjs/fabric.js/pull/8430)
+- feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)
+- chore(): Change import and export strategy [#8622](https://github.com/fabricjs/fabric.js/pull/8622)
+- chore(): rename files to modern style [#8621](https://github.com/fabricjs/fabric.js/pull/8621)
+- chore(): move and rename text & itext files and organize as folders, rename mixins [#8620](https://github.com/fabricjs/fabric.js/pull/8620)
+- chore(TS): type IText, IText behavior, IText click behavior [#8610](https://github.com/fabricjs/fabric.js/pull/8610)
+- BREAKING: refactor `clone(obj, true)` with `cloneDeep(obj)` and remove all `extend`, `clone` calls in favor of object spreads. [#8600](https://github.com/fabricjs/fabric.js/pull/8600)
+- chore(TS): Fix some error caused by ts-nocheck removals [#8615](https://github.com/fabricjs/fabric.js/pull/8615)
+- refactor(IText): extract draggable text logic to a delegate [#8598](https://github.com/fabricjs/fabric.js/pull/8598)
+- chore(TS): Update StaticCanvas to remove ts-nocheck [#8606](https://github.com/fabricjs/fabric.js/pull/8606)
+- chore(TS): Update filters to remove ts-nocheck and added types where missing [#8609](https://github.com/fabricjs/fabric.js/pull/8609)
+- chore(TS): Intersection class, finalize TS [#8603](https://github.com/fabricjs/fabric.js/pull/8603)
+- chore(TS): Update Pattern to remove ts-nocheck and added types where missing [#8605](https://github.com/fabricjs/fabric.js/pull/8605)
+- chore(TS): Followup for interactivy and controls migration to TS [#8404](https://github.com/fabricjs/fabric.js/pull/8404)
+- refactor(IText): Fixes Draggable Text for retina and viewport transform #8534
+- chore(TS): refactor canvas init, fix `_initRetinaScaling` regression #8520
+- chore(TS): remove all remaining empty declarations [#8593](https://github.com/fabricjs/fabric.js/pull/8593)
+- refactor(IText): modernize IText cursor animation based on animation API changes (and fix minor regression) plus leftovers from #8547 [#8583](https://github.com/fabricjs/fabric.js/pull/8583)
+- refactor(Canvas, IText): Handle cross instance text editing states to an EditingManager class [#8543](https://github.com/fabricjs/fabric.js/pull/8543)
+- chore(TS): move to export, babel, new rollup, change import statement for fabric. [#8585](https://github.com/fabricjs/fabric.js/pull/8585);
+- chore(TS): Add declare in front of properties that are type definitions. [#8574](https://github.com/fabricjs/fabric.js/pull/8574)
+- refactor(Animation): BREAKING: Animation api reduction and semplification (byValue is removed, '+=' syntax is removed, callbacks fired 100%) [#8547](https://github.com/fabricjs/fabric.js/pull/8547)
+- feat(PolyControl): modify the shape of a poly with control points [#8556](https://github.com/fabricjs/fabric.js/pull/8556)
+- BREAKING: remove Object.stateful and Object.statefulCache [#8573](https://github.com/fabricjs/fabric.js/pull/8573)
+- fix(IText): refactor clearing context top logic of itext to align with brush pattern, using the canvas rendering cycle in order to guard from edge cases #8560
+- fix(Canvas): `_initRetinaScaling` initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
+- fix(Canvas): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
+- chore(TS): Use exports from files to build fabricJS, get rid of HEADER.js [#8549](https://github.com/fabricjs/fabric.js/pull/8549)
+- chore(): rm `fabric.filterBackend` => `getFilterBackend` [#8487](https://github.com/fabricjs/fabric.js/pull/8487)
+- chore(TS): migrate text SVG export mixin [#8486](https://github.com/fabricjs/fabric.js/pull/8486)
+- refactor(TS): `animate` and `AnimationRegistry` to classes [#8297](https://github.com/fabricjs/fabric.js/pull/8297)
+  BREAKING:
+  - return animation instance from animate instead of a cancel function and remove `findAnimationByXXX` from `AnimationRegistry`
+  - change `animateColor` signature to match `animate`, removed `colorEasing`
 - fix(Object Stacking): 🔙 refactor logic to support Group 🔝
 - chore(TS): migrate Group/ActiveSelection [#8455](https://github.com/fabricjs/fabric.js/pull/8455)
 - chore(TS): Migrate smaller mixins to classes (dataurl and serialization ) [#8542](https://github.com/fabricjs/fabric.js/pull/8542)

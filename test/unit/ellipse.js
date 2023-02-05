@@ -61,9 +61,13 @@
     assert.ok(typeof ellipse.toObject === 'function');
     assert.deepEqual(ellipse.toObject(), defaultProperties);
 
-    ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
+    ellipse.set('left', 100);
+    ellipse.set('top', 200);
+    ellipse.set('rx', 15);
+    ellipse.set('ry', 25);
 
-    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
+    assert.deepEqual(ellipse.toObject(), {
+      ...defaultProperties,
       left: 100,
       top: 200,
       rx: 15,
@@ -71,8 +75,6 @@
       width: 30,
       height: 50
     });
-
-    assert.deepEqual(ellipse.toObject(), augmentedProperties);
 
     ellipse.set('rx', 30);
     assert.deepEqual(ellipse.width, ellipse.rx * 2);
@@ -83,7 +85,8 @@
 
   QUnit.test('isNotVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
-    ellipse.set('rx', 0).set('ry', 0);
+    ellipse.set('rx', 0);
+    ellipse.set('ry', 0);
 
     assert.equal(ellipse.isNotVisible(), false, 'isNotVisible false when rx/ry are 0 because strokeWidth is > 0');
 
@@ -116,7 +119,7 @@
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elEllipse        = fabric.document.createElementNS(namespace, 'ellipse'),
+    var elEllipse        = fabric.getDocument().createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,

@@ -203,26 +203,27 @@
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.document.createElement('text');
+    var elText = fabric.getDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
       assert.ok(text instanceof fabric.Text);
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         left: 0,
         top: -14.05,
         width: 8,
         height: 18.08,
         fontSize: 16,
         originX: 'left'
-      });
+      };
       assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.document.createElementNS(namespace, 'text');
+    var elTextWithAttrs = fabric.getDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
@@ -249,7 +250,8 @@
 
       assert.ok(textWithAttrs instanceof fabric.Text);
 
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
         top:              -88.03,
@@ -270,7 +272,7 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-      });
+      };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
     });
   });

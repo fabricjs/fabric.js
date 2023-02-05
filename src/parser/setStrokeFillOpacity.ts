@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Color } from '../color';
+import { Color } from '../color/Color';
 import { toFixed } from '../util/misc/toFixed';
 import { colorAttributes } from './constants';
 import { FabricObject } from '../shapes/Object/FabricObject';

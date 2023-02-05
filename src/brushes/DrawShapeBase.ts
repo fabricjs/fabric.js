@@ -1,14 +1,14 @@
-import { Point } from '../point.class';
-import { Shadow } from '../shadow.class';
+import { Point } from '../Point';
+import { Shadow } from '../Shadow';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { BaseBrush } from './base_brush.class';
+import { SimpleBrush } from './SimpleBrush';
 
 /**
  * Declarative shape drawing using pointer events
  */
 export abstract class DrawShapeBase<
   T extends FabricObject
-> extends BaseBrush<T> {
+> extends SimpleBrush<T> {
   shape: T | undefined;
   stroke = '';
   fill = '';
@@ -41,14 +41,8 @@ export abstract class DrawShapeBase<
     return shape;
   }
 
-  _setBrushStyles() {
+  protected _setBrushStyles() {
     this.setStyles();
-  }
-
-  transform(ctx: CanvasRenderingContext2D) {
-    const t = this.canvas.viewportTransform;
-    const offset = new Point().transform(t);
-    ctx.transform(t[0], t[1], t[2], t[3], -offset.x, -offset.y);
   }
 
   protected _render(ctx: CanvasRenderingContext2D) {
