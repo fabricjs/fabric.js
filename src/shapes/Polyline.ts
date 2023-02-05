@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import { IPoint, Point } from '../Point';
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';

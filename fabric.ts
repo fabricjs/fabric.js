@@ -2,6 +2,7 @@ export { getEnv, getDocument, getWindow, setEnvForTests } from './src/env';
 export { cache } from './src/cache';
 export { VERSION as version, iMatrix } from './src/constants';
 export { config } from './src/config';
+export { classRegistry } from './src/ClassRegistry';
 export { runningAnimations } from './src/util/animation/AnimationRegistry';
 
 export { Observable } from './src/Observable';

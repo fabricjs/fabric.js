@@ -15,7 +15,7 @@ import {
   LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export type ImageSource =

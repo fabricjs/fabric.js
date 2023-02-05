@@ -93,7 +93,6 @@ export {
   requestAnimFrame,
   cancelAnimFrame,
 } from './animation/AnimationFrameProvider';
-export { classRegistry } from './class_registry';
 export { removeFromArray } from './internals/removeFromArray';
 export { getRandomInt } from './internals/getRandomInt';
 export { wrapElement } from './dom_misc';

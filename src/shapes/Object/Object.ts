@@ -12,7 +12,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';

@@ -7,7 +7,7 @@ import type {
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Blur filter class
