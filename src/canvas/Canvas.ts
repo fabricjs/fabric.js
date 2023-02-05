@@ -1107,12 +1107,12 @@ export class Canvas extends SelectableCanvas {
     const pointer = this.getPointer(e, true);
     // save pointer for check in __onMouseUp event
     this._previousPointer = pointer;
-    const shouldRender = this._shouldRender(target),
-      shouldGroup = this._shouldGroup(e, target);
+    const shouldRender = this._shouldRender(target);
+    let shouldGroup = false;
     if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
-    } else if (shouldGroup) {
-      // in order for shouldGroup to be true, target needs to be true
+    } else if (this._shouldGroup(e, target)) {
+      shouldGroup = true;
       this._handleGrouping(e, target!);
       target = this._activeObject;
     }
@@ -1477,7 +1477,10 @@ export class Canvas extends SelectableCanvas {
    * @param {FabricObject} target
    * @return {Boolean}
    */
-  _shouldGroup(e: TPointerEvent, target?: FabricObject): boolean {
+  protected _shouldGroup(
+    e: TPointerEvent,
+    target?: FabricObject
+  ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
     // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
     return (
@@ -1496,7 +1499,7 @@ export class Canvas extends SelectableCanvas {
       !target.isDescendantOf(activeObject) &&
       !activeObject.isDescendantOf(target) &&
       //  target accepts selection
-      !target.onSelect({ e: e })
+      !target.onSelect({ e })
     );
   }
 
@@ -1506,21 +1509,25 @@ export class Canvas extends SelectableCanvas {
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
    */
-  _handleGrouping(e: TPointerEvent, target: FabricObject) {
-    let groupingTarget: FabricObject | undefined = target;
-    // Called always a shouldGroup, meaning that we can trust this._activeObject exists.
-    const activeObject = this._activeObject!;
+  protected _handleGrouping(
+    this: AssertKeys<this, '_activeObject'>,
+    e: TPointerEvent,
+    target: FabricObject
+  ) {
+    const activeObject = this._activeObject;
     // avoid multi select when shift click on a corner
     if (activeObject.__corner) {
       return;
     }
+    let groupingTarget = target;
     if (groupingTarget === activeObject) {
       // if it's a group, find target again, using activeGroup objects
-      groupingTarget = this.findTarget(e, true);
+      const subTarget = this.findTarget(e, true);
       // if even object is not found or we are on activeObjectCorner, bail out
-      if (!groupingTarget || !groupingTarget.selectable) {
+      if (!subTarget || !subTarget.selectable) {
         return;
       }
+      groupingTarget = subTarget;
     }
     if (isActiveSelection(activeObject)) {
       this._updateActiveSelection(e, groupingTarget);
@@ -1588,10 +1595,7 @@ export class Canvas extends SelectableCanvas {
     this._fireSelectionEvents([activeObject], e);
   }
 
-  /**
-   * @private
-   */
-  _collectObjects(e: TPointerEvent) {
+  protected _collectObjects(e: TPointerEvent) {
     const group: FabricObject[] = [],
       _groupSelector = this._groupSelector,
       point1 = new Point(_groupSelector.ex, _groupSelector.ey),
