@@ -11,7 +11,7 @@ export enum PropagationState {
 export class FabricEvent<T> {
   declare defaultPrevented: boolean;
   declare propagate: PropagationState;
-  path: Observable<any>[] = [];
+  declare path: Observable<any>[];
 
   static init<T>(data?: T) {
     return new FabricEvent<T>(data) as TFabricEvent<T>;
@@ -27,6 +27,12 @@ export class FabricEvent<T> {
       },
       propagate: {
         value: PropagationState.propagate,
+        enumerable: false,
+        configurable: false,
+        writable: true,
+      },
+      path: {
+        value: [],
         enumerable: false,
         configurable: false,
         writable: true,
