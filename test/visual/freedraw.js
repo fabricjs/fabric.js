@@ -2042,7 +2042,7 @@ QUnit.module('Free Drawing', hooks => {
   }
   hooks.before(() => {
     objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });

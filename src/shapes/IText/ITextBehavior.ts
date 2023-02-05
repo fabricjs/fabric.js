@@ -1,4 +1,4 @@
-import { getEnv } from '../../env';
+import { getDocument } from '../../env';
 import {
   ObjectEvents,
   TPointerEvent,
@@ -388,7 +388,7 @@ export abstract class ITextBehavior<
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
-    getEnv().document.activeElement !== this.hiddenTextarea &&
+    getDocument().activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea!.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),

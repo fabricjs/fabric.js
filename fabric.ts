@@ -143,7 +143,6 @@ import { isTouchEvent, getPointer } from './src/util/dom_event';
 import {
   // getScrollLeftTop,
   getElementOffset,
-  cleanUpJsdomNode,
   makeElementUnselectable,
   makeElementSelectable,
 } from './src/util/dom_misc';
@@ -236,7 +235,6 @@ const util = {
   isTouchEvent,
   getPointer,
   // getScrollLeftTop,
-  cleanUpJsdomNode,
   makeElementUnselectable,
   makeElementSelectable,
   isTransparent,
