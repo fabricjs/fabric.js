@@ -599,7 +599,9 @@ export class SelectableCanvas<
       return;
     }
     if (
-      (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) ||
+      (this.contextTopDirty &&
+        !this._groupSelector &&
+        !this.isCurrentlyDrawing()) ||
       this.shouldClearContextTop
     ) {
       this.clearContext(this.contextTop);
