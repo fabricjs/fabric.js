@@ -47,7 +47,7 @@ export class StackedObject<
    * Returns instance's parent **EXCLUDING** `ActiveSelection`
    * @param {boolean} [strict] exclude canvas as well
    */
-  getParent<T extends boolean>(strict?: T) {
+  getParent<T extends boolean>(strict?: T): TAncestor | undefined {
     return (
       this.__owningGroup || this.group || (strict ? undefined : this.canvas)
     );
@@ -60,17 +60,20 @@ export class StackedObject<
    * @returns {boolean}
    */
   isDescendantOf(target: TAncestor): boolean {
-    let parent = this.group || this.canvas;
-    while (parent) {
-      if (target === parent) {
-        return true;
-      } else if (parent instanceof StaticCanvas) {
-        //  happens after all parents were traversed through without a match
-        return false;
-      }
-      parent = (parent as Group).group || (parent as Group).canvas;
-    }
-    return false;
+    return this.isDescendantOfTraversal(this, target);
+  }
+
+  private isDescendantOfTraversal<T extends StackedObject>(
+    a: T,
+    b: TAncestor
+  ): boolean {
+    return (
+      a.__owningGroup === b ||
+      a.group === b ||
+      a.canvas === b ||
+      (!!a.__owningGroup && this.isDescendantOfTraversal(a.__owningGroup, b)) ||
+      (!!a.group && this.isDescendantOfTraversal(a.group, b))
+    );
   }
 
   /**
@@ -80,13 +83,13 @@ export class StackedObject<
    */
   getAncestors<T extends boolean>(strict?: T): Ancestors<T> {
     const ancestors: TAncestor[] = [];
-    let parent = this.group || (strict ? undefined : this.canvas);
-    while (parent) {
-      ancestors.push(parent);
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let parent: TAncestor | undefined = this;
+    do {
       parent =
-        (parent as Group).group ||
-        (strict ? undefined : (parent as Group).canvas);
-    }
+        parent instanceof StackedObject ? parent.getParent(strict) : undefined;
+      parent && ancestors.push(parent);
+    } while (parent);
     return ancestors as Ancestors<T>;
   }
 
