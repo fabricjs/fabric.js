@@ -36,10 +36,11 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
     },
     resolveSource: {
       value(key: string) {
-        return (this.source &&
+        return ((this.source &&
           (this.source[key] ||
             (typeof this.source.resolve === 'function' &&
-              this.source.resolve(key)))) as Control | undefined;
+              this.source.resolve(key)))) ||
+          undefined) as Control | undefined;
       },
       configurable: false,
       enumerable: false,

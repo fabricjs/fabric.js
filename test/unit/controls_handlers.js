@@ -374,7 +374,7 @@
         assert.equal(controls.resolve('x'), source.x, 'resolve source key');
         assert.equal(controls.resolve('y'), source.source.y, 'resolve source key');
         assert.equal(controls.resolve('xyz'), undefined, 'can\'t resolve key');
-        assert.deepEqual(controls.keys(), ['o', 'x', 'y', 'a', 'b',], 'keys'); 
+        assert.deepEqual(controls.keys(), ['o', 'x', 'y', 'b', 'a'], 'keys'); 
         assert.deepEqual(controls.resolveAll(), { ...source.source, ...source, ...target, });
         const called = {};
         assert.equal(controls.forEach((control, key) => { called[key] = control }), undefined, 'forEach');
