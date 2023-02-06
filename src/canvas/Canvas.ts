@@ -1529,7 +1529,6 @@ export class Canvas extends SelectableCanvas {
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
-        // TODO: out of scope, move to somewhere else
         isInteractiveTextObject(activeObject) && activeObject.exitEditing();
         // add the active object and the target to the active selection and set it as the active object
         this._activeSelection.add(
