@@ -482,9 +482,16 @@
     group.insertAt(0, rect1);
     group.remove(rect3);
     canvas.add(rect3);
-    assertNestedObjectsInOrder([rect1, rect2], rect3);
-    assertNestedObjectsInOrder([rect1, rect3], rect2);
-    assertNestedObjectsInOrder([rect2, rect3], rect1);
+    function assertNestedObjectsInOrder2(init, added) {
+      assert.deepEqual(canvas.getObjects(), [group, rect3]);
+      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [group, rect3]);
+      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+    }
+    assertNestedObjectsInOrder2([rect1, rect2], rect3);
+    assertNestedObjectsInOrder2([rect1, rect3], rect2);
+    assertNestedObjectsInOrder2([rect2, rect3], rect1);
   });
 
   QUnit.test('group selected objects fires selected for objects', function(assert) {
