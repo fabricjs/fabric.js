@@ -453,7 +453,8 @@
     const rect3 = new fabric.Rect();
     canvas.add(rect1, rect2, rect3);
     function assertObjectsInOrder(init, added) {
-      const activeSelection = new fabric.ActiveSelection(init);
+      const activeSelection = canvas.getActiveSelection();
+      activeSelection.add(...init)
       canvas.setActiveObject(activeSelection);
       updateActiveSelection(canvas, added);
       assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3]);
