@@ -695,7 +695,10 @@ export class SelectableCanvas<
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
    */
-  _shouldClearSelection(e: TPointerEvent, target?: FabricObject): boolean {
+  _shouldClearSelection(
+    e: TPointerEvent,
+    target?: FabricObject
+  ): target is undefined {
     const activeObjects = this.getActiveObjects(),
       activeObject = this._activeObject;
 

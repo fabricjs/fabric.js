@@ -1101,7 +1101,7 @@ export class Canvas extends SelectableCanvas {
       this.discardActiveObject(e);
     } else if (this._shouldGroup(e, target)) {
       shouldGroup = true;
-      this._handleGrouping(e, target!);
+      this._handleGrouping(e, target);
       target = this._activeObject;
     }
     // we start a group selector rectangle if
