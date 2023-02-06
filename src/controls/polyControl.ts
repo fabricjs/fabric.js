@@ -10,6 +10,7 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
+import { createControlSet } from './default_controls';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
@@ -131,5 +132,5 @@ export function createPolyControls(
       ...options,
     });
   }
-  return controls;
+  return createControlSet(controls);
 }
