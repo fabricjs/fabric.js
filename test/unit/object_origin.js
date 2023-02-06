@@ -161,12 +161,12 @@
   });
 
   function normalizePoint(target, point, originX, originY) {
-    target.controls = {
+    target.controls = fabric.controlsUtils.createControlSet({
       test: new fabric.Control({
         offsetX: 0,
         offsetY: 0,
       })
-    }
+    });
     return fabric.controlsUtils.getLocalPoint({ target, corner: 'test' }, originX, originY, point.x, point.y);
   }
 

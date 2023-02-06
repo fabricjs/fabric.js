@@ -30,7 +30,7 @@
     assert.equal(cObj.isControlVisible('tl'), true);
   });
 
-  QUnit.test('setControlVisible is per object', function(assert) {
+  QUnit.test.only('setControlVisible is per object', function(assert) {
     assert.ok(fabric.Object);
 
     var cObj = new fabric.Object({ });
@@ -39,12 +39,12 @@
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
     assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
-    cObj.controls.tl.setVisibility(false);
+    cObj.controls.resolve('tl').setVisibility(false);
     assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
     cObj.setControlVisible('tl', true);
     assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precedence');
     // restore original visibility
-    cObj.controls.tl.setVisibility(true);
+    cObj.controls.resolve('tl').setVisibility(true);
   });
 
   QUnit.test('setControlsVisibility', function(assert) {
@@ -146,11 +146,11 @@
 
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   QUnit.test('corner coords: custom control size', function(assert) {
-    //set custom corner size
-    fabric.Object.prototype.controls.bl.sizeX = 30;
-    fabric.Object.prototype.controls.bl.sizeY = 10;
-
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
+    const bl = cObj.controls.resolve('bl');
+    //set custom corner size
+    bl.sizeX = 30;
+    bl.sizeY = 10;
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
@@ -195,8 +195,8 @@
     assert.equal(cObj.oCoords.mtr.corner.br.y.toFixed(2), -23.5);
 
     // reset
-    fabric.Object.prototype.controls.bl.sizeX = null;
-    fabric.Object.prototype.controls.bl.sizeY = null;
+    bl.sizeX = null;
+    bl.sizeY = null;
   });
 
   QUnit.test('_findTargetCorner', function(assert) {

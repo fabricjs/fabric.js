@@ -424,13 +424,11 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
     var mouseUpCalled = false;
     var mouseDownCalled = false;
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
-    rect.controls.br.mouseUpHandler = function() {
+    const br = rect.controls.resolve('br');
+    br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
-    rect.controls.br.mouseDownHandler = function() {
+    br.mouseDownHandler = function() {
       mouseDownCalled = true;
     };
     const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
@@ -451,7 +449,8 @@
     var e1 = { clientX: 6, clientY: 6, which: 1 };
     var e2 = { clientX: 9, clientY: 9, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0, scaleX: 0.5 });
-    rect.controls = {};
+    // remove controls
+    rect.controls.source = {};
     const group = new fabric.Group([rect, new fabric.Rect({ left: 100, top: 100, width: 3, height: 3 })], { interactive: true, subTargetCheck: true, scaleX: 2 });
     canvas.add(group);
     canvas.setActiveObject(rect);
@@ -470,13 +469,11 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
     var mouseDownCalled = false;
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
-    rect.controls.br.mouseUpHandler = function() {
+    const br = rect.controls.resolve('br');
+    br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
-    rect.controls.br.mouseDownHandler = function() {
+    br.mouseDownHandler = function() {
       mouseDownCalled = true;
     };
     canvas.add(rect);
@@ -496,10 +493,8 @@
     var e3 = { clientX: 100, clientY: 100, which: 1 };
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-    };
-    rect.controls.br.mouseUpHandler = function() {
+    const br = rect.controls.resolve('br');
+    br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
     canvas.add(rect);
@@ -520,14 +515,12 @@
     var mouseUpCalled1 = false;
     var mouseUpCalled2 = false;
 
-    rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-      tr: fabric.Object.prototype.controls.tr,
-    };
-    rect.controls.br.mouseUpHandler = function() {
+    const tr = rect.controls.resolve('tr');
+    const br = rect.controls.resolve('br');
+    br.mouseUpHandler = function() {
       mouseUpCalled1 = true;
     };
-    rect.controls.tr.mouseUpHandler = function() {
+    tr.mouseUpHandler = function() {
       mouseUpCalled2 = true;
     };
     canvas.add(rect);
