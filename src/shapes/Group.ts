@@ -484,7 +484,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
       if (
-        this.canvas.preserveObjectStacking &&
+        this.canvas?.preserveObjectStacking &&
         this._objects[i].group !== this
       ) {
         ctx.save();
