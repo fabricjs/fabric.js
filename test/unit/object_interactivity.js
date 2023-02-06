@@ -30,7 +30,7 @@
     assert.equal(cObj.isControlVisible('tl'), true);
   });
 
-  QUnit.test.only('setControlVisible is per object', function(assert) {
+  QUnit.test('setControlVisible is per object', function(assert) {
     assert.ok(fabric.Object);
 
     var cObj = new fabric.Object({ });
