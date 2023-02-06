@@ -349,6 +349,10 @@
             o[k] = v;
             return o;
           }, {}), called, 'map');
+        // mutate source
+        assert.equal(controls.resolve('c'), undefined, 'can\'t resolve key');
+        source.c = new fabric.Control();
+        assert.equal(controls.resolve('c'), source.c, 'source is shared');
       });
       QUnit.test('with control set as source', assert => {
         const target = {
@@ -385,6 +389,10 @@
             o[k] = v;
             return o;
           }, {}), called, 'map');
+        // mutate source
+        assert.equal(controls.resolve('c'), undefined, 'can\'t resolve key');
+        source.source.c = new fabric.Control();
+        assert.equal(controls.resolve('c'), source.source.c, 'source is shared');
       });
       QUnit.test('without source', assert => {
         const target = {
