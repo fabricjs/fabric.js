@@ -1405,6 +1405,9 @@ export class SelectableCanvas<
       return false;
     }
     this._activeObject = object;
+    // clear active selection since it is not active anymore
+    this._activeObject !== this._activeSelection &&
+      this._activeSelection.removeAll();
     return true;
   }
 
