@@ -10,7 +10,7 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
-import { createControlSet } from './default_controls';
+import { createControlSet } from './ControlSet';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 

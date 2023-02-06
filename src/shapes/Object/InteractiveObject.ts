@@ -13,10 +13,8 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
-import {
-  createControlSet,
-  defaultControls,
-} from '../../controls/default_controls';
+import { createObjectDefaultControls } from '../../controls/default_controls';
+import { createControlSet } from '../../controls/ControlSet';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -41,6 +39,8 @@ export interface DragMethods {
 }
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
+
+export const defaultControls = createControlSet(createObjectDefaultControls());
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents

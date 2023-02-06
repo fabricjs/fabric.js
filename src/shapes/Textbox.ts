@@ -2,10 +2,14 @@
 import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../util/class_registry';
-import {
-  createControlSet,
-  textboxDefaultControls,
-} from '../controls/default_controls';
+import { createResizeControls } from '../controls/default_controls';
+import { createControlSet } from '../controls/ControlSet';
+import { defaultObjectControls } from './Object/InteractiveObject';
+
+export const textboxDefaultControls = createControlSet(
+  createResizeControls(),
+  defaultObjectControls
+);
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
