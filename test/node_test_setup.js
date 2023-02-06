@@ -133,29 +133,29 @@ function getLoggingRepresentation(input) {
 //  https://api.qunitjs.com/extension/QUnit.dump.parse/
 QUnit.dump.maxDepth = 1;
 //  https://github.com/qunitjs/qunit/blob/main/src/assert.js
-QUnit.assert.deepEqual = function (actual, expected, message) {
-  actual = QUnit.dump.parse(actual);
-  expected = QUnit.dump.parse(expected);
-  this.pushResult({
-    result: QUnit.equiv(actual, expected),
-    message: `${message}\ndiff:\n${diff(actual, expected)}`,
-    actual,
-    expected
-  });
-};
-QUnit.assert.equal = function (actual, expected, message) {
-  this.pushResult({
-    result: actual == expected,
-    actual: getLoggingRepresentation(actual),
-    expected: getLoggingRepresentation(expected),
-    message
-  });
-};
-QUnit.assert.strictEqual = function (actual, expected, message) {
-  this.pushResult({
-    result: actual === expected,
-    actual: getLoggingRepresentation(actual),
-    expected: getLoggingRepresentation(expected),
-    message
-  });
-};
+// QUnit.assert.deepEqual = function (actual, expected, message) {
+//   actual = QUnit.dump.parse(actual);
+//   expected = QUnit.dump.parse(expected);
+//   this.pushResult({
+//     result: QUnit.equiv(actual, expected),
+//     message: `${message}\ndiff:\n${diff(actual, expected)}`,
+//     actual,
+//     expected
+//   });
+// };
+// QUnit.assert.equal = function (actual, expected, message) {
+//   this.pushResult({
+//     result: actual == expected,
+//     actual: getLoggingRepresentation(actual),
+//     expected: getLoggingRepresentation(expected),
+//     message
+//   });
+// };
+// QUnit.assert.strictEqual = function (actual, expected, message) {
+//   this.pushResult({
+//     result: actual === expected,
+//     actual: getLoggingRepresentation(actual),
+//     expected: getLoggingRepresentation(expected),
+//     message
+//   });
+// };
