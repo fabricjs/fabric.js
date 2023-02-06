@@ -57,24 +57,18 @@ export class StackedObject<
 
   /**
    * Checks if object is descendant of target
-   * Should be used instead of @link {Collection.contains} for performance reasons
+   * Should be used instead of {@link Group.contains} or {@link StaticCanvas.contains} for performance reasons
    * @param {TAncestor} target
    * @returns {boolean}
    */
   isDescendantOf(target: TAncestor): boolean {
-    return this.isDescendantOfTraversal(this, target);
-  }
-
-  private isDescendantOfTraversal<T extends StackedObject>(
-    a: T,
-    b: TAncestor
-  ): boolean {
     return (
-      a.__owningGroup === b ||
-      a.group === b ||
-      a.canvas === b ||
-      (!!a.__owningGroup && this.isDescendantOfTraversal(a.__owningGroup, b)) ||
-      (!!a.group && this.isDescendantOfTraversal(a.group, b))
+      this.__owningGroup === target ||
+      this.group === target ||
+      this.canvas === target ||
+      // walk up
+      (!!this.__owningGroup && this.__owningGroup.isDescendantOf(target)) ||
+      (!!this.group && this.group.isDescendantOf(target))
     );
   }
 
