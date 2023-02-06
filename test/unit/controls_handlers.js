@@ -353,6 +353,8 @@
         assert.equal(controls.resolve('c'), undefined, 'can\'t resolve key');
         source.c = new fabric.Control();
         assert.equal(controls.resolve('c'), source.c, 'source is shared');
+        target.z = new fabric.Control();
+        assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
       });
       QUnit.test('with control set as source', assert => {
         const target = {
@@ -393,6 +395,8 @@
         assert.equal(controls.resolve('c'), undefined, 'can\'t resolve key');
         source.source.c = new fabric.Control();
         assert.equal(controls.resolve('c'), source.source.c, 'source is shared');
+        target.z = new fabric.Control();
+        assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
       });
       QUnit.test('without source', assert => {
         const target = {
