@@ -10,7 +10,6 @@ import {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
@@ -115,14 +114,6 @@ export class Canvas extends SelectableCanvas {
   declare currentTarget?: FabricObject;
 
   declare currentSubTargets?: FabricObject[];
-
-  /**
-   * Holds a reference to a pointer during mousedown to compare on mouse up and determine
-   * if it was a click event
-   * @type FabricObject
-   * @private
-   */
-  declare _previousPointer: Point;
 
   private _isClick: boolean;
 
@@ -1104,9 +1095,6 @@ export class Canvas extends SelectableCanvas {
       return;
     }
 
-    const pointer = this.getPointer(e, true);
-    // save pointer for check in __onMouseUp event
-    this._previousPointer = pointer;
     const shouldRender = this._shouldRender(target);
     let shouldGroup = false;
     if (this._shouldClearSelection(e, target)) {
