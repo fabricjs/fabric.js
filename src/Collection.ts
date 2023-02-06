@@ -307,7 +307,9 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     }
 
     /**
-     * @returns array of objects contained in bbox ordered from top to bottom stacking wise
+     * Given a bounding box, return all the objects of the collection that are contained in it.
+     * If `includeIntersecting` is true, return also the objects that intersect the bounding box are well.
+     * @returns array of objects contained in the bounding box, ordered from top to bottom stacking wise
      */
     collectObjects(
       { left, top, width, height }: TBBox,
