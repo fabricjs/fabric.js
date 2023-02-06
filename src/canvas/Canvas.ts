@@ -856,7 +856,7 @@ export class Canvas extends SelectableCanvas {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else {
-        const control = target.controls[corner as string];
+        const control = target.controls.resolve(corner);
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
@@ -873,7 +873,8 @@ export class Canvas extends SelectableCanvas {
       (transform.target !== target || transform.corner !== corner)
     ) {
       const originalControl =
-          transform.target && transform.target.controls[transform.corner],
+          transform.target &&
+          transform.target.controls.resolve(transform.corner),
         originalMouseUpHandler =
           originalControl &&
           originalControl.getMouseUpHandler(
@@ -1139,7 +1140,7 @@ export class Canvas extends SelectableCanvas {
       );
       if (target === this._activeObject && (corner || !shouldGroup)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        const control = target.controls[corner],
+        const control = target.controls.resolve(corner),
           pointer = this.getPointer(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
@@ -1452,7 +1453,7 @@ export class Canvas extends SelectableCanvas {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = target.controls[corner];
+      const control = target.controls.resolve(corner)!;
       this.setCursor(control.cursorStyleHandler(e, control, target));
     }
   }

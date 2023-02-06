@@ -31,7 +31,7 @@ export const getActionFromCorner = (
   if (!corner || !alreadySelected) {
     return 'drag';
   }
-  const control = target.controls[corner];
+  const control = target.controls.resolve(corner);
   return control.getActionName(e, control, target);
 };
 
@@ -132,7 +132,7 @@ export function getLocalPoint(
   x: number,
   y: number
 ) {
-  const control = target.controls[corner],
+  const control = target.controls.resolve(corner),
     zoom = target.canvas?.getZoom() || 1,
     padding = target.padding / zoom,
     localPoint = normalizePoint(target, new Point(x, y), originX, originY);

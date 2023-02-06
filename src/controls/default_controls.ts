@@ -1,15 +1,15 @@
-import { FabricObject } from '../shapes/Object/FabricObject';
-import { Textbox } from '../shapes/Textbox';
-import { scaleCursorStyleHandler, scalingEqually } from './scale';
 import { changeWidth } from './changeWidth';
+import { Control } from './Control';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
+import { scaleCursorStyleHandler, scalingEqually } from './scale';
 import {
   scaleOrSkewActionName,
   scaleSkewCursorStyleHandler,
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './scaleSkew';
-import { Control } from './Control';
+
+export type TControlSet = Record<string, Control>;
 
 // use this function if you want to generate new controls for every instance
 export const createObjectDefaultControls = () => ({
@@ -106,27 +106,40 @@ export const createTextboxDefaultControls = () => ({
   ...createResizeControls(),
 });
 
-export const defaultControls = createObjectDefaultControls();
-
-// shared with the default object on purpose
-export const textboxDefaultControls = {
-  ...defaultControls,
-  ...createResizeControls(),
+export type HybridControls<T extends TControlSet> = T & {
+  resolve(key: string): Control | undefined;
 };
 
-FabricObject.prototype.controls = {
-  ...(FabricObject.prototype.controls || {}),
-  ...defaultControls,
-};
-
-if (Textbox) {
-  // this is breaking the prototype inheritance, no time / ideas to fix it.
-  // is important to document that if you want to have all objects to have a
-  // specific custom control, you have to add it to Object prototype and to Textbox
-  // prototype. The controls are shared as references. So changes to control `tr`
-  // can still apply to all objects if needed.
-  Textbox.prototype.controls = {
-    ...(Textbox.prototype.controls || {}),
-    ...textboxDefaultControls,
-  };
+export function createControlSet<T extends TControlSet, S extends TControlSet>(
+  target: T | HybridControls<T>,
+  source?: S | HybridControls<S>
+) {
+  return Object.defineProperties(target, {
+    source: {
+      value: source,
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+    resolve: {
+      value(key: string) {
+        return (
+          this[key] ||
+          (this.source && this.source.resolve
+            ? this.source.resolve(key)
+            : this.source[key])
+        );
+      },
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+  }) as HybridControls<T>;
 }
+
+export const defaultControls = createControlSet(createObjectDefaultControls());
+
+export const textboxDefaultControls = createControlSet(
+  createResizeControls(),
+  defaultControls
+);

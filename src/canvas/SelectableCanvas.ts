@@ -822,7 +822,7 @@ export class SelectableCanvas<
         )
       : this.getPointer(e);
     const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
+      control = !!corner && target.controls.resolve(corner),
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)

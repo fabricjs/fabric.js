@@ -13,13 +13,15 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
+import {
+  createControlSet,
+  defaultControls,
+} from '../../controls/default_controls';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
-
-type TControlSet = Record<string, Control>;
 
 type TBorderRenderingStyleOverride = Partial<
   Pick<FabricObject, 'borderColor' | 'borderDashArray'>
@@ -97,9 +99,8 @@ export class InteractiveFabricObject<
 
   /**
    * holds the controls for the object.
-   * controls are added by default_controls.js
    */
-  declare controls: TControlSet;
+  controls = createControlSet({}, defaultControls);
 
   /**
    * internal boolean to signal the code that the object is
@@ -155,13 +156,13 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
    */
-  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
+  _findTargetCorner(pointer: Point, forTouch = false): string {
     if (
       !this.hasControls ||
       !this.canvas ||
       (this.canvas._activeObject as InteractiveFabricObject) !== this
     ) {
-      return 0;
+      return '';
     }
 
     this.__corner = undefined;
@@ -194,7 +195,7 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return 0;
+    return '';
   }
 
   /**
@@ -305,8 +306,8 @@ export class InteractiveFabricObject<
       fabricObject: InteractiveFabricObject
     ) => any
   ) {
-    for (const i in this.controls) {
-      fn(this.controls[i], i, this);
+    for (const key in this.controls) {
+      fn(this.controls.resolve(key), key, this);
     }
   }
 
@@ -517,10 +518,8 @@ export class InteractiveFabricObject<
    * @returns {boolean} true if the specified control is visible, false otherwise
    */
   isControlVisible(controlKey: string): boolean {
-    return (
-      this.controls[controlKey] &&
-      this.controls[controlKey].getVisibility(this, controlKey)
-    );
+    const control = this.controls.resolve(controlKey);
+    return control && control.getVisibility(this, controlKey);
   }
 
   /**

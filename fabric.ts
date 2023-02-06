@@ -363,8 +363,6 @@ import { parsePointsAttribute } from './src/parser/parsePointsAttribute';
 import { parseTransformAttribute } from './src/parser/parseTransformAttribute';
 import { getCSSRules } from './src/parser/getCSSRules';
 
-import './src/controls/default_controls';
-
 export {
   parseElements,
   parseAttributes,
