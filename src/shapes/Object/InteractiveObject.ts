@@ -40,7 +40,9 @@ export interface DragMethods {
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
-export const defaultControls = createControlSet(createObjectDefaultControls());
+export const defaultObjectControls = createControlSet(
+  createObjectDefaultControls()
+);
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -100,7 +102,7 @@ export class InteractiveFabricObject<
   /**
    * holds the controls for the object.
    */
-  controls = createControlSet({}, defaultControls);
+  controls = createControlSet({}, defaultObjectControls);
 
   /**
    * internal boolean to signal the code that the object is

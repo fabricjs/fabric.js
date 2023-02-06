@@ -116,10 +116,3 @@ export type HybridControls<
   forEach<R>(cb: (control: Control, key: string) => R): void;
   map<R>(cb: (control: Control, key: string) => R): R[];
 };
-
-export const defaultControls = createControlSet(createObjectDefaultControls());
-
-export const textboxDefaultControls = createControlSet(
-  createResizeControls(),
-  defaultControls
-);
