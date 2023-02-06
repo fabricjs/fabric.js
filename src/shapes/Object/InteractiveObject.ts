@@ -14,7 +14,7 @@ import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
 import { createObjectDefaultControls } from '../../controls/default_controls';
-import { createControlSet } from '../../controls/ControlSet';
+import { createControlSet, isControlSet } from '../../controls/ControlSet';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -127,6 +127,11 @@ export class InteractiveFabricObject<
    * @param {Object} [options] Options object
    */
   constructor(options?: Record<string, unknown>) {
+    if (options?.controls && !isControlSet(options.controls)) {
+      throw new Error(
+        'fabric.js: controls must be initialized with `createControlSet`'
+      );
+    }
     super(options);
   }
 

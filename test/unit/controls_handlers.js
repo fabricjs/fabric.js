@@ -410,13 +410,15 @@
             return o;
           }, {}), called, 'map');
       });
-      QUnit.test('configuration', assert => {
+      QUnit.test('configuration and safety', assert => {
         assert.throws(() => fabric.controlsUtils.createControlSet({ source: new fabric.Control() }), 'source is reserved');
         const controls = fabric.controlsUtils.createControlSet({ a: new fabric.Control() });
         const source = { a: new fabric.Control() };
         controls.source = source;
         assert.equal(controls.source, source, 'source is writeable');
         assert.throws(() => { control.resolve = new fabric.Control() }, 'not writeable');
+        assert.throws(() => new fabric.Object({ controls: {} }), 'controls must be a control set');
+        assert.ok(new fabric.Object({ controls }), 'controls must be a control set');
       })
     });
   });

@@ -14,6 +14,12 @@ export type HybridControls<
   map<R>(cb: (control: Control, key: string) => R): R[];
 };
 
+export function isControlSet<T extends TControlSet>(
+  controls?: T | any
+): controls is HybridControls<T> {
+  return !!controls && typeof controls.resolve === 'function';
+}
+
 export function createControlSet<T extends TControlSet, S extends TControlSet>(
   target: T,
   source?: S | HybridControls<S>
@@ -36,10 +42,9 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
     },
     resolveSource: {
       value(key: string) {
-        return ((this.source &&
-          (this.source[key] ||
-            (typeof this.source.resolve === 'function' &&
-              this.source.resolve(key)))) ||
+        const source = this.source as S | undefined;
+        return ((source &&
+          (source[key] || (isControlSet(source) && source.resolve(key)))) ||
           undefined) as Control | undefined;
       },
       configurable: false,
@@ -48,10 +53,9 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
     },
     resolveAll: {
       value() {
+        const source = this.source as S | undefined;
         return {
-          ...(typeof this.source?.resolveAll === 'function'
-            ? this.source.resolveAll()
-            : this.source),
+          ...(isControlSet(source) ? source.resolveAll() : source),
           ...this,
         };
       },
