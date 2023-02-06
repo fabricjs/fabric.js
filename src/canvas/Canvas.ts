@@ -1101,6 +1101,7 @@ export class Canvas extends SelectableCanvas {
       this.discardActiveObject(e);
     } else if (this._shouldGroup(e, target)) {
       shouldGroup = true;
+      // may change active object
       this._handleGrouping(e, target);
       target = this._activeObject;
     }
@@ -1459,7 +1460,7 @@ export class Canvas extends SelectableCanvas {
   // Grouping objects mixin
 
   /**
-   * Return true if the current mouse event that generated a new selection should generate a group
+   * Return true if the current mouse down event that generated a new selection should generate a group
    * @private
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
@@ -1470,18 +1471,17 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
-    // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
+
     return (
+      // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
       this._isSelectionKeyPressed(e) &&
       this.selection &&
       // on top of that the user also has to hit a target that is selectable.
       !!target &&
       target.selectable &&
-      // if all pre-requisite pass, the target is either something different from the current
-      // activeObject or if an activeSelection already exists
-      // TODO at time of writing why `isActiveSelection(activeObject)` matter is unclear.
-      // is a very old condition uncertain if still valid.
+      // group target and active object only if they are different objects
+      // if they are the same we look for a subtarget when grouping
       (activeObject !== target || isActiveSelection(activeObject)) &&
       //  make sure `activeObject` and `target` aren't ancestors of each other
       !target.isDescendantOf(activeObject) &&
@@ -1492,7 +1492,8 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * Handles active selection creation for user event
+   * Handles active selection creation for user event.
+   * Sets the active object in case it is not set or in case there is a single active object left under active selection.
    * @private
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
@@ -1503,8 +1504,9 @@ export class Canvas extends SelectableCanvas {
     target: FabricObject
   ) {
     const activeObject = this._activeObject;
-    // avoid multi select when shift click on a corner
+
     if (activeObject.__corner) {
+      // avoid multi select when shift click on a corner
       return;
     }
     // TODO: out of scope, move to somewhere else
@@ -1564,6 +1566,9 @@ export class Canvas extends SelectableCanvas {
     }
   }
 
+  /**
+   * Runs on mouse up
+   */
   protected _collectObjects(e: TPointerEvent) {
     const _groupSelector = this._groupSelector,
       point1 = new Point(_groupSelector.ex, _groupSelector.ey),
