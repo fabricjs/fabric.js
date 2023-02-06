@@ -25,6 +25,14 @@ export class ActiveSelection extends Group {
 
   /**
    * @private
+   * @override we don't want the selection monitor to be active
+   */
+  __objectSelectionMonitor() {
+    //  noop
+  }
+
+  /**
+   * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    * @returns {boolean} true if object entered group
@@ -51,7 +59,7 @@ export class ActiveSelection extends Group {
     const parent = object.__owningGroup;
     if (parent) {
       //  return to owning group
-      parent.enterGroup(object);
+      parent._enterGroup(object);
       delete object.__owningGroup;
     }
   }
