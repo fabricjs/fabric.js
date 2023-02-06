@@ -106,12 +106,20 @@ export const createTextboxDefaultControls = () => ({
   ...createResizeControls(),
 });
 
-export type HybridControls<T extends TControlSet> = T & {
+export type HybridControls<
+  T extends TControlSet,
+  S extends TControlSet | never = never
+> = T & {
+  source: S;
   resolve(key: string): Control | undefined;
+  resolveSource(key: string): Control | undefined;
+  keys(): (keyof (T & S))[];
+  forEach<R>(cb: (control: Control, key: string) => R): void;
+  map<R>(cb: (control: Control, key: string) => R): R[];
 };
 
 export function createControlSet<T extends TControlSet, S extends TControlSet>(
-  target: T | HybridControls<T>,
+  target: T | HybridControls<T, S>,
   source?: S | HybridControls<S>
 ) {
   return Object.defineProperties(target, {
@@ -123,10 +131,17 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
     },
     resolve: {
       value(key: string) {
-        return (this[key] ||
-          (this.source &&
-            (this.source[key] ||
-              (this.source.resolve && this.source.resolve(key))))) as
+        return (this[key] || this.resolveSource(key)) as Control | undefined;
+      },
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+    resolveSource: {
+      value(key: string) {
+        return (this.source &&
+          (this.source[key] ||
+            (this.source.resolve && this.source.resolve(key)))) as
           | Control
           | undefined;
       },
@@ -134,7 +149,35 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
       enumerable: false,
       writable: true,
     },
-  }) as HybridControls<T>;
+    keys: {
+      value() {
+        return Object.keys({ ...this.source, ...this });
+      },
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+    forEach: {
+      value<T>(cb: (control: Control, key: string) => T) {
+        return Object.entries<Control>({ ...this.source, ...this }).forEach(
+          ([key, control]) => cb(control, key)
+        );
+      },
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+    map: {
+      value<T>(cb: (control: Control, key: string) => T) {
+        return Object.entries<Control>({ ...this.source, ...this }).map(
+          ([key, control]) => cb(control, key)
+        );
+      },
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    },
+  }) as HybridControls<T, S>;
 }
 
 export const defaultControls = createControlSet(createObjectDefaultControls());
