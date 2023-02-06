@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): selection logic to support nested multiselection [#8665](https://github.com/fabricjs/fabric.js/issues/8665)
 - docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
 - ci(): remove TS transformer [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
 - refactor(): BREAKING remove stateful mixin and functionality [#8663](https://github.com/fabricjs/fabric.js/pull/8663)
