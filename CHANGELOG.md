@@ -8,7 +8,7 @@
   - accessing a control:
     `rect.controls.tl` will be defined only if there is a scoped control that was defined on rect.
     In order to get the resolved `tl` control use `rect.controls.resolve('tl')`
-  - `source` is reserved key so apps with a `source` control will need to rename it
+  - `source` is a reserved key so apps with a `source` control will need to rename it
 - docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
 - ci(): remove TS transformer [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
 - refactor(): BREAKING remove stateful mixin and functionality [#8663](https://github.com/fabricjs/fabric.js/pull/8663)
