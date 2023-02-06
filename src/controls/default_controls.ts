@@ -123,12 +123,12 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
     },
     resolve: {
       value(key: string) {
-        return (
-          this[key] ||
-          (this.source && this.source.resolve
-            ? this.source.resolve(key)
-            : this.source[key])
-        );
+        return (this[key] ||
+          (this.source &&
+            (this.source[key] ||
+              (this.source.resolve && this.source.resolve(key))))) as
+          | Control
+          | undefined;
       },
       configurable: true,
       enumerable: false,
