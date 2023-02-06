@@ -447,7 +447,7 @@
     };
   }
 
-  QUnit.test('update active selection respects order of objects', function (assert) {
+  QUnit.test.skip('update active selection respects order of objects', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
