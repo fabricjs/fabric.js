@@ -38,6 +38,22 @@ export class StackedObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectGeometry<EventSpec> {
   /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  declare __owningGroup?: Group;
+
+  /**
+   * Returns instance's parent **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] exclude canvas as well
+   */
+  getParent<T extends boolean>(strict?: T) {
+    return (
+      this.__owningGroup || this.group || (strict ? undefined : this.canvas)
+    );
+  }
+
+  /**
    * Checks if object is descendant of target
    * Should be used instead of @link {Collection.contains} for performance reasons
    * @param {TAncestor} target
