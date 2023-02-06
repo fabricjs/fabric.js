@@ -1,7 +1,18 @@
 import { Control } from './Control';
-import { HybridControls } from './default_controls';
 
 export type TControlSet = Record<string, Control>;
+
+export type HybridControls<
+  T extends TControlSet,
+  S extends TControlSet | never = never
+> = T & {
+  source: S;
+  resolve(key: string): Control | undefined;
+  resolveSource(key: string): Control | undefined;
+  keys(): (keyof (T & S))[];
+  forEach<R>(cb: (control: Control, key: string) => R): void;
+  map<R>(cb: (control: Control, key: string) => R): R[];
+};
 
 export function createControlSet<T extends TControlSet, S extends TControlSet>(
   target: T | HybridControls<T, S>,
