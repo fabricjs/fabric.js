@@ -15,7 +15,7 @@ export type HybridControls<
 };
 
 export function createControlSet<T extends TControlSet, S extends TControlSet>(
-  target: T | HybridControls<T, S>,
+  target: T,
   source?: S | HybridControls<S>
 ) {
   return Object.defineProperties(target, {
