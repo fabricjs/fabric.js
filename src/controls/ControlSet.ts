@@ -8,8 +8,8 @@ export type HybridControls<
 > = T & {
   source: S;
   resolve(key: string): Control | undefined;
-  resolveSource(key: string): Control | undefined;
-  keys(): (keyof (T & S))[];
+  resolveAll(): S & T;
+  keys(): (keyof (S & T))[];
   forEach<R>(cb: (control: Control, key: string) => R): void;
   map<R>(cb: (control: Control, key: string) => R): R[];
 };
@@ -18,10 +18,11 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
   target: T,
   source?: S | HybridControls<S>
 ) {
+  if (target.source) throw new Error('fabric.js: source is a reserved key');
   return Object.defineProperties(target, {
     source: {
       value: source,
-      configurable: true,
+      configurable: false,
       enumerable: false,
       writable: true,
     },
@@ -29,49 +30,61 @@ export function createControlSet<T extends TControlSet, S extends TControlSet>(
       value(key: string) {
         return (this[key] || this.resolveSource(key)) as Control | undefined;
       },
-      configurable: true,
+      configurable: false,
       enumerable: false,
-      writable: true,
+      writable: false,
     },
     resolveSource: {
       value(key: string) {
         return (this.source &&
           (this.source[key] ||
-            (this.source.resolve && this.source.resolve(key)))) as
-          | Control
-          | undefined;
+            (typeof this.source.resolve === 'function' &&
+              this.source.resolve(key)))) as Control | undefined;
       },
-      configurable: true,
+      configurable: false,
       enumerable: false,
-      writable: true,
+      writable: false,
+    },
+    resolveAll: {
+      value() {
+        return {
+          ...(typeof this.source?.resolveAll === 'function'
+            ? this.source.resolveAll()
+            : this.source),
+          ...this,
+        };
+      },
+      configurable: false,
+      enumerable: false,
+      writable: false,
     },
     keys: {
       value() {
-        return Object.keys({ ...this.source, ...this });
+        return Object.keys(this.resolveAll());
       },
-      configurable: true,
+      configurable: false,
       enumerable: false,
-      writable: true,
+      writable: false,
     },
     forEach: {
       value<T>(cb: (control: Control, key: string) => T) {
-        return Object.entries<Control>({ ...this.source, ...this }).forEach(
+        return Object.entries<Control>(this.resolveAll()).forEach(
           ([key, control]) => cb(control, key)
         );
       },
-      configurable: true,
+      configurable: false,
       enumerable: false,
-      writable: true,
+      writable: false,
     },
     map: {
       value<T>(cb: (control: Control, key: string) => T) {
-        return Object.entries<Control>({ ...this.source, ...this }).map(
+        return Object.entries<Control>(this.resolveAll()).map(
           ([key, control]) => cb(control, key)
         );
       },
-      configurable: true,
+      configurable: false,
       enumerable: false,
-      writable: true,
+      writable: false,
     },
   }) as HybridControls<T, S>;
 }
