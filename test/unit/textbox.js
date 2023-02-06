@@ -178,8 +178,11 @@
       assert.deepEqual(obj.styles[2], textbox.styles[2], 'styles match at line 2');
       assert.deepEqual(obj.styles[2][0], textbox.styles[2][0], 'styles match at index 0');
       assert.deepEqual(obj.styles[2][1], textbox.styles[2][1], 'styles match at index 1');
-      fabric.Textbox.fromObject(obj).then(function(obj2) {
+      const out = obj.toObject();
+      fabric.Textbox.fromObject(out).then(function(obj2) {
         assert.notEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
+        assert.notEqual(out.styles, obj2.styles, 'styles copy is a different object after initialization');
+        assert.deepEqual(obj.styles, obj2.styles, 'styles copy is a different object after initialization');
         done();
       });
     });
