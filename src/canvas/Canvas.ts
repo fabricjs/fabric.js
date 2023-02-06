@@ -1110,7 +1110,7 @@ export class Canvas extends SelectableCanvas {
     // and there is no target, or the following 3 condition both apply
     // target is not selectable ( otherwise we selected it )
     // target is not editing
-    // target is not already selected ( otherwise we drage )
+    // target is not already selected ( otherwise we drag )
     if (
       this.selection &&
       (!target ||
@@ -1481,7 +1481,7 @@ export class Canvas extends SelectableCanvas {
       !!target &&
       target.selectable &&
       // group target and active object only if they are different objects
-      // if they are the same we look for a subtarget when grouping
+      // else we handle subtarget logic in `_handleGrouping`
       (activeObject !== target || isActiveSelection(activeObject)) &&
       //  make sure `activeObject` and `target` aren't ancestors of each other
       !target.isDescendantOf(activeObject) &&
@@ -1504,7 +1504,6 @@ export class Canvas extends SelectableCanvas {
     target: FabricObject
   ) {
     const activeObject = this._activeObject;
-
     if (activeObject.__corner) {
       // avoid multi select when shift click on a corner
       return;
@@ -1524,7 +1523,7 @@ export class Canvas extends SelectableCanvas {
     if (isActiveSelection(activeObject)) {
       const prevActiveObjects = activeObject.getObjects() as FabricObject[];
       if (groupingTarget.group === activeObject) {
-        // clicked on a selected target => toggle selection
+        // groupingTarget is part of active selection => remove it
         activeObject.remove(groupingTarget);
         this._hoveredTarget = groupingTarget;
         this._hoveredTargets = [...this.targets];
@@ -1533,6 +1532,7 @@ export class Canvas extends SelectableCanvas {
           this._setActiveObject(activeObject.item(0) as FabricObject, e);
         }
       } else {
+        //  groupingTarget isn't part of active selection => add it
         //  respect object stacking in ActiveSelection
         //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
         const index = activeObject._objects.findIndex((obj) =>
@@ -1549,6 +1549,7 @@ export class Canvas extends SelectableCanvas {
       }
       this._fireSelectionEvents(prevActiveObjects, e);
     } else {
+      // add the active object and the target to the active selection and set it as the active object
       this._activeSelection.removeAll();
       resetObjectTransform(this._activeSelection);
       this._activeSelection.add(

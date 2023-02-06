@@ -153,7 +153,8 @@ export class InteractiveFabricObject<
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
-   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found
+   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found.
+   * Returning a corner means instance is the active object.
    */
   _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
     if (
