@@ -510,57 +510,7 @@
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
-  QUnit.test('_collectObjects collects object contained in area', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 15,
-      left: 15,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
-    assert.equal(collected[3], rect1, 'contains rect1 as last object');
-    assert.equal(collected[2], rect2, 'contains rect2');
-    assert.equal(collected[1], rect3, 'contains rect3');
-    assert.equal(collected[0], rect4, 'contains rect4 as first object');
-  });
-
-  QUnit.test('_collectObjects do not collects object if area is outside', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 1,
-      left: 1,
-      ex: 24,
-      ey: 24
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 0, 'a rect outside objects do not collect any of them');
-  });
-
-  QUnit.test('_collectObjects collect included objects that are not touched by the selection sides', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 5, left: 5 });
-    canvas.add(rect1);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect1, 'rect1 is collected');
-  });
-
-  QUnit.test('_collectObjects collect topmost object if no dragging occurs', function(assert) {
+  QUnit.test('_collectObjects collect topmost object if no dragging occurs', function (assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
@@ -576,67 +526,7 @@
     assert.equal(collected[0], rect3, 'rect3 is collected');
   });
 
-  QUnit.test('_collectObjects collect objects if the drag is inside the object', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    canvas.add(rect1, rect2, rect3);
-    canvas._groupSelector = {
-      top: 2,
-      left: 2,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 3, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect3, 'rect3 is collected');
-    assert.equal(collected[1], rect2, 'rect2 is collected');
-    assert.equal(collected[2], rect1, 'rect1 is collected');
-  });
-
-  QUnit.test('_collectObjects collects object fully contained in area', function(assert) {
-    canvas.selectionFullyContained = true;
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 30,
-      left: 30,
-      ex: -1,
-      ey: -1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
-    assert.equal(collected[3], rect1, 'contains rect1 as last object');
-    assert.equal(collected[2], rect2, 'contains rect2');
-    assert.equal(collected[1], rect3, 'contains rect3');
-    assert.equal(collected[0], rect4, 'contains rect4 as first object');
-    canvas.selectionFullyContained = false;
-  });
-
-  QUnit.test('_collectObjects does not collect objects not fully contained', function(assert) {
-    canvas.selectionFullyContained = true;
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 5,
-      ey: 5
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect intersecting objects does not collect those');
-    assert.equal(collected[0], rect4, 'contains rect1 as only one fully contained');
-    canvas.selectionFullyContained = false;
-  });
-
   QUnit.test('_collectObjects does not collect objects that have onSelect returning true', function(assert) {
-    canvas.selectionFullyContained = false;
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     rect1.onSelect = function() {
       return true;
@@ -644,10 +534,10 @@
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     canvas.add(rect1, rect2);
     canvas._groupSelector = {
-      top: 20,
-      left: 20,
       ex: 1,
-      ey: 1
+      ey: 1,
+      left: 20,
+      top: 20
     };
     var collected = canvas._collectObjects();
     assert.equal(collected.length, 1, 'objects are in the same position buy only one gets selected');
@@ -655,7 +545,6 @@
   });
 
   QUnit.test('_collectObjects does not call onSelect on objects that are not intersected', function(assert) {
-    canvas.selectionFullyContained = false;
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
     var onSelectRect1CallCount = 0;
@@ -671,10 +560,10 @@
     canvas.add(rect1, rect2);
     // Intersects none
     canvas._groupSelector = {
-      top: 1,
-      left: 1,
       ex: 25,
-      ey: 25
+      ey: 25,
+      left: 1,
+      top: 1
     };
     canvas._collectObjects();
     var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
