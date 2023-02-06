@@ -1094,15 +1094,15 @@ export class Canvas extends SelectableCanvas {
       return;
     }
 
-    const shouldRender = this._shouldRender(target);
-    let shouldGroup = false;
+    let shouldRender = this._shouldRender(target);
+    let grouped = false;
     if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
-    } else if (this._shouldGroup(e, target)) {
-      shouldGroup = true;
-      // may change active object
-      this._handleGrouping(e, target);
+    } else if (this._handleGrouping(e, target)) {
+      // active object might have changed while grouping
       target = this._activeObject;
+      grouped = true;
+      shouldRender = true;
     }
     // we start a group selector rectangle if
     // selection is enabled
@@ -1136,7 +1136,7 @@ export class Canvas extends SelectableCanvas {
         this.getPointer(e, true),
         isTouchEvent(e)
       );
-      if (target === this._activeObject && (corner || !shouldGroup)) {
+      if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
         const control = target.controls[corner],
           pointer = this.getPointer(e),
@@ -1147,13 +1147,12 @@ export class Canvas extends SelectableCanvas {
         }
       }
     }
-    const invalidate = shouldRender || shouldGroup;
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
     //  run before firing the `down` event to give the dev a chance to populate it themselves
-    invalidate && (this._objectsToRender = undefined);
+    shouldRender && (this._objectsToRender = undefined);
     this._handleEvent(e, 'down');
     // we must renderAll so that we update the visuals
-    invalidate && this.requestRenderAll();
+    shouldRender && this.requestRenderAll();
   }
 
   /**
@@ -1459,19 +1458,20 @@ export class Canvas extends SelectableCanvas {
   // Grouping objects mixin
 
   /**
-   * Return true if the current mouse down event that generated a new selection should generate a group
+   * Handles active selection updates for user event.
+   * Sets the active object in case it is not set or in case there is a single active object left under active selection.
    * @private
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
-   * @return {Boolean}
+   * @returns true if grouping occurred
    */
-  protected _shouldGroup(
+  protected _handleGrouping(
     e: TPointerEvent,
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
-
-    return (
+    const isAS = isActiveSelection(activeObject);
+    if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
       this._isSelectionKeyPressed(e) &&
@@ -1480,86 +1480,74 @@ export class Canvas extends SelectableCanvas {
       !!target &&
       target.selectable &&
       // group target and active object only if they are different objects
-      // else we handle subtarget logic in `_handleGrouping`
-      (activeObject !== target || isActiveSelection(activeObject)) &&
-      //  make sure `activeObject` and `target` aren't ancestors of each other
-      !target.isDescendantOf(activeObject) &&
-      !activeObject.isDescendantOf(target) &&
+      // else we try to find a subtarget
+      (activeObject !== target || isAS) &&
+      //  make sure `activeObject` and `target` aren't ancestors of each other in case `activeObject` is not `ActiveSelection`
+      // if it is then we want to remove `target` from it
+      (isAS ||
+        (!target.isDescendantOf(activeObject) &&
+          !activeObject.isDescendantOf(target))) &&
       //  target accepts selection
       !target.onSelect({ e }) &&
       // make sure we are not on top of a control
       !activeObject.__corner
-    );
-  }
-
-  /**
-   * Handles active selection creation for user event.
-   * Sets the active object in case it is not set or in case there is a single active object left under active selection.
-   * @private
-   * @param {TPointerEvent} e Event object
-   * @param {FabricObject} target
-   */
-  protected _handleGrouping(
-    this: AssertKeys<this, '_activeObject'>,
-    e: TPointerEvent,
-    target: FabricObject
-  ) {
-    const activeObject = this._activeObject;
-    // TODO: out of scope, move to somewhere else
-    isInteractiveTextObject(activeObject) && activeObject.exitEditing();
-    let groupingTarget = target;
-    if (groupingTarget === activeObject) {
-      // if it's a group, find target again, using activeGroup objects
-      const subTarget = this.findTarget(e, true);
-      // if even object is not found or we are on activeObjectCorner, bail out
-      if (!subTarget || !subTarget.selectable) {
-        return;
-      }
-      groupingTarget = subTarget;
-    }
-    if (isActiveSelection(activeObject)) {
-      const prevActiveObjects = activeObject.getObjects() as FabricObject[];
-      if (groupingTarget.group === activeObject) {
-        // groupingTarget is part of active selection => remove it
-        activeObject.remove(groupingTarget);
-        this._hoveredTarget = groupingTarget;
-        this._hoveredTargets = [...this.targets];
-        if (activeObject.size() === 1) {
-          // activate last remaining object
-          this._setActiveObject(activeObject.item(0) as FabricObject, e);
+    ) {
+      if (isActiveSelection(activeObject)) {
+        if (target === activeObject) {
+          // find target from active objects
+          target = this.findTarget(e, true);
+          // if nothing is found or we are on activeObject's corner, bail out
+          if (!target || !target.selectable) {
+            return false;
+          }
         }
+        const prevActiveObjects = activeObject.getObjects() as FabricObject[];
+        if (target.group === activeObject) {
+          // `target` is part of active selection => remove it
+          activeObject.remove(target);
+          this._hoveredTarget = target;
+          this._hoveredTargets = [...this.targets];
+          if (activeObject.size() === 1) {
+            // activate last remaining object
+            this._setActiveObject(activeObject.item(0) as FabricObject, e);
+          }
+        } else {
+          //  `target` isn't part of active selection => add it
+          //  respect object stacking in ActiveSelection
+          //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+          const index = activeObject._objects.findIndex((obj) =>
+            obj.isInFrontOf(target!)
+          );
+          const insertAt =
+            index === -1
+              ? //  `target` is in front of all other objects
+                activeObject.size()
+              : index;
+          activeObject.insertAt(insertAt, target);
+          this._hoveredTarget = activeObject;
+          this._hoveredTargets = [...this.targets];
+        }
+        this._fireSelectionEvents(prevActiveObjects, e);
       } else {
-        //  groupingTarget isn't part of active selection => add it
-        //  respect object stacking in ActiveSelection
-        //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
-        const index = activeObject._objects.findIndex((obj) =>
-          obj.isInFrontOf(groupingTarget)
+        // TODO: out of scope, move to somewhere else
+        isInteractiveTextObject(activeObject) && activeObject.exitEditing();
+        // add the active object and the target to the active selection and set it as the active object
+        this._activeSelection.add(
+          ...(target.isInFrontOf(activeObject)
+            ? [activeObject, target]
+            : [target, activeObject])
         );
-        const insertAt =
-          index === -1
-            ? //  groupingTarget is in front of all other objects
-              activeObject.size()
-            : index;
-        activeObject.insertAt(insertAt, groupingTarget);
-        this._hoveredTarget = activeObject;
-        this._hoveredTargets = [...this.targets];
-      }
-      this._fireSelectionEvents(prevActiveObjects, e);
-    } else {
-      // add the active object and the target to the active selection and set it as the active object
-      this._activeSelection.add(
-        ...(groupingTarget.isInFrontOf(activeObject)
-          ? [activeObject, groupingTarget]
-          : [groupingTarget, activeObject])
-      );
 
-      this._hoveredTarget = this._activeSelection;
-      // ISSUE 4115: should we consider subTargets here?
-      // this._hoveredTargets = [];
-      // this._hoveredTargets = this.targets.concat();
-      this._setActiveObject(this._activeSelection, e);
-      this._fireSelectionEvents([activeObject], e);
+        this._hoveredTarget = this._activeSelection;
+        // ISSUE 4115: should we consider subTargets here?
+        // this._hoveredTargets = [];
+        // this._hoveredTargets = this.targets.concat();
+        this._setActiveObject(this._activeSelection, e);
+        this._fireSelectionEvents([activeObject], e);
+      }
+      return true;
     }
+    return false;
   }
 
   /**
