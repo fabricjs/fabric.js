@@ -80,9 +80,7 @@
 
   var IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
-  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
-  var upperCanvasEl = canvas.upperCanvasEl;
-  var lowerCanvasEl = canvas.lowerCanvasEl;
+  let canvas, upperCanvasEl, lowerCanvasEl;
 
   function makeRect(options = {}) {
     var defaultOptions = { width: 10, height: 10 };
@@ -94,30 +92,15 @@
     return new fabric.Triangle({ ...defaultOptions, ...options });
   }
 
-  let ORIGINAL_DPR;
-
   QUnit.module('fabric.Canvas', {
     beforeEach: function () {
-      upperCanvasEl.style.display = '';
-      canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
-      canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
-      ORIGINAL_DPR = fabric.config.devicePixelRatio;
+      canvas = new fabric.Canvas(null, { enableRetinaScaling: false, width: 600, height: 600 });
+      upperCanvasEl = canvas.upperCanvasEl;
+      lowerCanvasEl = canvas.lowerCanvasEl;
     },
     afterEach: function () {
-      fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
-      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-      canvas.clear();
-      canvas.cancelRequestedRender();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
-      canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
-      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
-      canvas.off();
-      canvas.calcOffset();
-      canvas.cancelRequestedRender();
-      delete canvas._groupSelector;
-      upperCanvasEl.style.display = 'none';
-      canvas.perPixelTargetFind = false;
-      canvas.preserveObjectStacking = false;
+      fabric.config.restoreDefaults();
+      return canvas.dispose();
     }
   });
 
@@ -1022,7 +1005,6 @@
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], triangle2, 'The deepest target should be triangle2');
-    canvas.perPixelTargetFind = false;
     canvas.remove(group3);
   });
 
@@ -1953,7 +1935,7 @@
     assert.equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.upperCanvasEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.wrapperEl.style.height, '100%', 'Should be as the css only value');
-    assert.equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+    assert.equal(canvas.getHeight(), 123, 'Should be as the none css only value');
   });
 
   QUnit.test('setWidth backstore only', function(assert) {
