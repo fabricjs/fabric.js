@@ -425,6 +425,7 @@
     var mouseUpCalled = false;
     var mouseDownCalled = false;
     const br = rect.controls.resolve('br');
+    rect.controls.source = { br };
     br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -470,6 +471,7 @@
     var mouseUpCalled = false;
     var mouseDownCalled = false;
     const br = rect.controls.resolve('br');
+    rect.controls.source = { br };
     br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -494,6 +496,7 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
     const br = rect.controls.resolve('br');
+    rect.controls.source = { br };
     br.mouseUpHandler = function() {
       mouseUpCalled = true;
     };
@@ -517,6 +520,7 @@
 
     const tr = rect.controls.resolve('tr');
     const br = rect.controls.resolve('br');
+    rect.controls.source = { br, tr };
     br.mouseUpHandler = function() {
       mouseUpCalled1 = true;
     };
