@@ -306,9 +306,7 @@ export class InteractiveFabricObject<
       fabricObject: InteractiveFabricObject
     ) => any
   ) {
-    for (const key in this.controls) {
-      fn(this.controls.resolve(key), key, this);
-    }
+    this.controls.forEach((control, key) => fn(control, key, this));
   }
 
   /**
