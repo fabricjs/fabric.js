@@ -1486,7 +1486,9 @@ export class Canvas extends SelectableCanvas {
       !target.isDescendantOf(activeObject) &&
       !activeObject.isDescendantOf(target) &&
       //  target accepts selection
-      !target.onSelect({ e })
+      !target.onSelect({ e }) &&
+      // make sure we are not on top of a control
+      !activeObject.__corner
     );
   }
 
@@ -1503,10 +1505,6 @@ export class Canvas extends SelectableCanvas {
     target: FabricObject
   ) {
     const activeObject = this._activeObject;
-    if (activeObject.__corner) {
-      // avoid multi select when shift click on a corner
-      return;
-    }
     // TODO: out of scope, move to somewhere else
     isInteractiveTextObject(activeObject) && activeObject.exitEditing();
     let groupingTarget = target;
