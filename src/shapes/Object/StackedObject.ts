@@ -81,7 +81,7 @@ export class StackedObject<
   /**
    *
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
-   * @returns {Ancestors} ancestors from bottom to top
+   * @returns {Ancestors} ancestors (excluding `ActiveSelection`) from bottom to top
    */
   getAncestors<T extends boolean>(strict?: T): Ancestors<T> {
     const ancestors: TAncestor[] = [];
