@@ -8,9 +8,7 @@ import {
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './scaleSkew';
-import { TControlSet, createControlSet } from './ControlSet';
 
-// use this function if you want to generate new controls for every instance
 export const createObjectDefaultControls = () => ({
   ml: new Control({
     x: -0.5,
