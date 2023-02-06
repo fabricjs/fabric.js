@@ -483,6 +483,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
+      // TODO: handle rendering edge case somehow
       if (
         this.canvas?.preserveObjectStacking &&
         this._objects[i].group !== this
