@@ -14,7 +14,6 @@ import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
-import { resetObjectTransform } from '../util/misc/objectTransforms';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isActiveSelection,
@@ -1550,8 +1549,6 @@ export class Canvas extends SelectableCanvas {
       this._fireSelectionEvents(prevActiveObjects, e);
     } else {
       // add the active object and the target to the active selection and set it as the active object
-      this._activeSelection.removeAll();
-      resetObjectTransform(this._activeSelection);
       this._activeSelection.add(
         ...(groupingTarget.isInFrontOf(activeObject)
           ? [activeObject, groupingTarget]

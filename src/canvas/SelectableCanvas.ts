@@ -12,6 +12,7 @@ import {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
+  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
@@ -1405,9 +1406,7 @@ export class SelectableCanvas<
       return false;
     }
     this._activeObject = object;
-    // clear active selection since it is not active anymore
-    this._activeObject !== this._activeSelection &&
-      this._activeSelection.removeAll();
+
     return true;
   }
 
@@ -1427,6 +1426,11 @@ export class SelectableCanvas<
       // onDeselect return TRUE to cancel selection;
       if (obj.onDeselect({ e, object })) {
         return false;
+      }
+      // clear active selection
+      if (obj === this._activeSelection) {
+        this._activeSelection.removeAll();
+        resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
         // @ts-ignore
