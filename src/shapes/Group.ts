@@ -483,7 +483,14 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
-      this._objects[i].render(ctx);
+      if (this._objects[i].group !== this) {
+        ctx.save();
+        ctx.transform(...invertTransform(this.calcTransformMatrix()));
+        this._objects[i].render(ctx);
+        ctx.restore();
+      } else {
+        this._objects[i].render(ctx);
+      }
     }
     this._drawClipPath(ctx, this.clipPath);
   }
@@ -571,7 +578,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       //  adjust objects to account for new center
       !context.objectsRelativeToGroup &&
         this.forEachObject((object) => {
-          this._adjustObjectPosition(object, diff);
+          object.group === this && this._adjustObjectPosition(object, diff);
         });
       //  clip path as well
       !isFirstLayout &&
