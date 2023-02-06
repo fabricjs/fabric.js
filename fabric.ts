@@ -284,6 +284,7 @@ import {
 import { getLocalPoint } from './src/controls/util';
 import { wrapWithFireEvent } from './src/controls/wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './src/controls/wrapWithFixedAnchor';
+import { createControlSet } from './src/controls/default_controls';
 
 /**
  * @todo remove as unused
@@ -310,6 +311,7 @@ const controlsUtils = {
   getLocalPoint,
   renderCircleControl,
   renderSquareControl,
+  createControlSet,
 };
 
 // EXPORTS
