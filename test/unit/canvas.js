@@ -448,13 +448,12 @@
   }
 
   QUnit.test('update active selection respects order of objects', function (assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    var rect3 = new fabric.Rect();
-    var rect3 = new fabric.Rect();
+    const rect1 = new fabric.Rect();
+    const rect2 = new fabric.Rect();
+    const rect3 = new fabric.Rect();
     canvas.add(rect1, rect2, rect3);
     function assertObjectsInOrder(init, added) {
-      var activeSelection = new fabric.ActiveSelection(init);
+      const activeSelection = new fabric.ActiveSelection(init);
       canvas.setActiveObject(activeSelection);
       updateActiveSelection(canvas, added);
       assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3]);
@@ -469,7 +468,7 @@
     assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
     assertObjectsInOrderOnCanvas([rect2, rect3], rect1);
     canvas.remove(rect2, rect3);
-    var group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    const group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
     canvas.add(group);
     function assertNestedObjectsInOrder(init, added) {
       assert.deepEqual(canvas.getObjects(), [rect1, group]);
