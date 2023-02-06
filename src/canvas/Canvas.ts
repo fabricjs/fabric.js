@@ -1480,7 +1480,7 @@ export class Canvas extends SelectableCanvas {
       !!target &&
       target.selectable &&
       // group target and active object only if they are different objects
-      // else we try to find a subtarget
+      // else we try to find a subtarget of `ActiveSelection`
       (activeObject !== target || isAS) &&
       //  make sure `activeObject` and `target` aren't ancestors of each other in case `activeObject` is not `ActiveSelection`
       // if it is then we want to remove `target` from it
