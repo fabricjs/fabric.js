@@ -123,7 +123,7 @@ export class Observable<EventSpec> {
   }
 
   /**
-   * unsubscribe an event handler
+   * unsubscribe an event listener
    * @param {string} eventName event name (eg. 'after:render')
    * @param {TEventCallback} handler event listener to unsubscribe
    */
