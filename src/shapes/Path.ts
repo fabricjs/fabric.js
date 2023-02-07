@@ -32,6 +32,8 @@ export class Path extends FabricObject {
 
   declare segmentsInfo?: TPathSegmentsInfo[];
 
+  static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
+
   /**
    * Constructor
    * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
@@ -386,7 +388,6 @@ export const pathDefaultValues: Partial<TClassProperties<Path>> = {
 
 Object.assign(Path.prototype, {
   ...pathDefaultValues,
-  cacheProperties: [...cacheProperties, 'path', 'fillRule'],
 });
 
 classRegistry.setClass(Path);

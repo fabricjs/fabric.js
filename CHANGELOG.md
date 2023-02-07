@@ -2,6 +2,8 @@
 
 ## [next]
 
+- TS(): Moved cache properties to static properties on classes [#xxxx](https://github.com/fabricjs/fabric.js/pull/xxxx)
+- refactor(): Moved cache properties to static properties on classes [#8662](https://github.com/fabricjs/fabric.js/pull/8662)
 - docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
 - ci(): remove TS transformer [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
 - refactor(): BREAKING remove stateful mixin and functionality [#8663](https://github.com/fabricjs/fabric.js/pull/8663)
