@@ -1611,6 +1611,7 @@ export class Canvas extends SelectableCanvas {
    * @override clear {@link textEditingManager}
    */
   destroy() {
+    this.removeListeners();
     super.destroy();
     this.textEditingManager.dispose();
   }

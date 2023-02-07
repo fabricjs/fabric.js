@@ -31,22 +31,21 @@ import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 
-type TDestroyedCanvas = Omit<
-  SelectableCanvas<CanvasEvents>,
+type TDestroyed<T, K extends keyof any> = {
+  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
+  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
+};
+
+type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
+  T,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
   | 'upperCanvasEl'
   | 'cacheCanvasEl'
   | 'wrapperEl'
-> & {
-  wrapperEl?: HTMLDivElement;
-  cacheCanvasEl?: HTMLCanvasElement;
-  upperCanvasEl?: HTMLCanvasElement;
-  lowerCanvasEl?: HTMLCanvasElement;
-  contextCache?: CanvasRenderingContext2D | null;
-  contextTop?: CanvasRenderingContext2D | null;
-};
+  | '_activeSelection'
+>;
 
 /**
  * Canvas class
@@ -1486,13 +1485,16 @@ export class SelectableCanvas<
    *
    * @private
    */
-  destroy(this: TDestroyedCanvas) {
+  destroy(this: TDestroyedCanvas<this>) {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!;
-    // @ts-ignore
-    this.removeListeners();
+      cacheCanvasEl = this.cacheCanvasEl!,
+      activeSelection = this._activeSelection!;
+    // dispose of active selection
+    activeSelection.removeAll();
+    this._activeSelection = undefined;
+    activeSelection.dispose();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);

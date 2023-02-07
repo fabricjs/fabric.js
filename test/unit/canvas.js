@@ -1750,6 +1750,11 @@
     assert.equal(canvas.getActiveObject(), group);
   });
 
+  QUnit.test('getActiveSelection', function(assert) {
+    assert.ok(canvas.getActiveSelection() === canvas._activeSelection, 'should equal');
+    assert.ok(canvas.getActiveSelection() instanceof fabric.ActiveSelection, 'is active selection');
+  });
+
   QUnit.test('item', function(assert) {
     assert.ok(typeof canvas.item === 'function');
 
