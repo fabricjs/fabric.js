@@ -106,6 +106,7 @@
     afterEach: function () {
       fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
+      canvas._activeObject = undefined;
       canvas.clear();
       canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
@@ -1790,10 +1791,11 @@
 
     canvas.add(rect1, rect2);
 
-    canvas.setActiveObject(rect1);
+    assert.ok(canvas.setActiveObject(rect1), 'selected');
     assert.ok(rect1 === canvas._activeObject);
 
-    canvas.setActiveObject(rect2);
+    assert.ok(canvas.setActiveObject(rect2), 'selected');
+    assert.ok(!canvas.setActiveObject(rect2), 'no effect');
     assert.ok(rect2 === canvas._activeObject);
   });
 
@@ -1852,7 +1854,8 @@
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
 
-    canvas._discardActiveObject();
+    assert.ok(canvas._discardActiveObject(), 'discarded');
+    assert.ok(!canvas._discardActiveObject(), 'no effect');
     assert.equal(canvas.getActiveObject(), null);
   });
 
@@ -1891,14 +1894,23 @@
       eventsFired.selectionCleared = true;
     });
 
-    canvas.discardActiveObject();
-    assert.equal(canvas.getActiveObject(), null);
+    assert.ok(canvas.discardActiveObject(), 'deselected');
+    assert.ok(!canvas.getActiveObject(), 'no active object');
+    assert.ok(!canvas.discardActiveObject(), 'no effect');
     assert.equal(canvas.getActiveObject(), null);
 
     for (var prop in eventsFired) {
       assert.ok(eventsFired[prop]);
     }
   });
+
+  QUnit.test('refuse discarding active object', function (assert) {
+    const rect = makeRect();
+    rect.onDeselect = () => true;
+    canvas.setActiveObject(rect);
+    assert.ok(!canvas.discardActiveObject(), 'no effect');
+    assert.ok(canvas.getActiveObject() === rect, 'active object');
+  })
 
   QUnit.test('complexity', function(assert) {
     assert.ok(typeof canvas.complexity === 'function');
@@ -1948,7 +1960,7 @@
     assert.equal(aGroup._objects[1], circle2);
     assert.equal(aGroup._objects[2], rect1);
     assert.equal(aGroup._objects[3], circle1);
-    canvas.setActiveObject(aGroup)
+    assert.ok(canvas.setActiveObject(aGroup));
     canvas.renderAll();
     // after rendering objects are ordered in canvas stack order
     assert.equal(aGroup._objects[0], rect1);

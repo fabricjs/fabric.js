@@ -22,7 +22,7 @@ import {
 } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -1383,13 +1383,17 @@ export class SelectableCanvas<
    * Sets given object as the only active object on canvas
    * @param {FabricObject} object Object to set as an active one
    * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
-   * @chainable
+   * @return {Boolean} true if occurred
    */
-  setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  setActiveObject(
+    object: FabricObject,
+    e?: TPointerEvent
+  ): this is AssertKeys<this, '_activeObject'> {
     // we can't inline this, since _setActiveObject will change what getActiveObjects returns
     const currentActives = this.getActiveObjects();
-    this._setActiveObject(object, e);
+    const selected = this._setActiveObject(object, e);
     this._fireSelectionEvents(currentActives, e);
+    return selected;
   }
 
   /**
@@ -1400,13 +1404,17 @@ export class SelectableCanvas<
    * @private
    * @param {Object} object to set as active
    * @param {Event} [e] Event (passed along when firing "object:selected")
-   * @return {Boolean} true if the selection happened
+   * @return {Boolean} true if occurred
    */
-  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  protected _setActiveObject(
+    object: FabricObject,
+    e?: TPointerEvent
+  ): this is AssertKeys<this, '_activeObject'> {
     if (this._activeObject === object) {
       return false;
     }
-    if (!this._discardActiveObject(e, object)) {
+    if (!this._discardActiveObject(e, object) && this._activeObject) {
+      // refused to deselect
       return false;
     }
     if (object.onSelect({ e })) {
@@ -1423,10 +1431,10 @@ export class SelectableCanvas<
    * This is the functional part of discardActiveObject.
    * @param {Event} [e] Event (passed along when firing "object:deselected")
    * @param {Object} object the next object to set as active, reason why we are discarding this
-   * @return {Boolean} true if the selection happened
+   * @return {Boolean} true if occurred
    * @private
    */
-  _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
+  protected _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
@@ -1438,8 +1446,9 @@ export class SelectableCanvas<
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
+      return true;
     }
-    return true;
+    return false;
   }
 
   /**
@@ -1448,7 +1457,7 @@ export class SelectableCanvas<
    * sent to the fire function for the custom events. When used as a method the
    * e param does not have any application.
    * @param {event} e
-   * @chainable
+   * @return {Boolean} true if occurred
    */
   discardActiveObject(e?: TPointerEvent) {
     const currentActives = this.getActiveObjects(),
@@ -1459,8 +1468,9 @@ export class SelectableCanvas<
         deselected: [activeObject!],
       });
     }
-    this._discardActiveObject(e);
+    const discarded = this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
+    return discarded;
   }
 
   /**
