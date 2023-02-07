@@ -106,7 +106,6 @@
     afterEach: function () {
       fabric.config.configure({ devicePixelRatio: ORIGINAL_DPR });
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-      canvas._activeObject = undefined;
       canvas.clear();
       canvas.cancelRequestedRender();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
@@ -1910,6 +1909,8 @@
     canvas.setActiveObject(rect);
     assert.ok(!canvas.discardActiveObject(), 'no effect');
     assert.ok(canvas.getActiveObject() === rect, 'active object');
+    canvas.clear();
+    assert.ok(!canvas.getActiveObject(), 'cleared the stubborn ref');
   })
 
   QUnit.test('complexity', function(assert) {

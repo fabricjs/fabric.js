@@ -1524,8 +1524,10 @@ export class SelectableCanvas<
    * Clears all contexts (background, main, top) of an instance
    */
   clear() {
-    // this.discardActiveGroup();
+    // discard active object and fire events
     this.discardActiveObject();
+    // make sure we clear the active object in case it refused to be discarded
+    this._activeObject = undefined;
     this.clearContext(this.contextTop);
     super.clear();
   }
