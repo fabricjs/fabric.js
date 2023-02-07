@@ -759,9 +759,8 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = new fabric.ActiveSelection(canvas.getObjects(), {
-        canvas: canvas
-      });
+      var activeSelection = canvas.getActiveSelection();
+      activeSelection.add(...canvas.getObjects());
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);
 

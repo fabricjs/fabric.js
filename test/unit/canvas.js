@@ -307,7 +307,8 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
-    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    var activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     canvas.discardActiveObject();
     assert.equal(deselected.length, 1, 'options.deselected was the removed object');
@@ -656,7 +657,8 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
-    var activeSelection = new fabric.ActiveSelection([rect1, rect2]);
+    var activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     rect1.on('deselected', function( ) {
       rect1Deselected = true;
@@ -1039,7 +1041,8 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.ActiveSelection([rect1, rect2], { subTargetCheck: true });
+    const group = canvas.getActiveSelection();
+    group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -1070,7 +1073,8 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    var group = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    const group = canvas.getActiveSelection();
+    group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 8, clientY: 8
@@ -1168,7 +1172,9 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle], { canvas: canvas }));
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect, circle);
+    canvas.setActiveObject(activeSelection);
     var jsonWithActiveGroup = JSON.stringify(canvas);
 
     assert.equal(json, jsonWithActiveGroup);
@@ -1845,8 +1851,9 @@
     var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
-
-    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle]));
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect, circle);
+    canvas.setActiveObject(activeSelection);
     var svgWithActiveGroup = canvas.toSVG();
 
     assert.equal(svg, svgWithActiveGroup);

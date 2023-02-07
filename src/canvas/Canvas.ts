@@ -16,7 +16,6 @@ import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
-  isActiveSelection,
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
@@ -1416,9 +1415,10 @@ export class Canvas extends SelectableCanvas {
       return;
     }
     let hoverCursor = target.hoverCursor || this.hoverCursor;
-    const activeSelection = isActiveSelection(this._activeObject)
-        ? this._activeObject
-        : null,
+    const activeSelection =
+        this._activeObject === this._activeSelection
+          ? this._activeObject
+          : null,
       // only show proper corner when group selection is not active
       corner =
         (!activeSelection || target.group !== activeSelection) &&
@@ -1462,7 +1462,7 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
-    const isAS = isActiveSelection(activeObject);
+    const isAS = activeObject === this._activeSelection;
     if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
@@ -1484,7 +1484,7 @@ export class Canvas extends SelectableCanvas {
       // make sure we are not on top of a control
       !activeObject.__corner
     ) {
-      if (isActiveSelection(activeObject)) {
+      if (activeObject === this._activeSelection) {
         if (target === activeObject) {
           // find target from active objects
           target = this.findTarget(e, true);

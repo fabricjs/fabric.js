@@ -16,11 +16,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import {
-  isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
-} from '../util/types';
+import { isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -948,7 +944,7 @@ export class SelectableCanvas<
     }
     if (
       aObjects.length > 1 &&
-      isActiveSelection(activeObject) &&
+      activeObject === this._activeSelection &&
       !skipGroup &&
       this.searchPossibleTargets([activeObject], pointer)
     ) {
@@ -1308,8 +1304,8 @@ export class SelectableCanvas<
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
     if (active) {
-      if (isActiveSelection(active)) {
-        return [...active._objects];
+      if (active === this._activeSelection) {
+        return [...(active as ActiveSelection)._objects];
       } else {
         return [active];
       }
@@ -1555,7 +1551,7 @@ export class SelectableCanvas<
   }
 
   /**
-   * Realises an object's group transformation on it
+   * Realizes an object's group transformation on it
    * @private
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
@@ -1565,7 +1561,7 @@ export class SelectableCanvas<
   ): Partial<typeof instance> {
     if (
       instance.group &&
-      isActiveSelection(instance.group) &&
+      instance.group === this._activeSelection &&
       this._activeObject === instance.group
     ) {
       const layoutProps = [
