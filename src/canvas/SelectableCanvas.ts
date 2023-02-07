@@ -33,10 +33,7 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import {
-  ActiveSelection,
-  activeSelectionDefaultValues,
-} from '../shapes/ActiveSelection';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 
 type TDestroyedCanvas = Omit<
   SelectableCanvas<CanvasEvents>,
@@ -437,13 +434,18 @@ export class SelectableCanvas<
   _currentTransform: Transform | null = null;
 
   /**
-   * hold a reference to a data structure used to track the selecion
+   * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
    * @type
    * @private
    */
-  _groupSelector: any = null;
+  protected _groupSelector: {
+    x: number;
+    y: number;
+    deltaX: number;
+    deltaY: number;
+  } | null = null;
 
   /**
    * internal flag used to understand if the context top requires a cleanup
@@ -873,9 +875,11 @@ export class SelectableCanvas<
    * @param {CanvasRenderingContext2D} ctx to draw the selection on
    */
   _drawSelection(ctx: CanvasRenderingContext2D): void {
-    const { ex, ey, left, top } = this._groupSelector,
-      start = new Point(ex, ey).transform(this.viewportTransform),
-      extent = new Point(ex + left, ey + top).transform(this.viewportTransform),
+    const { x, y, deltaX, deltaY } = this._groupSelector!,
+      start = new Point(x, y).transform(this.viewportTransform),
+      extent = new Point(x + deltaX, y + deltaY).transform(
+        this.viewportTransform
+      ),
       strokeOffset = this.selectionLineWidth / 2;
     let minX = Math.min(start.x, extent.x),
       minY = Math.min(start.y, extent.y),

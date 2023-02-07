@@ -441,9 +441,9 @@
     assert.equal(isFired, true, 'switching active group fires deselected');
   });
 
-  function setGroupSelector(canvas, { left: ex = 0, top: ey = 0, width: left = 0, height: top = 0 } = {}) {
+  function setGroupSelector(canvas, { x = 0, y = 0, deltaX = 0, deltaY = 0 } = {}) {
     canvas._groupSelector = {
-      ex, ey, left, top
+      x, y, deltaX, deltaY
     };
   }
 
@@ -504,10 +504,10 @@
     rect3.on('selected', function () { fired++; });
     canvas.add(rect1, rect2, rect3);
     setGroupSelector(canvas, {
-      left: 1,
-      top: 1,
-      width: 5,
-      height: 5
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
     });
     canvas.__onMouseUp({});
     assert.equal(fired, 3, 'event fired for each of 3 rects');
@@ -521,10 +521,10 @@
     canvas.on('selection:created', function () { isFired = true; });
     canvas.add(rect1, rect2, rect3);
     setGroupSelector(canvas, {
-      left: 1,
-      top: 1,
-      width: 5,
-      height: 5
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
     });
     canvas.__onMouseUp({});
     assert.equal(isFired, true, 'selection created fired');
@@ -541,10 +541,10 @@
     canvas.on('selection:created', function() { isFired = true; });
     canvas.add(rect1);
     setGroupSelector(canvas, {
-      left: 1,
-      top: 1,
-      width: 5,
-      height: 5
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
     });
     canvas.__onMouseUp({});
     assert.equal(isFired, true, 'selection:created fired');
@@ -556,12 +556,7 @@
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     canvas.add(rect1, rect2, rect3);
-    canvas._groupSelector = {
-      top: 0,
-      left: 0,
-      ex: 1,
-      ey: 1
-    };
+    setGroupSelector(canvas, { x: 1, y: 1, deltaX: 0, deltaY: 0 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
     assert.equal(canvas.getActiveObjects().length, 1, 'a rect that contains all objects collects them all');
     assert.equal(canvas.getActiveObjects()[0], rect3, 'rect3 is collected');
@@ -574,12 +569,7 @@
     };
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     canvas.add(rect1, rect2);
-    canvas._groupSelector = {
-      ex: 1,
-      ey: 1,
-      left: 20,
-      top: 20
-    };
+    setGroupSelector(canvas, { x: 1, y: 1, deltaX: 20, deltaY: 20 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
     assert.equal(canvas.getActiveObjects().length, 1, 'objects are in the same position buy only one gets selected');
     assert.equal(canvas.getActiveObjects()[0], rect2, 'contains rect2 but not rect 1');
@@ -600,33 +590,18 @@
     };
     canvas.add(rect1, rect2);
     // Intersects none
-    canvas._groupSelector = {
-      ex: 25,
-      ey: 25,
-      left: 1,
-      top: 1
-    };
+    setGroupSelector(canvas, { x: 25, y: 25, deltaX: 1, deltaY: 1 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
     var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
     assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
     // Intersects one
-    canvas._groupSelector = {
-      top: 5,
-      left: 5,
-      ex: 0,
-      ey: 0
-    };
+    setGroupSelector(canvas, { x: 0, y: 0, deltaX: 5, deltaY: 5 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 was selected');
     assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called while setting active object');
     assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
     // Intersects both
-    canvas._groupSelector = {
-      top: 5,
-      left: 15,
-      ex: 0,
-      ey: 0
-    };
+    setGroupSelector(canvas, { x: 0, y: 0, deltaX: 15, deltaY: 5 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect1 selected');
     assert.equal(onSelectRect1CallCount, 2, 'rect1 onSelect was called once when collectiong it and once when selecting it');

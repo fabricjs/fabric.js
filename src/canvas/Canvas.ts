@@ -1110,10 +1110,10 @@ export class Canvas extends SelectableCanvas {
     ) {
       const p = this.getPointer(e);
       this._groupSelector = {
-        ex: p.x,
-        ey: p.y,
-        top: 0,
-        left: 0,
+        x: p.x,
+        y: p.y,
+        deltaY: 0,
+        deltaX: 0,
       };
     }
 
@@ -1210,8 +1210,8 @@ export class Canvas extends SelectableCanvas {
     if (groupSelector) {
       const pointer = this.getPointer(e);
 
-      groupSelector.left = pointer.x - groupSelector.ex;
-      groupSelector.top = pointer.y - groupSelector.ey;
+      groupSelector.deltaX = pointer.x - groupSelector.x;
+      groupSelector.deltaY = pointer.y - groupSelector.y;
 
       this.renderTop();
     } else if (!this._currentTransform) {
@@ -1554,9 +1554,9 @@ export class Canvas extends SelectableCanvas {
     if (!this.selection || !this._groupSelector) {
       return false;
     }
-    const { ex: x, ey: y, left: dx, top: dy } = this._groupSelector,
+    const { x, y, deltaX, deltaY } = this._groupSelector,
       point1 = new Point(x, y),
-      point2 = point1.add(new Point(dx, dy)),
+      point2 = point1.add(new Point(deltaX, deltaY)),
       tl = point1.min(point2),
       br = point1.max(point2),
       size = br.subtract(tl),
