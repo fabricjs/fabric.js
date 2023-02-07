@@ -123,14 +123,20 @@ export class Observable<EventSpec> {
   }
 
   /**
-   * Stops event observing for a particular event handler. Calling this method
-   * without arguments removes all handlers for all events
+   * Stops event observing for a particular event handler
    * @param {string} eventName Event name (eg. 'after:render')
-   * @param {EventRegistryObject} handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
-   * @param {Function} handler Function to be deleted from EventListeners
+   * @param {TEventCallback} handler Function to be deleted from EventListeners
    */
   off<K extends keyof EventSpec>(eventName: K, handler: TEventCallback): void;
+  /**
+   * Stops event observing for a particular event handlers
+   * @param handlers handlers key/value pairs (eg. {'after:render': handler, 'selection:cleared': handler})
+   */
   off(handlers: EventRegistryObject): void;
+  /**
+   * Stops event observing for all events
+   */
+  off(): void;
   off<K extends keyof EventSpec>(
     arg0?: K | EventRegistryObject,
     handler?: TEventCallback
