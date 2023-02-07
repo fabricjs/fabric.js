@@ -1086,13 +1086,13 @@ export class Canvas extends SelectableCanvas {
 
     let shouldRender = this._shouldRender(target);
     let grouped = false;
-    if (this._shouldClearSelection(e, target)) {
-      this.discardActiveObject(e);
-    } else if (this.handleMultiSelection(e, target)) {
+    if (this.handleMultiSelection(e, target)) {
       // active object might have changed while grouping
       target = this._activeObject;
       grouped = true;
       shouldRender = true;
+    } else if (this._shouldClearSelection(e, target)) {
+      this.discardActiveObject(e);
     }
     // we start a group selector rectangle if
     // selection is enabled
