@@ -58,8 +58,8 @@
   QUnit.test('cache properties', function(assert) {
     var rect = new fabric.Rect();
 
-    assert.ok(rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
-    assert.ok(rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
   });
 
   QUnit.test('toObject', function(assert) {

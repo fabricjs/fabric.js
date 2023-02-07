@@ -1004,13 +1004,15 @@
 
   QUnit.test('dirty flag on set property', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
-    object.cacheProperties = ['propA', 'propB'];
+    const originalCacheProps = fabric.Object.cacheProperties;
+    fabric.Object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     assert.equal(object.dirty, false, 'object starts with dirty flag disabled');
     object.set('propC', '3');
     assert.equal(object.dirty, false, 'after setting a property out of cache, dirty flag is still false');
     object.set('propA', '2');
     assert.equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
+    fabric.Object.cacheProperties = originalCacheProps;
   });
 
   QUnit.test('_createCacheCanvas sets object as dirty', function(assert) {
@@ -1025,11 +1027,13 @@
   QUnit.test('isCacheDirty', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
-    object.cacheProperties = ['propA', 'propB'];
+    const originalCacheProps = fabric.Object.cacheProperties;
+    fabric.Object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
     object.dirty = true;
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
+    fabric.Object.cacheProperties = originalCacheProps;
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {

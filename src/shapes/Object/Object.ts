@@ -477,7 +477,7 @@ export class FabricObject<
    * and refreshed at the next render
    * @type Array
    */
-  declare cacheProperties: string[];
+  static cacheProperties: string[] = cacheProperties;
 
   /**
    * a fabricObject that, without stroke define a clipping area with their shape. filled in black
@@ -1017,7 +1017,8 @@ export class FabricObject<
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (this.cacheProperties.includes(key)) {
+      // @ts-ignore TS and constructor issue
+      if (this.constructor.cacheProperties.includes(key)) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
       } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
@@ -1883,7 +1884,6 @@ export class FabricObject<
  * For inheritance reasons ( used in the superclass but static in the subclass )
  */
 Object.assign(FabricObject.prototype, {
-  cacheProperties,
   stateProperties,
   ...fabricObjectDefaultValues,
 });

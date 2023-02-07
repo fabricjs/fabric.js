@@ -118,6 +118,7 @@ export class Image extends FabricObject {
   protected declare _originalElement: ImageSource;
   protected declare _filteredEl: ImageSource;
 
+  static cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
   /**
    * Constructor
    * Image can be initialized with any canvas drawable or a string.
@@ -780,7 +781,6 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
 
 Object.assign(Image.prototype, {
   ...imageDefaultValues,
-  cacheProperties: [...cacheProperties, 'cropX', 'cropY'],
 });
 
 classRegistry.setClass(Image);
