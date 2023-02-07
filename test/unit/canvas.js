@@ -333,14 +333,14 @@
 
   function initActiveSelection(canvas, activeObject, target) {
     canvas.setActiveObject(activeObject);
-    canvas._handleGrouping({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
+    canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
   }
 
   function updateActiveSelection(canvas, existing, target) {
     const activeSelection = canvas.getActiveSelection();
     activeSelection.add(...existing);
     canvas.setActiveObject(activeSelection);
-    canvas._handleGrouping({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
+    canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
   }
 
   QUnit.test('create active selection fires selection:created', function(assert) {
@@ -551,7 +551,7 @@
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
-  QUnit.test('_collectObjects collect topmost object if no dragging occurs', function (assert) {
+  QUnit.test('handleSelection collect topmost object if no dragging occurs', function (assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
@@ -562,12 +562,12 @@
       ex: 1,
       ey: 1
     };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect3, 'rect3 is collected');
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObjects().length, 1, 'a rect that contains all objects collects them all');
+    assert.equal(canvas.getActiveObjects()[0], rect3, 'rect3 is collected');
   });
 
-  QUnit.test('_collectObjects does not collect objects that have onSelect returning true', function(assert) {
+  QUnit.test('handleSelection does not collect objects that have onSelect returning true', function(assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     rect1.onSelect = function() {
       return true;
@@ -580,12 +580,12 @@
       left: 20,
       top: 20
     };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'objects are in the same position buy only one gets selected');
-    assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObjects().length, 1, 'objects are in the same position buy only one gets selected');
+    assert.equal(canvas.getActiveObjects()[0], rect2, 'contains rect2 but not rect 1');
   });
 
-  QUnit.test('_collectObjects does not call onSelect on objects that are not intersected', function(assert) {
+  QUnit.test('handleSelection does not call onSelect on objects that are not intersected', function(assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
     var onSelectRect1CallCount = 0;
@@ -606,7 +606,7 @@
       left: 1,
       top: 1
     };
-    canvas._collectObjects();
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
     var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
     assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
     // Intersects one
@@ -616,8 +616,9 @@
       ex: 0,
       ey: 0
     };
-    canvas._collectObjects();
-    assert.equal(onSelectRect1CallCount, 0, 'rect1 onSelect was not called. It will be called in _setActiveObject()');
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObject(), rect1, 'rect1 was selected');
+    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called while setting active object');
     assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
     // Intersects both
     canvas._groupSelector = {
@@ -626,12 +627,13 @@
       ex: 0,
       ey: 0
     };
-    canvas._collectObjects();
-    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called');
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect1 selected');
+    assert.equal(onSelectRect1CallCount, 2, 'rect1 onSelect was called once when collectiong it and once when selecting it');
     assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
   });
 
-  QUnit.test('_handleGrouping return false if onSelect return true', function(assert) {
+  QUnit.test('handleMultiSelection return false if onSelect return true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -641,11 +643,11 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = true;
-    var returned = canvas._handleGrouping(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, false, 'if onSelect returns true, shouldGroup return false');
   });
 
-  QUnit.test('_handleGrouping return true if onSelect return false and selectionKey is true', function(assert) {
+  QUnit.test('handleMultiSelection return true if onSelect return false and selectionKey is true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -655,11 +657,11 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = true;
-    var returned = canvas._handleGrouping(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, true, 'if onSelect returns false, shouldGroup return true');
   });
 
-  QUnit.test('_handleGrouping return false if selectionKey is false', function(assert) {
+  QUnit.test('handleMultiSelection return false if selectionKey is false', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -669,7 +671,7 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = false;
-    var returned = canvas._handleGrouping(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, false, 'shouldGroup return false');
   });
 

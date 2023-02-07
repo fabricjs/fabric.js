@@ -826,17 +826,7 @@ export class Canvas extends SelectableCanvas {
     }
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
-      if (this.selection && this._groupSelector) {
-        const objects = this._collectObjects(e);
-        // do not create group for 1 element only
-        if (objects.length === 1) {
-          this.setActiveObject(objects[0], e);
-        } else if (objects.length > 1) {
-          this._activeSelection.add(...objects);
-          this.setActiveObject(this._activeSelection, e);
-        }
-      }
-      this._groupSelector = null;
+      this.handleSelection(e);
       if (!shouldRender) {
         shouldRender =
           this._shouldRender(target) ||
@@ -1098,7 +1088,7 @@ export class Canvas extends SelectableCanvas {
     let grouped = false;
     if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
-    } else if (this._handleGrouping(e, target)) {
+    } else if (this.handleMultiSelection(e, target)) {
       // active object might have changed while grouping
       target = this._activeObject;
       grouped = true;
@@ -1455,17 +1445,19 @@ export class Canvas extends SelectableCanvas {
     }
   }
 
-  // Grouping objects mixin
-
   /**
-   * Handles active selection updates for user event.
-   * Sets the active object in case it is not set or in case there is a single active object left under active selection.
+   * ## Handles multiple selection
+   * - toggles `target` selection (selects/deselects `target` if it isn't/is selected respectively)
+   * - sets the active object in case it is not set or in case there is a single active object left under active selection.
+   * ---
+   * - If the active object is the active selection we add/remove `target` from it
+   * - If not, add the active object and `target` to the active selection and make it the active object.
    * @private
    * @param {TPointerEvent} e Event object
-   * @param {FabricObject} target
+   * @param {FabricObject} target target of event to select/deselect
    * @returns true if grouping occurred
    */
-  protected _handleGrouping(
+  protected handleMultiSelection(
     e: TPointerEvent,
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
@@ -1550,18 +1542,27 @@ export class Canvas extends SelectableCanvas {
   }
 
   /**
-   * Runs on mouse up
+   * ## Handles selection
+   * - selects objects that are contained in (and possibly intersecting) the selection bounding box
+   * - sets the active object
+   * ---
+   * runs on mouse up
    */
-  protected _collectObjects(e: TPointerEvent) {
-    const _groupSelector = this._groupSelector,
-      point1 = new Point(_groupSelector.ex, _groupSelector.ey),
-      point2 = point1.add(new Point(_groupSelector.left, _groupSelector.top)),
+  protected handleSelection(
+    e: TPointerEvent
+  ): this is AssertKeys<this, '_activeObject'> {
+    if (!this.selection || !this._groupSelector) {
+      return false;
+    }
+    const { ex: x, ey: y, left: dx, top: dy } = this._groupSelector,
+      point1 = new Point(x, y),
+      point2 = point1.add(new Point(dx, dy)),
       tl = point1.min(point2),
       br = point1.max(point2),
       size = br.subtract(tl),
       isClick = point1.eq(point2);
 
-    const objects = this.collectObjects(
+    const collectedObjects = this.collectObjects(
       {
         left: tl.x,
         top: tl.y,
@@ -1571,13 +1572,27 @@ export class Canvas extends SelectableCanvas {
       { includeIntersecting: !this.selectionFullyContained }
     ) as FabricObject[];
 
-    return isClick
-      ? objects[0]
-        ? [objects[0]]
+    const objects = isClick
+      ? collectedObjects[0]
+        ? [collectedObjects[0]]
         : []
-      : objects.length > 1
-      ? objects.filter((object) => !object.onSelect({ e })).reverse()
-      : objects;
+      : collectedObjects.length > 1
+      ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
+      : collectedObjects;
+
+    // set active object
+    if (objects.length === 1) {
+      // set as active object
+      this.setActiveObject(objects[0], e);
+    } else if (objects.length > 1) {
+      // add to active selection and make it the active object
+      this._activeSelection.add(...objects);
+      this.setActiveObject(this._activeSelection, e);
+    }
+
+    // cleanup
+    this._groupSelector = null;
+    return true;
   }
 
   exitTextEditing() {

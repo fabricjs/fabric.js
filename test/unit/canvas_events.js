@@ -17,7 +17,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
-      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
+      canvas.handleSelection = fabric.Canvas.prototype.handleSelection;
       canvas.off();
       canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
