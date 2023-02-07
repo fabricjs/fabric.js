@@ -98,7 +98,7 @@
     assert.equal(textbox.text, 'test');
     assert.equal(textbox.type, 'textbox');
     assert.deepEqual(textbox.styles, { });
-    assert.ok(textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
+    assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });
 
   QUnit.test('toObject', function(assert) {
@@ -530,7 +530,7 @@
     var styles = {};
     for (var index = 0; index < text.length; index++) {
       styles[index] = { fontSize: 4 };
-      
+
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },

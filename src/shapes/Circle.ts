@@ -31,6 +31,13 @@ export class Circle extends FabricObject {
    */
   declare endAngle: number;
 
+  static cacheProperties = [
+    ...cacheProperties,
+    'radius',
+    'startAngle',
+    'endAngle',
+  ];
+
   /**
    * @private
    * @param {String} key
@@ -198,7 +205,6 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 
 Object.assign(Circle.prototype, {
   ...circleDefaultValues,
-  cacheProperties: [...cacheProperties, 'radius', 'startAngle', 'endAngle'],
 });
 
 classRegistry.setClass(Circle);
