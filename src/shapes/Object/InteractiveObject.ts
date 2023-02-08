@@ -68,8 +68,6 @@ export class InteractiveFabricObject<
    */
   declare __corner?: string;
 
-  declare noScaleCache: boolean;
-
   /**
    * a map of control visibility for this object.
    * this was left when controls were introduced to not break the api too much
@@ -77,6 +75,7 @@ export class InteractiveFabricObject<
    */
   declare _controlsVisibility: Record<string, boolean>;
 
+  declare noScaleCache: boolean;
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
 
