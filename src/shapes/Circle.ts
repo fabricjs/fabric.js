@@ -8,7 +8,7 @@ import { sin } from '../util/misc/sin';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
 import { SerializedObjectProps } from './Object/ObjectProps';
 
-export interface CircleProps {
+export interface SerializedCircleProps extends SerializedObjectProps {
   /**
    * Radius of this circle
    * @type Number
@@ -33,7 +33,10 @@ export interface CircleProps {
   endAngle: number;
 }
 
-export class Circle extends FabricObject<CircleProps> implements CircleProps {
+export class Circle
+  extends FabricObject<SerializedCircleProps>
+  implements SerializedCircleProps
+{
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;
@@ -108,7 +111,7 @@ export class Circle extends FabricObject<CircleProps> implements CircleProps {
    */
   toObject<T extends keyof TClassProperties<this> = never>(
     propertiesToInclude: T[] = []
-  ): CircleProps & SerializedObjectProps & { [K in T]: this[K] } {
+  ): SerializedCircleProps & { [K in T]: this[K] } {
     return super.toObject([
       'radius',
       'startAngle',

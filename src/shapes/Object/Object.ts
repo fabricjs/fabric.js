@@ -84,7 +84,7 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    SProps = never,
+    SProps = SerializedObjectProps,
     Props = Partial<SProps>,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -492,7 +492,7 @@ export class FabricObject<
    */
   toObject<T extends keyof TClassProperties<this> = never>(
     propertiesToInclude?: T[]
-  ): SProps & SerializedObjectProps & { [K in T]: this[K] } {
+  ): { [K in T]: this[K] } & SProps {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -1542,11 +1542,12 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T = unknown>(
-    object: Partial<ReturnType<FabricObject<T>['toObject']>>,
-    options?: { signal?: AbortSignal }
-  ): Promise<FabricObject> {
-    return this._fromObject(object, options);
+  static fromObject<
+    T extends
+      | Record<string, unknown>
+      | SerializedObjectProps = SerializedObjectProps
+  >(object: T, options?: { signal?: AbortSignal }): Promise<FabricObject> {
+    return this._fromObject(object as Record<string, unknown>, options);
   }
 }
 

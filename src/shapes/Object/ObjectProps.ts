@@ -415,7 +415,7 @@ export interface FabricObjectProps extends ObjectProps {
    * @type Boolean
    * @default true
    */
-  noScaleCache: boolean;
+  noScaleCache?: boolean;
 
   /**
    * The angle that an object will lock to while rotating.
