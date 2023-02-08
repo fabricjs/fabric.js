@@ -908,14 +908,12 @@ export class SelectableCanvas<
 
   /**
    * Method that determines what object we are clicking on
-   * the skipGroup parameter is for internal use, is needed for shift+click action
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | undefined {
+  findTarget(e: TPointerEvent): FabricObject | undefined {
     if (this.skipTargetFind) {
       return undefined;
     }
@@ -923,9 +921,7 @@ export class SelectableCanvas<
     const pointer = this.getPointer(e, true),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
-      isTouch = isTouchEvent(e),
-      shouldLookForActive =
-        (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
+      isTouch = isTouchEvent(e);
 
     // first check current group (if one exists)
     // active group does not check sub targets like normal groups.
@@ -934,9 +930,9 @@ export class SelectableCanvas<
 
     // if we hit the corner of an activeObject, let's return that.
     if (
-      // ts doesn't get that if shouldLookForActive is true, activeObject exists
+      // ts doesn't get that if aObjects has one object, activeObject exists
       activeObject &&
-      shouldLookForActive &&
+      aObjects.length >= 1 &&
       activeObject._findTargetCorner(pointer, isTouch)
     ) {
       return activeObject;
@@ -944,7 +940,6 @@ export class SelectableCanvas<
     if (
       aObjects.length > 1 &&
       activeObject === this._activeSelection &&
-      !skipGroup &&
       this.searchPossibleTargets([activeObject], pointer)
     ) {
       return activeObject;

@@ -824,7 +824,7 @@
     canvas.remove(group);
   });
 
-  QUnit.skip('findTarget with subTargetCheck and canvas zoom', function(assert) {
+  QUnit.test('findTarget with subTargetCheck and canvas zoom', function(assert) {
     var rect3 = new fabric.Rect({
       width: 100,
       height: 100,
@@ -861,42 +861,42 @@
 
     var target = canvas.findTarget({
       clientX: 96, clientY: 186
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 96');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 96');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 98, clientY: 188
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 98');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 98');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 100, clientY: 190
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 100');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 100');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 102, clientY: 192
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 102');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 102');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 104, clientY: 194
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 104');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 104');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 106, clientY: 196
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
     canvas.targets = [];
