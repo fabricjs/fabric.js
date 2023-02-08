@@ -1,8 +1,8 @@
-import { Shadow } from '../../Shadow';
+import type { Shadow } from '../../Shadow';
 import { TDegree, TFiller } from '../../typedefs';
-import { FabricObject } from './Object';
+import type { FabricObject } from './Object';
 
-export interface ObjectProps {
+export interface SerializedObjectProps {
   /**
    * Opacity of an object
    * @type Number
@@ -377,7 +377,7 @@ export interface ObjectProps {
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
    * @type FabricObject
    */
-  clipPath?: FabricObject;
+  clipPath?: SerializedObjectProps;
 
   /**
    * Meaningful ONLY when the object is used as clipPath.
@@ -399,6 +399,10 @@ export interface ObjectProps {
    * @default false
    */
   absolutePositioned: boolean;
+}
+
+export interface ObjectProps extends SerializedObjectProps {
+  clipPath?: FabricObject;
 }
 
 export interface FabricObjectProps extends ObjectProps {

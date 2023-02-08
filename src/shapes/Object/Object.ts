@@ -38,7 +38,7 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { ObjectProps } from './ObjectProps';
+import { ObjectProps, SerializedObjectProps } from './ObjectProps';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -83,9 +83,13 @@ export type TCachedFabricObject = FabricObject &
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
+export class FabricObject<
+    SProps = never,
+    Props = Partial<SProps>,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
   extends AnimatableObject<EventSpec>
-  implements ObjectProps
+  implements SerializedObjectProps
 {
   declare readonly type: string;
 
@@ -159,7 +163,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * and refreshed at the next render
    * @type Array
    */
-  static cacheProperties: string[] = cacheProperties;
+  static cacheProperties: string[] = cacheProperties as unknown as string[];
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.
@@ -280,7 +284,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Partial<ObjectProps>) {
+  constructor(options?: Partial<ObjectProps> & Props) {
     super();
     this.setOptions(options);
   }
@@ -486,7 +490,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): Record<string, any> {
+  toObject<T extends keyof TClassProperties<this> = never>(
+    propertiesToInclude?: T[]
+  ): SProps & SerializedObjectProps & { [K in T]: this[K] } {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -497,7 +503,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
             }
           : null,
       object = {
-        ...pick(this, propertiesToInclude as (keyof this)[]),
+        ...pick(this, propertiesToInclude),
         type: this.type,
         version: VERSION,
         originX: this.originX,
@@ -1536,8 +1542,8 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject(
-    object: ReturnType<FabricObject['toObject']>,
+  static fromObject<T = unknown>(
+    object: Partial<ReturnType<FabricObject<T>['toObject']>>,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
     return this._fromObject(object, options);

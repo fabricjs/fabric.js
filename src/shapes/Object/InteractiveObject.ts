@@ -13,7 +13,7 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
-import { FabricObjectProps } from './ObjectProps';
+import { FabricObjectProps, SerializedObjectProps } from './ObjectProps';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -42,9 +42,11 @@ export interface DragMethods {
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
+    SProps = never,
+    Props = Partial<SProps>,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<EventSpec>
+  extends FabricObject<SProps, FabricObjectProps & Props, EventSpec>
   implements FabricObjectProps
 {
   /**
@@ -107,7 +109,7 @@ export class InteractiveFabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: FabricObjectProps) {
+  constructor(options?: Partial<FabricObjectProps> & Props) {
     super(options);
   }
 

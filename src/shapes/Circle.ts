@@ -6,9 +6,9 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
-import { FabricObjectProps } from './Object/ObjectProps';
+import { SerializedObjectProps } from './Object/ObjectProps';
 
-export interface CircleProps extends FabricObjectProps {
+export interface CircleProps {
   /**
    * Radius of this circle
    * @type Number
@@ -33,7 +33,7 @@ export interface CircleProps extends FabricObjectProps {
   endAngle: number;
 }
 
-export class Circle extends FabricObject implements CircleProps {
+export class Circle extends FabricObject<CircleProps> implements CircleProps {
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;
@@ -44,10 +44,6 @@ export class Circle extends FabricObject implements CircleProps {
     'startAngle',
     'endAngle',
   ];
-
-  constructor(options?: CircleProps) {
-    super(options);
-  }
 
   /**
    * @private
@@ -110,13 +106,15 @@ export class Circle extends FabricObject implements CircleProps {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []): object {
+  toObject<T extends keyof TClassProperties<this> = never>(
+    propertiesToInclude: T[] = []
+  ): CircleProps & SerializedObjectProps & { [K in T]: this[K] } {
     return super.toObject([
       'radius',
       'startAngle',
       'endAngle',
       ...propertiesToInclude,
-    ]);
+    ] as T[]);
   }
 
   /* _TO_SVG_START_ */
