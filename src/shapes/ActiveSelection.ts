@@ -9,7 +9,7 @@ export class ActiveSelection extends Group {
 
   /**
    * controls how selected objects are added during a multiselection event
-   * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking
+   * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
    * - `selection-order` adds the selected object to the top of the stack,
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
