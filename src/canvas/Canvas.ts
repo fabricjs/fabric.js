@@ -1486,16 +1486,19 @@ export class Canvas extends SelectableCanvas {
       !activeObject.__corner
     ) {
       if (isAS) {
+        const prevActiveObjects =
+          activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
           // find target from active objects
-          target = this.findTarget(e, true);
-          // if nothing is found or we are on activeObject's corner, bail out
+          target = this.searchPossibleTargets(
+            prevActiveObjects,
+            this.getPointer(e, true)
+          );
+          // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
           }
         }
-        const prevActiveObjects =
-          activeSelection.getObjects() as FabricObject[];
         if (target.group === activeSelection) {
           // `target` is part of active selection => remove it
           activeSelection.remove(target);
@@ -1507,17 +1510,7 @@ export class Canvas extends SelectableCanvas {
           }
         } else {
           //  `target` isn't part of active selection => add it
-          //  respect object stacking in ActiveSelection
-          //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
-          const index = activeSelection._objects.findIndex((obj) =>
-            obj.isInFrontOf(target!)
-          );
-          const insertAt =
-            index === -1
-              ? //  `target` is in front of all other objects
-                activeSelection.size()
-              : index;
-          activeSelection.insertAt(insertAt, target);
+          activeSelection.multiSelectAdd(target);
           this._hoveredTarget = activeSelection;
           this._hoveredTargets = [...this.targets];
         }
@@ -1525,17 +1518,12 @@ export class Canvas extends SelectableCanvas {
       } else {
         isInteractiveTextObject(activeObject) && activeObject.exitEditing();
         // add the active object and the target to the active selection and set it as the active object
-        this._activeSelection.add(
-          ...(target.isInFrontOf(activeObject)
-            ? [activeObject, target]
-            : [target, activeObject])
-        );
-
-        this._hoveredTarget = this._activeSelection;
+        activeSelection.multiSelectAdd(activeObject, target);
+        this._hoveredTarget = activeSelection;
         // ISSUE 4115: should we consider subTargets here?
         // this._hoveredTargets = [];
         // this._hoveredTargets = this.targets.concat();
-        this._setActiveObject(this._activeSelection, e);
+        this._setActiveObject(activeSelection, e);
         this._fireSelectionEvents([activeObject], e);
       }
       return true;

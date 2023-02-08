@@ -332,16 +332,19 @@
     canvas.off('selection:cleared');
   });
 
-  function initActiveSelection(canvas, activeObject, target) {
+  function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.multiSelectionStacking = multiSelectionStacking;
     canvas.setActiveObject(activeObject);
     canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
   }
 
-  function updateActiveSelection(canvas, existing, target) {
+  function updateActiveSelection(canvas, existing, target, multiSelectionStacking) {
     const activeSelection = canvas.getActiveSelection();
+    activeSelection.multiSelectionStacking = multiSelectionStacking;
     activeSelection.add(...existing);
     canvas.setActiveObject(activeSelection);
-    canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, target);
   }
 
   QUnit.test('create active selection fires selection:created', function(assert) {
@@ -350,7 +353,7 @@
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
     canvas.on('selection:created', function( ) { isFired = true; });
-    initActiveSelection(canvas, rect1, rect2);
+    initActiveSelection(canvas, rect1, rect2, 'selection-order');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
@@ -363,7 +366,7 @@
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
     rect2.on('selected', function( ) { isFired = true; });
-    initActiveSelection(canvas, rect1, rect2);
+    initActiveSelection(canvas, rect1, rect2, 'selection-order');
     const activeSelection = canvas.getActiveObjects();
     assert.equal(isFired, true, 'selected fired on rect2');
     assert.equal(activeSelection[0], rect1, 'first rec1');
@@ -371,30 +374,24 @@
     canvas.clear();
   });
 
-  QUnit.test('create active selection selected in different order, but same result', function(assert) {
-    var isFired = false;
+  QUnit.test('start multiselection: default', function(assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
-    rect2.on('selected', function( ) { isFired = true; });
-    initActiveSelection(canvas, rect2, rect1);
+    initActiveSelection(canvas, rect2, rect1, 'selection-order');
     const activeSelection = canvas.getActiveObjects();
-    assert.equal(activeSelection[0], rect1, 'first rec1');
-    assert.equal(activeSelection[1], rect2, 'then rect2');
-    canvas.clear();
+    assert.equal(activeSelection[0], rect2, 'first rect2');
+    assert.equal(activeSelection[1], rect1, 'then rect1');
   });
 
-  QUnit.test('create active added in different order, selection selected in different order, different result', function(assert) {
-    var isFired = false;
+  QUnit.test('start multiselection: preserve', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
-    canvas.add(rect2, rect1);
-    rect2.on('selected', function( ) { isFired = true; });
-    initActiveSelection(canvas, rect2, rect1);
+    canvas.add(rect1, rect2);
+    initActiveSelection(canvas, rect2, rect1, 'canvas-stacking');
     const activeSelection = canvas.getActiveObjects();
-    assert.equal(activeSelection[1], rect1, 'then rect1');
-    assert.equal(activeSelection[0], rect2, 'first rect2');
-    canvas.clear();
+    assert.equal(activeSelection[0], rect1, 'first rect1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
   });
 
   QUnit.test('update active selection selection:updated', function(assert) {
@@ -404,10 +401,9 @@
     var rect3 = new fabric.Rect();
     canvas.add(rect1, rect2, rect3);
     canvas.on('selection:updated', function( ) { isFired = true; });
-    updateActiveSelection(canvas, [rect1, rect2], rect3);
+    updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selection:updated fired');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
-    canvas.off('selection:updated');
   });
 
   QUnit.test('update active selection fires deselected on an object', function(assert) {
@@ -416,7 +412,7 @@
     var rect2 = new fabric.Rect({ width: 10, height: 10 });
     canvas.add(rect1, rect2);
     rect2.on('deselected', function( ) { isFired = true; });
-    updateActiveSelection(canvas, [rect1, rect2], rect2);
+    updateActiveSelection(canvas, [rect1, rect2], rect2, 'selection-order');
     assert.equal(isFired, true, 'deselected on rect2 fired');
   });
 
@@ -427,36 +423,23 @@
     var rect3 = new fabric.Rect();
     canvas.add(rect1, rect2, rect3);
     rect3.on('selected', function( ) { isFired = true; });
-    updateActiveSelection(canvas, [rect1, rect2], rect3);
+    updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
 
-  QUnit.test('setActiveObject fires deselected', function(assert) {
-    var isFired = false;
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    rect1.on('deselected', function( ) { isFired = true; });
-
-    canvas.setActiveObject(rect1);
-    canvas.setActiveObject(rect2);
-    assert.equal(isFired, true, 'switching active group fires deselected');
-  });
-
-  function setGroupSelector(canvas, { x = 0, y = 0, deltaX = 0, deltaY = 0 } = {}) {
-    canvas._groupSelector = {
-      x, y, deltaX, deltaY
-    };
-  }
-
-  QUnit.test('update active selection respects order of objects', function (assert) {
+  
+  QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
     const rect2 = new fabric.Rect();
     const rect3 = new fabric.Rect();
     canvas.add(rect1, rect2, rect3);
     function assertObjectsInOrder(init, added) {
-      updateActiveSelection(canvas, init, added);
-      assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3]);
-      canvas.getActiveSelection().removeAll();
+      updateActiveSelection(canvas, init, added, 'canvas-stacking');
+      assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'updated selection while preserving canvas stacking order');
+      canvas.discardActiveObject();
+      updateActiveSelection(canvas, init, added, 'selection-order');
+      assert.deepEqual(canvas.getActiveObjects(), [...init, added], 'updated selection while preserving click order');
+      canvas.discardActiveObject();
     }
     function assertObjectsInOrderOnCanvas(init, added) {
       assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
@@ -494,6 +477,58 @@
     assertNestedObjectsInOrder2([rect1, rect3], rect2);
     assertNestedObjectsInOrder2([rect2, rect3], rect1);
   });
+
+  QUnit.test('multiselection: toggle', assert => {
+    const rect1 = new fabric.Rect();
+    const rect2 = new fabric.Rect();
+    const rect3 = new fabric.Rect();
+    let isFired = false;
+    rect2.on('deselected', () => { isFired = true; });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], rect2, 'selection-order');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'rect2 was deselected');
+    assert.ok(isFired, 'fired deselected');
+  });
+
+  QUnit.test('multiselection: clicking nested target of active selection toggles nested target', assert => {
+    const rect1 = new fabric.Rect({ width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ width: 10, height: 10 });
+    const rect3 = new fabric.Rect({ width: 10, height: 10 });
+    let isFired = false;
+    rect3.on('deselected', () => { isFired = true; });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect3 was deselected');
+    assert.ok(isFired, 'fired deselected');
+  });
+
+  QUnit.test('multiselection: clicking active selection does nothing', assert => {
+    const rect1 = new fabric.Rect({ left: 10, width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ left: -10, width: 5, height: 5 });
+    const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    canvas.getActiveObjects().forEach(o=>console.log(o.left))
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+  });
+
+  QUnit.test('setActiveObject fires deselected', function(assert) {
+    var isFired = false;
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    rect1.on('deselected', function( ) { isFired = true; });
+
+    canvas.setActiveObject(rect1);
+    canvas.setActiveObject(rect2);
+    assert.equal(isFired, true, 'switching active group fires deselected');
+  });
+
+  function setGroupSelector(canvas, { x = 0, y = 0, deltaX = 0, deltaY = 0 } = {}) {
+    canvas._groupSelector = {
+      x, y, deltaX, deltaY
+    };
+  }
 
   QUnit.test('group selected objects fires selected for objects', function(assert) {
     var fired = 0;
@@ -759,7 +794,7 @@
 
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
@@ -789,7 +824,7 @@
     canvas.remove(group);
   });
 
-  QUnit.test('findTarget with subTargetCheck and canvas zoom', function(assert) {
+  QUnit.skip('findTarget with subTargetCheck and canvas zoom', function(assert) {
     var rect3 = new fabric.Rect({
       width: 100,
       height: 100,

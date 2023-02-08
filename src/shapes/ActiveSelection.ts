@@ -7,6 +7,16 @@ import type { FabricObject } from './Object/FabricObject';
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
 
+  /**
+   * controls how selected objects are added during a multiselection event
+   * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking
+   * - `selection-order` adds the selected object to the top of the stack,
+   * meaning that the stack is ordered by the order in which objects were selected
+   * @default `canvas-stacking`
+   */
+  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
+    'canvas-stacking';
+
   constructor(
     objects?: FabricObject[],
     options?: any,
@@ -29,6 +39,28 @@ export class ActiveSelection extends Group {
    */
   __objectSelectionMonitor() {
     //  noop
+  }
+
+  /**
+   * Adds objects with respect to {@link multiSelectionStacking}
+   * @param targets object to add to selection
+   */
+  multiSelectAdd(...targets: FabricObject[]) {
+    if (this.multiSelectionStacking === 'selection-order') {
+      this.add(...targets);
+    } else {
+      //  respect object stacking as it is on canvas
+      //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+      targets.forEach((target) => {
+        const index = this._objects.findIndex((obj) => obj.isInFrontOf(target));
+        const insertAt =
+          index === -1
+            ? //  `target` is in front of all other objects
+              this.size()
+            : index;
+        this.insertAt(insertAt, target);
+      });
+    }
   }
 
   /**

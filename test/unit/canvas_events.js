@@ -204,7 +204,7 @@
     assert.equal(canvas._activeObject, rect, 'with activeOn of up object is selected on mouse up');
   });
 
-  QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
+  QUnit.test('specific bug #5317 for multiselection', function(assert) {
     var greenRect = new fabric.Rect({
       width: 300,
       height: 300,
