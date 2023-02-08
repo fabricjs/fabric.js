@@ -1537,7 +1537,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {Promise<FabricObject>}
    */
   static fromObject(
-    object: Record<string, unknown>,
+    object: ReturnType<FabricObject['toObject']>,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
     return this._fromObject(object, options);
