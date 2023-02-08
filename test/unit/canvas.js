@@ -508,7 +508,6 @@
     const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
     canvas.add(rect1, rect2, rect3);
     updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
-    canvas.getActiveObjects().forEach(o=>console.log(o.left))
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
     assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
@@ -1069,7 +1068,7 @@
     canvas.remove(group3);
   });
 
-  QUnit.test('findTarget on activegroup', function(assert) {
+  QUnit.test('findTarget on active selection', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
     var rect3 = makeRect({ left: 20, top: 0 });
@@ -1077,7 +1076,10 @@
     canvas.add(rect2);
     canvas.add(rect3);
     const group = canvas.getActiveSelection();
+    group.subTargetCheck = true;
     group.add(rect1, rect2);
+    group.cornerSize = 2;
+    group.setCoords();
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -1087,21 +1089,30 @@
       clientX: 40, clientY: 15
     });
     assert.equal(target, null, 'Should miss the activegroup');
+    assert.ok(!group.__corner, 'not over control');
+    target = canvas.findTarget({
+      clientX: 0, clientY: 0
+    });
+    assert.equal(group.__corner, 'tl', 'over control');
+    assert.ok(target, group, 'should return active selection if over control');
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
-    assert.equal(target, rect1, 'Should return the rect inside activegroup');
+    });
+    assert.ok(target, group, 'should return active selection');
+    assert.equal(canvas.targets[0], rect1, 'Should return the rect inside active selection');
     target = canvas.findTarget({
       clientX: 25, clientY: 5
     });
-    assert.equal(target, group, 'Should return the activegroup');
+    assert.equal(target, group, 'Should return the active selection');
+    assert.deepEqual(canvas.targets, [], 'Should not return the rect behind active selection');
+    canvas.discardActiveObject();
     target = canvas.findTarget({
       clientX: 25, clientY: 5
-    }, true);
-    assert.equal(target, rect3, 'Should return the rect behind activegroup');
+    });
+    assert.equal(target, rect3, 'Should return the rect3 now that active selection has been cleared');
   });
 
-  QUnit.test('findTarget on activegroup with perPixelTargetFind', function(assert) {
+  QUnit.test('findTarget on active selection with perPixelTargetFind', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
     canvas.perPixelTargetFind = true;

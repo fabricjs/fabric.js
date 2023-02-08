@@ -920,58 +920,47 @@ export class SelectableCanvas<
 
     const pointer = this.getPointer(e, true),
       activeObject = this._activeObject,
-      aObjects = this.getActiveObjects(),
-      isTouch = isTouchEvent(e);
+      aObjects = this.getActiveObjects();
 
-    // first check current group (if one exists)
-    // active group does not check sub targets like normal groups.
-    // if active group just exits.
     this.targets = [];
 
-    // if we hit the corner of an activeObject, let's return that.
-    if (
-      // ts doesn't get that if aObjects has one object, activeObject exists
-      activeObject &&
-      aObjects.length >= 1 &&
-      activeObject._findTargetCorner(pointer, isTouch)
-    ) {
-      return activeObject;
-    }
-    if (
-      aObjects.length > 1 &&
-      activeObject === this._activeSelection &&
-      this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      return activeObject;
-    }
-
-    let activeTarget;
-    let activeTargetSubs: FabricObject[] = [];
-    if (
-      // ts doesn't get that if aObjects has one object, activeObject exists
-      activeObject &&
-      aObjects.length === 1 &&
-      activeObject === this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      if (!this.preserveObjectStacking) {
+    if (activeObject && aObjects.length >= 1) {
+      if (activeObject._findTargetCorner(pointer, isTouchEvent(e))) {
+        // if we hit the corner of the active object, let's return that.
         return activeObject;
-      } else {
-        activeTarget = activeObject;
-        activeTargetSubs = this.targets;
-        this.targets = [];
+      } else if (
+        aObjects.length > 1 &&
+        // check pointer is over active selection and possibly perform `subTargetCheck`
+        this.searchPossibleTargets([activeObject], pointer)
+      ) {
+        // active selection does not select sub targets like normal groups
+        return activeObject;
+      } else if (
+        activeObject === this.searchPossibleTargets([activeObject], pointer)
+      ) {
+        // active object is not an active selection
+        if (!this.preserveObjectStacking) {
+          return activeObject;
+        } else {
+          const subTargets = this.targets;
+          this.targets = [];
+          const target = this.searchPossibleTargets(this._objects, pointer);
+          if (
+            e[this.altSelectionKey as ModifierKey] &&
+            target &&
+            target !== activeObject
+          ) {
+            // alt selection: select active object even though it is not the top most target
+            // restore targets
+            this.targets = subTargets;
+            return activeObject;
+          }
+          return target;
+        }
       }
     }
-    const target = this.searchPossibleTargets(this._objects, pointer);
-    if (
-      e[this.altSelectionKey as ModifierKey] &&
-      target &&
-      activeTarget &&
-      target !== activeTarget
-    ) {
-      this.targets = activeTargetSubs;
-      return activeTarget;
-    }
-    return target;
+
+    return this.searchPossibleTargets(this._objects, pointer);
   }
 
   /**
@@ -1605,7 +1594,6 @@ Object.assign(SelectableCanvas.prototype, {
   altActionKey: 'shiftKey',
   selection: true,
   selectionKey: 'shiftKey',
-  altSelectionKey: null,
   selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
   selectionDashArray: [],
   selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
