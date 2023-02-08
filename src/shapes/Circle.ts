@@ -111,7 +111,7 @@ export class Circle
    */
   toObject<T extends keyof TClassProperties<this> = never>(
     propertiesToInclude: T[] = []
-  ): SerializedCircleProps & { [K in T]: this[K] } {
+  ): { [K in T]: this[K] } & SerializedCircleProps {
     return super.toObject([
       'radius',
       'startAngle',
@@ -206,6 +206,10 @@ export class Circle
   }
 
   /* _FROM_SVG_END_ */
+
+  static fromObject(object: SerializedCircleProps): Promise<Circle> {
+    return super.fromObject(object) as Promise<Circle>;
+  }
 }
 
 export const circleDefaultValues: Partial<TClassProperties<Circle>> = {

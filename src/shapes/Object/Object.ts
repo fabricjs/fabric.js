@@ -1542,13 +1542,11 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<
-    T extends
-      | Record<string, unknown>
-      | SerializedObjectProps = SerializedObjectProps,
-    S extends FabricObject = FabricObject
-  >(object: T, options?: { signal?: AbortSignal }): Promise<S> {
-    return this._fromObject(object as Record<string, unknown>, options);
+  static fromObject(
+    object: SerializedObjectProps,
+    options?: { signal?: AbortSignal }
+  ): Promise<FabricObject> {
+    return this._fromObject(object as any, options);
   }
 }
 
