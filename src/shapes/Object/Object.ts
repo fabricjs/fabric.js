@@ -1512,13 +1512,13 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject(
+  static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
     {
       extraParam,
       ...options
     }: { extraParam?: string; signal?: AbortSignal } = {}
-  ): Promise<FabricObject> {
+  ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
         const allOptions = { ...options, ...enlivedMap };
@@ -1532,7 +1532,7 @@ export class FabricObject<
           return new this(allOptions);
         }
       }
-    );
+    ) as Promise<S>;
   }
 
   /**
@@ -1545,8 +1545,9 @@ export class FabricObject<
   static fromObject<
     T extends
       | Record<string, unknown>
-      | SerializedObjectProps = SerializedObjectProps
-  >(object: T, options?: { signal?: AbortSignal }): Promise<FabricObject> {
+      | SerializedObjectProps = SerializedObjectProps,
+    S extends FabricObject = FabricObject
+  >(object: T, options?: { signal?: AbortSignal }): Promise<S> {
     return this._fromObject(object as Record<string, unknown>, options);
   }
 }
