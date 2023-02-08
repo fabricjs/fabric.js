@@ -1462,7 +1462,8 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
-    const isAS = activeObject === this._activeSelection;
+    const activeSelection = this._activeSelection;
+    const isAS = activeObject === activeSelection;
     if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
@@ -1484,8 +1485,8 @@ export class Canvas extends SelectableCanvas {
       // make sure we are not on top of a control
       !activeObject.__corner
     ) {
-      if (activeObject === this._activeSelection) {
-        if (target === activeObject) {
+      if (isAS) {
+        if (target === activeSelection) {
           // find target from active objects
           target = this.findTarget(e, true);
           // if nothing is found or we are on activeObject's corner, bail out
@@ -1493,30 +1494,31 @@ export class Canvas extends SelectableCanvas {
             return false;
           }
         }
-        const prevActiveObjects = activeObject.getObjects() as FabricObject[];
-        if (target.group === activeObject) {
+        const prevActiveObjects =
+          activeSelection.getObjects() as FabricObject[];
+        if (target.group === activeSelection) {
           // `target` is part of active selection => remove it
-          activeObject.remove(target);
+          activeSelection.remove(target);
           this._hoveredTarget = target;
           this._hoveredTargets = [...this.targets];
-          if (activeObject.size() === 1) {
+          if (activeSelection.size() === 1) {
             // activate last remaining object
-            this._setActiveObject(activeObject.item(0) as FabricObject, e);
+            this._setActiveObject(activeSelection.item(0) as FabricObject, e);
           }
         } else {
           //  `target` isn't part of active selection => add it
           //  respect object stacking in ActiveSelection
           //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
-          const index = activeObject._objects.findIndex((obj) =>
+          const index = activeSelection._objects.findIndex((obj) =>
             obj.isInFrontOf(target!)
           );
           const insertAt =
             index === -1
               ? //  `target` is in front of all other objects
-                activeObject.size()
+                activeSelection.size()
               : index;
-          activeObject.insertAt(insertAt, target);
-          this._hoveredTarget = activeObject;
+          activeSelection.insertAt(insertAt, target);
+          this._hoveredTarget = activeSelection;
           this._hoveredTargets = [...this.targets];
         }
         this._fireSelectionEvents(prevActiveObjects, e);
