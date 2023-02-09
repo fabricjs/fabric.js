@@ -1,7 +1,50 @@
-//@ts-nocheck
 import { Observable } from './Observable';
+import { createHybrid } from './util/internals';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
+  static getDefaultValues() {
+    return {};
+  }
+
+  constructor(options?: any) {
+    super();
+    return createHybrid(
+      Object.assign(this, options),
+      (this.constructor as typeof CommonMethods).getDefaultValues()
+    );
+  }
+
+  /**
+   * A side effect that runs during {@link Object#set}
+   *
+   * ---
+   *
+   * **IMPORTANT**
+   *
+   * Setting the value of `key` in this block will result in an infinite loop.\
+   * To do so use {@link Reflect} or {@link Object}
+   *
+   * ---
+   *
+   * @todo
+   * **Migration Path**
+   *
+   * - Do **NOT** call from {@link _set} and all of {@link CommonMethods} methods
+   * - Migrate logic from {@link _set} to here making sure all logic related to a key has been fully migrated
+   *
+   * @param key
+   * @param value
+   * @param prevValue
+   * @returns true if the change should be accepted and `false` to revert the set operation
+   */
+  protected onChange<K extends keyof this>(
+    key: K,
+    value: T[K],
+    prevValue: T[K]
+  ): boolean {
+    return true;
+  }
+
   /**
    * Sets object's properties from options, for initialization only
    * @protected
