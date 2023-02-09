@@ -90,7 +90,7 @@ export function createHybrid<
             prevValue === newValue ||
             !target.onChange ||
             // a change occurred => run side effects
-            (target.onChange(p, newValue, prevValue, target) &&
+            (!target.onChange(p, newValue, prevValue, target) &&
               // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
               !(has
                 ? Reflect.set(target, p, prevValue, receiver)
