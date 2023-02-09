@@ -1,5 +1,6 @@
 import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
+import { commaWsp } from '../../parser/constants';
 
 type TPathSegmentInfoCommon = {
   x: number;
@@ -91,6 +92,16 @@ type TCommand7<T extends TParsedCommand> =
 type TCommand8<T extends TParsedCommand> =
   `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]} ${T[5]} ${T[6]} ${T[7]}`;
 
+// absolute value number
+const absNumberRegExStr = String.raw`(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
+export const numberRegExStr = String.raw`[-+]?${absNumberRegExStr}`;
+
+/**
+ * p for param
+ * using "bad naming" here because it makes the regex much easier to read
+ */
+const p = String.raw`(${numberRegExStr})`;
+
 /**
  * Begin parsed SVG path commands
  * Read about commands at {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths|MDN}
@@ -106,6 +117,7 @@ export type TParsedMoveToCommand =
   | TParsedRelativeMoveToCommand;
 
 export type TMoveToCommand = TCommand3<TParsedMoveToCommand>;
+export const reMoveToCommand = new RegExp(String.raw`(M) (?:${p} ${p} ?)+`, 'gi');
 
 export type TParsedAbsoluteLineCommand = [command: 'L', x: number, y: number];
 export type TParsedRelativeLineCommand = [command: 'l', dx: number, dy: number];
@@ -114,6 +126,7 @@ export type TParsedLineCommand =
   | TParsedRelativeLineCommand;
 
 export type TLineCommand = TCommand3<TParsedLineCommand>;
+export const reLineCommand = new RegExp(String.raw`(L) (?:${p} ${p} ?)+`, 'gi');
 
 export type TParsedAbsoluteHorizontalLineCommand = [command: 'H', x: number];
 export type TParsedRelativeHorizontalLineCommand = [command: 'h', dx: number];
@@ -122,6 +135,10 @@ export type TParsedHorizontalLineCommand =
   | TParsedRelativeHorizontalLineCommand;
 
 export type THorizontalLineCommand = TCommand2<TParsedHorizontalLineCommand>;
+export const reHorizontalLineCommand = new RegExp(
+  String.raw`(H) (?:${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteVerticalLineCommand = [command: 'V', y: number];
 export type TParsedRelativeVerticalLineCommand = [command: 'v', dy: number];
@@ -130,6 +147,10 @@ export type TParsedVerticalLineCommand =
   | TParsedRelativeVerticalLineCommand;
 
 export type TVerticalLineCommand = TCommand2<TParsedVerticalLineCommand>;
+export const reVerticalLineCommand = new RegExp(
+  String.raw`(V) (?:${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteClosePathCommand = [command: 'Z'];
 export type TParsedRelativeClosePathCommand = [command: 'z'];
@@ -138,6 +159,7 @@ export type TParsedClosePathCommand =
   | TParsedRelativeClosePathCommand;
 
 export type TClosePathCommand = TCommand1<TParsedClosePathCommand>;
+export const reClosePathCommand = new RegExp(String.raw`(Z)\s*`, 'gi');
 
 export type TParsedAbsoluteCubicCurveCommand = [
   command: 'C',
@@ -162,6 +184,10 @@ export type TParsedCubicCurveCommand =
   | TParsedRelativeCubicCurveCommand;
 
 export type TCubicCurveCommand = TCommand7<TParsedCubicCurveCommand>;
+export const reCubicCurveCommand = new RegExp(
+  String.raw`(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteCubicCurveShortcutCommand = [
   command: 'S',
@@ -183,6 +209,10 @@ export type TParsedCubicCurveShortcutCommand =
 
 export type TCubicCurveShortcutCommand =
   TCommand5<TParsedCubicCurveShortcutCommand>;
+export const reCubicCurveShortcutCommand = new RegExp(
+  String.raw`(S) (?:${p} ${p} ${p} ${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteQuadraticCurveCommand = [
   command: 'Q',
@@ -203,6 +233,10 @@ export type TParsedQuadraticCurveCommand =
   | TParsedRelativeQuadraticCurveCommand;
 
 export type TQuadraticCurveCommand = TCommand5<TParsedQuadraticCurveCommand>;
+export const reQuadraticCurveCommand = new RegExp(
+  String.raw`(Q) (?:${p} ${p} ${p} ${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteQuadraticCurveShortcutCommand = [
   command: 'T',
@@ -217,6 +251,10 @@ export type TParsedRelativeQuadraticCurveShortcutCommand = [
 export type TParsedQuadraticCurveShortcutCommand =
   | TParsedAbsoluteQuadraticCurveShortcutCommand
   | TParsedRelativeQuadraticCurveShortcutCommand;
+export const reQuadraticCurveShortcutCommand = new RegExp(
+  String.raw`(T) (?:${p} ${p} ?)+`,
+  'gi'
+);
 
 export type TQuadraticCurveShortcutCommand =
   TCommand3<TParsedQuadraticCurveShortcutCommand>;
@@ -241,11 +279,20 @@ export type TParsedRelativeArcCommand = [
   endDX: number,
   endDY: number
 ];
+
 export type TParsedArcCommand =
   | TParsedAbsoluteArcCommand
   | TParsedRelativeArcCommand;
 
-export type TArcCommand = TCommand8<TParsedArcCommand>;
+export type TArcCommandSingleFlag<T extends TParsedArcCommand> =
+  `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]}${T[5]} ${T[6]} ${T[7]}`;
+export type TArcCommand =
+  | TCommand8<TParsedArcCommand>
+  | TArcCommandSingleFlag<TParsedArcCommand>;
+export const reArcCommand = new RegExp(
+  String.raw`(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`,
+  'gi'
+);
 /**
  * End parsed path commands
  */
@@ -264,6 +311,20 @@ export type TComplexParsedCommand =
   | TParsedQuadraticCurveCommand
   | TParsedQuadraticCurveShortcutCommand
   | TParsedArcCommand;
+
+export const rePathCommand = new RegExp(
+  `(?:(?:${reMoveToCommand.source})` +
+    `|(?:${reLineCommand.source})` +
+    `|(?:${reHorizontalLineCommand.source})` +
+    `|(?:${reVerticalLineCommand.source})` +
+    `|(?:${reClosePathCommand.source})` +
+    `|(?:${reCubicCurveCommand.source})` +
+    `|(?:${reCubicCurveShortcutCommand.source})` +
+    `|(?:${reQuadraticCurveCommand.source})` +
+    `|(?:${reQuadraticCurveShortcutCommand.source})` +
+    `|(?:${reArcCommand.source}))`,
+  'dgi'
+);
 
 /**
  * A series of path commands

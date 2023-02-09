@@ -1,7 +1,7 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { halfPI, PiBy180 } from '../../constants';
-import { commaWsp, rePathCommand } from '../../parser/constants';
+import { commaWsp } from '../../parser/constants';
 import { Point } from '../../point.class';
 import type { TBounds, TMat2D, TRadian } from '../../typedefs';
 import { cos } from '../misc/cos';
@@ -26,6 +26,8 @@ import {
   TSimpleParsedCommand,
   TSimplePathData,
   TPathSegmentInfo,
+  rePathCommand,
+  numberRegExStr,
 } from './path_types';
 
 /**
@@ -522,7 +524,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         break;
       case 'z':
       case 'Z':
-        current[0] = 'Z';
+        // current[0] = 'Z';
         x = x1;
         y = y1;
         break;
@@ -820,7 +822,7 @@ export const getPointOnPath = (
   path: TSimplePathData,
   distance: number,
   infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
-): TPointAngle => {
+): TPointAngle | undefined => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;
@@ -879,7 +881,7 @@ export const getPointOnPath = (
         distance
       );
     default:
-      throw Error('Invalid command');
+      // throw Error('Invalid command');
   }
 };
 
@@ -896,71 +898,53 @@ export const getPointOnPath = (
  *
  */
 export const parsePath = (pathString: string): TComplexPathData => {
-  // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-  const re = rePathCommand;
-  const rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
-    rNumberCommaWsp = `(${rNumber})${commaWsp}`,
-    rFlagCommaWsp = `([01])${commaWsp}?`,
-    rArcSeq = `${rNumberCommaWsp}?${rNumberCommaWsp}?${rNumberCommaWsp}${rFlagCommaWsp}${rFlagCommaWsp}${rNumberCommaWsp}?(${rNumber})`,
-    regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
-    result: TComplexPathData = [];
+  // clean the string
+  // add spaces around the numbers
+  pathString = pathString.replace(new RegExp(`(${numberRegExStr})`, 'gi'), " $1 ");
+  // replace annoying commas and arbitrary whitespace with single spaces
+  pathString = pathString.replace(/,/gi, " ");
+  pathString = pathString.replace(/\s+/gi, " ");
 
-  if (!pathString || !pathString.match) {
-    return result;
-  }
-  const path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
-  if (!path) {
-    return result;
-  }
-  for (const currentPath of path) {
-    const coordsStr = currentPath.slice(1).trim();
-    const coords: string[] = [];
-    let command = currentPath.charAt(0);
-    const coordsParsed: TParsedCommand = [command];
 
-    if (command.toLowerCase() === 'a') {
-      // arcs have special flags that apparently don't require spaces so handle special
-      for (let args; (args = regArcArgumentSequence.exec(coordsStr)); ) {
-        for (let j = 1; j < args.length; j++) {
-          coords.push(args[j]);
+  const res: TComplexPathData = [];
+  for (const match of pathString.matchAll(rePathCommand)) {
+    let matchStr = match[0];
+    const chain: TComplexPathData = [];
+    // console.log(matchStr, match, (match as any).indices);
+    let paramArr: RegExpExecArray | null;
+    do {
+      // console.log(matchStr);
+      paramArr = new RegExp(rePathCommand.source, 'id').exec(matchStr);
+      if (!paramArr) {
+        break;
+      }
+      const filteredGroups = paramArr.filter((g) => g);
+      const filteredIndices = (paramArr as any).indices.filter((i: never) => i);
+      // console.log(filteredIndices, filteredGroups);
+      // remove the first element from the match array since it's just the whole command
+      filteredGroups.shift();
+      filteredIndices.shift();
+      // if we can't parse the number, just interpret it as a string
+      // (since it's probably the path command)
+      const command = filteredGroups.map((g) => {
+        const numParse = Number.parseFloat(g);
+        if (Number.isNaN(numParse)) {
+          return g;
+        } else {
+          return numParse;
         }
+      });
+      chain.push(command as any);
+      // chop off that last set of params
+      // console.log(filteredIndices.length);
+      if (filteredIndices.length <= 1) {
+        break;
       }
-    } else {
-      let match: RegExpExecArray | null;
-      while ((match = re.exec(coordsStr))) {
-        coords.push(match[0]);
-      }
-    }
-
-    for (const coord of coords) {
-      const parsed = parseFloat(coord);
-      if (!isNaN(parsed)) {
-        // TODO: remove any
-        coordsParsed.push(parsed as any);
-      }
-    }
-
-    const commandLength = commandLengths[command.toLowerCase()],
-      repeatedCommand = repeatedCommands[command] || command;
-
-    if (coordsParsed.length - 1 > commandLength) {
-      for (
-        let k = 1, klen = coordsParsed.length;
-        k < klen;
-        k += commandLength
-      ) {
-        // TODO: remove any
-        result.push(
-          [command].concat(coordsParsed.slice(k, k + commandLength)) as any
-        );
-        command = repeatedCommand;
-      }
-    } else {
-      // TODO: remove any
-      result.push(coordsParsed as any);
-    }
+      matchStr = matchStr.substring(0, filteredIndices[1][0]);
+    } while (paramArr);
+    chain.reverse().forEach((c) => res.push(c));
   }
-  return result;
+  return res;
 };
 
 /**
