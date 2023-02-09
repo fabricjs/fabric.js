@@ -15,7 +15,7 @@ QUnit[isNode() ? 'module' : 'skip']('Hybrid', (hooks) => {
             o: x,
         };
         const hybrid = createHybrid(target);
-        assert.equal(hybrid.getSource(), undefined, 'source');
+        assert.equal(hybrid.__source__, undefined, 'source');
         assert.equal(hybrid.a, a, 'get from target');
         assert.equal(hybrid.o, o, 'get from target');
         assert.equal(hybrid.z, undefined, 'doesn\'t exist');
@@ -41,7 +41,7 @@ QUnit[isNode() ? 'module' : 'skip']('Hybrid', (hooks) => {
             o: x,
         };
         const hybrid = createHybrid(target, source);
-        assert.equal(hybrid.getSource(), source, 'source');
+        assert.equal(hybrid.__source__, source, 'source');
         assert.equal(hybrid.a, a, 'get from target');
         assert.equal(hybrid.o, o, 'get from target');
         assert.equal(hybrid.b, b, 'get from source');
@@ -78,8 +78,8 @@ QUnit[isNode() ? 'module' : 'skip']('Hybrid', (hooks) => {
             o: {},
             b: {}
         });
-        hybrid.setSource(source);
-        assert.equal(hybrid.getSource(), source, 'source');
+        hybrid.__source__ = source;
+        assert.equal(hybrid.__source__, source, 'source');
         assert.equal(hybrid.a, a, 'get from target');
         assert.equal(hybrid.o, o, 'get from target');
         assert.equal(hybrid.b, b, 'get from source');
@@ -121,7 +121,7 @@ QUnit[isNode() ? 'module' : 'skip']('Hybrid', (hooks) => {
             y,
         });
         const hybrid = createHybrid(target, source);
-        assert.equal(hybrid.getSource(), source, 'source');
+        assert.equal(hybrid.__source__, source, 'source');
         assert.equal(hybrid.a, a, 'get from target');
         assert.equal(hybrid.o, o, 'get from target');
         assert.equal(hybrid.b, b, 'get from source');
@@ -129,16 +129,16 @@ QUnit[isNode() ? 'module' : 'skip']('Hybrid', (hooks) => {
         assert.equal(hybrid.y, y, 'get from source of source');
         assert.equal(hybrid.z, undefined, 'doesn\'t exist');
         assert.deepEqual(Object.keys(hybrid), ['o', 'x', 'y', 'b', 'a'], 'keys');
-        assert.deepEqual({ ...hybrid }, { ...source.getSource(), ...source, ...target, });
+        assert.deepEqual({ ...hybrid }, { ...source.__source__, ...source, ...target, });
         // mutate source
         assert.equal(hybrid.c, undefined, 'can\'t resolve key');
         const c = {};
-        source.setSource({ c });
+        source.__source__ = { c };
         assert.equal(hybrid.c, c, 'source is shared');
         // mutate target
         const z = {};
         target.z = z;
         assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
-        assert.equal(source.getSource().z, undefined, 'mutating target doesn\'t mutate source');
+        assert.equal(source.__source__.z, undefined, 'mutating target doesn\'t mutate source');
     });
 });
