@@ -83,24 +83,22 @@ export function createHybrid<
         }
         if (Reflect.set(target, p, newValue, receiver)) {
           if (
-            p !== SOURCE_KEY &&
-            descriptor?.enumerable &&
-            prevValue !== newValue &&
-            target.onChange &&
+            p === SOURCE_KEY ||
+            !descriptor?.enumerable ||
+            prevValue === newValue ||
+            !target.onChange ||
             // a change occurred => run side effects
-            !target.onChange(p, newValue, prevValue, target) &&
+            target.onChange(p, newValue, prevValue, target) ||
             // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
-            (has
+            !(has
               ? Reflect.set(target, p, prevValue, receiver)
               : Reflect.deleteProperty(target, p))
           ) {
-            // signal that the operation didn't succeed
-            return false;
-          } else {
-            // monitor key
+            // the operation has succeeded
+            // monitor `p`
             Reflect.set(Reflect.get(target, MONITOR_KEY), p, true);
-            return true;
           }
+          return true;
         }
         return false;
       },
@@ -115,25 +113,23 @@ export function createHybrid<
           Reflect.getOwnPropertyDescriptor(source, p);
         if (Reflect.deleteProperty(target, p)) {
           if (
-            p !== SOURCE_KEY &&
-            descriptor?.enumerable &&
-            prevValue &&
-            target.onChange &&
+            p === SOURCE_KEY ||
+            !descriptor?.enumerable ||
+            !prevValue ||
+            !target.onChange ||
             // a change occurred => run side effects
-            !target.onChange(p, undefined, prevValue, target) &&
+            target.onChange(p, undefined, prevValue, target) ||
             // change was refused by side effects => revert by redefining the property
-            Reflect.defineProperty(target, p, {
+            !Reflect.defineProperty(target, p, {
               ...descriptor,
               value: prevValue,
             })
           ) {
-            // signal that the operation didn't succeed
-            return false;
-          } else {
-            // monitor key
+            // the operation has succeeded
+            // monitor `p`
             Reflect.set(Reflect.get(target, MONITOR_KEY), p, true);
-            return true;
           }
+          return true;
         }
         return false;
       },
