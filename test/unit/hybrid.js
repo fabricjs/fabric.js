@@ -1,4 +1,4 @@
-QUnit[isNode() ? 'module' : 'skip']('internals', (hooks) => {
+QUnit.module('internals', (hooks) => {
     const createHybrid = fabric.util.createHybrid
 
     QUnit.module('Hybrid', () => {
