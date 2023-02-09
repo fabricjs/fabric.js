@@ -43,6 +43,7 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.z, undefined, 'doesn\'t exist');
             assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'b'], 'keys');
             assert.deepEqual({ ...hybrid }, { ...source, ...target, });
+            assert.deepEqual({ ...hybrid }, { a, o, b });
             // mutate source
             assert.equal(hybrid.c, undefined, 'can\'t resolve key');
             const c = {};
@@ -84,6 +85,7 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.b, b, 'get from source');
             assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'b'], 'keys');
             assert.deepEqual({ ...hybrid }, { ...source, ...target, });
+            assert.deepEqual({ ...hybrid }, { a, o, b });
         });
         QUnit.test('with hybrid set as source', assert => {
             const a = {};
@@ -117,11 +119,13 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.z, undefined, 'doesn\'t exist');
             assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'b', 'x', 'y'], 'keys');
             assert.deepEqual({ ...hybrid }, { ...source.__source__, ...source, ...target, });
+            assert.deepEqual({ ...hybrid }, { a, o, b, x, y });
             // mutate source
             assert.equal(hybrid.c, undefined, 'can\'t resolve key');
             const c = {};
             source.__source__ = { c };
             assert.equal(hybrid.c, c, 'source is shared');
+            assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'b', 'x', 'c'], 'keys');
             // mutate target
             const z = {};
             target.z = z;
