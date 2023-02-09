@@ -72,6 +72,7 @@ export function createHybrid<
       },
       set(target, p, newValue, receiver) {
         const has = Reflect.has(target, p);
+        // call with `receiver` to run `get` through this proxy in order to obtain the correct value of target or source
         const prevValue = Reflect.get(target, p, receiver);
         const source = Reflect.get(target, SOURCE_KEY);
         const descriptor =
@@ -86,7 +87,7 @@ export function createHybrid<
           // the object is frozen => operation failed
           return false;
         }
-        if (Reflect.set(target, p, newValue, receiver)) {
+        if (Reflect.set(target, p, newValue)) {
           if (
             p === SOURCE_KEY ||
             prevValue === newValue ||
@@ -96,7 +97,7 @@ export function createHybrid<
               !target.onChange(p, newValue, prevValue, target) &&
               // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
               !(has
-                ? Reflect.set(target, p, prevValue, receiver)
+                ? Reflect.set(target, p, prevValue)
                 : Reflect.deleteProperty(target, p)))
           ) {
             // the operation has succeeded
