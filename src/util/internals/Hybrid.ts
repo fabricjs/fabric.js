@@ -86,11 +86,11 @@ export function createHybrid<
         if (Reflect.set(target, p, newValue, receiver)) {
           if (
             p === SOURCE_KEY ||
-            !descriptor?.enumerable ||
             prevValue === newValue ||
             !target.onChange ||
             // a change occurred => run side effects
-            (!target.onChange(p, newValue, prevValue, target) &&
+            ((!descriptor || descriptor.enumerable) &&
+              !target.onChange(p, newValue, prevValue, target) &&
               // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
               !(has
                 ? Reflect.set(target, p, prevValue, receiver)
