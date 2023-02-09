@@ -40,10 +40,16 @@ export function createHybrid<
         writable: true,
       },
       [MONITOR_KEY]: {
-        value: Object.keys(target).reduce((monitor, key) => {
-          monitor[key] = true;
-          return monitor;
-        }, {} as Record<string | symbol, true>),
+        value: Object.keys(target).reduce(
+          (monitor, key) => {
+            monitor[key] = true;
+            return monitor;
+          },
+          { [SOURCE_KEY]: true, [MONITOR_KEY]: true } as Record<
+            string | symbol,
+            true
+          >
+        ),
         configurable: false,
         enumerable: false,
         writable: false,
@@ -82,7 +88,11 @@ export function createHybrid<
           !has &&
           descriptor &&
           // define `source` descriptor on `target` before setting the new value (or else it becomes frozen)
-          !Reflect.defineProperty(target, p, descriptor)
+          !Reflect.defineProperty(target, p, {
+            ...descriptor,
+            // make sure we use the correct value
+            value: prevValue,
+          })
         ) {
           // the object is frozen => operation failed
           return false;
@@ -119,8 +129,9 @@ export function createHybrid<
       deleteProperty(target, p) {
         const monitor = Reflect.get(target, MONITOR_KEY);
         const source = Reflect.get(target, SOURCE_KEY);
+        const prevTargetValue = Reflect.get(target, p);
         const prevValue = monitor[p]
-          ? Reflect.get(target, p)
+          ? prevTargetValue
           : source && Reflect.get(source, p);
         const descriptor =
           Reflect.getOwnPropertyDescriptor(target, p) ||
@@ -128,11 +139,11 @@ export function createHybrid<
         if (Reflect.deleteProperty(target, p)) {
           if (
             p === SOURCE_KEY ||
-            !descriptor?.enumerable ||
-            !prevValue ||
+            !prevTargetValue ||
             !target.onChange ||
             // a change occurred => run side effects
-            (!target.onChange(p, undefined, prevValue, target) &&
+            ((!descriptor || descriptor.enumerable) &&
+              !target.onChange(p, undefined, prevValue, target) &&
               // change was refused by side effects => revert by redefining the property
               !Reflect.defineProperty(target, p, {
                 ...descriptor,
