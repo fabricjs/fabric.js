@@ -1,55 +1,54 @@
 const SOURCE_KEY = '__source__';
 
 export type Hybrid<T extends object, S extends object> = T & {
-  getSource(): S | undefined;
-  setSource(source: S): void;
+  [SOURCE_KEY]: S;
 };
 
 export function createHybrid<T extends object, S extends object>(
   target: T,
   source?: S
 ) {
-  return Object.defineProperties(
-    new Proxy(target, {
-      get(target, p, receiver) {
-        const source = Reflect.get(target, SOURCE_KEY, receiver);
-        if (p === SOURCE_KEY) {
-          return source;
-        } else if (!source) {
-          return Reflect.get(target, p, receiver);
-        } else {
-          return Reflect.get(source, p, source);
-        }
-      },
-      ownKeys(target) {
-        return [
-          ...Reflect.ownKeys(Reflect.get(target, SOURCE_KEY, target) || {}),
-          ...Reflect.ownKeys(target),
-        ];
-      },
-    }),
-    {
+  return new Proxy(
+    Object.defineProperties(target, {
       [SOURCE_KEY]: {
         value: source,
         configurable: false,
         enumerable: false,
         writable: true,
       },
-      getSource: {
-        value() {
-          return this[SOURCE_KEY];
-        },
-        configurable: false,
-        enumerable: false,
-        writable: false,
+    }),
+    {
+      get(target, p) {
+        const source = Reflect.get(target, SOURCE_KEY);
+        if (p === SOURCE_KEY) {
+          return source;
+        } else if (
+          !Reflect.get(target, p) &&
+          source &&
+          Reflect.has(source, p)
+        ) {
+          return Reflect.get(source, p);
+        } else {
+          return Reflect.get(target, p);
+        }
       },
-      setSource: {
-        value(value: S) {
-          this[SOURCE_KEY] = value;
-        },
-        configurable: false,
-        enumerable: false,
-        writable: false,
+      ownKeys(target) {
+        const ownKeys = Reflect.ownKeys(target);
+        Reflect.ownKeys(Reflect.get(target, SOURCE_KEY) || {}).forEach(
+          (key) => !ownKeys.includes(key) && ownKeys.push(key)
+        );
+        return ownKeys;
+      },
+      getOwnPropertyDescriptor(target, p) {
+        const source = Reflect.get(target, SOURCE_KEY);
+        return (
+          Reflect.getOwnPropertyDescriptor(target, p) ||
+          (source && Reflect.getOwnPropertyDescriptor(source, p))
+        );
+      },
+      has(target, p) {
+        const source = Reflect.get(target, SOURCE_KEY);
+        return Reflect.has(target, p) || (!!source && Reflect.has(source, p));
       },
     }
   ) as Hybrid<T, S>;
