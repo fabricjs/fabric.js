@@ -1,13 +1,26 @@
 const SOURCE_KEY = '__source__';
 
-export type Hybrid<T extends object, S extends object> = T & {
+export type OnChange<T, K extends keyof T = keyof T> = (
+  key: T,
+  value: T[K],
+  prevValue: T[K]
+) => boolean;
+
+export type Hybrid<
+  T extends object & {
+    onChange?: OnChange<T>;
+  },
+  S extends object
+> = T & {
   [SOURCE_KEY]: S;
 };
 
-export function createHybrid<T extends object, S extends object>(
-  target: T,
-  source?: S
-) {
+export function createHybrid<
+  T extends object & {
+    onChange?: OnChange<T>;
+  },
+  S extends object
+>(target: T, source?: S) {
   return new Proxy(
     Object.defineProperties(target, {
       [SOURCE_KEY]: {
@@ -31,6 +44,30 @@ export function createHybrid<T extends object, S extends object>(
         } else {
           return Reflect.get(target, p);
         }
+      },
+      set(target, p, newValue, receiver) {
+        const has = Reflect.has(target, p);
+        const prevValue = Reflect.get(target, p, receiver);
+        if (Reflect.set(target, p, newValue, receiver)) {
+          if (
+            p === SOURCE_KEY ||
+            !Object.getOwnPropertyDescriptor(target, p)?.enumerable ||
+            prevValue === newValue ||
+            !target.onChange
+          ) {
+            return true;
+          } else {
+            return (
+              // run side effects
+              target.onChange(p, newValue, prevValue) ||
+              // change was refused so we revert
+              (has
+                ? Reflect.set(target, p, prevValue, receiver)
+                : Reflect.deleteProperty(target, p))
+            );
+          }
+        }
+        return false;
       },
       ownKeys(target) {
         const ownKeys = Reflect.ownKeys(target);

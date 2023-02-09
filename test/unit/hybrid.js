@@ -132,5 +132,44 @@ QUnit.module('internals', (hooks) => {
             assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
             assert.equal(source.__source__.z, undefined, 'mutating target doesn\'t mutate source');
         });
+        QUnit.test('set calls on change', assert => {
+            const changes = [];
+            let controller = true;
+            const hybrid = createHybrid(Object.defineProperties({
+                x: 1
+            }, {
+                onChange: {
+                    enumerable: false,
+                    value(key, value, prevValue) {
+                        changes.push({ key, value, prevValue, accepted: controller });
+                        return controller;
+                    }
+                }
+            }));
+            hybrid.x = 2;
+            assert.equal(hybrid.x, 2, 'set');
+            controller = false;
+            hybrid.x = 3;
+            assert.equal(hybrid.x, 2, 'refused to change');
+            Object.assign(hybrid, { x: 4, y: 5 });
+            assert.deepEqual(hybrid, { x: 2 }, 'refused to change, deleted y');
+            controller = true;
+            hybrid.x = 3;
+            assert.equal(hybrid.x, 3, 'accepted');
+            assert.deepEqual(Object.assign(hybrid, { x: 4, y: 5 }), { x: 4, y: 5 }, 'changed');
+            assert.deepEqual(hybrid, { x: 4, y: 5 }, 'changed');
+            // no value change => no side effect
+            hybrid.x = 4;
+            Object.assign({ y: 5 });
+            assert.deepEqual(changes, [
+                { key: 'x', value: 2, prevValue: 1, accepted: true },
+                { key: 'x', value: 3, prevValue: 2, accepted: false },
+                { key: 'x', value: 4, prevValue: 2, accepted: false },
+                { key: 'y', value: 5, prevValue: undefined, accepted: false },
+                { key: 'x', value: 3, prevValue: 2, accepted: true },
+                { key: 'x', value: 4, prevValue: 3, accepted: true },
+                { key: 'y', value: 5, prevValue: undefined, accepted: true }
+            ], 'called on change');
+        })
     });
 });
