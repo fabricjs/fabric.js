@@ -40,7 +40,10 @@ export function createHybrid<
         writable: true,
       },
       [MONITOR_KEY]: {
-        value: {},
+        value: Object.keys(target).reduce((monitor, key) => {
+          monitor[key] = true;
+          return monitor;
+        }, {} as Record<string | symbol, true>),
         configurable: false,
         enumerable: false,
         writable: false,
@@ -100,6 +103,14 @@ export function createHybrid<
             // monitor `p`
             Reflect.set(Reflect.get(target, MONITOR_KEY), p, true);
           }
+          return true;
+        }
+        return false;
+      },
+      defineProperty(target, property, attributes) {
+        if (Reflect.defineProperty(target, property, attributes)) {
+          // monitor `property`
+          Reflect.set(Reflect.get(target, MONITOR_KEY), property, true);
           return true;
         }
         return false;
