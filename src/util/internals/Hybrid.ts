@@ -12,7 +12,7 @@ export function createHybrid<T extends object, S extends object>(
     Object.defineProperties(target, {
       [SOURCE_KEY]: {
         value: source,
-        configurable: false,
+        configurable: true,
         enumerable: false,
         writable: true,
       },

@@ -161,6 +161,7 @@ import { wrapElement } from './src/util/dom_misc';
 import { request } from './src/util/dom_request';
 import { removeTransformMatrixForSvgParsing } from './src/util/transform_matrix_removal';
 import { parseFontDeclaration } from './src/parser/parseFontDeclaration';
+import { createHybrid } from './src/util/internals';
 
 const util = {
   rotatePoint,
@@ -249,6 +250,7 @@ const util = {
   classRegistry,
   // for test compatibility. We don't want to export it.
   removeTransformMatrixForSvgParsing,
+  createHybrid,
 };
 
 // CONTROLS UTILS
