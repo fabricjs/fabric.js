@@ -76,10 +76,7 @@ export function createHybrid<
           Reflect.getOwnPropertyDescriptor(source, p);
         if (!has && descriptor) {
           // define `source` descriptor on `target` before setting the new value (or else it becomes frozen)
-          Reflect.defineProperty(target, p, {
-            ...descriptor,
-            value: newValue,
-          });
+          Reflect.defineProperty(target, p, descriptor);
         }
         if (Reflect.set(target, p, newValue, receiver)) {
           if (
