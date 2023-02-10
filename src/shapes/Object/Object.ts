@@ -1017,31 +1017,32 @@ export class FabricObject<
     return super.transformValue(key, newValue, value, target);
   }
 
-  protected onChange<K extends keyof this>(
-    key: K,
-    value: this[K],
-    prevValue: this[K],
-    target: this
-  ): boolean {
-    switch (key) {
-      case 'dirty':
-        value && this.group && (this.group.dirty = true);
-        break;
+  /**
+   * Handles setting values on the instance and handling internal side effects
+   * @protected
+   * @param {String} key
+   * @param {*} value
+   */
+  _set(key: string, value: any) {
+    const isChanged = this[key as keyof this] !== value;
+
+    if (key === 'dirty' && this.group) {
+      this.group.set('dirty', value);
     }
-    if (value !== prevValue) {
-      const groupNeedsUpdate =
-        this.group &&
-        typeof this.group.isOnACache === 'function' &&
-        this.group.isOnACache();
+
+    this[key as keyof this] = value;
+
+    if (isChanged) {
+      const groupNeedsUpdate = this.group && this.group.isOnACache();
       // @ts-ignore TS and constructor issue
       if (this.constructor.cacheProperties.includes(key)) {
         this.dirty = true;
-        groupNeedsUpdate && (this.group!.dirty = true);
+        groupNeedsUpdate && this.group!.set('dirty', true);
       } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
-        this.group!.dirty = true;
+        this.group!.set('dirty', true);
       }
     }
-    return super.onChange(key, value, prevValue, target);
+    return this;
   }
 
   /*
