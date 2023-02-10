@@ -65,10 +65,10 @@
     assert.equal(circle.height, 40);
   });
 
-  QUnit.test('set radius', function(assert) {
+  QUnit.test('set radius side effect', function(assert) {
     var circle = new fabric.Circle({strokeWidth: 0});
 
-    circle.set('radius', 20);
+    circle.radius = 20;
 
     assert.equal(circle.getRadiusX(), 20);
     assert.equal(circle.getRadiusY(), 20);

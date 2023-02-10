@@ -38,19 +38,16 @@ export class Circle extends FabricObject {
     'endAngle',
   ];
 
-  /**
-   * @private
-   * @param {String} key
-   * @param {*} value
-   */
-  _set(key: string, value: any) {
-    super._set(key, value);
-
+  protected onChange<K extends keyof this>(
+    key: K,
+    value: this[K],
+    prevValue: this[K],
+    target: this
+  ): boolean {
     if (key === 'radius') {
-      this.setRadius(value);
+      this.width = this.height = value * 2;
     }
-
-    return this;
+    return super.onChange(key, value, prevValue, target);
   }
 
   /**
