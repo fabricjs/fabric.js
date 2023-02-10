@@ -15,12 +15,14 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   }
 
   /**
+   * A hook that runs from the `set` trap of {@link Proxy} before a change is made to instance,
+   * allowing to return a different value to the operation
    *
    * @param key
    * @param newValue
    * @param value
    * @param target {@link Reflect} target
-   * @returns
+   * @returns the value to set
    */
   protected transformValue<K extends keyof this, R extends this[K]>(
     key: K,
@@ -34,7 +36,9 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   }
 
   /**
-   * A side effect that runs during {@link Object#set}
+   * A hook that runs after a change has been made to instance
+   * It is a good place to run side effects
+   * Allows ro revert the operation by returning `false`
    *
    * ---
    *
