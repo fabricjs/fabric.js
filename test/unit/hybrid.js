@@ -254,6 +254,35 @@ QUnit.module('internals', (hooks) => {
                 { key: 'z', value: 4, prevValue: undefined, accepted: true },
                 { key: 'z', value: undefined, prevValue: 4, accepted: true }
             ], 'called on change');
+        });
+        QUnit.test('transform value', assert => {
+            const hybrid = createHybrid(Object.defineProperties({
+                x: 1
+            }, {
+                transformValue: {
+                    enumerable: false,
+                    value(key, newValue, value) {
+                        switch (key) {
+                            case 'a':
+                                return newValue + 5;
+                            case 'x':
+                                return value;
+                            default:
+                               return newValue
+                        }
+                    }
+                },
+            }), {
+                z: 3
+            });
+            hybrid.a = 5;
+            assert.equal(hybrid.a, 10, 'transform valued');
+            hybrid.a = 25;
+            assert.equal(hybrid.a, 30, 'transform valued');
+            hybrid.x = 25;
+            assert.equal(hybrid.x, 1, 'transform valued');
+            hybrid.foo = 'bar';
+            assert.equal(hybrid.foo, 'bar', 'transform valued');
         })
     });
 });

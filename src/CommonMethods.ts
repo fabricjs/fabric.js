@@ -14,6 +14,15 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
     );
   }
 
+  protected transformValue<K extends keyof this>(
+    key: K,
+    newValue: this[K],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    value: this[K]
+  ): this[K] {
+    return newValue;
+  }
+
   /**
    * A side effect that runs during {@link Object#set}
    *

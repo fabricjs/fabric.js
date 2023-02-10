@@ -1,36 +1,44 @@
 const SOURCE_KEY = '__source__';
 const MONITOR_KEY = '__monitor__';
 
-export type OnChange<T, K extends keyof T = keyof T> = (
-  key: T,
-  value: T[K],
-  prevValue: T[K],
+export type THybrid<T, K extends keyof T = keyof T> = object & {
   /**
-   * {@link Reflect} target
+   * @returns the value to commit
    */
-  target: T
-) => boolean;
+  transformValue?: (
+    key: T,
+    newValue: T[K],
+    value: T[K],
+    /**
+     * {@link Reflect} target
+     */
+    target: T
+  ) => T[K];
 
-export type Hybrid<
-  T extends object & {
-    onChange?: OnChange<T>;
-  },
-  S extends object
-> = T &
+  /**
+   * @returns true if the change is accepted
+   */
+  onChange?: (
+    key: T,
+    value: T[K],
+    prevValue: T[K],
+    /**
+     * {@link Reflect} target
+     */
+    target: T
+  ) => boolean;
+};
+
+export type Hybrid<T extends THybrid<T>, S extends object> = T &
   // S is partial since keys of T might be monitored and deleted
   Partial<S> & {
     [SOURCE_KEY]: S;
   };
 
-export function createHybrid<
-  T extends object & {
-    /**
-     * @returns true if the change is accepted
-     */
-    onChange?: OnChange<T>;
-  },
-  S extends object
->(target: T, source?: S): Hybrid<T, S> {
+export function createHybrid<T extends THybrid<T>, S extends object>(
+  target: T,
+  source?: S
+): Hybrid<T, S> {
   return new Proxy(
     Object.defineProperties(target, {
       [SOURCE_KEY]: {
@@ -84,6 +92,11 @@ export function createHybrid<
         const descriptor =
           Reflect.getOwnPropertyDescriptor(target, p) ||
           Reflect.getOwnPropertyDescriptor(source, p);
+
+        if (target.transformValue) {
+          newValue = target.transformValue(p, newValue, prevValue, target);
+        }
+
         if (
           !has &&
           descriptor &&
@@ -97,6 +110,7 @@ export function createHybrid<
           // the object is frozen => operation failed
           return false;
         }
+
         if (Reflect.set(target, p, newValue)) {
           if (
             p === SOURCE_KEY ||
