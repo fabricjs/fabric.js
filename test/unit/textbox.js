@@ -532,8 +532,7 @@
     var text = 'aaa aaq ggg gg oee eee';
     var styles = {};
     for (var index = 0; index < text.length; index++) {
-      styles[index] = { fontSize: 4 };
-      
+      styles[index] = { fontSize: 4 };      
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },
