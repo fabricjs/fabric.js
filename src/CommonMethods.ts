@@ -54,6 +54,7 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    *
    * - Do **NOT** call from {@link _set} and all of {@link CommonMethods} methods
    * - Migrate logic from {@link _set} to here making sure all logic related to a key has been fully migrated
+   * - Use {@link transformValue} when needed
    *
    * @param key
    * @param value
