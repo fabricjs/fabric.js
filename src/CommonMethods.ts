@@ -14,13 +14,23 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
     );
   }
 
-  protected transformValue<K extends keyof this>(
+  /**
+   *
+   * @param key
+   * @param newValue
+   * @param value
+   * @param target {@link Reflect} target
+   * @returns
+   */
+  protected transformValue<K extends keyof this, R extends this[K]>(
     key: K,
     newValue: this[K],
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    value: this[K]
-  ): this[K] {
-    return newValue;
+    value: this[K],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    target: this
+  ): R {
+    return newValue as R;
   }
 
   /**
@@ -44,12 +54,18 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @param key
    * @param value
    * @param prevValue
+   * @param target {@link Reflect} target
    * @returns true if the change should be accepted and `false` to revert the set operation
    */
   protected onChange<K extends keyof this>(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key: K,
-    value: T[K],
-    prevValue: T[K]
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    value: this[K],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    prevValue: this[K],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    target: this
   ): boolean {
     return true;
   }
