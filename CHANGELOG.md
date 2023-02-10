@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): Textbox `fromObject` test not to pass an instance
 - TS(): Moved cache properties to static properties on classes [#xxxx](https://github.com/fabricjs/fabric.js/pull/xxxx)
 - refactor(): Moved cache properties to static properties on classes [#8662](https://github.com/fabricjs/fabric.js/pull/8662)
 - docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
