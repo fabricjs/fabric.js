@@ -994,29 +994,6 @@ export class FabricObject<
     return value;
   }
 
-  protected transformValue<K extends keyof this, R extends this[K]>(
-    key: K,
-    newValue: this[K],
-    value: this[K],
-    target: this
-  ): R {
-    if (key === 'scaleX' || key === 'scaleY') {
-      newValue = this._constrainScale(newValue);
-    }
-    if (key === 'scaleX' && newValue < 0) {
-      this.flipX = !this.flipX;
-      newValue *= -1;
-    } else if (key === 'scaleY' && newValue < 0) {
-      this.flipY = !this.flipY;
-      newValue *= -1;
-    }
-    // i don't like this automatic initialization here
-    if (key === 'shadow' && newValue && !(newValue instanceof Shadow)) {
-      newValue = new Shadow(newValue);
-    }
-    return super.transformValue(key, newValue, value, target);
-  }
-
   /**
    * Handles setting values on the instance and handling internal side effects
    * @protected
@@ -1026,7 +1003,19 @@ export class FabricObject<
   _set(key: string, value: any) {
     const isChanged = this[key as keyof this] !== value;
 
-    if (key === 'dirty' && this.group) {
+    if (key === 'scaleX' || key === 'scaleY') {
+      value = this._constrainScale(value);
+    }
+    if (key === 'scaleX' && value < 0) {
+      this.flipX = !this.flipX;
+      value *= -1;
+    } else if (key === 'scaleY' && value < 0) {
+      this.flipY = !this.flipY;
+      value *= -1;
+      // i don't like this automatic initialization here
+    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
+      value = new Shadow(value);
+    } else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
     }
 
