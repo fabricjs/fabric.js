@@ -1358,12 +1358,19 @@
   });
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    let off = false;
+    object.off = () => {
+      off = true;
+    }
+    object.canvas = canvas;
     assert.ok(typeof object.dispose === 'function');
     object.animate({ fill: 'red' });
     const findAnimationsByTarget = target => fabric.runningAnimations.filter(({ target: t }) => target === t);
     assert.equal(findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
     assert.equal(findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
+    assert.ok(!object.canvas, 'cleared canvas');
+    assert.ok(off, 'unsubscribe events');
   });
   QUnit.test('prototype changes', function (assert) {
     var object = new fabric.Object();
