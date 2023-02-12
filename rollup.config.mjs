@@ -62,7 +62,7 @@ export default [
         sourcemap: true,
       },
       {
-        file: path.resolve(dirname, `${basename}.node.js`),
+        file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',
         format: 'cjs',
         sourcemap: true,
