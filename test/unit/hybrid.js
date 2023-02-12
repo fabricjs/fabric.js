@@ -227,7 +227,7 @@ QUnit.module('internals', (hooks) => {
                     }, {
                         onChange: {
                             enumerable: false,
-                            value(key, value, prevValue) {
+                            value({ key, value, prevValue }) {
                                 changes.push({ key, value, prevValue, accepted: controller });
                                 return controller;
                             }
@@ -284,7 +284,7 @@ QUnit.module('internals', (hooks) => {
                     }, {
                         onChange: {
                             enumerable: false,
-                            value(key, value, prevValue) {
+                            value({ key, value, prevValue }) {
                                 changes.push({ key, value, prevValue, accepted: controller });
                                 return controller;
                             }
@@ -383,7 +383,7 @@ QUnit.module('internals', (hooks) => {
                     const hybrid = createHybrid(Object.defineProperties(target, {
                         onChange: {
                             enumerable: false,
-                            value(key, value, prevValue) {
+                            value({ key, value, prevValue }) {
                                 changes.push({ key, value, prevValue, accepted: controller });
                                 return controller;
                             }

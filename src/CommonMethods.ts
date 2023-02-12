@@ -1,5 +1,9 @@
 import { Observable } from './Observable';
-import { createHybrid, TransformValueContext } from './util/internals';
+import {
+  ChangeContext,
+  createHybrid,
+  TransformValueContext,
+} from './util/internals';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   static getDefaultValues() {
@@ -75,16 +79,8 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @param target {@link Reflect} target
    * @returns true if the change should be accepted and `false` to revert the set operation
    */
-  protected onChange<K extends keyof this>(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    key: K,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    value: this[K],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    prevValue: this[K],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    target: this
-  ): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected onChange(context: ChangeContext<this>, target: this): boolean {
     return true;
   }
 

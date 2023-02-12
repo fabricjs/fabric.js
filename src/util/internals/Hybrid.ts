@@ -15,6 +15,12 @@ export type TransformValueContext<T, K extends keyof T = keyof T> = {
     }
 );
 
+export type ChangeContext<T, K extends keyof T = keyof T> = {
+  key: T;
+  value: T[K];
+  prevValue: T[K];
+};
+
 type THybrid<T, K extends keyof T = keyof T> = object & {
   /**
    * @returns the value to commit
@@ -31,9 +37,7 @@ type THybrid<T, K extends keyof T = keyof T> = object & {
    * @returns true if the change is accepted
    */
   onChange?: (
-    key: T,
-    value: T[K],
-    prevValue: T[K],
+    context: ChangeContext<T, K>,
     /**
      * {@link Reflect} target
      */
@@ -197,7 +201,10 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
             !target.onChange ||
             // a change occurred => run side effects
             ((!descriptor || descriptor.enumerable) &&
-              (target.onChange(p, newValue, prevValue, target) ||
+              (target.onChange(
+                { key: p, value: newValue, prevValue },
+                target
+              ) ||
                 // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
                 !(has
                   ? Reflect.set(target, p, prevValue)
@@ -236,7 +243,10 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
             !target.onChange ||
             // a change occurred => run side effects
             ((!descriptor || descriptor.enumerable) &&
-              (target.onChange(p, undefined, prevValue, target) ||
+              (target.onChange(
+                { key: p, value: undefined, prevValue },
+                target
+              ) ||
                 // change was refused by side effects => revert by redefining the property
                 !Reflect.defineProperty(target, p, {
                   ...descriptor,
