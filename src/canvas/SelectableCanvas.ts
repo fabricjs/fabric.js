@@ -1430,7 +1430,10 @@ export class SelectableCanvas<
    * @param {Object} object the next object to set as active, reason why we are discarding this
    * @return {Boolean} true if the active object has been discarded
    */
-  _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
+  _discardActiveObject(
+    e?: TPointerEvent,
+    object?: FabricObject
+  ): this is { _activeObject: undefined } {
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
@@ -1455,7 +1458,7 @@ export class SelectableCanvas<
    * @param {event} e
    * @return {Boolean} true if the active object has been discarded
    */
-  discardActiveObject(e?: TPointerEvent) {
+  discardActiveObject(e?: TPointerEvent): this is { _activeObject: undefined } {
     const currentActives = this.getActiveObjects(),
       activeObject = this.getActiveObject();
     if (currentActives.length) {
