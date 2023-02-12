@@ -82,7 +82,9 @@ export type LayoutResult = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
+export class Group extends createCollectionMixin(
+  FabricObject<any, any, GroupEvents>
+) {
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout
