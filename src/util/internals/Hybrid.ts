@@ -64,7 +64,11 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
       },
       restoreDefault: {
         value(key: string) {
-          if (!this[MONITOR_KEY][key]) {
+          if (
+            key === SOURCE_KEY ||
+            key === MONITOR_KEY ||
+            !this[MONITOR_KEY][key]
+          ) {
             return false;
           }
           const value = this[key];
@@ -151,18 +155,18 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           return false;
         }
 
-        if (Reflect.set(target, p, newValue)) {
+        if (p !== MONITOR_KEY && Reflect.set(target, p, newValue)) {
           if (
             p === SOURCE_KEY ||
             prevValue === newValue ||
             !target.onChange ||
             // a change occurred => run side effects
             ((!descriptor || descriptor.enumerable) &&
-              !target.onChange(p, newValue, prevValue, target) &&
-              // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
-              !(has
-                ? Reflect.set(target, p, prevValue)
-                : Reflect.deleteProperty(target, p)))
+              (target.onChange(p, newValue, prevValue, target) ||
+                // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
+                !(has
+                  ? Reflect.set(target, p, prevValue)
+                  : Reflect.deleteProperty(target, p))))
           ) {
             // the operation has succeeded
             // monitor `p`
@@ -183,26 +187,26 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
       deleteProperty(target, p) {
         const monitor = Reflect.get(target, MONITOR_KEY);
         const source = Reflect.get(target, SOURCE_KEY);
-        const prevTargetValue = Reflect.get(target, p);
         const prevValue = monitor[p]
-          ? prevTargetValue
+          ? Reflect.get(target, p)
           : source && Reflect.get(source, p);
         const descriptor =
           Reflect.getOwnPropertyDescriptor(target, p) ||
           Reflect.getOwnPropertyDescriptor(source, p);
-        if (Reflect.deleteProperty(target, p)) {
+
+        if (p !== MONITOR_KEY && Reflect.deleteProperty(target, p)) {
           if (
             p === SOURCE_KEY ||
-            !prevTargetValue ||
+            !prevValue ||
             !target.onChange ||
             // a change occurred => run side effects
             ((!descriptor || descriptor.enumerable) &&
-              !target.onChange(p, undefined, prevValue, target) &&
-              // change was refused by side effects => revert by redefining the property
-              !Reflect.defineProperty(target, p, {
-                ...descriptor,
-                value: prevValue,
-              }))
+              (target.onChange(p, undefined, prevValue, target) ||
+                // change was refused by side effects => revert by redefining the property
+                !Reflect.defineProperty(target, p, {
+                  ...descriptor,
+                  value: prevValue,
+                })))
           ) {
             // the operation has succeeded
             // monitor `p`
