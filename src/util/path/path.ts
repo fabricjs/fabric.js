@@ -838,6 +838,7 @@ export const getPointOnPath = (
   switch (command) {
     case 'M':
       return { x: segInfo.x, y: segInfo.y, angle: 0 };
+    case 'z':
     case 'Z':
       info = {
         ...new Point(segInfo.x, segInfo.y).lerp(
