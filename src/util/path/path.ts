@@ -48,7 +48,7 @@ const commandLengths: Record<string, number> = {
 /**
  * Commands that may be repeated
  */
-const repeatedCommands: Record<string, string> = {
+const repeatedCommands: { m: 'l'; M: 'L' } = {
   m: 'l',
   M: 'L',
 };
@@ -882,7 +882,7 @@ export const getPointOnPath = (
         distance
       );
     default:
-      // throw Error('Invalid command');
+    // throw Error('Invalid command');
   }
 };
 
@@ -901,10 +901,13 @@ export const getPointOnPath = (
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
   // add spaces around the numbers
-  pathString = pathString.replace(new RegExp(`(${numberRegExStr})`, 'gi'), " $1 ");
+  pathString = pathString.replace(
+    new RegExp(`(${numberRegExStr})`, 'gi'),
+    ' $1 '
+  );
   // replace annoying commas and arbitrary whitespace with single spaces
-  pathString = pathString.replace(/,/gi, " ");
-  pathString = pathString.replace(/\s+/gi, " ");
+  pathString = pathString.replace(/,/gi, ' ');
+  pathString = pathString.replace(/\s+/gi, ' ');
 
   const res: TComplexPathData = [];
   for (const match of pathString.matchAll(rePathCommand)) {
@@ -938,7 +941,14 @@ export const parsePath = (pathString: string): TComplexPathData => {
       }
       matchStr = matchStr.substring(0, filteredIndices[1][0]);
     } while (paramArr);
-    chain.reverse().forEach((c) => res.push(c));
+    // add the chain, convert multiple m's to l's in the process
+    chain.reverse().forEach((c, idx) => {
+      // use weird 'M' | 'm' because otherwise ts complains
+      if (idx > 0 && repeatedCommands[c[0] as 'M' | 'm']) {
+        c[0] = repeatedCommands[c[0] as 'M' | 'm'];
+      }
+      res.push(c);
+    });
   }
   return res;
 };
