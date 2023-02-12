@@ -905,22 +905,18 @@ export const parsePath = (pathString: string): TComplexPathData => {
   pathString = pathString.replace(/,/gi, " ");
   pathString = pathString.replace(/\s+/gi, " ");
 
-
   const res: TComplexPathData = [];
   for (const match of pathString.matchAll(rePathCommand)) {
     let matchStr = match[0];
     const chain: TComplexPathData = [];
-    // console.log(matchStr, match, (match as any).indices);
     let paramArr: RegExpExecArray | null;
     do {
-      // console.log(matchStr);
       paramArr = new RegExp(rePathCommand.source, 'id').exec(matchStr);
       if (!paramArr) {
         break;
       }
       const filteredGroups = paramArr.filter((g) => g);
       const filteredIndices = (paramArr as any).indices.filter((i: never) => i);
-      // console.log(filteredIndices, filteredGroups);
       // remove the first element from the match array since it's just the whole command
       filteredGroups.shift();
       filteredIndices.shift();
@@ -936,7 +932,6 @@ export const parsePath = (pathString: string): TComplexPathData => {
       });
       chain.push(command as any);
       // chop off that last set of params
-      // console.log(filteredIndices.length);
       if (filteredIndices.length <= 1) {
         break;
       }

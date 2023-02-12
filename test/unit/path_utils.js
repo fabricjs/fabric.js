@@ -91,7 +91,7 @@
       ["Z"]
     ];
 
-    assert.deepEqual(roundDecimals(penta), roundDecimals(expetedPenta), 'regualr pentagon should match');
-    assert.deepEqual(roundDecimals(hexa), roundDecimals(expetedHexa), 'regualr hexagon should match');
+    assert.deepEqual(roundDecimals(penta), roundDecimals(expetedPenta), 'regular pentagon should match');
+    assert.deepEqual(roundDecimals(hexa), roundDecimals(expetedHexa), 'regular hexagon should match');
   });
 })();
