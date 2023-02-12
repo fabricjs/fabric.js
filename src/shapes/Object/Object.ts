@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { fabric } from '../../../HEADER';
+import { getEnv } from '../../env';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
@@ -14,7 +14,8 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
-import { runningAnimations } from '../../util/animation_registry';
+import { classRegistry } from '../../util/class_registry';
+import { runningAnimations } from '../../util/animation';
 import { clone } from '../../util/lang_object';
 import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
@@ -32,6 +33,9 @@ import {
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../group.class';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
+import { isTextObject } from '../../util/types';
+import { Image } from '../image.class';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -114,17 +118,17 @@ export class FabricObject<
 
   /**
    * Default cursor value used when hovering over this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  hoverCursor: null;
+  hoverCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Default cursor value used when moving this object on canvas
-   * @type String
+   * @type CSSStyleDeclaration['cursor'] | null
    * @default null
    */
-  moveCursor: null;
+  moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
    * Color of controlling borders of an object (when it's active)
@@ -430,18 +434,6 @@ export class FabricObject<
   objectCaching: boolean;
 
   /**
-   * When `true`, object properties are checked for cache invalidation. In some particular
-   * situation you may want this to be disabled ( spray brush, very big, groups)
-   * or if your application does not allow you to modify properties for groups child you want
-   * to disable it for groups.
-   * default to false
-   * since 1.7.0
-   * @type Boolean
-   * @default false
-   */
-  statefullCache: boolean;
-
-  /**
    * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
    * too much and will be redrawn with correct details at the end of scaling.
    * this setting is performance and application dependant.
@@ -488,7 +480,7 @@ export class FabricObject<
 
   /**
    * List of properties to consider when checking if cache needs refresh
-   * Those properties are checked by statefullCache ON ( or lazy mode if we want ) or from single
+   * Those properties are checked by
    * calls to Object.set(key, value). If the key is in this list, the object is marked as dirty
    * and refreshed at the next render
    * @type Array
@@ -646,16 +638,6 @@ export class FabricObject<
   }
 
   /**
-   * Temporary compatibility issue with old classes
-   * @param {Object} [options] Options object
-   */
-  initialize(options?: Partial<TClassProperties<FabricObject>>) {
-    if (options) {
-      this.setOptions(options);
-    }
-  }
-
-  /**
    * Create a the canvas used to keep the cached copy of the object
    * @private
    */
@@ -805,7 +787,7 @@ export class FabricObject<
         additionalHeight = height * 0.1;
       }
     }
-    if (this instanceof fabric.Text && this.path) {
+    if (isTextObject(this) && this.path) {
       shouldRedraw = true;
       shouldResizeCanvas = true;
       // IMHO in those lines we are using zoomX and zoomY not the this version.
@@ -937,7 +919,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = fabric.util.getKlass(object.type).prototype;
+    const prototype = classRegistry.getClass(object.type).prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
@@ -1057,10 +1039,10 @@ export class FabricObject<
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (this.cacheProperties.indexOf(key) > -1) {
+      if (this.cacheProperties.includes(key)) {
         this.dirty = true;
         groupNeedsUpdate && this.group.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.indexOf(key) > -1) {
+      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
         this.group.set('dirty', true);
       }
     }
@@ -1111,9 +1093,6 @@ export class FabricObject<
       this._removeCacheCanvas();
       this.dirty = false;
       this.drawObject(ctx);
-      if (this.objectCaching && this.statefullCache) {
-        this.saveState({ propertySet: 'cacheProperties' });
-      }
     }
     ctx.restore();
   }
@@ -1124,7 +1103,6 @@ export class FabricObject<
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.statefullCache && this.saveState({ propertySet: 'cacheProperties' });
       this.drawObject(this._cacheContext, options.forClipping);
       this.dirty = false;
     }
@@ -1321,11 +1299,7 @@ export class FabricObject<
       // in this case the context is already cleared.
       return true;
     } else {
-      if (
-        this.dirty ||
-        (this.clipPath && this.clipPath.absolutePositioned) ||
-        (this.statefullCache && this.hasStateChanged('cacheProperties'))
-      ) {
+      if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
         if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
           const width = this.cacheWidth! / this.zoomX!;
           const height = this.cacheHeight! / this.zoomY!;
@@ -1712,10 +1686,10 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {Image} Object cloned as image.
    */
-  cloneAsImage(options: any) {
+  cloneAsImage(options: any): Image {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    return new fabric.Image(canvasEl);
+    return new Image(canvasEl);
   }
 
   /**
@@ -1731,9 +1705,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any) {
-    options || (options = {});
-
+  toCanvasElement(options: any = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
@@ -1773,7 +1745,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    let canvas = new fabric.StaticCanvas(el, {
+    let canvas = new StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,
@@ -1974,25 +1946,18 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject<
-    T extends FabricObject,
-    X,
-    K extends X extends keyof T
-      ? { new (arg0: T[X], ...args: any[]): T }
-      : { new (...args: any[]): T }
-  >(
-    klass: K,
+  static _fromObject(
     object: Record<string, unknown>,
-    { extraParam, ...options }: { extraParam?: X; signal?: AbortSignal } = {}
+    { extraParam, ...options }: { extraParam?: any; signal?: AbortSignal } = {}
   ) {
-    return enlivenObjectEnlivables<InstanceType<K>>(
+    return enlivenObjectEnlivables<InstanceType<this>>(
       clone(object, true),
       options
     ).then((enlivedMap) => {
       // from the resulting enlived options, extract options.extraParam to arg0
       // to avoid accidental overrides later
       const { [extraParam]: arg0, ...rest } = { ...options, ...enlivedMap };
-      return extraParam ? new klass(arg0, rest) : new klass(rest);
+      return extraParam ? new this(arg0, rest) : new this(rest);
     });
   }
 
@@ -2007,7 +1972,7 @@ export class FabricObject<
     object: Record<string, unknown>,
     options?: { signal?: AbortSignal }
   ) {
-    return FabricObject._fromObject(FabricObject, object, options);
+    return this._fromObject(object, options);
   }
 }
 
@@ -2073,8 +2038,7 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  objectCaching: !fabric.isLikelyNode,
-  statefullCache: false,
+  objectCaching: !getEnv().isLikelyNode,
   noScaleCache: true,
   strokeUniform: false,
   dirty: true,
@@ -2084,35 +2048,19 @@ export const fabricObjectDefaultValues = {
   stateProperties: [
     'top',
     'left',
-    'width',
-    'height',
     'scaleX',
     'scaleY',
     'flipX',
     'flipY',
     'originX',
     'originY',
-    'transformMatrix',
-    'stroke',
-    'strokeWidth',
-    'strokeDashArray',
-    'strokeLineCap',
-    'strokeDashOffset',
-    'strokeLineJoin',
-    'strokeMiterLimit',
     'angle',
     'opacity',
-    'fill',
     'globalCompositeOperation',
     'shadow',
     'visible',
-    'backgroundColor',
     'skewX',
     'skewY',
-    'fillRule',
-    'paintFirst',
-    'clipPath',
-    'strokeUniform',
   ],
   cacheProperties: [
     'fill',
@@ -2138,3 +2086,5 @@ export const fabricObjectDefaultValues = {
 };
 
 Object.assign(FabricObject.prototype, fabricObjectDefaultValues);
+
+classRegistry.setClass(FabricObject);

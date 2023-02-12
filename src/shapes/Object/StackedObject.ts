@@ -1,7 +1,7 @@
-import { fabric } from '../../../HEADER';
 import { ObjectEvents } from '../../EventTypeDefs';
 import type { Group } from '../group.class';
-import type { Canvas, StaticCanvas } from '../../__types__';
+import type { Canvas } from '../../canvas/canvas_events';
+import { StaticCanvas } from '../../canvas/static_canvas.class';
 import { ObjectGeometry } from './ObjectGeometry';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
@@ -48,11 +48,11 @@ export class StackedObject<
     while (parent) {
       if (target === parent) {
         return true;
-      } else if (parent instanceof fabric.StaticCanvas) {
+      } else if (parent instanceof StaticCanvas) {
         //  happens after all parents were traversed through without a match
         return false;
       }
-      parent = parent.group || parent.canvas;
+      parent = (parent as Group).group || (parent as Group).canvas;
     }
     return false;
   }
@@ -67,7 +67,9 @@ export class StackedObject<
     let parent = this.group || (strict ? undefined : this.canvas);
     while (parent) {
       ancestors.push(parent);
-      parent = parent.group || (strict ? undefined : parent.canvas);
+      parent =
+        (parent as Group).group ||
+        (strict ? undefined : (parent as Group).canvas);
     }
     return ancestors as Ancestors<T>;
   }

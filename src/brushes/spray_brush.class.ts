@@ -1,10 +1,9 @@
-import { fabric } from '../../HEADER';
 import { Point } from '../point.class';
 import { Group } from '../shapes/group.class';
 import { Shadow } from '../shadow.class';
 import { Rect } from '../shapes/rect.class';
 import { getRandomInt } from '../util/internals';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';
 
 export type SprayBrushPoint = {
@@ -218,5 +217,3 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunks.push(this.sprayChunk);
   }
 }
-
-fabric.SprayBrush = SprayBrush;

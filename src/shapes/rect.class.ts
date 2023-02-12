@@ -1,8 +1,8 @@
-import { fabric } from '../../HEADER';
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 export class Rect extends FabricObject {
@@ -142,17 +142,6 @@ export class Rect extends FabricObject {
     'height',
   ];
 
-  /**
-   * Returns {@link Rect} instance from an object representation
-   * @static
-   * @memberOf Rect
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<Rect>}
-   */
-  static fromObject(object: any) {
-    return FabricObject._fromObject(Rect, object);
-  }
-
   /* _FROM_SVG_START_ */
 
   /**
@@ -178,9 +167,9 @@ export class Rect extends FabricObject {
       height = 0,
       visible = true,
       ...restOfparsedAttributes
-    } = parseAttributes(element, Rect.ATTRIBUTE_NAMES);
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
-    const rect = new Rect({
+    const rect = new this({
       ...options,
       ...restOfparsedAttributes,
       left,
@@ -196,13 +185,13 @@ export class Rect extends FabricObject {
 }
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  stateProperties: fabricObjectDefaultValues.stateProperties.concat('rx', 'ry'),
   type: 'rect',
   rx: 0,
   ry: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('rx', 'ry'),
+  cacheProperties: [...fabricObjectDefaultValues.cacheProperties, 'rx', 'ry'],
 };
 
 Object.assign(Rect.prototype, rectDefaultValues);
 
-fabric.Rect = Rect;
+classRegistry.setClass(Rect);
+classRegistry.setSVGClass(Rect);

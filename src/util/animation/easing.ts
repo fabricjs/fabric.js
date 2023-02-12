@@ -1,16 +1,10 @@
 /**
  * Easing functions
- * See <a href="http://gizma.com/easing/">Easing Equations by Robert Penner</a>
+ * @see {@link http://gizma.com/easing/ Easing Equations by Robert Penner}
  */
 
-import { twoMathPi, halfPI } from '../constants';
-
-type TEasingFunction = (
-  currentTime: number,
-  startValue: number,
-  byValue: number,
-  duration: number
-) => number;
+import { twoMathPi, halfPI } from '../../constants';
+import { TEasingFunction } from './types';
 
 const normalize = (a: number, c: number, p: number, s: number) => {
   if (a < Math.abs(c)) {
@@ -37,10 +31,22 @@ const elastic = (
   a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * twoMathPi) / p);
 
 /**
+ * Default sinusoidal easing
+ */
+export const defaultEasing: TEasingFunction = (t, b, c, d) =>
+  -c * Math.cos((t / d) * halfPI) + c + b;
+
+/**
+ * Cubic easing in
+ */
+export const easeInCubic: TEasingFunction = (t, b, c, d) =>
+  c * (t / d) ** 3 + b;
+
+/**
  * Cubic easing out
  */
 export const easeOutCubic: TEasingFunction = (t, b, c, d) =>
-  c * ((t /= d - 1) * t ** 2 + 1) + b;
+  c * ((t / d - 1) ** 3 + 1) + b;
 
 /**
  * Cubic easing in and out
@@ -50,7 +56,7 @@ export const easeInOutCubic: TEasingFunction = (t, b, c, d) => {
   if (t < 1) {
     return (c / 2) * t ** 3 + b;
   }
-  return (c / 2) * ((t -= 2) * t ** 2 + 2) + b;
+  return (c / 2) * ((t - 2) ** 3 + 2) + b;
 };
 
 /**
@@ -80,13 +86,13 @@ export const easeInOutQuart: TEasingFunction = (t, b, c, d) => {
  * Quintic easing in
  */
 export const easeInQuint: TEasingFunction = (t, b, c, d) =>
-  c * (t /= d) * t ** 4 + b;
+  c * (t / d) ** 5 + b;
 
 /**
  * Quintic easing out
  */
 export const easeOutQuint: TEasingFunction = (t, b, c, d) =>
-  c * ((t /= d - 1) * t ** 4 + 1) + b;
+  c * ((t / d - 1) ** 5 + 1) + b;
 
 /**
  * Quintic easing in and out
@@ -96,7 +102,7 @@ export const easeInOutQuint: TEasingFunction = (t, b, c, d) => {
   if (t < 1) {
     return (c / 2) * t ** 5 + b;
   }
-  return (c / 2) * ((t -= 2) * t ** 4 + 2) + b;
+  return (c / 2) * ((t - 2) ** 5 + 2) + b;
 };
 
 /**
@@ -319,9 +325,3 @@ export const easeInOutQuad: TEasingFunction = (t, b, c, d) => {
   }
   return (-c / 2) * (--t * (t - 2) - 1) + b;
 };
-
-/**
- * Cubic easing in
- */
-export const easeInCubic: TEasingFunction = (t, b, c, d) =>
-  c * (t /= d) * t * t + b;

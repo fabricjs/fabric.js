@@ -1,10 +1,9 @@
-import { fabric } from '../../HEADER';
 import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../point.class';
 import { Shadow } from '../shadow.class';
 import { Path } from '../shapes/path.class';
 import { getSmoothPathFromPoints, joinPath } from '../util/path/path';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { BaseBrush } from './base_brush.class';
 import { TSimplePathData } from '../util/path/path_types';
 
@@ -299,5 +298,3 @@ export class PencilBrush extends BaseBrush {
     this.canvas.fire('path:created', { path: path });
   }
 }
-
-fabric.PencilBrush = PencilBrush;

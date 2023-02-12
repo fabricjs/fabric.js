@@ -1,44 +1,45 @@
-import { fabric } from '../HEADER';
-import { dragHandler, getActionFromCorner } from './controls/actions';
-import { Point } from './point.class';
-import { FabricObject } from './shapes/Object/FabricObject';
+import { getEnv } from '../env';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
+import { Point } from '../point.class';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
   TOptionalModifierKey,
   TPointerEvent,
   Transform,
-} from './EventTypeDefs';
+} from '../EventTypeDefs';
 import {
   addTransformToObject,
   saveObjectTransform,
-} from './util/misc/objectTransforms';
+} from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './static_canvas.class';
 import {
   isActiveSelection,
   isCollection,
   isFabricObjectCached,
-  isInteractiveTextObject,
-} from './util/types';
-import { invertTransform, transformPoint } from './util/misc/matrix';
-import { isTransparent } from './util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from './typedefs';
-import { degreesToRadians } from './util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from './util/dom_event';
-import type { IText } from './shapes/itext.class';
+} from '../util/types';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isTransparent } from '../util/misc/isTransparent';
+import { TOriginX, TOriginY, TSize } from '../typedefs';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { getPointer, isTouchEvent } from '../util/dom_event';
+import type { IText } from '../shapes/itext.class';
 import {
   cleanUpJsdomNode,
   makeElementUnselectable,
   wrapElement,
-} from './util/dom_misc';
-import { setStyle } from './util/dom_style';
-import type { BaseBrush } from './brushes/base_brush.class';
-import type { Textbox } from './shapes/textbox.class';
-import { pick } from './util/misc/pick';
-import { TSVGReviver } from './mixins/object.svg_export';
+} from '../util/dom_misc';
+import { setStyle } from '../util/dom_style';
+import type { BaseBrush } from '../brushes/base_brush.class';
+import type { Textbox } from '../shapes/textbox.class';
+import { pick } from '../util/misc/pick';
+import { TSVGReviver } from '../typedefs';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 type TDestroyedCanvas = Omit<
-  Canvas<CanvasEvents>,
+  SelectableCanvas<CanvasEvents>,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
@@ -59,9 +60,8 @@ type TDestroyedCanvas = Omit<
  * @class Canvas
  * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
- * @see {@link fabric.Canvas#initialize} for constructor definition
  *
- * @fires object:modified at the end of a transform or any change when statefull is true
+ * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
  * @fires object:scaling while an object is being scaled by controls
  * @fires object:moving while an object is being dragged
@@ -105,8 +105,8 @@ type TDestroyedCanvas = Omit<
  * }
  * b.on('dragover', opt => b.set('fill', opt.dropTarget === b ? 'pink' : 'black'));
  * a.on('drop', opt => {
- *  opt.e.defaultPrevented  //  drop occured
- *  opt.didDrop             //  drop occured on canvas
+ *  opt.e.defaultPrevented  //  drop occurred
+ *  opt.didDrop             //  drop occurred on canvas
  *  opt.target              //  drop target
  *  opt.target !== a && a.set('text', 'I lost');
  * });
@@ -149,7 +149,7 @@ type TDestroyedCanvas = Omit<
  * });
  *
  */
-export class Canvas<
+export class SelectableCanvas<
   EventSpec extends CanvasEvents = CanvasEvents
 > extends StaticCanvas<EventSpec> {
   /**
@@ -292,31 +292,31 @@ export class Canvas<
 
   /**
    * Default cursor value used when hovering over an object on canvas
-   * @type String
-   * @default
+   * @type CSSStyleDeclaration['cursor']
+   * @default move
    */
-  hoverCursor: string;
+  hoverCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used when moving an object on canvas
-   * @type String
-   * @default
+   * @type CSSStyleDeclaration['cursor']
+   * @default move
    */
-  moveCursor: string;
+  moveCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default cursor value used for the entire canvas
    * @type String
-   * @default
+   * @default default
    */
-  defaultCursor: string;
+  defaultCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used during free drawing
    * @type String
    * @default crosshair
    */
-  freeDrawingCursor: string;
+  freeDrawingCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
@@ -324,7 +324,7 @@ export class Canvas<
    * @since 2.0.0
    * @default not-allowed
    */
-  notAllowedCursor: string;
+  notAllowedCursor: CSSStyleDeclaration['cursor'];
 
   /**
    * Default element class that's given to wrapper (div) element of canvas
@@ -407,18 +407,11 @@ export class Canvas<
   targets: FabricObject[] = [];
 
   /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
-  enablePointerEvents: boolean;
-
-  /**
    * Keep track of the hovered target
    * @type FabricObject | null
    * @private
    */
-  _hoveredTarget: FabricObject | null = null;
+  _hoveredTarget?: FabricObject;
 
   /**
    * hold the list of nested targets hovered
@@ -470,19 +463,29 @@ export class Canvas<
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _absolutePointer holds a reference to the pointer in coordinates that is valide for the event
+   * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
+   * @type {Point}
    */
-  _absolutePointer?: Point;
+  protected _absolutePointer?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _pointer holds a reference to the pointer in coordinates that is valide for the event
+   * _pointer holds a reference to the pointer in html coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
+   * @type {Point}
    */
-  _pointer?: Point;
+  protected _pointer?: Point;
+
+  /**
+   * During a mouse event we may need the target multiple times in multiple functions.
+   * _target holds a reference to the target that is valid for the event
+   * lifespan. Every fabricJS mouse event create and delete the cache every time
+   * @type {FabricObject}
+   */
+  protected _target?: FabricObject;
 
   upperCanvasEl: HTMLCanvasElement;
   contextTop: CanvasRenderingContext2D;
@@ -490,12 +493,12 @@ export class Canvas<
   cacheCanvasEl: HTMLCanvasElement;
   protected _isCurrentlyDrawing: boolean;
   freeDrawingBrush?: BaseBrush;
-  _activeObject: FabricObject | null;
+  _activeObject?: FabricObject;
   _hasITextHandlers?: boolean;
   _iTextInstances: (IText | Textbox)[];
   /**
    * Constructor
-   * @param {HTMLCanvasElement | String} el &lt;canvas> element to initialize instance on
+   * @param {HTMLCanvasElement | String} el canvas element to initialize instance on
    * @param {Object} [options] Options object
    * @return {Object} thisArg
    */
@@ -512,7 +515,7 @@ export class Canvas<
     this._createUpperCanvas();
     // @ts-ignore
     this._initEventListeners();
-    this._initRetinaScaling();
+    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
     this._createCacheCanvas();
   }
@@ -550,7 +553,7 @@ export class Canvas<
       });
     }
     if (obj === this._hoveredTarget) {
-      this._hoveredTarget = null;
+      this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
     super._onObjectRemoved(obj);
@@ -730,7 +733,7 @@ export class Canvas<
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
    */
-  _shouldClearSelection(e: TPointerEvent, target: FabricObject): boolean {
+  _shouldClearSelection(e: TPointerEvent, target?: FabricObject): boolean {
     const activeObjects = this.getActiveObjects(),
       activeObject = this._activeObject;
 
@@ -748,20 +751,19 @@ export class Canvas<
   }
 
   /**
-   * This is an internal method to decide if given the action and the modifier key pressed
-   * the transformation should with the object center as origin
-   * centeredScaling from object can't override centeredScaling from canvas.
-   * this should be fixed, since object setting should take precedence over canvas.
-   * also this should be something that will be migrated in the control properties.
-   * as ability to define the origin of the transformation that the control provide.
+   * This method will take in consideration a modifier key pressed and the control we are
+   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
+   * This should be really in the realm of controls, and we should remove specific code for legacy
+   * embedded actions.
    * @TODO this probably deserve discussion/rediscovery and change/refactor
    * @private
+   * @deprecated
    * @param {FabricObject} target
    * @param {string} action
    * @param {boolean} altKey
    * @returns {boolean} true if the transformation should be centered
    */
-  _shouldCenterTransform(
+  private _shouldCenterTransform(
     target: FabricObject,
     action: string,
     modifierKeyPressed: boolean
@@ -831,14 +833,14 @@ export class Canvas<
     if (!target) {
       return;
     }
-    let pointer = this.getPointer(e);
-    if (target.group) {
-      // transform pointer to target's containing coordinate plane
-      // should we use send point to plane?
-      pointer = pointer.transform(
-        invertTransform(target.group.calcTransformMatrix())
-      );
-    }
+    const pointer = target.group
+      ? // transform pointer to target's containing coordinate plane
+        sendPointToPlane(
+          this.getPointer(e),
+          undefined,
+          target.group.calcTransformMatrix()
+        )
+      : this.getPointer(e);
     const corner = target.__corner || '',
       control = target.controls[corner],
       actionHandler =
@@ -855,7 +857,8 @@ export class Canvas<
       transform: Transform = {
         target: target,
         action: action,
-        actionHandler: actionHandler,
+        actionHandler,
+        actionPerformed: false,
         corner,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
@@ -947,9 +950,9 @@ export class Canvas<
    * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent, skipGroup: boolean): FabricObject | null {
+  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | undefined {
     if (this.skipTargetFind) {
-      return null;
+      return undefined;
     }
 
     const pointer = this.getPointer(e, true),
@@ -1056,9 +1059,9 @@ export class Canvas<
   _searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point
-  ): FabricObject | null {
+  ): FabricObject | undefined {
     // Cache all targets where their bounding box contains point.
-    let target = null,
+    let target,
       i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
@@ -1089,7 +1092,10 @@ export class Canvas<
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
-  searchPossibleTargets(objects: FabricObject[], pointer: Point) {
+  searchPossibleTargets(
+    objects: FabricObject[],
+    pointer: Point
+  ): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
     // if we found something in this.targets, and the group is interactive, return that subTarget
     // TODO: reverify why interactive. the target should be returned always, but selected only
@@ -1269,13 +1275,13 @@ export class Canvas<
     if (this.wrapperEl) {
       return;
     }
-    const container = fabric.document.createElement('div');
+    const container = getEnv().document.createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
     setStyle(this.wrapperEl, {
-      width: this.width + 'px',
-      height: this.height + 'px',
+      width: `${this.width}px`,
+      height: `${this.height}px`,
       position: 'relative',
     });
     makeElementUnselectable(this.wrapperEl);
@@ -1332,7 +1338,7 @@ export class Canvas<
    * Returns currently active object
    * @return {FabricObject | null} active object
    */
-  getActiveObject(): FabricObject | null {
+  getActiveObject(): FabricObject | undefined {
     return this._activeObject;
   }
 
@@ -1344,7 +1350,7 @@ export class Canvas<
     const active = this._activeObject;
     if (active) {
       if (isActiveSelection(active)) {
-        return active._objects.slice(0);
+        return [...active._objects];
       } else {
         return [active];
       }
@@ -1462,14 +1468,14 @@ export class Canvas<
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
-      if (obj.onDeselect({ e: e, object })) {
+      if (obj.onDeselect({ e, object })) {
         return false;
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
         // @ts-ignore
         this.endCurrentTransform(e);
       }
-      this._activeObject = null;
+      this._activeObject = undefined;
     }
     return true;
   }
@@ -1488,7 +1494,7 @@ export class Canvas<
     if (currentActives.length) {
       this.fire('before:selection:cleared', {
         e,
-        deselected: [activeObject],
+        deselected: [activeObject!],
       });
     }
     this._discardActiveObject(e);
@@ -1509,14 +1515,15 @@ export class Canvas<
    */
   destroy(this: TDestroyedCanvas) {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
-      lowerCanvasEl = this.lowerCanvasEl as HTMLCanvasElement,
-      upperCanvasEl = this.upperCanvasEl as HTMLCanvasElement,
-      cacheCanvasEl = this.cacheCanvasEl as HTMLCanvasElement;
+      lowerCanvasEl = this.lowerCanvasEl!,
+      upperCanvasEl = this.upperCanvasEl!,
+      cacheCanvasEl = this.cacheCanvasEl!;
     // @ts-ignore
     this.removeListeners();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
+    this._iTextInstances = [];
     this.contextCache = null;
     this.contextTop = null;
     cleanUpJsdomNode(upperCanvasEl);
@@ -1617,26 +1624,15 @@ export class Canvas<
     instance: FabricObject,
     reviver: TSVGReviver
   ) {
-    //If the object is in a selection group, simulate what would happen to that
-    //object when the group is deselected
+    // If the object is in a selection group, simulate what would happen to that
+    // object when the group is deselected
     const originalProperties = this._realizeGroupTransformOnObject(instance);
     super._setSVGObject(markup, instance, reviver);
     instance.set(originalProperties);
   }
-
-  setViewportTransform(vpt: TMat2D) {
-    if (
-      this.renderOnAddRemove &&
-      isInteractiveTextObject(this._activeObject) &&
-      this._activeObject.isEditing
-    ) {
-      this._activeObject.clearContextTop();
-    }
-    super.setViewportTransform(vpt);
-  }
 }
 
-Object.assign(Canvas.prototype, {
+Object.assign(SelectableCanvas.prototype, {
   uniformScaling: true,
   uniScaleKey: 'shiftKey',
   centeredScaling: false,
@@ -1666,5 +1662,3 @@ Object.assign(Canvas.prototype, {
   fireMiddleClick: false,
   enablePointerEvents: false,
 });
-
-fabric.Canvas = Canvas;

@@ -1,10 +1,9 @@
 // @ts-nocheck
-
-import { fabric } from '../../HEADER';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { clone } from '../util/lang_object';
+import { classRegistry } from '../util/class_registry';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
 const coordProps = { x1: 1, x2: 1, y1: 1, y2: 1 };
@@ -276,14 +275,14 @@ export class Line extends FabricObject {
    */
   static fromElement(element, callback, options) {
     options = options || {};
-    const parsedAttributes = parseAttributes(element, Line.ATTRIBUTE_NAMES),
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
       points = [
         parsedAttributes.x1 || 0,
         parsedAttributes.y1 || 0,
         parsedAttributes.x2 || 0,
         parsedAttributes.y2 || 0,
       ];
-    callback(new Line(points, { ...parsedAttributes, ...options }));
+    callback(new this(points, { ...parsedAttributes, ...options }));
   }
 
   /* _FROM_SVG_END_ */
@@ -298,9 +297,9 @@ export class Line extends FabricObject {
   static fromObject(object) {
     const options = clone(object, true);
     options.points = [object.x1, object.y1, object.x2, object.y2];
-    return FabricObject._fromObject(Line, options, {
+    return this._fromObject(options, {
       extraParam: 'points',
-    }).then(function (fabricLine) {
+    }).then((fabricLine) => {
       delete fabricLine.points;
       return fabricLine;
     });
@@ -313,14 +312,16 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
   y1: 0,
   x2: 0,
   y2: 0,
-  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat(
+  cacheProperties: [
+    ...fabricObjectDefaultValues.cacheProperties,
     'x1',
     'x2',
     'y1',
-    'y2'
-  ),
+    'y2',
+  ],
 };
 
 Object.assign(Line.prototype, lineDefaultValues);
-/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
-fabric.Line = Line;
+
+classRegistry.setClass(Line);
+classRegistry.setSVGClass(Line);

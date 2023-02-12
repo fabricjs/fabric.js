@@ -1,30 +1,24 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
-import { ObjectEvents, TransformEvent } from '../EventTypeDefs';
+import { ObjectEvents, TPointerEventInfo } from '../EventTypeDefs';
 import { ITextClickBehaviorMixin } from '../mixins/itext_click_behavior.mixin';
-import { TClassProperties, TFiller } from '../typedefs';
-import { stylesFromArray } from '../util/misc/textStyles';
-import { FabricObject } from './Object/FabricObject';
 import {
-  keysMap,
-  keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  keysMap,
+  keysMapRtl,
 } from '../mixins/itext_key_const';
+import { classRegistry } from '../util/class_registry';
+import { TClassProperties, TFiller } from '../typedefs';
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never;
-  tripleclick: TransformEvent;
+  tripleclick: TPointerEventInfo;
   'editing:entered': never;
   'editing:exited': never;
 };
 
 /**
- * IText class (introduced in <b>v1.4</b>) Events are also fired with "text:"
- * prefix when observing canvas.
- * @class IText
- *
  * @fires changed
  * @fires selection:changed
  * @fires editing:entered
@@ -36,11 +30,8 @@ export type ITextEvents = ObjectEvents & {
  * @fires cut
  * @fires paste
  *
- * @return {IText} thisArg
- * @see {@link IText#initialize} for constructor definition
- *
- * <p>Supported key combinations:</p>
- * <pre>
+ * #### Supported key combinations
+ * ```
  *   Move cursor:                    left, right, up, down
  *   Select character:               shift + left, shift + right
  *   Select text vertically:         shift + up, shift + down
@@ -59,16 +50,16 @@ export type ITextEvents = ObjectEvents & {
  *   Cut text:                       ctrl/cmd + x
  *   Select entire text:             ctrl/cmd + a
  *   Quit editing                    tab or esc
- * </pre>
+ * ```
  *
- * <p>Supported mouse/touch combination</p>
- * <pre>
+ * #### Supported mouse/touch combination
+ * ```
  *   Position cursor:                click/touch
  *   Create selection:               click/touch & drag
  *   Create selection:               click & shift + click
  *   Select word:                    double click
  *   Select line:                    triple click
- * </pre>
+ * ```
  */
 export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   /**
@@ -160,7 +151,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
-   * @return {IText} thisArg
    */
   constructor(text: string, options: object) {
     super(text, options);
@@ -231,7 +221,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    */
   initDimensions() {
     this.isEditing && this.initDelayedCursor();
-    this.clearContextTop();
     super.initDimensions();
   }
 
@@ -282,20 +271,11 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   render(ctx: CanvasRenderingContext2D) {
-    this.clearContextTop();
     super.render(ctx);
     // clear the cursorOffsetCache, so we ensure to calculate once per renderCursor
     // the correct position but not at every cursor animation.
     this.cursorOffsetCache = {};
     this.renderCursorOrSelection();
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   */
-  _render(ctx: CanvasRenderingContext2D) {
-    super._render(ctx);
   }
 
   /**
@@ -316,17 +296,8 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
     } else {
       this.renderSelection(ctx, boundaries);
     }
+    this.canvas!.contextTopDirty = true;
     ctx.restore();
-  }
-
-  /**
-   * Renders cursor on context Top, outside the animation cycle, on request
-   * Used for the drag/drop effect.
-   * If contextTop is not available, do nothing.
-   */
-  renderCursorAt(selectionStart) {
-    const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
   }
 
   /**
@@ -417,6 +388,16 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
   }
 
   /**
+   * Renders cursor on context Top, outside the animation cycle, on request
+   * Used for the drag/drop effect.
+   * If contextTop is not available, do nothing.
+   */
+  renderCursorAt(selectionStart: number) {
+    const boundaries = this._getCursorBoundaries(selectionStart, true);
+    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
+  }
+
+  /**
    * Renders cursor
    * @param {Object} boundaries
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
@@ -478,11 +459,7 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
    * Renders drag start text selection
    */
   renderDragSourceEffect() {
-    if (
-      this.__isDragging &&
-      this.__dragStartSelection &&
-      this.__dragStartSelection
-    ) {
+    if (this.__isDragging && this.__dragStartSelection) {
       this._renderSelection(
         this.canvas.contextTop,
         this.__dragStartSelection,
@@ -626,26 +603,6 @@ export class IText extends ITextClickBehaviorMixin<ITextEvents> {
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };
   }
-
-  /**
-   * Returns IText instance from an object representation
-   * @static
-   * @memberOf IText
-   * @param {Object} object Object to create an instance from
-   * @returns {Promise<IText>}
-   */
-  static fromObject(object: object): Promise<IText> {
-    return FabricObject._fromObject(
-      IText,
-      {
-        ...object,
-        styles: stylesFromArray(object.styles, object.text),
-      },
-      {
-        extraParam: 'text',
-      }
-    );
-  }
 }
 
 export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
@@ -674,4 +631,4 @@ export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
 
 Object.assign(IText.prototype, iTextDefaultValues);
 
-fabric.IText = IText;
+classRegistry.setClass(IText);

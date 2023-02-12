@@ -1,7 +1,6 @@
-import { fabric } from '../../HEADER';
 import { Pattern } from '../pattern.class';
 import { createCanvasElement } from '../util/misc/dom';
-import { Canvas } from '../__types__';
+import type { Canvas } from '../canvas/canvas_events';
 import { PencilBrush } from './pencil_brush.class';
 import { TSimplePathData } from '../util/path/path_types';
 
@@ -69,5 +68,3 @@ export class PatternBrush extends PencilBrush {
     return path;
   }
 }
-
-fabric.PatternBrush = PatternBrush;

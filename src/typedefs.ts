@@ -2,6 +2,7 @@
 import type { Gradient } from './gradient/gradient.class';
 import type { Pattern } from './pattern.class';
 import type { IPoint, Point } from './point.class';
+import type { FabricObject } from './shapes/Object/FabricObject';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -81,6 +82,8 @@ export type TCornerPoint = {
   br: Point;
 };
 
+export type TSVGReviver = (markup: string) => string;
+
 export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
 
 export type TCacheCanvasDimensions = {
@@ -93,3 +96,18 @@ export type TCacheCanvasDimensions = {
 };
 
 export type TBounds = IPoint[];
+
+export type TToCanvasElementOptions = {
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+  filter?: (object: FabricObject) => boolean;
+};
+
+export type TDataUrlOptions = TToCanvasElementOptions & {
+  multiplier: number;
+  format?: ImageFormat;
+  quality?: number;
+  enableRetinaScaling?: boolean;
+};

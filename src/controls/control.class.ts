@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { fabric } from '../../HEADER';
 import { halfPI } from '../constants';
 import {
+  ControlActionHandler,
   TPointerEvent,
-  TransformAction,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../point.class';
@@ -146,7 +145,7 @@ export class Control {
   /**
    * The control actionHandler, provide one to handle action ( control being moved )
    * @param {Event} eventData the native mouse event
-   * @param {Object} transformData properties of the current transform
+   * @param {Transform} transformData properties of the current transform
    * @param {Number} x x position of the cursor
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
@@ -156,22 +155,22 @@ export class Control {
   /**
    * The control handler for mouse down, provide one to handle mouse down on control
    * @param {Event} eventData the native mouse event
-   * @param {Object} transformData properties of the current transform
+   * @param {Transform} transformData properties of the current transform
    * @param {Number} x x position of the cursor
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseDownHandler?: TransformAction;
+  mouseDownHandler?: ControlActionHandler;
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
    * @param {Event} eventData the native mouse event
-   * @param {Object} transformData properties of the current transform
+   * @param {Transform} transformData properties of the current transform
    * @param {Number} x x position of the cursor
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  mouseUpHandler?: TransformAction;
+  mouseUpHandler?: ControlActionHandler;
 
   /**
    * Returns control actionHandler
@@ -184,7 +183,7 @@ export class Control {
     eventData: TPointerEvent,
     fabricObject: FabricObject,
     control: Control
-  ) {
+  ): TransformActionHandler | undefined {
     return this.actionHandler;
   }
 
@@ -199,12 +198,13 @@ export class Control {
     eventData: TPointerEvent,
     fabricObject: FabricObject,
     control: Control
-  ) {
+  ): ControlActionHandler | undefined {
     return this.mouseDownHandler;
   }
 
   /**
-   * Returns control mouseUp handler
+   * Returns control mouseUp handler.
+   * During actions the fabricObject or the control can be of different obj
    * @param {Event} eventData the native mouse event
    * @param {FabricObject} fabricObject on which the control is displayed
    * @param {Control} control control for which the action handler is being asked
@@ -214,7 +214,7 @@ export class Control {
     eventData: TPointerEvent,
     fabricObject: FabricObject,
     control: Control
-  ) {
+  ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
   }
 
@@ -375,5 +375,3 @@ export class Control {
     }
   }
 }
-
-fabric.Control = Control;

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { fabric } from '../../HEADER';
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../mixins/collection.mixin';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -20,6 +19,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 import { Rect } from './rect.class';
+import { classRegistry } from '../util/class_registry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -262,6 +262,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     this._set('dirty', true);
   }
 
+  _onStackOrderChanged() {
+    this._set('dirty', true);
+  }
+
   /**
    * @private
    * @param {string} key
@@ -485,30 +489,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 
   /**
-   * Check if cache is dirty
-   */
-  isCacheDirty(skipCanvas?: boolean) {
-    if (super.isCacheDirty(skipCanvas)) {
-      return true;
-    }
-    if (!this.statefullCache) {
-      return false;
-    }
-    for (let i = 0; i < this._objects.length; i++) {
-      if (this._objects[i].isCacheDirty(true)) {
-        if (this._cacheCanvas) {
-          // if this group has not a cache canvas there is nothing to clean
-          const x = this.cacheWidth / this.zoomX,
-            y = this.cacheHeight / this.zoomY;
-          this._cacheContext.clearRect(-x / 2, -y / 2, x, y);
-        }
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * @override
    * @return {Boolean}
    */
@@ -676,7 +656,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         (context.type === 'initialization' || context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        const clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());
@@ -1052,7 +1032,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new Group(objects, { ...options, ...hydratedOptions }, true)
+        new this(objects, { ...options, ...hydratedOptions }, true)
     );
   }
 }
@@ -1067,5 +1047,4 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 };
 
 Object.assign(Group.prototype, groupDefaultValues);
-
-fabric.Group = Group;
+classRegistry.setClass(Group);
