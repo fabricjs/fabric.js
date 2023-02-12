@@ -1497,11 +1497,9 @@ export class FabricObject<
    * override if necessary to dispose artifacts such as `clipPath`
    */
   dispose() {
-    // todo verify this.
-    // runningAnimations is always truthy
-    if (runningAnimations) {
-      runningAnimations.cancelByTarget(this);
-    }
+    runningAnimations.cancelByTarget(this);
+    this.off();
+    this._set('canvas', undefined);
   }
 
   /**
