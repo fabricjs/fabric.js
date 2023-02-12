@@ -73,11 +73,9 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * - Migrate logic from {@link _set} to here making sure all logic related to a key has been fully migrated
    * - Use {@link transformValue} when needed
    *
-   * @param key
-   * @param value
-   * @param prevValue
+   * @param context
    * @param target {@link Reflect} target
-   * @returns true if the change should be accepted and `false` to revert the set operation
+   * @returns true if the change should be accepted and `false` to revert the `set` operation
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected onChange(context: ChangeContext<this>, target: this): boolean {
