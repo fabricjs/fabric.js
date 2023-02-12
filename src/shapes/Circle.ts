@@ -6,6 +6,7 @@ import { sin } from '../util/misc/sin';
 import { classRegistry } from '../util/class_registry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
+import { ChangeContext } from '../util/internals';
 
 export class Circle extends FabricObject {
   /**
@@ -38,16 +39,12 @@ export class Circle extends FabricObject {
     'endAngle',
   ];
 
-  protected onChange<K extends keyof this>(
-    key: K,
-    value: this[K],
-    prevValue: this[K],
-    target: this
-  ): boolean {
-    if (key === 'radius') {
-      this.width = this.height = value * 2;
+  protected onChange(context: ChangeContext<this>, target: this): boolean {
+    if (context.key === 'radius') {
+      this.width = this.height =
+        (context as ChangeContext<this, 'radius'>).value * 2;
     }
-    return super.onChange(key, value, prevValue, target);
+    return super.onChange(context, target);
   }
 
   /**

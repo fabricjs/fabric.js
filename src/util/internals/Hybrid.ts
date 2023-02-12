@@ -16,7 +16,7 @@ export type TransformValueContext<T, K extends keyof T = keyof T> = {
 );
 
 export type ChangeContext<T, K extends keyof T = keyof T> = {
-  key: T;
+  key: K;
   value: T[K];
   prevValue: T[K];
 };
