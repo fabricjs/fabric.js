@@ -994,54 +994,44 @@ export class FabricObject<
     return value;
   }
 
-  protected transformValue<K extends keyof this, R extends this[K]>(
-    key: K,
-    newValue: this[K],
-    value: this[K],
-    target: this
-  ): R {
-    if (key === 'scaleX' || key === 'scaleY') {
-      newValue = this._constrainScale(newValue);
-    }
-    if (key === 'scaleX' && newValue < 0) {
-      this.flipX = !this.flipX;
-      newValue *= -1;
-    } else if (key === 'scaleY' && newValue < 0) {
-      this.flipY = !this.flipY;
-      newValue *= -1;
-    }
-    // i don't like this automatic initialization here
-    if (key === 'shadow' && newValue && !(newValue instanceof Shadow)) {
-      newValue = new Shadow(newValue);
-    }
-    return super.transformValue(key, newValue, value, target);
-  }
+  /**
+   * Handles setting values on the instance and handling internal side effects
+   * @protected
+   * @param {String} key
+   * @param {*} value
+   */
+  _set(key: string, value: any) {
+    const isChanged = this[key as keyof this] !== value;
 
-  protected onChange<K extends keyof this>(
-    key: K,
-    value: this[K],
-    prevValue: this[K],
-    target: this
-  ): boolean {
-    switch (key) {
-      case 'dirty':
-        value && this.group && (this.group.dirty = true);
-        break;
+    if (key === 'scaleX' || key === 'scaleY') {
+      value = this._constrainScale(value);
     }
-    if (value !== prevValue) {
-      const groupNeedsUpdate =
-        this.group &&
-        typeof this.group.isOnACache === 'function' &&
-        this.group.isOnACache();
+    if (key === 'scaleX' && value < 0) {
+      this.flipX = !this.flipX;
+      value *= -1;
+    } else if (key === 'scaleY' && value < 0) {
+      this.flipY = !this.flipY;
+      value *= -1;
+      // i don't like this automatic initialization here
+    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
+      value = new Shadow(value);
+    } else if (key === 'dirty' && this.group) {
+      this.group.set('dirty', value);
+    }
+
+    this[key as keyof this] = value;
+
+    if (isChanged) {
+      const groupNeedsUpdate = this.group && this.group.isOnACache();
       // @ts-ignore TS and constructor issue
       if (this.constructor.cacheProperties.includes(key)) {
         this.dirty = true;
-        groupNeedsUpdate && (this.group!.dirty = true);
+        groupNeedsUpdate && this.group!.set('dirty', true);
       } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
-        this.group!.dirty = true;
+        this.group!.set('dirty', true);
       }
     }
-    return super.onChange(key, value, prevValue, target);
+    return this;
   }
 
   /*
