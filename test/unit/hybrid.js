@@ -130,6 +130,7 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.c, undefined, '`c` was touched by target so it is scoped');
             assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, a: true, o: true, z: true, c: true }, 'monitoring keys');
             assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'c', 'b'], 'keys without `z`');
+            assert.throws(() => { hybrid.__monitor__ = {} }, 'monitor is readonly');
         });
         QUnit.test('changing source after creation', assert => {
             const a = {};
@@ -203,6 +204,72 @@ QUnit.module('internals', (hooks) => {
             assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
             assert.equal(source.__source__.z, undefined, 'mutating target doesn\'t mutate source');
         });
+        QUnit.test.skip('restore default', assert => {
+            const a = {};
+            const o = {};
+            const b = {};
+            const x = {};
+            const target = {
+                a,
+                o,
+            };
+            const source = {
+                b,
+                o: x,
+            };
+            const changes = [];
+            let controller = true;
+            const hybrid = createHybrid(Object.defineProperties(target, {
+                onChange: {
+                    enumerable: false,
+                    value(key, value, prevValue) {
+                        changes.push({ key, value, prevValue, accepted: controller,stack:new Error('').stack });
+                        return controller;
+                    }
+                }
+            }), source);
+            assert.ok(hybrid.restoreDefault('a'), 'restored');
+            assert.equal(hybrid.a, undefined, 'was deleted');
+            // assert.ok(hybrid.restoreDefault('o'), 'restored');
+            // assert.equal(hybrid.o, x, 'get from source');
+            // assert.ok(!hybrid.restoreDefault('a'), 'should return false since restoring didn\'t occur');
+            // assert.ok(!hybrid.restoreDefault('o'), 'should return false since restoring didn\'t occur');
+            // assert.ok(!hybrid.restoreDefault('foo'), 'should return false since restoring didn\'t occur');
+            console.log(changes)
+        });
+        QUnit.test.skip('restore defaults', assert => {
+            const a = {};
+            const o = {};
+            const b = {};
+            const x = {};
+            const target = {
+                a,
+                o,
+            };
+            const source = {
+                b,
+                o: x,
+            };
+            const changes = [];
+            let controller = true;
+            const hybrid = createHybrid(Object.defineProperties(target, {
+                onChange: {
+                    enumerable: false,
+                    value(key, value, prevValue) {
+                        changes.push({ key, value, prevValue, accepted: controller,stack:new Error('').stack });
+                        return controller;
+                    }
+                }
+            }), source);
+            assert.ok(hybrid.restoreDefault('a'), 'restored');
+            assert.equal(hybrid.a, undefined, 'was deleted');
+            // assert.ok(hybrid.restoreDefault('o'), 'restored');
+            // assert.equal(hybrid.o, x, 'get from source');
+            // assert.ok(!hybrid.restoreDefault('a'), 'should return false since restoring didn\'t occur');
+            // assert.ok(!hybrid.restoreDefault('o'), 'should return false since restoring didn\'t occur');
+            // assert.ok(!hybrid.restoreDefault('foo'), 'should return false since restoring didn\'t occur');
+            console.log(changes)
+        });
         QUnit.test('set trap calls on change', assert => {
             const changes = [];
             let controller = true;
@@ -233,15 +300,19 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.x, 3, 'accepted');
             assert.deepEqual(Object.assign(hybrid, { x: 4, y: 5 }), { x: 4, y: 5, z: 3 }, 'changed x, y, skipped z');
             assert.deepEqual(hybrid, { x: 4, y: 5, z: 3 }, 'changed x, y, skipped z');
+            assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true, y: true }, 'monitoring keys');
             delete hybrid.z;
-            assert.ok(hybrid.__monitor__.z, 'monitoring');
+            assert.ok(hybrid.__monitor__.z, 'monitoring z');
             assert.deepEqual(Object.assign(hybrid, { z: 4 }), { x: 4, y: 5, z: 4 }, 'changed');
             assert.equal(hybrid.z, 4, 'accepted');
-            delete hybrid.z;
+            hybrid.__source__.bar = 1;
+            hybrid.bar = 1; // no on change call
+            hybrid.bar = 2;
             // no value change => no side effect
             hybrid.x = 4;
             Object.assign({ y: 5 });
-            // check all
+            
+            // check on change calls
             assert.deepEqual(changes, [
                 { key: 'x', value: 2, prevValue: 1, accepted: true },
                 { key: 'x', value: 3, prevValue: 2, accepted: false },
@@ -251,8 +322,56 @@ QUnit.module('internals', (hooks) => {
                 { key: 'x', value: 3, prevValue: 2, accepted: true },
                 { key: 'x', value: 4, prevValue: 3, accepted: true },
                 { key: 'y', value: 5, prevValue: undefined, accepted: true },
+                { key: 'z', value: undefined, prevValue: 3, accepted: true },
                 { key: 'z', value: 4, prevValue: undefined, accepted: true },
-                { key: 'z', value: undefined, prevValue: 4, accepted: true }
+                { key: 'bar', value: 2, prevValue: 1, accepted: true }
+            ], 'called on change');
+        });
+        QUnit.test('delete trap call on change', assert => {
+            const changes = [];
+            let controller = true;
+            const hybrid = createHybrid(Object.defineProperties({
+                x: 1
+            }, {
+                onChange: {
+                    enumerable: false,
+                    value(key, value, prevValue) {
+                        changes.push({ key, value, prevValue, accepted: controller });
+                        return controller;
+                    }
+                }
+            }), {
+                z: 3
+            });
+            controller = false;
+            delete hybrid.x;
+            delete hybrid.z;
+            assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true }, 'monitoring defined keys');
+            controller = true;
+            delete hybrid.x;
+            assert.deepEqual(hybrid, { z: 3 }, 'removed x');
+            assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true }, 'monitoring defined keys');
+            delete hybrid.z;
+            assert.deepEqual(hybrid, {}, 'removed z');
+            assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true, z: true }, 'monitoring deleted keys');
+            
+            // delete, on change edge cases
+            // deleted already
+            delete hybrid.x;
+            delete hybrid.z;
+            // not monitored
+            hybrid.__source__.bar = 1;
+            delete hybrid.bar;
+            // doesn't exist
+            delete hybrid.y;
+            
+            // check on change calls
+            assert.deepEqual(changes, [
+                { key: 'x', value: undefined, prevValue: 1, accepted: false },
+                { key: 'z', value: undefined, prevValue: 3, accepted: false },
+                { key: 'x', value: undefined, prevValue: 1, accepted: true },
+                { key: 'z', value: undefined, prevValue: 3, accepted: true },
+                { key: 'bar', value: undefined, prevValue: 1, accepted: true }
             ], 'called on change');
         });
         QUnit.test('transform value', assert => {
