@@ -29,10 +29,19 @@ export type THybrid<T, K extends keyof T = keyof T> = object & {
   ) => boolean;
 };
 
-export type Hybrid<T extends THybrid<T>, S extends object> = T &
+export type Hybrid<
+  T extends THybrid<T>,
+  S extends object,
+  K extends Exclude<keyof (S & T), 'transformValue' | 'onChange'> = Exclude<
+    keyof (S & T),
+    'transformValue' | 'onChange'
+  >
+> = T &
   // S is partial since keys of T might be monitored and deleted
   Partial<S> & {
     [SOURCE_KEY]: S;
+    restoreDefault(key: K): boolean;
+    restoreDefaults(): Record<K, boolean>;
   };
 
 export function createHybrid<T extends THybrid<T>, S extends object>(
@@ -100,8 +109,7 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
         enumerable: false,
         writable: false,
       },
-    }) as T & {
-      [SOURCE_KEY]: S;
+    }) as Hybrid<T, S> & {
       [MONITOR_KEY]: Record<string | symbol, boolean>;
     },
     {
