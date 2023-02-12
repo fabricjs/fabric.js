@@ -1383,7 +1383,7 @@ export class SelectableCanvas<
    * Sets given object as the only active object on canvas
    * @param {FabricObject} object Object to set as an active one
    * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
-   * @return {Boolean} true if occurred
+   * @return {Boolean} true if the object has been selected
    */
   setActiveObject(
     object: FabricObject,
@@ -1397,16 +1397,14 @@ export class SelectableCanvas<
   }
 
   /**
-   * This is a private method for now.
    * This is supposed to be equivalent to setActiveObject but without firing
    * any event. There is commitment to have this stay this way.
    * This is the functional part of setActiveObject.
-   * @private
    * @param {Object} object to set as active
    * @param {Event} [e] Event (passed along when firing "object:selected")
-   * @return {Boolean} true if occurred
+   * @return {Boolean} true if the object has been selected
    */
-  protected _setActiveObject(
+  _setActiveObject(
     object: FabricObject,
     e?: TPointerEvent
   ): this is AssertKeys<this, '_activeObject'> {
@@ -1425,16 +1423,14 @@ export class SelectableCanvas<
   }
 
   /**
-   * This is a private method for now.
    * This is supposed to be equivalent to discardActiveObject but without firing
    * any selection events ( can still fire object transformation events ). There is commitment to have this stay this way.
    * This is the functional part of discardActiveObject.
    * @param {Event} [e] Event (passed along when firing "object:deselected")
    * @param {Object} object the next object to set as active, reason why we are discarding this
-   * @return {Boolean} true if occurred
-   * @private
+   * @return {Boolean} true if the active object has been discarded
    */
-  protected _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
+  _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
@@ -1457,7 +1453,7 @@ export class SelectableCanvas<
    * sent to the fire function for the custom events. When used as a method the
    * e param does not have any application.
    * @param {event} e
-   * @return {Boolean} true if occurred
+   * @return {Boolean} true if the active object has been discarded
    */
   discardActiveObject(e?: TPointerEvent) {
     const currentActives = this.getActiveObjects(),
