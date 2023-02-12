@@ -36,7 +36,6 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   /**
    * A hook that runs from the `get` and `set` traps of {@link Proxy},
    * allowing to return a different value to the operation.
-   * Runs before a change is made to instance in the `set` trap.
    *
    * @param context
    * @param target {@link Reflect} target
