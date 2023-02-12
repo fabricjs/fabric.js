@@ -128,11 +128,13 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           return Reflect.get(target, p);
         }
       },
-      set(target, p, newValue, receiver) {
+      set(target, p, newValue) {
         const has = Reflect.has(target, p);
-        // call with `receiver` to run `get` through this proxy in order to obtain the correct value of target or source
-        const prevValue = Reflect.get(target, p, receiver);
+        const monitor = Reflect.get(target, MONITOR_KEY);
         const source = Reflect.get(target, SOURCE_KEY);
+        const prevValue = monitor[p]
+          ? Reflect.get(target, p)
+          : source && Reflect.get(source, p);
         const descriptor =
           Reflect.getOwnPropertyDescriptor(target, p) ||
           Reflect.getOwnPropertyDescriptor(source, p);
