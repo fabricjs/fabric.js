@@ -55,16 +55,56 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           },
           { [SOURCE_KEY]: true, [MONITOR_KEY]: true } as Record<
             string | symbol,
-            true
+            boolean
           >
         ),
         configurable: false,
         enumerable: false,
         writable: false,
       },
+      restoreDefault: {
+        value(key: string) {
+          if (!this[MONITOR_KEY][key]) {
+            return false;
+          }
+          const value = this[key];
+          const srcValue = this[SOURCE_KEY][key];
+          this[MONITOR_KEY][key] = false;
+          delete this[key];
+          if (
+            srcValue === value ||
+            !this.onChange ||
+            // a change occurred => run side effects
+            this.onChange(key, srcValue, value, this)
+          ) {
+            return true;
+          } else {
+            // change was refused by side effects => revert by resetting the property and monitoring it
+            this[key] = value;
+            this[MONITOR_KEY][key] = true;
+            return false;
+          }
+        },
+        configurable: false,
+        enumerable: false,
+        writable: false,
+      },
+      restoreDefaults: {
+        value() {
+          const monitor = this[MONITOR_KEY];
+          const result = {} as Record<string, boolean>;
+          for (const key in monitor) {
+            result[key] = this.restoreDefault(key);
+          }
+          return result;
+        },
+        configurable: false,
+        enumerable: false,
+        writable: false,
+      },
     }) as T & {
       [SOURCE_KEY]: S;
-      [MONITOR_KEY]: Record<string | symbol, true>;
+      [MONITOR_KEY]: Record<string | symbol, boolean>;
     },
     {
       get(target, p) {
