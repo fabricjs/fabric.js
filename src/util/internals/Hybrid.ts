@@ -1,14 +1,26 @@
 const SOURCE_KEY = '__source__';
 const MONITOR_KEY = '__monitor__';
 
+export type TransformValueContext<T, K extends keyof T = keyof T> = {
+  key: T;
+  value: T[K];
+  isDefault: boolean;
+} & (
+  | {
+      operation: 'get';
+    }
+  | {
+      newValue: T[K];
+      operation: 'set';
+    }
+);
+
 type THybrid<T, K extends keyof T = keyof T> = object & {
   /**
    * @returns the value to commit
    */
   transformValue?: (
-    key: T,
-    newValue: T[K],
-    value: T[K],
+    context: TransformValueContext<T, K>,
     /**
      * {@link Reflect} target
      */
@@ -117,18 +129,28 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
         const source = Reflect.get(target, SOURCE_KEY);
         if (p === SOURCE_KEY) {
           return source;
-        } else if (
+        }
+        const context =
           !Reflect.has(target, p) &&
           // `p` hasn't been monitored
           !Reflect.get(Reflect.get(target, MONITOR_KEY), p) &&
           source &&
           Reflect.has(source, p)
-        ) {
-          // get `source` only if `p` was never touched by `target`
-          return Reflect.get(source, p);
-        } else {
-          return Reflect.get(target, p);
-        }
+            ? // get `source` only if `p` was never touched by `target`
+              source
+            : target;
+        const value = Reflect.get(context, p);
+        return target.transformValue
+          ? target.transformValue(
+              {
+                operation: 'get',
+                key: p,
+                value,
+                isDefault: context === source,
+              },
+              target
+            )
+          : value;
       },
       set(target, p, newValue) {
         const has = Reflect.has(target, p);
@@ -142,7 +164,16 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           Reflect.getOwnPropertyDescriptor(source, p);
 
         if (target.transformValue) {
-          newValue = target.transformValue(p, newValue, prevValue, target);
+          newValue = target.transformValue(
+            {
+              operation: 'set',
+              key: p,
+              newValue,
+              value: prevValue,
+              isDefault: monitor[p],
+            },
+            target
+          );
         }
 
         if (

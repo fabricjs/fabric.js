@@ -329,14 +329,23 @@ QUnit.module('internals', (hooks) => {
                     }, {
                         transformValue: {
                             enumerable: false,
-                            value(key, newValue, value) {
-                                switch (key) {
-                                    case 'a':
-                                        return newValue + 5;
-                                    case 'x':
-                                        return value;
-                                    default:
-                                        return newValue
+                            value({ operation, key, newValue, value }) {
+                                if (operation === 'set') {
+                                    switch (key) {
+                                        case 'a':
+                                            return newValue + 5;
+                                        case 'x':
+                                            return value;
+                                        default:
+                                            return newValue;
+                                    }
+                                } else {
+                                    switch (key) {
+                                        case 'x':
+                                            return value + 2;
+                                        default:
+                                            return value;
+                                    }
                                 }
                             }
                         },
@@ -344,13 +353,13 @@ QUnit.module('internals', (hooks) => {
                         z: 3
                     }, keyOrder);
                     hybrid.a = 5;
-                    assert.equal(hybrid.a, 10, 'transform valued');
+                    assert.equal(hybrid.a, 10, 'transform set value');
                     hybrid.a = 25;
-                    assert.equal(hybrid.a, 30, 'transform valued');
+                    assert.equal(hybrid.a, 30, 'transform set value');
                     hybrid.x = 25;
-                    assert.equal(hybrid.x, 1, 'transform valued');
+                    assert.equal(hybrid.x, 3, 'transform get value, set value blocked');
                     hybrid.foo = 'bar';
-                    assert.equal(hybrid.foo, 'bar', 'transform valued');
+                    assert.equal(hybrid.foo, 'bar', 'transform value');
                 });
                 QUnit.test('restore defaults', assert => {
                     const a = 1;

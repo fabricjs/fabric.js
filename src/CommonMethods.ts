@@ -1,5 +1,5 @@
 import { Observable } from './Observable';
-import { createHybrid } from './util/internals';
+import { createHybrid, TransformValueContext } from './util/internals';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   static getDefaultValues() {
@@ -34,24 +34,19 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   }
 
   /**
-   * A hook that runs from the `set` trap of {@link Proxy} before a change is made to instance,
-   * allowing to return a different value to the operation
+   * A hook that runs from the `get` and `set` traps of {@link Proxy},
+   * allowing to return a different value to the operation.
+   * Runs before a change is made to instance in the `set` trap.
    *
-   * @param key
-   * @param newValue
-   * @param value
+   * @param context
    * @param target {@link Reflect} target
-   * @returns the value to set
    */
-  protected transformValue<K extends keyof this, R extends this[K]>(
-    key: K,
-    newValue: this[K],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    value: this[K],
+  protected transformValue(
+    context: TransformValueContext<this>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     target: this
-  ): R {
-    return newValue as R;
+  ) {
+    return context.operation === 'set' ? context.newValue : context.value;
   }
 
   /**
