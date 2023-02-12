@@ -130,7 +130,8 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.c, undefined, '`c` was touched by target so it is scoped');
             assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, a: true, o: true, z: true, c: true }, 'monitoring keys');
             assert.deepEqual(Object.keys(hybrid), ['a', 'o', 'c', 'b'], 'keys without `z`');
-            assert.throws(() => { hybrid.__monitor__ = {} }, 'monitor is readonly');
+            hybrid.__monitor__ = {};
+            assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, a: true, o: true, z: true, c: true }, 'monitor is readonly');
         });
         QUnit.test('changing source after creation', assert => {
             const a = {};
@@ -203,72 +204,6 @@ QUnit.module('internals', (hooks) => {
             target.z = z;
             assert.equal(source.z, undefined, 'mutating target doesn\'t mutate source');
             assert.equal(source.__source__.z, undefined, 'mutating target doesn\'t mutate source');
-        });
-        QUnit.test.skip('restore default', assert => {
-            const a = {};
-            const o = {};
-            const b = {};
-            const x = {};
-            const target = {
-                a,
-                o,
-            };
-            const source = {
-                b,
-                o: x,
-            };
-            const changes = [];
-            let controller = true;
-            const hybrid = createHybrid(Object.defineProperties(target, {
-                onChange: {
-                    enumerable: false,
-                    value(key, value, prevValue) {
-                        changes.push({ key, value, prevValue, accepted: controller,stack:new Error('').stack });
-                        return controller;
-                    }
-                }
-            }), source);
-            assert.ok(hybrid.restoreDefault('a'), 'restored');
-            assert.equal(hybrid.a, undefined, 'was deleted');
-            // assert.ok(hybrid.restoreDefault('o'), 'restored');
-            // assert.equal(hybrid.o, x, 'get from source');
-            // assert.ok(!hybrid.restoreDefault('a'), 'should return false since restoring didn\'t occur');
-            // assert.ok(!hybrid.restoreDefault('o'), 'should return false since restoring didn\'t occur');
-            // assert.ok(!hybrid.restoreDefault('foo'), 'should return false since restoring didn\'t occur');
-            console.log(changes)
-        });
-        QUnit.test.skip('restore defaults', assert => {
-            const a = {};
-            const o = {};
-            const b = {};
-            const x = {};
-            const target = {
-                a,
-                o,
-            };
-            const source = {
-                b,
-                o: x,
-            };
-            const changes = [];
-            let controller = true;
-            const hybrid = createHybrid(Object.defineProperties(target, {
-                onChange: {
-                    enumerable: false,
-                    value(key, value, prevValue) {
-                        changes.push({ key, value, prevValue, accepted: controller,stack:new Error('').stack });
-                        return controller;
-                    }
-                }
-            }), source);
-            assert.ok(hybrid.restoreDefault('a'), 'restored');
-            assert.equal(hybrid.a, undefined, 'was deleted');
-            // assert.ok(hybrid.restoreDefault('o'), 'restored');
-            // assert.equal(hybrid.o, x, 'get from source');
-            // assert.ok(!hybrid.restoreDefault('a'), 'should return false since restoring didn\'t occur');
-            // assert.ok(!hybrid.restoreDefault('o'), 'should return false since restoring didn\'t occur');
-            // assert.ok(!hybrid.restoreDefault('foo'), 'should return false since restoring didn\'t occur');
-            console.log(changes)
         });
         QUnit.test('set trap calls on change', assert => {
             const changes = [];
@@ -387,7 +322,7 @@ QUnit.module('internals', (hooks) => {
                             case 'x':
                                 return value;
                             default:
-                               return newValue
+                                return newValue
                         }
                     }
                 },
@@ -402,6 +337,57 @@ QUnit.module('internals', (hooks) => {
             assert.equal(hybrid.x, 1, 'transform valued');
             hybrid.foo = 'bar';
             assert.equal(hybrid.foo, 'bar', 'transform valued');
-        })
+        });
+        QUnit.test('restore defaults', assert => {
+            const a = 1;
+            const o = 2;
+            const b = 3;
+            const x = 4;
+            const target = {
+                a,
+                o,
+                same: 5,
+                foo: 'bar'
+            };
+            const source = {
+                b,
+                o: x,
+                same: 5,
+                foo: 'baz'
+            };
+            const changes = [];
+            let controller = true;
+            const hybrid = createHybrid(Object.defineProperties(target, {
+                onChange: {
+                    enumerable: false,
+                    value(key, value, prevValue) {
+                        changes.push({ key, value, prevValue, accepted: controller });
+                        return controller;
+                    }
+                }
+            }), source);
+            assert.ok(hybrid.restoreDefault('a'), 'restored');
+            assert.equal(hybrid.a, undefined, 'was deleted');
+            assert.ok(hybrid.restoreDefault('o'), 'restored');
+            assert.equal(hybrid.o, x, 'get from source');
+            assert.ok(!hybrid.restoreDefault('a'), 'should return false since restoring didn\'t occur');
+            assert.ok(!hybrid.restoreDefault('o'), 'should return false since restoring didn\'t occur');
+            assert.ok(!hybrid.restoreDefault('same'), 'should return false since restoring didn\'t occur - same value');
+            assert.ok(!hybrid.restoreDefault('bar'), 'should return false since restoring didn\'t occur - not defined');
+            assert.ok(!hybrid.restoreDefault('__source__'), 'should return false since restoring is not allowed');
+            assert.ok(!hybrid.restoreDefault('__monitor__'), 'should return false since restoring is not allowed');
+            assert.deepEqual(hybrid.restoreDefaults(), {
+                a: false,
+                foo: true,
+                o: false,
+                same: false
+            }, 'bulk action');
+            // check on change calls
+            assert.deepEqual(changes, [
+                { key: 'a', value: undefined, prevValue: 1, accepted: true },
+                { key: 'o', value: 4, prevValue: 2, accepted: true },
+                { key: 'foo', value: 'baz', prevValue: 'bar', accepted: true }
+            ], 'called on change');
+        });
     });
 });
