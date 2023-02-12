@@ -15,6 +15,25 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   }
 
   /**
+   *
+   * @param key key to restore
+   * @returns true if value changed
+   */
+  restoreDefault(key: keyof this): boolean {
+    // @ts-expect-error TS doesn't recognize `Hybrid` as super
+    return super.restoreDefault(key);
+  }
+
+  /**
+   * restores all default values
+   * @returns a map indicating which keys were changed
+   */
+  restoreDefaults(): Record<keyof this, boolean> {
+    // @ts-expect-error TS doesn't recognize `Hybrid` as super
+    return super.restoreDefaults();
+  }
+
+  /**
    * A hook that runs from the `set` trap of {@link Proxy} before a change is made to instance,
    * allowing to return a different value to the operation
    *

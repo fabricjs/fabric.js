@@ -34,6 +34,12 @@
     assert.equal(cObj.objectCaching, !isNode(), 'object caching default value');
   });
 
+  QUnit.test('restoring defaults', function(assert) {
+    var cObj = new fabric.Object();
+    assert.ok(typeof cObj.restoreDefault === 'function', 'exists');
+    assert.ok(typeof cObj.restoreDefaults === 'function', 'exists');
+  });
+
   QUnit.test('get', function(assert) {
     var cObj = new fabric.Object({
       left: 11,

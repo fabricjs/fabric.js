@@ -1,7 +1,7 @@
 const SOURCE_KEY = '__source__';
 const MONITOR_KEY = '__monitor__';
 
-export type THybrid<T, K extends keyof T = keyof T> = object & {
+type THybrid<T, K extends keyof T = keyof T> = object & {
   /**
    * @returns the value to commit
    */
