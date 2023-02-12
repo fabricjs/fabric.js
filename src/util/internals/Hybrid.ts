@@ -37,7 +37,8 @@ export type Hybrid<T extends THybrid<T>, S extends object> = T &
 
 export function createHybrid<T extends THybrid<T>, S extends object>(
   target: T,
-  source?: S
+  source?: S,
+  keyOrder: 'target-source' | 'source-target' = 'source-target'
 ): Hybrid<T, S> {
   return new Proxy(
     Object.defineProperties(target, {
@@ -221,13 +222,13 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
       },
       ownKeys(target) {
         const monitor = Reflect.get(target, MONITOR_KEY);
-        const ownKeys = Reflect.ownKeys(target);
-        return [
-          ...ownKeys,
-          ...Reflect.ownKeys(Reflect.get(target, SOURCE_KEY) || {}).filter(
-            (key) => !monitor[key] && !ownKeys.includes(key)
-          ),
-        ];
+        const targetKeys = Reflect.ownKeys(target);
+        const uniqSourceKeys = Reflect.ownKeys(
+          Reflect.get(target, SOURCE_KEY) || {}
+        ).filter((key) => !monitor[key] && !targetKeys.includes(key));
+        return keyOrder === 'target-source'
+          ? [...targetKeys, ...uniqSourceKeys]
+          : [...uniqSourceKeys, ...targetKeys];
       },
       getOwnPropertyDescriptor(target, p) {
         const monitor = Reflect.get(target, MONITOR_KEY);
