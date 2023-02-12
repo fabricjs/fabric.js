@@ -150,7 +150,7 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           return false;
         }
 
-        if (p !== MONITOR_KEY && Reflect.set(target, p, newValue)) {
+        if (Reflect.set(target, p, newValue)) {
           if (
             p === SOURCE_KEY ||
             prevValue === newValue ||
@@ -189,7 +189,7 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           Reflect.getOwnPropertyDescriptor(target, p) ||
           Reflect.getOwnPropertyDescriptor(source, p);
 
-        if (p !== MONITOR_KEY && Reflect.deleteProperty(target, p)) {
+        if (Reflect.deleteProperty(target, p)) {
           if (
             p === SOURCE_KEY ||
             !prevValue ||
