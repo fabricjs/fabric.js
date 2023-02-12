@@ -377,7 +377,7 @@ export interface SerializedObjectProps {
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
    * @type FabricObject
    */
-  clipPath?: SerializedObjectProps;
+  clipPath?: Partial<SerializedObjectProps>;
 
   /**
    * Meaningful ONLY when the object is used as clipPath.
