@@ -73,21 +73,12 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           }
           const value = this[key];
           const srcValue = this[SOURCE_KEY][key];
+          // set `target[key]` to `srcValue` in order to fire a correct `onChange`
+          const changed =
+            Reflect.set(this, key, srcValue) && srcValue !== value;
+          // stop monitoring `key`
           this[MONITOR_KEY][key] = false;
-          delete this[key];
-          if (
-            srcValue === value ||
-            !this.onChange ||
-            // a change occurred => run side effects
-            this.onChange(key, srcValue, value, this)
-          ) {
-            return true;
-          } else {
-            // change was refused by side effects => revert by resetting the property and monitoring it
-            this[key] = value;
-            this[MONITOR_KEY][key] = true;
-            return false;
-          }
+          return changed;
         },
         configurable: false,
         enumerable: false,
@@ -98,7 +89,9 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           const monitor = this[MONITOR_KEY];
           const result = {} as Record<string, boolean>;
           for (const key in monitor) {
-            result[key] = this.restoreDefault(key);
+            if (key !== SOURCE_KEY && key !== MONITOR_KEY) {
+              result[key] = this.restoreDefault(key);
+            }
           }
           return result;
         },
