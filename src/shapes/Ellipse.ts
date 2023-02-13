@@ -20,6 +20,8 @@ export class Ellipse extends FabricObject {
    */
   declare ry: number;
 
+  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
   /**
    * Constructor
    * @param {Object} [options] Options object
@@ -147,7 +149,6 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
 
 Object.assign(Ellipse.prototype, {
   ...ellipseDefaultValues,
-  cacheProperties: [...cacheProperties, 'rx', 'ry'],
 });
 
 classRegistry.setClass(Ellipse);

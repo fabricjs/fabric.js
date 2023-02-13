@@ -1654,11 +1654,11 @@ export class StaticCanvas<
     this.cancelRequestedRender();
     this.forEachObject((object) => object.dispose());
     this._objects = [];
-    if (this.backgroundImage && this.backgroundImage.dispose) {
+    if (this.backgroundImage) {
       this.backgroundImage.dispose();
     }
     this.backgroundImage = null;
-    if (this.overlayImage && this.overlayImage.dispose) {
+    if (this.overlayImage) {
       this.overlayImage.dispose();
     }
     this.overlayImage = null;

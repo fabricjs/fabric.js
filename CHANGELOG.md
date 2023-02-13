@@ -3,6 +3,14 @@
 ## [next]
 
 - chore(TS): patch class registry [#8507](https://github.com/fabricjs/fabric.js/pull/8507)
+- fix(): keep browser files as .js [#8690](https://github.com/fabricjs/fabric.js/issues/8690)
+- fix(): object dispose removes canvas/event refs [#8673](https://github.com/fabricjs/fabric.js/issues/8673)
+- fix(test): Textbox `fromObject` test is incorrectly trying to restore an instance [#8686](https://github.com/fabricjs/fabric.js/pull/8686)
+- TS(): Moved cache properties to static properties on classes [#xxxx](https://github.com/fabricjs/fabric.js/pull/xxxx)
+- refactor(): Moved cache properties to static properties on classes [#8662](https://github.com/fabricjs/fabric.js/pull/8662)
+- docs(): v6 announcements [#8664](https://github.com/fabricjs/fabric.js/issues/8664)
+- ci(): remove TS transformer [#8660](https://github.com/fabricjs/fabric.js/pull/8660)
+- refactor(): BREAKING remove stateful mixin and functionality [#8663](https://github.com/fabricjs/fabric.js/pull/8663)
 - patch(): Added WebGLProbe to env, removed isLikelyNode, added specific env dispose ( instead of cleanup JSDOM ) [#8652](https://github.com/fabricjs/fabric.js/pull/8652)
 - ci(): Removed the browser publish script [#8656](https://github.com/fabricjs/fabric.js/pull/8656)
 - feat(): Node entry point [#8632](https://github.com/fabricjs/fabric.js/pull/8632)

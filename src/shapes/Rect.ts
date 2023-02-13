@@ -20,6 +20,8 @@ export class Rect extends FabricObject {
    */
   declare ry: number;
 
+  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
   /**
    * Constructor
    * @param {Object} [options] Options object
@@ -192,7 +194,6 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
 
 Object.assign(Rect.prototype, {
   ...rectDefaultValues,
-  cacheProperties: [...cacheProperties, 'rx', 'ry'],
 });
 
 classRegistry.setClass(Rect);

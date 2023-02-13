@@ -39,6 +39,7 @@ export class Line extends FabricObject {
    */
   declare y2: number;
 
+  static cacheProperties = [...cacheProperties, 'x1', 'x2', 'y1', 'y2'];
   /**
    * Constructor
    * @param {Array} [points] Array of points
@@ -322,7 +323,6 @@ export const lineDefaultValues: Partial<TClassProperties<Line>> = {
 
 Object.assign(Line.prototype, {
   ...lineDefaultValues,
-  cacheProperties: [...cacheProperties, 'x1', 'x2', 'y1', 'y2'],
 });
 
 classRegistry.setClass(Line);

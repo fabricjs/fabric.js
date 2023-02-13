@@ -962,13 +962,15 @@
 
   QUnit.test('dirty flag on set property', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2});
-    object.cacheProperties = ['propA', 'propB'];
+    const originalCacheProps = fabric.Object.cacheProperties;
+    fabric.Object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     assert.equal(object.dirty, false, 'object starts with dirty flag disabled');
     object.set('propC', '3');
     assert.equal(object.dirty, false, 'after setting a property out of cache, dirty flag is still false');
     object.set('propA', '2');
     assert.equal(object.dirty, true, 'after setting a property from cache, dirty flag is true');
+    fabric.Object.cacheProperties = originalCacheProps;
   });
 
   QUnit.test('_createCacheCanvas sets object as dirty', function(assert) {
@@ -983,11 +985,13 @@
   QUnit.test('isCacheDirty', function(assert) {
     var object = new fabric.Object({ scaleX: 3, scaleY: 2, width: 1, height: 2});
     assert.equal(object.dirty, true, 'object is dirty after creation');
-    object.cacheProperties = ['propA', 'propB'];
+    const originalCacheProps = fabric.Object.cacheProperties;
+    fabric.Object.cacheProperties = ['propA', 'propB'];
     object.dirty = false;
     assert.equal(object.isCacheDirty(), false, 'object is not dirty if dirty flag is false');
     object.dirty = true;
     assert.equal(object.isCacheDirty(), true, 'object is dirty if dirty flag is true');
+    fabric.Object.cacheProperties = originalCacheProps;
   });
 
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {
@@ -1312,12 +1316,19 @@
   });
   QUnit.test('dispose', function (assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
+    let off = false;
+    object.off = () => {
+      off = true;
+    }
+    object.canvas = canvas;
     assert.ok(typeof object.dispose === 'function');
     object.animate({ fill: 'red' });
     const findAnimationsByTarget = target => fabric.runningAnimations.filter(({ target: t }) => target === t);
     assert.equal(findAnimationsByTarget(object).length, 1, 'runningAnimations should include the animation');
     object.dispose();
     assert.equal(findAnimationsByTarget(object).length, 0, 'runningAnimations should be empty after dispose');
+    assert.ok(!object.canvas, 'cleared canvas');
+    assert.ok(off, 'unsubscribe events');
   });
   QUnit.test('prototype changes', function (assert) {
     var object = new fabric.Object();
