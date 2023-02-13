@@ -62,12 +62,12 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 - [Issues][issues]
 - [Discussions][discussions]
 
-### 🎮 Adding a DEMO
+### 🎮 Adding a DEMO (currently not possible)
 
 Take a look at an existing [demo file][demo_file].\
 Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
 
-### ~~`fabricjs.com`~~ (_deprecated_)
+### ~~`fabricjs.com`~~ (currently not possible)
 
 To develop fabric's site you need to clone [`fabricjs.com`][website_repo] in the same parent folder of [`fabric.js`][repo], so that `fabric.js` and `fabricjs.com` are siblings.
 
@@ -94,14 +94,14 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - Follow [Developing](#-developing-) and read [Testing](#-testing).
 
 ### ✅ Guidelines
-
+- **Be patient** \
+  Sometimes it takes time to get back to you. Someone eventually will come back at you. Having a small and concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
   Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
-- **⛔ `dist`** \
-  Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
+  Do not reorder imports. Unrelevant changes in pr that are not created by the basic prettier aren't needed nor welcome.
 - **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#-testing).
+  PRs must be backed with relevant tests, follow [TESTING](#-testing). If you are a first timer with tests, asks for help.
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
@@ -110,6 +110,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - **1️⃣ PR per feature/bug** \
   Create a new branch for every pull request.\
   If you want to do more than one thing, create multiple pull requests 💪.
+  If your bug fix or feature requires a refactor, don't refactor. Commit the bugfix or the feature with the current code structure, let it sink, give some time to surface issues with the change, then when the bug or the feature seem solid, a refactor or code improvement can be tried
 - **And there you go!** \
   If you still have questions we're always happy to help.
 
