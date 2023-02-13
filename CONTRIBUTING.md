@@ -94,6 +94,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - Follow [Developing](#-developing-) and read [Testing](#-testing).
 
 ### ✅ Guidelines
+
 - **Be patient** \
   Sometimes it takes time to get back to you. Someone eventually will come back at you. Having a small and concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
