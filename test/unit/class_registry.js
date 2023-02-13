@@ -80,7 +80,7 @@
     }), fabric.Shadow, 'found shadow');
     assert.equal(fabric.util.classRegistry.getJSONClass({
       colorStops: []
-    }), fabric.Gradient, 'found shadow');
+    }), fabric.Gradient, 'found gradient');
   });
 
 })()
