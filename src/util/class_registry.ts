@@ -74,8 +74,15 @@ export class ClassRegistry {
     strict: S = true as S
   ): ResolverReturnValue<TJSONResolver<T>, S> {
     if (typeof arg0 === 'object' && arg0.colorStops) {
-      // TODO: remove this condition once Gradient aligns its type
+      // TODO: remove this backward compat condition once Gradient aligns its type
       arg0 = 'gradient';
+    }
+    if (
+      typeof arg0 === 'object' &&
+      ('blur' in arg0 || 'offsetX' in arg0 || 'offsetY' in arg0)
+    ) {
+      // TODO: remove this backward compat condition in v7
+      arg0 = 'shadow';
     }
     const constructor = this[JSON].get(
       typeof arg0 === 'string' ? arg0 : arg0.type

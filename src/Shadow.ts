@@ -3,6 +3,7 @@ import { config } from './config';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
+import { classRegistry } from './util/class_registry';
 import { uid } from './util/internals/uid';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
@@ -176,6 +177,7 @@ export class Shadow {
       offsetY: this.offsetY,
       affectStroke: this.affectStroke,
       nonScaling: this.nonScaling,
+      type: 'shadow',
     };
 
     if (this.includeDefaultValues) {
@@ -192,6 +194,10 @@ export class Shadow {
       }
     }
     return out;
+  }
+
+  static fromObject(options: Partial<TClassProperties<Shadow>>) {
+    return new Shadow(options);
   }
 
   /**
@@ -213,3 +219,5 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 Object.assign(Shadow.prototype, shadowDefaultValues);
+
+classRegistry.setClass(Shadow, 'shadow');

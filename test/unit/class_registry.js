@@ -72,4 +72,15 @@
     assert.throws(() => classRegistry.getJSONClass('X'), 'should not have registered class');
     assert.throws(() => classRegistry.getSVGClass('X'), 'should not have registered class');
   });
+  
+  QUnit.test('backward compat resolution: shadow and gradient', async assert => {
+    assert.equal(fabric.util.classRegistry.getJSONClass({
+      blur: 1,
+      offsetY: 2
+    }), fabric.Shadow, 'found shadow');
+    assert.equal(fabric.util.classRegistry.getJSONClass({
+      colorStops: []
+    }), fabric.Gradient, 'found shadow');
+  });
+
 })()

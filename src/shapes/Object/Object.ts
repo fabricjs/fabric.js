@@ -4,7 +4,7 @@ import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
-import { Shadow } from '../../Shadow';
+import type { Shadow } from '../../Shadow';
 import type {
   TCacheCanvasDimensions,
   TClassProperties,
@@ -1011,9 +1011,6 @@ export class FabricObject<
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-      // i don't like this automatic initialization here
-    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
-      value = new Shadow(value);
     } else if (key === 'dirty' && this.group) {
       this.group.set('dirty', value);
     }
