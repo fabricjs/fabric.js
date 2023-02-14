@@ -1,6 +1,39 @@
 import { THybrid, ChangeContext, HybridProtected, Hybrid } from './types';
 import { TARGETS_KEY, MONITOR_KEY } from './constants';
 
+/**
+ * adds target to source's targets monitor in order to bubble changes from source to target
+ * @param target
+ * @param source
+ * @returns
+ */
+export function connectSource(target: object, source?: object) {
+  if (!source) return;
+  if (!Reflect.get(source, TARGETS_KEY)) {
+    Reflect.defineProperty(source, TARGETS_KEY, {
+      value: new Map(),
+      configurable: true,
+      enumerable: false,
+      writable: false,
+    });
+  }
+  Reflect.get(source, TARGETS_KEY).set(target, true);
+}
+
+/**
+ * removes target from source's targets monitor
+ * @param target
+ * @param source
+ */
+export function disconnectSource(
+  target: Hybrid<object, object>,
+  source: object
+) {
+  (
+    Reflect.get(source, TARGETS_KEY) as Map<Hybrid<object, object>, true>
+  )?.delete(target);
+}
+
 export function bubbleChange<T extends THybrid<T>, S extends object>(
   { key, value, prevValue }: ChangeContext<T>,
   source: HybridProtected<T, S>,
@@ -36,35 +69,4 @@ export function bubbleChange<T extends THybrid<T>, S extends object>(
         // stop bubbling (subTargets will not be affected by the change since it is blocked)
       }
     });
-}
-/**
- * adds target to source's targets monitor in order to bubble changes from source to target
- * @param target
- * @param source
- * @returns
- */
-export function connectSource(target: object, source?: object) {
-  if (!source) return;
-  if (!Reflect.get(source, TARGETS_KEY)) {
-    Reflect.defineProperty(source, TARGETS_KEY, {
-      value: new Map(),
-      configurable: true,
-      enumerable: false,
-      writable: false,
-    });
-  }
-  Reflect.get(source, TARGETS_KEY).set(target, true);
-}
-/**
- * removes target from source's targets monitor
- * @param target
- * @param source
- */
-export function disconnectSource(
-  target: Hybrid<object, object>,
-  source: object
-) {
-  (
-    Reflect.get(source, TARGETS_KEY) as Map<Hybrid<object, object>, true>
-  )?.delete(target);
 }
