@@ -91,7 +91,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 - Read this section through.
 - Take a look at [**GOTCHAS**][gotchas]
-- Follow [Developing](#-developing-) and read [Testing](#-testing).
+- Follow [Developing](#-developing-) and [Testing](#-testing).
 
 ### ✅ Guidelines
 
@@ -102,7 +102,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
   Do not reorder imports. Unrelevant changes in pr that are not created by the basic prettier aren't needed nor welcome.
 - **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#-testing). If you are a first timer with tests, asks for help.
+  PRs must be backed with relevant tests, follow [TESTING](#-testing). We are here to help.
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
@@ -124,55 +124,81 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving
+Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests
 
 - `unit` tests: test logic and state
-- `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
+- `visual` tests: test visual outcome against image refs located at `test/visual/golden`
 
 ### Getting Started
 
-- build and watch for changes:
+- Build and watch for changes
 
-```bash
+  ```bash
+  npm run build -- -f -w
+  ```
 
-npm run build -- -f -w
+- Run the entire test suite on `chrome` (many tests are skipped on `node`)
 
-```
+  ```bash
+  npm test -- -a -c chrome
+  ```
 
-- run tests:
+- Handle failing tests
 
-```bash
+  - Fix logic
+  - If needed, alter tests with **caution**
+  - Rerun failing tests
 
-npm test -- -a -d
-> Running all tests in debug mode (read more in the help section)
+    - Save time by rerunning failing tests only
 
-npm test -- -s visual --dev -l -c chrome
-> Running live visual tests on chrome (navigate to see)
+      - Select failing test files
 
-npm test -- --help
+        ```bash
+        npm test -- -c chrome
+        ```
 
-> Usage: fabric.js test [options]
+      - **OR** run in _browser dev mode_ to watch for test changes
+        ```bash
+        npm test -- -c chrome --dev -l
+        ```
 
-> run test suite
+    - In case of failing visual tests, there are 2 options to view visual diffs (in order to understand what is wrong)
 
-Options:
-  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
-  -f, --file <file>           run a specific test file
-  --filter <filter>           filter tests by name
-  -a, --all                   run all tests (default: false)
-  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
-                              false)
-  -r, --recreate              recreate visual refs (golden images) (default: false)
-  -v, --verbose               log passing tests (default: false)
-  -l, --launch                launch tests in the browser (default: false)
-  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
-  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
-  -p, --port
-  -o, --out <out>             path to report test results to
-  --clear-cache               clear CLI test cache (default: false)
-  -h, --help                  display help for command
+      - Testing in _visual debug mode_ is comfortable when using with `Github Desktop` to view the diffs since refs will be overwritten (rerunning tests will use the overwritten refs so be cautious)
 
-```
+        ```bash
+        npm test -- -d -c chrome
+        ```
+
+      - Launching the browser test suite
+
+        ```bash
+        npm test -- -c chrome --dev -l
+        ```
+
+      - Take into account that different environments produce different outputs so it is advised to run both in `chrome` and `node`.
+
+      - Committing refs is done **ONLY** with `chrome` output.
+
+    - When you are done, rerun the entire test suit to verify all tests pass.
+
+    - If you are submitting a PR, visit the PR page on github to see all checks have passed (different platforms and config are covered by the checks).
+
+- Refer to the command docs
+  ```bash
+  npm test -- -h
+  ```
+
+### Adding Tests
+
+Backing a PR with tests that cover the changes that were made is a **MUST**. Aim to cover 100% of the cases.
+
+Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
+
+- [`unit` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237)
+- [`visual` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67)
+
+If you need to change test config ask for guidance.
 
 ---
 
