@@ -63,49 +63,44 @@ export type Hybrid<
 
 type HybridProtected<T extends THybrid<T>, S extends object> = Hybrid<T, S> & {
   readonly [MONITOR_KEY]: Record<string | symbol, boolean>;
-  readonly [TARGETS_KEY]: Map<S, true>;
+  readonly [TARGETS_KEY]: Map<HybridProtected<T, S>, true>;
 };
 
 function bubbleChange<T extends THybrid<T>, S extends object>(
   { key, value, prevValue }: ChangeContext<T>,
-  target: HybridProtected<T, S>,
-  source: S | HybridProtected<T, S>,
+  source: HybridProtected<T, S>,
   descriptor: TypedPropertyDescriptor<S>
 ) {
-  const monitor = Reflect.get(target, MONITOR_KEY);
-  const targets = Reflect.get(target, TARGETS_KEY);
-
-  if (Reflect.get(monitor, key)) {
-    return false;
-  } else if (
-    target.onChange &&
-    target.onChange(
-      {
-        key,
-        value,
-        prevValue,
-      },
-      target
-    )
-  ) {
-    // bubble change
-    targets &&
-      targets.forEach((__, subTarget) =>
-        bubbleChange({ key, value, prevValue }, subTarget, target, descriptor)
-      );
-    return true;
-  } else {
-    // change was refused => define and monitor `key`
-    // stop bubbling (subTargets will not be affected by the change since it is blocked)
-    return (
-      Reflect.defineProperty(target, key, {
-        ...descriptor,
-        value: prevValue,
-      }) &&
-      // monitor `key`
-      Reflect.set(monitor, key, true)
-    );
-  }
+  const targets = Reflect.get(source, TARGETS_KEY);
+  targets &&
+    targets.forEach((__, target) => {
+      const monitor = Reflect.get(target, MONITOR_KEY);
+      if (Reflect.get(monitor, key)) {
+        return false;
+      } else if (
+        target.onChange &&
+        target.onChange(
+          {
+            key,
+            value,
+            prevValue,
+          },
+          target
+        )
+      ) {
+        // bubble change
+        bubbleChange({ key, value, prevValue }, target, descriptor);
+      } else if (
+        Reflect.defineProperty(target, key, {
+          ...descriptor,
+          value: prevValue,
+        })
+      ) {
+        // change was refused => define and monitor `key`
+        Reflect.set(monitor, key, true);
+        // stop bubbling (subTargets will not be affected by the change since it is blocked)
+      }
+    });
 }
 
 /**
@@ -237,17 +232,11 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
             // the operation has succeeded
             // monitor `p`
             Reflect.set(Reflect.get(target, MONITOR_KEY), p, true);
-            // bubble change
-            const targets = Reflect.get(target, TARGETS_KEY);
-            targets &&
-              targets.forEach((__, subTarget) =>
-                bubbleChange(
-                  { key: p, value: newValue, prevValue },
-                  subTarget,
-                  target,
-                  descriptor
-                )
-              );
+            bubbleChange(
+              { key: p, value: newValue, prevValue },
+              target,
+              descriptor
+            );
           }
           return true;
         }
@@ -296,17 +285,11 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
             // the operation has succeeded
             // monitor `p`
             Reflect.set(Reflect.get(target, MONITOR_KEY), p, true);
-            // bubble change
-            const targets = Reflect.get(target, TARGETS_KEY);
-            targets &&
-              targets.forEach((__, subTarget) =>
-                bubbleChange(
-                  { key: p, value: undefined, prevValue },
-                  subTarget,
-                  target,
-                  descriptor
-                )
-              );
+            bubbleChange(
+              { key: p, value: undefined, prevValue },
+              target,
+              descriptor
+            );
           }
           return true;
         }
