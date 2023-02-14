@@ -108,14 +108,14 @@ QUnit.module('internals', (hooks) => {
                 {
                     key: 'a',
                     value: 3,
-                    prevValue: 1,
+                    prevValue: 2,
                     target: 'b',
                     accepted: true
                 },
                 {
                     key: 'a',
                     value: 3,
-                    prevValue: 1,
+                    prevValue: 2,
                     target: 'c',
                     accepted: true
                 },
