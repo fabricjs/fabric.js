@@ -132,58 +132,39 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
 ### Getting Started
 
 - Build and watch for changes
-
   ```bash
   npm run build -- -f -w
   ```
-
 - Run the entire test suite on `chrome` (many tests are skipped on `node`)
-
   ```bash
   npm test -- -a -c chrome
   ```
-
 - Handle failing tests
-
   - Fix logic
   - If needed, alter tests with **caution**
   - Rerun failing tests
-
     - Save time by rerunning failing tests only
-
       - Select failing test files
-
         ```bash
         npm test -- -c chrome
         ```
-
-      - **OR** run in _browser dev mode_ to watch for test changes
+      - **OR** launch the browser test suite in _dev mode_ to watch for test changes
         ```bash
         npm test -- -c chrome --dev -l
         ```
-
     - In case of failing visual tests, there are 2 options to view visual diffs (in order to understand what is wrong)
-
       - Testing in _visual debug mode_ is comfortable when using with `Github Desktop` to view the diffs since refs will be overwritten (rerunning tests will use the overwritten refs so be cautious)
-
         ```bash
         npm test -- -d -c chrome
         ```
-
       - Launching the browser test suite
-
         ```bash
         npm test -- -c chrome --dev -l
         ```
-
       - Take into account that different environments produce different outputs so it is advised to run both in `chrome` and `node`.
-
       - Committing refs is done **ONLY** with `chrome` output.
-
     - When you are done, rerun the entire test suit to verify all tests pass.
-
     - If you are submitting a PR, visit the PR page on github to see all checks have passed (different platforms and config are covered by the checks).
-
 - Refer to the command docs
   ```bash
   npm test -- -h
