@@ -6,7 +6,7 @@ QUnit.module('internals', (hooks) => {
             const hybrid = createHybrid({ a: 0 }, { b: 1 });
             assert.deepEqual(Object.keys(hybrid), ['b', 'a'], 'source-target');
         });
-        QUnit.test('on change bubbling', (assert) => {
+        QUnit.test('source change bubbling', (assert) => {
             let changes = [];
             const controller = {
                 a: true,
