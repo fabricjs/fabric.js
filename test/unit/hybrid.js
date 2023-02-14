@@ -6,6 +6,184 @@ QUnit.module('internals', (hooks) => {
             const hybrid = createHybrid({ a: 0 }, { b: 1 });
             assert.deepEqual(Object.keys(hybrid), ['b', 'a'], 'source-target');
         });
+        QUnit.test('on change bubbling', (assert) => {
+            let changes = [];
+            const controller = {
+                a: true,
+                b: true,
+                c: true,
+                d: true,
+                e: true,
+                x: false
+            };
+            function wrap(o, k) {
+                return Object.defineProperties(o, {
+                    onChange: {
+                        enumerable: false,
+                        value({ key, value, prevValue }) {
+                            changes.push({ key, value, prevValue, target: k, accepted: controller[k] });
+                            return controller[k];
+                        }
+                    }
+                });
+            }
+            const src = createHybrid({ a: 0 });
+            const hybrid = createHybrid(wrap({ d: 3 }, 'd'), createHybrid(wrap({ c: 2 }, 'c'), createHybrid(wrap({ b: 1 }, 'b'), src)));
+            const e = createHybrid(wrap({ e: 4 }, 'e'), hybrid);
+            const hybrid2 = createHybrid(wrap({ x: -1 }, 'x'), src);
+            assert.equal(hybrid.__source__.__source__.__source__, src);
+            assert.deepEqual(src, { a: 0 }, 'src');
+            src.a = 1;
+            assert.deepEqual(hybrid, { a: 1, b: 1, c: 2, d: 3 }, 'changed');
+            assert.deepEqual(changes, [
+                {
+                    key: 'a',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'b',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'c',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'd',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'e',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'x',
+                    accepted: false
+                },
+            ], 'changes bubbled');
+            changes = [];
+            controller.d = false;
+            src.a = 2;
+            assert.ok(hybrid.__monitor__.a, 'monitoring a because default was refused');
+            assert.deepEqual(hybrid, { a: 1, b: 1, c: 2, d: 3 }, 'refused change');
+            assert.deepEqual(e, { a: 1, b: 1, c: 2, d: 3, e: 4 }, 'e was not affected');
+            assert.deepEqual(changes, [
+                {
+                    key: 'a',
+                    value: 2,
+                    prevValue: 1,
+                    target: 'b',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 2,
+                    prevValue: 1,
+                    target: 'c',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 2,
+                    prevValue: 1,
+                    target: 'd',
+                    accepted: false
+                },
+            ], 'changes bubbled, stopped by d not reaching e, stopped by x');
+            changes = [];
+            controller.d = true;
+            src.a = 3;
+            assert.deepEqual(changes, [
+                {
+                    key: 'a',
+                    value: 3,
+                    prevValue: 1,
+                    target: 'b',
+                    accepted: true
+                },
+                {
+                    key: 'a',
+                    value: 3,
+                    prevValue: 1,
+                    target: 'c',
+                    accepted: true
+                },
+            ], 'changes bubbled, no effect on d, e, x');
+            changes = [];
+            delete hybrid.__source__.__source__.b;
+            assert.deepEqual(changes, [
+                {
+                    key: 'b',
+                    value: undefined,
+                    prevValue: 1,
+                    target: 'b',
+                    accepted: true
+                },
+                {
+                    key: 'b',
+                    value: undefined,
+                    prevValue: 1,
+                    target: 'c',
+                    accepted: true
+                },
+                {
+                    key: 'b',
+                    value: undefined,
+                    prevValue: 1,
+                    target: 'd',
+                    accepted: true
+                },
+                {
+                    key: 'b',
+                    value: undefined,
+                    prevValue: 1,
+                    target: 'e',
+                    accepted: true
+                },
+            ], 'delete changes bubbled');
+            assert.deepEqual(hybrid, { a: 1, c: 2, d: 3 }, 'refused change');
+            assert.deepEqual(e, { a: 1, c: 2, d: 3, e: 4 }, 'e was not affected');
+            assert.deepEqual(hybrid2, { x: -1, a: 0 }, 'refused all changes');
+            changes = [];
+            delete e.__source__;
+            hybrid.d = 5;
+            assert.deepEqual(changes, [
+                { key: 'd', value: 5, prevValue: 3, target: 'd', accepted: true }
+            ], 'e was disconnected');
+            changes = [];
+            const c = hybrid.__source__;
+            hybrid.__source__ = { z: 0 };
+            c.c = 1;
+            assert.deepEqual(changes, [
+                { key: 'c', value: 1, prevValue: 2, target: 'c', accepted: true }
+            ], 'c was disconnected');
+            changes = [];
+            hybrid.__source__.z = 1;
+            assert.deepEqual(changes, [], 'changing z has no effect because it is not a hybrid');
+            changes = [];
+            hybrid.__source__ = createHybrid({ z: 0 });
+            hybrid.__source__.z = 1;
+            assert.deepEqual(changes, [
+                {
+                    key: 'z',
+                    value: 1,
+                    prevValue: 0,
+                    target: 'd',
+                    accepted: true
+                }
+            ], 'z was connected, changes bubbled');
+        });
         ['source-target', 'target-source'].forEach((keyOrder) => {
             QUnit.module(`key order: ${keyOrder}`, (hooks) => {
                 hooks.before(() => {
