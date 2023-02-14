@@ -2,7 +2,7 @@
 
 ## [next]
 
-- feat(): Hybrid Object solving default values, shared controls, get/set [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
+- feat(): Hybrid Object solving default values, shared controls, get/set hooks [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
 - fix(): keep browser files as .js [#8690](https://github.com/fabricjs/fabric.js/issues/8690)
 - fix(): object dispose removes canvas/event refs [#8673](https://github.com/fabricjs/fabric.js/issues/8673)
 - fix(test): Textbox `fromObject` test is incorrectly trying to restore an instance [#8686](https://github.com/fabricjs/fabric.js/pull/8686)
