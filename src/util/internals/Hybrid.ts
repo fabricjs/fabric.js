@@ -76,7 +76,7 @@ function bubbleChange<T extends THybrid<T>, S extends object>(
     targets.forEach((__, target) => {
       const monitor = Reflect.get(target, MONITOR_KEY);
       if (Reflect.get(monitor, key)) {
-        return false;
+        return;
       } else if (
         target.onChange &&
         target.onChange(
