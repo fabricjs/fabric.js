@@ -1,137 +1,6 @@
-const SOURCE_KEY = '__source__';
-const TARGETS_KEY = '__targets__';
-const MONITOR_KEY = '__monitor__';
-
-export type TransformValueContext<T, K extends keyof T = keyof T> = {
-  key: T;
-  value: T[K];
-  isDefault: boolean;
-} & (
-  | {
-      operation: 'get';
-    }
-  | {
-      newValue: T[K];
-      operation: 'set';
-    }
-);
-
-export type ChangeContext<T, K extends keyof T = keyof T> = {
-  key: K;
-  value: T[K];
-  prevValue: T[K];
-};
-
-type THybrid<T, K extends keyof T = keyof T> = object & {
-  /**
-   * @returns the value to commit
-   */
-  transformValue?: (
-    context: TransformValueContext<T, K>,
-    /**
-     * {@link Reflect} target
-     */
-    target: T
-  ) => T[K];
-
-  /**
-   * @returns true if the change is accepted
-   */
-  onChange?: (
-    context: ChangeContext<T, K>,
-    /**
-     * {@link Reflect} target
-     */
-    target: T
-  ) => boolean;
-};
-
-export type Hybrid<
-  T extends THybrid<T>,
-  S extends object,
-  K extends Exclude<keyof (S & T), 'transformValue' | 'onChange'> = Exclude<
-    keyof (S & T),
-    'transformValue' | 'onChange'
-  >
-> = T &
-  // S is partial since keys of T might be monitored and deleted
-  Partial<S> & {
-    [SOURCE_KEY]: S;
-    restoreDefault(key: K): boolean;
-    restoreDefaults(): Record<K, boolean>;
-  };
-
-type HybridProtected<T extends THybrid<T>, S extends object> = Hybrid<T, S> & {
-  readonly [MONITOR_KEY]: Record<string | symbol, boolean>;
-  readonly [TARGETS_KEY]: Map<HybridProtected<T, S>, true>;
-};
-
-function bubbleChange<T extends THybrid<T>, S extends object>(
-  { key, value, prevValue }: ChangeContext<T>,
-  source: HybridProtected<T, S>,
-  descriptor: TypedPropertyDescriptor<S>
-) {
-  const targets = Reflect.get(source, TARGETS_KEY);
-  targets &&
-    targets.forEach((__, target) => {
-      const monitor = Reflect.get(target, MONITOR_KEY);
-      if (Reflect.get(monitor, key)) {
-        return;
-      } else if (
-        target.onChange &&
-        target.onChange(
-          {
-            key,
-            value,
-            prevValue,
-          },
-          target
-        )
-      ) {
-        // bubble change
-        bubbleChange({ key, value, prevValue }, target, descriptor);
-      } else if (
-        Reflect.defineProperty(target, key, {
-          ...descriptor,
-          value: prevValue,
-        })
-      ) {
-        // change was refused => define and monitor `key`
-        Reflect.set(monitor, key, true);
-        // stop bubbling (subTargets will not be affected by the change since it is blocked)
-      }
-    });
-}
-
-/**
- * adds target to source's targets monitor in order to bubble changes from source to target
- * @param target
- * @param source
- * @returns
- */
-function connectSource(target: object, source?: object) {
-  if (!source) return;
-  if (!Reflect.get(source, TARGETS_KEY)) {
-    Reflect.defineProperty(source, TARGETS_KEY, {
-      value: new Map(),
-      configurable: true,
-      enumerable: false,
-      writable: false,
-    });
-  }
-  Reflect.get(source, TARGETS_KEY).set(target, true);
-}
-
-/**
- * removes target from source's targets monitor
- * @param target
- * @param source
- */
-function disconnectSource(target: Hybrid<object, object>, source: object) {
-  (
-    Reflect.get(source, TARGETS_KEY) as Map<Hybrid<object, object>, true>
-  )?.delete(target);
-}
+import { THybrid, HybridProtected, Hybrid } from './types';
+import { TARGETS_KEY, MONITOR_KEY, SOURCE_KEY } from './constants';
+import { disconnectSource, connectSource, bubbleChange } from './bubbling';
 
 export function createHybrid<T extends THybrid<T>, S extends object>(
   target: T,
@@ -172,6 +41,18 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
               target
             )
           : value;
+      },
+      defineProperty(target, property, attributes) {
+        if (Reflect.defineProperty(target, property, attributes)) {
+          if (property === SOURCE_KEY) {
+            connectSource(target, attributes.value);
+          } else if (attributes.enumerable) {
+            // monitor `property`
+            Reflect.set(Reflect.get(target, MONITOR_KEY), property, true);
+          }
+          return true;
+        }
+        return false;
       },
       set(target, p, newValue) {
         const has = Reflect.has(target, p);
@@ -237,18 +118,6 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
               target,
               descriptor
             );
-          }
-          return true;
-        }
-        return false;
-      },
-      defineProperty(target, property, attributes) {
-        if (Reflect.defineProperty(target, property, attributes)) {
-          if (property === SOURCE_KEY) {
-            connectSource(target, attributes.value);
-          } else if (attributes.enumerable) {
-            // monitor `property`
-            Reflect.set(Reflect.get(target, MONITOR_KEY), property, true);
           }
           return true;
         }
