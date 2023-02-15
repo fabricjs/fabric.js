@@ -65,19 +65,6 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
           Reflect.getOwnPropertyDescriptor(target, p) ||
           Reflect.getOwnPropertyDescriptor(source, p);
 
-        if (target.transformValue) {
-          newValue = target.transformValue(
-            {
-              operation: 'set',
-              key: p,
-              newValue,
-              value: prevValue,
-              isDefault: monitor[p],
-            },
-            target
-          );
-        }
-
         if (
           !has &&
           descriptor &&
@@ -90,6 +77,19 @@ export function createHybrid<T extends THybrid<T>, S extends object>(
         ) {
           // the object is frozen => operation failed
           return false;
+        }
+
+        if (target.transformValue && (!descriptor || descriptor.enumerable)) {
+          newValue = target.transformValue(
+            {
+              operation: 'set',
+              key: p,
+              newValue,
+              value: prevValue,
+              isDefault: monitor[p],
+            },
+            target
+          );
         }
 
         if (Reflect.set(target, p, newValue)) {

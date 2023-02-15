@@ -502,12 +502,14 @@ QUnit.module('internals', (hooks) => {
                     ], 'called on change');
                 });
                 QUnit.test('transform value', assert => {
+                    const calls = [];
                     const hybrid = createHybrid(Object.defineProperties({
                         x: 1
                     }, {
                         transformValue: {
                             enumerable: false,
                             value({ operation, key, newValue, value }) {
+                                calls.push({ operation, key, newValue, value })
                                 if (operation === 'set') {
                                     switch (key) {
                                         case 'a':
@@ -538,6 +540,23 @@ QUnit.module('internals', (hooks) => {
                     assert.equal(hybrid.x, 3, 'transform get value, set value blocked');
                     hybrid.foo = 'bar';
                     assert.equal(hybrid.foo, 'bar', 'transform value');
+                    Object.defineProperty(hybrid, 'z', {
+                        value: 0,
+                        configurable: true,
+                        enumerable: false,
+                        writable: true
+                    });
+                    hybrid.z = 1;
+                    assert.deepEqual(calls, [
+                        { operation: 'set', key: 'a', newValue: 5, value: undefined },
+                        { operation: 'get', key: 'a', newValue: undefined, value: 10 },
+                        { operation: 'set', key: 'a', newValue: 25, value: 10 },
+                        { operation: 'get', key: 'a', newValue: undefined, value: 30 },
+                        { operation: 'set', key: 'x', newValue: 25, value: 1 },
+                        { operation: 'get', key: 'x', newValue: undefined, value: 1 },
+                        { operation: 'set', key: 'foo', newValue: 'bar', value: undefined },
+                        { operation: 'get', key: 'foo', newValue: undefined, value: 'bar' }
+                    ], 'transform value calls, changes to non enumerable keys do not get called');
                 });
                 QUnit.test('restore defaults', assert => {
                     const a = 1;
