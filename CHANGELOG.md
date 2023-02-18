@@ -2,6 +2,8 @@
 
 ## [next]
 
+- feat(): Control set [#8704](https://github.com/fabricjs/fabric.js/pull/8704)
+  **BREAKING**: controls are no longer attached to the prototype and are hybrid
 - feat(): Hybrid Object solving default values, shared controls, get/set hooks [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
 - fix(): keep browser files as .js [#8690](https://github.com/fabricjs/fabric.js/issues/8690)
 - fix(): object dispose removes canvas/event refs [#8673](https://github.com/fabricjs/fabric.js/issues/8673)
