@@ -10,6 +10,8 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
+import { createHybrid } from '../util/internals';
+import { defaultObjectControls } from '../shapes/Object/InteractiveObject';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
@@ -131,5 +133,5 @@ export function createPolyControls(
       ...options,
     });
   }
-  return controls;
+  return createHybrid(controls, defaultObjectControls);
 }

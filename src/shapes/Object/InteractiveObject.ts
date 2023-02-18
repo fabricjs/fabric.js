@@ -13,13 +13,13 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
+import { createHybrid } from '../../util/internals';
+import { createObjectDefaultControls } from '../../controls/default_controls';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
-
-type TControlSet = Record<string, Control>;
 
 type TBorderRenderingStyleOverride = Partial<
   Pick<FabricObject, 'borderColor' | 'borderDashArray'>
@@ -39,6 +39,10 @@ export interface DragMethods {
 }
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
+
+export const defaultObjectControls = createHybrid(
+  createObjectDefaultControls()
+);
 
 export class InteractiveFabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -99,7 +103,7 @@ export class InteractiveFabricObject<
    * holds the controls for the object.
    * controls are added by default_controls.js
    */
-  declare controls: TControlSet;
+  controls = createHybrid({}, defaultObjectControls);
 
   /**
    * internal boolean to signal the code that the object is

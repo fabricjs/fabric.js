@@ -2,6 +2,14 @@
 import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../util/class_registry';
+import { createResizeControls } from '../controls/default_controls';
+import { defaultObjectControls } from './Object/InteractiveObject';
+import { createHybrid } from '../util/internals';
+
+export const textboxDefaultControls = createHybrid(
+  createResizeControls(),
+  defaultObjectControls
+);
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -33,6 +41,8 @@ export class Textbox extends IText {
    * @since 2.6.0
    */
   declare splitByGrapheme: boolean;
+
+  controls = createHybrid({}, textboxDefaultControls);
 
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
