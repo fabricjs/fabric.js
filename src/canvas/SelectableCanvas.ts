@@ -19,7 +19,7 @@ import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -1359,30 +1359,36 @@ export class SelectableCanvas<
    * Sets given object as the only active object on canvas
    * @param {FabricObject} object Object to set as an active one
    * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
-   * @chainable
+   * @return {Boolean} true if the object has been selected
    */
-  setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  setActiveObject(
+    object: FabricObject,
+    e?: TPointerEvent
+  ): this is AssertKeys<this, '_activeObject'> {
     // we can't inline this, since _setActiveObject will change what getActiveObjects returns
     const currentActives = this.getActiveObjects();
-    this._setActiveObject(object, e);
+    const selected = this._setActiveObject(object, e);
     this._fireSelectionEvents(currentActives, e);
+    return selected;
   }
 
   /**
-   * This is a private method for now.
    * This is supposed to be equivalent to setActiveObject but without firing
    * any event. There is commitment to have this stay this way.
    * This is the functional part of setActiveObject.
-   * @private
    * @param {Object} object to set as active
    * @param {Event} [e] Event (passed along when firing "object:selected")
-   * @return {Boolean} true if the selection happened
+   * @return {Boolean} true if the object has been selected
    */
-  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  _setActiveObject(
+    object: FabricObject,
+    e?: TPointerEvent
+  ): this is AssertKeys<this, '_activeObject'> {
     if (this._activeObject === object) {
       return false;
     }
-    if (!this._discardActiveObject(e, object)) {
+    if (!this._discardActiveObject(e, object) && this._activeObject) {
+      // refused to deselect
       return false;
     }
     if (object.onSelect({ e })) {
@@ -1394,16 +1400,17 @@ export class SelectableCanvas<
   }
 
   /**
-   * This is a private method for now.
    * This is supposed to be equivalent to discardActiveObject but without firing
    * any selection events ( can still fire object transformation events ). There is commitment to have this stay this way.
    * This is the functional part of discardActiveObject.
    * @param {Event} [e] Event (passed along when firing "object:deselected")
    * @param {Object} object the next object to set as active, reason why we are discarding this
-   * @return {Boolean} true if the selection happened
-   * @private
+   * @return {Boolean} true if the active object has been discarded
    */
-  _discardActiveObject(e?: TPointerEvent, object?: FabricObject) {
+  _discardActiveObject(
+    e?: TPointerEvent,
+    object?: FabricObject
+  ): this is { _activeObject: undefined } {
     const obj = this._activeObject;
     if (obj) {
       // onDeselect return TRUE to cancel selection;
@@ -1420,8 +1427,9 @@ export class SelectableCanvas<
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
+      return true;
     }
-    return true;
+    return false;
   }
 
   /**
@@ -1430,9 +1438,9 @@ export class SelectableCanvas<
    * sent to the fire function for the custom events. When used as a method the
    * e param does not have any application.
    * @param {event} e
-   * @chainable
+   * @return {Boolean} true if the active object has been discarded
    */
-  discardActiveObject(e?: TPointerEvent) {
+  discardActiveObject(e?: TPointerEvent): this is { _activeObject: undefined } {
     const currentActives = this.getActiveObjects(),
       activeObject = this.getActiveObject();
     if (currentActives.length) {
@@ -1441,8 +1449,9 @@ export class SelectableCanvas<
         deselected: [activeObject!],
       });
     }
-    this._discardActiveObject(e);
+    const discarded = this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
+    return discarded;
   }
 
   /**
@@ -1499,8 +1508,10 @@ export class SelectableCanvas<
    * Clears all contexts (background, main, top) of an instance
    */
   clear() {
-    // this.discardActiveGroup();
+    // discard active object and fire events
     this.discardActiveObject();
+    // make sure we clear the active object in case it refused to be discarded
+    this._activeObject = undefined;
     this.clearContext(this.contextTop);
     super.clear();
   }
