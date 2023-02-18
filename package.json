@@ -129,8 +129,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.cjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
       "node": null,
       "types": "./dist/index.d.ts"
     },

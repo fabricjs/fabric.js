@@ -146,7 +146,7 @@ export const FabricJSCanvas = () => {
   }, []);
 
   return <canvas width="300" height="300" ref={canvasEl}/>;
-});
+};
 
 ```
 

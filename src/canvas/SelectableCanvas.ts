@@ -12,14 +12,11 @@ import {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
+  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import {
-  isActiveSelection,
-  isCollection,
-  isFabricObjectCached,
-} from '../util/types';
+import { isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -32,23 +29,23 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 
-type TDestroyedCanvas = Omit<
-  SelectableCanvas<CanvasEvents>,
+type TDestroyed<T, K extends keyof any> = {
+  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
+  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
+};
+
+type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
+  T,
   | 'contextTop'
   | 'contextCache'
   | 'lowerCanvasEl'
   | 'upperCanvasEl'
   | 'cacheCanvasEl'
   | 'wrapperEl'
-> & {
-  wrapperEl?: HTMLDivElement;
-  cacheCanvasEl?: HTMLCanvasElement;
-  upperCanvasEl?: HTMLCanvasElement;
-  lowerCanvasEl?: HTMLCanvasElement;
-  contextCache?: CanvasRenderingContext2D | null;
-  contextTop?: CanvasRenderingContext2D | null;
-};
+  | '_activeSelection'
+>;
 
 /**
  * Canvas class
@@ -432,13 +429,18 @@ export class SelectableCanvas<
   _currentTransform: Transform | null = null;
 
   /**
-   * hold a reference to a data structure used to track the selecion
+   * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
    * @type
    * @private
    */
-  _groupSelector: any = null;
+  protected _groupSelector: {
+    x: number;
+    y: number;
+    deltaX: number;
+    deltaY: number;
+  } | null = null;
 
   /**
    * internal flag used to understand if the context top requires a cleanup
@@ -490,6 +492,12 @@ export class SelectableCanvas<
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
+  protected readonly _activeSelection: ActiveSelection;
+
+  constructor(el: string | HTMLCanvasElement, options = {}) {
+    super(el, options);
+    this._activeSelection = new ActiveSelection([], { canvas: this });
+  }
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -541,40 +549,12 @@ export class SelectableCanvas<
    * @return {Array} objects to render immediately and pushes the other in the activeGroup.
    */
   _chooseObjectsToRender(): FabricObject[] {
-    const activeObjects = this.getActiveObjects();
-    let objsToRender, activeGroupObjects;
-
-    if (!this.preserveObjectStacking && activeObjects.length > 1) {
-      objsToRender = [];
-      activeGroupObjects = [];
-      for (let i = 0, length = this._objects.length; i < length; i++) {
-        const object = this._objects[i];
-        if (activeObjects.indexOf(object) === -1) {
-          objsToRender.push(object);
-        } else {
-          activeGroupObjects.push(object);
-        }
-      }
-      if (activeObjects.length > 1 && isCollection(this._activeObject)) {
-        this._activeObject._objects = activeGroupObjects;
-      }
-      objsToRender.push(...activeGroupObjects);
-    }
-    //  in case a single object is selected render it's entire parent above the other objects
-    else if (!this.preserveObjectStacking && activeObjects.length === 1) {
-      const target = activeObjects[0],
-        ancestors = target.getAncestors(true);
-      const topAncestor = (
-        ancestors.length === 0 ? target : ancestors.pop()
-      ) as FabricObject;
-      objsToRender = this._objects.slice();
-      const index = objsToRender.indexOf(topAncestor);
-      index > -1 && objsToRender.splice(objsToRender.indexOf(topAncestor), 1);
-      objsToRender.push(topAncestor);
-    } else {
-      objsToRender = this._objects;
-    }
-    return objsToRender;
+    const activeObject = this._activeObject;
+    return !this.preserveObjectStacking && activeObject
+      ? this._objects
+          .filter((object) => !object.group && object !== activeObject)
+          .concat(activeObject)
+      : this._objects;
   }
 
   /**
@@ -713,7 +693,10 @@ export class SelectableCanvas<
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target
    */
-  _shouldClearSelection(e: TPointerEvent, target?: FabricObject): boolean {
+  _shouldClearSelection(
+    e: TPointerEvent,
+    target?: FabricObject
+  ): target is undefined {
     const activeObjects = this.getActiveObjects(),
       activeObject = this._activeObject;
 
@@ -887,9 +870,11 @@ export class SelectableCanvas<
    * @param {CanvasRenderingContext2D} ctx to draw the selection on
    */
   _drawSelection(ctx: CanvasRenderingContext2D): void {
-    const { ex, ey, left, top } = this._groupSelector,
-      start = new Point(ex, ey).transform(this.viewportTransform),
-      extent = new Point(ex + left, ey + top).transform(this.viewportTransform),
+    const { x, y, deltaX, deltaY } = this._groupSelector!,
+      start = new Point(x, y).transform(this.viewportTransform),
+      extent = new Point(x + deltaX, y + deltaY).transform(
+        this.viewportTransform
+      ),
       strokeOffset = this.selectionLineWidth / 2;
     let minX = Math.min(start.x, extent.x),
       minY = Math.min(start.y, extent.y),
@@ -923,75 +908,59 @@ export class SelectableCanvas<
 
   /**
    * Method that determines what object we are clicking on
-   * the skipGroup parameter is for internal use, is needed for shift+click action
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @param {Boolean} skipGroup when true, activeGroup is skipped and only objects are traversed through
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent, skipGroup = false): FabricObject | undefined {
+  findTarget(e: TPointerEvent): FabricObject | undefined {
     if (this.skipTargetFind) {
       return undefined;
     }
 
     const pointer = this.getPointer(e, true),
       activeObject = this._activeObject,
-      aObjects = this.getActiveObjects(),
-      isTouch = isTouchEvent(e),
-      shouldLookForActive =
-        (aObjects.length > 1 && !skipGroup) || aObjects.length === 1;
+      aObjects = this.getActiveObjects();
 
-    // first check current group (if one exists)
-    // active group does not check sub targets like normal groups.
-    // if active group just exits.
     this.targets = [];
 
-    // if we hit the corner of an activeObject, let's return that.
-    if (
-      // ts doesn't get that if shouldLookForActive is true, activeObject exists
-      activeObject &&
-      shouldLookForActive &&
-      activeObject._findTargetCorner(pointer, isTouch)
-    ) {
-      return activeObject;
-    }
-    if (
-      aObjects.length > 1 &&
-      isActiveSelection(activeObject) &&
-      !skipGroup &&
-      this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      return activeObject;
-    }
-
-    let activeTarget;
-    let activeTargetSubs: FabricObject[] = [];
-    if (
-      // ts doesn't get that if aObjects has one object, activeObject exists
-      activeObject &&
-      aObjects.length === 1 &&
-      activeObject === this.searchPossibleTargets([activeObject], pointer)
-    ) {
-      if (!this.preserveObjectStacking) {
+    if (activeObject && aObjects.length >= 1) {
+      if (activeObject._findTargetCorner(pointer, isTouchEvent(e))) {
+        // if we hit the corner of the active object, let's return that.
         return activeObject;
-      } else {
-        activeTarget = activeObject;
-        activeTargetSubs = this.targets;
-        this.targets = [];
+      } else if (
+        aObjects.length > 1 &&
+        // check pointer is over active selection and possibly perform `subTargetCheck`
+        this.searchPossibleTargets([activeObject], pointer)
+      ) {
+        // active selection does not select sub targets like normal groups
+        return activeObject;
+      } else if (
+        activeObject === this.searchPossibleTargets([activeObject], pointer)
+      ) {
+        // active object is not an active selection
+        if (!this.preserveObjectStacking) {
+          return activeObject;
+        } else {
+          const subTargets = this.targets;
+          this.targets = [];
+          const target = this.searchPossibleTargets(this._objects, pointer);
+          if (
+            e[this.altSelectionKey as ModifierKey] &&
+            target &&
+            target !== activeObject
+          ) {
+            // alt selection: select active object even though it is not the top most target
+            // restore targets
+            this.targets = subTargets;
+            return activeObject;
+          }
+          return target;
+        }
       }
     }
-    const target = this.searchPossibleTargets(this._objects, pointer);
-    if (
-      e[this.altSelectionKey as ModifierKey] &&
-      target &&
-      activeTarget &&
-      target !== activeTarget
-    ) {
-      this.targets = activeTargetSubs;
-      return activeTarget;
-    }
-    return target;
+
+    return this.searchPossibleTargets(this._objects, pointer);
   }
 
   /**
@@ -1305,14 +1274,21 @@ export class SelectableCanvas<
   }
 
   /**
+   * Returns instance's active selection
+   */
+  getActiveSelection() {
+    return this._activeSelection;
+  }
+
+  /**
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
     if (active) {
-      if (isActiveSelection(active)) {
-        return [...active._objects];
+      if (active === this._activeSelection) {
+        return [...(active as ActiveSelection)._objects];
       } else {
         return [active];
       }
@@ -1419,6 +1395,7 @@ export class SelectableCanvas<
       return false;
     }
     this._activeObject = object;
+
     return true;
   }
 
@@ -1439,6 +1416,11 @@ export class SelectableCanvas<
       // onDeselect return TRUE to cancel selection;
       if (obj.onDeselect({ e, object })) {
         return false;
+      }
+      // clear active selection
+      if (obj === this._activeSelection) {
+        this._activeSelection.removeAll();
+        resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
         // @ts-ignore
@@ -1496,13 +1478,16 @@ export class SelectableCanvas<
    *
    * @private
    */
-  destroy(this: TDestroyedCanvas) {
+  destroy(this: TDestroyedCanvas<this>) {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!;
-    // @ts-ignore
-    this.removeListeners();
+      cacheCanvasEl = this.cacheCanvasEl!,
+      activeSelection = this._activeSelection!;
+    // dispose of active selection
+    activeSelection.removeAll();
+    this._activeSelection = undefined;
+    activeSelection.dispose();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
@@ -1563,7 +1548,7 @@ export class SelectableCanvas<
   }
 
   /**
-   * Realises an object's group transformation on it
+   * Realizes an object's group transformation on it
    * @private
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
@@ -1573,7 +1558,7 @@ export class SelectableCanvas<
   ): Partial<typeof instance> {
     if (
       instance.group &&
-      isActiveSelection(instance.group) &&
+      instance.group === this._activeSelection &&
       this._activeObject === instance.group
     ) {
       const layoutProps = [
@@ -1620,7 +1605,6 @@ Object.assign(SelectableCanvas.prototype, {
   altActionKey: 'shiftKey',
   selection: true,
   selectionKey: 'shiftKey',
-  altSelectionKey: null,
   selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
   selectionDashArray: [],
   selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
