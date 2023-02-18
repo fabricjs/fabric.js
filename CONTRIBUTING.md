@@ -100,7 +100,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - **Code Style** \
   Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
-  Do not reorder imports. Unrelevant changes in pr that are not created by the basic prettier aren't needed nor welcome.
+  Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
 - **Tests** \
   PRs must be backed with relevant tests, follow [TESTING](#-testing). We are here to help.
 - **Docs** \
