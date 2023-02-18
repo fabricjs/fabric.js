@@ -12,11 +12,10 @@ import {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
-  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import { isActiveSelection, isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -29,7 +28,6 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/ActiveSelection';
 
 type TDestroyed<T, K extends keyof any> = {
   // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
@@ -44,7 +42,6 @@ type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
   | 'upperCanvasEl'
   | 'cacheCanvasEl'
   | 'wrapperEl'
-  | '_activeSelection'
 >;
 
 /**
@@ -492,12 +489,6 @@ export class SelectableCanvas<
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected readonly _activeSelection: ActiveSelection;
-
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super(el, options);
-    this._activeSelection = new ActiveSelection([], { canvas: this });
-  }
 
   protected initElements(el: string | HTMLCanvasElement) {
     super.initElements(el);
@@ -1274,21 +1265,14 @@ export class SelectableCanvas<
   }
 
   /**
-   * Returns instance's active selection
-   */
-  getActiveSelection() {
-    return this._activeSelection;
-  }
-
-  /**
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
     if (active) {
-      if (active === this._activeSelection) {
-        return [...(active as ActiveSelection)._objects];
+      if (isActiveSelection(active)) {
+        return [...active._objects];
       } else {
         return [active];
       }
@@ -1410,11 +1394,6 @@ export class SelectableCanvas<
       if (obj.onDeselect({ e, object })) {
         return false;
       }
-      // clear active selection
-      if (obj === this._activeSelection) {
-        this._activeSelection.removeAll();
-        resetObjectTransform(this._activeSelection);
-      }
       if (this._currentTransform && this._currentTransform.target === obj) {
         // @ts-ignore
         this.endCurrentTransform(e);
@@ -1473,12 +1452,7 @@ export class SelectableCanvas<
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!,
-      activeSelection = this._activeSelection!;
-    // dispose of active selection
-    activeSelection.removeAll();
-    this._activeSelection = undefined;
-    activeSelection.dispose();
+      cacheCanvasEl = this.cacheCanvasEl!;
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
@@ -1547,7 +1521,7 @@ export class SelectableCanvas<
   ): Partial<typeof instance> {
     if (
       instance.group &&
-      instance.group === this._activeSelection &&
+      isActiveSelection(instance.group) &&
       this._activeObject === instance.group
     ) {
       const layoutProps = [

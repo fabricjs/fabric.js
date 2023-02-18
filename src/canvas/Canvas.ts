@@ -16,11 +16,13 @@ import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
+  isActiveSelection,
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
@@ -1416,7 +1418,7 @@ export class Canvas extends SelectableCanvas {
     }
     let hoverCursor = target.hoverCursor || this.hoverCursor;
     const activeSelection =
-        this._activeObject === this._activeSelection
+        isActiveSelection(this._activeObject)
           ? this._activeObject
           : null,
       // only show proper corner when group selection is not active
@@ -1462,8 +1464,8 @@ export class Canvas extends SelectableCanvas {
     target?: FabricObject
   ): this is AssertKeys<this, '_activeObject'> {
     const activeObject = this._activeObject;
-    const activeSelection = this._activeSelection;
-    const isAS = activeObject === activeSelection;
+    const activeSelection = this._activeObject;
+    const isAS = isActiveSelection(activeSelection);
     if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
@@ -1518,12 +1520,13 @@ export class Canvas extends SelectableCanvas {
       } else {
         isInteractiveTextObject(activeObject) && activeObject.exitEditing();
         // add the active object and the target to the active selection and set it as the active object
-        activeSelection.multiSelectAdd(activeObject, target);
-        this._hoveredTarget = activeSelection;
+        const newActiveSelection = new ActiveSelection([], { canvas: this });
+        newActiveSelection.multiSelectAdd(activeObject, target);
+        this._hoveredTarget = newActiveSelection;
         // ISSUE 4115: should we consider subTargets here?
         // this._hoveredTargets = [];
         // this._hoveredTargets = this.targets.concat();
-        this._setActiveObject(activeSelection, e);
+        this._setActiveObject(newActiveSelection, e);
         this._fireSelectionEvents([activeObject], e);
       }
       return true;
@@ -1576,8 +1579,8 @@ export class Canvas extends SelectableCanvas {
       this.setActiveObject(objects[0], e);
     } else if (objects.length > 1) {
       // add to active selection and make it the active object
-      this._activeSelection.add(...objects);
-      this.setActiveObject(this._activeSelection, e);
+      const activeSelection = new ActiveSelection(objects, { canvas: this })
+      this.setActiveObject(activeSelection, e);
     }
 
     // cleanup
