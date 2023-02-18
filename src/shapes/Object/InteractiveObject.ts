@@ -149,12 +149,15 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Determines which corner has been clicked
+   * Determines which corner is under the mouse cursor, represented by `pointer`.
+   * This function is return a corner only if the object is the active one.
+   * This is done to avoid selecting corner of non active object and activating transformations
+   * rather than drag action. The default behaviour of fabricJS is that if you want to trasform
+   * an object, first you select it to show the control set
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
-   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or false if nothing is found.
-   * Returning a corner means instance is the active object.
+   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
   _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
     if (
