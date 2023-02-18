@@ -96,7 +96,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 ### ✅ Guidelines
 
 - **Be patient** \
-  Sometimes it takes time to get back to you. Someone eventually will come back at you. Having a small and concise and super clear change will make maintainers more prone to handle it quickly.
+  Sometimes it takes time to get back to you. Someone eventually will. Having a small, concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
   Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
