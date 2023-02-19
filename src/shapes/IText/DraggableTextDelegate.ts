@@ -147,15 +147,15 @@ export class DraggableTextDelegate {
     target.backgroundColor = bgc;
     target.styles = styles;
     //  handle retina scaling and vpt
-    if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
+    if (!isIdentityMatrix(vpt)) {
       const dragImageCanvas = createCanvasElement();
-      const size = new Point(dragImage.width, dragImage.height)
-        .scalarDivide(retinaScaling)
-        .transform(vpt, true);
+      const size = new Point(dragImage.width, dragImage.height).transform(
+        vpt,
+        true
+      );
       dragImageCanvas.width = size.x;
       dragImageCanvas.height = size.y;
       const ctx = dragImageCanvas.getContext('2d')!;
-      ctx.scale(1 / retinaScaling, 1 / retinaScaling);
       const [a, b, c, d] = vpt;
       ctx.transform(a, b, c, d, 0, 0);
       ctx.drawImage(dragImage, 0, 0);
@@ -168,11 +168,15 @@ export class DraggableTextDelegate {
     //  position drag image offscreen
     setStyle(dragImage, {
       position: 'absolute',
-      left: -dragImage.width + 'px',
+      left: `${-dragImage.width}px`,
       border: 'none',
+      transform: `scale(${1 / retinaScaling},${1 / retinaScaling})`,
     });
-    getDocument().body.appendChild(dragImage);
-    e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
+    // wrap the image so css transform will be respected
+    const wrapper = getDocument().createElement('div');
+    wrapper.appendChild(dragImage);
+    canvas.wrapperEl.appendChild(wrapper);
+    e.dataTransfer?.setDragImage(wrapper, offset.x, offset.y);
   }
 
   /**
