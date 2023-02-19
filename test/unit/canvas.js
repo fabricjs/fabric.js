@@ -2243,6 +2243,7 @@
     assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    // disabled this pixel because firefox 110 updates
     // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
     assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
     assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
@@ -2272,6 +2273,7 @@
     assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
+    // disabled this pixel because firefox 110 updates
     // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
     assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
     assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
@@ -2312,6 +2314,7 @@
     assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
     assert.equal(canvas.isTargetTransparent(rect, 17, 17), true, 'transparent 17, 17');
     assert.equal(canvas.isTargetTransparent(rect, 18, 18), true, 'transparent 18, 18');
+    // disabled this pixel because firefox 110 updates
     // assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
     assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
     assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
