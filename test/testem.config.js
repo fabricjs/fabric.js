@@ -6,7 +6,7 @@
 module.exports = {
   framework: 'qunit',
   serve_files: [
-    'dist/index.cjs',
+    'dist/index.js',
     'test/lib/assert.js'
   ],
   styles: [

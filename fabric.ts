@@ -56,3 +56,4 @@ export {
   WebGLFilterBackend,
 } from './src/filters';
 export * as filters from './src/filters';
+

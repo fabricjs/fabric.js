@@ -114,18 +114,15 @@
   exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
-    var imageDataToChalk;
     if (isNode()) {
       _pixelMatch = global.pixelmatch;
       visualCallback = global.visualCallback;
-      imageDataToChalk = global.imageDataToChalk;
     }
     else {
       if (window) {
         _pixelMatch = window.pixelmatch;
         visualCallback = window.visualCallback;
       }
-      imageDataToChalk = function() { return ''; };
     }
 
     var pixelmatchOptions = {
@@ -179,10 +176,6 @@
             isOK,
             testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
           );
-          if (!isOK) {
-            var stringa = imageDataToChalk(output);
-            console.log(stringa);
-          }
           if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
