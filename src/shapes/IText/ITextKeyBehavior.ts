@@ -119,18 +119,18 @@ export abstract class ITextKeyBehavior<
    * @returns true if text selection changed
    */
   handleSelectionChange(e: KeyboardEvent): boolean {
-    let func: ((e: KeyboardEvent) => any) | string | undefined;
     const keyMap =
       e.ctrlKey || e.metaKey
         ? this.ctrlKeysMapDown
         : this.direction === 'rtl'
         ? this.keysMapRtl
         : this.keysMap;
-    let func: ((e: KeyboardEvent) => any) | string | undefined =
+    const value: TKeyMapIText[string] | undefined =
       keyMap[e.key] || keyMap[e.code] || keyMap[e.keyCode];
-    if (typeof func === 'string' && typeof this[func] === 'function') {
-      func = this[func];
-    }
+    const func =
+      typeof value === 'string' && typeof this[value] === 'function'
+        ? this[value]
+        : value;
     // execute
     if (typeof func === 'function') {
       console.warn(
