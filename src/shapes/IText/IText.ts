@@ -3,7 +3,7 @@ import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import { ctrlKeysMapDown, keysMap, keysMapRtl } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 
 type CursorBoundaries = {
   left: number;

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle

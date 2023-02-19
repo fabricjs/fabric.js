@@ -6,7 +6,7 @@ import {
 } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.

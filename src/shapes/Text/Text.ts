@@ -11,7 +11,7 @@ import type {
   TClassProperties,
   TFiller,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
 import {

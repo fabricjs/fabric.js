@@ -5,7 +5,7 @@ import { uid } from './util/internals/uid';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { classRegistry } from './util/class_registry';
+import { classRegistry } from './ClassRegistry';
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
