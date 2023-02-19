@@ -26,9 +26,9 @@ type CursorBoundaries = {
  * @fires dragstart
  * @fires drag drag event firing on the drag source
  * @fires dragend
- * @fires copy
- * @fires cut
- * @fires paste
+ * @fires copy provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires cut provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires paste provides ability to modify {@link ClipboardEvent#clipboardData}
  *
  * #### Supported key combinations
  * ```

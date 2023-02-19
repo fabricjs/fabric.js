@@ -21,6 +21,9 @@ export type ITextEvents = ObjectEvents & {
   tripleclick: TPointerEventInfo;
   'editing:entered': never | { e: TPointerEvent };
   'editing:exited': never;
+  copy: { e: ClipboardEvent };
+  cut: { e: ClipboardEvent };
+  paste: { e: ClipboardEvent };
 };
 
 export abstract class ITextBehavior<
