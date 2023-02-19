@@ -47,6 +47,5 @@ export * from './src/parser';
 
 export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
-import './src/controls/defaultControls';
 
 export * from './src/filters';
