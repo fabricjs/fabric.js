@@ -12,14 +12,13 @@
     }
   }
 
-  QUnit.module('fabric.Collection', {
-    beforeEach: function() {
+  QUnit.module('fabric.Collection', (hooks) => {
+    hooks.beforeEach(() => {
       collection = new TestCollection();
       collection2 = new TestCollection();
       added = [];
       removed = [];
-    }
-  });
+    });
 
   QUnit.test('init', function (assert) {
     assert.ok(Array.isArray(collection._objects), 'is array');
@@ -222,5 +221,124 @@
     collection.add(complexObject, complexObject2);
     returned = collection.complexity();
     assert.equal(returned, 19, 'collection has complexity 9 + 10');
+  });
+
+  QUnit.module('collect objects', (hooks) => {
+    QUnit.test('method collects object contained in area', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+      var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+      collection.add(rect1, rect2, rect3, rect4);
+      var collected = collection.collectObjects({
+        left: 1,
+        top: 1,
+        width: 15,
+        height: 15
+      });
+      assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
+      assert.equal(collected[3], rect1, 'contains rect1 as last object');
+      assert.equal(collected[2], rect2, 'contains rect2');
+      assert.equal(collected[1], rect3, 'contains rect3');
+      assert.equal(collected[0], rect4, 'contains rect4 as first object');
+    });
+
+    QUnit.test('method do not collects object if area is outside', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+      var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+      collection.add(rect1, rect2, rect3, rect4);
+      var collected = collection.collectObjects({
+        left: 24,
+        top: 24,
+        width: 1,
+        height: 1
+      });
+      assert.equal(collected.length, 0, 'a rect outside objects do not collect any of them');
+    });
+
+    QUnit.test('method collect included objects that are not touched by the selection sides', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 5, left: 5 });
+      collection.add(rect1);
+      var collected = collection.collectObjects({
+        left: 1,
+        top: 1,
+        width: 20,
+        height: 20
+      });
+      assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
+      assert.equal(collected[0], rect1, 'rect1 is collected');
+    });
+
+    QUnit.test('method collect topmost object if no dragging occurs', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      collection.add(rect1, rect2, rect3);
+      var collected = collection.collectObjects({
+        left: 1,
+        top: 1,
+        width: 0,
+        height: 0
+      });
+      assert.equal(collected.length, 3, 'a rect that contains all objects collects them all');
+    });
+
+
+
+    QUnit.test('method collect objects if the drag is inside the object', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      collection.add(rect1, rect2, rect3);
+      var collected = collection.collectObjects({
+        left: 1,
+        top: 1,
+        width: 2,
+        height: 2
+      });;
+      assert.equal(collected.length, 3, 'a rect that contains all objects collects them all');
+      assert.equal(collected[0], rect3, 'rect3 is collected');
+      assert.equal(collected[1], rect2, 'rect2 is collected');
+      assert.equal(collected[2], rect1, 'rect1 is collected');
+    });
+
+    QUnit.test('method collects object fully contained in area', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+      var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+      collection.add(rect1, rect2, rect3, rect4);
+      var collected = collection.collectObjects({
+        left: -1,
+        top: -1,
+        width: 30,
+        height: 30
+      }, { includeIntersecting: false });
+      assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
+      assert.equal(collected[3], rect1, 'contains rect1 as last object');
+      assert.equal(collected[2], rect2, 'contains rect2');
+      assert.equal(collected[1], rect3, 'contains rect3');
+      assert.equal(collected[0], rect4, 'contains rect4 as first object');
+    });
+
+    QUnit.test('method does not collect objects not fully contained', function (assert) {
+      var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
+      var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
+      var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
+      var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+      collection.add(rect1, rect2, rect3, rect4);
+      var collected = collection.collectObjects({
+        left: 5,
+        top: 5,
+        width: 20,
+        height: 20
+      }, { includeIntersecting: false });
+      assert.equal(collected.length, 1, 'a rect intersecting objects does not collect those');
+      assert.equal(collected[0], rect4, 'contains rect1 as only one fully contained');
+    });
+  });
+    
   });
 })();

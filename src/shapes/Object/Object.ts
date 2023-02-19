@@ -593,12 +593,6 @@ export class FabricObject<
   declare group?: Group;
 
   /**
-   * A reference to the parent of the object
-   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
-   */
-  declare __owningGroup?: Group;
-
-  /**
    * Indicate if the object is sitting on a cache dedicated to it
    * or is part of a larger cache for many object ( a group for example)
    * @type number
