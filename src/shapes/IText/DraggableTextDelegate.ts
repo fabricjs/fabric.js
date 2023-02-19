@@ -140,12 +140,14 @@ export class DraggableTextDelegate {
     };
     target.setSelectionStyles(styleOverride, 0, selectionStart);
     target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
+    target.dirty = true;
     let dragImage = target.toCanvasElement({
       enableRetinaScaling,
     });
     // restore values
     target.backgroundColor = bgc;
     target.styles = styles;
+    target.dirty = true;
     //  handle retina scaling and vpt
     if (!isIdentityMatrix(vpt)) {
       const dragImageCanvas = createCanvasElement();
@@ -161,10 +163,6 @@ export class DraggableTextDelegate {
       ctx.drawImage(dragImage, 0, 0);
       dragImage = dragImageCanvas;
     }
-    this.__dragImageDisposer && this.__dragImageDisposer();
-    this.__dragImageDisposer = () => {
-      dragImage.remove();
-    };
     //  position drag image offscreen
     setStyle(dragImage, {
       position: 'absolute',
@@ -175,6 +173,10 @@ export class DraggableTextDelegate {
     // wrap the image so css transform will be respected
     const wrapper = getDocument().createElement('div');
     wrapper.appendChild(dragImage);
+    this.__dragImageDisposer && this.__dragImageDisposer();
+    this.__dragImageDisposer = () => {
+      wrapper.remove();
+    };
     canvas.wrapperEl.appendChild(wrapper);
     e.dataTransfer?.setDragImage(wrapper, offset.x, offset.y);
   }
@@ -305,7 +307,7 @@ export class DraggableTextDelegate {
         } else if (insertAt > selectionEnd) {
           insertAt -= selectionEnd - selectionStart;
         }
-        target.insertChars('', undefined, selectionStart, selectionEnd);
+        target.removeChars(selectionStart, selectionEnd);
         // prevent `dragend` from handling event
         delete this.__dragStartSelection;
       }
@@ -369,7 +371,7 @@ export class DraggableTextDelegate {
         } else {
           target.clearContextTop();
           if (dropEffect === 'move') {
-            target.insertChars('', undefined, selectionStart, selectionEnd);
+            target.removeChars(selectionStart, selectionEnd);
             target.selectionStart = target.selectionEnd = selectionStart;
             target.hiddenTextarea &&
               (target.hiddenTextarea.value = target.text);
