@@ -12,7 +12,7 @@ import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
-import type { ControlRenderingStyleOverride } from '../../controls/controls.render';
+import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
