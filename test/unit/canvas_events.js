@@ -17,7 +17,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
-      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
+      canvas.handleSelection = fabric.Canvas.prototype.handleSelection;
       canvas.off();
       canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
@@ -164,7 +164,7 @@
   QUnit.test('mouse:down and group selector', function(assert) {
     var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 150, height: 150 });
-    var expectedGroupSelector = { ex: 80, ey: 120, top: 0, left: 0 };
+    var expectedGroupSelector = { x: 80, y: 120, deltaX: 0, deltaY: 0 };
     canvas.absolutePan(new fabric.Point(50, 80));
     canvas.__onMouseDown(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'a new groupSelector is created');
@@ -204,7 +204,7 @@
     assert.equal(canvas._activeObject, rect, 'with activeOn of up object is selected on mouse up');
   });
 
-  QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
+  QUnit.test('specific bug #5317 for multiselection', function(assert) {
     var greenRect = new fabric.Rect({
       width: 300,
       height: 300,
@@ -755,9 +755,8 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = new fabric.ActiveSelection(canvas.getObjects(), {
-        canvas: canvas
-      });
+      var activeSelection = canvas.getActiveSelection();
+      activeSelection.add(...canvas.getObjects());
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);
 
@@ -790,9 +789,9 @@
 
   QUnit.test('mouse move and group selector', function(assert){
     var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
-    var expectedGroupSelector = { ex: 15, ey: 30, left: 65, top: 90};
+    var expectedGroupSelector = { x: 15, y: 30, deltaX: 65, deltaY: 90};
     canvas.absolutePan(new fabric.Point(50, 80));
-    canvas._groupSelector = {ex: 15, ey: 30, top: 0, left: 0};
+    canvas._groupSelector = {x: 15, y: 30, deltaX: 0, deltaY: 0};
     canvas.__onMouseMove(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'groupSelector is updated');
   });

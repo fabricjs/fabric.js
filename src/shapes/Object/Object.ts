@@ -12,7 +12,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';
@@ -591,12 +591,6 @@ export class FabricObject<
    * @private
    */
   declare group?: Group;
-
-  /**
-   * A reference to the parent of the object
-   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
-   */
-  declare __owningGroup?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it

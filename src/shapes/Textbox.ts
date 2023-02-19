@@ -1,10 +1,10 @@
 // @ts-nocheck
+import { createResizeControls } from '../controls/commonControls';
 import { TClassProperties } from '../typedefs';
-import { IText } from './IText/IText';
-import { classRegistry } from '../util/class_registry';
-import { createResizeControls } from '../controls/default_controls';
-import { defaultObjectControls } from './Object/InteractiveObject';
+import { classRegistry } from '../util/ClassRegistry';
 import { createHybrid } from '../util/internals';
+import { IText } from './IText/IText';
+import { defaultObjectControls } from './Object/InteractiveObject';
 
 export const textboxDefaultControls = createHybrid(
   createResizeControls(),
