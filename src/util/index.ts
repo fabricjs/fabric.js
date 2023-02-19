@@ -100,3 +100,4 @@ export { request } from './dom_request';
 
 // for test compatibility. We don't want to export it
 export { removeTransformMatrixForSvgParsing } from './transform_matrix_removal';
+export { createHybrid } from './internals';
