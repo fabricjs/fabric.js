@@ -3,6 +3,7 @@
 ## [next]
 
 - feat(): Hybrid Object solving default values, shared controls, get/set hooks [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
+- ci(): Fix tests for firefox 110 update [#8710](https://github.com/fabricjs/fabric.js/pull/8710)
 - chore(): index files for exports and tree shaking [#8661](https://github.com/fabricjs/fabric.js/pull/8661)
 - ci(test): cleanup node config (#8694 followup) [#8707](https://github.com/fabricjs/fabric.js/issues/8707)
 - fix(): BREAKING set/discard active object return value, discard active object now return false if no discard happened [#8672](https://github.com/fabricjs/fabric.js/issues/8672)
