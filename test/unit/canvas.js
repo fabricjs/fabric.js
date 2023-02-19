@@ -307,8 +307,7 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
-    var activeSelection = canvas.getActiveSelection();
-    activeSelection.add(rect1, rect2);
+    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
     canvas.setActiveObject(activeSelection);
     canvas.discardActiveObject();
     assert.equal(deselected.length, 1, 'options.deselected was the removed object');
@@ -333,16 +332,13 @@
   });
 
   function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
-    const activeSelection = canvas.getActiveSelection();
-    activeSelection.multiSelectionStacking = multiSelectionStacking;
+    fabric.ActiveSelection.prototype.multiSelectionStacking = multiSelectionStacking;
     canvas.setActiveObject(activeObject);
     canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
   }
 
   function updateActiveSelection(canvas, existing, target, multiSelectionStacking) {
-    const activeSelection = canvas.getActiveSelection();
-    activeSelection.multiSelectionStacking = multiSelectionStacking;
-    activeSelection.add(...existing);
+    const activeSelection = new fabric.ActiveSelection(existing, { canvas, multiSelectionStacking });
     canvas.setActiveObject(activeSelection);
     canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, target);
   }
@@ -427,7 +423,7 @@
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
 
-  
+
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
     const rect2 = new fabric.Rect();
@@ -442,9 +438,9 @@
       canvas.discardActiveObject();
     }
     function assertObjectsInOrderOnCanvas(init, added) {
-      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3], 'objects are in order before multi selecting');
       assertObjectsInOrder(init, added);
-      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3], 'objects are in order after multi selecting');
     }
     assertObjectsInOrderOnCanvas([rect1, rect2], rect3);
     assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
@@ -497,7 +493,9 @@
     let isFired = false;
     rect3.on('deselected', () => { isFired = true; });
     canvas.add(rect1, rect2, rect3);
-    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    const activeSelection = new fabric.ActiveSelection([rect1, rect2, rect3], { canvas, multiSelectionStacking: 'selection-order' });
+    canvas.setActiveObject(activeSelection);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, activeSelection);
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect3 was deselected');
     assert.ok(isFired, 'fired deselected');
   });
@@ -507,9 +505,11 @@
     const rect2 = new fabric.Rect({ left: -10, width: 5, height: 5 });
     const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
     canvas.add(rect1, rect2, rect3);
-    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    const activeSelection = new fabric.ActiveSelection([rect1, rect2, rect3], { canvas, multiSelectionStacking: 'selection-order' });
+    canvas.setActiveObject(activeSelection);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, activeSelection);
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
-    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+    assert.ok(activeSelection === canvas.getActiveObject(), 'still selected');
   });
 
   QUnit.test('setActiveObject fires deselected', function(assert) {
@@ -691,8 +691,7 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
-    var activeSelection = canvas.getActiveSelection();
-    activeSelection.add(rect1, rect2);
+    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas })
     canvas.setActiveObject(activeSelection);
     rect1.on('deselected', function( ) {
       rect1Deselected = true;
@@ -1075,7 +1074,7 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    const group = canvas.getActiveSelection();
+    const group = new fabric.ActiveSelection([], { canvas });
     group.subTargetCheck = true;
     group.add(rect1, rect2);
     group.cornerSize = 2;
@@ -1119,7 +1118,7 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    const group = canvas.getActiveSelection();
+    const group = new fabric.ActiveSelection([], { canvas });
     group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
@@ -1218,7 +1217,7 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new fabric.ActiveSelection([], { canvas });
     activeSelection.add(rect, circle);
     canvas.setActiveObject(activeSelection);
     var jsonWithActiveGroup = JSON.stringify(canvas);
@@ -1796,11 +1795,6 @@
     assert.equal(canvas.getActiveObject(), group);
   });
 
-  QUnit.test('getActiveSelection', function(assert) {
-    assert.ok(canvas.getActiveSelection() === canvas._activeSelection, 'should equal');
-    assert.ok(canvas.getActiveSelection() instanceof fabric.ActiveSelection, 'is active selection');
-  });
-
   QUnit.test('item', function(assert) {
     assert.ok(typeof canvas.item === 'function');
 
@@ -1902,7 +1896,7 @@
     var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new fabric.ActiveSelection([], { canvas });
     activeSelection.add(rect, circle);
     canvas.setActiveObject(activeSelection);
     var svgWithActiveGroup = canvas.toSVG();

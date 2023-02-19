@@ -320,10 +320,10 @@
     canvas.__onMouseDown(e);
     canvas._onDragStart({
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       }
     });
     canvas.__onMouseUp(e2);
@@ -759,8 +759,7 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = canvas.getActiveSelection();
-      activeSelection.add(...canvas.getObjects());
+      var activeSelection = new fabric.ActiveSelection(canvas.getObjects())
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);
 

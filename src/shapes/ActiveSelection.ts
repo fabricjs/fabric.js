@@ -14,8 +14,7 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
-  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
-    'canvas-stacking';
+  declare multiSelectionStacking: 'canvas-stacking' | 'selection-order';
 
   constructor(
     objects?: FabricObject[],
@@ -190,6 +189,7 @@ export const activeSelectionDefaultValues: Partial<
   TClassProperties<ActiveSelection>
 > = {
   type: 'activeSelection',
+  multiSelectionStacking: 'canvas-stacking',
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
