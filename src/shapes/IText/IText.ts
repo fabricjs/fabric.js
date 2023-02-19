@@ -1,15 +1,9 @@
 import { Canvas } from '../../canvas/Canvas';
 import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
-import {
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-  keysMap,
-  keysMapRtl,
-} from './constants';
+import { ctrlKeysMapDown, keysMap, keysMapRtl } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
-import { Text } from '../Text/Text';
 
 type CursorBoundaries = {
   left: number;
@@ -659,7 +653,7 @@ export const iTextDefaultValues = {
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
-  ctrlKeysMapUp,
+  ctrlKeysMapUp: {},
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
