@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(IText): `copyPasteData` => clipboard events, supporting cross platform clipboard event support [#8708](https://github.com/fabricjs/fabric.js/issues/8708)
 - fix(): BREAKING set/discard active object return value, discard active object now return false if no discard happened [#8672](https://github.com/fabricjs/fabric.js/issues/8672)
 - fix(): selection logic to support nested multiselection [#8665](https://github.com/fabricjs/fabric.js/issues/8665)
 - fix(test): remove bad node config [#8694](https://github.com/fabricjs/fabric.js/issues/8694)
