@@ -126,13 +126,8 @@ export abstract class ITextKeyBehavior<
         : this.direction === 'rtl'
         ? this.keysMapRtl
         : this.keysMap;
-    if (e.key in keyMap) {
-      func = keyMap[e.key];
-    } else if (e.code in keyMap) {
-      func = keyMap[e.code];
-    } else if (e.keyCode in keyMap) {
-      func = keyMap[e.keyCode];
-    }
+    let func: ((e: KeyboardEvent) => any) | string | undefined =
+      keyMap[e.key] || keyMap[e.code] || keyMap[e.keyCode];
     if (typeof func === 'string' && typeof this[func] === 'function') {
       func = this[func];
     }
@@ -143,7 +138,7 @@ export abstract class ITextKeyBehavior<
       );
       func.call(this, e);
       return true;
-    } else if (e.ctrlKey) {
+    } else if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
         case 'a':
           this.selectAll();
