@@ -28,7 +28,7 @@ QUnit.module('internals', (hooks) => {
                 });
             }
             const src = createHybrid({ a: 0 });
-            const hybrid = createHybrid(wrap({ d: 3 }, 'd'), createHybrid(wrap({ c: 2 }, 'c'), createHybrid(wrap({ b: 1 }, 'b'), src)));
+            const hybrid = createHybrid(wrap({ d: 3 }, 'd'), createHybrid(wrap({ c: 2 }, 'c'), createHybrid({ b: 1 }, src)));
             const e = createHybrid(wrap({ e: 4 }, 'e'), hybrid);
             const hybrid2 = createHybrid(wrap({ x: -1 }, 'x'), src);
             assert.equal(hybrid.__source__.__source__.__source__, src);
@@ -36,13 +36,6 @@ QUnit.module('internals', (hooks) => {
             src.a = 1;
             assert.deepEqual(hybrid, { a: 1, b: 1, c: 2, d: 3 }, 'changed');
             assert.deepEqual(changes, [
-                {
-                    key: 'a',
-                    value: 1,
-                    prevValue: 0,
-                    target: 'b',
-                    accepted: true
-                },
                 {
                     key: 'a',
                     value: 1,
@@ -83,13 +76,6 @@ QUnit.module('internals', (hooks) => {
                     key: 'a',
                     value: 2,
                     prevValue: 1,
-                    target: 'b',
-                    accepted: true
-                },
-                {
-                    key: 'a',
-                    value: 2,
-                    prevValue: 1,
                     target: 'c',
                     accepted: true
                 },
@@ -109,13 +95,6 @@ QUnit.module('internals', (hooks) => {
                     key: 'a',
                     value: 3,
                     prevValue: 2,
-                    target: 'b',
-                    accepted: true
-                },
-                {
-                    key: 'a',
-                    value: 3,
-                    prevValue: 2,
                     target: 'c',
                     accepted: true
                 },
@@ -123,13 +102,6 @@ QUnit.module('internals', (hooks) => {
             changes = [];
             delete hybrid.__source__.__source__.b;
             assert.deepEqual(changes, [
-                {
-                    key: 'b',
-                    value: undefined,
-                    prevValue: 1,
-                    target: 'b',
-                    accepted: true
-                },
                 {
                     key: 'b',
                     value: undefined,
