@@ -1,7 +1,7 @@
 // @ts-nocheck
+import { classRegistry } from '../ClassRegistry';
 import { createResizeControls } from '../controls/commonControls';
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/ClassRegistry';
 import { createHybrid } from '../util/internals';
 import { IText } from './IText/IText';
 import { defaultObjectControls } from './Object/InteractiveObject';
