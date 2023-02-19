@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import {
   invertTransform,
   multiplyTransformMatrices,

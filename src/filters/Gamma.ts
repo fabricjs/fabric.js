@@ -1,7 +1,7 @@
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter, BaseFilterOptions } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 export type GammaInput = [number, number, number];
 

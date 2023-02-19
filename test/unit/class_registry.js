@@ -1,9 +1,9 @@
 (function () {
-  const classRegistry = new fabric.util.classRegistry.constructor();
-  QUnit.module('fabric.util.classRegistry');
-  QUnit.test('getJSONClass throw when no class is registered', function (assert) {
-    assert.ok(fabric.util.classRegistry, 'classRegistry is available');
-    assert.throws(() => classRegistry.getJSONClass('rect'), new Error(`No class registered for rect`), 'initially Rect is undefined');
+  const classRegistry = new fabric.classRegistry.constructor();
+  QUnit.module('classRegistry');
+  QUnit.test('getClass throws when no class is registered', function (assert) {
+    assert.ok(fabric.classRegistry, 'classRegistry is available');
+    assert.throws(() => classRegistry.getClass('rect'), new Error(`No class registered for rect`), 'initially Rect is undefined');
   });
   QUnit.test('getJSONClass will return specific class from the prototype type', function (assert) {
     class TestClass {
@@ -74,11 +74,11 @@
   });
   
   QUnit.test('backward compat resolution: shadow and gradient', async assert => {
-    assert.equal(fabric.util.classRegistry.getJSONClass({
+    assert.equal(fabric.classRegistry.getJSONClass({
       blur: 1,
       offsetY: 2
     }), fabric.Shadow, 'found shadow');
-    assert.equal(fabric.util.classRegistry.getJSONClass({
+    assert.equal(fabric.classRegistry.getJSONClass({
       colorStops: []
     }), fabric.Gradient, 'found gradient');
   });

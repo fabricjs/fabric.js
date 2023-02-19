@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
 
 export class Triangle extends FabricObject {
