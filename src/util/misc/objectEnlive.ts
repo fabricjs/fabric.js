@@ -4,7 +4,7 @@ import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
-import { classRegistry } from '../class_registry';
+import { classRegistry } from '../../ClassRegistry';
 
 export type LoadImageOptions = {
   /**

@@ -2,7 +2,7 @@ import { Color } from '../color/Color';
 import { TClassProperties } from '../typedefs';
 import { AbstractBaseFilter } from './BaseFilter';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Color Blend filter class
