@@ -4,6 +4,11 @@ import { classRegistry } from '../util/class_registry';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
+const enum SelectionStacking {
+  canvasStacking = 'canvas-stacking',
+  selectionOrder = 'selection-order',
+};
+
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
 
@@ -14,7 +19,7 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
-  declare multiSelectionStacking: 'canvas-stacking' | 'selection-order';
+  declare multiSelectionStacking: SelectionStacking;
 
   constructor(
     objects?: FabricObject[],
@@ -45,7 +50,7 @@ export class ActiveSelection extends Group {
    * @param targets object to add to selection
    */
   multiSelectAdd(...targets: FabricObject[]) {
-    if (this.multiSelectionStacking === 'selection-order') {
+    if (this.multiSelectionStacking === SelectionStacking.selectionOrder) {
       this.add(...targets);
     } else {
       //  respect object stacking as it is on canvas
@@ -189,7 +194,7 @@ export const activeSelectionDefaultValues: Partial<
   TClassProperties<ActiveSelection>
 > = {
   type: 'activeSelection',
-  multiSelectionStacking: 'canvas-stacking',
+  multiSelectionStacking: SelectionStacking.canvasStacking,
 };
 
 Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);

@@ -425,35 +425,36 @@
 
 
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
-    const rect1 = new fabric.Rect();
-    const rect2 = new fabric.Rect();
-    const rect3 = new fabric.Rect();
+    const rect1 = new fabric.Rect({ name: 'r1' });
+    const rect2 = new fabric.Rect({ name: 'r2' });
+    const rect3 = new fabric.Rect({ name: 'r3' });
     canvas.add(rect1, rect2, rect3);
+    const mapNames = (o) => o.name;
     function assertObjectsInOrder(init, added) {
       updateActiveSelection(canvas, init, added, 'canvas-stacking');
       assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'updated selection while preserving canvas stacking order');
       canvas.discardActiveObject();
       updateActiveSelection(canvas, init, added, 'selection-order');
-      assert.deepEqual(canvas.getActiveObjects(), [...init, added], 'updated selection while preserving click order');
+      assert.deepEqual(canvas.getActiveObjects().map(mapNames), [...init, added].map(mapNames), 'updated selection while preserving click order');
       canvas.discardActiveObject();
     }
     function assertObjectsInOrderOnCanvas(init, added) {
-      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3], 'objects are in order before multi selecting');
+      assert.deepEqual(canvas.getObjects().map(mapNames), [rect1, rect2, rect3].map(mapNames), 'objects are in order before multi selecting');
       assertObjectsInOrder(init, added);
-      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3], 'objects are in order after multi selecting');
+      assert.deepEqual(canvas.getObjects().map(mapNames), [rect1, rect2, rect3].map(mapNames), 'objects are in order after multi selecting');
     }
     assertObjectsInOrderOnCanvas([rect1, rect2], rect3);
     assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
     assertObjectsInOrderOnCanvas([rect2, rect3], rect1);
     canvas.remove(rect2, rect3);
-    const group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    const group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true, name: 'g' });
     canvas.add(group);
     function assertNestedObjectsInOrder(init, added) {
-      assert.deepEqual(canvas.getObjects(), [rect1, group]);
-      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+      assert.deepEqual(canvas.getObjects().map(mapNames), [rect1, group].map(mapNames));
+      assert.deepEqual(group.getObjects().map(mapNames), [rect2, rect3].map(mapNames));
       assertObjectsInOrder(init, added);
-      assert.deepEqual(canvas.getObjects(), [rect1, group]);
-      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+      assert.deepEqual(canvas.getObjects().map(mapNames), [rect1, group].map(mapNames));
+      assert.deepEqual(group.getObjects().map(mapNames), [rect2, rect3].map(mapNames));
     }
     assertNestedObjectsInOrder([rect1, rect2], rect3);
     assertNestedObjectsInOrder([rect1, rect3], rect2);
@@ -463,11 +464,11 @@
     group.remove(rect3);
     canvas.add(rect3);
     function assertNestedObjectsInOrder2(init, added) {
-      assert.deepEqual(canvas.getObjects(), [group, rect3]);
-      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+      assert.deepEqual(canvas.getObjects().map(mapNames), [group, rect3].map(mapNames));
+      assert.deepEqual(group.getObjects().map(mapNames), [rect1, rect2].map(mapNames));
       assertObjectsInOrder(init, added);
-      assert.deepEqual(canvas.getObjects(), [group, rect3]);
-      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+      assert.deepEqual(canvas.getObjects().map(mapNames), [group, rect3].map(mapNames));
+      assert.deepEqual(group.getObjects().map(mapNames), [rect1, rect2].map(mapNames));
     }
     assertNestedObjectsInOrder2([rect1, rect2], rect3);
     assertNestedObjectsInOrder2([rect1, rect3], rect2);
