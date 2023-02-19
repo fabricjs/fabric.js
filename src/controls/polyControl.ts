@@ -12,6 +12,7 @@ import {
 import { getLocalPoint } from './util';
 import { createHybrid } from '../util/internals';
 import { defaultObjectControls } from '../shapes/Object/InteractiveObject';
+import { renderCircleControl } from './controlRendering';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
@@ -130,6 +131,7 @@ export function createPolyControls(
       actionName: 'modifyPoly',
       positionHandler: factoryPolyPositionHandler(idx),
       actionHandler: anchorWrapper(idx, polyActionHandler),
+      render: renderCircleControl,
       ...options,
     });
   }
