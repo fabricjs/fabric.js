@@ -967,10 +967,7 @@ export abstract class ITextBehavior<
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
-  removeChars(start: number, end: number) {
-    if (typeof end === 'undefined') {
-      end = start + 1;
-    }
+  removeChars(start: number, end: number = start + 1) {
     this.removeStyleFromTo(start, end);
     this._text.splice(start, end - start);
     this.text = this._text.join('');
