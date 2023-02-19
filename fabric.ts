@@ -45,15 +45,9 @@ export * as util from './src/util';
 
 export * from './src/parser';
 
-export { Control } from './src/controls';
+export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
 import './src/controls/defaultControls';
 
-export {
-  getFilterBackend,
-  initFilterBackend,
-  Canvas2dFilterBackend,
-  WebGLFilterBackend,
-} from './src/filters';
-export * as filters from './src/filters';
+export * from './src/filters';
 
