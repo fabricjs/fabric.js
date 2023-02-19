@@ -85,16 +85,3 @@ fabric.getWindow().addEventListener('error', (event) => {
   event.preventDefault();
   QUnit.onUncaughtException(event.error);
 });
-
-//  testID
-var objectInit = fabric.Object.prototype.initialize;
-var canvasInit = fabric.StaticCanvas.prototype.initialize;
-var testID = 0;
-fabric.Object.prototype.initialize = function () {
-  objectInit.apply(this, arguments);
-  this.testID = `${this.type}#${++testID}`;
-}
-fabric.StaticCanvas.prototype.initialize = function () {
-  canvasInit.apply(this, arguments);
-  this.testID = `Canvas#${++testID}`;
-}
