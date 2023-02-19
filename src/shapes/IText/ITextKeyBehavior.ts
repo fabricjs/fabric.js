@@ -428,7 +428,7 @@ export abstract class ITextKeyBehavior<
     if (
       lineIndex === this._textLines.length - 1 ||
       e.metaKey ||
-      e.keyCode === 34
+      e.key === 'PageDown'
     ) {
       // move to the end of a text
       return this._text.length - selectionProp;
@@ -469,7 +469,7 @@ export abstract class ITextKeyBehavior<
     const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
-    if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+    if (lineIndex === 0 || e.metaKey || e.key === 'PageUp') {
       // if on first line, up cursor goes to start of line
       return -selectionProp;
     }
@@ -623,7 +623,7 @@ export abstract class ITextKeyBehavior<
     let newValue;
     if (e.altKey) {
       newValue = this['findWordBoundary' + direction](this[prop]);
-    } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
+    } else if (e.metaKey || e.key === 'End' || e.key === 'Home') {
       newValue = this['findLineBoundary' + direction](this[prop]);
     } else {
       this[prop] += direction === 'Left' ? -1 : 1;
