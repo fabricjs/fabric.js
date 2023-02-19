@@ -1,7 +1,6 @@
 import { Canvas } from '../../canvas/Canvas';
 import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
-import { ctrlKeysMapDown, keysMap, keysMapRtl } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../util/class_registry';
 
@@ -650,10 +649,9 @@ export const iTextDefaultValues = {
   _selectionDirection: null,
   _reSpace: /\s|\n/,
   inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp: {},
+  keysMap: {},
+  keysMapRtl: {},
+  ctrlKeysMapDown: {},
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);
