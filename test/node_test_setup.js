@@ -2,7 +2,6 @@ require('source-map-support/register');
 require('./lib/assert');
 // set the fabric framework as a global for tests
 var chalk = require('chalk');
-var diff = require('deep-object-diff').diff;
 var commander = require('commander');
 
 // TODO remove block and dependency when node 14 fades out
