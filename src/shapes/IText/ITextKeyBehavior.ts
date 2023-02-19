@@ -78,6 +78,7 @@ export abstract class ITextKeyBehavior<
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
     this.hiddenTextarea.addEventListener('keydown', this.onKeyDown.bind(this));
+    this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
     this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
     this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
     this.hiddenTextarea.addEventListener('cut', this.cut.bind(this));
@@ -193,6 +194,11 @@ export abstract class ITextKeyBehavior<
       this.inCompositionMode = false;
       this.renderCursorOrSelection();
     }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onKeyUp(e: KeyboardEvent) {
+    // override at will
   }
 
   /**
