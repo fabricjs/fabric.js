@@ -36,24 +36,7 @@ global.getFixture = require('./lib/visualTestLoop').getFixture;
 global.getAsset = require('./lib/visualTestLoop').getAsset;
 global.getAssetName = require('./lib/visualTestLoop').getAssetName;
 global.simulateEvent = require('./lib/event.simulate').simulateEvent;
-global.imageDataToChalk = function(imageData) {
-  // actually this does not work on travis-ci, so commenting it out
-  return '';
-  var block = String.fromCharCode(9608);
-  var data = imageData.data;
-  var width = imageData.width;
-  var height = imageData.height;
-  var outputString = '';
-  var cp = 0;
-  for (var i = 0; i < height; i++) {
-    outputString += '\n';
-    for (var j = 0; j < width; j++) {
-      cp = (i * width + j) * 4;
-      outputString += chalk.rgb(data[cp], data[cp + 1], data[cp + 2])(block);
-    }
-  }
-  return outputString;
-};
+
 QUnit.config.testTimeout = 15000;
 QUnit.config.noglobals = true;
 QUnit.config.hidepassed = true;
