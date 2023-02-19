@@ -189,7 +189,7 @@ export abstract class ITextKeyBehavior<
     if (this.hiddenTextarea.value === '') {
       this.styles = {};
       this.updateFromTextArea();
-      this.fire('changed');
+      this.fire('changed', { index: this.selectionStart, action: 'input' });
       if (this.canvas) {
         this.canvas.fire('text:changed', { target: this });
         this.canvas.requestRenderAll();
