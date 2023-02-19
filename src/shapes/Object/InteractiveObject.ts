@@ -101,7 +101,6 @@ export class InteractiveFabricObject<
 
   /**
    * holds the controls for the object.
-   * controls are added by default_controls.js
    */
   controls = createHybrid({}, defaultObjectControls);
 
