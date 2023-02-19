@@ -353,7 +353,7 @@ import { Textbox } from './src/shapes/Textbox';
 import { Group } from './src/shapes/Group';
 import { ActiveSelection } from './src/shapes/ActiveSelection';
 import { Image } from './src/shapes/Image';
-import { getEnv, getDocument, getWindow, setEnvForTests } from './src/env';
+import { getEnv, getDocument, getWindow } from './src/env';
 import { createCollectionMixin } from './src/Collection';
 import { parseAttributes } from './src/parser/parseAttributes';
 import { parseElements } from './src/parser/parseElements';
@@ -416,7 +416,6 @@ export {
   getEnv,
   getDocument,
   getWindow,
-  setEnvForTests,
   parseStyleAttribute,
   parsePointsAttribute,
   parseFontDeclaration,
