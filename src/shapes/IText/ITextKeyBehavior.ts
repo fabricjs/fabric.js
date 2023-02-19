@@ -48,7 +48,6 @@ export abstract class ITextKeyBehavior<
   declare hiddenTextareaContainer?: HTMLElement | null;
 
   private declare _clickHandlerInitialized: boolean;
-  private declare _copyDone: boolean;
   private declare fromPaste: boolean;
 
   /**
@@ -149,8 +148,7 @@ export abstract class ITextKeyBehavior<
    * @param {KeyboardEvent} e Event object
    */
   onKeyUp(e: KeyboardEvent) {
-    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
-      this._copyDone = false;
+    if (!this.isEditing || this.inCompositionMode) {
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
