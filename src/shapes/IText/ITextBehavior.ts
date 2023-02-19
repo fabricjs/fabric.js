@@ -499,8 +499,9 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
+    const prevText = this.text;
     this.text = this.hiddenTextarea.value;
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache || prevText !== this.text) {
       this.initDimensions();
       this.setCoords();
     }
@@ -657,7 +658,7 @@ export abstract class ITextBehavior<
     this.selectionEnd = this.selectionStart;
     this._exitEditing();
     this._restoreEditingProps();
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache) {
       this.initDimensions();
       this.setCoords();
     }
@@ -974,7 +975,7 @@ export abstract class ITextBehavior<
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache || start !== end) {
       this.initDimensions();
       this.setCoords();
     }
@@ -1011,7 +1012,7 @@ export abstract class ITextBehavior<
     ];
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache || start !== end || text.length > 0) {
       this.initDimensions();
       this.setCoords();
     }
