@@ -1,4 +1,4 @@
-export { getEnv, getDocument, getWindow, setEnvForTests } from './src/env';
+export { getEnv, getDocument, getWindow } from './src/env';
 export { cache } from './src/cache';
 export { VERSION as version, iMatrix } from './src/constants';
 export { config } from './src/config';
