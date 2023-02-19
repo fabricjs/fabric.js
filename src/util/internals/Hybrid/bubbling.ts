@@ -45,8 +45,9 @@ export function bubbleChange<T extends THybrid<T>, S extends object>(
       const monitor = Reflect.get(target, MONITOR_KEY);
       if (Reflect.get(monitor, key)) {
         return;
-      } else if (
-        target.onChange &&
+      }
+      if (
+        !target.onChange ||
         target.onChange(
           {
             key,
