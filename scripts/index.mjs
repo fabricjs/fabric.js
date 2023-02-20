@@ -160,7 +160,7 @@ function copy(from, to) {
   }
 }
 
-const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
+const BUILD_SOURCE = ['src', 'lib'];
 
 function exportBuildToWebsite(options = {}) {
   _.defaultsDeep(options, { gestures: true });

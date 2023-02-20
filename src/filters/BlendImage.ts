@@ -8,7 +8,7 @@ import type {
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Image Blend filter class
