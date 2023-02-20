@@ -141,8 +141,17 @@
     assert.equal(obj3.prop, true, 'fired for obj3');
   });
 
-  QUnit.test('getObjects', function(assert) {
-    var obj = { type: 'a' }, obj2 = { type: 'b' }, obj3 = { type: 'c' };
+  QUnit.test('getObjects', function (assert) {
+    class A extends fabric.Object {
+      static type = 'a'
+    }
+    class B extends fabric.Object {
+      static type = 'b'
+    }
+    class C extends fabric.Object {
+      static type = 'c'
+    }
+    var obj = new A(), obj2 = new B(), obj3 = new C();
     collection.add(obj2, obj, obj3);
     assert.ok(typeof collection.getObjects === 'function', 'has getObjects method');
     var returned = collection.getObjects();

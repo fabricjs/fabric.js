@@ -1069,7 +1069,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].constructor.type, rect.constructor.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
   });
 
   QUnit.test('toObject non includeDefaultValues', function(assert) {
@@ -1148,7 +1148,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].constructor.type, rect.constructor.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 

@@ -291,11 +291,13 @@
     assert.deepEqual(cObj.toObject(), cObj.toDatalessObject());
   });
 
-  QUnit.test('toString', function(assert) {
+  QUnit.test('toString', function (assert) {
+    class Moo extends fabric.Object {
+      static type = 'moo'
+    }
     var cObj = new fabric.Object();
     assert.equal(cObj.toString(), '#<Object>');
-    cObj.constructor.type = 'moo';
-    assert.equal(cObj.toString(), '#<Moo>');
+    assert.equal(new Moo().toString(), '#<Moo>');
   });
 
   QUnit.test('render', function(assert) {
