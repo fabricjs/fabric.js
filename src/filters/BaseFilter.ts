@@ -50,9 +50,10 @@ export abstract class AbstractBaseFilter<T> {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(
-    options: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
-  ) {
+  constructor({
+    type: _,
+    ...options
+  }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}) {
     Object.assign(this, options);
   }
 
