@@ -337,7 +337,7 @@ export class Text<
    * @type {String} 'ltr|rtl'
    * @default
    */
-  declare direction: string;
+  declare direction: 'ltr' | 'rtl';
 
   /**
    * contains characters bounding boxes

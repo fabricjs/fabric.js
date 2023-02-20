@@ -281,53 +281,106 @@
       assert.deepEqual(fired, ['default', 'rtl', 'ctrl']);
     });
 
-    // QUnit.test('copy and paste', function(assert) {
-    //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
-    //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    //   iText.enterEditing();
-    //   iText.selectionStart = 0;
-    //   iText.selectionEnd = 2;
-    //   iText.hiddenTextarea.selectionStart = 0
-    //   iText.hiddenTextarea.selectionEnd = 2
-    //   iText.copy(event);
-    //   assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
-    //   assert.equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
-    //   assert.equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
-    //   iText.selectionStart = 2;
-    //   iText.selectionEnd = 2;
-    //   iText.hiddenTextarea.value = 'tetest';
-    //   iText.paste(event);
-    //   assert.equal(iText.text, 'tetest', 'text has been copied');
-    //   assert.notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
-    //   assert.notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
-    //   assert.deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
-    //   assert.deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
-    // });
-    QUnit.test('copy', function(assert) {
-      var event = { stopPropagation: function(){}, preventDefault: function(){} };
-      const { copyPasteData } = fabric.getEnv()
-      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-      iText.selectionStart = 0;
-      iText.selectionEnd = 2;
-      iText.copy(event);
-      assert.equal(copyPasteData.copiedText, 'te', 'it copied first 2 characters');
-      assert.equal(copyPasteData.copiedTextStyle[0].fill, iText.styles[0][0].fill, 'style is cloned');
-      assert.equal(copyPasteData.copiedTextStyle[1].fill, iText.styles[0][1].fill, 'style is referenced');
-      assert.equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
-      assert.equal(copyPasteData.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
-    });
+    QUnit.module('Clipboard Events', (hooks) => {
+      let fabricCanvas;
+      hooks.beforeEach(() => {
+        fabricCanvas = new fabric.Canvas(canvas);
+      });
+      hooks.afterEach(() => fabricCanvas.dispose());
 
-    QUnit.test('copy with fabric.config.disableStyleCopyPaste', function(assert) {
-      var event = { stopPropagation: function(){}, preventDefault: function(){} };
-      const { copyPasteData } = fabric.getEnv()
-      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-      iText.selectionStart = 0;
-      iText.selectionEnd = 2;
-      fabric.config.configure({ disableStyleCopyPaste: true });
-      iText.copy(event);
-      assert.equal(copyPasteData.copiedText, 'te', 'it copied first 2 characters');
-      assert.equal(copyPasteData.copiedTextStyle, null, 'style is not cloned');
-      fabric.config.configure({ disableStyleCopyPaste: false });
+      QUnit[isNode() ? 'skip' : 'test']('copy', function (assert) {
+        const event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
+        const iText = new fabric.IText('test', { canvas: fabricCanvas, fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+        iText.enterEditing();
+        iText.selectionStart = 0;
+        iText.selectionEnd = 2;
+        const fired = [];
+        iText.on('copy', ev => fired.push(ev.e));
+        iText.hiddenTextarea.dispatchEvent(event);
+        assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
+        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
+        assert.equal(data.value, 'te');
+        assert.equal(data.styles[0].fill, 'red', 'style is cloned');
+        assert.equal(data.styles[1].fill, 'blue', 'style is referenced');
+        assert.equal(data.styles[1].fontSize, 25, 'style took fontSize from text element');
+        assert.ok(fired.length === 1 && fired[0] === event, 'fired copy');
+        assert.equal(iText.text, 'test', 'text is preserved');
+      });
+
+      QUnit[isNode() ? 'skip' : 'test']('cut', function (assert) {
+        const event = new ClipboardEvent('cut', { clipboardData: new DataTransfer() });
+        const iText = new fabric.IText('test', { canvas: fabricCanvas, fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+        iText.enterEditing();
+        iText.selectionStart = 0;
+        iText.selectionEnd = 2;
+        const fired = [];
+        iText.on('cut', ev => fired.push(ev.e));
+        iText.hiddenTextarea.dispatchEvent(event);
+        assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
+        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
+        assert.equal(data.value, 'te');
+        assert.equal(data.styles[0].fill, 'red', 'style is cloned');
+        assert.equal(data.styles[1].fill, 'blue', 'style is referenced');
+        assert.equal(data.styles[1].fontSize, 25, 'style took fontSize from text element');
+        assert.ok(fired.length === 1 && fired[0] === event, 'fired paste');
+        assert.equal(iText.text, 'st', 'text is modified');
+      });
+
+      QUnit[isNode() ? 'skip' : 'test']('copy paste', function (assert) {
+        const event = new ClipboardEvent('copy', { clipboardData: new DataTransfer() });
+        const iText = new fabric.IText('test', { canvas: fabricCanvas, fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+        iText.enterEditing();
+        iText.selectionStart = 0;
+        iText.selectionEnd = 2;
+        iText.hiddenTextarea.dispatchEvent(event);
+        const target = new fabric.IText('Hello World', { canvas: fabricCanvas });
+        const firedCanvas = [];
+        fabricCanvas.fire = (ev) => {
+          firedCanvas.push(ev);
+        };
+        fabricCanvas.requestRenderAll = () => {
+          firedCanvas.push('requestRenderAll');
+        };
+        target.enterEditing();
+        target.selectionStart = target.selectionEnd = 4;
+        const fired = [];
+        target.on('paste', ev => fired.push(ev.e));
+        const pasteEvent = new ClipboardEvent('paste', { clipboardData: event.clipboardData });
+        target.hiddenTextarea.dispatchEvent(pasteEvent);
+        assert.equal(target.text, 'Hellteo World', 'paste in place');
+        assert.ok(fired.length === 1 && fired[0] === pasteEvent, 'fired paste');
+        assert.deepEqual(firedCanvas, [
+          "text:editing:exited",
+          "text:selection:changed",
+          "text:editing:entered",
+          "requestRenderAll",
+          "text:changed",
+          "requestRenderAll"
+        ], 'fired changed event on canvas');
+        assert.notEqual(iText.styles[0][0], target.styles[0][4], 'style is not referenced');
+        assert.notEqual(iText.styles[0][1], target.styles[0][5], 'style is not referenced');
+        function cleanStyle(target) {
+          const ref = {
+            "deltaY": 0,
+            "fill": "blue",
+            "fontFamily": "Times New Roman",
+            "fontSize": 25,
+            "fontStyle": "normal",
+            "fontWeight": "normal",
+            "linethrough": false,
+            "overline": false,
+            "stroke": null,
+            "strokeWidth": 1,
+            "textBackgroundColor": "",
+            "underline": false
+          };
+          Object.keys(ref).forEach(key => target.cleanStyle(key));
+        }
+        cleanStyle(target);
+        assert.deepEqual(Object.assign({}, iText.styles[0][0], { fontSize: 25 }), target.styles[0][4], 'style is copied fully and equal after cleanup');
+        assert.deepEqual(Object.assign({}, iText.styles[0][1], { fontSize: 25 }), target.styles[0][5], 'style is copied fully and equal after cleanup');
+      });
+      
     });
 
     QUnit.test('removeChars', function(assert) {

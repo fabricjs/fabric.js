@@ -1,15 +1,8 @@
 import { Canvas } from '../../canvas/Canvas';
 import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
-import {
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-  keysMap,
-  keysMapRtl,
-} from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Text } from '../Text/Text';
 
 type CursorBoundaries = {
   left: number;
@@ -26,9 +19,9 @@ type CursorBoundaries = {
  * @fires dragstart
  * @fires drag drag event firing on the drag source
  * @fires dragend
- * @fires copy
- * @fires cut
- * @fires paste
+ * @fires copy provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires cut provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires paste provides ability to modify {@link ClipboardEvent#clipboardData}
  *
  * #### Supported key combinations
  * ```
@@ -656,10 +649,9 @@ export const iTextDefaultValues = {
   _selectionDirection: null,
   _reSpace: /\s|\n/,
   inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
+  keysMap: {},
+  keysMapRtl: {},
+  ctrlKeysMapDown: {},
 };
 
 Object.assign(IText.prototype, iTextDefaultValues);

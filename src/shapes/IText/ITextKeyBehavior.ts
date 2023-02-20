@@ -1,37 +1,41 @@
 //@ts-nocheck
 
-import { config } from '../../config';
-import { getDocument, getEnv } from '../../env';
+import { getDocument } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
-import type { TKeyMapIText } from './constants';
+import { AssertKeys } from '../../typedefs';
+import type { IText } from './IText';
+
+export type TKeyMapIText = Record<
+  KeyboardEvent['key'],
+  keyof IText | ((this: IText, e: KeyboardEvent) => any)
+>;
 
 export abstract class ITextKeyBehavior<
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextBehavior<EventSpec> {
   /**
+   * Prefer using [KeyboardEvent#key]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key}
+   * or [KeyboardEvent#code]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code}
+   * instead of **deprecated** [KeyboardEvent#keyCode]{@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode}
+   *
    * For functionalities on keyDown
-   * Map a special key to a function of the instance/prototype
-   * If you need different behavior for ESC or TAB or arrows, you have to change
-   * this map setting the name of a function that you build on the IText or
-   * your prototype.
-   * the map change will affect all Instances unless you need for only some text Instances
-   * in that case you have to clone this object and assign your Instance.
-   * this.keysMap = Object.assign({}, this.keysMap);
-   * The function must be in IText.prototype.myFunction And will receive event as args[0]
+   *
+   * @deprecated override {@link handleSelectionChange} instead
    */
   declare keysMap: TKeyMapIText;
 
+  /**
+   * For functionalities on keyDown when `direction === 'rtl'`
+   *
+   * @deprecated override {@link handleSelectionChange} instead
+   */
   declare keysMapRtl: TKeyMapIText;
 
   /**
-   * For functionalities on keyUp + ctrl || cmd
-   */
-  declare ctrlKeysMapUp: TKeyMapIText;
-
-  /**
    * For functionalities on keyDown + ctrl || cmd
+   * @deprecated override {@link handleSelectionChange} instead
    */
   declare ctrlKeysMapDown: TKeyMapIText;
 
@@ -48,7 +52,6 @@ export abstract class ITextKeyBehavior<
   declare hiddenTextareaContainer?: HTMLElement | null;
 
   private declare _clickHandlerInitialized: boolean;
-  private declare _copyDone: boolean;
   private declare fromPaste: boolean;
 
   /**
@@ -78,7 +81,7 @@ export abstract class ITextKeyBehavior<
     this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
     this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
     this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
+    this.hiddenTextarea.addEventListener('cut', this.cut.bind(this));
     this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
     this.hiddenTextarea.addEventListener(
       'compositionstart',
@@ -114,53 +117,88 @@ export abstract class ITextKeyBehavior<
   }
 
   /**
-   * Handles keydown event
-   * only used for arrows and combination of modifier keys.
-   * @param {KeyboardEvent} e Event object
+   * @returns true if text selection changed
    */
-  onKeyDown(e: KeyboardEvent) {
-    if (!this.isEditing) {
-      return;
-    }
-    const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
-    if (e.keyCode in keyMap) {
-      this[keyMap[e.keyCode]](e);
-    } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapDown[e.keyCode]](e);
+  handleSelectionChange(e: KeyboardEvent): boolean {
+    const keyMap =
+      e.ctrlKey || e.metaKey
+        ? this.ctrlKeysMapDown
+        : this.direction === 'rtl'
+        ? this.keysMapRtl
+        : this.keysMap;
+    const value: TKeyMapIText[string] | undefined =
+      keyMap[e.key] || keyMap[e.code] || keyMap[e.keyCode];
+    const func =
+      typeof value === 'string' && typeof this[value] === 'function'
+        ? this[value]
+        : value;
+    // execute
+    if (typeof func === 'function') {
+      console.warn(
+        'fabric.IText: Key maps are deprecated, override `handleSelectionChange` or `onKeyDown` instead.'
+      );
+      func.call(this, e);
+      return true;
+    } else if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 'a':
+          this.selectAll();
+          return true;
+        default:
+          return false;
+      }
     } else {
-      return;
-    }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    if (e.keyCode >= 33 && e.keyCode <= 40) {
-      // if i press an arrow key just update selection
-      this.inCompositionMode = false;
-      this.clearContextTop();
-      this.renderCursorOrSelection();
-    } else {
-      this.canvas && this.canvas.requestRenderAll();
+      switch (e.key) {
+        case 'Tab':
+        case 'Escape':
+          this.exitEditing();
+          // TODO: shouldn't this be called from `exitEditing`?
+          this.canvas.requestRenderAll();
+          return true;
+        case 'ArrowUp':
+        case 'PageUp':
+          this.moveCursorUp(e);
+          return true;
+        case 'ArrowDown':
+        case 'PageDown':
+          this.moveCursorDown(e);
+          return true;
+        case 'ArrowLeft':
+        case 'Home':
+          this.direction === 'rtl'
+            ? this.moveCursorRight(e)
+            : this.moveCursorLeft(e);
+          return true;
+        case 'ArrowRight':
+        case 'End':
+          this.direction === 'rtl'
+            ? this.moveCursorLeft(e)
+            : this.moveCursorRight(e);
+          return true;
+        default:
+          return false;
+      }
     }
   }
 
   /**
-   * Handles keyup event
-   * We handle KeyUp because ie11 and edge have difficulties copy/pasting
-   * if a copy/cut event fired, keyup is dismissed
+   * Handles keydown event.\
+   * Used **ONLY** for changing text selection (including {@link exitEditing}).
+   * For anything else use the input event, see {@link onInput}.
    * @param {KeyboardEvent} e Event object
    */
+  onKeyDown(e: KeyboardEvent) {
+    if (this.isEditing && this.handleSelectionChange(e)) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      this.inCompositionMode = false;
+      this.renderCursorOrSelection();
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onKeyUp(e: KeyboardEvent) {
-    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
-      this._copyDone = false;
-      return;
-    }
-    if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
-      this[this.ctrlKeysMapUp[e.keyCode]](e);
-    } else {
-      return;
-    }
-    e.stopImmediatePropagation();
-    e.preventDefault();
-    this.canvas && this.canvas.requestRenderAll();
+    // override at will
   }
 
   /**
@@ -168,8 +206,6 @@ export abstract class ITextKeyBehavior<
    * @param {Event} e Event object
    */
   onInput(e: Event) {
-    const fromPaste = this.fromPaste;
-    this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
       return;
@@ -255,14 +291,6 @@ export abstract class ITextKeyBehavior<
       this.removeStyleFromTo(removeFrom, removeTo);
     }
     if (insertedText.length) {
-      const { copyPasteData } = getEnv();
-      if (
-        fromPaste &&
-        insertedText.join('') === copyPasteData.copiedText &&
-        !config.disableStyleCopyPaste
-      ) {
-        copiedStyle = copyPasteData.copiedTextStyle;
-      }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
     this.updateFromTextArea();
@@ -288,39 +316,90 @@ export abstract class ITextKeyBehavior<
   }
 
   //  */
-  onCompositionUpdate(e) {
+  onCompositionUpdate(e: CompositionEvent) {
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();
   }
 
   /**
-   * Copies selected text
+   *
+   * @returns true if text is selected and if the {@link ClipboardEvent#clipboardData} was set
    */
-  copy() {
-    if (this.selectionStart === this.selectionEnd) {
-      //do not cut-copy if no selection
-      return;
+  protected setClipboardData(e: ClipboardEvent) {
+    // prevent input event
+    e.preventDefault();
+    const clipboardData = e.clipboardData;
+    if (this.selectionStart === this.selectionEnd || !clipboardData) {
+      return false;
     }
-    const { copyPasteData } = getEnv();
-    copyPasteData.copiedText = this.getSelectedText();
-    if (!config.disableStyleCopyPaste) {
-      copyPasteData.copiedTextStyle = this.getSelectionStyles(
-        this.selectionStart,
-        this.selectionEnd,
-        true
-      );
-    } else {
-      copyPasteData.copiedTextStyle = null;
-    }
-    this._copyDone = true;
+    const value = this.getSelectedText();
+    clipboardData.setData('text/plain', value);
+    clipboardData.setData(
+      'application/fabric',
+      JSON.stringify({
+        value,
+        styles: this.getSelectionStyles(
+          this.selectionStart,
+          this.selectionEnd,
+          true
+        ),
+      })
+    );
+    return true;
   }
 
   /**
-   * Pastes text
+   * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  paste() {
-    this.fromPaste = true;
+  copy(e: ClipboardEvent) {
+    this.setClipboardData(e) && this.fire('copy', { e });
+  }
+
+  /**
+   * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
+   */
+  cut(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
+    if (this.setClipboardData(e)) {
+      //  remove selection and force recalculating dimensions
+      this._forceClearCache = true;
+      this.insertChars('', null, this.selectionStart, this.selectionEnd);
+      this.selectionEnd = this.selectionStart;
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+      this.fire('cut', { e });
+      this.fire('changed', { index: this.selectionStart, action: 'cut' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  /**
+   * @override Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData}
+   * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
+   */
+  paste(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
+    // prevent input event
+    e.preventDefault();
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('paste', { e });
+    // obtain values from event
+    const clipboardData = e.clipboardData;
+    const value = clipboardData.getData('text/plain');
+    const { styles } = clipboardData.types.includes('application/fabric')
+      ? JSON.parse(clipboardData.getData('application/fabric'))
+      : {};
+    // execute paste logic
+    if (value) {
+      this.insertChars(value, styles, this.selectionStart, this.selectionEnd);
+      this.selectionStart = this.selectionEnd =
+        this.selectionStart + value.length;
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+      this.fire('changed', { index: this.selectionStart, action: 'paste' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
   }
 
   /**
@@ -355,7 +434,7 @@ export abstract class ITextKeyBehavior<
     if (
       lineIndex === this._textLines.length - 1 ||
       e.metaKey ||
-      e.keyCode === 34
+      e.key === 'PageDown'
     ) {
       // move to the end of a text
       return this._text.length - selectionProp;
@@ -396,7 +475,7 @@ export abstract class ITextKeyBehavior<
     const selectionProp = this._getSelectionForOffset(e, isRight),
       cursorLocation = this.get2DCursorLocation(selectionProp),
       lineIndex = cursorLocation.lineIndex;
-    if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
+    if (lineIndex === 0 || e.metaKey || e.key === 'PageUp') {
       // if on first line, up cursor goes to start of line
       return -selectionProp;
     }
@@ -550,7 +629,7 @@ export abstract class ITextKeyBehavior<
     let newValue;
     if (e.altKey) {
       newValue = this['findWordBoundary' + direction](this[prop]);
-    } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
+    } else if (e.metaKey || e.key === 'End' || e.key === 'Home') {
       newValue = this['findLineBoundary' + direction](this[prop]);
     } else {
       this[prop] += direction === 'Left' ? -1 : 1;

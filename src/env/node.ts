@@ -6,11 +6,9 @@ import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
 import { setEnv } from './index';
-import { TCopyPasteData, TFabricEnv } from './types';
+import { TFabricEnv } from './types';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
-
-const copyPasteData: TCopyPasteData = {};
 
 const { window: JSDOMWindow } = new JSDOM(
   decodeURIComponent(
@@ -49,7 +47,6 @@ export const getEnv = (): TFabricEnv => {
         impl._classList = null;
       }
     },
-    copyPasteData,
   };
 };
 
