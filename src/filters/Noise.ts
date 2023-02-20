@@ -14,6 +14,8 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Noise extends BaseFilter {
+  static readonly type = 'Noise';
+
   /**
    * Noise value, from
    * @param {Number} noise
@@ -84,7 +86,6 @@ export class Noise extends BaseFilter {
 }
 
 export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  type: 'Noise',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

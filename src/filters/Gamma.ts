@@ -15,6 +15,8 @@ export type GammaInput = [number, number, number];
  * object.applyFilters();
  */
 export class Gamma extends BaseFilter {
+  static readonly type = 'Gamma';
+
   /**
    * Gamma array value, from 0.01 to 2.2.
    * @param {Array} gamma
@@ -103,7 +105,6 @@ export class Gamma extends BaseFilter {
 }
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
-  type: 'Gamma',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

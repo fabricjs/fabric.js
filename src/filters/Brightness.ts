@@ -12,6 +12,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Brightness extends BaseFilter {
+  static readonly type = 'Brightness';
+
   /**
    * Brightness value, from -1 to 1.
    * translated to -255 to 255 for 2d
@@ -73,7 +75,6 @@ export class Brightness extends BaseFilter {
 }
 
 export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
-  type: 'Brightness',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

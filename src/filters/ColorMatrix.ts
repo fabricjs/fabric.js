@@ -19,6 +19,8 @@ import { classRegistry } from '../ClassRegistry';
    * object.applyFilters();
    */
 export class ColorMatrix extends BaseFilter {
+  static readonly type = 'ColorMatrix' as string;
+
   /**
    * Colormatrix for pixels.
    * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -134,7 +136,6 @@ export class ColorMatrix extends BaseFilter {
 
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   {
-    type: 'ColorMatrix',
     fragmentSource: `
       precision highp float;
       uniform sampler2D uTexture;

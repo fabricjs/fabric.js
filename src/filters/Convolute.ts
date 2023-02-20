@@ -44,6 +44,8 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Convolute extends AbstractBaseFilter<Record<string, string>> {
+  static readonly type = 'Convolute';
+
   /*
    * Opaque value (true/false)
    */
@@ -55,7 +57,7 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   declare matrix: number[];
 
   getCacheKey() {
-    return `${this.type}_${Math.sqrt(this.matrix.length)}_${
+    return `${this.getType()}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
     }`;
   }
@@ -178,7 +180,6 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
-  type: 'Convolute',
   opaque: false,
   matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
   fragmentSource: {

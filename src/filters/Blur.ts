@@ -20,6 +20,8 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Blur extends BaseFilter {
+  static readonly type = 'Blur';
+
   /**
    * blur value, in percentage of image dimensions.
    * specific to keep the image blur constant at different resolutions
@@ -169,7 +171,6 @@ export class Blur extends BaseFilter {
 }
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
-  type: 'Blur',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

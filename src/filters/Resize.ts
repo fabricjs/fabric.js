@@ -15,6 +15,8 @@ import { createCanvasElement } from '../util/misc/dom';
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
 export class Resize extends BaseFilter {
+  static readonly type = 'Resize';
+
   /**
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:
@@ -80,7 +82,7 @@ export class Resize extends BaseFilter {
 
   getCacheKey(): string {
     const filterWindow = this.getFilterWindow();
-    return `${this.type}_${filterWindow}`;
+    return `${this.getType()}_${filterWindow}`;
   }
 
   getFragmentSource(): string {
@@ -510,7 +512,7 @@ export class Resize extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.type,
+      type: this.getType(),
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       resizeType: this.resizeType,
@@ -524,7 +526,6 @@ export class Resize extends BaseFilter {
 }
 
 export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
-  type: 'Resize',
   resizeType: 'hermite',
   scaleX: 1,
   scaleY: 1,

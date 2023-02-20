@@ -13,6 +13,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Pixelate extends BaseFilter {
+  static readonly type = 'Pixelate';
+
   declare blocksize: number;
 
   /**
@@ -86,7 +88,6 @@ export class Pixelate extends BaseFilter {
 }
 
 export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
-  type: 'Pixelate',
   blocksize: 4,
   mainParameter: 'blocksize',
   fragmentSource: `

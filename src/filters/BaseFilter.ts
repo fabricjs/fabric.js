@@ -27,10 +27,8 @@ export interface AnyFilter
 export abstract class AbstractBaseFilter<T> {
   /**
    * Filter type
-   * @param {String} type
-   * @default
    */
-  declare type: string;
+  static readonly type = 'filter' as string;
 
   /**
    * Array of attributes to send with buffers. do not modify
@@ -90,7 +88,7 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+        `Vertex shader compile error for ${this.getType()}: ${gl.getShaderInfoLog(
           vertexShader
         )}`
       );
@@ -100,7 +98,7 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+        `Fragment shader compile error for ${this.getType()}: ${gl.getShaderInfoLog(
           fragmentShader
         )}`
       );
@@ -111,8 +109,9 @@ export abstract class AbstractBaseFilter<T> {
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new Error(
-        // eslint-disable-next-line prefer-template
-        'Shader link error for "${this.type}" ' + gl.getProgramInfoLog(program)
+        `Shader link error for ${this.getType()} ${gl.getProgramInfoLog(
+          program
+        )}`
       );
     }
 
@@ -261,8 +260,12 @@ export abstract class AbstractBaseFilter<T> {
 
   abstract applyTo2d(options: T2DPipelineState): void;
 
+  protected getType() {
+    return (this.constructor as typeof BaseFilter).type;
+  }
+
   getCacheKey() {
-    return this.type;
+    return this.getType();
   }
 
   /**
@@ -371,7 +374,7 @@ export abstract class AbstractBaseFilter<T> {
   toObject() {
     const mainP = this.mainParameter;
     return {
-      type: this.type,
+      type: this.getType(),
       ...(mainP ? { [mainP]: this[mainP] } : {}),
     };
   }

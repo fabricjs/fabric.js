@@ -16,6 +16,8 @@ import { classRegistry } from '../ClassRegistry';
  */
 // @ts-expect-error fromObject
 export class HueRotation extends ColorMatrix {
+  static readonly type = 'HueRotation';
+
   /**
    * HueRotation value, from -1 to 1.
    */
@@ -57,7 +59,6 @@ export class HueRotation extends ColorMatrix {
 
 export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
   {
-    type: 'HueRotation',
     rotation: 0,
     mainParameter: 'rotation',
   };

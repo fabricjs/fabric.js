@@ -13,6 +13,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Saturation extends BaseFilter {
+  static readonly type = 'Saturation';
+
   /**
    * Saturation value, from -1 to 1.
    * Increases/decreases the color saturation.
@@ -76,7 +78,6 @@ export class Saturation extends BaseFilter {
 }
 
 export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  type: 'Saturation',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

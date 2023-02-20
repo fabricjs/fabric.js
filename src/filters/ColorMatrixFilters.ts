@@ -8,7 +8,11 @@ export function createColorMatrixFilter(key: string, matrix: number[]) {
      * @param {String} type
      * @default
      */
-    type = key;
+    static readonly type = key;
+
+    getType() {
+      return super.getType();
+    }
 
     /**
      * Colormatrix for the effect

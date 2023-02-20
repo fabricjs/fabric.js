@@ -12,6 +12,8 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  */
 export class MyFilter extends BaseFilter {
+  static readonly type = 'MyFilter';
+
   /**
    * MyFilter value, from -1 to 1.
    * translated to -255 to 255 for 2d
@@ -72,7 +74,6 @@ export class MyFilter extends BaseFilter {
 }
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
-  type: 'MyFilter',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

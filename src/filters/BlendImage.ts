@@ -28,6 +28,8 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
+  static readonly type = 'BlendImage';
+
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -43,7 +45,7 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
   declare alpha: number;
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${this.getType()}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -178,7 +180,7 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    */
   toObject() {
     return {
-      type: this.type,
+      type: this.getType(),
       image: this.image && this.image.toObject(),
       mode: this.mode,
       alpha: this.alpha,
@@ -204,7 +206,6 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
-  type: 'BlendImage',
   mode: 'multiply',
   alpha: 1,
   vertexSource: `

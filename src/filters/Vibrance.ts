@@ -13,6 +13,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Vibrance extends BaseFilter {
+  static readonly type = 'Vibrance';
+
   /**
    * Vibrance value, from -1 to 1.
    * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
@@ -78,7 +80,6 @@ export class Vibrance extends BaseFilter {
 }
 
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
-  type: 'Vibrance',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

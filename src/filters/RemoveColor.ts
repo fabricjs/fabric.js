@@ -15,9 +15,11 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class RemoveColor extends BaseFilter {
+  static readonly type = 'RemoveColor';
+
   /**
    * Color to remove, in any format understood by {@link Color}.
-   * @param {String} type
+   * @type string
    * @default
    */
   declare color: string;
@@ -125,7 +127,6 @@ export class RemoveColor extends BaseFilter {
 
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
-    type: 'RemoveColor',
     color: '#FFFFFF',
     fragmentSource: `
       precision highp float;

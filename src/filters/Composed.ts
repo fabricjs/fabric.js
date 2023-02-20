@@ -11,8 +11,10 @@ import { classRegistry } from '../ClassRegistry';
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
-// @ts-expect-error
+// @ts-expect-error doesn't implement abstract methods
 export class Composed extends BaseFilter {
+  static readonly type = 'Composed';
+
   /**
    * A non sparse array of filters to apply
    */
@@ -66,20 +68,17 @@ export class Composed extends BaseFilter {
    * @returns {Promise<Composed>}
    */
   static fromObject(
-    object: Record<string, any>,
+    object: Record<string, any> & {
+      subFilters?: (Record<string, any> & { type: string })[];
+    },
     options: { signal: AbortSignal }
   ) {
     return Promise.all(
-      ((object.subFilters || []) as AnyFilter[]).map((filter) =>
+      (object.subFilters || []).map((filter) =>
         classRegistry.getClass(filter.type).fromObject(filter, options)
       )
     ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
   }
 }
 
-export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
-  type: 'Composed',
-};
-
-Object.assign(Composed.prototype, composedDefaultValues);
 classRegistry.setClass(Composed);

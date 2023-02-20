@@ -11,6 +11,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
+  static readonly type = 'Grayscale';
+
   declare mode: 'average' | 'lightness' | 'luminosity';
 
   /**
@@ -43,7 +45,7 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${this.getType()}_${this.mode}`;
   }
 
   getFragmentSource() {
@@ -94,7 +96,6 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
-  type: 'Grayscale',
   fragmentSource: {
     average: `
       precision highp float;

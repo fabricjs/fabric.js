@@ -22,6 +22,8 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
+  static readonly type = 'BlendColor';
+
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -74,7 +76,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${this.getType()}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -202,7 +204,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    */
   toObject() {
     return {
-      type: this.type,
+      type: this.getType(),
       color: this.color,
       mode: this.mode,
       alpha: this.alpha,
@@ -215,7 +217,6 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
-  type: 'BlendColor',
   color: '#F95C63',
   mode: 'multiply',
   alpha: 1,

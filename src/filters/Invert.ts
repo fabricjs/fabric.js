@@ -10,6 +10,8 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
 export class Invert extends BaseFilter {
+  static readonly type = 'Invert';
+
   /**
    * Invert also alpha.
    * @param {Boolean} alpha
@@ -88,7 +90,6 @@ export class Invert extends BaseFilter {
 }
 
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
-  type: 'Invert',
   alpha: false,
   fragmentSource: `
     precision highp float;
