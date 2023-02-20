@@ -33,6 +33,8 @@ export class Gradient<
   S,
   T extends GradientType = S extends GradientType ? S : 'linear'
 > {
+  static readonly type = 'gradient';
+
   /**
    * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
    * @type Number
