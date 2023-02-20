@@ -18,6 +18,9 @@ jobs:
   stats:
     name: Build stats
     runs-on: ubuntu-latest
+    env:
+      minified: dist/index.min.js
+      bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,10 +39,10 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
+              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: checkout src files
-        run: git checkout origin/master -- src index.js
+        run: git checkout origin/master -- src fabric.ts index.ts index.node.ts
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist
@@ -50,7 +53,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync('dist/fabric.min.js').size, bundled: fs.statSync('dist/fabric.js').size } }
+              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: process
         uses: actions/github-script@v6

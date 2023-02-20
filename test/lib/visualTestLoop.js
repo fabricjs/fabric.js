@@ -6,7 +6,7 @@
 
   exports.getAsset = function(name, callback) {
     var finalName = getAssetName(name);
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
       var plainFileName = finalName.replace('file://', '');
       return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
     }
@@ -37,22 +37,22 @@
 
   function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
-    return fabric.getEnv().isLikelyNode ? localPath('/../visual', finalName) : finalName;
+    return isNode() ? localPath('/../visual', finalName) : finalName;
   }
   exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.getEnv().isLikelyNode ? localPath('/../visual', finalName) : finalName;
+    return isNode() ? localPath('/../visual', finalName) : finalName;
   }
 
   function getFixtureName(filename) {
     var finalName = '/fixtures/' + filename;
-    return fabric.getEnv().isLikelyNode ? localPath('/..', finalName) : finalName;
+    return isNode() ? localPath('/..', finalName) : finalName;
   }
 
   function generateGolden(filename, original) {
-    if (fabric.getEnv().isLikelyNode && original) {
+    if (isNode() && original) {
       var plainFileName = filename.replace('file://', '');
       var dataUrl = original.toDataURL().split(',')[1];
       console.log('creating golden for ', filename);
@@ -83,7 +83,7 @@
   }
 
   async function getImage(filename, original) {
-    if (fabric.getEnv().isLikelyNode && original) {
+    if (isNode() && original) {
       var plainFileName = filename.replace('file://', '');
       if (!fs.existsSync(plainFileName)) {
         generateGolden(filename, original);
@@ -114,18 +114,15 @@
   exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
-    var imageDataToChalk;
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
       _pixelMatch = global.pixelmatch;
       visualCallback = global.visualCallback;
-      imageDataToChalk = global.imageDataToChalk;
     }
     else {
       if (window) {
         _pixelMatch = window.pixelmatch;
         visualCallback = window.visualCallback;
       }
-      imageDataToChalk = function() { return ''; };
     }
 
     var pixelmatchOptions = {
@@ -179,10 +176,6 @@
             isOK,
             testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
           );
-          if (!isOK) {
-            var stringa = imageDataToChalk(output);
-            console.log(stringa);
-          }
           if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }

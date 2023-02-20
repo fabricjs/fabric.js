@@ -188,6 +188,7 @@ function testCanvasDisposing() {
         wrapperEl = canvas.wrapperEl;
         lowerCanvasEl = canvas.lowerCanvasEl;
         upperCanvasEl = canvas.upperCanvasEl;
+        const activeSel = canvas.getActiveSelection();
         assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
         assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
         assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
@@ -195,8 +196,9 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
         assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
         assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-        if (!fabric.getEnv().isLikelyNode) {
+        if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
         }
         //looks like i cannot use parentNode
@@ -208,13 +210,16 @@ function testCanvasDisposing() {
         assert.ok(typeof canvas.dispose === 'function');
         assert.ok(typeof canvas.destroy === 'function');
         canvas.add(makeRect(), makeRect(), makeRect());
-        canvas.item(0).animate('scaleX', 10);
+        canvas.item(0).animate({ scaleX: 10 });
+        activeSel.add(canvas.item(1));
         assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
         await canvas.dispose();
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
+        assert.equal(canvas.getActiveSelection(), undefined, 'dispose should dispose active selection');
+        assert.equal(activeSel.size(), 0, 'dispose should dispose active selection');
         assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-        if (!fabric.getEnv().isLikelyNode) {
+        if (!isNode()) {
             assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
         }
         assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');

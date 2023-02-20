@@ -1,5 +1,5 @@
 import { halfPI } from '../../../constants';
-import { IPoint, Point } from '../../../point.class';
+import { IPoint, Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
@@ -12,10 +12,10 @@ import { TProjectStrokeOnPointsOptions, TProjection } from './types';
  * @see https://github.com/fabricjs/fabric.js/pull/8344
  */
 export abstract class StrokeProjectionsBase {
-  options: TProjectStrokeOnPointsOptions;
-  scale: Point;
-  strokeUniformScalar: Point;
-  strokeProjectionMagnitude: number;
+  declare options: TProjectStrokeOnPointsOptions;
+  declare scale: Point;
+  declare strokeUniformScalar: Point;
+  declare strokeProjectionMagnitude: number;
 
   static getAcuteAngleFactor(vector1: Point, vector2?: Point) {
     const angle = vector2

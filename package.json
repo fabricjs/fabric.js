@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "5.1.0",
+  "version": "6.0.0-beta1",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -31,17 +31,6 @@
     "HTML5",
     "object model"
   ],
-  "browser": {
-    "canvas": false,
-    "fs": false,
-    "jsdom": false,
-    "jsdom/lib/jsdom/living/generated/utils": false,
-    "jsdom/lib/jsdom/utils": false,
-    "http": false,
-    "https": false,
-    "xmldom": false,
-    "url": false
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/fabricjs/fabric.js"
@@ -51,6 +40,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "docs": "typedoc --out docs fabric.ts",
     "cli": "node ./scripts/index.mjs",
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "npm run cli -- build",
@@ -69,26 +59,35 @@
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write ."
+    "prettier:write": "prettier --write .",
+    "babel-constants": "babel --no-babelrc src/constants.ts --extensions '.ts' --out-dir dist/src/ --config-file ./.babelrcAlt --plugins=babel-plugin-import-json-value",
+    "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
   },
   "optionalDependencies": {
     "canvas": "^2.8.0",
-    "jsdom": "^19.0.0"
+    "jsdom": "^20.0.1"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^22.0.2",
-    "@rollup/plugin-json": "^4.1.0",
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.18.6",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-terser": "^0.3.0",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/fs-extra": "^9.0.13",
+    "@types/jsdom": "^20.0.1",
     "@types/lodash": "^4.14.180",
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "abort-controller": "^3.0.0",
     "auto-changelog": "^2.3.0",
+    "babel-plugin-import-json-value": "^0.1.2",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
-    "deep-object-diff": "^1.1.7",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "fireworm": "^0.7.2",
@@ -103,16 +102,43 @@
     "prettier": "2.7.1",
     "ps-list": "^8.1.0",
     "qunit": "^2.17.2",
-    "rollup": "^2.75.6",
-    "rollup-plugin-size-snapshot": "^0.12.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-ts": "^3.0.2",
+    "rollup": "^3.9.1",
     "source-map-support": "^0.5.21",
     "testem": "^3.8.0",
-    "typescript": "^4.7.4"
+    "tslib": "^2.4.1",
+    "typedoc": "^0.23.24",
+    "typescript": "^4.9.4"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js"
+  "module": "./dist/index.mjs",
+  "main": "./dist/index.node.cjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    ">=4.2": {
+      "*": [
+        "dist/index.d.ts"
+      ],
+      "node": [
+        "dist/index.node.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
+      "node": null,
+      "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/index.node.mjs",
+      "require": "./dist/index.node.cjs",
+      "default": "./dist/index.node.cjs",
+      "node": "./dist/index.node.cjs",
+      "types": "./dist/index.node.d.ts"
+    }
+  }
 }

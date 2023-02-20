@@ -1,91 +1,47 @@
-import { TColorArg } from '../../color/color.class';
-import { noop } from '../../constants';
+import { TColorArg } from '../../color/Color';
 import { ObjectEvents } from '../../EventTypeDefs';
-import { TDegree } from '../../typedefs';
 import {
   animate,
   animateColor,
+  TAnimation,
+} from '../../util/animation/animate';
+import type {
   AnimationOptions,
+  ArrayAnimationOptions,
   ColorAnimationOptions,
-} from '../../util/animation';
-import type { ColorAnimation } from '../../util/animation/ColorAnimation';
-import type { ValueAnimation } from '../../util/animation/ValueAnimation';
+  ValueAnimationOptions,
+} from '../../util/animation/types';
 import { StackedObject } from './StackedObject';
-
-type TAnimationOptions<T extends number | TColorArg> = T extends number
-  ? AnimationOptions
-  : ColorAnimationOptions;
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends StackedObject<EventSpec> {
   /**
-   * Animation duration (in ms) for fx* methods
-   * @type Number
-   * @default
-   */
-  FX_DURATION: number;
-
-  /**
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  colorProperties: string[];
-
-  abstract rotate(deg: TDegree): void;
+  declare colorProperties: string[];
 
   /**
    * Animates object's properties
-   * @param {String|Object} property Property to animate (if string) or properties to animate (if object)
-   * @param {Number|Object} value Value to animate property to (if string was given first) or options object
+   * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
+   * @param {Partial<AnimationOptions<T>>} options
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {(ColorAnimation | ValueAnimation)[]} animation context (or an array if passed multiple properties)
+   * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties
    *
    * object.animate({ left: ..., top: ... });
    * object.animate({ left: ..., top: ... }, { duration: ... });
-   *
-   * As string — one property
-   * Supports +=N and -=N for animating N units in a given direction
-   *
-   * object.animate('left', ...);
-   * object.animate('left', ..., { duration: ... });
-   *
-   * Example of +=/-=
-   * object.animate('right', '-=50');
-   * object.animate('top', '+=50', { duration: ... });
    */
-  animate<T extends number | TColorArg>(
-    key: string,
-    toValue: T,
-    options?: Partial<TAnimationOptions<T>>
-  ): (ColorAnimation | ValueAnimation)[];
-  animate<T extends number | TColorArg>(
+  animate<T extends number | number[] | TColorArg>(
     animatable: Record<string, T>,
-    options?: Partial<TAnimationOptions<T>>
-  ): (ColorAnimation | ValueAnimation)[];
-  animate<T extends number | TColorArg, S extends string | Record<string, T>>(
-    arg0: S,
-    arg1: S extends string ? T : Partial<TAnimationOptions<T>>,
-    arg2?: S extends string ? Partial<TAnimationOptions<T>> : never
-  ): (ColorAnimation | ValueAnimation)[] {
-    const animatable = (
-      typeof arg0 === 'string' ? { [arg0]: arg1 } : arg0
-    ) as Record<string, T>;
-    const keys = Object.keys(animatable);
-    const options = (typeof arg0 === 'string' ? arg2 : arg1) as Partial<
-      TAnimationOptions<T>
-    >;
-    return keys.map((key, index) =>
-      this._animate(
-        key,
-        animatable[key],
-        index === keys.length - 1
-          ? options
-          : { ...options, onChange: undefined, onComplete: undefined }
-      )
-    );
+    options?: Partial<AnimationOptions<T>>
+  ): Record<string, TAnimation<T>> {
+    return Object.entries(animatable).reduce((acc, [key, endValue]) => {
+      acc[key] = this._animate(key, endValue, options);
+      return acc;
+    }, {} as Record<string, TAnimation<T>>);
   }
 
   /**
@@ -94,43 +50,28 @@ export abstract class AnimatableObject<
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
    */
-  _animate<T extends number | TColorArg>(
+  _animate<T extends number | number[] | TColorArg>(
     key: string,
-    to: T,
-    options: Partial<TAnimationOptions<T>> = {}
-  ) {
+    endValue: T,
+    options: Partial<AnimationOptions<T>> = {}
+  ): TAnimation<T> {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
-    const currentValue = path.reduce((deep: any, key) => deep[key], this);
-
-    if (!propIsColor && typeof to === 'string') {
-      // check for things like +=50
-      // which should animate so that the thing moves by 50 units in the positive direction
-      to = to.includes('=')
-        ? currentValue + parseFloat(to.replace('=', ''))
-        : parseFloat(to);
-    }
-
+    const { easing, duration, abort, startValue, onChange, onComplete } =
+      options;
     const animationOptions = {
       target: this,
+      // path.reduce... is the current value in case start value isn't provided
       startValue:
-        options.startValue ??
-        // backward compat
-        (options as any).from ??
-        currentValue,
-      endValue: to,
-      // `byValue` takes precedence over `endValue`
-      byValue:
-        options.byValue ??
-        // backward compat
-        (options as any).by,
-      easing: options.easing,
-      duration: options.duration,
-      abort: options.abort?.bind(this),
+        startValue ?? path.reduce((deep: any, key) => deep[key], this),
+      endValue,
+      easing,
+      duration,
+      abort: abort?.bind(this),
       onChange: (
-        value: string | number,
-        valueRatio: number,
-        durationRatio: number
+        value: number | number[] | string,
+        valueProgress: number,
+        durationProgress: number
       ) => {
         path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
@@ -138,76 +79,28 @@ export abstract class AnimatableObject<
           }
           return deep[key];
         }, this);
-        options.onChange &&
+        onChange &&
           // @ts-expect-error generic callback arg0 is wrong
-          options.onChange(value, valueRatio, durationRatio);
+          onChange(value, valueProgress, durationProgress);
       },
       onComplete: (
-        value: string | number,
-        valueRatio: number,
-        durationRatio: number
+        value: number | number[] | string,
+        valueProgress: number,
+        durationProgress: number
       ) => {
         this.setCoords();
-        options.onComplete &&
+        onComplete &&
           // @ts-expect-error generic callback arg0 is wrong
-          options.onComplete(value, valueRatio, durationRatio);
+          onComplete(value, valueProgress, durationProgress);
       },
-    } as TAnimationOptions<T>;
+    } as AnimationOptions<T>;
 
-    if (propIsColor) {
-      return animateColor(animationOptions as ColorAnimationOptions);
-    } else {
-      return animate(animationOptions as AnimationOptions);
-    }
-  }
-
-  /**
-   * @private
-   * @return {Number} angle value
-   */
-  protected _getAngleValueForStraighten() {
-    const angle = this.angle % 360;
-    if (angle > 0) {
-      return Math.round((angle - 1) / 90) * 90;
-    }
-    return Math.round(angle / 90) * 90;
-  }
-
-  /**
-   * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
-   */
-  straighten() {
-    this.rotate(this._getAngleValueForStraighten());
-  }
-
-  /**
-   * Same as {@link straighten} but with animation
-   * @param {Object} callbacks Object with callback functions
-   * @param {Function} [callbacks.onComplete] Invoked on completion
-   * @param {Function} [callbacks.onChange] Invoked on every step of animation
-   */
-  fxStraighten(
-    callbacks: {
-      onChange?(value: TDegree): any;
-      onComplete?(): any;
-    } = {}
-  ) {
-    const onComplete = callbacks.onComplete || noop,
-      onChange = callbacks.onChange || noop;
-
-    return animate({
-      target: this,
-      startValue: this.angle,
-      endValue: this._getAngleValueForStraighten(),
-      duration: this.FX_DURATION,
-      onChange: (value: TDegree) => {
-        this.rotate(value);
-        onChange(value);
-      },
-      onComplete: () => {
-        this.setCoords();
-        onComplete();
-      },
-    });
+    return (
+      propIsColor
+        ? animateColor(animationOptions as ColorAnimationOptions)
+        : animate(
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+          )
+    ) as TAnimation<T>;
   }
 }

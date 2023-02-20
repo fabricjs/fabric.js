@@ -1,11 +1,4 @@
 (function() {
-  var simulateEvent;
-  if (fabric.getEnv().isLikelyNode) {
-    simulateEvent = global.simulateEvent;
-  }
-  else {
-    simulateEvent = window.simulateEvent;
-  }
 
   var SUB_TARGETS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"activeSelection","left":-152,"top":656.25,"width":356.5,"height":356.5,"scaleX":0.45,"scaleY":0.45,"objects":[]},{"type":"group","left":11,"top":6,"width":511.5,"height":511.5,"objects":[{"type":"rect","left":-255.75,"top":-255.75,"width":50,"height":50,"fill":"#6ce798","scaleX":10.03,"scaleY":10.03,"opacity":0.8},{"type":"group","left":-179.75,"top":22,"width":356.5,"height":356.5,"scaleX":0.54,"scaleY":0.54,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":-202.75,"top":-228.5,"width":356.5,"height":356.5,"scaleX":0.61,"scaleY":0.61,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"group","left":138.3,"top":-90.22,"width":356.5,"height":356.5,"scaleX":0.42,"scaleY":0.42,"angle":62.73,"objects":[{"type":"rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]}]}]}';
 
@@ -24,7 +17,7 @@
       canvas.clear();
       canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
       canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
-      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
+      canvas.handleSelection = fabric.Canvas.prototype.handleSelection;
       canvas.off();
       canvas.setDimensions({ width: 600, height: 600 });
       canvas.calcOffset();
@@ -171,7 +164,7 @@
   QUnit.test('mouse:down and group selector', function(assert) {
     var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 150, height: 150 });
-    var expectedGroupSelector = { ex: 80, ey: 120, top: 0, left: 0 };
+    var expectedGroupSelector = { x: 80, y: 120, deltaX: 0, deltaY: 0 };
     canvas.absolutePan(new fabric.Point(50, 80));
     canvas.__onMouseDown(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'a new groupSelector is created');
@@ -211,7 +204,7 @@
     assert.equal(canvas._activeObject, rect, 'with activeOn of up object is selected on mouse up');
   });
 
-  QUnit.test('specific bug #5317 for shift+click and active selection', function(assert) {
+  QUnit.test('specific bug #5317 for multiselection', function(assert) {
     var greenRect = new fabric.Rect({
       width: 300,
       height: 300,
@@ -293,7 +286,7 @@
   });
 
 
-  QUnit.test('mouse:up isClick = true', function(assert) {
+  QUnit.test('mouse:up, isClick = true', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl  };
     var isClick = false;
     canvas.on('mouse:up', function(opt) {
@@ -302,6 +295,39 @@
     canvas.__onMouseDown(e);
     canvas.__onMouseUp(e);
     assert.equal(isClick, true, 'without moving the pointer, the click is true');
+  });
+
+  QUnit.test('mouse:up after move, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
+  });
+
+  QUnit.test('mouse:up after dragging, isClick = false', function (assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var isClick = true;
+    canvas.on('mouse:up', function (opt) {
+      isClick = opt.isClick;
+    });
+    canvas.__onMouseDown(e);
+    canvas._onDragStart({
+      preventDefault() {
+        
+      },
+      stopPropagation() {
+        
+      }
+    });
+    canvas.__onMouseUp(e2);
+    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('setDimensions and active brush', function(assert) {
@@ -318,19 +344,6 @@
     canva.renderAll();
     assert.equal(rendered, true, 'the brush called the _render method');
     assert.equal(prepareFor, true, 'the brush called the _setBrushStyles method');
-  });
-
-  QUnit.test('mouse:up isClick = false', function(assert) {
-    var e = { clientX: 30, clientY: 30, which: 1 };
-    var e2 = { clientX: 31, clientY: 31, which: 1 };
-    var isClick = true;
-    canvas.on('mouse:up', function(opt) {
-      isClick = opt.isClick;
-    });
-    canvas.__onMouseDown(e);
-    canvas.__onMouseMove(e2);
-    canvas.__onMouseUp(e2);
-    assert.equal(isClick, false, 'moving the pointer, the click is false');
   });
 
   QUnit.test('mouse:up should return target and currentTarget', function(assert) {
@@ -525,72 +538,6 @@
     canvas.__onMouseUp(e3);
     assert.equal(mouseUpCalled1, true, 'mouse up handler for rect has been called anyway');
     assert.equal(mouseUpCalled2, true, 'mouse up handler for rect2 has been called');
-  });
-
-
-  QUnit.test('avoid multiple bindings', function(assert) {
-    var c = new fabric.Canvas();
-    var eventsArray = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    // _initEventListeners canvas more than once
-    c._initEventListeners();
-    c._initEventListeners();
-    var eventsArray2 = [
-      c._onMouseDown,
-      c._onMouseMove,
-      c._onMouseUp,
-      c._onResize,
-      c._onGesture,
-      c._onDrag,
-      c._onShake,
-      c._onLongPress,
-      c._onOrientationChange,
-      c._onMouseWheel,
-      c._onMouseOut,
-      c._onMouseEnter,
-      c._onContextMenu,
-      c._onDragOver,
-      c._onDragEnter,
-      c._onDragLeave,
-      c._onDrop,
-    ];
-    assert.deepEqual(eventsArray, eventsArray2, 'after first _initEventListeners, functions do not change.');
-  });
-
-  ['DragEnter', 'DragLeave', 'DragOver', 'Drop'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.getDocument().createEvent('HTMLEvents');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
   });
 
   QUnit.test('Fabric event fired - Drop', function (assert) {
@@ -812,9 +759,8 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = new fabric.ActiveSelection(canvas.getObjects(), {
-        canvas: canvas
-      });
+      var activeSelection = canvas.getActiveSelection();
+      activeSelection.add(...canvas.getObjects());
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);
 
@@ -847,63 +793,11 @@
 
   QUnit.test('mouse move and group selector', function(assert){
     var e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
-    var expectedGroupSelector = { ex: 15, ey: 30, left: 65, top: 90};
+    var expectedGroupSelector = { x: 15, y: 30, deltaX: 65, deltaY: 90};
     canvas.absolutePan(new fabric.Point(50, 80));
-    canvas._groupSelector = {ex: 15, ey: 30, top: 0, left: 0};
+    canvas._groupSelector = {x: 15, y: 30, deltaX: 0, deltaY: 0};
     canvas.__onMouseMove(e);
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'groupSelector is updated');
-  });
-
-  ['MouseDown', 'MouseMove', 'MouseOut', 'MouseEnter', 'MouseWheel', 'DoubleClick'].forEach(function(eventType) {
-    QUnit.test('avoid multiple registration - ' + eventType, function(assert) {
-      var funcName = '_on' + eventType;
-      var eventName = eventType.toLowerCase();
-      if (eventType === 'DoubleClick') {
-        eventName = 'dblclick';
-      }
-      if (eventType === 'MouseWheel') {
-        eventName = 'wheel';
-      }
-      var counter = 0;
-      var c = new fabric.Canvas();
-      c[funcName] = function() {
-        counter++;
-      };
-      // _initEventListeners canvas more than once
-      c._initEventListeners(c.lowerCanvasEl);
-      c._initEventListeners(c.lowerCanvasEl);
-      var event = fabric.getDocument().createEvent('MouseEvent');
-      event.initEvent(eventName, true, true);
-      c.upperCanvasEl.dispatchEvent(event);
-      assert.equal(counter, 1, eventName + ' listener executed once');
-    });
-  });
-
-  QUnit.test('avoid multiple registration - mouseup', function(assert) {
-    var done = assert.async();
-    var originalMouseUp = fabric.Canvas.prototype._onMouseUp;
-    var counter = 0;
-    fabric.Canvas.prototype._onMouseUp = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-
-    // a mouse down is necessary to register mouse up.
-    var _event = fabric.getDocument().createEvent('MouseEvent');
-    _event.initEvent('mousedown', true, true);
-    c.upperCanvasEl.dispatchEvent(_event);
-    setTimeout(function() {
-      var event = fabric.getDocument().createEvent('MouseEvent');
-      event.initEvent('mouseup', true, true);
-      fabric.getDocument().dispatchEvent(event);
-      assert.equal(counter, 1, 'listener executed once');
-      fabric.Canvas.prototype._onMouseUp = originalMouseUp;
-      c.cancelRequestedRender();
-      done();
-    }, 200);
   });
 
   QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
@@ -935,7 +829,7 @@
     c.setActiveObject(obj);
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(obj.__corner, 0, '__corner has been resetted from activeObject');
+    assert.equal(obj.__corner, undefined, '__corner has been resetted from activeObject');
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
@@ -948,23 +842,6 @@
     obj.__corner = 'test';
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(obj.__corner, 'test', '__corner has not been reset');
-  });
-
-  QUnit.test('avoid multiple events on window', function(assert) {
-    var originalResize = fabric.Canvas.prototype._onResize;
-    var counter = 0;
-    fabric.Canvas.prototype._onResize = function() {
-      counter++;
-    };
-    var c = new fabric.Canvas();
-    // _initEventListeners canvas more than once
-    c._initEventListeners(c.lowerCanvasEl);
-    c._initEventListeners(c.lowerCanvasEl);
-    var event = fabric.getDocument().createEvent('UIEvents');
-    event.initUIEvent('resize', true, false, fabric.getWindow(), 0);
-    fabric.getWindow().dispatchEvent(event);
-    assert.equal(counter, 1, 'listener on window executed once');
-    fabric.Canvas.prototype._onResize = originalResize;
   });
 
   // this test is important. As today we do not havenymore a unique function that give us the
@@ -1257,5 +1134,81 @@
       canvas._setCursorFromEvent(e, target);
       assert.equal(canvas.upperCanvasEl.style.cursor, expectedLockSkewingX[corner], `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`);
     });
+  });
+
+  QUnit.test('text editing manager', async function (assert) {
+    const canvas = new fabric.Canvas();
+    const manager = canvas.textEditingManager;
+    assert.ok(manager, 'should exist');
+    assert.deepEqual(manager.targets, [], 'should be empty');
+
+    const a = new fabric.IText('test');
+    const b = new fabric.IText('test');
+    const e = { clientX: 30, clientY: 40, which: 1, target: canvas.upperCanvasEl };
+
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.remove(a);
+    assert.deepEqual(manager.targets, []);
+    canvas.add(a);
+    assert.deepEqual(manager.targets, [a]);
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [a, b]);
+    a.enterEditing();
+    assert.ok(a.isEditing);
+    b.enterEditing();
+    assert.ok(b.isEditing);
+    assert.ok(!a.isEditing, 'should have called exit editing');
+    manager.register(b);
+    manager.exitTextEditing();
+    assert.ok(!manager.target, 'should unregister b');
+    assert.ok(!b.isEditing, 'b should exit editing');
+    b.enterEditing();
+    b.fire('mousedown', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should register b');
+    const called = [];
+    a.updateSelectionOnMouseMove = () => called.push(a);
+    b.updateSelectionOnMouseMove = () => called.push(b);
+    canvas.__onMouseMove(e);
+    assert.deepEqual(called, [b], 'manager is called from mouse move');
+    manager.unregister(a);
+    assert.ok(manager.target === b, 'should not unregister b');
+    a.fire('mouseup', { e, pointer: new fabric.Point(30, 40) });
+    assert.ok(manager.target === b, 'should not unregister b');
+    canvas.__onMouseUp(e);
+    assert.ok(!manager.target, 'should unregister b');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(a);
+    assert.ok(!manager.target, 'should unregister a');
+    manager.dispose();
+    assert.ok(!manager.target, 'should have disposed ref');
+    assert.deepEqual(manager.targets, [], 'should have disposed refs');
+    const g = new fabric.Group([a]);
+    canvas.add(g);
+    assert.deepEqual(manager.targets, [a], 'should register an existing nested instance');
+    g.add(b);
+    assert.deepEqual(manager.targets, [a, b], 'should register an added nested instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    g.remove(b);
+    assert.ok(!manager.target, 'should unregister b');
+    assert.deepEqual(manager.targets, [a], 'should unregister a nested instance upon removal');
+    manager.register(a);
+    assert.ok(manager.target === a, 'should register a');
+    canvas.remove(g);
+    assert.ok(!manager.target, 'should unregister a');
+    assert.deepEqual(manager.targets, [], 'should unregister nested instances upon group removal');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    canvas.clear();
+    assert.deepEqual(manager.targets, [], 'clear should clear instances');
+    canvas.add(b);
+    assert.deepEqual(manager.targets, [b], 'should register instance');
+    manager.register(b);
+    assert.ok(manager.target === b, 'should register b');
+    await canvas.dispose();
+    assert.deepEqual(manager.targets, [], 'dispose should clear instances');
+    assert.ok(!manager.target, 'should unregister b');
   });
 })();

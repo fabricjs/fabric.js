@@ -65,7 +65,7 @@
     return src;
   }
   var IMG_SRC =
-        fabric.getEnv().isLikelyNode ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif'))
+        isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif'))
           :
           getAbsolutePath('../fixtures/test_image.gif'),
       IMG_WIDTH   = 276,
@@ -154,9 +154,9 @@
 
   var lowerCanvasEl = canvas.lowerCanvasEl;
 
-  function makeRect(options) {
+  function makeRect(options={}) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect({ ...defaultOptions, ...options });
   }
 
   QUnit.module('fabric.StaticCanvas', {
@@ -201,6 +201,8 @@
     assert.ok('imageSmoothingEnabled' in canvas);
     assert.ok('backgroundVpt' in canvas);
     assert.ok('overlayVpt' in canvas);
+    assert.ok(Array.isArray(canvas._objects), 'is array');
+    assert.equal(canvas._objects.length, 0, 'is empty array');
 
     assert.equal(canvas.includeDefaultValues, true);
     assert.equal(canvas.renderOnAddRemove, true);
@@ -1882,7 +1884,7 @@
   });
 
   QUnit.test('createPNGStream', function(assert) {
-    if (!fabric.getEnv().isLikelyNode) {
+    if (!isNode()) {
       assert.ok(true, 'not supposed to run outside node');
     }
     else {
@@ -1891,7 +1893,7 @@
   });
 
   QUnit.test('createJPEGStream', function(assert) {
-    if (!fabric.getEnv().isLikelyNode) {
+    if (!isNode()) {
       assert.ok(true, 'not supposed to run outside node');
     }
     else {
