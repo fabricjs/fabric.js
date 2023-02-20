@@ -96,7 +96,7 @@
   QUnit.test('initial properties', function(assert) {
     var textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
-    assert.equal(textbox.type, 'textbox');
+    assert.equal(textbox.constructor.type, 'textbox');
     assert.deepEqual(textbox.styles, { });
     assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });

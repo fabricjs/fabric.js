@@ -10,7 +10,7 @@
     assert.ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
     assert.ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.deepEqual(circle.type, 'circle');
+    assert.deepEqual(circle.constructor.type, 'circle');
   });
 
   QUnit.test('constructor with radius', function(assert) {

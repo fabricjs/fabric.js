@@ -27,7 +27,7 @@
     assert.ok(cObj instanceof fabric.Object);
     assert.ok(cObj.constructor === fabric.Object);
 
-    assert.equal(cObj.type, 'object');
+    assert.equal(cObj.constructor.type, 'object');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 
@@ -294,7 +294,7 @@
   QUnit.test('toString', function(assert) {
     var cObj = new fabric.Object();
     assert.equal(cObj.toString(), '#<Object>');
-    cObj.type = 'moo';
+    cObj.constructor.type = 'moo';
     assert.equal(cObj.toString(), '#<Moo>');
   });
 

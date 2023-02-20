@@ -12,7 +12,7 @@
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.equal(ellipse.type, 'ellipse');
+    assert.equal(ellipse.constructor.type, 'ellipse');
   });
 
   QUnit.test('complexity', function(assert) {

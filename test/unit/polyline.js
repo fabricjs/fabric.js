@@ -60,7 +60,7 @@
     assert.ok(polyline instanceof fabric.Polyline);
     assert.ok(polyline instanceof fabric.Object);
 
-    assert.equal(polyline.type, 'polyline');
+    assert.equal(polyline.constructor.type, 'polyline');
     assert.deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 

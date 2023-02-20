@@ -73,7 +73,7 @@
       assert.ok(iText instanceof fabric.IText);
 
       assert.equal(iText.text, 'test');
-      assert.equal(iText.type, 'i-text');
+      assert.equal(iText.constructor.type, 'i-text');
       assert.deepEqual(iText.styles, { });
     });
 

@@ -889,7 +889,7 @@
     });
     var toObject = text.toObject();
     fabric.Text.fromObject(toObject).then(function(text) {
-      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.equal(text.path.constructor.type, 'path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');
       done();
