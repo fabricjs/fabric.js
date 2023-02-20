@@ -9,7 +9,7 @@
     class TestClass {
 
     }
-    TestClass.prototype.type = 'anyType';
+    TestClass.type = 'anyType';
     classRegistry.setClass(TestClass);
     const resolved = classRegistry.getClass('anyType');
     assert.equal(resolved, TestClass, 'resolves class correctly');
@@ -18,7 +18,7 @@
     class TestClass2 {
 
     }
-    TestClass2.prototype.type = 'anyType';
+    TestClass2.type = 'anyType';
     classRegistry.setClass(TestClass2, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');
     assert.equal(resolved, TestClass2, 'resolves class correctly with custom type');
@@ -27,11 +27,11 @@
     class TestClass3 {
 
     }
-    TestClass3.prototype.type = 'anyType';
+    TestClass3.type = 'anyType';
     class TestClass4 {
 
     }
-    TestClass4.prototype.type = 'typeC';
+    TestClass4.type = 'typeC';
     classRegistry.setClass(TestClass3, 'myCustomType');
     classRegistry.setSVGClass(TestClass4, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');
