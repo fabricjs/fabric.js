@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING: static object/filter `type` [#87104](https://github.com/fabricjs/fabric.js/pull/8714)
 - ci(): Fix tests for firefox 110 update [#8710](https://github.com/fabricjs/fabric.js/pull/8710)
 - chore(): index files for exports and tree shaking [#8661](https://github.com/fabricjs/fabric.js/pull/8661)
 - ci(test): cleanup node config (#8694 followup) [#8707](https://github.com/fabricjs/fabric.js/issues/8707)
