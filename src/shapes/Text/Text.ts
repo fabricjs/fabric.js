@@ -102,6 +102,8 @@ const textLayoutProperties: string[] = [
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends StyledText<EventSpec> {
+  static readonly type = 'text';
+
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
@@ -1900,7 +1902,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
-  type: 'text',
   fontSize: 40,
   fontWeight: 'normal',
   fontFamily: 'Times New Roman',

@@ -6,6 +6,8 @@ import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Ellipse extends FabricObject {
+  static readonly type = 'ellipse';
+
   /**
    * Horizontal radius
    * @type Number
@@ -142,7 +144,6 @@ export class Ellipse extends FabricObject {
 }
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
-  type: 'ellipse',
   rx: 0,
   ry: 0,
 };

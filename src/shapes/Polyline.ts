@@ -12,6 +12,8 @@ import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Polyline extends FabricObject {
+  static readonly type = 'polyline';
+
   /**
    * Points array
    * @type Array
@@ -215,7 +217,9 @@ export class Polyline extends FabricObject {
       );
     }
     return [
-      `<${this.type} `,
+      `<${
+        (this.constructor as typeof FabricObject).type as 'polyline' | 'polygon'
+      } `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];
@@ -312,7 +316,6 @@ export class Polyline extends FabricObject {
 }
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  type: 'polyline',
   exactBoundingBox: false,
 };
 

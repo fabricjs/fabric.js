@@ -1,10 +1,11 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
+  static readonly type = 'activeSelection';
+
   declare _objects: FabricObject[];
 
   /**
@@ -185,13 +186,5 @@ export class ActiveSelection extends Group {
     ctx.restore();
   }
 }
-
-export const activeSelectionDefaultValues: Partial<
-  TClassProperties<ActiveSelection>
-> = {
-  type: 'activeSelection',
-};
-
-Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
 
 classRegistry.setClass(ActiveSelection);

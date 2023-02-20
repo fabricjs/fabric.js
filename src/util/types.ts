@@ -40,7 +40,7 @@ export const isCollection = (
 export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection => {
-  return !!fabricObject && fabricObject.type === 'activeSelection';
+  return !!fabricObject && fabricObject.isType('activeSelection');
 };
 
 export const isTextObject = (
@@ -48,7 +48,7 @@ export const isTextObject = (
 ): fabricObject is Text => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.type.includes('text');
+  return !!fabricObject && fabricObject.isType('text', 'i-text', 'textbox');
 };
 
 export const isInteractiveTextObject = (
@@ -56,7 +56,7 @@ export const isInteractiveTextObject = (
 ): fabricObject is IText | Textbox => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && ['i-text', 'textbox'].includes(fabricObject.type);
+  return !!fabricObject && fabricObject.isType('i-text', 'textbox');
 };
 
 export const isFabricObjectCached = (

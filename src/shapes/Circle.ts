@@ -8,6 +8,8 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
 
 export class Circle extends FabricObject {
+  static readonly type = 'circle';
+
   /**
    * Radius of this circle
    * @type Number
@@ -197,7 +199,6 @@ export class Circle extends FabricObject {
 }
 
 export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
   radius: 0,
   startAngle: 0,
   endAngle: 360,

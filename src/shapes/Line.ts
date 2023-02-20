@@ -11,6 +11,8 @@ import { isFiller } from '../util/types';
 const coordProps = ['x1', 'x2', 'y1', 'y2'];
 
 export class Line extends FabricObject {
+  static readonly type = 'line';
+
   /**
    * x value or first line edge
    * @type Number
@@ -314,7 +316,6 @@ export class Line extends FabricObject {
 }
 
 export const lineDefaultValues: Partial<TClassProperties<Line>> = {
-  type: 'line',
   x1: 0,
   y1: 0,
   x2: 0,

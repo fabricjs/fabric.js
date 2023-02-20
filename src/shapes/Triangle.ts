@@ -3,6 +3,8 @@ import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
 
 export class Triangle extends FabricObject {
+  static readonly type = 'triangle';
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -34,7 +36,6 @@ export class Triangle extends FabricObject {
 }
 
 export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
-  type: 'triangle',
   width: 100,
   height: 100,
 };

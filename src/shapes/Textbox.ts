@@ -10,6 +10,8 @@ import { classRegistry } from '../ClassRegistry';
  * wrapping of lines.
  */
 export class Textbox extends IText {
+  static readonly type = 'textbox';
+
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -455,7 +457,6 @@ export class Textbox extends IText {
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
 export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
-  type: 'textbox',
   minWidth: 20,
   dynamicMinWidth: 2,
   lockScalingFlip: true,

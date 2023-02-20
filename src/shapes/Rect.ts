@@ -6,6 +6,8 @@ import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Rect extends FabricObject {
+  static readonly type = 'rect';
+
   /**
    * Horizontal border radius
    * @type Number
@@ -187,7 +189,6 @@ export class Rect extends FabricObject {
 }
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  type: 'rect',
   rx: 0,
   ry: 0,
 };

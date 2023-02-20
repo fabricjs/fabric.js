@@ -200,7 +200,7 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    if (object.type === 'path' && this.gradientUnits !== 'percentage') {
+    if (object.isType('path') && this.gradientUnits !== 'percentage') {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }

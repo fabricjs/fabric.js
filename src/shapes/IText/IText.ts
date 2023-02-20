@@ -64,6 +64,8 @@ type CursorBoundaries = {
 export class IText<
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextClickBehavior<EventSpec> {
+  static readonly type = 'i-text';
+
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -640,7 +642,6 @@ export class IText<
 }
 
 export const iTextDefaultValues = {
-  type: 'i-text',
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',

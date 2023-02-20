@@ -83,6 +83,8 @@ export type LayoutResult = {
  * @fires layout once layout completes
  */
 export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
+  static readonly type = 'group';
+
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout
@@ -1049,7 +1051,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
 }
 
 export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
   layout: 'fit-content',
   strokeWidth: 0,
   subTargetCheck: false,

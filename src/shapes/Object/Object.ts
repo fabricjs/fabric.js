@@ -85,7 +85,7 @@ export type TCachedFabricObject = FabricObject &
 export class FabricObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends AnimatableObject<EventSpec> {
-  declare type: string;
+  static readonly type = 'object' as string;
 
   /**
    * Opacity of an object
@@ -832,7 +832,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.type,
+        type: (this.constructor as typeof FabricObject).type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -922,7 +922,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${capitalize(this.type)}>`;
+    return `#<${capitalize((this.constructor as typeof FabricObject).type)}>`;
   }
 
   /**
@@ -1758,7 +1758,7 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.type);
+    return types.includes((this.constructor as typeof FabricObject).type);
   }
 
   /**
