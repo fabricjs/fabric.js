@@ -1,6 +1,5 @@
-import { IPoint, Point } from '../../point.class';
 import { TRadian } from '../../typedefs';
-import { commaWsp } from '../../parser/constants';
+import { IPoint, Point } from '../../Point';
 
 type TPathSegmentInfoCommon = {
   x: number;
@@ -117,7 +116,10 @@ export type TParsedMoveToCommand =
   | TParsedRelativeMoveToCommand;
 
 export type TMoveToCommand = TCommand3<TParsedMoveToCommand>;
-export const reMoveToCommand = new RegExp(String.raw`(M) (?:${p} ${p} ?)+`, 'gi');
+export const reMoveToCommand = new RegExp(
+  String.raw`(M) (?:${p} ${p} ?)+`,
+  'gi'
+);
 
 export type TParsedAbsoluteLineCommand = [command: 'L', x: number, y: number];
 export type TParsedRelativeLineCommand = [command: 'l', dx: number, dy: number];

@@ -1,8 +1,6 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { halfPI, PiBy180 } from '../../constants';
-import { commaWsp } from '../../parser/constants';
-import { Point } from '../../point.class';
 import type { TBounds, TMat2D, TRadian } from '../../typedefs';
 import { cos } from '../misc/cos';
 import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
@@ -29,6 +27,7 @@ import {
   rePathCommand,
   numberRegExStr,
 } from './path_types';
+import {Point} from "fabric";
 
 /**
  * The number of parameters per command

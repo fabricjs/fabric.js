@@ -1602,6 +1602,7 @@ export class Canvas extends SelectableCanvas {
    */
   destroy() {
     this.removeListeners();
+    // @ts-ignore
     super.destroy();
     this.textEditingManager.dispose();
   }
