@@ -895,7 +895,7 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    const prototype = this.constructor.prototype;
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
