@@ -39,8 +39,6 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
-  type = 'pattern';
-
   /**
    * @type TPatternRepeat
    * @defaults
