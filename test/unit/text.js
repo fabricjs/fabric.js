@@ -75,7 +75,7 @@
     assert.ok(text instanceof fabric.Text);
     assert.ok(text instanceof fabric.Object);
 
-    assert.equal(text.get('type'), 'text');
+    assert.equal(text.constructor.type, 'text');
     assert.equal(text.get('text'), 'x');
   });
 

@@ -76,7 +76,7 @@
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
 
-      assert.equal(path.get('type'), 'path');
+      assert.equal(path.constructor.type, 'path');
 
       var error;
       try {
