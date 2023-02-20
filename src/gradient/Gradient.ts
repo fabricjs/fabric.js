@@ -22,7 +22,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Gradient class

@@ -2,7 +2,7 @@ import { Canvas } from '../../canvas/Canvas';
 import { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import { AssertKeys, TFiller } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 
 type CursorBoundaries = {
   left: number;

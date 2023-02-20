@@ -1,6 +1,6 @@
-import { ControlRenderingStyleOverride } from '../controls/controls.render';
+import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
