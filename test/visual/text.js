@@ -500,7 +500,7 @@
       clientY: 0,
       dataTransfer: {
         setDragImage(imageSource, x, y) {
-          canvas.getContext().drawImage(imageSource.firstChild, 0, 0);
+          canvas.getContext().drawImage(imageSource, 0, 0);
           callback(canvas.lowerCanvasEl);
         }
       }

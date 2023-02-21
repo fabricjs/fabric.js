@@ -178,7 +178,7 @@ function assertDragEventStream(name, a, b) {
                     'text/plain': "test"
                 }, 'should set dataTransfer');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');
-                assert.ok(e.dataTransfer.dragImageData.img.firstChild instanceof HTMLCanvasElement, 'drag image was set');
+                assert.ok(e.dataTransfer.dragImageData.img instanceof HTMLCanvasElement, 'drag image was set');
                 assert.equal(e.dataTransfer.dragImageData.x, 30, 'drag image position');
                 assert.equal(e.dataTransfer.dragImageData.y, 15, 'drag image position');
                 assert.deepEqual(renderEffects, [], 'not rendered effects yet');

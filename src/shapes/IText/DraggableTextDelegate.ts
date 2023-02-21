@@ -9,8 +9,6 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { createCanvasElement } from '../../util/misc/dom';
-import { isIdentityMatrix } from '../../util/misc/matrix';
 import { TextStyleDeclaration } from '../Text/StyledText';
 
 /**
@@ -141,44 +139,28 @@ export class DraggableTextDelegate {
     target.setSelectionStyles(styleOverride, 0, selectionStart);
     target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
     target.dirty = true;
-    let dragImage = target.toCanvasElement({
+    const dragImage = target.toCanvasElement({
       enableRetinaScaling,
+      viewportTransform: true,
     });
     // restore values
     target.backgroundColor = bgc;
     target.styles = styles;
     target.dirty = true;
-    //  handle retina scaling and vpt
-    if (!isIdentityMatrix(vpt)) {
-      const dragImageCanvas = createCanvasElement();
-      const size = new Point(dragImage.width, dragImage.height).transform(
-        vpt,
-        true
-      );
-      dragImageCanvas.width = size.x;
-      dragImageCanvas.height = size.y;
-      const ctx = dragImageCanvas.getContext('2d')!;
-      const [a, b, c, d] = vpt;
-      ctx.transform(a, b, c, d, 0, 0);
-      ctx.drawImage(dragImage, 0, 0);
-      dragImage = dragImageCanvas;
-    }
     //  position drag image offscreen
     setStyle(dragImage, {
-      position: 'absolute',
+      position: 'fixed',
       left: `${-dragImage.width}px`,
       border: 'none',
-      transform: `scale(${1 / retinaScaling},${1 / retinaScaling})`,
+      width: `${dragImage.width / retinaScaling}px`,
+      height: `${dragImage.height / retinaScaling}px`,
     });
-    // wrap the image so css transform will be respected
-    const wrapper = getDocument().createElement('div');
-    wrapper.appendChild(dragImage);
     this.__dragImageDisposer && this.__dragImageDisposer();
     this.__dragImageDisposer = () => {
-      wrapper.remove();
+      dragImage.remove();
     };
-    canvas.wrapperEl.appendChild(wrapper);
-    e.dataTransfer?.setDragImage(wrapper, offset.x, offset.y);
+    getDocument().body.appendChild(dragImage);
+    e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
   /**
