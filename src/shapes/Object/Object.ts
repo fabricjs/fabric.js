@@ -610,9 +610,10 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
+  private static ownDefaults = fabricObjectDefaultValues;
 
   static get defaultValues() :Record<string, any> {
-    return fabricObjectDefaultValues;
+    return FabricObject.ownDefaults;
   }
 
   /**

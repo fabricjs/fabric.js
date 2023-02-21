@@ -27,10 +27,12 @@ export class Rect extends FabricObject {
 
   static cacheProperties = [...cacheProperties, 'rx', 'ry'];
 
+  private static ownDefaults = rectDefaultValues;
+
   static get defaultValues() :Record<string, any> {
     return {
       ...super.defaultValues,
-      ...rectDefaultValues,
+      ...Rect.ownDefaults,
     }
   }
 
