@@ -186,12 +186,6 @@ export class ActiveSelection extends Group {
   }
 }
 
-export const activeSelectionDefaultValues: Partial<
-  TClassProperties<ActiveSelection>
-> = {
-  type: 'activeSelection',
-};
-
-Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
+ActiveSelection.prototype.type = 'activeSelection';
 
 classRegistry.setClass(ActiveSelection);

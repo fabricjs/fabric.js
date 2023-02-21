@@ -610,12 +610,19 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
+
+  static get defaultValues() :Record<string, any> {
+    return fabricObjectDefaultValues;
+  }
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
+    // @ts-ignore constructor type
+    Object.assign(this, this.constructor.defaultValues);
     this.setOptions(options);
   }
 
@@ -895,20 +902,24 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    const topLevelClass = classRegistry.getClass(object.type);
+    // static defaultValues should win over prototype since anyway they get assigned to instance
+    const hasStaticDefaultValues = Object.keys(topLevelClass.defaultValues).length > 0;
+    const baseValues = hasStaticDefaultValues ? topLevelClass.defaultValues : topLevelClass.prototype;
+
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
       }
-      if (object[prop] === prototype[prop]) {
+      if (object[prop] === baseValues[prop]) {
         delete object[prop];
       }
       // basically a check for [] === []
       if (
         Array.isArray(object[prop]) &&
-        Array.isArray(prototype[prop]) &&
+        Array.isArray(baseValues[prop]) &&
         object[prop].length === 0 &&
-        prototype[prop].length === 0
+        baseValues[prop].length === 0
       ) {
         delete object[prop];
       }
@@ -1877,13 +1888,6 @@ export class FabricObject<
   }
 }
 
-/*
- * Properties that at minimum needs to stay on the prototype
- * That shouldn't be either on the instance and that can't be used as static
- * For inheritance reasons ( used in the superclass but static in the subclass )
- */
-Object.assign(FabricObject.prototype, {
-  ...fabricObjectDefaultValues,
-});
+FabricObject.prototype.type = 'object';
 
 classRegistry.setClass(FabricObject);

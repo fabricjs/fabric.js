@@ -77,6 +77,13 @@ export type LayoutResult = {
   height: number;
 };
 
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
+  layout: 'fit-content',
+  strokeWidth: 0,
+  subTargetCheck: false,
+  interactive: false,
+};
+
 /**
  * @fires object:added
  * @fires object:removed
@@ -119,6 +126,12 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
 
   static stateProperties: string[] = [...FabricObject.stateProperties, 'layout'];
 
+  static get defaultValues() :Record<string, any> {
+    return {
+      ...super.defaultValues,
+      ...groupDefaultValues,
+    }
+  }
 
   /**
    * Constructor
@@ -1051,16 +1064,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 }
 
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
-  layout: 'fit-content',
-  strokeWidth: 0,
-  subTargetCheck: false,
-  interactive: false,
-};
 
-Object.assign(Group.prototype, {
-  ...groupDefaultValues,
-});
+
+Group.prototype.type = 'group';
 
 classRegistry.setClass(Group);
