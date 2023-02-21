@@ -678,8 +678,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      // @ts-ignore TS and constructor issue
-      if (this.constructor.cacheProperties.includes(key)) {
+      if (
+        (this.constructor as typeof FabricObject).cacheProperties.includes(key)
+      ) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
       } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
@@ -1269,10 +1270,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    */
   clone(propertiesToInclude: string[]) {
     const objectForm = this.toObject(propertiesToInclude);
-    // todo ok understand this. is static or it isn't?
-    // TS is more an issue here than an helper.
-    // @ts-ignore
-    return this.constructor.fromObject(objectForm);
+    return (this.constructor as typeof FabricObject).fromObject(
+      objectForm
+    ) as unknown as this;
   }
 
   /**
