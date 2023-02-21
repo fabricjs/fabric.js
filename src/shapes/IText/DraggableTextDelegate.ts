@@ -183,12 +183,14 @@ export class DraggableTextDelegate {
       e.dataTransfer.setData(
         'application/fabric',
         JSON.stringify({
-          value: value,
-          styles: target.getSelectionStyles(
-            selection.selectionStart,
-            selection.selectionEnd,
-            true
-          ),
+          text: {
+            value: value,
+            styles: target.getSelectionStyles(
+              selection.selectionStart,
+              selection.selectionEnd,
+              true
+            ),
+          },
         })
       );
       e.dataTransfer.effectAllowed = 'copyMove';
