@@ -295,6 +295,7 @@ export abstract class ITextKeyBehavior<
     }
     const value = this.getSelectedText();
     clipboardData.setData('text/plain', value);
+    clipboardData.setData('text/svg+xml', `<svg>${this.toSVG()}</svg>`);
     clipboardData.setData(
       'application/fabric',
       JSON.stringify({
