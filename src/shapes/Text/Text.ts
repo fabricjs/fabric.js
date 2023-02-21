@@ -1696,6 +1696,7 @@ export class Text<
   }
 
   set(key: string | any, value?: any) {
+    const { textLayoutProperties } = this.constructor as typeof Text;
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
@@ -1704,12 +1705,11 @@ export class Text<
         if (_key === 'path') {
           this.setPathInfo();
         }
-        needsDims =
-          needsDims || this.constructor.textLayoutProperties.includes(_key);
+        needsDims = needsDims || textLayoutProperties.includes(_key);
         isAddingPath = isAddingPath || _key === 'path';
       }
     } else {
-      needsDims = this.constructor.textLayoutProperties.includes(key);
+      needsDims = textLayoutProperties.includes(key);
       isAddingPath = key === 'path';
     }
     if (isAddingPath) {
