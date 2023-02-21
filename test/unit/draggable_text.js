@@ -172,8 +172,10 @@ function assertDragEventStream(name, a, b) {
                 const charStyle = { "stroke": null, "strokeWidth": 1, "fill": "rgb(0,0,0)", "fontFamily": "Times New Roman", "fontSize": 40, "fontWeight": "normal", "fontStyle": "normal", "underline": false, "overline": false, "linethrough": false, "deltaY": 0, "textBackgroundColor": "" };
                 assert.deepEqual(e.dataTransfer.data, {
                     'application/fabric': JSON.stringify({
-                        value: 'test',
-                        styles: [charStyle, charStyle, charStyle, charStyle]
+                        text: {
+                            value: 'test',
+                            styles: [charStyle, charStyle, charStyle, charStyle]
+                        }
                     }),
                     'text/plain': "test"
                 }, 'should set dataTransfer');

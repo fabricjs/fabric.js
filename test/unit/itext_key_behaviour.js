@@ -298,7 +298,7 @@
         iText.on('copy', ev => fired.push(ev.e));
         iText.hiddenTextarea.dispatchEvent(event);
         assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
-        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
+        const { text: data } = JSON.parse(event.clipboardData.getData('application/fabric'));
         assert.equal(data.value, 'te');
         assert.equal(data.styles[0].fill, 'red', 'style is cloned');
         assert.equal(data.styles[1].fill, 'blue', 'style is referenced');
@@ -317,7 +317,7 @@
         iText.on('cut', ev => fired.push(ev.e));
         iText.hiddenTextarea.dispatchEvent(event);
         assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
-        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
+        const { text: data } = JSON.parse(event.clipboardData.getData('application/fabric'));
         assert.equal(data.value, 'te');
         assert.equal(data.styles[0].fill, 'red', 'style is cloned');
         assert.equal(data.styles[1].fill, 'blue', 'style is referenced');

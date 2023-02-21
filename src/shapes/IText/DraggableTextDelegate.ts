@@ -285,11 +285,11 @@ export class DraggableTextDelegate {
       const target = this.target;
       const canvas = target.canvas!;
       let insertAt = target.getSelectionStartFromPointer(e);
-      const { styles } = (
+      const { text: { styles } = {} } = (
         e.dataTransfer!.types.includes('application/fabric')
           ? JSON.parse(e.dataTransfer!.getData('application/fabric'))
           : {}
-      ) as { styles: TextStyleDeclaration[] };
+      ) as { text?: { styles: TextStyleDeclaration[] } };
       const trailing = insert[Math.max(0, insert.length - 1)];
       const selectionStartOffset = 0;
       //  drag and drop in same instance

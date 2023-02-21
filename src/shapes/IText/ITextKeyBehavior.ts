@@ -299,12 +299,14 @@ export abstract class ITextKeyBehavior<
     clipboardData.setData(
       'application/fabric',
       JSON.stringify({
-        value,
-        styles: this.getSelectionStyles(
-          this.selectionStart,
-          this.selectionEnd,
-          true
-        ),
+        text: {
+          value,
+          styles: this.getSelectionStyles(
+            this.selectionStart,
+            this.selectionEnd,
+            true
+          ),
+        },
       })
     );
     return true;
@@ -347,9 +349,11 @@ export abstract class ITextKeyBehavior<
     // obtain values from event
     const clipboardData = e.clipboardData;
     const value = clipboardData.getData('text/plain');
-    const { styles } = clipboardData.types.includes('application/fabric')
-      ? JSON.parse(clipboardData.getData('application/fabric'))
-      : {};
+    const { text: { styles } = {} } = (
+      clipboardData.types.includes('application/fabric')
+        ? JSON.parse(clipboardData.getData('application/fabric'))
+        : {}
+    ) as { text?: { styles: TextStyleDeclaration[] } };
     // execute paste logic
     if (value) {
       this.insertChars(value, styles, this.selectionStart, this.selectionEnd);
