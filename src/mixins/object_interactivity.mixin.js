@@ -212,7 +212,7 @@
       styleOverride = styleOverride || {};
       ctx.save();
       var retinaScaling = 1, matrix, p;
-      if(this.canvas) {
+      if (this.canvas) {
         retinaScaling = this.canvas.getRetinaScaling();
       }
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
