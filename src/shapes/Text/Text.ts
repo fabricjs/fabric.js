@@ -18,12 +18,15 @@ import {
   hasStyleChanged,
   stylesFromArray,
   stylesToArray,
+  TextStyleArray,
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import { textStylesFromCSS, textStylesToCSS } from '../../util/misc/CSSParsing';
+import { getWindow } from '../../env';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1728,6 +1731,67 @@ export class Text<
    */
   complexity(): number {
     return 1;
+  }
+
+  toHTML(from = 0, to = this.text.length) {
+    const text = this.text.substring(from, to);
+    const styles = this.getSelectionStyles(from, to, true);
+    const spans = styles.reduce(
+      (spans, style, index) => {
+        if (hasStyleChanged(spans[spans.length - 1].style, style, true)) {
+          spans.push({ text: text[index], style });
+        } else {
+          spans[spans.length - 1].text += text[index];
+        }
+        return spans;
+      },
+      [{ text: '', style: styles[0] }]
+    );
+    return `<html>
+    <body>
+    <!--StartFragment-->
+    <meta charset="utf-8"><span style="${textStylesToCSS(this)}">${spans
+      .map(
+        ({ text, style }) =>
+          `<span style="${textStylesToCSS({
+            ...style,
+            visible: true,
+          })}">${text}</span>`
+      )
+      .join('')}</span>
+      <!--EndFragment-->
+      </body>
+      </html>`;
+  }
+
+  static parseHTML(html = '') {
+    const parser = new (getWindow().DOMParser)() as DOMParser,
+      doc = parser.parseFromString(html.trim(), 'text/html');
+    let text = '';
+    const stylesArr: TextStyleArray = [];
+    doc.querySelectorAll('span').forEach((el) => {
+      const value = el.textContent || '';
+      stylesArr.push({
+        start: text.length,
+        end: text.length + value.length,
+        style: textStylesFromCSS(el.style),
+      });
+      text += value;
+    });
+    const styles = stylesFromArray(stylesArr, text);
+    return {
+      text,
+      styles,
+      flattenedStyles: Object.values(styles).reduce((styles, lineStyles) => {
+        const curr = Object.values(lineStyles);
+        return [
+          ...styles,
+          ...curr,
+          // EOL
+          curr[curr.length - 1],
+        ];
+      }, [] as TextStyleDeclaration[]) as TextStyleDeclaration[],
+    };
   }
 
   static genericFonts = [

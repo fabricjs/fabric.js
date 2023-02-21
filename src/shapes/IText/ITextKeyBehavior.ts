@@ -3,9 +3,8 @@
 import { getDocument } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
-import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
-import { AssertKeys } from '../../typedefs';
+import { ITextBehavior, ITextEvents } from './ITextBehavior';
 
 export abstract class ITextKeyBehavior<
   EventSpec extends ITextEvents = ITextEvents
@@ -251,8 +250,13 @@ export abstract class ITextKeyBehavior<
       this.removeStyleFromTo(removeFrom, removeTo);
     }
     if (insertedText.length) {
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      this.insertNewStyleBlock(
+        insertedText,
+        selectionStart,
+        this._pasteContext?.flattenedStyles || copiedStyle
+      );
     }
+    delete this._pasteContext;
     this.updateFromTextArea();
     this.fire('changed');
     if (this.canvas) {
@@ -287,26 +291,18 @@ export abstract class ITextKeyBehavior<
    * @returns true if text is selected and if the {@link ClipboardEvent#clipboardData} was set
    */
   protected setClipboardData(e: ClipboardEvent) {
-    // prevent input event
-    e.preventDefault();
     const clipboardData = e.clipboardData;
     if (this.selectionStart === this.selectionEnd || !clipboardData) {
+      clipboardData?.clearData();
       return false;
     }
     const value = this.getSelectedText();
     clipboardData.setData('text/plain', value);
-    clipboardData.setData('text/svg+xml', `<svg>${this.toSVG()}</svg>`);
     clipboardData.setData(
-      'application/fabric',
-      JSON.stringify({
-        value,
-        styles: this.getSelectionStyles(
-          this.selectionStart,
-          this.selectionEnd,
-          true
-        ),
-      })
+      'text/html',
+      this.toHTML(this.selectionStart, this.selectionEnd)
     );
+    clipboardData.setData('text/svg+xml', `<svg>${this.toSVG()}</svg>`);
     return true;
   }
 
@@ -320,46 +316,25 @@ export abstract class ITextKeyBehavior<
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  cut(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
-    if (this.setClipboardData(e)) {
-      //  remove selection and force recalculating dimensions
-      this._forceClearCache = true;
-      this.insertChars('', null, this.selectionStart, this.selectionEnd);
-      this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea.value = this.text;
-      this._updateTextarea();
-      this.fire('cut', { e });
-      this.fire('changed', { index: this.selectionStart, action: 'cut' });
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+  cut(e: ClipboardEvent) {
+    this.setClipboardData(e) && this.fire('cut', { e });
   }
 
   /**
-   * @override Override the `text/plain | application/fabric` types of {@link ClipboardEvent#clipboardData}
+   * @override Override the `text/plain | text/plain` types of {@link ClipboardEvent#clipboardData}
    * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
+   *
+   * The input event handles the actual pasting after this method completes
    */
-  paste(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
-    // prevent input event
-    e.preventDefault();
+  paste(e: ClipboardEvent) {
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
-    // obtain values from event
-    const clipboardData = e.clipboardData;
-    const value = clipboardData.getData('text/plain');
-    const { styles } = clipboardData.types.includes('application/fabric')
-      ? JSON.parse(clipboardData.getData('application/fabric'))
-      : {};
-    // execute paste logic
-    if (value) {
-      this.insertChars(value, styles, this.selectionStart, this.selectionEnd);
-      this.selectionStart = this.selectionEnd =
-        this.selectionStart + value.length;
-      this.hiddenTextarea.value = this.text;
-      this._updateTextarea();
-      this.fire('changed', { index: this.selectionStart, action: 'paste' });
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
+    // obtain styles from event
+    const data = e.clipboardData?.getData('text/html');
+    if (data) {
+      this._pasteContext = (
+        this.constructor as typeof ITextKeyBehavior
+      ).parseHTML(data);
     }
   }
 

@@ -193,15 +193,8 @@ export class DraggableTextDelegate {
       const data = { text: target.text, value, ...selection };
       e.dataTransfer.setData('text/plain', value);
       e.dataTransfer.setData(
-        'application/fabric',
-        JSON.stringify({
-          value: value,
-          styles: target.getSelectionStyles(
-            selection.selectionStart,
-            selection.selectionEnd,
-            true
-          ),
-        })
+        'text/html',
+        target.toHTML(selection.selectionStart, selection.selectionEnd)
       );
       e.dataTransfer.effectAllowed = 'copyMove';
       this.setDragImage(e, data);
@@ -270,7 +263,7 @@ export class DraggableTextDelegate {
   }
 
   /**
-   * Override the `text/plain | application/fabric` types of {@link DragEvent#dataTransfer}
+   * Override the `text/plain | text/html` types of {@link DragEvent#dataTransfer}
    * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
    */
@@ -285,11 +278,10 @@ export class DraggableTextDelegate {
       const target = this.target;
       const canvas = target.canvas!;
       let insertAt = target.getSelectionStartFromPointer(e);
-      const { styles } = (
-        e.dataTransfer!.types.includes('application/fabric')
-          ? JSON.parse(e.dataTransfer!.getData('application/fabric'))
-          : {}
-      ) as { styles: TextStyleDeclaration[] };
+      const html = e.dataTransfer?.getData('text/html');
+      const { flattenedStyles: styles = {} } = html
+        ? (target.constructor as typeof IText).parseHTML(html)
+        : {};
       const trailing = insert[Math.max(0, insert.length - 1)];
       const selectionStartOffset = 0;
       //  drag and drop in same instance
