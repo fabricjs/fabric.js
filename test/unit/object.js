@@ -99,8 +99,8 @@
 
   QUnit.test('stateProperties', function(assert) {
     var cObj = new fabric.Object();
-    assert.ok(cObj.stateProperties);
-    assert.ok(cObj.stateProperties.length > 0);
+    assert.ok(cObj.constructor.stateProperties);
+    assert.ok(cObj.constructor.stateProperties.length > 0);
   });
 
   QUnit.test('transform', function(assert) {

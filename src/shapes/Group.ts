@@ -17,7 +17,7 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, stateProperties } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 
@@ -116,6 +116,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @private
    */
   protected _activeObjects: FabricObject[] = [];
+
+  static stateProperties: string[] = [...FabricObject.stateProperties, 'layout'];
+
 
   /**
    * Constructor
@@ -1058,7 +1061,6 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
 
 Object.assign(Group.prototype, {
   ...groupDefaultValues,
-  stateProperties: [...stateProperties, 'layout'],
 });
 
 classRegistry.setClass(Group);

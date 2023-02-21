@@ -468,7 +468,7 @@ export class FabricObject<
    * needs its cache regenerated during a .set call
    * @type Array
    */
-  declare stateProperties: string[];
+  static stateProperties: string[] = stateProperties;
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -1021,7 +1021,8 @@ export class FabricObject<
       if (this.constructor.cacheProperties.includes(key)) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
+        // @ts-ignore TS and constructor issue
+      } else if (groupNeedsUpdate && this.constructor.stateProperties.includes(key)) {
         this.group!.set('dirty', true);
       }
     }
@@ -1882,7 +1883,6 @@ export class FabricObject<
  * For inheritance reasons ( used in the superclass but static in the subclass )
  */
 Object.assign(FabricObject.prototype, {
-  stateProperties,
   ...fabricObjectDefaultValues,
 });
 
