@@ -40,6 +40,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "docs": "typedoc --out docs fabric.ts",
     "cli": "node ./scripts/index.mjs",
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "npm run cli -- build",
@@ -87,7 +88,6 @@
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
-    "deep-object-diff": "^1.1.7",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
     "fireworm": "^0.7.2",
@@ -106,6 +106,7 @@
     "source-map-support": "^0.5.21",
     "testem": "^3.8.0",
     "tslib": "^2.4.1",
+    "typedoc": "^0.23.24",
     "typescript": "^4.9.4"
   },
   "engines": {
@@ -127,8 +128,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.cjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js",
       "node": null,
       "types": "./dist/index.d.ts"
     },

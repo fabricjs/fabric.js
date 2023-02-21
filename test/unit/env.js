@@ -18,8 +18,8 @@ QUnit.module('env', (hooks) => {
 
         QUnit.test('SSR: importing fabric before window/document are defined', async assert => {
             const done = assert.async();
-            const imported = await import('../../dist/index.cjs');
-            const required = require('../../dist/index.cjs');
+            const imported = await import('../../dist/index.js');
+            const required = require('../../dist/index.js');
             assert.notOk(global.window, 'no window');
             assert.notOk(global.document, 'no document');
             const win = { devicePixelRatio: 1.25 };
@@ -29,12 +29,12 @@ QUnit.module('env', (hooks) => {
             [imported, required].forEach(fabric => {
                 assert.equal(fabric.getEnv().window, win, 'window should match');
                 assert.equal(fabric.getEnv().document, doc, 'document should match');
-            });            
+            });
             done();
         });
     });
 
-    (!isNode() ? QUnit.module : QUnit.module.skip)('browser', (hooks) => { 
+    (!isNode() ? QUnit.module : QUnit.module.skip)('browser', (hooks) => {
         QUnit.test('env', assert => {
             assert.equal(fabric.getWindow(), window, 'window should be set');
             assert.equal(fabric.getDocument(), document, 'window should be set');

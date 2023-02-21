@@ -3,6 +3,7 @@ import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
+import { isActiveSelection } from '../../util/types';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
@@ -38,39 +39,53 @@ export class StackedObject<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectGeometry<EventSpec> {
   /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  declare __owningGroup?: Group;
+
+  /**
+   * Returns instance's parent **EXCLUDING** `ActiveSelection`
+   * @param {boolean} [strict] exclude canvas as well
+   */
+  getParent<T extends boolean>(strict?: T): TAncestor | undefined {
+    return (
+      (isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
+      (strict ? undefined : this.canvas)
+    );
+  }
+
+  /**
    * Checks if object is descendant of target
-   * Should be used instead of @link {Collection.contains} for performance reasons
+   * Should be used instead of {@link Group.contains} or {@link StaticCanvas.contains} for performance reasons
    * @param {TAncestor} target
    * @returns {boolean}
    */
   isDescendantOf(target: TAncestor): boolean {
-    let parent = this.group || this.canvas;
-    while (parent) {
-      if (target === parent) {
-        return true;
-      } else if (parent instanceof StaticCanvas) {
-        //  happens after all parents were traversed through without a match
-        return false;
-      }
-      parent = (parent as Group).group || (parent as Group).canvas;
-    }
-    return false;
+    return (
+      this.__owningGroup === target ||
+      this.group === target ||
+      this.canvas === target ||
+      // walk up
+      (!!this.__owningGroup && this.__owningGroup.isDescendantOf(target)) ||
+      (!!this.group && this.group.isDescendantOf(target))
+    );
   }
 
   /**
    *
    * @param {boolean} [strict] returns only ancestors that are objects (without canvas)
-   * @returns {Ancestors} ancestors from bottom to top
+   * @returns {Ancestors} ancestors (excluding `ActiveSelection`) from bottom to top
    */
   getAncestors<T extends boolean>(strict?: T): Ancestors<T> {
     const ancestors: TAncestor[] = [];
-    let parent = this.group || (strict ? undefined : this.canvas);
-    while (parent) {
-      ancestors.push(parent);
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let parent: TAncestor | undefined = this;
+    do {
       parent =
-        (parent as Group).group ||
-        (strict ? undefined : (parent as Group).canvas);
-    }
+        parent instanceof StackedObject ? parent.getParent(strict) : undefined;
+      parent && ancestors.push(parent);
+    } while (parent);
     return ancestors as Ancestors<T>;
   }
 

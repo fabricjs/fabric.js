@@ -12,7 +12,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capitalize } from '../../util/lang_string';
@@ -24,6 +24,7 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
+import { sendObjectToPlane } from '../../util/misc/planeChange';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
@@ -591,12 +592,6 @@ export class FabricObject<
    * @private
    */
   declare group?: Group;
-
-  /**
-   * A reference to the parent of the object
-   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
-   */
-  declare __owningGroup?: Group;
 
   /**
    * Indicate if the object is sitting on a cache dedicated to it
@@ -1657,6 +1652,7 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
+   * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options: any = {}) {
@@ -1674,6 +1670,9 @@ export class FabricObject<
     }
     if (options.withoutShadow) {
       this.shadow = null;
+    }
+    if (options.viewportTransform) {
+      sendObjectToPlane(this, this.getViewportTransform());
     }
 
     const el = createCanvasElement(),
@@ -1830,11 +1829,9 @@ export class FabricObject<
    * override if necessary to dispose artifacts such as `clipPath`
    */
   dispose() {
-    // todo verify this.
-    // runningAnimations is always truthy
-    if (runningAnimations) {
-      runningAnimations.cancelByTarget(this);
-    }
+    runningAnimations.cancelByTarget(this);
+    this.off();
+    this._set('canvas', undefined);
   }
 
   /**
