@@ -518,7 +518,7 @@
     golden: 'drag_image.png',
     width: 120,
     height: 220,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -529,7 +529,7 @@
     golden: 'drag_image.png',
     width: 110,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -540,7 +540,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -551,7 +551,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 

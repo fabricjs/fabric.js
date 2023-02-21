@@ -24,6 +24,7 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
+import { sendObjectToPlane } from '../../util/misc/planeChange';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
@@ -1311,6 +1312,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
+   * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options: any = {}) {
@@ -1328,6 +1330,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
     }
     if (options.withoutShadow) {
       this.shadow = null;
+    }
+    if (options.viewportTransform) {
+      sendObjectToPlane(this, this.getViewportTransform());
     }
 
     const el = createCanvasElement(),
