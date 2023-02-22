@@ -14,7 +14,10 @@ export abstract class DataTransferManager<
 
   protected abstract extractDataTransfer(e: T): DataTransfer | null;
 
-  setDataTransfer(e: T): boolean {
+  /**
+   * @returns true if {@link DataTransfer} was set
+   */
+  setData(e: T): boolean {
     const dataTransfer = this.extractDataTransfer(e);
     if (!dataTransfer) {
       return false;
@@ -33,7 +36,7 @@ export abstract class DataTransferManager<
     return true;
   }
 
-  getDataTransfer(e: T): {
+  getData(e: T): {
     text?: string;
     styles?: TextStyleDeclaration[];
   } {

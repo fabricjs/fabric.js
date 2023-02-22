@@ -52,8 +52,8 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
     return e.dataTransfer;
   }
 
-  setDataTransfer(e: DragEvent): boolean {
-    if (super.setDataTransfer(e)) {
+  setData(e: DragEvent): boolean {
+    if (super.setData(e)) {
       this.extractDataTransfer(e)!.effectAllowed = 'copyMove';
       this.setDragImage(e as AssertKeys<DragEvent, 'dataTransfer'>);
       return true;
@@ -189,7 +189,7 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
         selectionStart,
         selectionEnd,
       };
-      this.setDataTransfer(e);
+      this.setData(e);
     }
     target.abortCursorAnimation();
     return active;
@@ -265,7 +265,7 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
     e.preventDefault();
-    const { text, styles } = this.getDataTransfer(e);
+    const { text, styles } = this.getData(e);
     let insert = text;
     if (insert && !didDrop) {
       const target = this.target;

@@ -286,16 +286,14 @@ export abstract class ITextKeyBehavior<
    * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   copy(e: ClipboardEvent) {
-    new ClipboardDataManager(this).setDataTransfer(e) &&
-      this.fire('copy', { e });
+    new ClipboardDataManager(this).setData(e) && this.fire('copy', { e });
   }
 
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   cut(e: ClipboardEvent) {
-    new ClipboardDataManager(this).setDataTransfer(e) &&
-      this.fire('cut', { e });
+    new ClipboardDataManager(this).setData(e) && this.fire('cut', { e });
   }
 
   /**
@@ -309,7 +307,7 @@ export abstract class ITextKeyBehavior<
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
     // obtain styles from event
-    const { text, styles } = new ClipboardDataManager(this).getDataTransfer(e);
+    const { text, styles } = new ClipboardDataManager(this).getData(e);
     // execute paste logic
     if (text) {
       this.insertChars(text, styles, this.selectionStart, this.selectionEnd);

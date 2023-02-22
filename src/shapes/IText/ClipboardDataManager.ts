@@ -5,8 +5,8 @@ export class ClipboardDataManager extends DataTransferManager<ClipboardEvent> {
     return e.clipboardData;
   }
 
-  setDataTransfer(e: ClipboardEvent): boolean {
+  setData(e: ClipboardEvent): boolean {
     e.preventDefault();
-    return super.setDataTransfer(e);
+    return super.setData(e);
   }
 }
