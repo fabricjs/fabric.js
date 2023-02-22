@@ -5,6 +5,7 @@ import {
   isDefinedValueTransformer,
   isTruthyValueTransformer,
   colorTransformer,
+  colorRestorer,
 } from './util';
 import { CSSTransformConfigMap, CSSTransformConfig } from './types';
 import { CSSTransformationMap } from './CSSTransformationMap';
@@ -26,6 +27,8 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   fontFamily: {
     key: 'font-family',
     transformValue: (value) => value.replace(dblQuoteRegex, "'"),
+    restoreValue: (value) =>
+      value?.replace(dblQuoteRegex, '').split(',').pop()?.trim(),
   },
   fontSize: {
     key: 'font-size',
@@ -46,6 +49,7 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   textBackgroundColor: {
     key: 'background',
     transform: colorTransformer,
+    restoreValue: colorRestorer,
   },
   textDecoration: {
     key: 'text-decoration',

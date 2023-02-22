@@ -9,6 +9,9 @@ export const colorTransformer = <T>(key: string, value: T) => {
     : hex;
 };
 
+export const colorRestorer = (value?: string) =>
+  value ? value.substring(0, value.indexOf(')') + 1) : '';
+
 export const isDefinedValueTransformer = <T>(value: T) => (value ? value : '');
 
 export const isTruthyValueTransformer = <T>(value: T, output: string): string =>
