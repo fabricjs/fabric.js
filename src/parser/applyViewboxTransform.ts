@@ -14,32 +14,30 @@ export function applyViewboxTransform(element) {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
-  let viewBoxAttr = element.getAttribute('viewBox'),
-    scaleX = 1,
-    scaleY = 1,
-    minX = 0,
-    minY = 0,
-    viewBoxWidth,
-    viewBoxHeight,
-    matrix,
-    el,
-    widthAttr = element.getAttribute('width'),
-    heightAttr = element.getAttribute('height'),
-    x = element.getAttribute('x') || 0,
-    y = element.getAttribute('y') || 0,
-    preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '',
-    missingViewBox =
-      !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue)),
-    missingDimAttr =
+  let viewBoxAttr = element.getAttribute('viewBox');
+  let scaleX = 1;
+  let scaleY = 1;
+  let minX = 0;
+  let minY = 0;
+  let matrix;
+  let el;
+  const widthAttr = element.getAttribute('width');
+  const heightAttr = element.getAttribute('height');
+  const x = element.getAttribute('x') || 0;
+  const y = element.getAttribute('y') || 0;
+  let preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '';
+  const missingViewBox =
+      !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
+  const missingDimAttr =
       !widthAttr ||
       !heightAttr ||
       widthAttr === '100%' ||
-      heightAttr === '100%',
-    toBeParsed = missingViewBox && missingDimAttr,
-    parsedDim = {},
-    translateMatrix = '',
-    widthDiff = 0,
-    heightDiff = 0;
+      heightAttr === '100%';
+  const toBeParsed = missingViewBox && missingDimAttr;
+  const parsedDim = {};
+  let translateMatrix = '';
+  let widthDiff = 0;
+  let heightDiff = 0;
 
   parsedDim.width = 0;
   parsedDim.height = 0;
@@ -72,8 +70,8 @@ export function applyViewboxTransform(element) {
   }
   minX = -parseFloat(viewBoxAttr[1]);
   minY = -parseFloat(viewBoxAttr[2]);
-  viewBoxWidth = parseFloat(viewBoxAttr[3]);
-  viewBoxHeight = parseFloat(viewBoxAttr[4]);
+  const viewBoxWidth = parseFloat(viewBoxAttr[3]);
+  const viewBoxHeight = parseFloat(viewBoxAttr[4]);
   parsedDim.minX = minX;
   parsedDim.minY = minY;
   parsedDim.viewBoxWidth = viewBoxWidth;
