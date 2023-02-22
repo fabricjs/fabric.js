@@ -9,8 +9,6 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { createCanvasElement } from '../../util/misc/dom';
-import { isIdentityMatrix } from '../../util/misc/matrix';
 import { TextStyleDeclaration } from '../Text/StyledText';
 
 /**
@@ -140,37 +138,27 @@ export class DraggableTextDelegate {
     };
     target.setSelectionStyles(styleOverride, 0, selectionStart);
     target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
-    let dragImage = target.toCanvasElement({
+    target.dirty = true;
+    const dragImage = target.toCanvasElement({
       enableRetinaScaling,
+      viewportTransform: true,
     });
     // restore values
     target.backgroundColor = bgc;
     target.styles = styles;
-    //  handle retina scaling and vpt
-    if (retinaScaling > 1 || !isIdentityMatrix(vpt)) {
-      const dragImageCanvas = createCanvasElement();
-      const size = new Point(dragImage.width, dragImage.height)
-        .scalarDivide(retinaScaling)
-        .transform(vpt, true);
-      dragImageCanvas.width = size.x;
-      dragImageCanvas.height = size.y;
-      const ctx = dragImageCanvas.getContext('2d')!;
-      ctx.scale(1 / retinaScaling, 1 / retinaScaling);
-      const [a, b, c, d] = vpt;
-      ctx.transform(a, b, c, d, 0, 0);
-      ctx.drawImage(dragImage, 0, 0);
-      dragImage = dragImageCanvas;
-    }
+    target.dirty = true;
+    //  position drag image offscreen
+    setStyle(dragImage, {
+      position: 'fixed',
+      left: `${-dragImage.width}px`,
+      border: 'none',
+      width: `${dragImage.width / retinaScaling}px`,
+      height: `${dragImage.height / retinaScaling}px`,
+    });
     this.__dragImageDisposer && this.__dragImageDisposer();
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    //  position drag image offscreen
-    setStyle(dragImage, {
-      position: 'absolute',
-      left: -dragImage.width + 'px',
-      border: 'none',
-    });
     getDocument().body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
@@ -293,7 +281,7 @@ export class DraggableTextDelegate {
         } else if (insertAt > selectionEnd) {
           insertAt -= selectionEnd - selectionStart;
         }
-        target.insertChars('', undefined, selectionStart, selectionEnd);
+        target.removeChars(selectionStart, selectionEnd);
         // prevent `dragend` from handling event
         delete this.__dragStartSelection;
       }
@@ -357,7 +345,7 @@ export class DraggableTextDelegate {
         } else {
           target.clearContextTop();
           if (dropEffect === 'move') {
-            target.insertChars('', undefined, selectionStart, selectionEnd);
+            target.removeChars(selectionStart, selectionEnd);
             target.selectionStart = target.selectionEnd = selectionStart;
             target.hiddenTextarea &&
               (target.hiddenTextarea.value = target.text);
