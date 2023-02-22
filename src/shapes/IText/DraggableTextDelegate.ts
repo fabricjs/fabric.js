@@ -10,6 +10,7 @@ import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { DataTransferManager } from './DataTransferManager';
+import { AssertKeys } from '../../typedefs';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -54,6 +55,7 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
   setDataTransfer(e: DragEvent): boolean {
     if (super.setDataTransfer(e)) {
       this.extractDataTransfer(e)!.effectAllowed = 'copyMove';
+      this.setDragImage(e as AssertKeys<DragEvent, 'dataTransfer'>);
       return true;
     }
     return false;
@@ -112,14 +114,14 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
    * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
    */
   setDragImage(
-    e: DragEvent,
+    e: AssertKeys<DragEvent, 'dataTransfer'>,
     {
-      selectionStart,
-      selectionEnd,
+      selectionStart = this.target.selectionStart,
+      selectionEnd = this.target.selectionEnd,
     }: {
-      selectionStart: number;
-      selectionEnd: number;
-    }
+      selectionStart?: number;
+      selectionEnd?: number;
+    } = {}
   ) {
     const target = this.target;
     const canvas = target.canvas!;
@@ -171,7 +173,7 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
       dragImage.remove();
     };
     getDocument().body.appendChild(dragImage);
-    e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
+    e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
   }
 
   /**
@@ -188,7 +190,6 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
         selectionEnd,
       };
       this.setDataTransfer(e);
-      this.setDragImage(e, { selectionStart, selectionEnd });
     }
     target.abortCursorAnimation();
     return active;
