@@ -18,7 +18,6 @@ const tagArray = [
 export function getGradientDefs(doc) {
   const elList = getMultipleNodes(doc, tagArray);
   let el;
-  let j = 0;
   const gradientDefs = {};
   let j = elList.length;
   while (j--) {
