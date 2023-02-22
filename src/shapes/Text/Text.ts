@@ -1769,28 +1769,31 @@ export class Text<
       doc = parser.parseFromString(html.trim(), 'text/html');
     let text = '';
     const stylesArr: TextStyleArray = [];
-    doc.querySelectorAll('span').forEach((el) => {
-      const value = el.textContent || '';
-      stylesArr.push({
-        start: text.length,
-        end: text.length + value.length,
-        style: textStylesFromCSS(el.style),
-      });
-      text += value;
+    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+      acceptNode() {
+        return NodeFilter.FILTER_ACCEPT;
+      },
     });
+    while (walker.nextNode()) {
+      const value = (walker.currentNode.textContent || '').replaceAll('\n', '');
+      if (value.length > 0) {
+        stylesArr.push({
+          start: text.length,
+          end: text.length + value.length,
+          style: textStylesFromCSS(
+            getWindow().getComputedStyle(walker.currentNode.parentElement)
+          ),
+        });
+        text += value;
+      }
+    }
     const styles = stylesFromArray(stylesArr, text);
     return {
       text,
       styles,
       flattenedStyles: Object.values(styles).reduce((styles, lineStyles) => {
-        const curr = Object.values(lineStyles);
-        return [
-          ...styles,
-          ...curr,
-          // EOL
-          curr[curr.length - 1],
-        ];
-      }, [] as TextStyleDeclaration[]) as TextStyleDeclaration[],
+        return [...styles, ...Object.values(lineStyles)];
+      }, [] as TextStyleDeclaration[]),
     };
   }
 
