@@ -293,6 +293,7 @@ export abstract class ITextKeyBehavior<
    * @returns true if text is selected and if the {@link ClipboardEvent#clipboardData} was set
    */
   protected setClipboardData(e: ClipboardEvent) {
+    e.preventDefault();
     const clipboardData = e.clipboardData;
     if (this.selectionStart === this.selectionEnd || !clipboardData) {
       clipboardData?.clearData();
@@ -336,7 +337,7 @@ export abstract class ITextKeyBehavior<
     let text = e.clipboardData
       ?.getData('text/plain')
       .replace(newlineRegExp, '\n');
-    let styles: TextStyleDeclaration[] = [];
+    let styles: TextStyleDeclaration[] | undefined;
     const data = e.clipboardData?.getData('text/html');
     if (data) {
       const parsedHTML = (
@@ -345,7 +346,6 @@ export abstract class ITextKeyBehavior<
       text = parsedHTML.text;
       styles = parsedHTML.flattenedStyles;
     }
-    console.log(styles);
     // execute paste logic
     if (text) {
       this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
