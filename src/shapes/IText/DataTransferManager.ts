@@ -56,7 +56,7 @@ export abstract class DataTransferManager<
   }
 
   static toHTML(target: IText, from = 0, to = target.text.length) {
-    const text = target.text.substring(from, to).split(target._reNewline);
+    const text = target.text.substring(from, to); //.split(target._reNewline);
     const styles = target.getSelectionStyles(from, to, true);
     const spans = styles.reduce<
       { text: string; style: TextStyleDeclaration }[]
