@@ -26,7 +26,7 @@ import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
 import { textStylesFromCSS, textStylesToCSS } from '../../util/misc/CSSParsing';
-import { getWindow } from '../../env';
+import { getDocument, getWindow } from '../../env';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1769,18 +1769,27 @@ export class Text<
       doc = parser.parseFromString(html.trim(), 'text/html');
     let text = '';
     const stylesArr: TextStyleArray = [];
-    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
-      acceptNode() {
-        return NodeFilter.FILTER_ACCEPT;
-      },
+    const container = doc.createElement('div');
+    container.append(...doc.body.children);
+    Object.assign(container.style, {
+      position: 'fixed',
+      left: `${-container.width}px`,
     });
+    const body = getDocument().body;
+    // append for computed styles
+    body.append(container);
+    const walker = getDocument().createTreeWalker(
+      container,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode() {
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      }
+    );
     while (walker.nextNode()) {
       const value = walker.currentNode.textContent || '';
       if (value.length > 0) {
-        console.log(
-          walker.currentNode,
-          getWindow().getComputedStyle(walker.currentNode.parentElement)
-        );
         stylesArr.push({
           start: text.length,
           end: text.length + value.length,
@@ -1791,6 +1800,7 @@ export class Text<
         text += value;
       }
     }
+    container.remove();
     text = text.replace(newlineRegExp, '\n');
     const styles = stylesFromArray(stylesArr, text);
     return {
