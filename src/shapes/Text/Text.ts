@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { cache } from '../../cache';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, newlineRegExp } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
@@ -1775,8 +1775,12 @@ export class Text<
       },
     });
     while (walker.nextNode()) {
-      const value = (walker.currentNode.textContent || '').replaceAll('\n', '');
+      const value = walker.currentNode.textContent || '';
       if (value.length > 0) {
+        console.log(
+          walker.currentNode,
+          getWindow().getComputedStyle(walker.currentNode.parentElement)
+        );
         stylesArr.push({
           start: text.length,
           end: text.length + value.length,
@@ -1787,13 +1791,15 @@ export class Text<
         text += value;
       }
     }
+    text = text.replace(newlineRegExp, '\n');
     const styles = stylesFromArray(stylesArr, text);
     return {
       text,
       styles,
-      flattenedStyles: Object.values(styles).reduce((styles, lineStyles) => {
-        return [...styles, ...Object.values(lineStyles)];
-      }, [] as TextStyleDeclaration[]),
+      flattenedStyles: Object.values(styles).reduce(
+        (styles, lineStyles) => [...styles, ...Object.values(lineStyles)],
+        [] as TextStyleDeclaration[]
+      ),
     };
   }
 
@@ -1963,7 +1969,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
     'deltaY',
     'textBackgroundColor',
   ],
-  _reNewline: /\r?\n/,
+  _reNewline: newlineRegExp,
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,

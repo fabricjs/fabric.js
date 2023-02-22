@@ -1,8 +1,10 @@
 //@ts-nocheck
 
+import { newlineRegExp } from '../../constants';
 import { getDocument } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
+import { TextStyle } from '../Text/StyledText';
 import type { TKeyMapIText } from './constants';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 
@@ -327,14 +329,33 @@ export abstract class ITextKeyBehavior<
    * The input event handles the actual pasting after this method completes
    */
   paste(e: ClipboardEvent) {
+    e.preventDefault();
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
     // obtain styles from event
+    let text = e.clipboardData
+      ?.getData('text/plain')
+      .replace(newlineRegExp, '\n');
+    let styles: TextStyleDeclaration[] = [];
     const data = e.clipboardData?.getData('text/html');
     if (data) {
-      this._pasteContext = (
+      const parsedHTML = (
         this.constructor as typeof ITextKeyBehavior
       ).parseHTML(data);
+      text = parsedHTML.text;
+      styles = parsedHTML.flattenedStyles;
+    }
+    console.log(styles);
+    // execute paste logic
+    if (text) {
+      this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
+      this.selectionStart = this.selectionEnd =
+        this.selectionStart + text.length;
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+      this.fire('changed', { index: this.selectionStart, action: 'paste' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
     }
   }
 

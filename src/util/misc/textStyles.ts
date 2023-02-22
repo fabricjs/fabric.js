@@ -1,3 +1,4 @@
+import { newlineRegExp } from '../../constants';
 import type {
   TextStyle,
   TextStyleDeclaration,
@@ -13,13 +14,13 @@ export type TextStyleArray = {
 /**
  * @param {Object} prevStyle first style to compare
  * @param {Object} thisStyle second style to compare
- * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
+ * @param {boolean} compareTextDecoration whether to check overline, underline, and line-through properties
  * @return {boolean} true if the style changed
  */
 export const hasStyleChanged = (
   prevStyle: TextStyleDeclaration,
   thisStyle: TextStyleDeclaration,
-  forTextSpans = false
+  compareTextDecoration = false
 ) =>
   prevStyle.fill !== thisStyle.fill ||
   prevStyle.stroke !== thisStyle.stroke ||
@@ -30,7 +31,7 @@ export const hasStyleChanged = (
   prevStyle.fontStyle !== thisStyle.fontStyle ||
   prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
   prevStyle.deltaY !== thisStyle.deltaY ||
-  (forTextSpans &&
+  (compareTextDecoration &&
     (prevStyle.overline !== thisStyle.overline ||
       prevStyle.underline !== thisStyle.underline ||
       prevStyle.linethrough !== thisStyle.linethrough));
@@ -45,9 +46,10 @@ export const hasStyleChanged = (
  */
 export const stylesToArray = (
   styles: TextStyle,
-  text: string
+  text: string,
+  separator: string | RegExp = newlineRegExp
 ): TextStyleArray => {
-  const textLines = text.split('\n'),
+  const textLines = text.split(separator),
     stylesArray = [];
   let charIndex = -1,
     prevStyle = {};
@@ -94,13 +96,14 @@ export const stylesToArray = (
  */
 export const stylesFromArray = (
   styles: TextStyleArray | TextStyle,
-  text: string
+  text: string,
+  separator: string | RegExp = newlineRegExp
 ): TextStyle => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
     return cloneDeep(styles);
   }
-  const textLines = text.split('\n'),
+  const textLines = text.split(separator),
     stylesObject = {} as Record<
       string | number,
       Record<string | number, Record<string, string>>
