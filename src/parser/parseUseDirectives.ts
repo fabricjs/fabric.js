@@ -5,8 +5,8 @@ import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
 export function parseUseDirectives(doc) {
-  let nodelist = getMultipleNodes(doc, ['use', 'svg:use']),
-    i = 0;
+  const nodelist = getMultipleNodes(doc, ['use', 'svg:use']);
+  let i = 0;
   while (nodelist.length && i < nodelist.length) {
     const el = nodelist[i],
       xlinkAttribute = el.getAttribute('xlink:href') || el.getAttribute('href');
@@ -15,24 +15,23 @@ export function parseUseDirectives(doc) {
       return;
     }
 
-    var xlink = xlinkAttribute.slice(1),
-      x = el.getAttribute('x') || 0,
-      y = el.getAttribute('y') || 0,
-      el2 = elementById(doc, xlink).cloneNode(true),
-      currentTrans =
+    const xlink = xlinkAttribute.slice(1);
+    const x = el.getAttribute('x') || 0;
+    const y = el.getAttribute('y') || 0;
+    let el2 = elementById(doc, xlink).cloneNode(true);
+    let currentTrans =
         (el2.getAttribute('transform') || '') +
         ' translate(' +
         x +
         ', ' +
         y +
-        ')',
-      parentNode,
-      oldLength = nodelist.length,
-      attr,
-      j,
-      attrs,
-      len,
-      namespace = svgNS;
+        ')';
+    const oldLength = nodelist.length;
+    let attr;
+    let j;
+    let attrs;
+    let len;
+    const namespace = svgNS;
 
     applyViewboxTransform(el2);
     if (/^svg$/i.test(el2.nodeName)) {
@@ -69,7 +68,7 @@ export function parseUseDirectives(doc) {
     el2.setAttribute('transform', currentTrans);
     el2.setAttribute('instantiated_by_use', '1');
     el2.removeAttribute('id');
-    parentNode = el.parentNode;
+    const parentNode = el.parentNode;
     parentNode.replaceChild(el2, el);
     // some browsers do not shorten nodelist after replaceChild (IE8)
     if (nodelist.length === oldLength) {
