@@ -4,6 +4,7 @@ import {
   unitTransformer,
   isDefinedValueTransformer,
   isTruthyValueTransformer,
+  colorTransformer,
 } from './util';
 import { CSSTransformConfigMap, CSSTransformConfig } from './types';
 import { CSSTransformationMap } from './CSSTransformationMap';
@@ -12,7 +13,12 @@ const dblQuoteRegex = /"/g;
 
 export const CSSTextTransformationMap: CSSTransformConfigMap<
   Text,
-  'fontFamily' | 'fontSize' | 'fontStyle' | 'fontWeight' | 'direction'
+  | 'fontFamily'
+  | 'fontSize'
+  | 'fontStyle'
+  | 'fontWeight'
+  | 'direction'
+  | 'textBackgroundColor'
 > & {
   textDecoration: CSSTransformConfig<Text, string>;
 } & typeof CSSTransformationMap = {
@@ -36,6 +42,10 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   },
   direction: {
     transformValue: isDefinedValueTransformer,
+  },
+  textBackgroundColor: {
+    key: 'background',
+    transform: colorTransformer,
   },
   textDecoration: {
     key: 'text-decoration',
