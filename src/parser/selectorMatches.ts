@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 export function selectorMatches(element, selector) {
-  let nodeName = element.nodeName,
+  const nodeName = element.nodeName,
     classNames = element.getAttribute('class'),
     id = element.getAttribute('id'),
     matcher,

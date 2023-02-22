@@ -16,7 +16,7 @@ const tagArray = [
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
 export function getGradientDefs(doc) {
-  let elList = getMultipleNodes(doc, tagArray),
+  const elList = getMultipleNodes(doc, tagArray),
     el,
     j = 0,
     gradientDefs = {};

@@ -12,8 +12,8 @@ export function elementById(doc, id) {
   }
   let node,
     i,
-    len,
-    nodelist = doc.getElementsByTagName('*');
+    len;
+  const nodelist = doc.getElementsByTagName('*');
   for (i = 0, len = nodelist.length; i < len; i++) {
     node = nodelist[i];
     if (id === node.getAttribute('id')) {

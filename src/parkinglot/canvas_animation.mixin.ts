@@ -22,10 +22,11 @@ Object.assign(StaticCanvas.prototype, {
   fxCenterObjectH: function (object, callbacks) {
     callbacks = callbacks || {};
 
-    var empty = function () {},
-      onComplete = callbacks.onComplete || empty,
-      onChange = callbacks.onChange || empty,
-      _this = this;
+    const empty = Function
+
+    const onComplete = callbacks.onComplete || empty
+    const onChange = callbacks.onChange || empty
+    const _this = this;
 
     return animate({
       target: this,

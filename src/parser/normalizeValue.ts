@@ -4,7 +4,7 @@ import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
 
 export function normalizeValue(attr, value, parentAttributes, fontSize) {
-  let isArray = Array.isArray(value),
+  const isArray = Array.isArray(value),
     parsed;
 
   if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
@@ -45,7 +45,7 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
   } else if (attr === 'paintFirst') {
     const fillIndex = value.indexOf('fill');
     const strokeIndex = value.indexOf('stroke');
-    var value = 'fill';
+    const value = 'fill';
     if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
       value = 'stroke';
     } else if (fillIndex === -1 && strokeIndex > -1) {

@@ -6,7 +6,7 @@
  * @return {Object} CSS rules of this document
  */
 export function getCSSRules(doc) {
-  let styles = doc.getElementsByTagName('style'),
+  const styles = doc.getElementsByTagName('style'),
     i,
     len,
     allRules = {},

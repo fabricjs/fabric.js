@@ -5,7 +5,7 @@ import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
 export function parseUseDirectives(doc) {
-  let nodelist = getMultipleNodes(doc, ['use', 'svg:use']),
+  const nodelist = getMultipleNodes(doc, ['use', 'svg:use']),
     i = 0;
   while (nodelist.length && i < nodelist.length) {
     const el = nodelist[i],
@@ -15,7 +15,7 @@ export function parseUseDirectives(doc) {
       return;
     }
 
-    var xlink = xlinkAttribute.slice(1),
+    const xlink = xlinkAttribute.slice(1),
       x = el.getAttribute('x') || 0,
       y = el.getAttribute('y') || 0,
       el2 = elementById(doc, xlink).cloneNode(true),

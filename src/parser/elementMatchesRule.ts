@@ -8,10 +8,9 @@ import { doesSomeParentMatch } from './doesSomeParentMatch';
  */
 
 export function elementMatchesRule(element, selectors) {
-  let firstMatching,
-    parentMatching = true;
+  let parentMatching = true;
   //start from rightmost selector.
-  firstMatching = selectorMatches(element, selectors.pop());
+  const firstMatching = selectorMatches(element, selectors.pop());
   if (firstMatching && selectors.length) {
     parentMatching = doesSomeParentMatch(element, selectors);
   }

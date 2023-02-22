@@ -13,7 +13,7 @@ import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { TextStyleDeclaration } from '../Text/StyledText';
 
 // extend this regex to support non english languages
-const reNonWord = /[ \n\.,;!\?\-]/;
+const reNonWord = /[ \n\\.,;!?-]/;
 
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;

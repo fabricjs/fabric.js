@@ -34,7 +34,7 @@ Object.assign(Canvas.prototype, {
       return;
     }
 
-    var target = this.findTarget(e);
+    const target = this.findTarget(e);
     if ('undefined' !== typeof target) {
       this.__gesturesParams = {
         e: e,
@@ -57,7 +57,7 @@ Object.assign(Canvas.prototype, {
       return;
     }
 
-    var self = this.__gesturesParams.self,
+    const self = this.__gesturesParams.self,
       t = this._currentTransform,
       e = this.__gesturesParams.e;
 
@@ -152,7 +152,7 @@ Object.assign(Canvas.prototype, {
    * @param {Event} e Event object by Event.js
    */
   _scaleObjectBy: function (s, e) {
-    var t = this._currentTransform,
+    const t = this._currentTransform,
       target = t.target;
     t.gestureScale = s;
     target._scaling = true;
@@ -165,7 +165,7 @@ Object.assign(Canvas.prototype, {
    * @param {Event} e Event object by Event.js
    */
   _rotateObjectByAngle: function (curAngle, e) {
-    var t = this._currentTransform;
+    const t = this._currentTransform;
 
     if (t.target.get('lockRotation')) {
       return;

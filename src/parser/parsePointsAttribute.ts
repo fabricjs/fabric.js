@@ -17,7 +17,7 @@ export function parsePointsAttribute(points) {
   points = points.replace(/,/g, ' ').trim();
 
   points = points.split(/\s+/);
-  let parsedPoints = [],
+  const parsedPoints = [],
     i,
     len;
 
