@@ -1,10 +1,9 @@
 //@ts-nocheck
 
-import { newlineRegExp } from '../../constants';
 import { getDocument } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
-import { TextStyle } from '../Text/StyledText';
+import { ClipboardDataManager } from './ClipboardDataManager';
 import type { TKeyMapIText } from './constants';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 
@@ -252,13 +251,8 @@ export abstract class ITextKeyBehavior<
       this.removeStyleFromTo(removeFrom, removeTo);
     }
     if (insertedText.length) {
-      this.insertNewStyleBlock(
-        insertedText,
-        selectionStart,
-        this._pasteContext?.flattenedStyles || copiedStyle
-      );
+      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
-    delete this._pasteContext;
     this.updateFromTextArea();
     this.fire('changed');
     if (this.canvas) {
@@ -289,38 +283,19 @@ export abstract class ITextKeyBehavior<
   }
 
   /**
-   *
-   * @returns true if text is selected and if the {@link ClipboardEvent#clipboardData} was set
-   */
-  protected setClipboardData(e: ClipboardEvent) {
-    e.preventDefault();
-    const clipboardData = e.clipboardData;
-    if (this.selectionStart === this.selectionEnd || !clipboardData) {
-      clipboardData?.clearData();
-      return false;
-    }
-    const value = this.getSelectedText();
-    clipboardData.setData('text/plain', value);
-    clipboardData.setData(
-      'text/html',
-      this.toHTML(this.selectionStart, this.selectionEnd)
-    );
-    clipboardData.setData('text/svg+xml', `<svg>${this.toSVG()}</svg>`);
-    return true;
-  }
-
-  /**
    * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   copy(e: ClipboardEvent) {
-    this.setClipboardData(e) && this.fire('copy', { e });
+    new ClipboardDataManager(this).setDataTransfer(e) &&
+      this.fire('copy', { e });
   }
 
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   cut(e: ClipboardEvent) {
-    this.setClipboardData(e) && this.fire('cut', { e });
+    new ClipboardDataManager(this).setDataTransfer(e) &&
+      this.fire('cut', { e });
   }
 
   /**
@@ -334,18 +309,7 @@ export abstract class ITextKeyBehavior<
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
     // obtain styles from event
-    let text = e.clipboardData
-      ?.getData('text/plain')
-      .replace(newlineRegExp, '\n');
-    let styles: TextStyleDeclaration[] | undefined;
-    const data = e.clipboardData?.getData('text/html');
-    if (data) {
-      const parsedHTML = (
-        this.constructor as typeof ITextKeyBehavior
-      ).parseHTML(data);
-      text = parsedHTML.text;
-      styles = parsedHTML.flattenedStyles;
-    }
+    const { text, styles } = new ClipboardDataManager(this).getDataTransfer(e);
     // execute paste logic
     if (text) {
       this.insertChars(text, styles, this.selectionStart, this.selectionEnd);

@@ -9,7 +9,7 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { TextStyleDeclaration } from '../Text/StyledText';
+import { DataTransferManager } from './DataTransferManager';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -21,8 +21,7 @@ import { TextStyleDeclaration } from '../Text/StyledText';
  * - {@link end} is called from `mouseup` {@link IText#mouseUpHandler}, blocking IText default click behavior
  * - in case the drag session didn't occur, {@link end} handles a click, since logic to do so was blocked during `mousedown`
  */
-export class DraggableTextDelegate {
-  readonly target: IText;
+export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
   private __mouseDownInPlace = false;
   private __dragStartFired = false;
   private __isDraggingOver = false;
@@ -34,7 +33,7 @@ export class DraggableTextDelegate {
   private _dispose?: () => void;
 
   constructor(target: IText) {
-    this.target = target;
+    super(target);
     const disposers = [
       this.target.on('dragenter', this.dragEnterHandler.bind(this)),
       this.target.on('dragover', this.dragOverHandler.bind(this)),
@@ -46,6 +45,18 @@ export class DraggableTextDelegate {
       disposers.forEach((d) => d());
       this._dispose = undefined;
     };
+  }
+
+  protected extractDataTransfer(e: DragEvent): DataTransfer | null {
+    return e.dataTransfer;
+  }
+
+  setDataTransfer(e: DragEvent): boolean {
+    if (super.setDataTransfer(e)) {
+      this.extractDataTransfer(e)!.effectAllowed = 'copyMove';
+      return true;
+    }
+    return false;
   }
 
   isPointerOverSelection(e: TPointerEvent) {
@@ -169,23 +180,15 @@ export class DraggableTextDelegate {
   onDragStart(e: DragEvent): boolean {
     this.__dragStartFired = true;
     const target = this.target;
+    const { selectionStart, selectionEnd } = target;
     const active = this.isActive();
     if (active && e.dataTransfer) {
-      const selection = (this.__dragStartSelection = {
-        selectionStart: target.selectionStart,
-        selectionEnd: target.selectionEnd,
-      });
-      const value = target._text
-        .slice(selection.selectionStart, selection.selectionEnd)
-        .join('');
-      const data = { text: target.text, value, ...selection };
-      e.dataTransfer.setData('text/plain', value);
-      e.dataTransfer.setData(
-        'text/html',
-        target.toHTML(selection.selectionStart, selection.selectionEnd)
-      );
-      e.dataTransfer.effectAllowed = 'copyMove';
-      this.setDragImage(e, data);
+      this.__dragStartSelection = {
+        selectionStart,
+        selectionEnd,
+      };
+      this.setDataTransfer(e);
+      this.setDragImage(e, { selectionStart, selectionEnd });
     }
     target.abortCursorAnimation();
     return active;
@@ -261,15 +264,12 @@ export class DraggableTextDelegate {
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
     e.preventDefault();
-    let insert = e.dataTransfer?.getData('text/plain');
+    const { text, styles } = this.getDataTransfer(e);
+    let insert = text;
     if (insert && !didDrop) {
       const target = this.target;
       const canvas = target.canvas!;
       let insertAt = target.getSelectionStartFromPointer(e);
-      const html = e.dataTransfer?.getData('text/html');
-      const { flattenedStyles: styles = {} } = html
-        ? (target.constructor as typeof IText).parseHTML(html)
-        : {};
       const trailing = insert[Math.max(0, insert.length - 1)];
       const selectionStartOffset = 0;
       //  drag and drop in same instance

@@ -904,6 +904,11 @@ export abstract class ITextBehavior<
     start: number,
     copiedStyle?: TextStyleDeclaration[]
   ) {
+    if (copiedStyle && insertedText.length !== copiedStyle.length) {
+      throw new Error(
+        `fabric.js: expected ${insertedText.length} style declarations, found ${copiedStyle.length}`
+      );
+    }
     const cursorLoc = this.get2DCursorLocation(start, true),
       addedLines = [0];
     let linesLength = 0;
