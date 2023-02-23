@@ -8,8 +8,7 @@ export const colorTransformer: CSSTransformConfig<
 >['transformValue'] = (value) => {
   if (!value) return 'none';
   else if (typeof value === 'object') {
-    // consider using css url with image/svg+xml
-    // for gradients we can use css gradient
+    // TODO: for gradients we can use css gradient, consider using css url for patterns
     return 'none';
   } else {
     const color = new Color(value as TColorArg);
