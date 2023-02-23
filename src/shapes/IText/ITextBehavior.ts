@@ -1009,13 +1009,13 @@ export abstract class ITextBehavior<
    * start/end ar per grapheme position in _text array.
    *
    * @param {String} text text to insert
-   * @param {Array} style array of style objects
+   * @param {Array} styles array of style objects
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
   insertChars(
     text: string,
-    style: TextStyleDeclaration[] | undefined,
+    styles: TextStyleDeclaration[] | undefined,
     start: number,
     end: number = start
   ) {
@@ -1023,7 +1023,7 @@ export abstract class ITextBehavior<
       this.removeStyleFromTo(start, end);
     }
     const graphemes = this.graphemeSplit(text);
-    this.insertNewStyleBlock(graphemes, start, style);
+    this.insertNewStyleBlock(graphemes, start, styles);
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,
