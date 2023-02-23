@@ -67,7 +67,10 @@ export abstract class DataTransferManager<
     <meta charset="utf-8">
     ${textLines
       .map((text) => {
-        const spans = [];
+        const spans: {
+          text: string;
+          style: TextStyleDeclaration;
+        }[] = [];
         for (let index = 0; index < text.length; index++) {
           const style = target.getStyleAtPosition(charIndex++, true);
           if (
@@ -131,14 +134,12 @@ export abstract class DataTransferManager<
         if (parent) {
           styles.push({});
           text += '\n';
-          console.log('pushed', text);
         }
         parent = walker.currentNode;
       } else if (walker.currentNode.nodeType === Node.TEXT_NODE) {
         const value = (walker.currentNode.textContent || '')
           // TODO: investigate why line breaks are added while parsing
           .replace(newlineRegExp, '');
-        console.log(walker.currentNode, value);
         if (value.length > 0) {
           const parentEl = walker.currentNode.parentElement;
           const style = parentEl
