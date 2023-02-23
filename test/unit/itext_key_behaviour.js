@@ -298,11 +298,7 @@
         iText.on('copy', ev => fired.push(ev.e));
         iText.hiddenTextarea.dispatchEvent(event);
         assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
-        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
-        assert.equal(data.value, 'te');
-        assert.equal(data.styles[0].fill, 'red', 'style is cloned');
-        assert.equal(data.styles[1].fill, 'blue', 'style is referenced');
-        assert.equal(data.styles[1].fontSize, 25, 'style took fontSize from text element');
+        assert.equal(event.clipboardData.getData('text/html'), '<html><body><!--StartFragment--><meta charset="utf-8"><p style="opacity:1;color:#000000;stroke:none;background-color:none;fill-rule:nonzero;paint-order:fill;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:miter;stroke-miterlimit:4;stroke-linecap:butt;font-family:Times New Roman;font-size:25px;font-style:normal;font-weight:normal;direction:ltr;background-color:none;"><span style="color:#ff0000;">t</span><span style="color:#0000ff;">e</span></p><!--EndFragment--></body></html>');
         assert.ok(fired.length === 1 && fired[0] === event, 'fired copy');
         assert.equal(iText.text, 'test', 'text is preserved');
       });
@@ -317,11 +313,7 @@
         iText.on('cut', ev => fired.push(ev.e));
         iText.hiddenTextarea.dispatchEvent(event);
         assert.equal(event.clipboardData.getData('text/plain'), 'te', 'it copied first 2 characters');
-        const data = JSON.parse(event.clipboardData.getData('application/fabric'));
-        assert.equal(data.value, 'te');
-        assert.equal(data.styles[0].fill, 'red', 'style is cloned');
-        assert.equal(data.styles[1].fill, 'blue', 'style is referenced');
-        assert.equal(data.styles[1].fontSize, 25, 'style took fontSize from text element');
+        assert.equal(event.clipboardData.getData('text/html'), '<html><body><!--StartFragment--><meta charset="utf-8"><p style="opacity:1;color:#000000;stroke:none;background-color:none;fill-rule:nonzero;paint-order:fill;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:miter;stroke-miterlimit:4;stroke-linecap:butt;font-family:Times New Roman;font-size:25px;font-style:normal;font-weight:normal;direction:ltr;background-color:none;"><span style="color:#ff0000;">t</span><span style="color:#0000ff;">e</span></p><!--EndFragment--></body></html>');
         assert.ok(fired.length === 1 && fired[0] === event, 'fired paste');
         assert.equal(iText.text, 'st', 'text is modified');
       });
@@ -377,8 +369,8 @@
           Object.keys(ref).forEach(key => target.cleanStyle(key));
         }
         cleanStyle(target);
-        assert.deepEqual(Object.assign({}, iText.styles[0][0], { fontSize: 25 }), target.styles[0][4], 'style is copied fully and equal after cleanup');
-        assert.deepEqual(Object.assign({}, iText.styles[0][1], { fontSize: 25 }), target.styles[0][5], 'style is copied fully and equal after cleanup');
+        assert.deepEqual({ fill: 'rgba(255,0,0,1)', fontSize: 25 }, target.styles[0][4], 'style is copied fully and equal after cleanup');
+        assert.deepEqual({ fill: 'rgba(0,0,255,1)', fontSize: 25 }, target.styles[0][5], 'style is copied fully and equal after cleanup');
       });
       
     });

@@ -27,6 +27,16 @@ export const colorRestorer = (value?: string) => {
   return '';
 };
 
+export const colorRestorerNoBlack = (value?: string) => {
+  if (value) {
+    const color = new Color(value.substring(0, value.indexOf(')') + 1));
+    const [r, g, b] = color.getSource();
+    const isBlack = r === 0 && g === 0 && b === 0;
+    return color.getAlpha() > 0 && !isBlack ? color.toRgba() : '';
+  }
+  return '';
+};
+
 export const isDefinedValueTransformer = <T>(value: T) => (value ? value : '');
 
 export const isTruthyValueTransformer = <T>(value: T, output: string): string =>

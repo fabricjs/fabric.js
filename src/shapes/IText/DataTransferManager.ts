@@ -1,8 +1,10 @@
+import { Color } from 'fabric/node';
 import { newlineRegExp } from '../../constants';
 import { getDocument, getWindow } from '../../env';
-import { hasStyleChanged } from '../../util';
+import { hasStyleChanged, pick } from '../../util';
 import { textStylesFromCSS, textStylesToCSS } from '../../util/CSSParsing';
 import { TextStyleDeclaration } from '../Text/StyledText';
+import { textDefaultValues } from '../Text/Text';
 import type { IText } from './IText';
 
 export abstract class DataTransferManager<
@@ -48,7 +50,39 @@ export abstract class DataTransferManager<
     }
     const data = dataTransfer.getData('text/html');
     if (data) {
-      return DataTransferManager.parseHTML(data);
+      const { text, styles } = DataTransferManager.parseHTML(data);
+      console.log(
+        'dfnkjg',
+        styles.map((style) =>
+          (
+            Object.entries(style) as [
+              keyof TextStyleDeclaration,
+              TextStyleDeclaration[keyof TextStyleDeclaration]
+            ][]
+          ).reduce((style, [key, value]) => {
+            if (value && this.target[key] !== value) {
+              style[key] = value;
+            }
+            return style;
+          }, {} as TextStyleDeclaration)
+        )
+      );
+      return {
+        text,
+        styles: styles.map((style) =>
+          (
+            Object.entries(style) as [
+              keyof TextStyleDeclaration,
+              TextStyleDeclaration[keyof TextStyleDeclaration]
+            ][]
+          ).reduce((style, [key, value]) => {
+            if (value && this.target[key] !== value) {
+              style[key] = value;
+            }
+            return style;
+          }, {} as TextStyleDeclaration)
+        ),
+      };
     }
     return {
       text: dataTransfer
@@ -143,7 +177,10 @@ export abstract class DataTransferManager<
         if (value.length > 0) {
           const parentEl = walker.currentNode.parentElement;
           const style = parentEl
-            ? textStylesFromCSS(getWindow().getComputedStyle(parentEl))
+            ? pick(
+                textStylesFromCSS(getWindow().getComputedStyle(parentEl)),
+                textDefaultValues._styleProperties
+              )
             : {};
           for (let index = 0; index < value.length; index++) {
             styles.push(style);

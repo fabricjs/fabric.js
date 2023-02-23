@@ -171,10 +171,8 @@ function assertDragEventStream(name, a, b) {
                 const e = startDragging(eventData);
                 const charStyle = { "stroke": null, "strokeWidth": 1, "fill": "rgb(0,0,0)", "fontFamily": "Times New Roman", "fontSize": 40, "fontWeight": "normal", "fontStyle": "normal", "underline": false, "overline": false, "linethrough": false, "deltaY": 0, "textBackgroundColor": "" };
                 assert.deepEqual(e.dataTransfer.data, {
-                    'application/fabric': JSON.stringify({
-                        value: 'test',
-                        styles: [charStyle, charStyle, charStyle, charStyle]
-                    }),
+                    'text/html': '<html><body><!--StartFragment--><meta charset="utf-8"><p style="opacity:1;color:#000000;stroke:none;background-color:none;fill-rule:nonzero;paint-order:fill;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:miter;stroke-miterlimit:4;stroke-linecap:butt;font-family:Times New Roman;font-size:40px;font-style:normal;font-weight:normal;direction:ltr;background-color:none;"><span style="">test</span></p><!--EndFragment--></body></html>',
+                    'text/svg+xml': '<svg><g transform="matrix(1 0 0 1 61.0469 23.1)" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60.5469" y="12.5656" >test test</tspan></text>\n</g>\n</svg>',
                     'text/plain': "test"
                 }, 'should set dataTransfer');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');

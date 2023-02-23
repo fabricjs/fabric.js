@@ -1,6 +1,11 @@
 import { Shadow } from '../../Shadow';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { numberRestorer, colorTransformer, colorRestorer } from './util';
+import {
+  numberRestorer,
+  colorTransformer,
+  colorRestorer,
+  colorRestorerNoBlack,
+} from './util';
 import { CSSTransformConfigMap } from './types';
 
 export const CSSTransformationMap: CSSTransformConfigMap<
@@ -30,13 +35,12 @@ export const CSSTransformationMap: CSSTransformConfigMap<
     restoreValue: numberRestorer,
   },
   fill: {
-    key: 'fill',
     transformValue: colorTransformer,
-    restoreValue: colorRestorer,
+    restoreValue: colorRestorerNoBlack,
   },
   stroke: {
     transformValue: colorTransformer,
-    restoreValue: colorRestorer,
+    restoreValue: colorRestorerNoBlack,
   },
   backgroundColor: {
     key: 'background-color',

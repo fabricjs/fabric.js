@@ -4,6 +4,7 @@ import { CSSTransformationMap } from './CSSTransformationMap';
 import { CSSTransformConfig, CSSTransformConfigMap } from './types';
 import {
   colorRestorer,
+  colorRestorerNoBlack,
   colorTransformer,
   isDefinedValueTransformer,
   isTruthyValueTransformer,
@@ -52,7 +53,7 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   fill: {
     key: 'color',
     transformValue: colorTransformer,
-    restoreValue: colorRestorer,
+    restoreValue: colorRestorerNoBlack,
   },
   textBackgroundColor: {
     key: 'background-color',
