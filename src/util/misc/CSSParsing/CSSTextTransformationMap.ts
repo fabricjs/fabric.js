@@ -1,14 +1,14 @@
 import type { Text } from '../../../shapes/Text/Text';
+import { parseUnit } from '../svgParsing';
+import { CSSTransformationMap } from './CSSTransformationMap';
+import { CSSTransformConfig, CSSTransformConfigMap } from './types';
 import {
-  numberRestorer,
-  unitTransformer,
+  colorRestorer,
+  colorTransformer,
   isDefinedValueTransformer,
   isTruthyValueTransformer,
-  colorTransformer,
-  colorRestorer,
+  unitTransformer,
 } from './util';
-import { CSSTransformConfigMap, CSSTransformConfig } from './types';
-import { CSSTransformationMap } from './CSSTransformationMap';
 
 const dblQuoteRegex = /"/g;
 
@@ -33,7 +33,7 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   fontSize: {
     key: 'font-size',
     transformValue: (value) => unitTransformer(value),
-    restoreValue: numberRestorer,
+    restoreValue: (value) => parseUnit(value!),
   },
   fontStyle: {
     key: 'font-style',
@@ -52,12 +52,12 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
     restoreValue: colorRestorer,
   },
   textBackgroundColor: {
-    key: 'background',
+    key: 'background-color',
     transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
   textDecoration: {
-    key: 'text-decoration',
+    key: 'text-decoration-line',
     hasValue: false,
     transformValue: (_, { options: { overline, underline, linethrough } }) =>
       [
@@ -68,13 +68,14 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
         .filter((value) => value)
         .join(' '),
     restoreValue: (value) => {
-      return value
-        ? {
-            overline: value.includes('overline'),
-            underline: value.includes('underline'),
-            linethrough: value.includes('line-through'),
-          }
-        : null;
+      if (value) {
+        return {
+          overline: value.includes('overline'),
+          underline: value.includes('underline'),
+          linethrough: value.includes('line-through'),
+        };
+      }
+      return null;
     },
   },
 };

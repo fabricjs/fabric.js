@@ -49,12 +49,12 @@ export const getSvgAttributes = (type: SVGElementName) => {
  * @param {number} fontSize
  * @return {number}
  */
-export const parseUnit = (value: string, fontSize: number) => {
+export const parseUnit = (
+  value: string,
+  fontSize: number = DEFAULT_SVG_FONT_SIZE
+) => {
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
-  if (!fontSize) {
-    fontSize = DEFAULT_SVG_FONT_SIZE;
-  }
   const dpi = config.DPI;
   switch (unit?.[0]) {
     case SupportedSVGUnit.mm:

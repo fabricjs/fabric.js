@@ -39,7 +39,7 @@ export const CSSTransformationMap: CSSTransformConfigMap<
     restoreValue: colorRestorer,
   },
   backgroundColor: {
-    key: 'background',
+    key: 'background-color',
     transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
