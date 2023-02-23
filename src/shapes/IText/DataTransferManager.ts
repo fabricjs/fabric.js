@@ -1,3 +1,4 @@
+import { newlineRegExp } from '../../constants';
 import { getDocument, getWindow } from '../../env';
 import { hasStyleChanged } from '../../util';
 import { textStylesFromCSS, textStylesToCSS } from '../../util/misc/CSSParsing';
@@ -15,6 +16,7 @@ export abstract class DataTransferManager<
   protected abstract extractDataTransfer(e: T): DataTransfer | null;
 
   /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types
    * @returns true if {@link DataTransfer} was set
    */
   setData(e: T): boolean {
@@ -27,12 +29,12 @@ export abstract class DataTransferManager<
       dataTransfer.clearData();
       return false;
     }
-    dataTransfer.setData('text/plain', this.target.getSelectedText());
     dataTransfer.setData(
       'text/html',
       DataTransferManager.toHTML(this.target, selectionStart, selectionEnd)
     );
     dataTransfer.setData('text/svg+xml', `<svg>${this.target.toSVG()}</svg>`);
+    dataTransfer.setData('text/plain', this.target.getSelectedText());
     return true;
   }
 
@@ -56,36 +58,41 @@ export abstract class DataTransferManager<
   }
 
   static toHTML(target: IText, from = 0, to = target.text.length) {
-    const text = target.text.substring(from, to); //.split(target._reNewline);
-    const styles = target.getSelectionStyles(from, to, true);
-    const spans = styles.reduce<
-      { text: string; style: TextStyleDeclaration }[]
-    >(
-      (spans, style, index) => {
-        if (hasStyleChanged(spans[spans.length - 1].style, style, true)) {
-          spans.push({ text: text[index], style });
-        } else {
-          spans[spans.length - 1].text += text[index];
-        }
-        return spans;
-      },
-      [{ text: '', style: styles[0] }]
-    );
+    const textLines = target.text.substring(from, to).split(target._reNewline);
+    const topLevelStyles = textStylesToCSS(target);
+    let charIndex = from;
     return `<html>
     <body>
     <!--StartFragment-->
-    <meta charset="utf-8"><p style="${textStylesToCSS(target)}">${spans
-      .map(
-        ({ text, style }) =>
-          `<span style="${textStylesToCSS({
-            ...style,
-            visible: true,
-          })}">${text}</span>`
-      )
-      .join('')}</p>
-      <!--EndFragment-->
-      </body>
-      </html>`;
+    <meta charset="utf-8">
+    ${textLines
+      .map((text) => {
+        const spans = [];
+        for (let index = 0; index < text.length; index++) {
+          const style = target.getStyleAtPosition(charIndex++, true);
+          if (
+            index === 0 ||
+            hasStyleChanged(spans[spans.length - 1].style, style, true)
+          ) {
+            spans.push({ text: text[index], style });
+          } else {
+            spans[spans.length - 1].text += text[index];
+          }
+        }
+        return `<p style="${topLevelStyles}">${spans
+          .map(
+            ({ text, style }) =>
+              `<span style="${textStylesToCSS({
+                ...style,
+                visible: true,
+              })}">${text}</span>`
+          )
+          .join('')}</p>`;
+      })
+      .join('')}
+    <!--EndFragment-->
+    </body>
+    </html>`;
   }
 
   static parseHTML(html = '') {
@@ -124,10 +131,14 @@ export abstract class DataTransferManager<
         if (parent) {
           styles.push({});
           text += '\n';
+          console.log('pushed', text);
         }
         parent = walker.currentNode;
       } else if (walker.currentNode.nodeType === Node.TEXT_NODE) {
-        const value = walker.currentNode.textContent || '';
+        const value = (walker.currentNode.textContent || '')
+          // TODO: investigate why line breaks are added while parsing
+          .replace(newlineRegExp, '');
+        console.log(walker.currentNode, value);
         if (value.length > 0) {
           const parentEl = walker.currentNode.parentElement;
           const style = parentEl
