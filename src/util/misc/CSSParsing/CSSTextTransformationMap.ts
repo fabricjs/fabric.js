@@ -48,19 +48,12 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   },
   textBackgroundColor: {
     key: 'background',
-    transform: colorTransformer,
+    transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
   textDecoration: {
     key: 'text-decoration',
-    transformValue: (
-      _,
-      {
-        overline,
-        underline,
-        linethrough,
-      }: Pick<Text, 'overline' | 'underline' | 'linethrough'>
-    ) =>
+    transformValue: (_, { options: { overline, underline, linethrough } }) =>
       [
         isTruthyValueTransformer(overline, 'overline'),
         isTruthyValueTransformer(underline, 'underline'),

@@ -31,16 +31,16 @@ export const CSSTransformationMap: CSSTransformConfigMap<
   },
   fill: {
     key: 'color',
-    transform: colorTransformer,
+    transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
   stroke: {
-    transform: colorTransformer,
+    transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
   backgroundColor: {
     key: 'background',
-    transform: colorTransformer,
+    transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },
   fillRule: {

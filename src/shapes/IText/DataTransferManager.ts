@@ -59,20 +59,18 @@ export abstract class DataTransferManager<
 
   static toHTML(target: IText, from = 0, to = target.text.length) {
     const textLines = target.text.substring(from, to).split(target._reNewline);
-    const topLevelStyles = textStylesToCSS(target);
+    const topLevelDefs: string[] = [];
+    const { cssText: topLevelStyles, defs } = textStylesToCSS(target);
+    topLevelDefs.push(...defs);
     let charIndex = from;
-    return `<html>
-    <body>
-    <!--StartFragment-->
-    <meta charset="utf-8">
-    ${textLines
+    const markup = textLines
       .map((text) => {
         const spans: {
           text: string;
           style: TextStyleDeclaration;
         }[] = [];
         for (let index = 0; index < text.length; index++) {
-          const style = target.getStyleAtPosition(charIndex++, true);
+          const style = target.getStyleAtPosition(charIndex++);
           if (
             index === 0 ||
             hasStyleChanged(spans[spans.length - 1].style, style, true)
@@ -83,16 +81,23 @@ export abstract class DataTransferManager<
           }
         }
         return `<p style="${topLevelStyles}">${spans
-          .map(
-            ({ text, style }) =>
-              `<span style="${textStylesToCSS({
-                ...style,
-                visible: true,
-              })}">${text}</span>`
-          )
-          .join('')}</p>`;
+          .map(({ text, style }) => {
+            const { cssText, defs } = textStylesToCSS(target, {
+              ...style,
+              visible: true,
+            });
+            topLevelDefs.push(...defs);
+            return `<span style="${cssText}">${text}</span>`;
+          })
+          .join('\r\n')}</p>`;
       })
-      .join('')}
+      .join('\r\n');
+
+    return `<html>
+    <body>
+    <!--StartFragment-->
+    <meta charset="utf-8">
+    ${markup}
     <!--EndFragment-->
     </body>
     </html>`;

@@ -1,37 +1,41 @@
-import type { FabricObject } from '../../../shapes/Object/FabricObject';
+import type { FabricObject } from '../../../shapes/Object/Object';
 import type { TextStyleDeclaration } from '../../../shapes/Text/StyledText';
 import type { Text } from '../../../shapes/Text/Text';
-import { CSSTransformationMap } from './CSSTransformationMap';
 import { CSSTextTransformationMap } from './CSSTextTransformationMap';
+import { CSSTransformationMap } from './CSSTransformationMap';
+import { CSSTransformContext } from './types';
 
 export function stylesToCSS<
   T extends Pick<FabricObject, keyof typeof CSSTransformationMap>
->(options: T, map = CSSTransformationMap) {
-  let css = '';
+>(target: FabricObject, options: T, map = CSSTransformationMap) {
+  let cssText = '';
+  const context: CSSTransformContext<T> = {
+    defs: [],
+    target,
+    options,
+  };
   for (const key in map) {
-    const {
-      key: k = key,
-      transformValue,
-      transform,
-    } = map[key as keyof typeof map];
+    const { key: k = key, transformValue } = map[key as keyof typeof map];
     const v = options[key as keyof typeof map];
-    if (transform) {
-      css += `${transform(k, v, options)};`;
-    } else {
-      const value = transformValue ? transformValue(v, options) : v;
-      (value || value === 0) && (css += `${k}:${value};`);
+    const value =
+      transformValue && key in options ? transformValue(v, context) : v;
+    if (value || value === 0) {
+      (Array.isArray(value) ? value : [value]).forEach((value) => {
+        cssText += `${k}:${value};`;
+      });
     }
   }
-  return css;
+  return { cssText, defs: context.defs };
 }
 
 export function textStylesToCSS(
+  target: Text,
   options: Pick<
     Text,
     Exclude<keyof typeof CSSTextTransformationMap, 'textDecoration'>
-  >
+  > = target
 ) {
-  return stylesToCSS(options, CSSTextTransformationMap);
+  return stylesToCSS(target, options, CSSTextTransformationMap);
 }
 
 export function stylesFromCSS(
@@ -42,7 +46,7 @@ export function stylesFromCSS(
   for (const key in map) {
     const { key: k = key, restoreValue } = map[key as keyof typeof map];
     const v = styles[k as keyof CSSStyleDeclaration];
-    const value = restoreValue ? restoreValue(v, options) : v;
+    const value = restoreValue ? restoreValue(v, { options }) : v;
     (value || value === 0) && (options[key] = value);
   }
   return options;

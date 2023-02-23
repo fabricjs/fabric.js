@@ -1,17 +1,20 @@
+import { FabricObject } from '../../../shapes/Object/Object';
+
+export type CSSTransformContext<T> = {
+  defs: string[];
+  target: FabricObject;
+  options: T;
+};
+
 export type CSSTransformConfig<T, K> = {
   key?: string;
   transformValue?: (
     value: K extends keyof T ? NonNullable<T[K]> : undefined,
-    options: T
-  ) => string | number;
-  transform?: (
-    key: K,
-    value: K extends keyof T ? NonNullable<T[K]> : undefined,
-    options: T
-  ) => string;
+    context: CSSTransformContext<T>
+  ) => string | number | (string | number)[];
   restoreValue?: (
     value: string | undefined,
-    options: T
+    context: CSSTransformContext<T>
   ) => K extends keyof T ? T[K] | undefined : any;
 };
 
