@@ -249,6 +249,19 @@
     assert.equal(intersection.points.length, 0, '0 points of intersections');
   });
 
+  QUnit.test('intersectPolygonRectangle line edge case', function(assert) {
+    const a = new fabric.Point(10, 3),
+        b = new fabric.Point(30, 3),
+        p3 = new fabric.Point(2, 2), p4 = new fabric.Point(4, 2),
+        p5 = new fabric.Point(4, 4), p6 = new fabric.Point(2, 4),
+        points = [p3, p4, p5, p6],
+        intersection = fabric.Intersection.intersectPolygonRectangle(points, a, b);
+    assert.ok(typeof fabric.Intersection.intersectPolygonRectangle === 'function', 'has intersectPolygonPolygon function');
+    assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
+    assert.equal(intersection.status, undefined, 'it return a Intersection result');
+    assert.equal(intersection.points.length, 0, '0 points of intersections');
+  });
+
   QUnit.test('intersectPolygonPolygon coincident', function (assert) {
     const points = [
       new fabric.Point(0, 0),
