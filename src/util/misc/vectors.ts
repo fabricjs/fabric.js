@@ -40,6 +40,13 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
   return Math.atan2(det, dot) as TRadian;
 };
 
+export const slope = (v: Point) =>
+  v.x === 0 && v.y === 0
+    ? 0
+    : v.x === 0
+    ? Infinity * Math.sign(v.y)
+    : v.y / v.x;
+
 /**
  * Calculates the angle between the x axis and the vector
  * @param {Point} v
