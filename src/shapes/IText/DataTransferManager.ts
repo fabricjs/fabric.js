@@ -58,11 +58,15 @@ export abstract class DataTransferManager<
   }
 
   static toHTML(target: IText, from = 0, to = target.text.length) {
-    const textLines = target.text.substring(from, to).split(target._reNewline);
+    const text = target._text.slice(from, to);
+    const textLines = text.join('').split(target._reNewline);
+    const styles = target
+      .getSelectionStyles(from, to)
+      .filter((value, index) => !target._reNewline.test(text[index]));
     const topLevelDefs: string[] = [];
     const { cssText: topLevelStyles, defs } = textStylesToCSS(target);
     topLevelDefs.push(...defs);
-    let charIndex = from;
+    let charIndex = 0;
     const markup = textLines
       .map((text) => {
         const spans: {
@@ -70,7 +74,7 @@ export abstract class DataTransferManager<
           style: TextStyleDeclaration;
         }[] = [];
         for (let index = 0; index < text.length; index++) {
-          const style = target.getStyleAtPosition(charIndex++);
+          const style = styles[charIndex++];
           if (
             index === 0 ||
             hasStyleChanged(spans[spans.length - 1].style, style, true)
@@ -89,9 +93,9 @@ export abstract class DataTransferManager<
             topLevelDefs.push(...defs);
             return `<span style="${cssText}">${text}</span>`;
           })
-          .join('\r\n')}</p>`;
+          .join('')}</p>`;
       })
-      .join('\r\n');
+      .join('');
 
     return `<html>
     <body>
@@ -132,14 +136,15 @@ export abstract class DataTransferManager<
     );
     let parent: Node | undefined;
     while (walker.nextNode()) {
+      if (parent && !parent.contains(walker.currentNode)) {
+        parent = undefined;
+        styles.push({});
+        text += '\n';
+      }
       if (
         walker.currentNode instanceof HTMLDivElement ||
         walker.currentNode instanceof HTMLParagraphElement
       ) {
-        if (parent) {
-          styles.push({});
-          text += '\n';
-        }
         parent = walker.currentNode;
       } else if (walker.currentNode.nodeType === Node.TEXT_NODE) {
         const value = (walker.currentNode.textContent || '')
