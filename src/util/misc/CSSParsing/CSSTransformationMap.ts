@@ -30,7 +30,7 @@ export const CSSTransformationMap: CSSTransformConfigMap<
     restoreValue: numberRestorer,
   },
   fill: {
-    key: 'color',
+    key: 'fill',
     transformValue: colorTransformer,
     restoreValue: colorRestorer,
   },

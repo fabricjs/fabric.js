@@ -46,6 +46,11 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   direction: {
     transformValue: isDefinedValueTransformer,
   },
+  fill: {
+    key: 'color',
+    transformValue: colorTransformer,
+    restoreValue: colorRestorer,
+  },
   textBackgroundColor: {
     key: 'background',
     transformValue: colorTransformer,
