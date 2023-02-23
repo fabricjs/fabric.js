@@ -3,7 +3,6 @@ export function selectorMatches(element: HTMLElement, selector: string) {
   const classNames = element.getAttribute('class');
   const id = element.getAttribute('id');
   let matcher;
-  let i;
   // i check if a selector matches slicing away part from it.
   // if i get empty string i should match
   matcher = new RegExp('^' + nodeName, 'i');
@@ -14,7 +13,7 @@ export function selectorMatches(element: HTMLElement, selector: string) {
   }
   if (classNames != null && selector.length) {
     const splitClassNames = classNames.split(' ');
-    for (i = splitClassNames.length; i--; ) {
+    for (let i = splitClassNames.length; i--; ) {
       matcher = new RegExp('\\.' + splitClassNames[i] + '(?![a-zA-Z\\-]+)', 'i');
       selector = selector.replace(matcher, '');
     }
