@@ -1,7 +1,22 @@
 import { ObjectEvents } from '../../EventTypeDefs';
 import { FabricObject } from '../Object/FabricObject';
+import type { Text } from './Text';
 
-export type TextStyleDeclaration = Record<string, any>;
+export type TextStyleDeclaration = Pick<
+  Text,
+  | 'fill'
+  | 'stroke'
+  | 'strokeWidth'
+  | 'fontSize'
+  | 'fontFamily'
+  | 'fontWeight'
+  | 'fontStyle'
+  | 'textBackgroundColor'
+  | 'deltaY'
+  | 'overline'
+  | 'underline'
+  | 'linethrough'
+>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
