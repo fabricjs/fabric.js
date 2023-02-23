@@ -42,6 +42,9 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   fontWeight: {
     key: 'font-weight',
     transformValue: isDefinedValueTransformer,
+    restoreValue: (value) => {
+      !value || isNaN(parseFloat(value)) ? value : parseFloat(value);
+    },
   },
   direction: {
     transformValue: isDefinedValueTransformer,
