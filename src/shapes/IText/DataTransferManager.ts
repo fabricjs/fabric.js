@@ -63,9 +63,7 @@ export abstract class DataTransferManager<
     const styles = target
       .getSelectionStyles(from, to)
       .filter((value, index) => !target._reNewline.test(text[index]));
-    const topLevelDefs: string[] = [];
-    const { cssText: topLevelStyles, defs } = textStylesToCSS(target);
-    topLevelDefs.push(...defs);
+    const { cssText: topLevelStyles } = textStylesToCSS(target);
     let charIndex = 0;
     const markup = textLines
       .map((text) => {
@@ -86,11 +84,10 @@ export abstract class DataTransferManager<
         }
         return `<p style="${topLevelStyles}">${spans
           .map(({ text, style }) => {
-            const { cssText, defs } = textStylesToCSS(target, {
+            const { cssText } = textStylesToCSS(target, {
               ...style,
               visible: true,
             });
-            topLevelDefs.push(...defs);
             return `<span style="${cssText}">${text}</span>`;
           })
           .join('')}</p>`;

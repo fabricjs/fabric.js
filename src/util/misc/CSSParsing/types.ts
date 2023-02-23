@@ -1,7 +1,6 @@
 import { FabricObject } from '../../../shapes/Object/Object';
 
 export type CSSTransformContext<T> = {
-  defs: string[];
   target: FabricObject;
   options: T;
 };

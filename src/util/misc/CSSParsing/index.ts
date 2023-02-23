@@ -10,7 +10,6 @@ export function stylesToCSS<
 >(target: FabricObject, options: T, map = CSSTransformationMap) {
   let cssText = '';
   const context: CSSTransformContext<T> = {
-    defs: [],
     target,
     options,
   };
@@ -31,7 +30,7 @@ export function stylesToCSS<
       });
     }
   }
-  return { cssText, defs: context.defs };
+  return { cssText };
 }
 
 export function textStylesToCSS(
