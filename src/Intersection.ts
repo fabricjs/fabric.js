@@ -1,24 +1,9 @@
 import { Point } from './Point';
+import { calcAngleBetweenVectors, createVector } from './util/misc/vectors';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
 export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
-
-/**
- * **Assuming `T`, `A`, `B` are points on the same line**,
- * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
- * @param T
- * @param A
- * @param B
- * @returns true if `T` is contained
- */
-const isContainedInInterval = (T: Point, A: Point, B: Point) => {
-  const TA = new Point(T).subtract(A);
-  const TB = new Point(T).subtract(B);
-  return (
-    Math.sign(TA.x) !== Math.sign(TB.x) || Math.sign(TA.y) !== Math.sign(TB.y)
-  );
-};
 
 export class Intersection {
   declare points: Point[];
@@ -52,6 +37,24 @@ export class Intersection {
       })
     );
     return this;
+  }
+
+  /**
+   * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
+   * @param T
+   * @param A
+   * @param B
+   * @returns true if `T` is contained
+   */
+  static isContainedInInterval(T: Point, A: Point, B: Point) {
+    const AB = createVector(A, B);
+    return (
+      T.eq(A) ||
+      T.eq(B) ||
+      (!AB.eq(new Point()) &&
+        calcAngleBetweenVectors(AB, createVector(T, B)) === 0 &&
+        calcAngleBetweenVectors(AB, createVector(A, T)) === 0)
+    );
   }
 
   /**
@@ -100,11 +103,11 @@ export class Intersection {
         const segmentsCoincide =
           aInfinite ||
           bInfinite ||
-          isContainedInInterval(a1, b1, b2) ||
-          isContainedInInterval(a2, b1, b2) ||
-          isContainedInInterval(b1, a1, a2) ||
-          isContainedInInterval(b2, a1, a2);
-        return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
+          Intersection.isContainedInInterval(a1, b1, b2) ||
+          Intersection.isContainedInInterval(a2, b1, b2) ||
+          Intersection.isContainedInInterval(b1, a1, a2) ||
+          Intersection.isContainedInInterval(b2, a1, a2);
+        return new this(segmentsCoincide ? 'Coincident' : undefined);
       } else {
         return new Intersection('Parallel');
       }
