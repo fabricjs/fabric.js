@@ -18,10 +18,8 @@ export function parsePointsAttribute(points) {
 
   points = points.split(/\s+/);
   const parsedPoints = [];
-  let i;
-  let len;
 
-  for (i = 0, len = points.length; i < len; i += 2) {
+  for (let i = 0; i < points.length; i += 2) {
     parsedPoints.push({
       x: parseFloat(points[i]),
       y: parseFloat(points[i + 1]),
