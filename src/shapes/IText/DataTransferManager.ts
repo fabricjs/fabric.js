@@ -96,21 +96,21 @@ export abstract class DataTransferManager<
   }
 
   static parseHTML(html = '') {
-    const parser = new (getWindow().DOMParser)() as DOMParser,
-      doc = parser.parseFromString(html.trim(), 'text/html');
     let text = '';
     const styles: TextStyleDeclaration[] = [];
-    const container = doc.createElement('div');
-    container.append(...doc.body.children);
-    Object.assign(container.style, {
+    const sandbox = getDocument().createElement('iframe');
+    Object.assign(sandbox.style, {
       position: 'fixed',
-      left: `${-container.clientWidth}px`,
+      left: `${-sandbox.clientWidth}px`,
     });
-    const body = getDocument().body;
-    // append for computed styles
-    body.append(container);
-    const walker = getDocument().createTreeWalker(
-      container,
+    getDocument().body.append(sandbox);
+    const sandboxDoc =
+      sandbox.contentDocument || sandbox.contentWindow!.document;
+    sandboxDoc.open();
+    sandboxDoc.write(html);
+    sandboxDoc.close();
+    const walker = sandboxDoc.createTreeWalker(
+      sandboxDoc.body,
       NodeFilter.SHOW_ALL,
       {
         acceptNode(node) {
@@ -151,7 +151,7 @@ export abstract class DataTransferManager<
         }
       }
     }
-    container.remove();
+    sandbox.remove();
     return {
       text,
       styles,
