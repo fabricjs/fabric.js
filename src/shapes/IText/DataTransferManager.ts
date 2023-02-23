@@ -51,22 +51,6 @@ export abstract class DataTransferManager<
     const data = dataTransfer.getData('text/html');
     if (data) {
       const { text, styles } = DataTransferManager.parseHTML(data);
-      console.log(
-        'dfnkjg',
-        styles.map((style) =>
-          (
-            Object.entries(style) as [
-              keyof TextStyleDeclaration,
-              TextStyleDeclaration[keyof TextStyleDeclaration]
-            ][]
-          ).reduce((style, [key, value]) => {
-            if (value && this.target[key] !== value) {
-              style[key] = value;
-            }
-            return style;
-          }, {} as TextStyleDeclaration)
-        )
-      );
       return {
         text,
         styles: styles.map((style) =>
