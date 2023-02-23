@@ -11,7 +11,7 @@ export function selectorMatches(element: HTMLElement, selector: string) {
     matcher = new RegExp('#' + id + '(?![a-zA-Z\\-]+)', 'i');
     selector = selector.replace(matcher, '');
   }
-  if (classNames != null && selector.length) {
+  if (classNames && selector.length) {
     const splitClassNames = classNames.split(' ');
     for (let i = splitClassNames.length; i--; ) {
       matcher = new RegExp('\\.' + splitClassNames[i] + '(?![a-zA-Z\\-]+)', 'i');
