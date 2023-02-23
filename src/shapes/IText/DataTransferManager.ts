@@ -94,14 +94,7 @@ export abstract class DataTransferManager<
       })
       .join('');
 
-    return `<html>
-    <body>
-    <!--StartFragment-->
-    <meta charset="utf-8">
-    ${markup}
-    <!--EndFragment-->
-    </body>
-    </html>`;
+    return `<html><body><!--StartFragment--><meta charset="utf-8">${markup}<!--EndFragment--></body></html>`;
   }
 
   static parseHTML(html = '') {
