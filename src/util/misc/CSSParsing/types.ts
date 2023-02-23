@@ -8,6 +8,7 @@ export type CSSTransformContext<T> = {
 
 export type CSSTransformConfig<T, K> = {
   key?: string;
+  hasValue?: false;
   transformValue?: (
     value: K extends keyof T ? NonNullable<T[K]> : undefined,
     context: CSSTransformContext<T>

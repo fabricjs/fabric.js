@@ -15,10 +15,16 @@ export function stylesToCSS<
     options,
   };
   for (const key in map) {
-    const { key: k = key, transformValue } = map[key as keyof typeof map];
+    const {
+      key: k = key,
+      transformValue,
+      hasValue = true,
+    } = map[key as keyof typeof map];
     const v = options[key as keyof typeof map];
     const value =
-      transformValue && key in options ? transformValue(v, context) : v;
+      transformValue && (key in options || !hasValue)
+        ? transformValue(v, context)
+        : v;
     if (value || value === 0) {
       (Array.isArray(value) ? value : [value]).forEach((value) => {
         cssText += `${k}:${value};`;

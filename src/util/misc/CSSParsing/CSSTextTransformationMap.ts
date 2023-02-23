@@ -58,6 +58,7 @@ export const CSSTextTransformationMap: CSSTransformConfigMap<
   },
   textDecoration: {
     key: 'text-decoration',
+    hasValue: false,
     transformValue: (_, { options: { overline, underline, linethrough } }) =>
       [
         isTruthyValueTransformer(overline, 'overline'),
