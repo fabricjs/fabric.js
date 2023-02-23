@@ -2,6 +2,7 @@
 
 import { getDocument } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
+import { AssertKeys } from '../../typedefs';
 import { capValue } from '../../util/misc/capValue';
 import { ClipboardDataManager } from './ClipboardDataManager';
 import type { TKeyMapIText } from './constants';
@@ -292,8 +293,18 @@ export abstract class ITextKeyBehavior<
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  cut(e: ClipboardEvent) {
-    new ClipboardDataManager(this).setData(e) && this.fire('cut', { e });
+  cut(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
+    if (new ClipboardDataManager(this).setData(e)) {
+      //  remove selection and force recalculating dimensions
+      this.removeChars(this.selectionStart, this.selectionEnd);
+      this.selectionEnd = this.selectionStart;
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+      this.fire('cut', { e });
+      this.fire('changed', { index: this.selectionStart, action: 'cut' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
   }
 
   /**
