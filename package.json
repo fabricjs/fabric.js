@@ -64,8 +64,8 @@
     "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.0",
-    "jsdom": "^20.0.3"
+    "canvas": "^2.8.0",
+    "jsdom": "^20.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
@@ -88,8 +88,8 @@
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
-    "eslint": "^8.23.1",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
     "fireworm": "^0.7.2",
     "fs-extra": "^10.0.1",
     "fuzzy": "^0.1.3",
