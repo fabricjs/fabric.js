@@ -1,5 +1,5 @@
 import { Point } from './Point';
-import { createVector, slope } from './util/misc/vectors';
+import { calcAngleBetweenVectors, createVector } from './util/misc/vectors';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
@@ -47,16 +47,14 @@ export class Intersection {
    * @returns true if `T` is contained
    */
   static isContainedInInterval(T: Point, A: Point, B: Point) {
-    if (T.eq(A) || T.eq(B)) {
-      return true;
-    }
     const AB = createVector(A, B);
-    if (!AB.eq(new Point())) {
-      const s = slope(AB);
-      return s === slope(createVector(T, B)) && s === slope(createVector(T, B));
-    } else {
-      return false;
-    }
+    return (
+      T.eq(A) ||
+      T.eq(B) ||
+      (!AB.eq(new Point()) &&
+        calcAngleBetweenVectors(AB, createVector(T, B)) === 0 &&
+        calcAngleBetweenVectors(AB, createVector(A, T)) === 0)
+    );
   }
 
   /**
