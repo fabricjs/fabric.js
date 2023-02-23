@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { cache } from '../../cache';
+import { classRegistry } from '../../ClassRegistry';
 import { DEFAULT_SVG_FONT_SIZE, newlineRegExp } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
-import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
@@ -11,22 +11,19 @@ import type {
   TClassProperties,
   TFiller,
 } from '../../typedefs';
-import { classRegistry } from '../../ClassRegistry';
+import { applyMixins } from '../../util/applyMixins';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
 import {
   hasStyleChanged,
   stylesFromArray,
   stylesToArray,
-  TextStyleArray,
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
+import { StyledText, TextStyle, TextStyleDeclaration } from './StyledText';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
-import { applyMixins } from '../../util/applyMixins';
-import { textStylesFromCSS, textStylesToCSS } from '../../util/misc/CSSParsing';
-import { getDocument, getWindow } from '../../env';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
