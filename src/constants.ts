@@ -3,6 +3,7 @@ import { TMat2D } from './typedefs';
 import { version } from '../package.json';
 
 export const VERSION = version;
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
 export const halfPI = Math.PI / 2;
 export const twoMathPi = Math.PI * 2;
