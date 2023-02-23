@@ -2,7 +2,7 @@
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/Object';
 import { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
