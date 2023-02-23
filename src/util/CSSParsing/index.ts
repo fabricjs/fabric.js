@@ -1,6 +1,6 @@
-import type { FabricObject } from '../../../shapes/Object/Object';
-import type { TextStyleDeclaration } from '../../../shapes/Text/StyledText';
-import type { Text } from '../../../shapes/Text/Text';
+import type { FabricObject } from '../../shapes/Object/Object';
+import type { TextStyleDeclaration } from '../../shapes/Text/StyledText';
+import type { Text } from '../../shapes/Text/Text';
 import { CSSTextTransformationMap } from './CSSTextTransformationMap';
 import { CSSTransformationMap } from './CSSTransformationMap';
 import { CSSTransformContext } from './types';

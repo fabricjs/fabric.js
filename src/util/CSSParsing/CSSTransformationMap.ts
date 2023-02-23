@@ -1,5 +1,5 @@
-import { Shadow } from '../../../Shadow';
-import type { FabricObject } from '../../../shapes/Object/FabricObject';
+import { Shadow } from '../../Shadow';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { numberRestorer, colorTransformer, colorRestorer } from './util';
 import { CSSTransformConfigMap } from './types';
 

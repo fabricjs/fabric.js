@@ -1,5 +1,5 @@
-import { Color, TColorArg } from '../../../color/Color';
-import { FabricObject } from '../../../shapes/Object/Object';
+import { Color, TColorArg } from '../../color/Color';
+import { FabricObject } from '../../shapes/Object/Object';
 import { CSSTransformConfig } from './types';
 
 export const colorTransformer: CSSTransformConfig<

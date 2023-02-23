@@ -1,7 +1,7 @@
 import { newlineRegExp } from '../../constants';
 import { getDocument, getWindow } from '../../env';
 import { hasStyleChanged } from '../../util';
-import { textStylesFromCSS, textStylesToCSS } from '../../util/misc/CSSParsing';
+import { textStylesFromCSS, textStylesToCSS } from '../../util/CSSParsing';
 import { TextStyleDeclaration } from '../Text/StyledText';
 import type { IText } from './IText';
 
