@@ -1672,7 +1672,7 @@ export class FabricObject<
       this.shadow = null;
     }
     if (options.viewportTransform) {
-      sendObjectToPlane((this as any), this.getViewportTransform());
+      sendObjectToPlane(this, this.getViewportTransform());
     }
 
     const el = createCanvasElement(),
