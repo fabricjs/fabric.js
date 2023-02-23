@@ -45,7 +45,7 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
   } else if (attr === 'paintFirst') {
     const fillIndex = value.indexOf('fill');
     const strokeIndex = value.indexOf('stroke');
-    let value = 'fill';
+    value = 'fill';
     if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
       value = 'stroke';
     } else if (fillIndex === -1 && strokeIndex > -1) {
