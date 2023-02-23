@@ -116,7 +116,7 @@ const ElementsParser = function (
   };
 
   proto.resolveClipPath = function (obj, usingElement) {
-    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
+    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
       element,
       klass,
       objTransformInv,
