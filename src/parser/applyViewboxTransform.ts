@@ -27,12 +27,9 @@ export function applyViewboxTransform(element) {
   const y = element.getAttribute('y') || 0;
   let preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '';
   const missingViewBox =
-      !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
+    !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
   const missingDimAttr =
-      !widthAttr ||
-      !heightAttr ||
-      widthAttr === '100%' ||
-      heightAttr === '100%';
+    !widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%';
   const toBeParsed = missingViewBox && missingDimAttr;
   const parsedDim = {};
   let translateMatrix = '';

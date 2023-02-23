@@ -20,12 +20,12 @@ export function parseUseDirectives(doc) {
     const y = el.getAttribute('y') || 0;
     let el2 = elementById(doc, xlink).cloneNode(true);
     let currentTrans =
-        (el2.getAttribute('transform') || '') +
-        ' translate(' +
-        x +
-        ', ' +
-        y +
-        ')';
+      (el2.getAttribute('transform') || '') +
+      ' translate(' +
+      x +
+      ', ' +
+      y +
+      ')';
     const oldLength = nodelist.length;
     let attr;
     let j;

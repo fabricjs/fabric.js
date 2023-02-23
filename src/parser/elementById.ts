@@ -1,4 +1,3 @@
-
 /**
  * @private
  * to support IE8 missing getElementById on SVGdocument and on node xmlDOM
