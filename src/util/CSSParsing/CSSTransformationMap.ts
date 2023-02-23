@@ -71,6 +71,7 @@ export const CSSTransformationMap: CSSTransformConfigMap<
   },
   strokeMiterLimit: {
     key: 'stroke-miterlimit',
+    restoreValue: numberRestorer,
   },
   strokeLineCap: {
     key: 'stroke-linecap',
