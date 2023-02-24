@@ -903,9 +903,10 @@ export class FabricObject<
    */
   _removeDefaultValues(object: Record<string, any>) {
     const topLevelClass = classRegistry.getClass(object.type);
-    // static defaultValues should win over prototype since anyway they get assigned to instance
-    const hasStaticDefaultValues = Object.keys(topLevelClass.defaultValues).length > 0;
-    const baseValues = hasStaticDefaultValues ? topLevelClass.defaultValues : topLevelClass.prototype;
+    // defaultValues ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
+    // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
+    const hasStaticDefaultValues = Object.keys(this.defaultValues).length > 0;
+    const baseValues = hasStaticDefaultValues ? this.defaultValues : topLevelClass.prototype;
 
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {

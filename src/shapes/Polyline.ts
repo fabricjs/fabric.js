@@ -11,6 +11,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
+export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
+  exactBoundingBox: false,
+};
+
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -32,11 +36,28 @@ export class Polyline extends FabricObject {
 
   private declare initialized: true | undefined;
 
+  static ownDefaults: Record<string,any> = polylineDefaultValues;
+
+  get defaultValues() {
+    return {
+      ...super.defaultValues,
+      ...Polyline.ownDefaults,
+    };
+  }
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
-  declare strokeBBoxAffectingProperties: (keyof this)[];
+  static strokeBBoxAffectingProperties: (keyof Polyline)[] = [
+    'skewX',
+    'skewY',
+    'strokeLineCap',
+    'strokeLineJoin',
+    'strokeMiterLimit',
+    'strokeWidth',
+    'strokeUniform',
+    'points',
+  ];
 
   declare fromSVG: boolean;
 
@@ -174,9 +195,9 @@ export class Polyline extends FabricObject {
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
-        this.strokeBBoxAffectingProperties.includes('strokeUniform') &&
+        (this.constructor as typeof Polyline).strokeBBoxAffectingProperties.includes('strokeUniform') &&
         this.strokeLineJoin !== 'round') ||
-        this.strokeBBoxAffectingProperties.includes(key as keyof this))
+        (this.constructor as typeof Polyline).strokeBBoxAffectingProperties.includes(key as keyof Polyline))
     ) {
       this.setDimensions();
     }
@@ -311,24 +332,7 @@ export class Polyline extends FabricObject {
   }
 }
 
-export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  type: 'polyline',
-  exactBoundingBox: false,
-};
-
-Object.assign(Polyline.prototype, {
-  ...polylineDefaultValues,
-  strokeBBoxAffectingProperties: [
-    'skewX',
-    'skewY',
-    'strokeLineCap',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'strokeWidth',
-    'strokeUniform',
-    'points',
-  ],
-});
+Polyline.prototype.type = 'polyline';
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);
