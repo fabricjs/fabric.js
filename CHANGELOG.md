@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): fix import autocomplete in dev mode #8725
 - chore(): remove deprecated class util [#8731](https://github.com/fabricjs/fabric.js/pull/8731)
 - lint(): fix eslint errors [#8729](https://github.com/fabricjs/fabric.js/pull/8729)
 - fix(TS): `this.constructor` types [#8675](https://github.com/fabricjs/fabric.js/issues/8675)
