@@ -59,6 +59,8 @@ export class Intersection {
 
   /**
    * Checks if a line intersects another
+   * @see https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection
+   * @see https://en.wikipedia.org/wiki/Cramer%27s_rule
    * @static
    * @param {Point} a1
    * @param {Point} a2
