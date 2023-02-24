@@ -89,7 +89,7 @@
       fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4),
       fabric.Intersection.intersectSegmentSegment(p1, p2, p4, p3),
       fabric.Intersection.intersectSegmentSegment(p2, p1, p3, p4),
-      fabric.Intersection.intersectSegmentSegment(p2, p2, p4, p3)
+      fabric.Intersection.intersectSegmentSegment(p2, p1, p4, p3)
     ].forEach(intersection => {
       assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
       assert.equal(intersection.status, 'Coincident', 'it return a Coincident result');
