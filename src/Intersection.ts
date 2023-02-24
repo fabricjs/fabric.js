@@ -107,7 +107,7 @@ export class Intersection {
           Intersection.isContainedInInterval(a2, b1, b2) ||
           Intersection.isContainedInInterval(b1, a1, a2) ||
           Intersection.isContainedInInterval(b2, a1, a2);
-        return new this(segmentsCoincide ? 'Coincident' : undefined);
+        return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
         return new Intersection('Parallel');
       }
