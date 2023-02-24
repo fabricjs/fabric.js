@@ -195,11 +195,11 @@ export class Resize extends BaseFilter {
     this.rcpScaleX = 1 / scaleX;
     this.rcpScaleY = 1 / scaleY;
 
-    let oW = imageData.width,
-      oH = imageData.height,
-      dW = Math.round(oW * scaleX),
-      dH = Math.round(oH * scaleY),
-      newData;
+    const oW = imageData.width;
+    const oH = imageData.height;
+    const dW = Math.round(oW * scaleX);
+    const dH = Math.round(oH * scaleY);
+    let newData;
 
     if (this.resizeType === 'sliceHack') {
       newData = this.sliceByTwo(options, oW, oH, dW, dH);
@@ -229,17 +229,17 @@ export class Resize extends BaseFilter {
     dW: number,
     dH: number
   ) {
-    let imageData = options.imageData,
-      mult = 0.5,
-      doneW = false,
-      doneH = false,
-      stepW = oW * mult,
-      stepH = oH * mult,
-      resources = options.filterBackend.resources,
-      sX = 0,
-      sY = 0,
-      dX = oW,
-      dY = 0;
+    const imageData = options.imageData;
+    const mult = 0.5;
+    let doneW = false;
+    let doneH = false;
+    let stepW = oW * mult;
+    let stepH = oH * mult;
+    const resources = options.filterBackend.resources;
+    let sX = 0;
+    let sY = 0;
+    const dX = oW;
+    let dY = 0;
     if (!resources.sliceByTwo) {
       resources.sliceByTwo = createCanvasElement();
     }
@@ -384,27 +384,27 @@ export class Resize extends BaseFilter {
     dW: number,
     dH: number
   ) {
-    let a,
-      b,
-      c,
-      d,
-      x,
-      y,
-      i,
-      j,
-      xDiff,
-      yDiff,
-      chnl,
-      color,
-      offset = 0,
-      origPix,
-      ratioX = this.rcpScaleX,
-      ratioY = this.rcpScaleY,
-      w4 = 4 * (oW - 1),
-      img = options.imageData,
-      pixels = img.data,
-      destImage = options.ctx.createImageData(dW, dH),
-      destPixels = destImage.data;
+    let a;
+    let b;
+    let c;
+    let d;
+    let x;
+    let y;
+    let i;
+    let j;
+    let xDiff;
+    let yDiff;
+    let chnl;
+    let color;
+    let offset = 0;
+    let origPix;
+    const ratioX = this.rcpScaleX;
+    const ratioY = this.rcpScaleY;
+    const w4 = 4 * (oW - 1);
+    const img = options.imageData;
+    const pixels = img.data;
+    const destImage = options.ctx.createImageData(dW, dH);
+    const destPixels = destImage.data;
     for (i = 0; i < dH; i++) {
       for (j = 0; j < dW; j++) {
         x = Math.floor(ratioX * j);
@@ -456,22 +456,22 @@ export class Resize extends BaseFilter {
       data2 = img2.data;
     for (let j = 0; j < dH; j++) {
       for (let i = 0; i < dW; i++) {
-        let x2 = (i + j * dW) * 4,
-          weight = 0,
-          weights = 0,
-          weightsAlpha = 0,
-          gxR = 0,
-          gxG = 0,
-          gxB = 0,
-          gxA = 0,
-          centerY = (j + 0.5) * ratioH;
+        const x2 = (i + j * dW) * 4;
+        let weight = 0;
+        let weights = 0;
+        let weightsAlpha = 0;
+        let gxR = 0;
+        let gxG = 0;
+        let gxB = 0;
+        let gxA = 0;
+        const centerY = (j + 0.5) * ratioH;
         for (let yy = Math.floor(j * ratioH); yy < (j + 1) * ratioH; yy++) {
           const dy = Math.abs(centerY - (yy + 0.5)) / ratioHHalf,
             centerX = (i + 0.5) * ratioW,
             w0 = dy * dy;
           for (let xx = Math.floor(i * ratioW); xx < (i + 1) * ratioW; xx++) {
-            let dx = Math.abs(centerX - (xx + 0.5)) / ratioWHalf,
-              w = Math.sqrt(w0 + dx * dx);
+            let dx = Math.abs(centerX - (xx + 0.5)) / ratioWHalf;
+            const w = Math.sqrt(w0 + dx * dx);
             /* eslint-disable max-depth */
             if (w > 1 && w < -1) {
               continue;
