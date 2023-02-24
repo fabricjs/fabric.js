@@ -12,8 +12,9 @@ export interface IPoint {
  */
 export class Point implements IPoint {
   declare x: number;
-
   declare y: number;
+
+  static ZERO = new Point();
 
   constructor();
   constructor(x: number, y: number);
@@ -356,7 +357,7 @@ export class Point implements IPoint {
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(radians: TRadian, origin: IPoint = originZero): Point {
+  rotate(radians: TRadian, origin: IPoint = Point.ZERO): Point {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
     const sinus = sin(radians),
@@ -384,5 +385,3 @@ export class Point implements IPoint {
     );
   }
 }
-
-const originZero = new Point(0, 0);

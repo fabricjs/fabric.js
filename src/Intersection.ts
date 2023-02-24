@@ -51,7 +51,7 @@ export class Intersection {
     return (
       T.eq(A) ||
       T.eq(B) ||
-      (!AB.eq(new Point()) &&
+      (!AB.eq(Point.ZERO) &&
         calcAngleBetweenVectors(AB, createVector(T, B)) === 0 &&
         calcAngleBetweenVectors(AB, createVector(A, T)) === 0)
     );
