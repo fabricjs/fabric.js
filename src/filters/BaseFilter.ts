@@ -48,6 +48,14 @@ export abstract class AbstractBaseFilter<T> {
    */
   declare mainParameter?: keyof this;
 
+  static vertexSource = `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    void main() {
+      vTexCoord = aPosition;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }`;
+
   /**
    * Constructor
    * @param {Object} [options] Options object
@@ -55,6 +63,7 @@ export abstract class AbstractBaseFilter<T> {
   constructor(
     options: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
   ) {
+    this.vertexSource = (this.constructor as typeof AbstractBaseFilter<T>).vertexSource;
     Object.assign(this, options);
   }
 
@@ -387,27 +396,16 @@ export abstract class AbstractBaseFilter<T> {
 }
 
 export abstract class BaseFilter extends AbstractBaseFilter<string> {
-  getFragmentSource() {
-    return this.fragmentSource;
-  }
-}
-
-Object.assign(AbstractBaseFilter.prototype, {
-  vertexSource: `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    void main() {
-      vTexCoord = aPosition;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }`,
-});
-
-Object.assign(BaseFilter.prototype, {
-  fragmentSource: `
+  fragmentSource = `
     ${highPsourceCode};
     varying vec2 vTexCoord;
     uniform sampler2D uTexture;
     void main() {
       gl_FragColor = texture2D(uTexture, vTexCoord);
-    }`,
-});
+    }`;
+
+  getFragmentSource() {
+    return this.fragmentSource;
+  }
+}
+

@@ -36,7 +36,7 @@ type TDestroyed<T, K extends keyof any> = {
   [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
 };
 
-type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
+export type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
   T,
   | 'contextTop'
   | 'contextCache'
@@ -46,6 +46,36 @@ type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
   | 'wrapperEl'
   | '_activeSelection'
 >;
+
+export const DefaultCanvasProperties = {
+  uniformScaling: true,
+  uniScaleKey: 'shiftKey',
+  centeredScaling: false,
+  centeredRotation: false,
+  centeredKey: 'altKey',
+  altActionKey: 'shiftKey',
+  selection: true,
+  selectionKey: 'shiftKey',
+  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
+  selectionDashArray: [],
+  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
+  selectionLineWidth: 1,
+  selectionFullyContained: false,
+  hoverCursor: 'move',
+  moveCursor: 'move',
+  defaultCursor: 'default',
+  freeDrawingCursor: 'crosshair',
+  notAllowedCursor: 'not-allowed',
+  containerClass: 'canvas-container',
+  perPixelTargetFind: false,
+  targetFindTolerance: 0,
+  skipTargetFind: false,
+  preserveObjectStacking: false,
+  stopContextMenu: false,
+  fireRightClick: false,
+  fireMiddleClick: false,
+  enablePointerEvents: false,
+};
 
 /**
  * Canvas class
@@ -484,6 +514,12 @@ export class SelectableCanvas<
    * @type {FabricObject}
    */
   protected declare _target?: FabricObject;
+
+  static ownDefaults: Record<string, any> = DefaultCanvasProperties;
+
+  get defaultValues() :Record<string, any> {
+    return { ...super.defaultValues, ...SelectableCanvas.ownDefaults };
+  }
 
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
@@ -1595,33 +1631,3 @@ export class SelectableCanvas<
     instance.set(originalProperties);
   }
 }
-
-Object.assign(SelectableCanvas.prototype, {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-});

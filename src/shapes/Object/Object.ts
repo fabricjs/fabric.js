@@ -610,9 +610,9 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
-  private static ownDefaults = fabricObjectDefaultValues;
+  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
 
-  static get defaultValues() :Record<string, any> {
+  get defaultValues() :Record<string, any> {
     return FabricObject.ownDefaults;
   }
 
@@ -622,8 +622,7 @@ export class FabricObject<
    */
   constructor(options?: Partial<TClassProperties<FabricObject>>) {
     super();
-    // @ts-ignore constructor type
-    Object.assign(this, this.constructor.defaultValues);
+    Object.assign(this, this.defaultValues);
     this.setOptions(options);
   }
 

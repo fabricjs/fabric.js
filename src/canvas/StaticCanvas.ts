@@ -65,6 +65,25 @@ type TCanvasHydrationOption = {
   signal?: AbortSignal;
 };
 
+export const StaticCanvasDefaults = {
+  backgroundColor: '',
+  backgroundImage: null,
+  overlayColor: '',
+  overlayImage: null,
+  includeDefaultValues: true,
+  renderOnAddRemove: true,
+  controlsAboveOverlay: false,
+  allowTouchScrolling: false,
+  imageSmoothingEnabled: true,
+  viewportTransform: iMatrix.concat(),
+  backgroundVpt: true,
+  overlayVpt: true,
+  enableRetinaScaling: true,
+  svgViewportTransformation: true,
+  skipOffscreen: true,
+  clipPath: undefined,
+};
+
 /**
  * Static canvas class
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
@@ -268,14 +287,21 @@ export class StaticCanvas<
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
+  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+
   // reference to
   protected declare __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
 
+  get defaultValues() :Record<string, any> {
+    return StaticCanvas.ownDefaults;
+  }
+
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    Object.assign(this, this.defaultValues);
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({
@@ -1688,22 +1714,3 @@ export class StaticCanvas<
     } }>`;
   }
 }
-
-Object.assign(StaticCanvas.prototype, {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-});
