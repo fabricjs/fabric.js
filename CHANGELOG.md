@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): remove deprecated class util [#8731](https://github.com/fabricjs/fabric.js/pull/8731)
 - lint(): fix eslint errors [#8729](https://github.com/fabricjs/fabric.js/pull/8729)
 - fix(TS): `this.constructor` types [#8675](https://github.com/fabricjs/fabric.js/issues/8675)
 - fix(DraggableText): drag image blur [#8712](https://github.com/fabricjs/fabric.js/pull/8712)
