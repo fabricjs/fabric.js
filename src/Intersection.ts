@@ -1,5 +1,5 @@
 import { Point } from './Point';
-import { calcAngleBetweenVectors, createVector } from './util/misc/vectors';
+import { createVector } from './util/misc/vectors';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
@@ -40,7 +40,11 @@ export class Intersection {
   }
 
   /**
-   * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
+   * check if `T ∈ [A, B]`
+   *
+   * Solving the linear equation `A + s * AB = T` will give us `s`\
+   * If `s` has a solution and `s ∈ [0, 1]` then `T ∈ [A, B]`
+   *
    * @param T
    * @param A
    * @param B
@@ -48,13 +52,19 @@ export class Intersection {
    */
   static isContainedInInterval(T: Point, A: Point, B: Point) {
     const AB = createVector(A, B);
-    return (
-      T.eq(A) ||
-      T.eq(B) ||
-      (!AB.eq(Point.ZERO) &&
-        calcAngleBetweenVectors(AB, createVector(T, B)) === 0 &&
-        calcAngleBetweenVectors(AB, createVector(A, T)) === 0)
-    );
+    const AT = createVector(A, T);
+    if (AB.x === 0) {
+      return (
+        T.x === A.x && T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)
+      );
+    } else if (AB.y === 0) {
+      return (
+        T.y === A.y && T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)
+      );
+    } else {
+      const s = AT.divide(AB);
+      return s.x === s.y && s.x >= 0 && s.x <= 1;
+    }
   }
 
   /**
