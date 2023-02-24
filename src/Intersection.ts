@@ -44,6 +44,7 @@ export class Intersection {
    *
    * Solving the linear equation `A + s * AB = T` will give us `s`\
    * If `s` has a solution and `s ∈ [0, 1]` then `T ∈ [A, B]`
+   * If `AB` has a zero component we revert to a simple coordinate check
    *
    * @param T
    * @param A
