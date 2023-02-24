@@ -51,17 +51,17 @@ export class Intersection {
    * @returns true if `T` is contained
    */
   static isContainedInInterval(T: Point, A: Point, B: Point) {
-    const AB = createVector(A, B);
-    const AT = createVector(A, T);
-    if (AB.x === 0) {
+    if (A.x === B.x) {
       return (
         T.x === A.x && T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)
       );
-    } else if (AB.y === 0) {
+    } else if (A.y === B.y) {
       return (
         T.y === A.y && T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)
       );
     } else {
+      const AB = createVector(A, B);
+      const AT = createVector(A, T);
       const s = AT.divide(AB);
       return s.x === s.y && s.x >= 0 && s.x <= 1;
     }
