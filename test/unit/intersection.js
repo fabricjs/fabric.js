@@ -83,13 +83,20 @@
   });
 
   QUnit.test('intersectSegmentSegment coincident but different', function(assert) {
-    var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(0, 10),
-      p3 = new fabric.Point(0, 1), p4 = new fabric.Point(0, 9);
+    var a = new fabric.Point(0, 0),
+      b = new fabric.Point(0, 1),
+      c = new fabric.Point(0, 9),
+      d = new fabric.Point(0, 10);
     [
-      fabric.Intersection.intersectSegmentSegment(p1, p2, p3, p4),
-      fabric.Intersection.intersectSegmentSegment(p1, p2, p4, p3),
-      fabric.Intersection.intersectSegmentSegment(p2, p1, p3, p4),
-      fabric.Intersection.intersectSegmentSegment(p2, p1, p4, p3)
+      fabric.Intersection.intersectSegmentSegment(a, d, b, c),
+      fabric.Intersection.intersectSegmentSegment(a, d, c, b),
+      fabric.Intersection.intersectSegmentSegment(d, a, b, c),
+      fabric.Intersection.intersectSegmentSegment(d, a, c, b),
+
+      fabric.Intersection.intersectSegmentSegment(a, c, b, d),
+      fabric.Intersection.intersectSegmentSegment(a, c, d, b),
+      fabric.Intersection.intersectSegmentSegment(c, a, b, d),
+      fabric.Intersection.intersectSegmentSegment(c, a, d, b),
     ].forEach(intersection => {
       assert.ok(intersection instanceof fabric.Intersection, 'returns a fabric.Intersection');
       assert.equal(intersection.status, 'Coincident', 'it return a Coincident result');
