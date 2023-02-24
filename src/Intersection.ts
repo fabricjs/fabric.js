@@ -76,12 +76,12 @@ export class Intersection {
     aInfinite = true,
     bInfinite = true
   ): Intersection {
-    const b2xb1x = b2.x - b1.x,
-      a1yb1y = a1.y - b1.y,
+    const a2xa1x = a2.x - a1.x,
+      a2ya1y = a2.y - a1.y,
+      b2xb1x = b2.x - b1.x,
       b2yb1y = b2.y - b1.y,
       a1xb1x = a1.x - b1.x,
-      a2ya1y = a2.y - a1.y,
-      a2xa1x = a2.x - a1.x,
+      a1yb1y = a1.y - b1.y,
       uaT = b2xb1x * a1yb1y - b2yb1y * a1xb1x,
       ubT = a2xa1x * a1yb1y - a2ya1y * a1xb1x,
       uB = b2yb1y * a2xa1x - b2xb1x * a2ya1y;
