@@ -488,8 +488,8 @@ program
   .option('-v, --verbose', 'log passing tests', true)
   .option('--no-verbose', 'disable verbose logging')
   .option(
-    '--dev',
-    'runs browser tests in `dev` mode, launching the browser, watching for changes and restarting the test suite',
+    '-w, --watch',
+    'runs browser tests in `watch` mode, launching the browser, watching for changes and restarting the test suite',
     false
   )
   .addOption(
