@@ -31,6 +31,293 @@
     assert.equal(intersection.points.length, 2, 'now intersection contains 2 points');
   });
 
+  QUnit.module('isPointContained', () => {
+    QUnit.assert.isPointContained = function (T, A, B, infinite, expected, message) {
+      const actual = fabric.Intersection.isPointContained(T, A, B, infinite);
+      const reversed = fabric.Intersection.isPointContained(T, B, A, infinite);
+      this.pushResult({
+        expected,
+        actual: actual,
+        result: actual === expected,
+        message
+      });
+      this.pushResult({
+        expected,
+        actual: reversed,
+        result: reversed === expected,
+        message: `${message} (reversed point order)`
+      });
+      if (!infinite && expected) {
+        const actual = fabric.Intersection.isPointContained(T, A, B, true);
+        const reversed = fabric.Intersection.isPointContained(T, B, A, true);
+        this.pushResult({
+          expected,
+          actual: actual,
+          result: actual === expected,
+          message: `${message} (infinite)`
+        });
+        this.pushResult({
+          expected,
+          actual: reversed,
+          result: reversed === expected,
+          message: `${message} (reversed point order, infinite)`
+        });
+      }
+    };
+
+    QUnit.test('contained in point', function (assert) {
+      assert.isPointContained(
+        new fabric.Point(10, 0),
+        new fabric.Point(10, 0),
+        new fabric.Point(10, 0),
+        false,
+        true,
+        'same point'
+      );
+      assert.isPointContained(
+        new fabric.Point(10, 1),
+        new fabric.Point(10, 0),
+        new fabric.Point(10, 0),
+        false,
+        false,
+        'not same point'
+      );
+      assert.isPointContained(
+        new fabric.Point(10, 1),
+        new fabric.Point(10, 0),
+        new fabric.Point(10, 0),
+        true,
+        false,
+        'not same point, infinite check'
+      );
+    });
+
+    QUnit.test('x axis', function (assert) {
+      assert.isPointContained(
+        new fabric.Point(5, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(10, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(7, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        true,
+        'inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(4.9, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(10.1, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(4.9, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(10.1, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        false,
+        false,
+        'not inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        true,
+        false,
+        'not on line'
+      );
+    });
+
+    QUnit.test('y axis', function (assert) {
+      assert.isPointContained(
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 10),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 7),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        true,
+        'inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 4.9),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 10.1),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 4.9),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 10.1),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        false,
+        false,
+        'not inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        true,
+        false,
+        'not on line'
+      );
+    });
+
+    QUnit.test('sloped', function (assert) {
+      assert.isPointContained(
+        new fabric.Point(2, 1),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(4, 2),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        true,
+        'on edge'
+      );
+      assert.isPointContained(
+        new fabric.Point(3, 1.5),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        true,
+        'inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 0),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(6, 3),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        false,
+        'on line but not in segment'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 0),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(6, 3),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        true,
+        true,
+        'on line'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        false,
+        false,
+        'not inside'
+      );
+      assert.isPointContained(
+        new fabric.Point(1, 1),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        true,
+        false,
+        'not on line'
+      );
+    });
+  });
+
   QUnit.test('intersectLineLine intersection', function (assert) {
     var p1 = new fabric.Point(0, 0), p2 = new fabric.Point(-10, -10),
       p3 = new fabric.Point(0, 10), p4 = new fabric.Point(10, 0),
