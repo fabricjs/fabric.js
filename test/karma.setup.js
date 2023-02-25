@@ -33,21 +33,6 @@ window.addEventListener('error', (event) => {
   QUnit.onUncaughtException(event.error);
 });
 
-const qunit = document.createElement('div');
-qunit.id = 'qunit';
-
-const qunitFixture = document.createElement('div');
-qunitFixture.id = 'qunit-fixture';
-
-const qunitToolbar = document.createElement('div');
-qunitToolbar.id = 'qunit-testrunner-toolbar';
-
-const qunitUserAgent = document.createElement('h2');
-qunitUserAgent.id = 'qunit-userAgent';
-
-const tests = document.createElement('ol');
-tests.id = 'qunit-tests';
-
 // test setup
 
 const canvas = document.createElement('canvas');
@@ -81,4 +66,4 @@ visualOutputTemplate.innerHTML = `
     </table>
     `;
 
-document.body.append(qunit, qunitFixture, qunitToolbar, qunitUserAgent, canvas, staticCanvas, visualOutputTemplate);
+document.body.append(canvas, staticCanvas, visualOutputTemplate);
