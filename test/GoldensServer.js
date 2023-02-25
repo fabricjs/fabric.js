@@ -48,7 +48,7 @@ function startGoldensServer() {
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename);
                 res.end(JSON.stringify({ exists: fs.existsSync(goldenPath) }));
             }
-            else if (req.method.toUpperCase() === 'POST') {
+            else if (req.method.toUpperCase() === 'POST' && req.url === '/patch') {
                 const { files: [{ rawData }], fields: { filename } } = await parseRequest(req);
                 const goldenPath = path.resolve(wd, 'test', 'visual', 'golden', filename.split('/golden/')[1]);
                 console.log(chalk.gray('[info]'), `creating golden ${path.relative(wd, goldenPath)}`);

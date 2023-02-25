@@ -65,7 +65,7 @@
           formData.append('file', blob, filename);
           formData.append('filename', filename);
           const request = new XMLHttpRequest();
-          request.open('POST', '/goldens', true);
+          request.open('POST', '/goldens/patch', true);
           request.onreadystatechange = () => {
             if (request.readyState === XMLHttpRequest.DONE) {
               const status = request.status;
