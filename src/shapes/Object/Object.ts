@@ -696,10 +696,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
       ) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
-        // @ts-ignore TS and constructor issue
       } else if (
         groupNeedsUpdate &&
-        this.constructor.stateProperties.includes(key)
+        (this.constructor as typeof FabricObject).stateProperties.includes(key)
       ) {
         this.group!.set('dirty', true);
       }
