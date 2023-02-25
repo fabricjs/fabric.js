@@ -1,19 +1,19 @@
-import { babel } from '@rollup/plugin-babel';
-import json from '@rollup/plugin-json';
-import ts from '@rollup/plugin-typescript';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-
-const plugins = [
-  json(),
-  ts(),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
-  }),
-  nodeResolve(),
-  commonjs({ include: 'node_modules/**' })
-];
+// import { babel } from '@rollup/plugin-babel';
+// import json from '@rollup/plugin-json';
+// import ts from '@rollup/plugin-typescript';
+// import { nodeResolve } from '@rollup/plugin-node-resolve';
+// import commonjs from '@rollup/plugin-commonjs';
+// 
+// const plugins = [
+//   json(),
+//   ts(),
+//   babel({
+//     extensions: ['.ts', '.js'],
+//     babelHelpers: 'bundled',
+//   }),
+//   nodeResolve(),
+//   commonjs({ include: 'node_modules/**' })
+// ];
 
 const BROWSERS = process.env.BROWSERS ? process.env.BROWSERS.split(/,| /g) : ['chrome', 'firefox'];
 const TEST_FILES = process.env.TEST_FILES ? process.env.TEST_FILES.split(/,| /g) : null;
@@ -120,22 +120,8 @@ export default async function (config) {
       'dist/index.js': ['coverage'],
     },
 
-    rollupPreprocessor: {
-      /**
-       * This is just a normal Rollup config object,
-       * except that `input` is handled for you.
-       */
-      plugins,
-      output: {
-        format: 'umd', // Helps prevent naming collisions.
-        name: 'FabricTestSuite', // Required for 'iife' format.
-        sourcemap: 'inline', // Sensible for testing.
-      },
-    },
-
     /**
-     * QUnit client config
-     * https://github.com/karma-runner/karma-qunit
+     * Object available on the client in `window.__karma__.config`
      */
     client: {
       clearContext: false,
