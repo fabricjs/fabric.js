@@ -58,16 +58,14 @@ export class Intersection {
       // we first check if T.x has the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
-        (infinite ||
-          (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
+        (infinite || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
       // Edge case: vertical line.
       // we first check if T.y has the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
-        (infinite ||
-          (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
+        (infinite || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
       );
     } else {
       // Generic case: sloped line.
