@@ -73,7 +73,7 @@ export class Intersection {
       // Generic case: sloped line.
       // we check that AT has the same slope as AB
       // for the segment case we need both the vectors to have the same direction and for AT to be lt AB in size
-      // for the infinite we check the absolute value of the slope, since direction is meaningless
+      // for the infinite case we check the absolute value of the slope, since direction is meaningless
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
