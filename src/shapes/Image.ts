@@ -24,7 +24,6 @@ export type ImageSource =
   | HTMLCanvasElement;
 
 export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
