@@ -14,7 +14,7 @@ export const stateProperties = [
   'visible',
   'skewX',
   'skewY',
-];
+] as const;
 
 export const cacheProperties = [
   'fill',
@@ -31,7 +31,7 @@ export const cacheProperties = [
   'strokeMiterLimit',
   'backgroundColor',
   'clipPath',
-];
+] as const;
 
 export const fabricObjectDefaultValues = {
   type: 'object',
@@ -107,4 +107,4 @@ export const fabricObjectDefaultValues = {
   inverted: false,
   absolutePositioned: false,
   FX_DURATION: 500,
-};
+} as const;
