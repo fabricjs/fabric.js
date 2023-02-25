@@ -81,7 +81,7 @@ export class Shadow {
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
     const options: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
-    Object.assign(this, shadowDefaultValues);
+    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
     for (const prop in options) {
       // @ts-expect-error for loops are so messy in TS
       this[prop] = options[prop];
@@ -194,7 +194,7 @@ export class Shadow {
       return data;
     }
 
-    const defaults = Shadow.prototype;
+    const defaults = Shadow.ownDefaults;
     const out: Record<string, unknown> = {};
     for (const key in data) {
       if (

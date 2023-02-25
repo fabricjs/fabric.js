@@ -6,7 +6,6 @@ import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
-  TClassProperties,
   TDegree,
   TFiller,
   TSize,
@@ -151,7 +150,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * needs its cache regenerated during a .set call
    * @type Array
    */
-  static stateProperties: string[] = stateProperties;
+  static stateProperties = stateProperties;
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -160,7 +159,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * and refreshed at the next render
    * @type Array
    */
-  static cacheProperties: string[] = cacheProperties;
+  static cacheProperties = cacheProperties;
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.
@@ -274,7 +273,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
 
   get defaultValues() :Record<string, any> {
-    return FabricObject.ownDefaults;
+    return { ...FabricObject.ownDefaults };
   }
 
   /**

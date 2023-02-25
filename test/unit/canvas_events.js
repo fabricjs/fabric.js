@@ -10,13 +10,13 @@
       canvas.cancelRequestedRender();
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       upperCanvasEl.style.display = '';
-      canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
-      canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
+      canvas.controlsAboveOverlay = canvas.defaultValues.controlsAboveOverlay;
+      canvas.preserveObjectStacking = canvas.defaultValues.preserveObjectStacking;
     },
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
-      canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
+      canvas.backgroundColor = canvas.defaultValues.backgroundColor;
+      canvas.overlayColor = canvas.defaultValues.overlayColor;
       canvas.handleSelection = fabric.Canvas.prototype.handleSelection;
       canvas.off();
       canvas.setDimensions({ width: 600, height: 600 });
@@ -320,10 +320,10 @@
     canvas.__onMouseDown(e);
     canvas._onDragStart({
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       }
     });
     canvas.__onMouseUp(e2);
@@ -425,7 +425,7 @@
     var mouseUpCalled = false;
     var mouseDownCalled = false;
     rect.controls = {
-      br: fabric.Object.prototype.controls.br,
+      br: rect.defaultValues.controls.br,
     };
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
@@ -471,7 +471,7 @@
     var mouseUpCalled = false;
     var mouseDownCalled = false;
     rect.controls = {
-      br: fabric.Object.prototype.controls.br,
+      br: rect.defaultValues.controls.br,
     };
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
@@ -497,7 +497,7 @@
     var rect = new fabric.Rect({ left: 0, top: 0, width: 3, height: 3, strokeWidth: 0 });
     var mouseUpCalled = false;
     rect.controls = {
-      br: fabric.Object.prototype.controls.br,
+      br: rect.defaultValues.controls.br,
     };
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled = true;
@@ -521,8 +521,8 @@
     var mouseUpCalled2 = false;
 
     rect.controls = {
-      br: fabric.Object.prototype.controls.br,
-      tr: fabric.Object.prototype.controls.tr,
+      br: rect.defaultValues.controls.br,
+      tr: rect.defaultValues.controls.tr,
     };
     rect.controls.br.mouseUpHandler = function() {
       mouseUpCalled1 = true;
