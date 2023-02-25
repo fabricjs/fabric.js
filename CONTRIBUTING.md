@@ -122,7 +122,7 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving
+Test suites use [`QUnit`][qunit] for assertions and [`karma`][karma] for serving
 
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
@@ -139,7 +139,7 @@ npm run build -- -f -w
 
 - run tests:
 
-```bash
+````bash
 
 npm test -- -a -d
 > Running all tests in debug mode (read more in the help section)
@@ -150,27 +150,6 @@ npm test -- -s visual --dev -l -c chrome
 npm test -- --help
 
 > Usage: fabric.js test [options]
-
-> run test suite
-
-Options:
-  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
-  -f, --file <file>           run a specific test file
-  --filter <filter>           filter tests by name
-  -a, --all                   run all tests (default: false)
-  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
-                              false)
-  -r, --recreate              recreate visual refs (golden images) (default: false)
-  -v, --verbose               log passing tests (default: false)
-  -l, --launch                launch tests in the browser (default: false)
-  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
-  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
-  -p, --port
-  -o, --out <out>             path to report test results to
-  --clear-cache               clear CLI test cache (default: false)
-  -h, --help                  display help for command
-
-```
 
 ---
 
@@ -223,7 +202,7 @@ Commands:
   start <path>                    start a sandbox
   help [command]                  display help for command
 
-```
+````
 
 ### 🔮 Symlinking
 
@@ -255,6 +234,6 @@ Don't forget to unlink the package once you're done.
 [eslint]: https://eslint.org/
 [jsdoc]: https://jsdoc.app/
 [qunit]: https://qunitjs.com/
-[testem]: https://github.com/testem/testem
+[karma]: http://karma-runner.github.io/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
 [yarn_link]: https://yarnpkg.com/cli/link

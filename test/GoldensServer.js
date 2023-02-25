@@ -41,7 +41,7 @@ function startGoldensServer() {
     const server = http
         .createServer(async (req, res) => {
             if (req.method.toUpperCase() === 'GET' && req.url === '/') {
-                res.end('This endpoint is used by fabric.js and testem to generate goldens');
+                res.end('This endpoint is used by fabric.js to generate goldens for visual tests run from the browser');
             }
             else if (req.method.toUpperCase() === 'GET') {
                 const filename = req.url.split('/golden/')[1] || req.url;
