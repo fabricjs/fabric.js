@@ -1,9 +1,10 @@
+import chalk from 'chalk';
 // import { babel } from '@rollup/plugin-babel';
 // import json from '@rollup/plugin-json';
 // import ts from '@rollup/plugin-typescript';
 // import { nodeResolve } from '@rollup/plugin-node-resolve';
 // import commonjs from '@rollup/plugin-commonjs';
-// 
+//
 // const plugins = [
 //   json(),
 //   ts(),
@@ -15,14 +16,28 @@
 //   commonjs({ include: 'node_modules/**' })
 // ];
 
+// https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+const CI = !!process.env.CI
 const BROWSERS = process.env.BROWSERS ? process.env.BROWSERS.split(/,| /g) : ['chrome', 'firefox'];
 const TEST_FILES = process.env.TEST_FILES ? process.env.TEST_FILES.split(/,| /g) : null;
+const VISUAL_TEST_CONFIG = {
+  recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS),
+  debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS),
+};
 
-/**
+/** 
  * https://github.com/tom-sherman/blog/blob/main/posts/02-running-jest-tests-in-a-browser.md
  * @param {*} config 
  */
 export default async function (config) {
+  const browsers = (CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
+    .filter(browser => BROWSERS.some(b => b.startsWith(browser.toLowerCase())));
+  if (VISUAL_TEST_CONFIG.debug || VISUAL_TEST_CONFIG.recreate) {
+    browsers.length > 1 && console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
+    if (CI) {
+      throw new Error(chalk.red(`Debugging/recreating visual tests is banned in CI`));
+    }
+  }
   config.set({
     plugins: [
       'karma-jasmine',
@@ -34,19 +49,13 @@ export default async function (config) {
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../',
-
     autoWatch: false,
-
     singleRun: true,
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: [/*'jasmine',*/ 'qunit'],
-
-    // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-    browsers: (process.env.CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
-      .filter(browser => BROWSERS.some(b => b.startsWith(browser.toLowerCase()))),
-
+    browsers,
     customLaunchers: {
       ChromeHeadlessX: {
         base: 'ChromeHeadless',
@@ -125,10 +134,10 @@ export default async function (config) {
      */
     client: {
       clearContext: false,
-      CI: !!process.env.CI,
+      CI: !!CI,
       visual: {        
-        recreate: !process.env.CI && Number(process.env.QUNIT_RECREATE_VISUAL_REFS),
-        debug: !process.env.CI && Number(process.env.QUNIT_DEBUG_VISUAL_TESTS),
+        recreate: browsers.length === 1 && !CI && VISUAL_TEST_CONFIG.recreate,
+        debug: browsers.length === 1 && !CI && VISUAL_TEST_CONFIG.debug,
       },
       /**
        * QUnit client config
@@ -136,7 +145,7 @@ export default async function (config) {
        */
       qunit: {
         showUI: true,
-        testTimeout: process.env.CI ? 15000 : 5000,
+        testTimeout: CI ? 15000 : 5000,
         filter: process.env.QUNIT_FILTER || null,
         reorder: false,
         noglobals: true,
