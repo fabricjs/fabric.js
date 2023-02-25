@@ -6,14 +6,15 @@ import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
+import { FabricObjectProps } from './Object/ObjectProps';
 
-export class Circle extends FabricObject {
+export interface CircleProps extends FabricObjectProps {
   /**
    * Radius of this circle
    * @type Number
    * @default 0
    */
-  declare radius: number;
+  radius: number;
 
   /**
    * degrees of start of the circle.
@@ -21,7 +22,7 @@ export class Circle extends FabricObject {
    * @type Number 0 - 359
    * @default 0
    */
-  declare startAngle: number;
+  startAngle: number;
 
   /**
    * End angle of the circle
@@ -29,6 +30,12 @@ export class Circle extends FabricObject {
    * @type Number 1 - 360
    * @default 360
    */
+  endAngle: number;
+}
+
+export class Circle extends FabricObject implements CircleProps {
+  declare radius: number;
+  declare startAngle: number;
   declare endAngle: number;
 
   static cacheProperties = [
@@ -37,6 +44,10 @@ export class Circle extends FabricObject {
     'startAngle',
     'endAngle',
   ];
+
+  constructor(options?: CircleProps) {
+    super(options);
+  }
 
   /**
    * @private

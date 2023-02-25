@@ -13,6 +13,7 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
+import { FabricObjectProps } from './ObjectProps';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -41,8 +42,11 @@ export interface DragMethods {
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<EventSpec> {
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<EventSpec>
+  implements FabricObjectProps
+{
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -53,17 +57,6 @@ export class InteractiveFabricObject<
    * to draw and locate controls
    */
   declare oCoords: Record<string, TOCoord>;
-
-  /**
-   * When `true`, cache does not get updated during scaling. The picture will get blocky if scaled
-   * too much and will be redrawn with correct details at the end of scaling.
-   * this setting is performance and application dependant.
-   * default to true
-   * since 1.7.0
-   * @type Boolean
-   * @default true
-   */
-  declare noScaleCache: boolean;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -82,17 +75,8 @@ export class InteractiveFabricObject<
    */
   declare _controlsVisibility: Record<string, boolean>;
 
-  /**
-   * The angle that an object will lock to while rotating.
-   * @type [TDegree]
-   */
+  declare noScaleCache: boolean;
   declare snapAngle?: TDegree;
-
-  /**
-   * The angle difference from the current snapped angle in which snapping should occur.
-   * When undefined, the snapThreshold will default to the snapAngle.
-   * @type [TDegree]
-   */
   declare snapThreshold?: TDegree;
 
   /**
@@ -123,7 +107,7 @@ export class InteractiveFabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Record<string, unknown>) {
+  constructor(options?: FabricObjectProps) {
     super(options);
   }
 

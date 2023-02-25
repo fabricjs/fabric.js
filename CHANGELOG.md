@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): class interface for options/brevity [#8674](https://github.com/fabricjs/fabric.js/issues/8674)
 - ci(): fix import autocomplete in dev mode #8725
 - chore(): remove deprecated class util [#8731](https://github.com/fabricjs/fabric.js/pull/8731)
 - lint(): fix eslint errors [#8729](https://github.com/fabricjs/fabric.js/pull/8729)
