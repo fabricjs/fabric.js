@@ -127,8 +127,8 @@ export default async function (config) {
       clearContext: false,
       CI: !!process.env.CI,
       visual: {        
-        recreate: !process.env.CI & Number(process.env.QUNIT_RECREATE_VISUAL_REFS),
-        debug: !process.env.CI & Number(process.env.QUNIT_DEBUG_VISUAL_TESTS),
+        recreate: !process.env.CI && Number(process.env.QUNIT_RECREATE_VISUAL_REFS),
+        debug: !process.env.CI && Number(process.env.QUNIT_DEBUG_VISUAL_TESTS),
       },
       /**
        * QUnit client config
