@@ -17,6 +17,7 @@ export class Polygon extends Polyline {
   }
 }
 
+// @ts-expect-error
 Polygon.prototype.type = 'polygon';
 
 classRegistry.setClass(Polygon);

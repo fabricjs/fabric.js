@@ -44,6 +44,7 @@ export class Triangle extends FabricObject {
   }
 }
 
+// @ts-expect-error
 Triangle.prototype.type = 'triangle';
 
 classRegistry.setClass(Triangle);

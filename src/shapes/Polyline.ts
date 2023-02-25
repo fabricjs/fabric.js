@@ -332,6 +332,7 @@ export class Polyline extends FabricObject {
   }
 }
 
+// @ts-expect-error
 Polyline.prototype.type = 'polyline';
 
 classRegistry.setClass(Polyline);

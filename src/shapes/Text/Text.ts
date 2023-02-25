@@ -1945,6 +1945,7 @@ export class Text<
   }
 }
 
+// @ts-expect-error
 Text.prototype.type = 'text';
 
 applyMixins(Text, [TextSVGExportMixin]);

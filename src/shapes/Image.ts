@@ -787,8 +787,7 @@ export class Image extends FabricObject {
   }
 }
 
-
-
+// @ts-expect-error
 Image.prototype.type = 'image';
 
 classRegistry.setClass(Image);

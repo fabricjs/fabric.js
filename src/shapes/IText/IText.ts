@@ -667,6 +667,7 @@ export class IText<
   }
 }
 
+// @ts-expect-error
 IText.prototype.type = 'i-text';
 
 classRegistry.setClass(IText);

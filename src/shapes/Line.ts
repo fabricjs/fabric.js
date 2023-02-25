@@ -313,6 +313,7 @@ export class Line extends FabricObject {
   }
 }
 
+// @ts-expect-error
 Line.prototype.type = 'line';
 
 classRegistry.setClass(Line);

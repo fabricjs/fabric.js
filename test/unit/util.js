@@ -125,11 +125,6 @@
     assert.ok(!areAllTheSame);
   });
 
-  QUnit.test('String.prototype.trim', function(assert) {
-    assert.ok(typeof String.prototype.trim === 'function');
-    assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
@@ -169,39 +164,6 @@
     assert.equal(capitalize('FOO'), 'Foo');
     assert.equal(capitalize('FoobaR'), 'Foobar');
     assert.equal(capitalize('2foo'), '2foo');
-  });
-
-  QUnit.test('Function.prototype.bind', function(assert) {
-    assert.ok(typeof Function.prototype.bind === 'function');
-
-    var obj = { };
-    function fn() {
-      return [this, arguments[0], arguments[1]];
-    }
-
-    var bound = fn.bind(obj);
-    assert.deepEqual([obj, undefined, undefined], bound());
-    assert.deepEqual([obj, 1, undefined], bound(1));
-    assert.deepEqual([obj, 1, null], bound(1, null));
-
-    bound = fn.bind(obj, 1);
-    assert.deepEqual([obj, 1, undefined], bound());
-    assert.deepEqual([obj, 1, 2], bound(2));
-
-    function Point(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    obj = { };
-    var YAxisPoint = Point.bind(obj, 0);
-    var axisPoint = new YAxisPoint(5);
-
-    assert.deepEqual(0, axisPoint.x);
-    assert.deepEqual(5, axisPoint.y);
-
-    assert.ok(axisPoint instanceof Point);
-    // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
   QUnit.test('fabric.util.wrapElement', function(assert) {

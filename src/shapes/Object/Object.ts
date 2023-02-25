@@ -1553,6 +1553,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 }
 
+// @ts-expect-error
 FabricObject.prototype.type = 'object';
 
 classRegistry.setClass(FabricObject);

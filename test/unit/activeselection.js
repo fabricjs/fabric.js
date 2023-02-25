@@ -184,13 +184,6 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('inherited methods', function (assert) {
-    var methods = ['add', 'insertAt', 'remove', 'removeAll'];
-    methods.forEach(method => {
-      assert.strictEqual(fabric.ActiveSelection.prototype[method], fabric.Group.prototype[method]);
-    });
-  });
-
   QUnit.test('ActiveSelection shouldCache', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),

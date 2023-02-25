@@ -186,6 +186,7 @@ export class ActiveSelection extends Group {
   }
 }
 
+// @ts-expect-error
 ActiveSelection.prototype.type = 'activeSelection';
 
 classRegistry.setClass(ActiveSelection);

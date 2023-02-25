@@ -34,7 +34,7 @@
   QUnit.module('fabric.Group', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = canvas.defaultValues.backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -560,42 +560,42 @@
     group.bringObjectToFront(textBg);
     assert.deepEqual(group.getObjects(), [text, obj, textBg], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectToBack(textBg);
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectToBack(textBg);
     assert.deepEqual(group.getObjects(), [textBg, text, obj], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectBackwards(obj);
     assert.deepEqual(group.getObjects(), [textBg, obj, text]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(text);
     assert.deepEqual(group.getObjects(), [textBg, obj, text], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(obj);
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(textBg);
     assert.deepEqual(group.getObjects(), [text, textBg, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.moveObjectTo(obj, 2);
     assert.deepEqual(group.getObjects(), [text, textBg, obj], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.moveObjectTo(obj, 0);
     assert.deepEqual(group.getObjects(), [obj, text, textBg]);

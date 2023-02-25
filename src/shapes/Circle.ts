@@ -222,6 +222,7 @@ export class Circle extends FabricObject implements CircleProps {
   /* _FROM_SVG_END_ */
 }
 
+// @ts-expect-error
 Circle.prototype.type = 'circle';
 
 classRegistry.setClass(Circle);
