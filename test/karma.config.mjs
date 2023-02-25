@@ -142,7 +142,7 @@ export default async function (config) {
        */
       qunit: {
         showUI: true,
-        testTimeout: 15000,
+        testTimeout: process.env.CI ? 15000 : 5000,
         filter: process.env.QUNIT_FILTER || null,
         recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS) || false,
         debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
