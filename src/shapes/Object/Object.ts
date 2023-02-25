@@ -150,7 +150,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * needs its cache regenerated during a .set call
    * @type Array
    */
-  static stateProperties = stateProperties;
+  static stateProperties: string[] = stateProperties;
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -159,7 +159,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * and refreshed at the next render
    * @type Array
    */
-  static cacheProperties = cacheProperties;
+  static cacheProperties: string[] = cacheProperties;
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.
