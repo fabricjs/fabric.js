@@ -106,7 +106,6 @@
     "karma-firefox-launcher": "^2.1.2",
     "karma-jasmine": "^5.1.0",
     "karma-qunit": "^4.1.2",
-    "kill-port": "^2.0.1",
     "moment": "^2.29.1",
     "nyc": "^15.1.0",
     "pixelmatch": "^4.0.2",

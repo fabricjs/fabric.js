@@ -18,7 +18,6 @@ import fs from 'fs-extra';
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import Checkbox from 'inquirer-checkbox-plus-prompt';
-import killPort from 'kill-port';
 import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
@@ -289,6 +288,7 @@ async function test(suite, tests, options = {}) {
           'start',
           'test/karma.conf.js',
           !process.env.CI && options.dev ? '--no-single-run --auto-watch' : '',
+          options.port ? `--port ${options.port}` : '',
         ].join(' '),
         {
           cwd: wd,
@@ -497,7 +497,7 @@ program
       .choices(['node', 'chrome', 'firefox'])
       .default(['node'])
   )
-  .option('-p, --port')
+  .option('-p, --port <port>')
   .option('-o, --out <out>', 'path to report test results to')
   .option('--clear-cache', 'clear CLI test cache', false)
   .action(async (options) => {
