@@ -49,22 +49,29 @@ export class Intersection {
    * @param T
    * @param A
    * @param B
+   * @param [infinite] if true checks if `T` is on the line defined by `A` and `B`
    * @returns true if `T` is contained
    */
-  static isContainedInInterval(T: Point, A: Point, B: Point) {
-    if (A.x === B.x) {
+  static isPointContained(T: Point, A: Point, B: Point, infinite = false) {
+    if (A.eq(B)) {
+      return T.eq(A);
+    } else if (A.x === B.x) {
       return (
-        T.x === A.x && T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)
+        T.x === A.x &&
+        (infinite || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
       return (
-        T.y === A.y && T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)
+        T.y === A.y &&
+        (infinite || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
       );
     } else {
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
-      return s.x === s.y && s.x >= 0 && s.x <= 1;
+      return infinite
+        ? Math.abs(s.x) === Math.abs(s.y)
+        : s.x === s.y && s.x >= 0 && s.x <= 1;
     }
   }
 
@@ -116,10 +123,10 @@ export class Intersection {
         const segmentsCoincide =
           aInfinite ||
           bInfinite ||
-          Intersection.isContainedInInterval(a1, b1, b2) ||
-          Intersection.isContainedInInterval(a2, b1, b2) ||
-          Intersection.isContainedInInterval(b1, a1, a2) ||
-          Intersection.isContainedInInterval(b2, a1, a2);
+          Intersection.isPointContained(a1, b1, b2) ||
+          Intersection.isPointContained(a2, b1, b2) ||
+          Intersection.isPointContained(b1, a1, a2) ||
+          Intersection.isPointContained(b2, a1, a2);
         return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
         return new Intersection('Parallel');
