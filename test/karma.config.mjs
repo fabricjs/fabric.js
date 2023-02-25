@@ -15,6 +15,9 @@ const plugins = [
   commonjs({ include: 'node_modules/**' })
 ];
 
+const BROWSERS = process.env.BROWSERS ? process.env.BROWSERS.split(/,| /g) : ['chrome', 'firefox'];
+const TEST_FILES = process.env.TEST_FILES ? process.env.TEST_FILES.split(/,| /g) : null;
+
 /**
  * https://github.com/tom-sherman/blog/blob/main/posts/02-running-jest-tests-in-a-browser.md
  * @param {*} config 
@@ -42,7 +45,8 @@ export default async function (config) {
     frameworks: [/*'jasmine', */'qunit'],
 
     // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-    browsers: process.env.CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'],
+    browsers: (process.env.CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
+      .filter(browser => BROWSERS.some(b => b.startsWith(browser.toLowerCase()))),
 
     customLaunchers: {
       ChromeHeadlessX: {
@@ -91,8 +95,13 @@ export default async function (config) {
       { pattern: 'test/karma.setup.js', type: 'js', included: true, served: true, watched: true, nocache: false },
 
       // add test files last
-      { pattern: 'test/unit/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
-      { pattern: 'test/visual/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
+      ...(TEST_FILES?
+        TEST_FILES.map(file => ({ pattern: file, type: 'js', included: true, served: true, watched: true, nocache: false })) :
+        [
+          { pattern: 'test/unit/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
+          { pattern: 'test/visual/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
+        ]
+      )
     ],
 
     /**
@@ -133,8 +142,6 @@ export default async function (config) {
      * https://github.com/karma-runner/karma-qunit
      */
     client: {
-      // runInParent: true,
-      useIframe: false,
       clearContext: false,
       /**
        * QUnit client config
