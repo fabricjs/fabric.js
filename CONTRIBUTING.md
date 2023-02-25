@@ -139,17 +139,19 @@ npm run build -- -f -w
 
 - run tests:
 
-````bash
+```bash
 
 npm test -- -a -d
 > Running all tests in debug mode (read more in the help section)
 
-npm test -- -s visual --dev -l -c chrome
+npm test -- -s visual -w -c chrome
 > Running live visual tests on chrome (navigate to see)
 
 npm test -- --help
 
 > Usage: fabric.js test [options]
+
+```
 
 ---
 
@@ -202,7 +204,7 @@ Commands:
   start <path>                    start a sandbox
   help [command]                  display help for command
 
-````
+```
 
 ### 🔮 Symlinking
 
