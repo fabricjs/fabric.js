@@ -82,5 +82,3 @@ visualOutputTemplate.innerHTML = `
     `;
 
 document.body.append(qunit, qunitFixture, qunitToolbar, qunitUserAgent, canvas, staticCanvas, visualOutputTemplate);
-
-// QUnit.start();

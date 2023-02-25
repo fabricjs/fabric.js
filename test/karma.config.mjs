@@ -39,9 +39,10 @@ export default async function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'qunit'],
+    frameworks: [/*'jasmine', */'qunit'],
 
-    browsers: ['Chrome'],//['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'],
+    // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
+    browsers: process.env.CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'],
 
     customLaunchers: {
       ChromeHeadlessX: {
@@ -81,7 +82,8 @@ export default async function (config) {
     files: [
       { pattern: 'test/fixtures/*', included: false, served: true, watched: false, nocache: false },
       { pattern: 'test/lib/*.js', included: true, served: true, watched: true, nocache: false },
-      { pattern: 'test/lib/tests.css', included: true, served: true, watched: true, nocache: false },
+      { pattern: 'test/lib/tests.css', included: true, served: true, watched: true, nocache: false }, // qunit only
+      { pattern: 'test/visual/golden/*', included: false, served: true, watched: false, nocache: false },
 
       { pattern: 'dist/index.js', type: 'js', included: true, served: true, watched: true, nocache: true },
       { pattern: 'dist/index.js.map', included: false, served: true, watched: false, nocache: true },
@@ -147,7 +149,6 @@ export default async function (config) {
         reorder: false,
         noglobals: true,
         hidepassed: true,
-        autostart: true,
       }
     }
   });
