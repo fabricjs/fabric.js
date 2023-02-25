@@ -194,15 +194,6 @@ export class Rect extends FabricObject {
       height,
       visible: Boolean(visible && width && height),
     });
-    console.log({
-      ...options,
-      ...restOfparsedAttributes,
-      left,
-      top,
-      width,
-      height,
-      visible: Boolean(visible && width && height),
-    });
     callback(rect);
   }
 
