@@ -288,9 +288,7 @@ async function test(suite, tests, options = {}) {
           'karma',
           'start',
           'test/karma.conf.js',
-          !process.env.CI && (options.dev || options.launch)
-            ? '--no-single-run --auto-watch'
-            : '',
+          !process.env.CI && options.dev ? '--no-single-run --auto-watch' : '',
         ].join(' '),
         {
           cwd: wd,
@@ -489,8 +487,11 @@ program
   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
   .option('-v, --verbose', 'log passing tests', true)
   .option('--no-verbose', 'disable verbose logging')
-  .option('-l, --launch', 'launch tests in the browser', false)
-  .option('--dev', 'runs testem in `dev` mode, without a `ci` flag', false)
+  .option(
+    '--dev',
+    'runs browser tests in `dev` mode, launching the browser, watching for changes and restarting the test suite',
+    false
+  )
   .addOption(
     new commander.Option('-c, --context <context...>', 'context to test in')
       .choices(['node', 'chrome', 'firefox'])
