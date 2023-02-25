@@ -58,23 +58,26 @@ export class Intersection {
       // we first check if T.x is on the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
-        (extendToLine || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
+        (extendToLine ||
+          (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
       // Edge case: vertical line.
       // we first check if T.y is on the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
-        (extendToLine || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
+        (extendToLine ||
+          (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
       );
     } else {
-      // generic case: we normalize AT over AB.
-      // then for the line case we just verify that AB has the same inclination than AT
-      // for the segment case we need the same direction and the length of AT needs to be less than AB
+      // Generic case: sloped line.
+      // we check that AT has the same slope as AB
+      // for the segment case we need both the vectors to have the same direction and for AT to be lt AB in size
+      // for the infinite we check the absolute value of the slope, since direction is meaningless
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
-      return infinite
+      return extendToLine
         ? Math.abs(s.x) === Math.abs(s.y)
         : s.x === s.y && s.x >= 0 && s.x <= 1;
     }
