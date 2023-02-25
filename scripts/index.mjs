@@ -238,61 +238,6 @@ function exportToWebsite(options) {
 
 /**
  *
- * @returns {Promise<boolean | undefined>} true if some tests failed
- */
-async function runTestem({
-  suite,
-  port,
-  launch,
-  dev,
-  processOptions,
-  context,
-} = {}) {
-  port = port || suite === 'visual' ? 8081 : 8080;
-  try {
-    await killPort(port);
-  } catch (error) {}
-
-  if (launch) {
-    // open localhost
-    const url = `http://localhost:${port}/`;
-    const start =
-      os.platform() === 'darwin'
-        ? 'open'
-        : os.platform() === 'win32'
-        ? 'start'
-        : 'xdg-open';
-    cp.exec([start, url].join(' '));
-  }
-
-  const processCmdOptions = [
-    '-p',
-    port,
-    '-f',
-    `test/testem.${suite}.js`,
-    '-l',
-    context.map(_.upperFirst).join(','),
-  ];
-
-  if (dev) {
-    cp.spawn(['testem', ...processCmdOptions].join(' '), {
-      ...processOptions,
-      detached: true,
-    });
-  } else {
-    try {
-      cp.execSync(
-        ['testem', 'ci', ...processCmdOptions].join(' '),
-        processOptions
-      );
-    } catch (error) {
-      return true;
-    }
-  }
-}
-
-/**
- *
  * @param {'unit' | 'visual'} suite
  * @param {string[] | null} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
@@ -337,21 +282,31 @@ async function test(suite, tests, options = {}) {
   }
 
   if (browserContexts.length > 0) {
-    failed =
-      (await runTestem({
-        ...options,
-        suite,
-        processOptions: {
+    try {
+      cp.execSync(
+        [
+          'karma',
+          'start',
+          'test/karma.conf.js',
+          !process.env.CI && (options.dev || options.launch)
+            ? '--no-single-run --auto-watch'
+            : '',
+        ].join(' '),
+        {
           cwd: wd,
           env: {
             ...env,
             ...qunitEnv,
+            TEST_SUITE: suite,
+            BROWSERS: browserContexts,
           },
           shell: true,
           stdio: 'inherit',
-        },
-        context: browserContexts,
-      })) || failed;
+        }
+      );
+    } catch (error) {
+      failed = true;
+    }
   }
 
   return failed;

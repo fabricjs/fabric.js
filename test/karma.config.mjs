@@ -36,9 +36,9 @@ export default async function (config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '../',
 
-    // autoWatch: false,
+    autoWatch: false,
 
-    // singleRun: true,
+    singleRun: true,
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
