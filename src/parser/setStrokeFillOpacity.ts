@@ -19,10 +19,10 @@ export function setStrokeFillOpacity(attributes) {
     }
 
     if (typeof attributes[attr] === 'undefined') {
-      if (!FabricObject.prototype[attr]) {
+      if (!FabricObject.ownDefaults[attr]) {
         continue;
       }
-      attributes[attr] = FabricObject.prototype[attr];
+      attributes[attr] = FabricObject.ownDefaults[attr];
     }
 
     if (attributes[attr].indexOf('url(') === 0) {
