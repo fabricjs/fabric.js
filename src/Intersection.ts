@@ -45,20 +45,20 @@ export class Intersection {
    * @param {Point} T the point we are checking for
    * @param {Point} A one extremity of the segment
    * @param {Point} B the other extremity of the segment
-   * @param [extendToLine] if true checks if `T` is on the line defined by `A` and `B`
+   * @param [infinite] if true checks if `T` is on the line defined by `A` and `B`
    * @returns true if `T` is contained
    */
-  static isPointContained(T: Point, A: Point, B: Point, extendToLine = false) {
+  static isPointContained(T: Point, A: Point, B: Point, infinite = false) {
     if (A.eq(B)) {
       // Edge case: the segment is a point, we check for coincidence,
-      // extendToLine has no meaning because there are infinite lines to consider
+      // infinite param has no meaning because there are infinite lines to consider
       return T.eq(A);
     } else if (A.x === B.x) {
       // Edge case: horizontal line.
       // we first check if T.x has the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
-        (extendToLine ||
+        (infinite ||
           (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
@@ -66,7 +66,7 @@ export class Intersection {
       // we first check if T.y has the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
-        (extendToLine ||
+        (infinite ||
           (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
       );
     } else {
@@ -77,7 +77,7 @@ export class Intersection {
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
-      return extendToLine
+      return infinite
         ? Math.abs(s.x) === Math.abs(s.y)
         : s.x === s.y && s.x >= 0 && s.x <= 1;
     }
