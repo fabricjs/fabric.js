@@ -58,6 +58,7 @@ export class Circle extends FabricObject implements CircleProps {
       ...super.defaultValues,
       ...Circle.ownDefaults,
     };
+  }
 
   constructor(options?: CircleProps) {
     super(options);
