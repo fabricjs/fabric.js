@@ -48,7 +48,7 @@ export class Polyline extends FabricObject {
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
-  static strokeBBoxAffectingProperties: (keyof Polyline)[] = [
+  static layoutProperties: (keyof Polyline)[] = [
     'skewX',
     'skewY',
     'strokeLineCap',
@@ -197,11 +197,11 @@ export class Polyline extends FabricObject {
         this.strokeUniform &&
         (
           this.constructor as typeof Polyline
-        ).strokeBBoxAffectingProperties.includes('strokeUniform') &&
+        ).layoutProperties.includes('strokeUniform') &&
         this.strokeLineJoin !== 'round') ||
         (
           this.constructor as typeof Polyline
-        ).strokeBBoxAffectingProperties.includes(key as keyof Polyline))
+        ).layoutProperties.includes(key as keyof Polyline))
     ) {
       this.setDimensions();
     }
