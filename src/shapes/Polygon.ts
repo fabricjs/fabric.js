@@ -1,5 +1,5 @@
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { Polyline, polylineDefaultValues } from './Polyline';
 
 export class Polygon extends Polyline {

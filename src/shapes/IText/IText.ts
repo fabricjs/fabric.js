@@ -8,7 +8,7 @@ import {
   keysMapRtl,
 } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { Text } from '../Text/Text';
 
 type CursorBoundaries = {

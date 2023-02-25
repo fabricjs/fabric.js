@@ -3,6 +3,18 @@
 ## [next]
 
 - chore(TS): class interface for options/brevity [#8674](https://github.com/fabricjs/fabric.js/issues/8674)
+- ci(): fix import autocomplete in dev mode #8725
+- chore(): remove deprecated class util [#8731](https://github.com/fabricjs/fabric.js/pull/8731)
+- lint(): fix eslint errors [#8729](https://github.com/fabricjs/fabric.js/pull/8729)
+- fix(TS): `this.constructor` types [#8675](https://github.com/fabricjs/fabric.js/issues/8675)
+- fix(DraggableText): drag image blur [#8712](https://github.com/fabricjs/fabric.js/pull/8712)
+- ci(): Fix tests for firefox 110 update [#8710](https://github.com/fabricjs/fabric.js/pull/8710)
+- chore(): index files for exports and tree shaking [#8661](https://github.com/fabricjs/fabric.js/pull/8661)
+- ci(test): cleanup node config (#8694 followup) [#8707](https://github.com/fabricjs/fabric.js/issues/8707)
+- fix(): BREAKING set/discard active object return value, discard active object now return false if no discard happened [#8672](https://github.com/fabricjs/fabric.js/issues/8672)
+- fix(): selection logic to support nested multiselection [#8665](https://github.com/fabricjs/fabric.js/issues/8665)
+- fix(test): remove bad node config [#8694](https://github.com/fabricjs/fabric.js/issues/8694)
+- fix(): keep browser files as .js [#8690](https://github.com/fabricjs/fabric.js/issues/8690)
 - fix(): object dispose removes canvas/event refs [#8673](https://github.com/fabricjs/fabric.js/issues/8673)
 - fix(test): Textbox `fromObject` test is incorrectly trying to restore an instance [#8686](https://github.com/fabricjs/fabric.js/pull/8686)
 - TS(): Moved cache properties to static properties on classes [#xxxx](https://github.com/fabricjs/fabric.js/pull/xxxx)

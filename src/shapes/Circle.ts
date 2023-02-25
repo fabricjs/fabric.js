@@ -1,11 +1,11 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { classRegistry } from '../ClassRegistry';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+import { TClassProperties } from '../typedefs';
 import { SerializedObjectProps } from './Object/ObjectProps';
 
 export interface SerializedCircleProps extends SerializedObjectProps {
@@ -47,6 +47,10 @@ export class Circle
     'startAngle',
     'endAngle',
   ];
+
+  constructor(options?: CircleProps) {
+    super(options);
+  }
 
   /**
    * @private

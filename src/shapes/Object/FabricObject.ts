@@ -1,7 +1,7 @@
 import { ObjectEvents } from '../../EventTypeDefs';
-import { applyMixins } from '../../util/applyMixins';
 import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
+import { applyMixins } from '../../util/applyMixins';
 import { SerializedObjectProps } from './ObjectProps';
 
 // TODO somehow we have to make a tree-shakeable import

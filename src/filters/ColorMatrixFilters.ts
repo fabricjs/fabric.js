@@ -1,5 +1,5 @@
 import { ColorMatrix } from './ColorMatrix';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {
   return class GeneratedColorMatrix extends ColorMatrix {

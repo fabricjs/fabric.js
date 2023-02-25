@@ -1,8 +1,8 @@
 (function () {
-  const classRegistry = new fabric.util.classRegistry.constructor();
-  QUnit.module('fabric.util.classRegistry');
+  const classRegistry = new fabric.classRegistry.constructor();
+  QUnit.module('classRegistry');
   QUnit.test('getClass throw when no class is registered', function (assert) {
-    assert.ok(fabric.util.classRegistry, 'classRegistry is available');
+    assert.ok(fabric.classRegistry, 'classRegistry is available');
     assert.throws(() => classRegistry.getClass('rect'), new Error(`No class registered for rect`), 'initially Rect is undefined');
   });
   QUnit.test('getClass will return specific class from the prototype type', function (assert) {
