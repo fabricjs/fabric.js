@@ -1,11 +1,11 @@
-import { classRegistry } from '../ClassRegistry';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { classRegistry } from '../ClassRegistry';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
+import { TClassProperties } from '../typedefs';
 import { FabricObjectProps } from './Object/ObjectProps';
 
 export interface CircleProps extends FabricObjectProps {
