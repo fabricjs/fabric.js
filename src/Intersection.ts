@@ -40,32 +40,37 @@ export class Intersection {
   }
 
   /**
-   * check if `T ∈ [A, B]`
+   * check if point T is on the segment or line defined between A and B
    *
-   * Solving the linear equation `A + s * AB = T` will give us `s`\
-   * If `s` has a solution and `s ∈ [0, 1]` then `T ∈ [A, B]`
-   * If `AB` has a zero component we revert to a simple coordinate check
-   *
-   * @param T
-   * @param A
-   * @param B
-   * @param [infinite] if true checks if `T` is on the line defined by `A` and `B`
+   * @param {Point} T the point we are checking for
+   * @param {Point} A one extremity of the segment
+   * @param {Point} B the other extremity of the segment
+   * @param [extendToLine] if true checks if `T` is on the line defined by `A` and `B`
    * @returns true if `T` is contained
    */
-  static isPointContained(T: Point, A: Point, B: Point, infinite = false) {
+  static isPointContained(T: Point, A: Point, B: Point, extendToLine = false) {
     if (A.eq(B)) {
+      // Edge case: the segment is a point, we check for coincidence,
+      // extendToLine has no meaning because there are infinite lines to consider
       return T.eq(A);
     } else if (A.x === B.x) {
+      // Edge case: horizontal line.
+      // we first check if T.x is on the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
-        (infinite || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
+        (extendToLine || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
+      // Edge case: vertical line.
+      // we first check if T.y is on the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
-        (infinite || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
+        (extendToLine || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
       );
     } else {
+      // generic case: we normalize AT over AB.
+      // then for the line case we just verify that AB has the same inclination than AT
+      // for the segment case we need the same direction and the length of AT needs to be less than AB
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
