@@ -31,13 +31,17 @@ const VISUAL_TEST_CONFIG = {
  */
 export default async function (config) {
   const browsers = (CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
-    .filter(browser => BROWSERS.some(b => b.startsWith(browser.toLowerCase())));
+    .filter(browser => BROWSERS.some(b => browser.toLowerCase().startsWith(b)));
   if (VISUAL_TEST_CONFIG.debug || VISUAL_TEST_CONFIG.recreate) {
     browsers.length > 1 && console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
     if (CI) {
       throw new Error(chalk.red(`Debugging/recreating visual tests is banned in CI`));
     }
   }
+  if (browsers.length === 0) {
+    throw new Error(`no browsers to launch, input: ${BROWSERS}`);
+  }
+  
   config.set({
     plugins: [
       'karma-jasmine',
@@ -45,6 +49,7 @@ export default async function (config) {
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-coverage',
+      'karma-spec-reporter'
     ],
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -68,15 +73,9 @@ export default async function (config) {
           '--remote-debugging-port=9222',
         ],
       },
-      FirefoxHeadless: {
-        base: 'Firefox',
-        flags: [
-          '--headless',
-        ],
-      },
     },
 
-    reporters: ['progress', 'coverage'],
+    reporters: ['spec', 'coverage'],
     coverageReporter: {
       reporters: [
         { type: 'lcov', dir: '.nyc_output/' },
@@ -90,10 +89,11 @@ export default async function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: 'test/fixtures/*', included: false, served: true, watched: false, nocache: false },
+      { pattern: 'test/fixtures/**/*', included: false, served: true, watched: false, nocache: false },
       { pattern: 'test/lib/*.js', included: true, served: true, watched: true, nocache: false },
       { pattern: 'test/lib/tests.css', included: true, served: true, watched: true, nocache: false }, // qunit only
-      { pattern: 'test/visual/golden/*', included: false, served: true, watched: false, nocache: false },
+      { pattern: 'test/visual/golden/**/*', included: false, served: true, watched: false, nocache: false },
+      { pattern: 'test/visual/assets/**/*', included: false, served: true, watched: false, nocache: false },
 
       { pattern: 'dist/index.js', type: 'js', included: true, served: true, watched: true, nocache: true },
       { pattern: 'dist/index.js.map', included: false, served: true, watched: false, nocache: true },
@@ -101,12 +101,12 @@ export default async function (config) {
       { pattern: 'test/karma.setup.js', type: 'js', included: true, served: true, watched: true, nocache: false },
 
       // add test files last
-      ...(TEST_FILES?
+      ...(TEST_FILES ?
         TEST_FILES.map(file => ({ pattern: file, type: 'js', included: true, served: true, watched: true, nocache: false })) :
         [
-          { pattern: 'test/unit/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
-          { pattern: 'test/visual/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
-        ]
+          process.env.TEST_SUITE === 'unit' && { pattern: 'test/unit/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
+          process.env.TEST_SUITE === 'visual' && { pattern: 'test/visual/**/*.js', type: 'js', included: true, served: true, watched: true, nocache: false },
+        ].filter((exists) => exists)
       )
     ],
 
@@ -135,7 +135,7 @@ export default async function (config) {
     client: {
       clearContext: false,
       CI: !!CI,
-      visual: {        
+      visual: {
         recreate: browsers.length === 1 && !CI && VISUAL_TEST_CONFIG.recreate,
         debug: browsers.length === 1 && !CI && VISUAL_TEST_CONFIG.debug,
       },
@@ -146,7 +146,7 @@ export default async function (config) {
       qunit: {
         showUI: true,
         testTimeout: CI ? 15000 : 5000,
-        filter: process.env.QUNIT_FILTER || null,
+        filter: process.env.QUNIT_FILTER || '',
         reorder: false,
         noglobals: true,
         hidepassed: true,

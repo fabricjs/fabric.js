@@ -20,21 +20,11 @@ window.TEST_CONFIG = window.__karma__.config;
 
 
 // QUnit setup
-
+// workaround karma-qunit plugin bug https://github.com/karma-runner/karma-qunit/issues/111
+if (!window.TEST_CONFIG.CI) {
+  QUnit.todo = QUnit.test.todo = QUnit.skip;
+}
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
-
-// global error handling
-window.addEventListener('unhandledrejection', (event) => {
-  // prevent logging to console
-  event.preventDefault();
-  QUnit.onUncaughtException(event.reason);
-});
-
-window.addEventListener('error', (event) => {
-  // prevent logging to console
-  event.preventDefault();
-  QUnit.onUncaughtException(event.error);
-});
 
 // test setup
 
