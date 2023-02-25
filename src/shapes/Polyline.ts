@@ -36,7 +36,7 @@ export class Polyline extends FabricObject {
 
   private declare initialized: true | undefined;
 
-  static ownDefaults: Record<string,any> = polylineDefaultValues;
+  static ownDefaults: Record<string, any> = polylineDefaultValues;
 
   get defaultValues() {
     return {
@@ -195,9 +195,13 @@ export class Polyline extends FabricObject {
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
-        (this.constructor as typeof Polyline).strokeBBoxAffectingProperties.includes('strokeUniform') &&
+        (
+          this.constructor as typeof Polyline
+        ).strokeBBoxAffectingProperties.includes('strokeUniform') &&
         this.strokeLineJoin !== 'round') ||
-        (this.constructor as typeof Polyline).strokeBBoxAffectingProperties.includes(key as keyof Polyline))
+        (
+          this.constructor as typeof Polyline
+        ).strokeBBoxAffectingProperties.includes(key as keyof Polyline))
     ) {
       this.setDimensions();
     }

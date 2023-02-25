@@ -295,7 +295,7 @@ export class StaticCanvas<
     kill: (reason?: any) => void;
   };
 
-  get defaultValues() :Record<string, any> {
+  get defaultValues(): Record<string, any> {
     return StaticCanvas.ownDefaults;
   }
 

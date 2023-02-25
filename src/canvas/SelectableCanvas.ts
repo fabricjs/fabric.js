@@ -517,7 +517,7 @@ export class SelectableCanvas<
 
   static ownDefaults: Record<string, any> = DefaultCanvasProperties;
 
-  get defaultValues() :Record<string, any> {
+  get defaultValues(): Record<string, any> {
     return { ...super.defaultValues, ...SelectableCanvas.ownDefaults };
   }
 

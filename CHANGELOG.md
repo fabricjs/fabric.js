@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): remove default values from Objects prototypes, ( filters in a followup ) [#8719](https://github.com/fabricjs/fabric.js/issues/8719)
 - chore(TS): class interface for options/brevity [#8674](https://github.com/fabricjs/fabric.js/issues/8674)
 - ci(): fix import autocomplete in dev mode #8725
 - chore(): remove deprecated class util [#8731](https://github.com/fabricjs/fabric.js/pull/8731)

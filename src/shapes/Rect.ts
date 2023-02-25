@@ -29,11 +29,11 @@ export class Rect extends FabricObject {
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
 
-  get defaultValues() :Record<string, any> {
+  get defaultValues(): Record<string, any> {
     return {
       ...super.defaultValues,
       ...Rect.ownDefaults,
-    }
+    };
   }
 
   /**
@@ -202,7 +202,7 @@ export class Rect extends FabricObject {
       width,
       height,
       visible: Boolean(visible && width && height),
-    })
+    });
     callback(rect);
   }
 

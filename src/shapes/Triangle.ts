@@ -7,8 +7,7 @@ export const triangleDefaultValues = {
 };
 
 export class Triangle extends FabricObject {
-
-  static ownDefaults: Record<string,any> = triangleDefaultValues;
+  static ownDefaults: Record<string, any> = triangleDefaultValues;
 
   get defaultValues() {
     return { ...super.defaultValues, ...Triangle.ownDefaults };

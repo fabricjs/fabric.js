@@ -124,15 +124,18 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   protected _activeObjects: FabricObject[] = [];
 
-  static stateProperties: string[] = [...FabricObject.stateProperties, 'layout'];
+  static stateProperties: string[] = [
+    ...FabricObject.stateProperties,
+    'layout',
+  ];
 
   static ownDefaults: Record<string, any> = groupDefaultValues;
 
-  get defaultValues() :Record<string, any> {
+  get defaultValues(): Record<string, any> {
     return {
       ...super.defaultValues,
       ...Group.ownDefaults,
-    }
+    };
   }
 
   /**
