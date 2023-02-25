@@ -23,6 +23,19 @@ window.TEST_CONFIG = window.__karma__.config;
 
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
+// global error handling
+window.addEventListener('unhandledrejection', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.reason);
+});
+
+window.addEventListener('error', (event) => {
+  // prevent logging to console
+  event.preventDefault();
+  QUnit.onUncaughtException(event.error);
+});
+
 // test setup
 
 const canvas = document.createElement('canvas');
