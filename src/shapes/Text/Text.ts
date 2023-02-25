@@ -449,8 +449,8 @@ export class Text<
 
   static ownDefaults: Record<string, any> = textDefaultValues;
 
-  get defaultValues() {
-    return { ...super.defaultValues, ...Text.ownDefaults };
+  getDefaultValues() {
+    return { ...super.getDefaultValues(), ...Text.ownDefaults };
   }
 
   constructor(text: string, options: any) {

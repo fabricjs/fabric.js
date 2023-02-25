@@ -28,7 +28,7 @@
   QUnit.module('fabric.ActiveSelection', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = canvas.defaultValues.backgroundColor;
+      canvas.backgroundColor = canvas.getDefaultValues().backgroundColor;
       canvas.calcOffset();
     }
   });

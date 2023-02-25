@@ -517,8 +517,8 @@ export class SelectableCanvas<
 
   static ownDefaults: Record<string, any> = DefaultCanvasProperties;
 
-  get defaultValues(): Record<string, any> {
-    return { ...super.defaultValues, ...SelectableCanvas.ownDefaults };
+  getDefaultValues(): Record<string, any> {
+    return { ...super.getDefaultValues(), ...SelectableCanvas.ownDefaults };
   }
 
   declare upperCanvasEl: HTMLCanvasElement;

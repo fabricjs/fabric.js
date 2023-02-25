@@ -53,9 +53,9 @@ export class Circle extends FabricObject implements CircleProps {
 
   static ownDefaults: Record<string, any> = circleDefaultValues;
 
-  get defaultValues(): Record<string, any> {
+  getDefaultValues(): Record<string, any> {
     return {
-      ...super.defaultValues,
+      ...super.getDefaultValues(),
       ...Circle.ownDefaults,
     };
   }

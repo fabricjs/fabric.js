@@ -272,7 +272,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
 
   static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
 
-  get defaultValues(): Record<string, any> {
+  getDefaultValues(): Record<string, any> {
     return { ...FabricObject.ownDefaults };
   }
 
@@ -282,7 +282,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    */
   constructor(options?: Partial<ObjectProps>) {
     super();
-    Object.assign(this, this.defaultValues);
+    Object.assign(this, this.getDefaultValues());
     this.setOptions(options);
   }
 
@@ -565,9 +565,9 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
     const topLevelClass = classRegistry.getClass(object.type);
     // defaultValues ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
     // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
-    const hasStaticDefaultValues = Object.keys(this.defaultValues).length > 0;
+    const hasStaticDefaultValues = Object.keys(this.getDefaultValues()).length > 0;
     const baseValues = hasStaticDefaultValues
-      ? this.defaultValues
+      ? this.getDefaultValues()
       : topLevelClass.prototype;
 
     Object.keys(object).forEach(function (prop) {
