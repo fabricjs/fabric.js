@@ -55,7 +55,7 @@ export class Intersection {
       return T.eq(A);
     } else if (A.x === B.x) {
       // Edge case: horizontal line.
-      // we first check if T.x is on the same value, and then if T.y is contained between A.y and B.y
+      // we first check if T.x has the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
         (extendToLine ||
@@ -63,7 +63,7 @@ export class Intersection {
       );
     } else if (A.y === B.y) {
       // Edge case: vertical line.
-      // we first check if T.y is on the same value, and then if T.x is contained between A.x and B.x
+      // we first check if T.y has the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
         (extendToLine ||
