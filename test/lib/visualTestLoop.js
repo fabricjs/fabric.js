@@ -176,7 +176,7 @@
             isOK,
             testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
           );
-          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+          if (!testObj.testOnly && ((!isOK && TEST_CONFIG.visual.debug) || TEST_CONFIG.visual.recreate)) {
             await generateGolden(getGoldeName(golden), renderedCanvas);
           }
           await fabricCanvas.dispose();

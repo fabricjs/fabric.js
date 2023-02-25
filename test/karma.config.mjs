@@ -139,6 +139,11 @@ export default async function (config) {
      */
     client: {
       clearContext: false,
+      CI: !!process.env.CI,
+      visual: {        
+        recreate: !process.env.CI & Number(process.env.QUNIT_RECREATE_VISUAL_REFS),
+        debug: !process.env.CI & Number(process.env.QUNIT_DEBUG_VISUAL_TESTS),
+      },
       /**
        * QUnit client config
        * https://github.com/karma-runner/karma-qunit
@@ -147,8 +152,6 @@ export default async function (config) {
         showUI: true,
         testTimeout: process.env.CI ? 15000 : 5000,
         filter: process.env.QUNIT_FILTER || null,
-        recreate: Number(process.env.QUNIT_RECREATE_VISUAL_REFS) || false,
-        debug: Number(process.env.QUNIT_DEBUG_VISUAL_TESTS) || false,
         reorder: false,
         noglobals: true,
         hidepassed: true,

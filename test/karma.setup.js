@@ -16,6 +16,9 @@
 
 window.isNode = () => false;
 
+window.TEST_CONFIG = window.__karma__.config;
+
+
 // QUnit setup
 
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
