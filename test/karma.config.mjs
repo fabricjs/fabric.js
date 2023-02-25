@@ -27,7 +27,6 @@ export default async function (config) {
     plugins: [
       'karma-jasmine',
       'karma-qunit',
-      'karma-rollup-preprocessor',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-coverage',
@@ -42,7 +41,7 @@ export default async function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: [/*'jasmine', */'qunit'],
+    frameworks: [/*'jasmine',*/ 'qunit'],
 
     // running for CI: https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
     browsers: (process.env.CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
@@ -81,8 +80,6 @@ export default async function (config) {
     },
 
     // list of files / patterns to load in the browser
-    // Here I'm including all of the the Jest tests which are all under the __tests__ directory.
-    // You may need to tweak this patter to find your test files/
     files: [
       { pattern: 'test/fixtures/*', included: false, served: true, watched: false, nocache: false },
       { pattern: 'test/lib/*.js', included: true, served: true, watched: true, nocache: false },
@@ -119,8 +116,7 @@ export default async function (config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      // './karma.setup.js': ['rollup'],
-      // './**/*.js': ['rollup'],
+      // 'test/**/*.js': ['rollup'],
       'dist/index.js': ['coverage'],
     },
 
