@@ -195,13 +195,13 @@ export class Polyline extends FabricObject {
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
-        (
-          this.constructor as typeof Polyline
-        ).layoutProperties.includes('strokeUniform') &&
+        (this.constructor as typeof Polyline).layoutProperties.includes(
+          'strokeUniform'
+        ) &&
         this.strokeLineJoin !== 'round') ||
-        (
-          this.constructor as typeof Polyline
-        ).layoutProperties.includes(key as keyof Polyline))
+        (this.constructor as typeof Polyline).layoutProperties.includes(
+          key as keyof Polyline
+        ))
     ) {
       this.setDimensions();
     }
