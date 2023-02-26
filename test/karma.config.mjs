@@ -30,7 +30,7 @@ const VISUAL_TEST_CONFIG = {
  * @param {*} config 
  */
 export default async function (config) {
-  const browsers = (CI ? ['ChromeHeadlessX', 'FirefoxHeadless'] : ['ChromeHeadlessX', 'FirefoxHeadless', 'Chrome', 'Firefox'])
+  const browsers = (CI ? ['ChromeCI', 'FirefoxCI'] : ['ChromeCI', 'FirefoxCI', 'Chrome', 'Firefox'])
     .filter(browser => BROWSERS.some(b => browser.toLowerCase().startsWith(b)));
   if (VISUAL_TEST_CONFIG.debug || VISUAL_TEST_CONFIG.recreate) {
     browsers.length > 1 && console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
@@ -62,10 +62,9 @@ export default async function (config) {
     frameworks: [/*'jasmine',*/ 'qunit'],
     browsers,
     customLaunchers: {
-      ChromeHeadlessX: {
-        base: 'ChromeHeadless',
+      ChromeCI: {
+        base: 'Chrome',
         flags: [
-          '--headless',
           '--no-sandbox',
           '--disable-gpu',
           '--disable-translate',
@@ -73,6 +72,9 @@ export default async function (config) {
           '--remote-debugging-port=9222',
         ],
       },
+      FirefoxCI: {
+        base: 'Firefox'
+      }
     },
 
     reporters: ['spec', 'coverage'],

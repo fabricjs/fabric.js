@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
       - run: npm run build -- -f
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        run: npm test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+        run: xvfb-run -a npm test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
