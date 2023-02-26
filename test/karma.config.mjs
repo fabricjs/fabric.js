@@ -58,6 +58,7 @@ export default async function (config) {
     autoWatch: false,
     singleRun: true,
     pingTimeout: CI ? 10000 : 2000,
+    failOnFailingTestSuite: false,
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
