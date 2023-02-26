@@ -66,7 +66,7 @@ export default async function (config) {
     browsers,
     customLaunchers: {
       ChromeCI: {
-        base: 'ChromeHeadless',
+        base: 'Chrome',
         flags: [
           '--no-sandbox',
           '--disable-gpu',
@@ -76,7 +76,7 @@ export default async function (config) {
         ],
       },
       FirefoxCI: {
-        base: 'FirefoxHeadless'
+        base: 'Firefox'
       }
     },
 
