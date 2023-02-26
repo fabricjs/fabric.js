@@ -106,7 +106,7 @@
     assert.deepEqual(polygon._getTransformedDimensions(), round, 'dims should match');
   });
 
-  QUnit.todo('polygon with exactBoundingBox true and skew', function (assert) {
+  QUnit.test('polygon with exactBoundingBox true and skew', function (assert) {
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: true,
       strokeWidth: 60,
@@ -134,8 +134,7 @@
 
     polygon.set('strokeLineJoin', 'round');
     const round = polygon._getNonTransformedDimensions();
-    // WRONG value! was buggy when writing test
-    assert.equal(Math.round(round.x), 170, 'round x');
+    assert.equal(Math.round(round.x), 162, 'round x');
     assert.equal(Math.round(round.y), 185, 'round y');
     assert.deepEqual(polygon._getTransformedDimensions(), round, 'dims should match');
   });

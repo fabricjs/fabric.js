@@ -20,10 +20,6 @@ window.TEST_CONFIG = window.__karma__.config;
 
 
 // QUnit setup
-// workaround karma-qunit plugin bug https://github.com/karma-runner/karma-qunit/issues/111
-if (!window.TEST_CONFIG.CI) {
-  QUnit.todo = QUnit.test.todo = QUnit.skip;
-}
 QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
 // test setup
