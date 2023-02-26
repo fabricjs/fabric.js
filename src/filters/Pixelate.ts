@@ -3,6 +3,30 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
+export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
+  blocksize: 4,
+  mainParameter: 'blocksize',
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uBlocksize;
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      float blockW = uBlocksize * uStepW;
+      float blockH = uBlocksize * uStepW;
+      int posX = int(vTexCoord.x / blockW);
+      int posY = int(vTexCoord.y / blockH);
+      float fposX = float(posX);
+      float fposY = float(posY);
+      vec2 squareCoords = vec2(fposX * blockW, fposY * blockH);
+      vec4 color = texture2D(uTexture, squareCoords);
+      gl_FragColor = color;
+    }
+    `,
+};
+
 /**
  * Pixelate filter class
  * @example
@@ -14,6 +38,8 @@ import { classRegistry } from '../ClassRegistry';
  */
 export class Pixelate extends BaseFilter {
   declare blocksize: number;
+
+  static defaults = pixelateDefaultValues;
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
@@ -85,29 +111,4 @@ export class Pixelate extends BaseFilter {
   }
 }
 
-export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
-  blocksize: 4,
-  mainParameter: 'blocksize',
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uBlocksize;
-    uniform float uStepW;
-    uniform float uStepH;
-    varying vec2 vTexCoord;
-    void main() {
-      float blockW = uBlocksize * uStepW;
-      float blockH = uBlocksize * uStepW;
-      int posX = int(vTexCoord.x / blockW);
-      int posY = int(vTexCoord.y / blockH);
-      float fposX = float(posX);
-      float fposY = float(posY);
-      vec2 squareCoords = vec2(fposX * blockW, fposY * blockH);
-      vec4 color = texture2D(uTexture, squareCoords);
-      gl_FragColor = color;
-    }
-    `,
-};
-
-Object.assign(Pixelate.prototype, pixelateDefaultValues);
 classRegistry.setClass(Pixelate);

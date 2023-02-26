@@ -4,6 +4,27 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
+
+export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
+  {
+    color: '#FFFFFF',
+    fragmentSource: `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec4 uLow;
+      uniform vec4 uHigh;
+      varying vec2 vTexCoord;
+      void main() {
+        gl_FragColor = texture2D(uTexture, vTexCoord);
+        if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {
+          gl_FragColor.a = 0.0;
+        }
+      }
+      `,
+    distance: 0.02,
+    useAlpha: false,
+  };
+
 /**
  * Remove white filter class
  * @example
@@ -33,6 +54,8 @@ export class RemoveColor extends BaseFilter {
    * NOT IMPLEMENTED YET
    **/
   declare useAlpha: boolean;
+
+  static defaults = removeColorDefaultValues;
 
   /**
    * Applies filter to canvas element
@@ -123,25 +146,4 @@ export class RemoveColor extends BaseFilter {
   }
 }
 
-export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
-  {
-    color: '#FFFFFF',
-    fragmentSource: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform vec4 uLow;
-      uniform vec4 uHigh;
-      varying vec2 vTexCoord;
-      void main() {
-        gl_FragColor = texture2D(uTexture, vTexCoord);
-        if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {
-          gl_FragColor.a = 0.0;
-        }
-      }
-      `,
-    distance: 0.02,
-    useAlpha: false,
-  };
-
-Object.assign(RemoveColor.prototype, removeColorDefaultValues);
 classRegistry.setClass(RemoveColor);
