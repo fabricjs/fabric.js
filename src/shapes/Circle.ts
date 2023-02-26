@@ -8,6 +8,12 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
 import { FabricObjectProps } from './Object/ObjectProps';
 
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+};
+
 export interface CircleProps extends FabricObjectProps {
   /**
    * Radius of this circle
@@ -44,6 +50,15 @@ export class Circle extends FabricObject implements CircleProps {
     'startAngle',
     'endAngle',
   ];
+
+  static ownDefaults: Record<string, any> = circleDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Circle.ownDefaults,
+    };
+  }
 
   constructor(options?: CircleProps) {
     super(options);
@@ -207,16 +222,8 @@ export class Circle extends FabricObject implements CircleProps {
   /* _FROM_SVG_END_ */
 }
 
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-};
-
-Object.assign(Circle.prototype, {
-  ...circleDefaultValues,
-});
+// @ts-expect-error
+Circle.prototype.type = 'circle';
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

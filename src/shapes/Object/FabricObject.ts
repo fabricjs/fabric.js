@@ -16,4 +16,4 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-export { cacheProperties, stateProperties } from './defaultValues';
+export { cacheProperties } from './defaultValues';

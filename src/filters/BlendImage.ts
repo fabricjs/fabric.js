@@ -204,7 +204,6 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
-  type: 'BlendImage',
   mode: 'multiply',
   alpha: 1,
   vertexSource: `
