@@ -1,10 +1,9 @@
-const fs = require('fs-extra');
-const path = require('path');
-const chalk = require('chalk');
-const http = require('http');
-const busboy = require('busboy');
-
-const wd = path.resolve(__dirname, '..');
+import fs from 'node:fs';
+import path from 'node:path';
+import chalk from 'chalk';
+import http from 'node:http';
+import busboy from 'busboy';
+import { wd } from '../scripts/dirname.mjs';
 
 /**
  * 
@@ -37,7 +36,7 @@ function parseRequest(req) {
 /**
  * handles updating/checking goldens from the browser
  */
-function startGoldensServer() {
+export function startGoldensServer() {
     const server = http
         .createServer(async (req, res) => {
             if (req.method.toUpperCase() === 'GET' && req.url === '/') {
@@ -64,4 +63,3 @@ function startGoldensServer() {
     return { port, url };
 }
 
-exports.startGoldensServer = startGoldensServer;
