@@ -42,7 +42,6 @@
 
   QUnit.test('toString', function(assert) {
     var group = makeAsWith2Objects();
-    assert.ok(false)
     assert.equal(group.toString(), '#<ActiveSelection: (2)>', 'should return proper representation');
   });
 
