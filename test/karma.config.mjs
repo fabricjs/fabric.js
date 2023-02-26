@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import { startGoldensServer } from './GoldensServer.mjs';
+
 // import { babel } from '@rollup/plugin-babel';
 // import json from '@rollup/plugin-json';
 // import ts from '@rollup/plugin-typescript';
@@ -31,10 +33,14 @@ const VISUAL_TEST_CONFIG = {
  * @param {*} config 
  */
 export default async function (config) {
-  const browsers = (CI ? ['ChromeCI', 'FirefoxCI'] : ['ChromeCI', 'FirefoxCI', 'Chrome', 'Firefox'])
+  const browsers = (CI ?
+    ['ChromeCI', 'FirefoxCI'] :
+    [...(!VISUAL_TEST_CONFIG.debug && !VISUAL_TEST_CONFIG.recreate ? ['ChromeCI', 'FirefoxCI'] : []), 'Chrome', 'Firefox'])
     .filter(browser => BROWSERS.some(b => browser.toLowerCase().startsWith(b)));
   if (VISUAL_TEST_CONFIG.debug || VISUAL_TEST_CONFIG.recreate) {
-    browsers.length > 1 && console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
+    if (browsers.length > 1) {
+      console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
+    }
     if (CI) {
       throw new Error(chalk.red(`Debugging/recreating visual tests is banned in CI`));
     }
@@ -124,7 +130,7 @@ export default async function (config) {
       '/golden_maker.html': '/base/test/lib/goldenMaker.html',
       '/golden/': '/base/test/visual/golden/',
       '/assets/': '/base/test/visual/assets/',
-      '/goldens/': (await import('./GoldensServer.js')).startGoldensServer().url,
+      '/goldens/': startGoldensServer().url,
     },
 
     // preprocess matching files before serving them to the browser
