@@ -34,7 +34,7 @@
   QUnit.module('fabric.Group', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = canvas.getDefaults().backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });

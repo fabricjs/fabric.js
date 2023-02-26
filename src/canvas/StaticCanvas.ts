@@ -295,13 +295,16 @@ export class StaticCanvas<
     kill: (reason?: any) => void;
   };
 
-  getDefaults(): Record<string, any> {
+  static getDefaults(): Record<string, any> {
     return StaticCanvas.ownDefaults;
   }
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
-    Object.assign(this, this.getDefaults());
+    Object.assign(
+      this,
+      (this.constructor as typeof StaticCanvas).getDefaults()
+    );
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({

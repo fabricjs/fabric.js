@@ -449,7 +449,7 @@ export class Text<
 
   static ownDefaults: Record<string, any> = textDefaultValues;
 
-  getDefaults() {
+  static getDefaults() {
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 

@@ -158,12 +158,12 @@
   QUnit.test('toObject', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
-      path.top = path.getDefaults().top;
-      path.left = path.getDefaults().left;
+      path.top = fabric.Path.getDefaults().top;
+      path.left = fabric.Path.getDefaults().left;
       path.includeDefaultValues = false;
       var obj = path.toObject();
-      assert.equal(obj.top, path.getDefaults().top, 'top is available also when equal to prototype');
-      assert.equal(obj.left, path.getDefaults().left, 'left is available also when equal to prototype');
+      assert.equal(obj.top, fabric.Path.getDefaults().top, 'top is available also when equal to prototype');
+      assert.equal(obj.left, fabric.Path.getDefaults().left, 'left is available also when equal to prototype');
       done();
     });
   });

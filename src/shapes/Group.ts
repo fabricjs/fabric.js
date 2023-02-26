@@ -131,7 +131,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
 
   static ownDefaults: Record<string, any> = groupDefaultValues;
 
-  getDefaults(): Record<string, any> {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Group.ownDefaults,

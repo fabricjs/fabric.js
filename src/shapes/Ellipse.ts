@@ -29,7 +29,7 @@ export class Ellipse extends FabricObject {
 
   static ownDefaults: Record<string, any> = ellipseDefaultValues;
 
-  getDefaults() {
+  static getDefaults() {
     return {
       ...super.getDefaults(),
       ...Ellipse.ownDefaults,

@@ -38,7 +38,7 @@ export class Polyline extends FabricObject {
 
   static ownDefaults: Record<string, any> = polylineDefaultValues;
 
-  getDefaults() {
+  static getDefaults() {
     return {
       ...super.getDefaults(),
       ...Polyline.ownDefaults,

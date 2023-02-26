@@ -517,7 +517,7 @@ export class SelectableCanvas<
 
   static ownDefaults: Record<string, any> = DefaultCanvasProperties;
 
-  getDefaults(): Record<string, any> {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
   }
 

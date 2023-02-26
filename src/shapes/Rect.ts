@@ -29,7 +29,7 @@ export class Rect extends FabricObject {
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
 
-  getDefaults(): Record<string, any> {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Rect.ownDefaults,

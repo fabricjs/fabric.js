@@ -10,13 +10,13 @@
       canvas.cancelRequestedRender();
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       upperCanvasEl.style.display = '';
-      canvas.controlsAboveOverlay = canvas.getDefaults().controlsAboveOverlay;
-      canvas.preserveObjectStacking = canvas.getDefaults().preserveObjectStacking;
+      canvas.controlsAboveOverlay = fabric.Canvas.getDefaults().controlsAboveOverlay;
+      canvas.preserveObjectStacking = fabric.Canvas.getDefaults().preserveObjectStacking;
     },
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = canvas.getDefaults().backgroundColor;
-      canvas.overlayColor = canvas.getDefaults().overlayColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
+      canvas.overlayColor = fabric.Canvas.getDefaults().overlayColor;
       canvas.handleSelection = fabric.Canvas.prototype.handleSelection;
       canvas.off();
       canvas.setDimensions({ width: 600, height: 600 });
