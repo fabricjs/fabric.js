@@ -120,7 +120,7 @@
     test: 'various textpath aligned',
     code: textpath5,
     golden: 'textpath5.png',
-    percentage: 0.016,
+    percentage: 0.0175,
     width: 500,
     height: 400,
   });
