@@ -63,8 +63,8 @@ export default async function (config) {
     basePath: '../',
     autoWatch: false,
     singleRun: true,
-    pingTimeout: CI ? 10000 : 2000,
-    browserDisconnectTimeout: CI ? 10000 : 2000,
+    pingTimeout: 10000,
+    browserDisconnectTimeout: 10000,
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -89,12 +89,16 @@ export default async function (config) {
     reporters: ['spec', 'coverage'],
     coverageReporter: {
       reporters: [
-        { type: 'lcov', dir: '.nyc_output/' },
-        // Karma uses subdirs by default to account for multiple browsers.
-        // For the JSON file, it's important we disable 'subdir' so that
-        // the 'nyc report' command can pick this up when combining code
-        // coverage with the Node.js test run.
-        { type: 'json', dir: '.nyc_output/', subdir: '.' }
+        {
+          type: 'lcov',
+          dir: '.nyc_output/',
+          subdir: (browser) => browser.split(/-| /)[0].toLowerCase()
+        },
+        {
+          type: 'json',
+          dir: '.nyc_output/',
+          subdir: (browser) => browser.split(/-| /)[0].toLowerCase()
+        }
       ]
     },
 
@@ -156,7 +160,7 @@ export default async function (config) {
        */
       qunit: {
         showUI: true,
-        testTimeout: CI ? 15000 : 5000,
+        testTimeout: CI ? 15000 : 10000,
         filter: process.env.QUNIT_FILTER || '',
         reorder: false,
         noglobals: true,
