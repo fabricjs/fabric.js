@@ -491,7 +491,7 @@ program
   .option('--no-verbose', 'disable verbose logging')
   .option(
     '-w, --watch',
-    'runs browser tests in `watch` mode, launching the browser, watching for changes and restarting the test suite',
+    'runs browser tests in `watch` mode, launching the browser, watching for changes and restarting the test suite - great for visual test result comparison',
     false
   )
   .addOption(
