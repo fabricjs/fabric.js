@@ -20,6 +20,9 @@ window.TEST_CONFIG = window.__karma__.config;
 
 
 // QUnit setup
+// karma-qunit treats todo as failure, see https://github.com/karma-runner/karma-qunit/issues/111
+QUnit.todo = QUnit.skip;
+
 !window.TEST_CONFIG.CI && QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
 // test setup
@@ -31,8 +34,6 @@ canvas.width = canvas.height = 500;
 const staticCanvas = document.createElement('canvas');
 staticCanvas.id = 'static-canvas';
 staticCanvas.width = staticCanvas.height = 500;
-
-
 
 const visualOutputTemplate = document.createElement('template')
 visualOutputTemplate.id = 'error_output';
