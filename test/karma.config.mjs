@@ -26,6 +26,7 @@ const VISUAL_TEST_CONFIG = {
 };
 
 /** 
+ * http://karma-runner.github.io/6.4/config/configuration-file.html
  * https://github.com/tom-sherman/blog/blob/main/posts/02-running-jest-tests-in-a-browser.md
  * @param {*} config 
  */
@@ -56,6 +57,7 @@ export default async function (config) {
     basePath: '../',
     autoWatch: false,
     singleRun: true,
+    pingTimeout: CI ? 10000 : 2000,
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
