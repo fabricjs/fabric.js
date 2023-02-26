@@ -287,7 +287,9 @@ async function test(suite, tests, options = {}) {
           'karma',
           'start',
           'test/karma.conf.js',
-          !process.env.CI && options.dev ? '--no-single-run --auto-watch' : '',
+          !process.env.CI && options.watch
+            ? '--no-single-run --auto-watch'
+            : '',
           options.port ? `--port ${options.port}` : '',
         ].join(' '),
         {
