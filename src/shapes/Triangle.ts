@@ -9,8 +9,8 @@ export const triangleDefaultValues = {
 export class Triangle extends FabricObject {
   static ownDefaults: Record<string, any> = triangleDefaultValues;
 
-  getDefaultValues() {
-    return { ...super.getDefaultValues(), ...Triangle.ownDefaults };
+  getDefaults() {
+    return { ...super.getDefaults(), ...Triangle.ownDefaults };
   }
 
   /**

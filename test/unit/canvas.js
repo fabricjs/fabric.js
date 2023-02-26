@@ -1536,8 +1536,8 @@
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, canvas.getDefaultValues().controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, canvas.getDefaultValues().preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, canvas.getDefaults().preserveObjectStacking);
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.controlsAboveOverlay, true);
@@ -1555,8 +1555,8 @@
     };
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, canvas.getDefaultValues().controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, canvas.getDefaultValues().preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, canvas.getDefaults().preserveObjectStacking);
     // before callback the properties are still false.
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.preserveObjectStacking, false);

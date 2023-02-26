@@ -50,9 +50,9 @@ export class Textbox extends IText {
 
   static ownDefaults: Record<string, any> = textboxDefaultValues;
 
-  getDefaultValues() {
+  getDefaults() {
     return {
-      ...super.getDefaultValues(),
+      ...super.getDefaults(),
       ...Textbox.ownDefaults,
     };
   }

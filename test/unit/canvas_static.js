@@ -164,9 +164,9 @@
       canvas.clear();
       canvas.setDimensions({ width: 200, heigth: 200 });
       canvas2.setDimensions({ width: 200, heigth: 200 });
-      canvas.backgroundColor = canvas.getDefaultValues().backgroundColor;
-      canvas.backgroundImage = canvas.getDefaultValues().backgroundImage;
-      canvas.overlayColor = canvas.getDefaultValues().overlayColor;
+      canvas.backgroundColor = canvas.getDefaults().backgroundColor;
+      canvas.backgroundImage = canvas.getDefaults().backgroundImage;
+      canvas.overlayColor = canvas.getDefaults().overlayColor;
       canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
       canvas.calcOffset();
       canvas.requestRenderAll = fabric.StaticCanvas.prototype.requestRenderAll;
@@ -1723,11 +1723,11 @@
   QUnit.test('setViewportTransform', function(assert) {
     assert.ok(typeof canvas.setViewportTransform === 'function');
     var vpt = [2, 0, 0, 2, 50, 50];
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
     canvas.setViewportTransform(vpt);
     assert.deepEqual(canvas.viewportTransform, vpt, 'viewport now is the set one');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('setViewportTransform calls objects setCoords', function(assert) {
@@ -1752,11 +1752,11 @@
   QUnit.test('getZoom', function(assert) {
     assert.ok(typeof canvas.getZoom === 'function');
     var vpt = [2, 0, 0, 2, 50, 50];
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
     assert.deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
     canvas.setViewportTransform(vpt);
     assert.deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('setZoom', function(assert) {
@@ -1764,7 +1764,7 @@
     assert.deepEqual(canvas.getZoom(), 1, 'initial zoom is 1');
     canvas.setZoom(2);
     assert.deepEqual(canvas.getZoom(), 2, 'zoom is set to 2');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('zoomToPoint', function(assert) {
@@ -1777,7 +1777,7 @@
     assert.deepEqual(canvas.viewportTransform, [2, 0, 0, 2, -50, -50], 'viewport has a translation effect and zoom');
     canvas.zoomToPoint(point, 3);
     assert.deepEqual(canvas.viewportTransform, [3, 0, 0, 3, -100, -100], 'viewport has a translation effect and zoom');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('absolutePan', function(assert) {
@@ -1788,7 +1788,7 @@
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has translation effect applied');
     canvas.absolutePan(point);
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -point.x, -point.y], 'viewport has same translation effect applied');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('relativePan', function(assert) {
@@ -1799,7 +1799,7 @@
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -50, -50], 'viewport has translation effect applied');
     canvas.relativePan(point);
     assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, -100, -100], 'viewport has translation effect applied on top of old one');
-    canvas.viewportTransform = canvas.getDefaultValues().viewportTransform;
+    canvas.viewportTransform = canvas.getDefaults().viewportTransform;
   });
 
   QUnit.test('getContext', function(assert) {

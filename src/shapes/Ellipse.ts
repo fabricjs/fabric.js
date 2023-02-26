@@ -29,9 +29,9 @@ export class Ellipse extends FabricObject {
 
   static ownDefaults: Record<string, any> = ellipseDefaultValues;
 
-  getDefaultValues() {
+  getDefaults() {
     return {
-      ...super.getDefaultValues(),
+      ...super.getDefaults(),
       ...Ellipse.ownDefaults,
     };
   }

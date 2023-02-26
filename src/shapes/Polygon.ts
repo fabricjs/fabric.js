@@ -4,9 +4,9 @@ import { Polyline, polylineDefaultValues } from './Polyline';
 export class Polygon extends Polyline {
   static ownDefaults: Record<string, any> = polylineDefaultValues;
 
-  getDefaultValues() {
+  getDefaults() {
     return {
-      ...super.getDefaultValues(),
+      ...super.getDefaults(),
       ...Polyline.ownDefaults,
     };
   }

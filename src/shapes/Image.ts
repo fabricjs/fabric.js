@@ -131,9 +131,9 @@ export class Image extends FabricObject {
 
   static ownDefaults: Record<string, any> = imageDefaultValues;
 
-  getDefaultValues() {
+  getDefaults() {
     return {
-      ...super.getDefaultValues(),
+      ...super.getDefaults(),
       ...Image.ownDefaults,
     };
   }

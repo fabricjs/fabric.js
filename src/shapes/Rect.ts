@@ -29,9 +29,9 @@ export class Rect extends FabricObject {
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
 
-  getDefaultValues(): Record<string, any> {
+  getDefaults(): Record<string, any> {
     return {
-      ...super.getDefaultValues(),
+      ...super.getDefaults(),
       ...Rect.ownDefaults,
     };
   }

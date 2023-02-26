@@ -174,8 +174,8 @@ export class IText<
 
   static ownDefaults: Record<string, any> = iTextDefaultValues;
 
-  getDefaultValues() {
-    return { ...super.getDefaultValues(), ...IText.ownDefaults };
+  getDefaults() {
+    return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
   /**
