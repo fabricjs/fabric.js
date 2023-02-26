@@ -42,7 +42,7 @@ export default async function (config) {
       console.warn(chalk.yellow(`Debugging/recreating visual tests is allowed ONLY when running tests in a single browser`));
     }
     if (CI) {
-      throw new Error(chalk.red(`Debugging/recreating visual tests is banned in CI`));
+      throw new Error(chalk.red(`Debugging/recreating visual refs is banned in CI`));
     }
   }
   if (browsers.length === 0) {
