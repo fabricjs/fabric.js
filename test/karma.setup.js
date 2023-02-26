@@ -20,7 +20,7 @@ window.TEST_CONFIG = window.__karma__.config;
 
 
 // QUnit setup
-QUnit.testDone(visualCallback.testDone.bind(visualCallback));
+!window.TEST_CONFIG.CI && QUnit.testDone(visualCallback.testDone.bind(visualCallback));
 
 // test setup
 
