@@ -25,18 +25,29 @@ export interface AnyFilter
   extends AbstractBaseFilter<string | Record<string, string>> {}
 
 export abstract class AbstractBaseFilter<T> {
+
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  declare type: string;
+  get type(): string {
+    return this.constructor.name;
+  }
+
+  declare static defaults: Record<string, any>;
 
   /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
-  declare vertexSource: string;
+  vertexSource = `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    void main() {
+      vTexCoord = aPosition;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }`;
 
   declare fragmentSource: T;
 
@@ -53,9 +64,9 @@ export abstract class AbstractBaseFilter<T> {
    * @param {Object} [options] Options object
    */
   constructor(
-    options: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
+    { type, ...options }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
   ) {
-    Object.assign(this, options);
+    Object.assign(this, (this.constructor as typeof AbstractBaseFilter<T>).defaults, options);
   }
 
   abstract getFragmentSource(): string;
@@ -220,16 +231,15 @@ export abstract class AbstractBaseFilter<T> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
     const main = this.mainParameter,
-      // @ts-ignore ts you are lying
-      proto = this.__proto__;
+      defaultValue = (this.constructor as typeof AbstractBaseFilter).defaults[main as string];
     if (main) {
-      if (Array.isArray(proto[main]) && Array.isArray(this[main])) {
-        return proto[main].every(
-          // @ts-ignore requires some kind of dynamic type thing, or delete, or leave it ignored
-          (value: any, i: number) => value === this[main][i]
+      const thisValue = this[main];
+      if (Array.isArray(defaultValue) && Array.isArray(thisValue)) {
+        return defaultValue.every(
+          (value: any, i: number) => value === thisValue[i]
         );
       } else {
-        return proto[main] === this[main];
+        return defaultValue === thisValue;
       }
     } else {
       return false;
@@ -387,27 +397,16 @@ export abstract class AbstractBaseFilter<T> {
 }
 
 export abstract class BaseFilter extends AbstractBaseFilter<string> {
-  getFragmentSource() {
-    return this.fragmentSource;
-  }
-}
 
-Object.assign(AbstractBaseFilter.prototype, {
-  vertexSource: `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    void main() {
-      vTexCoord = aPosition;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }`,
-});
-
-Object.assign(BaseFilter.prototype, {
-  fragmentSource: `
+  fragmentSource = `
     ${highPsourceCode};
     varying vec2 vTexCoord;
     uniform sampler2D uTexture;
     void main() {
       gl_FragColor = texture2D(uTexture, vTexCoord);
-    }`,
-});
+    }`;
+
+  getFragmentSource() {
+    return this.fragmentSource;
+  }
+}

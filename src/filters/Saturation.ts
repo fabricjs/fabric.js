@@ -76,7 +76,6 @@ export class Saturation extends BaseFilter {
 }
 
 export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  type: 'Saturation',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

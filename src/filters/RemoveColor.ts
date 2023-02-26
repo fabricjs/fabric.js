@@ -125,7 +125,6 @@ export class RemoveColor extends BaseFilter {
 
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
-    type: 'RemoveColor',
     color: '#FFFFFF',
     fragmentSource: `
       precision highp float;

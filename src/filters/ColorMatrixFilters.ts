@@ -1,38 +1,27 @@
-import { ColorMatrix } from './ColorMatrix';
+import { ColorMatrix, colorMatrixDefaultValues } from './ColorMatrix';
 import { classRegistry } from '../ClassRegistry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {
-  return class GeneratedColorMatrix extends ColorMatrix {
-    /**
-     * Filter type
-     * @param {String} type
-     * @default
-     */
-    type = key;
+  const newClass = class extends ColorMatrix {
+    get type() {
+      return key;
+    }
 
-    /**
-     * Colormatrix for the effect
-     * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
-     * outside the -1, 1 range.
-     * @param {Array} matrix array of 20 numbers.
-     * @default
-     */
-    matrix = matrix;
-
-    /**
-     * Lock the matrix export for this kind of static, parameter less filters.
-     */
-    mainParameter = undefined;
-
-    /**
-     * Lock the colormatrix on the color part, skipping alpha
-     */
-    colorsOnly = true;
+    static defaults = {
+      ...colorMatrixDefaultValues,
+      /**
+       * Lock the matrix export for this kind of static, parameter less filters.
+       */
+      mainParameter: undefined,
+      matrix,
+    };
 
     static async fromObject(object: any) {
-      return new GeneratedColorMatrix(object);
+      return new this(object);
     }
   };
+  classRegistry.setClass(newClass, key);
+  return newClass;
 }
 
 export const Brownie = createColorMatrixFilter(
@@ -43,8 +32,6 @@ export const Brownie = createColorMatrixFilter(
   ]
 );
 
-classRegistry.setClass(Brownie);
-
 export const Vintage = createColorMatrixFilter(
   'Vintage',
   [
@@ -53,7 +40,7 @@ export const Vintage = createColorMatrixFilter(
   ]
 );
 
-classRegistry.setClass(Vintage);
+
 
 export const Kodachrome = createColorMatrixFilter(
   'Kodachrome',
@@ -63,8 +50,6 @@ export const Kodachrome = createColorMatrixFilter(
   ]
 );
 
-classRegistry.setClass(Kodachrome);
-
 export const Technicolor = createColorMatrixFilter(
   'Technicolor',
   [
@@ -72,8 +57,6 @@ export const Technicolor = createColorMatrixFilter(
     -0.27589, -0.2311, -0.75018, 1.84759, 0, 0.12137, 0, 0, 0, 1, 0,
   ]
 );
-
-classRegistry.setClass(Technicolor);
 
 export const Polaroid = createColorMatrixFilter(
   'Polaroid',
@@ -83,8 +66,6 @@ export const Polaroid = createColorMatrixFilter(
   ]
 );
 
-classRegistry.setClass(Polaroid);
-
 export const Sepia = createColorMatrixFilter(
   'Sepia',
   [
@@ -93,8 +74,6 @@ export const Sepia = createColorMatrixFilter(
   ]
 );
 
-classRegistry.setClass(Sepia);
-
 export const BlackWhite = createColorMatrixFilter(
   'BlackWhite',
   [
@@ -102,5 +81,3 @@ export const BlackWhite = createColorMatrixFilter(
     1, 0,
   ]
 );
-
-classRegistry.setClass(BlackWhite);

@@ -84,7 +84,6 @@ export class Noise extends BaseFilter {
 }
 
 export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  type: 'Noise',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

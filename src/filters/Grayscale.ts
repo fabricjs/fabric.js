@@ -94,7 +94,6 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
-  type: 'Grayscale',
   fragmentSource: {
     average: `
       precision highp float;

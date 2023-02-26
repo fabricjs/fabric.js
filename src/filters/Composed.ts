@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import {
   type AnyFilter,
   BaseFilter,
@@ -17,14 +16,6 @@ export class Composed extends BaseFilter {
    * A non sparse array of filters to apply
    */
   declare subFilters: AnyFilter[];
-
-  constructor({
-    subFilters = [],
-    ...options
-  }: Partial<BaseFilterOptions & { subFilters: AnyFilter[] }> = {}) {
-    super(options);
-    this.subFilters = subFilters;
-  }
 
   /**
    * Apply this container's filters to the input image provided.
@@ -77,9 +68,4 @@ export class Composed extends BaseFilter {
   }
 }
 
-export const composedDefaultValues: Partial<TClassProperties<Composed>> = {
-  type: 'Composed',
-};
-
-Object.assign(Composed.prototype, composedDefaultValues);
 classRegistry.setClass(Composed);

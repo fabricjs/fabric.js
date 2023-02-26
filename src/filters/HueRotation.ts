@@ -57,7 +57,6 @@ export class HueRotation extends ColorMatrix {
 
 export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
   {
-    type: 'HueRotation',
     rotation: 0,
     mainParameter: 'rotation',
   };

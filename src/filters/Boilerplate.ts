@@ -2,6 +2,22 @@ import { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
+export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMyParameter;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      // add your gl code here
+      gl_FragColor = color;
+    }
+  `,
+  myParameter: 0,
+  mainParameter: 'myParameter',
+};
+
 /**
  * MyFilter filter class
  * @example
@@ -20,6 +36,8 @@ export class MyFilter extends BaseFilter {
    * @default
    */
   declare myParameter: number;
+
+  static defaults = myFilterDefaultValues;
 
   /**
    * Apply the MyFilter operation to a Uint8ClampedArray representing the pixels of an image.
@@ -70,22 +88,5 @@ export class MyFilter extends BaseFilter {
     return new MyFilter(object);
   }
 }
-
-export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
-  type: 'MyFilter',
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uMyParameter;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      // add your gl code here
-      gl_FragColor = color;
-    }
-  `,
-  myParameter: 0,
-  mainParameter: 'myParameter',
-};
 
 Object.assign(MyFilter.prototype, myFilterDefaultValues);

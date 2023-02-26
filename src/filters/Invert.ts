@@ -88,7 +88,6 @@ export class Invert extends BaseFilter {
 }
 
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
-  type: 'Invert',
   alpha: false,
   fragmentSource: `
     precision highp float;

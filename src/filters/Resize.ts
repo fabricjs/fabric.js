@@ -524,7 +524,6 @@ export class Resize extends BaseFilter {
 }
 
 export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
-  type: 'Resize',
   resizeType: 'hermite',
   scaleX: 1,
   scaleY: 1,
