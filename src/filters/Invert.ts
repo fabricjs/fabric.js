@@ -3,6 +3,31 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
+export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
+  alpha: false,
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform int uInvert;
+    uniform int uAlpha;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      if (uInvert == 1) {
+        if (uAlpha == 1) {
+          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);
+        } else {
+          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);
+        }
+      } else {
+        gl_FragColor = color;
+      }
+    }
+    `,
+  invert: true,
+  mainParameter: 'invert',
+};
+
 /**
  * @example
  * const filter = new Invert();
@@ -23,6 +48,8 @@ export class Invert extends BaseFilter {
    * @default
    */
   declare invert: boolean;
+
+  static defaults = invertDefaultValues;
 
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.
@@ -87,30 +114,4 @@ export class Invert extends BaseFilter {
   }
 }
 
-export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
-  alpha: false,
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform int uInvert;
-    uniform int uAlpha;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      if (uInvert == 1) {
-        if (uAlpha == 1) {
-          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);
-        } else {
-          gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);
-        }
-      } else {
-        gl_FragColor = color;
-      }
-    }
-    `,
-  invert: true,
-  mainParameter: 'invert',
-};
-
-Object.assign(Invert.prototype, invertDefaultValues);
 classRegistry.setClass(Invert);
