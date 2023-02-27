@@ -6,6 +6,7 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { TOCoord } from '../shapes/Object/InteractiveObject';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';
@@ -282,6 +283,15 @@ export class Control {
     ).transform(finalMatrix);
   }
 
+  connectionPositionHandler(
+    dim: Point,
+    finalMatrix: TMat2D,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
+    return new Point(this.x * dim.x, this.y * dim.y).transform(finalMatrix);
+  }
+
   /**
    * Returns the coords for this control based on object values.
    * @param {Number} objectAngle angle from the fabric object holding the control
@@ -332,6 +342,28 @@ export class Control {
     };
   }
 
+  renderConnection(
+    ctx: CanvasRenderingContext2D,
+    from: Point,
+    to: Point,
+    styleOverride: Pick<
+      ControlRenderingStyleOverride,
+      'borderColor' | 'borderDashArray'
+    > = {},
+    fabricObject: FabricObject
+  ) {
+    ctx.save();
+    ctx.strokeStyle = styleOverride.borderColor || fabricObject.borderColor;
+    fabricObject._setLineDash(
+      ctx,
+      styleOverride.borderDashArray || fabricObject.borderDashArray
+    );
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   /**
    * Render function for the control.
    * When this function runs the context is unscaled. unrotate. Just retina scaled.
@@ -339,26 +371,31 @@ export class Control {
    * if they want to draw a control where the position is detected.
    * left and top are the result of the positionHandler function
    * @param {RenderingContext2D} ctx the context where the control will be drawn
-   * @param {Number} left position of the canvas where we are about to render the control.
-   * @param {Number} top position of the canvas where we are about to render the control.
+   * @param {Point} position coordinate where the control center should be
    * @param {Object} styleOverride
    * @param {FabricObject} fabricObject the object where the control is about to be rendered
    */
   render(
     ctx: CanvasRenderingContext2D,
-    left: number,
-    top: number,
-    styleOverride: ControlRenderingStyleOverride | undefined,
+    position: TOCoord,
+    styleOverride: ControlRenderingStyleOverride = {},
     fabricObject: FabricObject
   ) {
-    styleOverride = styleOverride || {};
+    if (this.withConnection) {
+      this.renderConnection(
+        ctx,
+        position.connection,
+        position,
+        styleOverride,
+        fabricObject
+      );
+    }
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
       case 'circle':
         renderCircleControl.call(
           this,
           ctx,
-          left,
-          top,
+          position,
           styleOverride,
           fabricObject
         );
@@ -367,8 +404,7 @@ export class Control {
         renderSquareControl.call(
           this,
           ctx,
-          left,
-          top,
+          position,
           styleOverride,
           fabricObject
         );

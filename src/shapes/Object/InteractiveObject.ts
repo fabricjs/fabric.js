@@ -15,9 +15,10 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './ObjectProps';
 
-type TOCoord = Point & {
+export type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
+  connection: Point;
 };
 
 type TControlSet = Record<string, Control>;
@@ -217,11 +218,18 @@ export class InteractiveFabricObject<
 
     this.forEachControl((control, key) => {
       const position = control.positionHandler(dim, finalMatrix, this, control);
+      const connectionPosition = control.connectionPositionHandler(
+        dim,
+        finalMatrix,
+        this,
+        control
+      );
       // coords[key] are sometimes used as points. Those are points to which we add
       // the property corner and touchCorner from `_calcCornerCoords`.
       // don't remove this assign for an object spread.
       coords[key] = Object.assign(
         position,
+        { connection: connectionPosition },
         this._calcCornerCoords(control, position)
       );
     });
@@ -359,7 +367,6 @@ export class InteractiveFabricObject<
     ctx.strokeStyle = options.borderColor;
     this._setLineDash(ctx, options.borderDashArray);
     this.strokeBorders(ctx, size);
-    options.hasControls && this.drawControlsConnectingLines(ctx, size);
     ctx.restore();
   }
 
@@ -433,36 +440,6 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size object size x = width, y = height
-   */
-  drawControlsConnectingLines(
-    ctx: CanvasRenderingContext2D,
-    size: Point
-  ): void {
-    let shouldStroke = false;
-
-    ctx.beginPath();
-    this.forEachControl((control, key) => {
-      // in this moment, the ctx is centered on the object.
-      // width and height of the above function are the size of the bbox.
-      if (control.withConnection && control.getVisibility(this, key)) {
-        // reset movement for each control
-        shouldStroke = true;
-        ctx.moveTo(control.x * size.x, control.y * size.y);
-        ctx.lineTo(
-          control.x * size.x + control.offsetX,
-          control.y * size.y + control.offsetY
-        );
-      }
-    });
-    shouldStroke && ctx.stroke();
-  }
-
-  /**
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
@@ -491,8 +468,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        const p = this.oCoords[key];
-        control.render(ctx, p.x, p.y, options, this);
+        control.render(ctx, this.oCoords[key], options, this);
       }
     });
     ctx.restore();
