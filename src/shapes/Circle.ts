@@ -137,7 +137,7 @@ export class Circle<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude?: K[] | undefined): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
