@@ -196,19 +196,22 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [
-        this.flipX ? -1 : 1,
-        0,
-        0,
-        this.flipY ? -1 : 1,
-        center.x,
-        center.y,
-      ] as TMat2D,
+      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
         angle: this.getTotalAngle(),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
+      startMatrix = multiplyTransformMatrices(
+        vpt,
+        multiplyTransformMatrices(positionMatrix, [
+          this.flipX ? -1 : 1,
+          0,
+          0,
+          this.flipY ? -1 : 1,
+          0,
+          0,
+        ])
+      ),
       finalMatrix = multiplyTransformMatrices(startMatrix, [
         1 / vpt[0],
         0,
