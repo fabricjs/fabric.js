@@ -6,6 +6,7 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { FabricObjectProps } from './Object/types/FabricObjectProps';
 import { SerializedObjectProps } from './Object/types/SerializedObjectProps';
 
 export interface SerializedCircleProps extends SerializedObjectProps {
@@ -45,7 +46,10 @@ export const circleDefaultValues: Pick<
 };
 
 export class Circle
-  extends FabricObject<SerializedCircleProps>
+  extends FabricObject<
+    Partial<SerializedCircleProps & FabricObjectProps>,
+    SerializedCircleProps
+  >
   implements SerializedCircleProps
 {
   declare radius: number;

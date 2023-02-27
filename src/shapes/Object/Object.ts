@@ -86,8 +86,8 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    SProps extends SerializedObjectProps = SerializedObjectProps,
     Props extends Partial<ObjectProps> = Partial<ObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends AnimatableObject<EventSpec>

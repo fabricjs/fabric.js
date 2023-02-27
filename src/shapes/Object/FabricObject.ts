@@ -9,14 +9,14 @@ import { SerializedObjectProps } from './types/SerializedObjectProps';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
 export interface FabricObject<
-  SProps extends SerializedObjectProps = SerializedObjectProps,
   Props extends Partial<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObjectSVGExportMixin {}
 
 export class FabricObject<
-  SProps extends SerializedObjectProps = SerializedObjectProps,
   Props extends Partial<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends InteractiveFabricObject<SProps, Props, EventSpec> {}
 

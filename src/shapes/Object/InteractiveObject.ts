@@ -43,8 +43,8 @@ export interface DragMethods {
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
-    SProps extends SerializedObjectProps = SerializedObjectProps,
     Props extends Partial<FabricObjectProps> = Partial<FabricObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<SProps, Props, EventSpec>
