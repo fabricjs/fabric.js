@@ -1489,9 +1489,14 @@ export class Canvas extends SelectableCanvas {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects
+          // find target from active objects to remove or from under active selection to add
           target = this.searchPossibleTargets(
-            prevActiveObjects,
+            [
+              ...this._objects.filter(
+                (object) => !prevActiveObjects.includes(object)
+              ),
+              ...prevActiveObjects,
+            ],
             this.getPointer(e, true)
           );
           // if nothing is found bail out
