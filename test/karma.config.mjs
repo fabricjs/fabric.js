@@ -1,23 +1,6 @@
 import chalk from 'chalk';
 import { startGoldensServer } from './GoldensServer.mjs';
 
-// import { babel } from '@rollup/plugin-babel';
-// import json from '@rollup/plugin-json';
-// import ts from '@rollup/plugin-typescript';
-// import { nodeResolve } from '@rollup/plugin-node-resolve';
-// import commonjs from '@rollup/plugin-commonjs';
-//
-// const plugins = [
-//   json(),
-//   ts(),
-//   babel({
-//     extensions: ['.ts', '.js'],
-//     babelHelpers: 'bundled',
-//   }),
-//   nodeResolve(),
-//   commonjs({ include: 'node_modules/**' })
-// ];
-
 // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 const CI = !!process.env.CI
 const BROWSERS = process.env.BROWSERS ? process.env.BROWSERS.split(/,| /g) : ['chrome', 'firefox'];
