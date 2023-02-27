@@ -3,8 +3,7 @@ import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
 import { applyMixins } from '../../util/applyMixins';
 import { FabricObjectProps } from './types/FabricObjectProps';
-import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { TFabricObjectProps } from './types';
+import { TFabricObjectProps, SerializedObjectProps } from './types';
 
 // TODO somehow we have to make a tree-shakeable import
 
