@@ -198,20 +198,10 @@ export class InteractiveFabricObject<
       center = this.getCenterPoint(),
       tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
-        angle: this.getTotalAngle(),
+        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(
-        vpt,
-        multiplyTransformMatrices(positionMatrix, [
-          this.flipX ? -1 : 1,
-          0,
-          0,
-          this.flipY ? -1 : 1,
-          0,
-          0,
-        ])
-      ),
+      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
       finalMatrix = multiplyTransformMatrices(startMatrix, [
         1 / vpt[0],
         0,
@@ -407,6 +397,9 @@ export class InteractiveFabricObject<
     ctx.lineWidth = this.borderScaleFactor;
     ctx.globalAlpha =
       this.isMoving || this.group?.isMoving ? this.borderOpacityWhenMoving : 1;
+    if (this.group && this.flipX) {
+      options.angle -= 180;
+    }
     ctx.rotate(degreesToRadians(options.angle));
     shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
