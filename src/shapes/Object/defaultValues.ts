@@ -14,7 +14,7 @@ export const stateProperties = [
   'visible',
   'skewX',
   'skewY',
-] as const;
+];
 
 export const cacheProperties = [
   'fill',
@@ -31,10 +31,9 @@ export const cacheProperties = [
   'strokeMiterLimit',
   'backgroundColor',
   'clipPath',
-] as const;
+];
 
 export const fabricObjectDefaultValues = {
-  type: 'object',
   originX: 'left',
   originY: 'top',
   top: 0,
@@ -95,7 +94,6 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  // TODO: restore once default values are refactored to a method
   objectCaching: true,
   noScaleCache: true,
   strokeUniform: false,

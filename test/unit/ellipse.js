@@ -83,6 +83,18 @@
     assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Ellipse({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "ellipse",
+      version: fabric.version,
+      left: 0,
+      top: 0
+    });
+  });
+
   QUnit.test('isNotVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0);

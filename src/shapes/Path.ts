@@ -382,13 +382,8 @@ export class Path extends FabricObject {
   }
 }
 
-export const pathDefaultValues: Partial<TClassProperties<Path>> = {
-  type: 'path',
-};
-
-Object.assign(Path.prototype, {
-  ...pathDefaultValues,
-});
+// @ts-expect-error
+Path.prototype.type = 'path';
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

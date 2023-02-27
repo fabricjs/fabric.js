@@ -6,7 +6,6 @@ import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
-  TClassProperties,
   TDegree,
   TFiller,
   TSize,
@@ -155,7 +154,7 @@ export class FabricObject<
    * needs its cache regenerated during a .set call
    * @type Array
    */
-  declare stateProperties: string[];
+  static stateProperties: string[] = stateProperties;
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -275,12 +274,22 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
+  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return { ...FabricObject.ownDefaults };
+  }
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
   constructor(options?: Partial<ObjectProps> & Props) {
     super();
+    Object.assign(
+      this,
+      (this.constructor as typeof FabricObject).getDefaults()
+    );
     this.setOptions(options);
   }
 
@@ -563,20 +572,27 @@ export class FabricObject<
    * @param {Object} object
    */
   _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+    // getDefaults() ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
+    // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
+    const defaults = (this.constructor as typeof FabricObject).getDefaults();
+    const hasStaticDefaultValues = Object.keys(defaults).length > 0;
+    const baseValues = hasStaticDefaultValues
+      ? defaults
+      : Object.getPrototypeOf(this);
+
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
       }
-      if (object[prop] === prototype[prop]) {
+      if (object[prop] === baseValues[prop]) {
         delete object[prop];
       }
       // basically a check for [] === []
       if (
         Array.isArray(object[prop]) &&
-        Array.isArray(prototype[prop]) &&
+        Array.isArray(baseValues[prop]) &&
         object[prop].length === 0 &&
-        prototype[prop].length === 0
+        baseValues[prop].length === 0
       ) {
         delete object[prop];
       }
@@ -690,7 +706,10 @@ export class FabricObject<
       ) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
+      } else if (
+        groupNeedsUpdate &&
+        (this.constructor as typeof FabricObject).stateProperties.includes(key)
+      ) {
         this.group!.set('dirty', true);
       }
     }
@@ -1548,14 +1567,7 @@ export class FabricObject<
   }
 }
 
-/*
- * Properties that at minimum needs to stay on the prototype
- * That shouldn't be either on the instance and that can't be used as static
- * For inheritance reasons ( used in the superclass but static in the subclass )
- */
-Object.assign(FabricObject.prototype, {
-  stateProperties,
-  ...fabricObjectDefaultValues,
-});
+// @ts-expect-error
+FabricObject.prototype.type = 'object';
 
 classRegistry.setClass(FabricObject);

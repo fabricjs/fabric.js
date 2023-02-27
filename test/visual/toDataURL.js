@@ -53,7 +53,7 @@
     newModule: 'DataURL exports',
     percentage: 0.10,
     beforeEachHandler: function() {
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 
