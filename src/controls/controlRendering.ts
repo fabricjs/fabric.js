@@ -38,7 +38,7 @@ export type ControlRenderer = (
 export function renderCircleControl(
   this: Control,
   ctx: CanvasRenderingContext2D,
-  coordinate: TOCoord,
+  { x, y }: TOCoord,
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: FabricObject
 ) {
@@ -54,8 +54,7 @@ export function renderCircleControl(
     stroke =
       !transparentCorners &&
       (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
-  let { x, y } = coordinate,
-    size;
+  let size: number;
   ctx.save();
   ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
@@ -64,11 +63,11 @@ export function renderCircleControl(
   if (xSize > ySize) {
     size = xSize;
     ctx.scale(1.0, ySize / xSize);
-    y = (coordinate.y * xSize) / ySize;
+    y *= xSize / ySize;
   } else if (ySize > xSize) {
     size = ySize;
     ctx.scale(xSize / ySize, 1.0);
-    x = (coordinate.x * ySize) / xSize;
+    x *= ySize / xSize;
   } else {
     size = xSize;
   }
