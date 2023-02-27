@@ -9,6 +9,7 @@ import { sin } from '../util/misc/sin';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
 import { SerializedObjectProps } from './Object/types/SerializedObjectProps';
 import { TFabricObjectProps, TProps } from './Object/types';
+import { FabricObjectProps } from './Object/types/FabricObjectProps';
 
 interface UniqCircleProps {
   /**
@@ -39,9 +40,7 @@ export interface SerializedCircleProps
   extends SerializedObjectProps,
     UniqCircleProps {}
 
-export interface CircleProps
-  extends TFabricObjectProps,
-    Partial<UniqCircleProps> {}
+export interface CircleProps extends FabricObjectProps, UniqCircleProps {}
 
 const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
 
@@ -52,12 +51,12 @@ export const circleDefaultValues: UniqCircleProps = {
 };
 
 export class Circle<
-    Props extends CircleProps = CircleProps,
+    Props extends TProps<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements SerializedCircleProps
+  implements UniqCircleProps
 {
   declare radius: number;
   declare startAngle: number;
