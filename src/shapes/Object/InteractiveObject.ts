@@ -15,7 +15,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './types/FabricObjectProps';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { TFabricObjectProps, TProps } from './types';
+import { TFabricObjectProps } from './types';
 
 type TOCoord = Point & {
   corner: TCornerPoint;

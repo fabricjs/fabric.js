@@ -7,9 +7,9 @@ import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
-import { SerializedObjectProps } from './Object/types/SerializedObjectProps';
-import { TFabricObjectProps, TProps } from './Object/types';
+import { TProps } from './Object/types';
 import { FabricObjectProps } from './Object/types/FabricObjectProps';
+import { SerializedObjectProps } from './Object/types/SerializedObjectProps';
 
 interface UniqCircleProps {
   /**
