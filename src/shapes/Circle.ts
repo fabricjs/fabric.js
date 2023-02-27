@@ -207,7 +207,7 @@ export class Circle<
       top = 0,
       radius,
       ...otherParsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES) as CircleProps;
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
 
     if (!radius || radius < 0) {
       throw new Error(
