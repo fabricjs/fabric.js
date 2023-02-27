@@ -384,7 +384,7 @@
     assert.equal(activeSelection[1], rect1, 'then rect1');
   });
 
-  QUnit.test('start multiselection: preserve', function (assert) {
+  QUnit.test('start multiselection: canvas-stacking', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
@@ -427,6 +427,22 @@
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
 
+  QUnit.test('update active selection deselects group if all it\'s children are selected', function(assert) {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    var rect3 = new fabric.Rect();
+    var group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    const events = [];
+    canvas.on('selection:updated', e => events.push(e));
+    canvas.add(rect1, group);
+    updateActiveSelection(canvas, [rect1, group, rect3], rect2, 'selection-order');
+    assert.deepEqual(events, [{
+      e: { clientX: 1, clientY: 1, shiftKey: true },
+      selected: [rect2],
+      deselected: [group]
+    }], 'fired events');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3, rect2], 'deslected group');
+  });
 
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
