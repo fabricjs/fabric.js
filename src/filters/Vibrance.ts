@@ -3,6 +3,28 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
+
+export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uVibrance;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      float max = max(color.r, max(color.g, color.b));
+      float avg = (color.r + color.g + color.b) / 3.0;
+      float amt = (abs(max - avg) * 2.0) * uVibrance;
+      color.r += max != color.r ? (max - color.r) * amt : 0.00;
+      color.g += max != color.g ? (max - color.g) * amt : 0.00;
+      color.b += max != color.b ? (max - color.b) * amt : 0.00;
+      gl_FragColor = color;
+    }
+  `,
+  vibrance: 0,
+  mainParameter: 'vibrance',
+};
+
 /**
  * Vibrance filter class
  * @example
@@ -22,6 +44,8 @@ export class Vibrance extends BaseFilter {
    * @default
    */
   declare vibrance: number;
+
+  static defaults = vibranceDefaultValues;
 
   /**
    * Apply the Vibrance operation to a Uint8ClampedArray representing the pixels of an image.
@@ -77,26 +101,4 @@ export class Vibrance extends BaseFilter {
   }
 }
 
-export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uVibrance;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      float max = max(color.r, max(color.g, color.b));
-      float avg = (color.r + color.g + color.b) / 3.0;
-      float amt = (abs(max - avg) * 2.0) * uVibrance;
-      color.r += max != color.r ? (max - color.r) * amt : 0.00;
-      color.g += max != color.g ? (max - color.g) * amt : 0.00;
-      color.b += max != color.b ? (max - color.b) * amt : 0.00;
-      gl_FragColor = color;
-    }
-  `,
-  vibrance: 0,
-  mainParameter: 'vibrance',
-};
-
-Object.assign(Vibrance.prototype, vibranceDefaultValues);
 classRegistry.setClass(Vibrance);

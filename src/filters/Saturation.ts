@@ -12,6 +12,27 @@ import { classRegistry } from '../ClassRegistry';
  * object.filters.push(filter);
  * object.applyFilters();
  */
+
+export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
+  fragmentSource: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uSaturation;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      float rgMax = max(color.r, color.g);
+      float rgbMax = max(rgMax, color.b);
+      color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
+      color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
+      color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
+      gl_FragColor = color;
+    }
+  `,
+  saturation: 0,
+  mainParameter: 'saturation',
+};
+
 export class Saturation extends BaseFilter {
   /**
    * Saturation value, from -1 to 1.
@@ -22,6 +43,8 @@ export class Saturation extends BaseFilter {
    * @default
    */
   declare saturation: number;
+
+  static defaults = saturationDefaultValues;
 
   /**
    * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
@@ -75,25 +98,4 @@ export class Saturation extends BaseFilter {
   }
 }
 
-export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uSaturation;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      float rgMax = max(color.r, color.g);
-      float rgbMax = max(rgMax, color.b);
-      color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
-      color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
-      color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
-      gl_FragColor = color;
-    }
-  `,
-  saturation: 0,
-  mainParameter: 'saturation',
-};
-
-Object.assign(Saturation.prototype, saturationDefaultValues);
 classRegistry.setClass(Saturation);
