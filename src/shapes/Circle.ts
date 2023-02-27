@@ -1,18 +1,12 @@
+import { classRegistry } from '../ClassRegistry';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
+import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { classRegistry } from '../ClassRegistry';
-import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TClassProperties } from '../typedefs';
-import { SerializedObjectProps } from './Object/ObjectProps';
-
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-};
+import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { SerializedObjectProps } from './Object/types/SerializedObjectProps';
 
 export interface SerializedCircleProps extends SerializedObjectProps {
   /**
@@ -39,6 +33,17 @@ export interface SerializedCircleProps extends SerializedObjectProps {
   endAngle: number;
 }
 
+const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
+
+export const circleDefaultValues: Pick<
+  SerializedCircleProps,
+  typeof CIRCLE_PROPS[number]
+> = {
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+};
+
 export class Circle
   extends FabricObject<SerializedCircleProps>
   implements SerializedCircleProps
@@ -47,12 +52,7 @@ export class Circle
   declare startAngle: number;
   declare endAngle: number;
 
-  static cacheProperties = [
-    ...cacheProperties,
-    'radius',
-    'startAngle',
-    'endAngle',
-  ];
+  static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
   static ownDefaults: Record<string, any> = circleDefaultValues;
 
@@ -124,15 +124,16 @@ export class Circle
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<T extends keyof TClassProperties<this> = never>(
-    propertiesToInclude: T[] = []
-  ): { [K in T]: this[K] } & SerializedCircleProps {
-    return super.toObject([
-      'radius',
-      'startAngle',
-      'endAngle',
-      ...propertiesToInclude,
-    ] as T[]);
+  toObject<
+    T extends Omit<
+      Partial<SerializedCircleProps> & TClassProperties<this>,
+      keyof SerializedCircleProps
+    >,
+    K extends keyof T = never
+  >(
+    propertiesToInclude?: K[] | undefined
+  ): { [R in K]: T[K] } & SerializedCircleProps {
+    return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
   /* _TO_SVG_START_ */
@@ -222,6 +223,9 @@ export class Circle
 
   /* _FROM_SVG_END_ */
 
+  /**
+   * @todo how do we declare this??
+   */
   static fromObject(object: SerializedCircleProps): Promise<Circle> {
     return super.fromObject(object) as Promise<Circle>;
   }
