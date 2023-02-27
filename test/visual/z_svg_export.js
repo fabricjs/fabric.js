@@ -58,7 +58,7 @@
     percentage: 0.06,
     beforeEachHandler: function() {
       fabric.config.configure({ NUM_FRACTION_DIGITS: 4 });
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 

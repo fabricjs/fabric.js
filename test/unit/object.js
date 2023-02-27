@@ -99,8 +99,8 @@
 
   QUnit.test('stateProperties', function(assert) {
     var cObj = new fabric.Object();
-    assert.ok(cObj.stateProperties);
-    assert.ok(cObj.stateProperties.length > 0);
+    assert.ok(cObj.constructor.stateProperties);
+    assert.ok(cObj.constructor.stateProperties.length > 0);
   });
 
   QUnit.test('transform', function(assert) {
@@ -1372,17 +1372,18 @@
     assert.ok(!object.canvas, 'cleared canvas');
     assert.ok(off, 'unsubscribe events');
   });
-  QUnit.test('prototype changes', function (assert) {
-    var object = new fabric.Object();
-    var object2 = new fabric.Object();
-    object2.fill = 'red'
-    assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
-    assert.equal(object2.fill, 'red', 'once assigned object is red');
-    fabric.Object.prototype.fill = 'green';
-    assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
-    assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
-    var object3 = new fabric.Object();
-    assert.equal(object3.fill, 'green', 'newly created object have now green by default');
-    fabric.Object.prototype.fill = 'rgb(0,0,0)';
-  });
+  // this is no more valid for now
+  // QUnit.test('prototype changes', function (assert) {
+  //   var object = new fabric.Object();
+  //   var object2 = new fabric.Object();
+  //   object2.fill = 'red'
+  //   assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
+  //   assert.equal(object2.fill, 'red', 'once assigned object is red');
+  //   fabric.Object.prototype.fill = 'green';
+  //   assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
+  //   assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
+  //   var object3 = new fabric.Object();
+  //   assert.equal(object3.fill, 'green', 'newly created object have now green by default');
+  //   fabric.Object.prototype.fill = 'rgb(0,0,0)';
+  // });
 })();

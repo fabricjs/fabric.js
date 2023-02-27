@@ -186,12 +186,7 @@ export class ActiveSelection extends Group {
   }
 }
 
-export const activeSelectionDefaultValues: Partial<
-  TClassProperties<ActiveSelection>
-> = {
-  type: 'activeSelection',
-};
-
-Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
+// @ts-expect-error
+ActiveSelection.prototype.type = 'activeSelection';
 
 classRegistry.setClass(ActiveSelection);

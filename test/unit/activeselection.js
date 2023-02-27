@@ -28,7 +28,7 @@
   QUnit.module('fabric.ActiveSelection', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -182,13 +182,6 @@
     //
     // assert.equal(group.get('lockMovementY'), true);
     // assert.equal(group.get('lockRotation'), true);
-  });
-
-  QUnit.test('inherited methods', function (assert) {
-    var methods = ['add', 'insertAt', 'remove', 'removeAll'];
-    methods.forEach(method => {
-      assert.strictEqual(fabric.ActiveSelection.prototype[method], fabric.Group.prototype[method]);
-    });
   });
 
   QUnit.test('ActiveSelection shouldCache', function(assert) {

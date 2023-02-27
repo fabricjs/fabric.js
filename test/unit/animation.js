@@ -311,8 +311,9 @@
   });
 
   QUnit.test('animate with color', function(assert) {
-    var done = assert.async(), properties = fabric.Object.prototype.colorProperties,
-        object = new fabric.Object();
+    var done = assert.async(),
+        object = new fabric.Object(),
+        properties = fabric.Object.getDefaults().colorProperties;
 
     properties.forEach(function (prop, index) {
       object.set(prop, 'red');

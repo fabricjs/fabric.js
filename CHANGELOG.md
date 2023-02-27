@@ -3,6 +3,7 @@
 ## [next]
 
 - ci(): replace browser test runner, `testem` => `karma` [#8738](https://github.com/fabricjs/fabric.js/pull/8738s)
+- chore(TS): remove default values from Objects prototypes, ( filters in a followup ) [#8719](https://github.com/fabricjs/fabric.js/issues/8719)
 - fix(Intersection): bug causing selection edge case [#8735](https://github.com/fabricjs/fabric.js/pull/8735)
 - chore(TS): class interface for options/brevity [#8674](https://github.com/fabricjs/fabric.js/issues/8674)
 - ci(): fix import autocomplete in dev mode #8725
