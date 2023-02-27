@@ -18,11 +18,7 @@ export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends InteractiveFabricObject<Props, SProps, EventSpec> {
-  constructor(options?: Props) {
-    super(options);
-  }
-}
+> extends InteractiveFabricObject<Props, SProps, EventSpec> {}
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
