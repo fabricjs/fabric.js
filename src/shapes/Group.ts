@@ -89,9 +89,7 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(
-  FabricObject<any, any, GroupEvents>
-) {
+export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout

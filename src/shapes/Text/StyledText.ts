@@ -8,8 +8,8 @@ export type TextStyle = {
 };
 
 export abstract class StyledText<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<any, any, EventSpec> {
+  EventSpec extends ObjectEvents
+> extends FabricObject<EventSpec> {
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
   protected declare abstract _forceClearCache: boolean;
