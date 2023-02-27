@@ -40,8 +40,6 @@ export const Vintage = createColorMatrixFilter(
   ]
 );
 
-
-
 export const Kodachrome = createColorMatrixFilter(
   'Kodachrome',
   [

@@ -17,6 +17,14 @@ export class Composed extends BaseFilter {
    */
   declare subFilters: AnyFilter[];
 
+  constructor({
+    subFilters = [],
+    ...options
+  }: Partial<BaseFilterOptions & { subFilters: AnyFilter[] }> = {}) {
+    super(options);
+    this.subFilters = subFilters;
+  }
+
   /**
    * Apply this container's filters to the input image provided.
    *

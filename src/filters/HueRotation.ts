@@ -11,7 +11,6 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
     mainParameter: 'rotation',
   };
 
-
 /**
  * HueRotation filter class
  * @example

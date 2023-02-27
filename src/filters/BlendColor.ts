@@ -5,17 +5,17 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
 type TBlendMode =
-    | 'multiply'
-    | 'add'
-    | 'diff'
-    | 'difference'
-    | 'screen'
-    | 'subtract'
-    | 'darken'
-    | 'lighten'
-    | 'overlay'
-    | 'exclusion'
-    | 'tint';
+  | 'multiply'
+  | 'add'
+  | 'diff'
+  | 'difference'
+  | 'screen'
+  | 'subtract'
+  | 'darken'
+  | 'lighten'
+  | 'overlay'
+  | 'exclusion'
+  | 'tint';
 
 export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
   color: '#F95C63',

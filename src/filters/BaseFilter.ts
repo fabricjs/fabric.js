@@ -25,7 +25,6 @@ export interface AnyFilter
   extends AbstractBaseFilter<string | Record<string, string>> {}
 
 export abstract class AbstractBaseFilter<T> {
-
   /**
    * Filter type
    * @param {String} type
@@ -63,10 +62,15 @@ export abstract class AbstractBaseFilter<T> {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(
-    { type, ...options }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
-  ) {
-    Object.assign(this, (this.constructor as typeof AbstractBaseFilter<T>).defaults, options);
+  constructor({
+    type,
+    ...options
+  }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}) {
+    Object.assign(
+      this,
+      (this.constructor as typeof AbstractBaseFilter<T>).defaults,
+      options
+    );
   }
 
   abstract getFragmentSource(): string;
@@ -231,7 +235,9 @@ export abstract class AbstractBaseFilter<T> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
     const main = this.mainParameter,
-      defaultValue = (this.constructor as typeof AbstractBaseFilter).defaults[main as string];
+      defaultValue = (this.constructor as typeof AbstractBaseFilter).defaults[
+        main as string
+      ];
     if (main) {
       const thisValue = this[main];
       if (Array.isArray(defaultValue) && Array.isArray(thisValue)) {
@@ -397,7 +403,6 @@ export abstract class AbstractBaseFilter<T> {
 }
 
 export abstract class BaseFilter extends AbstractBaseFilter<string> {
-
   fragmentSource = `
     ${highPsourceCode};
     varying vec2 vTexCoord;

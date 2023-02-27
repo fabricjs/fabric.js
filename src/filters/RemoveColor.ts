@@ -4,7 +4,6 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
     color: '#FFFFFF',

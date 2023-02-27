@@ -3,7 +3,6 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
   fragmentSource: `
     precision highp float;
