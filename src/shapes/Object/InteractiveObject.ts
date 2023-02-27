@@ -15,6 +15,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './types/FabricObjectProps';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
+import { TFabricObjectProps, TProps } from './types';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -43,11 +44,11 @@ export interface DragMethods {
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 export class InteractiveFabricObject<
-    Props extends Partial<FabricObjectProps> = Partial<FabricObjectProps>,
+    Props extends TFabricObjectProps = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<SProps, Props, EventSpec>
+  extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;

@@ -41,6 +41,7 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
+import { TProps } from './types';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -86,7 +87,7 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends Partial<ObjectProps> = Partial<ObjectProps>,
+    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -1536,7 +1537,7 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends Partial<SerializedObjectProps>>(
+  static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
