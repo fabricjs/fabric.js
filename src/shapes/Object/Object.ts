@@ -141,7 +141,7 @@ export class FabricObject<
    * and refreshed at the next render
    * @type Array
    */
-  static cacheProperties: string[] = cacheProperties as unknown as string[];
+  static cacheProperties: string[] = cacheProperties;
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.
@@ -1541,7 +1541,7 @@ export class FabricObject<
     object: T,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
-    return this._fromObject(object as any, options);
+    return this._fromObject(object, options);
   }
 }
 
