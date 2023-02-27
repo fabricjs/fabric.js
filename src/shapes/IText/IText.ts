@@ -18,6 +18,28 @@ type CursorBoundaries = {
   topOffset: number;
 };
 
+export const iTextDefaultValues = {
+  selectionStart: 0,
+  selectionEnd: 0,
+  selectionColor: 'rgba(17,119,255,0.3)',
+  isEditing: false,
+  editable: true,
+  editingBorderColor: 'rgba(102,153,255,0.25)',
+  cursorWidth: 2,
+  cursorColor: '',
+  cursorDelay: 1000,
+  cursorDuration: 600,
+  caching: true,
+  hiddenTextareaContainer: null,
+  _selectionDirection: null,
+  _reSpace: /\s|\n/,
+  inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
+};
+
 /**
  * @fires changed
  * @fires selection:changed
@@ -151,6 +173,12 @@ export class IText<
    * @default
    */
   declare caching: boolean;
+
+  static ownDefaults: Record<string, any> = iTextDefaultValues;
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...IText.ownDefaults };
+  }
 
   /**
 
@@ -640,29 +668,5 @@ export class IText<
     super.dispose();
   }
 }
-
-export const iTextDefaultValues = {
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\n/,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-};
-
-Object.assign(IText.prototype, iTextDefaultValues);
 
 classRegistry.setClass(IText);

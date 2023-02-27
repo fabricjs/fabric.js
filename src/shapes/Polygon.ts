@@ -1,8 +1,16 @@
 import { classRegistry } from '../ClassRegistry';
-import { Polyline } from './Polyline';
+import { Polyline, polylineDefaultValues } from './Polyline';
 
 export class Polygon extends Polyline {
   static readonly type = 'polygon';
+  static ownDefaults: Record<string, any> = polylineDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Polyline.ownDefaults,
+    };
+  }
 
   protected isOpen() {
     return false;

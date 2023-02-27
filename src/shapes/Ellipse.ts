@@ -5,6 +5,11 @@ import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
+export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
+  rx: 0,
+  ry: 0,
+};
+
 export class Ellipse extends FabricObject {
   static readonly type = 'ellipse';
 
@@ -23,6 +28,15 @@ export class Ellipse extends FabricObject {
   declare ry: number;
 
   static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
+  static ownDefaults: Record<string, any> = ellipseDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Ellipse.ownDefaults,
+    };
+  }
 
   /**
    * Constructor
@@ -142,15 +156,6 @@ export class Ellipse extends FabricObject {
 
   /* _FROM_SVG_END_ */
 }
-
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
-  rx: 0,
-  ry: 0,
-};
-
-Object.assign(Ellipse.prototype, {
-  ...ellipseDefaultValues,
-});
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);

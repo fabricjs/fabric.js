@@ -5,6 +5,11 @@ import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
+export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
+  rx: 0,
+  ry: 0,
+};
+
 export class Rect extends FabricObject {
   static readonly type = 'rect';
 
@@ -23,6 +28,15 @@ export class Rect extends FabricObject {
   declare ry: number;
 
   static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
+  static ownDefaults: Record<string, any> = rectDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Rect.ownDefaults,
+    };
+  }
 
   /**
    * Constructor
@@ -187,15 +201,6 @@ export class Rect extends FabricObject {
 
   /* _FROM_SVG_END_ */
 }
-
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  rx: 0,
-  ry: 0,
-};
-
-Object.assign(Rect.prototype, {
-  ...rectDefaultValues,
-});
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);

@@ -44,7 +44,7 @@
     width: 300,
     height: 300,
     beforeEachHandler: function() {
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 
@@ -518,7 +518,7 @@
     golden: 'drag_image.png',
     width: 120,
     height: 220,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -529,7 +529,7 @@
     golden: 'drag_image.png',
     width: 110,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -540,7 +540,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -551,7 +551,7 @@
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -570,17 +570,17 @@
       clientX: 5,
       clientY: 5,
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       },
       dataTransfer: {
         setData() {
-          
+
         },
         setDragImage(imageSource, x, y) {
-          
+
         }
       }
     });
@@ -588,10 +588,10 @@
       clientX: 25,
       clientY: 25,
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       },
     });
     canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
@@ -648,7 +648,7 @@
     fabricClass: 'Canvas'
   });
 
-  function selectionClearingEdgeCases2(canvas, callback, assert) {   
+  function selectionClearingEdgeCases2(canvas, callback, assert) {
     const text = new TestTextbox('lorem ipsum dolor sit Amet sit Amet', {
       width: 200,
     });

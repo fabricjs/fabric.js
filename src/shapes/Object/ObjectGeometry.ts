@@ -49,27 +49,6 @@ export class ObjectGeometry<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectOrigin<EventSpec> {
   /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  declare flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  declare flipY: boolean;
-
-  /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
-  declare padding: number;
-
-  /**
    * Describe object's corner position in canvas object absolute coordinates
    * properties are tl,tr,bl,br and describe the four main corner.
    * each property is an object with x, y, instance of Fabric.Point.
