@@ -61,6 +61,21 @@ export class ActiveSelection extends Group {
         this.insertAt(insertAt, target);
       });
     }
+
+    targets.forEach((target) => {
+      const parent = target.__owningGroup;
+      if (
+        parent &&
+        // a little perf optimization
+        parent.subTargetCheck &&
+        parent.interactive &&
+        // in case group and all it's objects are selected we deselect group
+        this._objects.includes(parent) &&
+        parent._objects.every((object) => this._objects.includes(object))
+      ) {
+        this.remove(parent);
+      }
+    });
   }
 
   /**
@@ -75,13 +90,6 @@ export class ActiveSelection extends Group {
       const parent = object.group;
       parent._exitGroup(object);
       object.__owningGroup = parent;
-      if (
-        this._objects.includes(parent) &&
-        parent._objects.every((object) => this._objects.includes(object))
-      ) {
-        // in case group and all it's objects are selected we deselect group
-        this.remove(parent);
-      }
     }
     this._enterGroup(object, removeParentTransform);
     return true;
