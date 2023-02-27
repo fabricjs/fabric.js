@@ -196,9 +196,16 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
+      tMatrix = [
+        this.flipX ? -1 : 1,
+        0,
+        0,
+        this.flipY ? -1 : 1,
+        center.x,
+        center.y,
+      ] as TMat2D,
       rMatrix = calcRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
+        angle: this.getTotalAngle(),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
       startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
@@ -394,14 +401,10 @@ export class InteractiveFabricObject<
     const options = qrDecompose(matrix);
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
+    ctx.lineWidth = this.borderScaleFactor;
+    ctx.globalAlpha =
+      this.isMoving || this.group?.isMoving ? this.borderOpacityWhenMoving : 1;
+    ctx.rotate(degreesToRadians(options.angle));
     shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
