@@ -211,7 +211,10 @@
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
+      var retinaScaling = 1, matrix, p;
+      if (this.canvas) {
+        retinaScaling = this.canvas.getRetinaScaling();
+      }
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
