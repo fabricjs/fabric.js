@@ -1001,17 +1001,12 @@ export class SelectableCanvas<
 
   /**
    * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas top left physical corner used to search per pixel target.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(
-    pointer: Point,
-    obj: FabricObject,
-    globalPointer: Point
-  ): boolean {
+  _checkTarget(obj: FabricObject, globalPointer: Point): boolean {
     if (
       obj &&
       obj.visible &&
@@ -1052,11 +1047,8 @@ export class SelectableCanvas<
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
       const objToCheck = objects[i];
-      const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
-        : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
+      if (this._checkTarget(objToCheck, pointer)) {
+        target = objToCheck;
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
