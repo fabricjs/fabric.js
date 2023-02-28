@@ -9,7 +9,7 @@
 
   var REFERENCE_OBJECT = {
     version:                  fabric.version,
-    type:                     'polyline',
+    type:                     'Polyline',
     originX:                  'left',
     originY:                  'top',
     left:                     9.5,
@@ -60,7 +60,7 @@
     assert.ok(polyline instanceof fabric.Polyline);
     assert.ok(polyline instanceof fabric.Object);
 
-    assert.equal(polyline.constructor.type, 'polyline');
+    assert.equal(polyline.constructor.name, 'Polyline');
     assert.deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 

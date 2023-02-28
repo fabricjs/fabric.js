@@ -5,20 +5,18 @@
     assert.ok(fabric.classRegistry, 'classRegistry is available');
     assert.throws(() => classRegistry.getClass('rect'), new Error(`No class registered for rect`), 'initially Rect is undefined');
   });
-  QUnit.test('getClass will return specific class from the prototype type', function (assert) {
+  QUnit.test('getClass will return specific class matched by name', function (assert) {
     class TestClass {
 
     }
-    TestClass.type = 'anyType';
     classRegistry.setClass(TestClass);
-    const resolved = classRegistry.getClass('anyType');
-    assert.equal(resolved, TestClass, 'resolves class correctly');
+    assert.equal(classRegistry.getClass('TestClass'), TestClass, 'resolves class correctly');
+    assert.equal(classRegistry.getClass('testclass'), TestClass, 'resolves class correctly to lower case');
   });
   QUnit.test('getClass will return specific class from custom type', function (assert) {
     class TestClass2 {
 
     }
-    TestClass2.type = 'anyType';
     classRegistry.setClass(TestClass2, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');
     assert.equal(resolved, TestClass2, 'resolves class correctly with custom type');
@@ -27,11 +25,9 @@
     class TestClass3 {
 
     }
-    TestClass3.type = 'anyType';
     class TestClass4 {
 
     }
-    TestClass4.type = 'typeC';
     classRegistry.setClass(TestClass3, 'myCustomType');
     classRegistry.setSVGClass(TestClass4, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');

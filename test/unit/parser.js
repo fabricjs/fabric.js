@@ -785,8 +785,8 @@
                   '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].clipPath.constructor.type, 'polygon');
-      assert.equal(objects[0].clipPath.clipPath.constructor.type, 'rect');
+      assert.equal(objects[0].clipPath.constructor.name, 'Polygon');
+      assert.equal(objects[0].clipPath.clipPath.constructor.name, 'Rect');
       done();
     });
   });
@@ -813,7 +813,7 @@
                  '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].constructor.type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -827,7 +827,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].constructor.type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -844,7 +844,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].constructor.type, 'image');
+      assert.equal(objects[0].constructor.name, 'Image');
       done();
     });
   });

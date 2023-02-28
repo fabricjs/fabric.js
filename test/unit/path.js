@@ -2,7 +2,7 @@
 
   var REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
-    type:                     'path',
+    type:                     'Path',
     originX:                  'left',
     originY:                  'top',
     left:                     100,
@@ -76,7 +76,7 @@
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
 
-      assert.equal(path.constructor.type, 'path');
+      assert.equal(path.constructor.name, 'Path');
 
       var error;
       try {

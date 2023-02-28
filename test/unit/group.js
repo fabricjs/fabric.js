@@ -71,9 +71,9 @@
 
     assert.equal(group.size(), 2, 'should have length=2 initially');
 
-    assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
-    assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
-    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are');
+    assert.deepEqual(group.getObjects('Rect'), [rect], 'should return rect only');
+    assert.deepEqual(group.getObjects('Circle'), [circle], 'should return circle only');
+    assert.deepEqual(group.getObjects('Circle', 'Rect'), [rect, circle], 'should return circle and rect, in the same order they are');
   });
 
   QUnit.test('add', function(assert) {
@@ -174,7 +174,7 @@
 
     var expectedObject = {
       version: fabric.version,
-      type:                     'group',
+      type:                     'Group',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -223,7 +223,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -231,7 +231,7 @@
       strokeWidth: 0,
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -240,7 +240,7 @@
     }];
     var expectedObject = {
       version: fabric.version,
-      type: 'group',
+      type: 'Group',
       left: 50,
       top: 100,
       width: 80,

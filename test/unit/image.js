@@ -33,7 +33,7 @@
 
   var REFERENCE_IMG_OBJECT = {
     version:                  fabric.version,
-    type:                     'image',
+    type:                     'Image',
     originX:                  'left',
     originY:                  'top',
     left:                     0,
@@ -118,7 +118,7 @@
       assert.ok(image instanceof fabric.Image);
       assert.ok(image instanceof fabric.Object);
 
-      assert.equal(image.constructor.type, 'image');
+      assert.equal(image.constructor.name, 'Image');
 
       done();
     });

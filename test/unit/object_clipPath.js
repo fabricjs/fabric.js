@@ -17,7 +17,7 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'Object',
       originX:                  'left',
       originY:                  'top',
       left:                     0,

@@ -143,24 +143,21 @@
 
   QUnit.test('getObjects', function (assert) {
     class A extends fabric.Object {
-      static type = 'a'
     }
     class B extends fabric.Object {
-      static type = 'b'
     }
     class C extends fabric.Object {
-      static type = 'c'
     }
     var obj = new A(), obj2 = new B(), obj3 = new C();
     collection.add(obj2, obj, obj3);
     assert.ok(typeof collection.getObjects === 'function', 'has getObjects method');
     var returned = collection.getObjects();
     assert.notEqual(returned, collection._objects, 'does not return a reference to _objects');
-    returned = collection.getObjects('a');
+    returned = collection.getObjects('A');
     assert.notEqual(returned, collection._objects, 'return a new array');
     assert.equal(returned.indexOf(obj2), -1, 'object of type B is not included');
     assert.equal(returned.indexOf(obj), 0, 'object of type A is included');
-    returned = collection.getObjects('a', 'b');
+    returned = collection.getObjects('A', 'B');
     assert.ok(returned.indexOf(obj2) > -1, 'object of type B is not included');
     assert.ok(returned.indexOf(obj) > -1, 'object of type A is included');
     assert.ok(returned.indexOf(obj3) === -1, 'object of type c is included');

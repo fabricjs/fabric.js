@@ -13,7 +13,7 @@
   });
   var TEXTBOX_OBJECT = {
     version: fabric.version,
-    type: 'textbox',
+    type: 'Textbox',
     originX: 'left',
     originY: 'top',
     left: 0,
@@ -96,7 +96,7 @@
   QUnit.test('initial properties', function(assert) {
     var textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
-    assert.equal(textbox.constructor.type, 'textbox');
+    assert.equal(textbox.constructor.name, 'Textbox');
     assert.deepEqual(textbox.styles, { });
     assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });
