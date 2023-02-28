@@ -2,24 +2,9 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './noise.shaders';
 
 export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uStepH;
-    uniform float uNoise;
-    uniform float uSeed;
-    varying vec2 vTexCoord;
-    float rand(vec2 co, float seed, float vScale) {
-      return fract(sin(dot(co.xy * vScale ,vec2(12.9898 , 78.233))) * 43758.5453 * (seed + 0.01) / 2.0);
-    }
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      color.rgb += (0.5 - rand(vTexCoord, uSeed, 0.1 / uStepH)) * uNoise;
-      gl_FragColor = color;
-    }
-    `,
   mainParameter: 'noise',
   noise: 0,
 };
@@ -43,6 +28,10 @@ export class Noise extends BaseFilter {
   declare noise: number;
 
   static defaults = noiseDefaultValues;
+
+  getFragmentSource() {
+    return fragmentSource;
+  }
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
