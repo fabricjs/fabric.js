@@ -3,7 +3,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentShader } from './removeColor.shaders';
+import { fragmentShader } from './shaders/removeColor.shaders';
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
     color: '#FFFFFF',

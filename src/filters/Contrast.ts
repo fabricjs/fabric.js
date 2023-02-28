@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './constrast.shaders';
+import { fragmentSource } from './shaders/constrast.shaders';
 export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
   contrast: 0,
   mainParameter: 'contrast',

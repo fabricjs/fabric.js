@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './gamma.shaders';
+import { fragmentSource } from './shaders/gamma.shaders';
 export type GammaInput = [number, number, number];
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {

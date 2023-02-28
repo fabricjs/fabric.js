@@ -1,4 +1,4 @@
-import { TBlendImageMode } from './BlendImage';
+import { TBlendImageMode } from '../BlendImage';
 
 export const fragmentSource: Record<TBlendImageMode, string> = {
   multiply: `

@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './convolute.shaders';
+import { fragmentSource } from './shaders/convolute.shaders';
 
 export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
   opaque: false,

@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './grayscale.shaders';
+import { fragmentSource } from './shaders/grayscale.shaders';
 
 export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
 

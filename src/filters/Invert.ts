@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './invert.shaders';
+import { fragmentSource } from './shaders/invert.shaders';
 
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
   alpha: false,

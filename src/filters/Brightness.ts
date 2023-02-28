@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './brightness.shaders';
+import { fragmentSource } from './shaders/brightness.shaders';
 export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
   brightness: 0,
   mainParameter: 'brightness',

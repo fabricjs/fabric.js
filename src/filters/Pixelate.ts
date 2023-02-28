@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './pixelate.shaders';
+import { fragmentSource } from './shaders/pixelate.shaders';
 
 export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
   blocksize: 4,
