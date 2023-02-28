@@ -213,8 +213,8 @@ export class StaticCanvas<
    * Describe canvas element extension over design
    * properties are tl,tr,bl,br.
    * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
+   * if canvas is viewportTransformed those points indicate the extension
+   * of canvas element in plain untransformed coordinates
    * The coordinates get updated with @method calcViewportBoundaries.
    */
   declare vptCoords: TCornerPoint;
