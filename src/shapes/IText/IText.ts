@@ -668,3 +668,5 @@ export class IText<
 }
 
 classRegistry.setClass(IText);
+// legacy
+classRegistry.setClass(IText, 'i-text');

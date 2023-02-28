@@ -206,4 +206,4 @@ export class Pattern {
   }
 }
 
-classRegistry.setClass(Pattern, 'pattern');
+classRegistry.setClass(Pattern);

@@ -240,9 +240,7 @@ export class Polyline extends FabricObject {
       );
     }
     return [
-      `<${
-        (this.constructor as typeof FabricObject).type as 'polyline' | 'polygon'
-      } `,
+      `<${this.constructor.name.toLowerCase() as 'polyline' | 'polygon'} `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];

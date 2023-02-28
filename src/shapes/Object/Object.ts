@@ -500,7 +500,10 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: (this.constructor as typeof FabricObject).type,
+        type:
+          this.constructor.name === 'FabricObject'
+            ? 'Object'
+            : this.constructor.name,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -597,7 +600,11 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {String}
    */
   toString() {
-    return `#<${capitalize((this.constructor as typeof FabricObject).type)}>`;
+    return `#<${
+      this.constructor.name === 'FabricObject'
+        ? 'Object'
+        : this.constructor.name
+    }>`;
   }
 
   /**
@@ -1440,7 +1447,11 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes((this.constructor as typeof FabricObject).type);
+    return types.includes(
+      this.constructor.name === 'FabricObject'
+        ? 'Object'
+        : this.constructor.name
+    );
   }
 
   /**
@@ -1558,7 +1569,5 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 }
 
-// @ts-expect-error
-FabricObject.prototype.type = 'object';
-
-classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'Object');
+classRegistry.setClass(FabricObject, 'object');
