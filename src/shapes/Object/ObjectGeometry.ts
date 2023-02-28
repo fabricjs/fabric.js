@@ -231,12 +231,7 @@ export class ObjectGeometry<
    */
   getCoords(absolute = false, calculate = false): Point[] {
     const { tl, tr, br, bl } = this._getCoords(absolute, calculate);
-    const coords = [tl, tr, br, bl];
-    if (this.group) {
-      const t = this.group.calcTransformMatrix();
-      return coords.map((p) => transformPoint(p, t));
-    }
-    return coords;
+    return [tl, tr, br, bl];
   }
 
   /**
@@ -667,7 +662,13 @@ export class ObjectGeometry<
     const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
       center = this.getRelativeCenterPoint(),
       translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+      positionMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+      finalMatrix = this.group
+        ? multiplyTransformMatrices(
+            this.group.calcTransformMatrix(),
+            positionMatrix
+          )
+        : positionMatrix,
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;
