@@ -1002,7 +1002,8 @@ export class SelectableCanvas<
   /**
    * Checks point is inside the object.
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas top left physical corner used to search per pixel target.
+   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas top left physical viewport corner
+   *  (used to measure the position of the mouse pointer on canvas) used to search per pixel target.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
@@ -1013,7 +1014,10 @@ export class SelectableCanvas<
       obj.evented &&
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(globalPointer)
+      obj.containsPoint(
+        sendPointToPlane(globalPointer, undefined, this.viewportTransform),
+        true
+      )
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
