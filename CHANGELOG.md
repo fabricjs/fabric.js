@@ -2,7 +2,7 @@
 
 ## [next]
 
-- BREAKING: static object/filter `type` [#87104](https://github.com/fabricjs/fabric.js/pull/8714)
+- BREAKING: remove object `type` [#8714](https://github.com/fabricjs/fabric.js/pull/8714)
 - chore(TS): remove default values from Objects prototypes, ( filters in a followup ) [#8719](https://github.com/fabricjs/fabric.js/issues/8719)
 - fix(Intersection): bug causing selection edge case [#8735](https://github.com/fabricjs/fabric.js/pull/8735)
 - chore(TS): class interface for options/brevity [#8674](https://github.com/fabricjs/fabric.js/issues/8674)
