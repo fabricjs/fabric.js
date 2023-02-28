@@ -273,7 +273,6 @@ export class ObjectGeometry<
       this.getCoords(absolute, calculate),
       other.getCoords(absolute, calculate)
     );
-
     return (
       intersection.status === 'Intersection' ||
       intersection.status === 'Coincident' ||
@@ -294,7 +293,7 @@ export class ObjectGeometry<
     absolute = false,
     calculate = false
   ): boolean {
-    return !other.containsPoints(
+    return other.containsPoints(
       this.getCoords(absolute, calculate),
       absolute,
       calculate
