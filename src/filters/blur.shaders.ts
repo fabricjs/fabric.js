@@ -1,4 +1,4 @@
-  export const fragmentSource = `
+export const fragmentSource = `
     precision highp float;
     uniform sampler2D uTexture;
     uniform vec2 uDelta;

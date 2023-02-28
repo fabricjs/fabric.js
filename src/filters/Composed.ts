@@ -1,6 +1,4 @@
-import {
-  BaseFilter,
-} from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -17,7 +15,7 @@ export class Composed extends BaseFilter {
   constructor({
     subFilters = [],
     ...options
-  }: { subFilters?: BaseFilter[] } & Record<string, any> = { }) {
+  }: { subFilters?: BaseFilter[] } & Record<string, any> = {}) {
     super(options);
     this.subFilters = subFilters;
   }

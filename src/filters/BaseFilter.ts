@@ -56,10 +56,7 @@ export class BaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({
-    type,
-    ...options
-  }: Record<string, any> = {}) {
+  constructor({ type, ...options }: Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
@@ -167,7 +164,7 @@ export class BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {};
-  };
+  }
 
   /**
    * Send attribute data from this filter to its shader program on the GPU.
@@ -273,7 +270,7 @@ export class BaseFilter {
     }
   }
 
-  applyTo2d(options: T2DPipelineState): void { }
+  applyTo2d(options: T2DPipelineState): void {}
 
   getCacheKey() {
     return this.type;
@@ -363,9 +360,7 @@ export class BaseFilter {
   sendUniformData(
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
-  ): void {
-
-  }
+  ): void {}
 
   /**
    * If needed by a 2d filter, this functions can create an helper canvas to be used
@@ -401,4 +396,3 @@ export class BaseFilter {
     return this.toObject();
   }
 }
-

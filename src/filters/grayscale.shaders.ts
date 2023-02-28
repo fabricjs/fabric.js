@@ -1,4 +1,4 @@
-import {TGrayscaleMode} from "./Grayscale";
+import { TGrayscaleMode } from './Grayscale';
 
 export const fragmentSource: Record<TGrayscaleMode, string> = {
   average: `

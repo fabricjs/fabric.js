@@ -38,10 +38,7 @@ export class Gamma extends BaseFilter {
     return fragmentSource;
   }
 
-  constructor({
-    gamma = [1, 1, 1],
-    ...options
-  }: { gamma?: GammaInput } = {}) {
+  constructor({ gamma = [1, 1, 1], ...options }: { gamma?: GammaInput } = {}) {
     super(options);
     this.gamma = gamma;
   }
