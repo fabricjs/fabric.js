@@ -186,3 +186,4 @@ export class ActiveSelection extends Group {
 }
 
 classRegistry.setClass(ActiveSelection);
+classRegistry.setClass(ActiveSelection, 'activeSelection');

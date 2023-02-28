@@ -34,4 +34,10 @@
     const resolvedSvg = classRegistry.getSVGClass('myCustomType');
     assert.notEqual(resolved, resolvedSvg, 'resolved different classes');
   });
+  QUnit.test('legacy resolution', function (assert) {
+    assert.equal(fabric.classRegistry.getClass('rect'), fabric.Rect, 'resolves class correctly');
+    assert.equal(fabric.classRegistry.getClass('i-text'), fabric.IText, 'resolves class correctly');
+    assert.equal(fabric.classRegistry.getClass('activeSelection'), fabric.ActiveSelection, 'resolves class correctly');
+    assert.equal(fabric.classRegistry.getClass('object'), fabric.Object, 'resolves class correctly');
+  });
 })()
