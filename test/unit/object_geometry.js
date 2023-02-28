@@ -116,9 +116,17 @@
     object2.set({ originX: 'center', originY: 'center' }).setCoords();
     object3.set({ originX: 'center', originY: 'center' }).setCoords();
 
-    assert.equal(object.intersectsWithObject(object1), true, 'object and object1 intersects');
-    assert.equal(object.intersectsWithObject(object2), true, 'object2 is contained in object');
-    assert.equal(object.intersectsWithObject(object3), false, 'object3 is outside of object (no intersection)');
+    function intersect(abs) {
+      assert.equal(object.intersectsWithObject(object1, abs), true, 'object and object1 intersects');
+      assert.equal(object.intersectsWithObject(object2, abs), true, 'object2 is contained in object');
+      assert.equal(object.intersectsWithObject(object3, abs), false, 'object3 is outside of object (no intersection)');
+    }
+
+    intersect();
+    intersect(true);
+    const group = new fabric.Group([object1, object2, object3], { subTargetCheck: true });
+    intersect();
+    intersect(true);  
   });
 
   QUnit.test('isContainedWithinObject', function(assert) {
