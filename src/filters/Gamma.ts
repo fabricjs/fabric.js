@@ -3,7 +3,6 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './gamma.shaders';
-import {BaseFilterOptions} from '../../dist/src/filters/BaseFilter';
 export type GammaInput = [number, number, number];
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
@@ -40,11 +39,11 @@ export class Gamma extends BaseFilter {
   }
 
   constructor({
-    gamma,
+    gamma = [1, 1, 1],
     ...options
-  }: Partial<BaseFilterOptions> & { gamma?: GammaInput } = {}) {
+  }: { gamma?: GammaInput } = {}) {
     super(options);
-    this.gamma = gamma || [1, 1, 1];
+    this.gamma = gamma;
   }
 
   /**

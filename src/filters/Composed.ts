@@ -4,12 +4,10 @@ import {
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import {BaseFilterOptions} from '../../dist/src/filters/BaseFilter';
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
-// @ts-expect-error
 export class Composed extends BaseFilter {
   /**
    * A non sparse array of filters to apply
@@ -19,7 +17,7 @@ export class Composed extends BaseFilter {
   constructor({
     subFilters = [],
     ...options
-  }: Partial<BaseFilterOptions & { subFilters: BaseFilter[] }> = {}) {
+  }: { subFilters?: BaseFilter[] } & Record<string, any> = { }) {
     super(options);
     this.subFilters = subFilters;
   }
