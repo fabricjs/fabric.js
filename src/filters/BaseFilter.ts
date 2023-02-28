@@ -401,7 +401,7 @@ export class BaseFilter {
     return this.toObject();
   }
 
-  static async fromObject({ type, ...options}: any) {
+  static async fromObject({ type, ...options }: any) {
     return new this(options);
   }
 }
