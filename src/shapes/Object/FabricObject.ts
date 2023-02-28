@@ -17,7 +17,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-classRegistry.setClass(FabricObject, 'Object');
+classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');
 
 export { cacheProperties } from './defaultValues';

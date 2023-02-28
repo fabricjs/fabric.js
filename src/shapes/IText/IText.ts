@@ -178,6 +178,10 @@ export class IText<
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
+  get type() {
+    return 'i-text';
+  }
+
   /**
 
    * Constructor

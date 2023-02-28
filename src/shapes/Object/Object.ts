@@ -14,7 +14,6 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
@@ -275,10 +274,27 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
+   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
+   * Will be removed in fabric 7 or 8.
+   * The setter exists because is very hard to catch all the ways in which a type value
+   * could be set in the instance
+   * @TODO add sustainable warning message
+   * @type string
+   * @deprecated
+   */
+  get type() {
+    return this.constructor.name.toLowerCase();
+  }
+
+  set type(value) {
+    console.warn('Setting type has no effect', value)
+  }
+
+  /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Partial<ObjectProps>) {
+  constructor(options: Partial<ObjectProps>) {
     super();
     Object.assign(
       this,
@@ -500,10 +516,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type:
-          this.constructor.name === 'FabricObject'
-            ? 'Object'
-            : this.constructor.name,
+        type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -600,11 +613,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {String}
    */
   toString() {
-    return `#<${
-      this.constructor.name === 'FabricObject'
-        ? 'Object'
-        : this.constructor.name
-    }>`;
+    return `#<${this.constructor.name}>`;
   }
 
   /**
@@ -1447,11 +1456,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(
-      this.constructor.name === 'FabricObject'
-        ? 'Object'
-        : this.constructor.name
-    );
+    return types.includes(this.constructor.name) || types.includes(this.type);
   }
 
   /**
@@ -1544,7 +1549,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, ...rest } = allOptions;
+          const { [extraParam]: arg0, type, ...rest } = allOptions;
           // @ts-ignore;
           return new this(arg0, rest);
         } else {
@@ -1569,5 +1574,5 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 }
 
-classRegistry.setClass(FabricObject, 'Object');
+classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');

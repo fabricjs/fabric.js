@@ -93,10 +93,14 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
 
     /**
      * Returns an array of children objects of this instance
+     * @param {...String} [types] When specified, only objects of these types are returned
      * @return {Array}
      */
-    getObjects() {
-      return [...this._objects];
+    getObjects(...types: string[]) {
+      if (types.length === 0) {
+        return [...this._objects];
+      }
+      return this._objects.filter((o) => types.includes(o.type));
     }
 
     /**
