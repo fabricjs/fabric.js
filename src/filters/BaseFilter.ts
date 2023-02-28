@@ -9,16 +9,7 @@ import type {
 } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { GLPrecision } from './GLProbes/GLProbe';
-
-const highPsourceCode = `precision ${GLPrecision.high} float`;
-
-const identityFragmentShader = `
-    ${highPsourceCode};
-    varying vec2 vTexCoord;
-    uniform sampler2D uTexture;
-    void main() {
-      gl_FragColor = texture2D(uTexture, vTexCoord);
-    }`;
+import { highPsourceCode, identityFragmentShader, vertexSource } from './shaders/baseFilter';
 
 export class BaseFilter {
   /**
@@ -36,13 +27,7 @@ export class BaseFilter {
    * Array of attributes to send with buffers. do not modify
    * @private
    */
-  vertexSource = `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    void main() {
-      vTexCoord = aPosition;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }`;
+  vertexSource = vertexSource;
 
   /**
    * Name of the parameter that can be changed in the filter.
