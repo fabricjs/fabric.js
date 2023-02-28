@@ -1,7 +1,15 @@
 import type { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/grayscale';
+
+export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
+
+export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
+  mode: 'average',
+  mainParameter: 'mode',
+};
 
 /**
  * Grayscale image filter class
@@ -10,8 +18,10 @@ import { classRegistry } from '../ClassRegistry';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
-  declare mode: 'average' | 'lightness' | 'luminosity';
+export class Grayscale extends BaseFilter {
+  declare mode: TGrayscaleMode;
+
+  static defaults = grayscaleDefaultValues;
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -47,7 +57,7 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getFragmentSource() {
-    return this.fragmentSource[this.mode];
+    return fragmentSource[this.mode];
   }
 
   /**
@@ -87,51 +97,6 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   isNeutralState() {
     return false;
   }
-
-  static async fromObject(object: any) {
-    return new Grayscale(object);
-  }
 }
 
-export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
-  type: 'Grayscale',
-  fragmentSource: {
-    average: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = texture2D(uTexture, vTexCoord);
-        float average = (color.r + color.b + color.g) / 3.0;
-        gl_FragColor = vec4(average, average, average, color.a);
-      }
-      `,
-    lightness: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform int uMode;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 col = texture2D(uTexture, vTexCoord);
-        float average = (max(max(col.r, col.g),col.b) + min(min(col.r, col.g),col.b)) / 2.0;
-        gl_FragColor = vec4(average, average, average, col.a);
-      }
-      `,
-    luminosity: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform int uMode;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 col = texture2D(uTexture, vTexCoord);
-        float average = 0.21 * col.r + 0.72 * col.g + 0.07 * col.b;
-        gl_FragColor = vec4(average, average, average, col.a);
-      }
-      `,
-  },
-  mode: 'average',
-  mainParameter: 'mode',
-};
-
-Object.assign(Grayscale.prototype, grayscaleDefaultValues);
 classRegistry.setClass(Grayscale);
