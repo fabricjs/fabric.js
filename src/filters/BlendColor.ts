@@ -114,7 +114,6 @@ export class BlendColor extends BaseFilter {
           data[i + 1] = g + tg;
           data[i + 2] = b + tb;
           break;
-        case 'diff':
         case 'difference':
           data[i] = Math.abs(r - tr);
           data[i + 1] = Math.abs(g - tg);
