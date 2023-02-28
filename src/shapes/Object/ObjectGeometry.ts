@@ -11,6 +11,8 @@ import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { sin } from '../../util/misc/sin';
 import {
   calcRotateMatrix,
   composeMatrix,
@@ -19,8 +21,6 @@ import {
   qrDecompose,
   transformPoint,
 } from '../../util/misc/matrix';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
@@ -55,7 +55,7 @@ export class ObjectGeometry<
    * The coordinates depends from this properties: width, height, scaleX, scaleY
    * skewX, skewY, angle, strokeWidth, top, left.
    * Those coordinates are useful to understand where an object is. They get updated
-   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
+   * with oCoords in interactive cases but they do not need to be updated when zoom or panning change.
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
    */
@@ -200,8 +200,7 @@ export class ObjectGeometry<
   }
 
   /**
-   * return correct set of coordinates for intersection
-   * this will return either aCoords or lineCoords.
+   * return coordinates for intersection
    * @param {boolean} absolute will return aCoords if true or lineCoords
    * @param {boolean} calculate will calculate the coords or use the one
    * that are attached to the object instance
@@ -209,34 +208,30 @@ export class ObjectGeometry<
    */
   _getCoords(absolute = false, calculate = false): TCornerPoint {
     if (calculate) {
-      return absolute ? this.calcACoords() : this.calcLineCoords();
+      return absolute
+        ? this.calcACoords()
+        : this.calcLineCoords(this.calcACoords());
     }
     // swapped this double if in place of setCoords();
     if (!this.aCoords) {
       this.aCoords = this.calcACoords();
-    }
-    if (!this.lineCoords) {
       this.lineCoords = this.calcLineCoords();
     }
+
     return absolute ? this.aCoords : this.lineCoords;
   }
 
   /**
-   * return correct set of coordinates for intersection
-   * this will return either aCoords or lineCoords.
+   * return coordinates for intersection
    * The coords are returned in an array.
    * @param {boolean} absolute will return aCoords if true or lineCoords
-   * @param {boolean} calculate will return aCoords if true or lineCoords
+   * @param {boolean} calculate will calculate the coords or use the one
+   * that are attached to the object instance
    * @return {Array} [tl, tr, br, bl] of points
    */
   getCoords(absolute = false, calculate = false): Point[] {
     const { tl, tr, br, bl } = this._getCoords(absolute, calculate);
-    const coords = [tl, tr, br, bl];
-    if (this.group) {
-      const t = this.group.calcTransformMatrix();
-      return coords.map((p) => transformPoint(p, t));
-    }
-    return coords;
+    return [tl, tr, br, bl];
   }
 
   /**
@@ -299,15 +294,11 @@ export class ObjectGeometry<
     absolute = false,
     calculate = false
   ): boolean {
-    const points = this.getCoords(absolute, calculate),
-      otherCoords = absolute ? other.aCoords : other.lineCoords,
-      lines = other._getImageLines(otherCoords);
-    for (let i = 0; i < 4; i++) {
-      if (!other.containsPoint(points[i], lines)) {
-        return false;
-      }
-    }
-    return true;
+    return other.containsPoints(
+      this.getCoords(absolute, calculate),
+      absolute,
+      calculate
+    );
   }
 
   /**
@@ -343,23 +334,31 @@ export class ObjectGeometry<
 
   /**
    * Checks if point is inside the object
-   * @param {Point} point Point to check against
-   * @param {Object} [lines] object returned from @method _getImageLines
+   * @param {Point} points Point to check against
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(
-    point: Point,
-    lines?: TBBoxLines,
-    absolute = false,
-    calculate = false
-  ): boolean {
-    const coords = this._getCoords(absolute, calculate),
-      imageLines = lines || this._getImageLines(coords),
-      xPoints = this._findCrossPoints(point, imageLines);
-    // if xPoints is odd then point is inside the object
-    return xPoints !== 0 && xPoints % 2 === 1;
+  containsPoint(point: Point, absolute = false, calculate = false) {
+    return this.containsPoints([point], absolute, calculate);
+  }
+
+  /**
+   * Checks if point is inside the object
+   * @param {Point[]} points Points to check against
+   * @param {Boolean} [absolute] use coordinates without viewportTransform
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
+   * @return {Boolean} true if points are inside the object
+   */
+  containsPoints(points: Point[], absolute = false, calculate = false) {
+    const imageLines = this._getImageLines(
+      this._getCoords(absolute, calculate)
+    );
+    return points.every((point) => {
+      const xPoints = this._findCrossPoints(point, imageLines);
+      // if xPoints is odd then point is inside the object
+      return xPoints !== 0 && xPoints % 2 === 1;
+    });
   }
 
   /**
@@ -409,7 +408,7 @@ export class ObjectGeometry<
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, undefined, true, calculate);
+    return this.containsPoint(centerPoint, true, calculate);
   }
 
   /**
@@ -438,9 +437,9 @@ export class ObjectGeometry<
   /**
    * Method that returns an object with the object edges in it, given the coordinates of the corners
    * @private
-   * @param {Object} lineCoords or aCoords Coordinates of the object corners
+   * @param {TCornerPoint} Coordinates of the object corners
    */
-  _getImageLines({ tl, tr, bl, br }: TCornerPoint): TBBoxLines {
+  private _getImageLines({ tl, tr, bl, br }: TCornerPoint): TBBoxLines {
     const lines = {
       topline: {
         o: tl,
@@ -529,7 +528,7 @@ export class ObjectGeometry<
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
    * the box is intended as aligned to axis of canvas.
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .lineCoords / .aCoords
+   * @param {Boolean} [calculate] use coordinates of current position instead cached ones
    * @return {Object} Object with left, top, width, height properties
    */
   getBoundingRect(absolute?: boolean, calculate?: boolean): TBBox {
@@ -596,52 +595,6 @@ export class ObjectGeometry<
   }
 
   /**
-   * Returns the object angle relative to canvas counting also the group property
-   * @returns {TDegree}
-   */
-  getTotalAngle(): TDegree {
-    return this.group
-      ? qrDecompose(this.calcTransformMatrix()).angle
-      : this.angle;
-  }
-
-  /**
-   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
-   * used for bounding box interactivity with the mouse
-   * @returns {TCornerPoint}
-   */
-  calcLineCoords(): TCornerPoint {
-    const vpt = this.getViewportTransform(),
-      padding = this.padding,
-      angle = degreesToRadians(this.getTotalAngle()),
-      cosP = cos(angle) * padding,
-      sinP = sin(angle) * padding,
-      cosPSinP = cosP + sinP,
-      cosPMinusSinP = cosP - sinP,
-      { tl, tr, bl, br } = this.calcACoords();
-
-    const lineCoords: TCornerPoint = {
-      tl: transformPoint(tl, vpt),
-      tr: transformPoint(tr, vpt),
-      bl: transformPoint(bl, vpt),
-      br: transformPoint(br, vpt),
-    };
-
-    if (padding) {
-      lineCoords.tl.x -= cosPMinusSinP;
-      lineCoords.tl.y -= cosPSinP;
-      lineCoords.tr.x += cosPSinP;
-      lineCoords.tr.y -= cosPMinusSinP;
-      lineCoords.bl.x -= cosPSinP;
-      lineCoords.bl.y += cosPMinusSinP;
-      lineCoords.br.x += cosPMinusSinP;
-      lineCoords.br.y += cosPSinP;
-    }
-
-    return lineCoords;
-  }
-
-  /**
    * Retrieves viewportTransform from Object's canvas if possible
    * @method getViewportTransform
    * @memberOf FabricObject.prototype
@@ -649,6 +602,16 @@ export class ObjectGeometry<
    */
   getViewportTransform(): TMat2D {
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
+  }
+
+  /**
+   * Returns the object angle relative to canvas counting also the group property
+   * @returns {TDegree}
+   */
+  getTotalAngle(): TDegree {
+    return this.group
+      ? qrDecompose(this.calcTransformMatrix()).angle
+      : this.angle;
   }
 
   /**
@@ -660,7 +623,13 @@ export class ObjectGeometry<
     const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
       center = this.getRelativeCenterPoint(),
       translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+      positionMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+      finalMatrix = this.group
+        ? multiplyTransformMatrices(
+            positionMatrix,
+            this.group.calcTransformMatrix()
+          )
+        : positionMatrix,
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;
@@ -674,18 +643,47 @@ export class ObjectGeometry<
   }
 
   /**
+   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
+   * used for bounding box interactivity with the mouse
+   * @returns {TCornerPoint}
+   */
+  private calcLineCoords(aCoords = this.aCoords): TCornerPoint {
+    const vpt = this.getViewportTransform(),
+      padding = this.padding,
+      angle = degreesToRadians(this.getTotalAngle()),
+      cosP = cos(angle) * padding,
+      sinP = sin(angle) * padding,
+      cosPSinP = cosP + sinP,
+      cosPMinusSinP = cosP - sinP,
+      { tl, tr, bl, br } = aCoords;
+    const lineCoords: TCornerPoint = {
+      tl: transformPoint(tl, vpt),
+      tr: transformPoint(tr, vpt),
+      bl: transformPoint(bl, vpt),
+      br: transformPoint(br, vpt),
+    };
+    if (padding) {
+      lineCoords.tl.x -= cosPMinusSinP;
+      lineCoords.tl.y -= cosPSinP;
+      lineCoords.tr.x += cosPSinP;
+      lineCoords.tr.y -= cosPMinusSinP;
+      lineCoords.bl.x -= cosPSinP;
+      lineCoords.bl.y += cosPMinusSinP;
+      lineCoords.br.x += cosPMinusSinP;
+      lineCoords.br.y += cosPSinP;
+    }
+    return lineCoords;
+  }
+
+  /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   * @param {Boolean} [skipCorners] skip calculation of aCoord, lineCoords.
+   * @param {Boolean} [skipCorners] skip calculation of coords.
    * @return {void}
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
-    // in case we are in a group, for how the inner group target check works,
-    // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
-    this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
+    this.lineCoords = this.calcLineCoords();
   }
 
   transformMatrixKey(skipGroup = false): string {
