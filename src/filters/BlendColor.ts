@@ -49,6 +49,12 @@ export class BlendColor extends BaseFilter {
    **/
   declare color: string;
 
+  /**
+   * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
+   * darken, lighten, overlay, exclusion, tint.
+   * @type String
+   * @default
+   **/
   declare mode: TBlendMode;
 
   /**

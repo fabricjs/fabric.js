@@ -272,6 +272,11 @@ export class BaseFilter {
 
   applyTo2d(options: T2DPipelineState): void {}
 
+  /**
+   * Returns a string that represent the current selected shader code for the filter.
+   * Used to force recompilation when parameters change or to retrieve the shader from cache
+   * @type string
+   **/
   getCacheKey() {
     return this.type;
   }
