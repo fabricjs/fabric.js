@@ -32,7 +32,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Brightness();
 
-    assert.equal(filter.constructor.name, 'Brightness');
+    assert.equal(filter.type, 'Brightness');
     assert.equal(filter.brightness, 0);
 
     var filter2 = new fabric.filters.Brightness({brightness: 0.12});
@@ -112,7 +112,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Composed();
 
-    assert.equal(filter.constructor.name, 'Composed');
+    assert.equal(filter.type, 'Composed');
 
   });
 
@@ -204,7 +204,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.ColorMatrix();
 
-    assert.equal(filter.constructor.name, 'ColorMatrix');
+    assert.equal(filter.type, 'ColorMatrix');
     assert.deepEqual(filter.matrix, [
       1, 0, 0, 0, 0,
       0, 1, 0, 0, 0,
@@ -320,7 +320,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.HueRotation();
 
-    assert.equal(filter.constructor.name, 'HueRotation');
+    assert.equal(filter.type, 'HueRotation');
     assert.equal(filter.rotation, 0, 'default rotation is 0');
 
     var filter2 = new fabric.filters.HueRotation({ rotation: 0.5 });
@@ -401,7 +401,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Contrast();
 
-    assert.equal(filter.constructor.name, 'Contrast');
+    assert.equal(filter.type, 'Contrast');
     assert.equal(filter.contrast, 0);
 
     var filter2 = new fabric.filters.Contrast({contrast: 0.12});
@@ -481,7 +481,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Saturation();
 
-    assert.equal(filter.constructor.name, 'Saturation');
+    assert.equal(filter.type, 'Saturation');
     assert.equal(filter.saturation, 0);
 
     var filter2 = new fabric.filters.Saturation({saturation: 0.12});
@@ -561,7 +561,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Gamma();
 
-    assert.equal(filter.constructor.name, 'Gamma');
+    assert.equal(filter.type, 'Gamma');
     assert.deepEqual(filter.gamma, [1, 1, 1]);
 
     var filter2 = new fabric.filters.Gamma({gamma: [0.1, 0.5, 1.3]});
@@ -641,7 +641,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Convolute();
 
-    assert.equal(filter.constructor.name, 'Convolute');
+    assert.equal(filter.type, 'Convolute');
     assert.equal(filter.opaque, false);
     assert.deepEqual(filter.matrix, [0,0,0,0,1,0,0,0,0]);
 
@@ -699,7 +699,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Grayscale();
 
-    assert.equal(filter.constructor.name, 'Grayscale');
+    assert.equal(filter.type, 'Grayscale');
   });
 
   QUnit.test('applyTo2d', function(assert) {
@@ -783,7 +783,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Invert();
 
-    assert.equal(filter.constructor.name, 'Invert');
+    assert.equal(filter.type, 'Invert');
   });
 
   QUnit.test('applyTo2d', function(assert) {
@@ -848,7 +848,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Noise();
 
-    assert.equal(filter.constructor.name, 'Noise');
+    assert.equal(filter.type, 'Noise');
     assert.equal(filter.noise, 0);
 
     var filter2 = new fabric.filters.Noise({noise: 200});
@@ -916,7 +916,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Pixelate();
 
-    assert.equal(filter.constructor.name, 'Pixelate');
+    assert.equal(filter.type, 'Pixelate');
     assert.equal(filter.blocksize, 4);
 
     var filter2 = new fabric.filters.Pixelate({blocksize: 8});
@@ -986,7 +986,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.RemoveColor();
 
-    assert.equal(filter.constructor.name, 'RemoveColor');
+    assert.equal(filter.type, 'RemoveColor');
     assert.equal(filter.distance, 0.02);
     assert.equal(filter.color, '#FFFFFF');
 
@@ -1056,7 +1056,7 @@
 
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Sepia();
-    assert.equal(filter.constructor.name, 'Sepia');
+    assert.equal(filter.type, 'Sepia');
   });
 
   QUnit.test('applyTo2d', function(assert) {
@@ -1108,7 +1108,7 @@
   QUnit.test('properties', function(assert) {
     var filter = new fabric.filters.Resize();
 
-    assert.equal(filter.constructor.name, 'Resize');
+    assert.equal(filter.type, 'Resize');
 
     assert.equal(filter.resizeType, 'hermite');
     assert.equal(filter.lanczosLobes, 3);
@@ -1183,7 +1183,7 @@
     });
     assert.ok(filter instanceof fabric.filters.Vibrance, 'should inherit from fabric.filters.Vibrance');
     assert.equal(filter.vibrance, 0.6, 'parameters are initialized');
-    assert.equal(filter.constructor.name, 'Vibrance');
+    assert.equal(filter.type, 'Vibrance');
   });
 
   QUnit.test('applyTo2d', function(assert) {
@@ -1236,7 +1236,7 @@
     });
     assert.ok(filter instanceof fabric.filters.BlendColor, 'should inherit from fabric.filters.Vibrance');
     assert.equal(filter.color, 'red', 'parameters are initialized');
-    assert.equal(filter.constructor.name, 'BlendColor');
+    assert.equal(filter.type, 'BlendColor');
   });
 
   QUnit.test('applyTo2d', function(assert) {

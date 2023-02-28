@@ -55,7 +55,7 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   declare matrix: number[];
 
   getCacheKey() {
-    return `${this.constructor.name}_${Math.sqrt(this.matrix.length)}_${
+    return `${this.type}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
     }`;
   }
@@ -178,6 +178,7 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
+  type: 'Convolute',
   opaque: false,
   matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
   fragmentSource: {

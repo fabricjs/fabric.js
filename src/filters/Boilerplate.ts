@@ -72,6 +72,7 @@ export class MyFilter extends BaseFilter {
 }
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
+  type: 'MyFilter',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

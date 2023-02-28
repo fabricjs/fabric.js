@@ -43,7 +43,7 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getCacheKey() {
-    return `${this.constructor.name}_${this.mode}`;
+    return `${this.type}_${this.mode}`;
   }
 
   getFragmentSource() {
@@ -94,6 +94,7 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
+  type: 'Grayscale',
   fragmentSource: {
     average: `
       precision highp float;

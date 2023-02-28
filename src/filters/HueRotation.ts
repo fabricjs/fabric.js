@@ -14,6 +14,7 @@ import { classRegistry } from '../ClassRegistry';
  * object.filters.push(filter);
  * object.applyFilters();
  */
+// @ts-expect-error fromObject
 export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.
@@ -56,6 +57,7 @@ export class HueRotation extends ColorMatrix {
 
 export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
   {
+    type: 'HueRotation',
     rotation: 0,
     mainParameter: 'rotation',
   };

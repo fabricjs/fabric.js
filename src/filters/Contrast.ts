@@ -74,6 +74,7 @@ export class Contrast extends BaseFilter {
 }
 
 export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
+  type: 'Contrast',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

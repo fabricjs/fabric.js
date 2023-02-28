@@ -128,12 +128,13 @@ export class ColorMatrix extends BaseFilter {
   }
 
   static async fromObject(object: any) {
-    return new this(object);
+    return new ColorMatrix(object);
   }
 }
 
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   {
+    type: 'ColorMatrix',
     fragmentSource: `
       precision highp float;
       uniform sampler2D uTexture;

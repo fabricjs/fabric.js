@@ -43,7 +43,7 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
   declare alpha: number;
 
   getCacheKey() {
-    return `${this.constructor.name}_${this.mode}`;
+    return `${this.type}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -178,7 +178,7 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    */
   toObject() {
     return {
-      type: this.constructor.name,
+      type: this.type,
       image: this.image && this.image.toObject(),
       mode: this.mode,
       alpha: this.alpha,

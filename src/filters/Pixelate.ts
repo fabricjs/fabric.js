@@ -86,6 +86,7 @@ export class Pixelate extends BaseFilter {
 }
 
 export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
+  type: 'Pixelate',
   blocksize: 4,
   mainParameter: 'blocksize',
   fragmentSource: `

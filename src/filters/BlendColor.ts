@@ -74,7 +74,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getCacheKey() {
-    return `${this.constructor.name}_${this.mode}`;
+    return `${this.type}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -202,7 +202,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    */
   toObject() {
     return {
-      type: this.constructor.name,
+      type: this.type,
       color: this.color,
       mode: this.mode,
       alpha: this.alpha,
@@ -215,6 +215,7 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
 }
 
 export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
+  type: 'BlendColor',
   color: '#F95C63',
   mode: 'multiply',
   alpha: 1,

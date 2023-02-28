@@ -169,6 +169,7 @@ export class Blur extends BaseFilter {
 }
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
+  type: 'Blur',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

@@ -73,6 +73,7 @@ export class Brightness extends BaseFilter {
 }
 
 export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
+  type: 'Brightness',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

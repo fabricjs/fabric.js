@@ -26,6 +26,13 @@ export interface AnyFilter
 
 export abstract class AbstractBaseFilter<T> {
   /**
+   * Filter type
+   * @param {String} type
+   * @default
+   */
+  declare type: string;
+
+  /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
@@ -45,10 +52,9 @@ export abstract class AbstractBaseFilter<T> {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({
-    type: _,
-    ...options
-  }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}) {
+  constructor(
+    options: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}
+  ) {
     Object.assign(this, options);
   }
 
@@ -84,9 +90,9 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Vertex shader compile error for ${
-          this.constructor.name
-        }: ${gl.getShaderInfoLog(vertexShader)}`
+        `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+          vertexShader
+        )}`
       );
     }
 
@@ -94,9 +100,9 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Fragment shader compile error for ${
-          this.constructor.name
-        }: ${gl.getShaderInfoLog(fragmentShader)}`
+        `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
+          fragmentShader
+        )}`
       );
     }
 
@@ -105,9 +111,8 @@ export abstract class AbstractBaseFilter<T> {
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new Error(
-        `Shader link error for ${this.constructor.name} ${gl.getProgramInfoLog(
-          program
-        )}`
+        // eslint-disable-next-line prefer-template
+        'Shader link error for "${this.type}" ' + gl.getProgramInfoLog(program)
       );
     }
 
@@ -257,7 +262,7 @@ export abstract class AbstractBaseFilter<T> {
   abstract applyTo2d(options: T2DPipelineState): void;
 
   getCacheKey() {
-    return this.constructor.name;
+    return this.type;
   }
 
   /**
@@ -366,7 +371,7 @@ export abstract class AbstractBaseFilter<T> {
   toObject() {
     const mainP = this.mainParameter;
     return {
-      type: this.constructor.name,
+      type: this.type,
       ...(mainP ? { [mainP]: this[mainP] } : {}),
     };
   }

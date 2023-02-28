@@ -17,7 +17,7 @@ import { classRegistry } from '../ClassRegistry';
 export class RemoveColor extends BaseFilter {
   /**
    * Color to remove, in any format understood by {@link Color}.
-   * @type string
+   * @param {String} type
    * @default
    */
   declare color: string;
@@ -125,6 +125,7 @@ export class RemoveColor extends BaseFilter {
 
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
+    type: 'RemoveColor',
     color: '#FFFFFF',
     fragmentSource: `
       precision highp float;

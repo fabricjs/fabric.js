@@ -78,6 +78,7 @@ export class Vibrance extends BaseFilter {
 }
 
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
+  type: 'Vibrance',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;

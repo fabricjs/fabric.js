@@ -103,6 +103,7 @@ export class Gamma extends BaseFilter {
 }
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
+  type: 'Gamma',
   fragmentSource: `
     precision highp float;
     uniform sampler2D uTexture;
