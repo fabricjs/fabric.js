@@ -55,7 +55,7 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
   declare matrix: number[];
 
   getCacheKey() {
-    return `${this.getType()}_${Math.sqrt(this.matrix.length)}_${
+    return `${this.constructor.name}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
     }`;
   }

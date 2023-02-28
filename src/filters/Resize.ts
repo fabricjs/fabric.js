@@ -80,7 +80,7 @@ export class Resize extends BaseFilter {
 
   getCacheKey(): string {
     const filterWindow = this.getFilterWindow();
-    return `${this.getType()}_${filterWindow}`;
+    return `${this.constructor.name}_${filterWindow}`;
   }
 
   getFragmentSource(): string {
@@ -510,7 +510,7 @@ export class Resize extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.getType(),
+      type: this.constructor.name,
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       resizeType: this.resizeType,

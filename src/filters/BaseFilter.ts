@@ -84,9 +84,9 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Vertex shader compile error for ${this.getType()}: ${gl.getShaderInfoLog(
-          vertexShader
-        )}`
+        `Vertex shader compile error for ${
+          this.constructor.name
+        }: ${gl.getShaderInfoLog(vertexShader)}`
       );
     }
 
@@ -94,9 +94,9 @@ export abstract class AbstractBaseFilter<T> {
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new Error(
-        `Fragment shader compile error for ${this.getType()}: ${gl.getShaderInfoLog(
-          fragmentShader
-        )}`
+        `Fragment shader compile error for ${
+          this.constructor.name
+        }: ${gl.getShaderInfoLog(fragmentShader)}`
       );
     }
 
@@ -105,7 +105,7 @@ export abstract class AbstractBaseFilter<T> {
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new Error(
-        `Shader link error for ${this.getType()} ${gl.getProgramInfoLog(
+        `Shader link error for ${this.constructor.name} ${gl.getProgramInfoLog(
           program
         )}`
       );
@@ -256,12 +256,8 @@ export abstract class AbstractBaseFilter<T> {
 
   abstract applyTo2d(options: T2DPipelineState): void;
 
-  protected getType() {
-    return this.constructor.name;
-  }
-
   getCacheKey() {
-    return this.getType();
+    return this.constructor.name;
   }
 
   /**
@@ -370,7 +366,7 @@ export abstract class AbstractBaseFilter<T> {
   toObject() {
     const mainP = this.mainParameter;
     return {
-      type: this.getType(),
+      type: this.constructor.name,
       ...(mainP ? { [mainP]: this[mainP] } : {}),
     };
   }

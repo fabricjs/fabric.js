@@ -43,7 +43,7 @@ export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
   }
 
   getCacheKey() {
-    return `${this.getType()}_${this.mode}`;
+    return `${this.constructor.name}_${this.mode}`;
   }
 
   getFragmentSource() {
