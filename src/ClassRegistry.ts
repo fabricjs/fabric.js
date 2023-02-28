@@ -10,6 +10,8 @@
  * different sources you will need to import all fabric because you may need all classes.
  */
 
+import { Constructor } from './typedefs';
+
 export const JSON = 'json';
 export const SVG = 'svg';
 
@@ -31,7 +33,13 @@ export class ClassRegistry {
   }
 
   setClass(classConstructor: any, classType?: string) {
-    this[JSON].set(classType ?? classConstructor.name, classConstructor);
+    if (classType) {
+      this[JSON].set(classType, classConstructor);
+    } else {
+      this[JSON].set(classConstructor.name, classConstructor);
+      // legacy
+      this[JSON].set(classConstructor.name.toLowerCase(), classConstructor);
+    }
   }
 
   getSVGClass(SVGTagName: string): any {
@@ -39,7 +47,13 @@ export class ClassRegistry {
   }
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {
-    this[SVG].set(SVGTagName ?? classConstructor.name, classConstructor);
+    if (SVGTagName) {
+      this[SVG].set(SVGTagName, classConstructor);
+    } else {
+      this[SVG].set(classConstructor.name, classConstructor);
+      // legacy
+      this[SVG].set(classConstructor.name.toLowerCase(), classConstructor);
+    }
   }
 }
 
