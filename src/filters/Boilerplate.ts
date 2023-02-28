@@ -90,5 +90,3 @@ export class MyFilter extends BaseFilter {
     return new MyFilter(object);
   }
 }
-
-Object.assign(MyFilter.prototype, myFilterDefaultValues);
