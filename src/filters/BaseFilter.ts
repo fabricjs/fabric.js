@@ -9,7 +9,11 @@ import type {
 } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { GLPrecision } from './GLProbes/GLProbe';
-import { highPsourceCode, identityFragmentShader, vertexSource } from './shaders/baseFilter';
+import {
+  highPsourceCode,
+  identityFragmentShader,
+  vertexSource,
+} from './shaders/baseFilter';
 
 export class BaseFilter {
   /**
