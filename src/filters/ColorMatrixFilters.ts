@@ -1,16 +1,7 @@
 import { ColorMatrix } from './ColorMatrix';
 import { classRegistry } from '../ClassRegistry';
-import { AbstractBaseFilterOptions } from './BaseFilter';
 
 class GeneratedColorMatrix extends ColorMatrix {
-  constructor({
-    matrix,
-    ...options
-  }: Partial<AbstractBaseFilterOptions<string>> & { matrix: number[] }) {
-    super({ ...options, mainParameter: undefined });
-    this.matrix = matrix;
-  }
-
   /**
    * Lock the matrix export for this kind of static, parameter less filters.
    */
