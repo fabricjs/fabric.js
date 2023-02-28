@@ -56,7 +56,7 @@ export class BaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ type, ...options }: Record<string, any> = {}) {
+  constructor({ ...options }: Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
@@ -399,5 +399,9 @@ export class BaseFilter {
   toJSON() {
     // delegate, not alias
     return this.toObject();
+  }
+
+  static async fromObject({ type, ...options}: any) {
+    return new this(options);
   }
 }

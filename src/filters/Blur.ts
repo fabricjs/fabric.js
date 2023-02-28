@@ -174,10 +174,6 @@ export class Blur extends BaseFilter {
     }
     return delta;
   }
-
-  static async fromObject(object: any) {
-    return new Blur(object);
-  }
 }
 
 classRegistry.setClass(Blur);

@@ -87,6 +87,8 @@ export class MyFilter extends BaseFilter {
   }
 
   static async fromObject(object: any) {
+    // or overide with custom logic if your filter needs to
+    // deserialize something that is not a plain value
     return new MyFilter(object);
   }
 }

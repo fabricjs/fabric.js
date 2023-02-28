@@ -179,10 +179,6 @@ export class Convolute extends BaseFilter {
       matrix: [...this.matrix],
     };
   }
-
-  static async fromObject(object: any) {
-    return new Convolute(object);
-  }
 }
 
 classRegistry.setClass(Convolute);

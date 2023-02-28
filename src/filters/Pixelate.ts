@@ -91,10 +91,6 @@ export class Pixelate extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
   }
-
-  static async fromObject(object: any) {
-    return new Pixelate(object);
-  }
 }
 
 classRegistry.setClass(Pixelate);

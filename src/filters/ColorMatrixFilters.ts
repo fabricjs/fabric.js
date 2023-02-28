@@ -15,10 +15,6 @@ export function createColorMatrixFilter(key: string, matrix: number[]) {
       mainParameter: undefined,
       matrix,
     };
-
-    static async fromObject(object: any) {
-      return new this(object);
-    }
   };
   classRegistry.setClass(newClass, key);
   return newClass;

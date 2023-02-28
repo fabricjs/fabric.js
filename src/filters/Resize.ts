@@ -533,10 +533,6 @@ export class Resize extends BaseFilter {
       lanczosLobes: this.lanczosLobes,
     };
   }
-
-  static async fromObject(object: any) {
-    return new Resize(object);
-  }
 }
 
 classRegistry.setClass(Resize);

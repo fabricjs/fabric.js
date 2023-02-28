@@ -78,10 +78,6 @@ export class Brightness extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uBrightness, this.brightness);
   }
-
-  static async fromObject(object: any) {
-    return new Brightness(object);
-  }
 }
 
 classRegistry.setClass(Brightness);

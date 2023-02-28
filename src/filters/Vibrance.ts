@@ -83,10 +83,6 @@ export class Vibrance extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }
-
-  static async fromObject(object: any) {
-    return new Vibrance(object);
-  }
 }
 
 classRegistry.setClass(Vibrance);

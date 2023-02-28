@@ -97,10 +97,6 @@ export class Grayscale extends BaseFilter {
   isNeutralState() {
     return false;
   }
-
-  static async fromObject(object: any) {
-    return new Grayscale(object);
-  }
 }
 
 classRegistry.setClass(Grayscale);

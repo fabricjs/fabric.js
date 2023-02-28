@@ -130,10 +130,6 @@ export class RemoveColor extends BaseFilter {
   toObject() {
     return { ...super.toObject(), color: this.color, distance: this.distance };
   }
-
-  static async fromObject(object: any) {
-    return new RemoveColor(object);
-  }
 }
 
 classRegistry.setClass(RemoveColor);

@@ -89,10 +89,6 @@ export class Noise extends BaseFilter {
   toObject() {
     return { ...super.toObject(), noise: this.noise };
   }
-
-  static async fromObject(object: any) {
-    return new Noise(object);
-  }
 }
 
 classRegistry.setClass(Noise);

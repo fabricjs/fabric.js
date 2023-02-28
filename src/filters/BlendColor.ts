@@ -212,10 +212,6 @@ export class BlendColor extends BaseFilter {
       alpha: this.alpha,
     };
   }
-
-  static async fromObject(object: any) {
-    return new BlendColor(object);
-  }
 }
 
 classRegistry.setClass(BlendColor);
