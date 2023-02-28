@@ -1,11 +1,10 @@
 import {
-  type AnyFilter,
   BaseFilter,
-  type BaseFilterOptions,
 } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import {BaseFilterOptions} from '../../dist/src/filters/BaseFilter';
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
@@ -15,12 +14,12 @@ export class Composed extends BaseFilter {
   /**
    * A non sparse array of filters to apply
    */
-  declare subFilters: AnyFilter[];
+  declare subFilters: BaseFilter[];
 
   constructor({
     subFilters = [],
     ...options
-  }: Partial<BaseFilterOptions & { subFilters: AnyFilter[] }> = {}) {
+  }: Partial<BaseFilterOptions & { subFilters: BaseFilter[] }> = {}) {
     super(options);
     this.subFilters = subFilters;
   }
@@ -69,7 +68,7 @@ export class Composed extends BaseFilter {
     options: { signal: AbortSignal }
   ) {
     return Promise.all(
-      ((object.subFilters || []) as AnyFilter[]).map((filter) =>
+      ((object.subFilters || []) as BaseFilter[]).map((filter) =>
         classRegistry.getClass(filter.type).fromObject(filter, options)
       )
     ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));

@@ -2,19 +2,8 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-
+import { fragmentSource } from './constrast.shaders';
 export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uContrast;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));
-      color.rgb = contrastF * (color.rgb - 0.5) + 0.5;
-      gl_FragColor = color;
-    }`,
   contrast: 0,
   mainParameter: 'contrast',
 };
@@ -38,6 +27,9 @@ export class Contrast extends BaseFilter {
 
   static defaults = contrastDefaultValues;
 
+  getFragmentSource() {
+    return fragmentSource;
+  }
   /**
    * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
    *

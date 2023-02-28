@@ -12,19 +12,15 @@ import { GLPrecision } from './GLProbes/GLProbe';
 
 const highPsourceCode = `precision ${GLPrecision.high} float`;
 
-export type AbstractBaseFilterOptions<T> = {
-  mainParameter: string;
-  vertexSource: string;
-  fragmentSource: T;
-};
+const identityFragmentShader = `
+    ${highPsourceCode};
+    varying vec2 vTexCoord;
+    uniform sampler2D uTexture;
+    void main() {
+      gl_FragColor = texture2D(uTexture, vTexCoord);
+    }`;
 
-export type BaseFilterOptions = AbstractBaseFilterOptions<string>;
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface AnyFilter
-  extends AbstractBaseFilter<string | Record<string, string>> {}
-
-export abstract class AbstractBaseFilter<T> {
+export class BaseFilter {
   /**
    * Filter type
    * @param {String} type
@@ -48,8 +44,6 @@ export abstract class AbstractBaseFilter<T> {
       gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
     }`;
 
-  declare fragmentSource: T;
-
   /**
    * Name of the parameter that can be changed in the filter.
    * Some filters have more than one parameter and there is no
@@ -65,15 +59,17 @@ export abstract class AbstractBaseFilter<T> {
   constructor({
     type,
     ...options
-  }: Partial<AbstractBaseFilterOptions<T>> & Record<string, any> = {}) {
+  }: Record<string, any> = {}) {
     Object.assign(
       this,
-      (this.constructor as typeof AbstractBaseFilter<T>).defaults,
+      (this.constructor as typeof BaseFilter).defaults,
       options
     );
   }
 
-  abstract getFragmentSource(): string;
+  protected getFragmentSource(): string {
+    return identityFragmentShader;
+  }
 
   /**
    * Compile this filter's shader program.
@@ -166,10 +162,12 @@ export abstract class AbstractBaseFilter<T> {
    * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
    * @returns {Object} A map of uniform names to uniform locations.
    */
-  abstract getUniformLocations(
+  getUniformLocations(
     gl: WebGLRenderingContext,
     program: WebGLProgram
-  ): TWebGLUniformLocationMap;
+  ): TWebGLUniformLocationMap {
+    return {};
+  };
 
   /**
    * Send attribute data from this filter to its shader program on the GPU.
@@ -235,7 +233,7 @@ export abstract class AbstractBaseFilter<T> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
     const main = this.mainParameter,
-      defaultValue = (this.constructor as typeof AbstractBaseFilter).defaults[
+      defaultValue = (this.constructor as typeof BaseFilter).defaults[
         main as string
       ];
     if (main) {
@@ -275,7 +273,7 @@ export abstract class AbstractBaseFilter<T> {
     }
   }
 
-  abstract applyTo2d(options: T2DPipelineState): void;
+  applyTo2d(options: T2DPipelineState): void { }
 
   getCacheKey() {
     return this.type;
@@ -362,10 +360,12 @@ export abstract class AbstractBaseFilter<T> {
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {Object} uniformLocations A map of shader uniform names to their locations.
    */
-  abstract sendUniformData(
+  sendUniformData(
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
-  ): void;
+  ): void {
+
+  }
 
   /**
    * If needed by a 2d filter, this functions can create an helper canvas to be used
@@ -402,16 +402,3 @@ export abstract class AbstractBaseFilter<T> {
   }
 }
 
-export abstract class BaseFilter extends AbstractBaseFilter<string> {
-  fragmentSource = `
-    ${highPsourceCode};
-    varying vec2 vTexCoord;
-    uniform sampler2D uTexture;
-    void main() {
-      gl_FragColor = texture2D(uTexture, vTexCoord);
-    }`;
-
-  getFragmentSource() {
-    return this.fragmentSource;
-  }
-}
