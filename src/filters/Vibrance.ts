@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/vibrance.shaders';
+import { fragmentSource } from './shaders/vibrance';
 
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
   vibrance: 0,

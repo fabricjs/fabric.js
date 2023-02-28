@@ -8,7 +8,7 @@ import type {
 } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/blur.shaders';
+import { fragmentSource } from './shaders/blur';
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
   blur: 0,

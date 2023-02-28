@@ -3,7 +3,7 @@ import { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { blendColorFragmentSource } from './shaders/blendColor.shaders';
+import { blendColorFragmentSource } from './shaders/blendColor';
 
 type TBlendMode =
   | 'multiply'

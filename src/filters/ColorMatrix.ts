@@ -2,7 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/colorMatrix.shader';
+import { fragmentSource } from './shaders/colorMatrix';
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   {
     matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],

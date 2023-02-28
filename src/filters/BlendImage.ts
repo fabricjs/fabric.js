@@ -9,7 +9,7 @@ import type {
 } from './typedefs';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/blendImage.shaders';
+import { fragmentSource } from './shaders/blendImage';
 
 export type TBlendImageMode = 'multiply' | 'mask';
 
