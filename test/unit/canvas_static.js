@@ -221,20 +221,6 @@
     assert.equal(canvas.getObjects().length, 0, 'should have a 0 length when empty');
   });
 
-  QUnit.test('getObjects with type', function(assert) {
-
-    var rect = new fabric.Rect({ width: 10, height: 20 });
-    var circle = new fabric.Circle({ radius: 30 });
-
-    canvas.add(rect, circle);
-
-    assert.equal(canvas.getObjects().length, 2, 'should have length=2 initially');
-
-    assert.deepEqual(canvas.getObjects('Rect'), [rect], 'should return rect only');
-    assert.deepEqual(canvas.getObjects('Circle'), [circle], 'should return circle only');
-    assert.deepEqual(canvas.getObjects('Circle', 'Rect'), [rect, circle], 'should return rect and circle');
-  });
-
   QUnit.test('getElement', function(assert) {
     assert.ok(typeof canvas.getElement === 'function', 'should respond to `getElement` method');
     assert.equal(canvas.getElement(), lowerCanvasEl, 'should return a proper element');

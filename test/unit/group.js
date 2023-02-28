@@ -63,19 +63,6 @@
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'should return deepEqual objects as those passed to constructor');
   });
 
-  QUnit.test('getObjects with type', function(assert) {
-    var rect = new fabric.Rect({ width: 10, height: 20 }),
-        circle = new fabric.Circle({ radius: 30 });
-
-    var group = new fabric.Group([rect, circle]);
-
-    assert.equal(group.size(), 2, 'should have length=2 initially');
-
-    assert.deepEqual(group.getObjects('Rect'), [rect], 'should return rect only');
-    assert.deepEqual(group.getObjects('Circle'), [circle], 'should return circle only');
-    assert.deepEqual(group.getObjects('Circle', 'Rect'), [rect, circle], 'should return circle and rect, in the same order they are');
-  });
-
   QUnit.test('add', function(assert) {
     var group = makeGroupWith2Objects();
     var rect1 = new fabric.Rect(),

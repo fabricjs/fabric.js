@@ -153,15 +153,7 @@
     assert.ok(typeof collection.getObjects === 'function', 'has getObjects method');
     var returned = collection.getObjects();
     assert.notEqual(returned, collection._objects, 'does not return a reference to _objects');
-    returned = collection.getObjects('A');
-    assert.notEqual(returned, collection._objects, 'return a new array');
-    assert.equal(returned.indexOf(obj2), -1, 'object of type B is not included');
-    assert.equal(returned.indexOf(obj), 0, 'object of type A is included');
-    returned = collection.getObjects('A', 'B');
-    assert.ok(returned.indexOf(obj2) > -1, 'object of type B is not included');
-    assert.ok(returned.indexOf(obj) > -1, 'object of type A is included');
-    assert.ok(returned.indexOf(obj3) === -1, 'object of type c is included');
-    assert.equal(returned.length, 2, 'returned only a, b types');
+    assert.deepEqual(returned, [obj2, obj, obj3], 'returns objects');
   });
 
   QUnit.test('item', function(assert) {
