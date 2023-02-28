@@ -626,8 +626,8 @@ export class ObjectGeometry<
       positionMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
       finalMatrix = this.group
         ? multiplyTransformMatrices(
-            positionMatrix,
-            this.group.calcTransformMatrix()
+            this.group.calcTransformMatrix(),
+            positionMatrix
           )
         : positionMatrix,
       dim = this._getTransformedDimensions(),
