@@ -16,7 +16,9 @@ import {
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
+  multiplyTransformMatricesRight,
   qrDecompose,
+  TComposeMatrixArgs,
   transformPoint,
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
@@ -612,34 +614,33 @@ export class ObjectGeometry<
    * @returns {TCornerPoint}
    */
   calcLineCoords(): TCornerPoint {
-    const vpt = this.getViewportTransform(),
-      padding = this.padding,
-      angle = degreesToRadians(this.getTotalAngle()),
+    const { dimensions, transform, options } = this.getCoordsCalculationContext(
+      { applyViewportTransform: true, applyPadding: true }
+    );
+    const padding = this.padding;
+    const angle = degreesToRadians(options.angle ?? 0),
       cosP = cos(angle) * padding,
       sinP = sin(angle) * padding,
       cosPSinP = cosP + sinP,
-      cosPMinusSinP = cosP - sinP,
-      { tl, tr, bl, br } = this.calcACoords();
-
-    const lineCoords: TCornerPoint = {
-      tl: transformPoint(tl, vpt),
-      tr: transformPoint(tr, vpt),
-      bl: transformPoint(bl, vpt),
-      br: transformPoint(br, vpt),
+      cosPMinusSinP = cosP - sinP;
+    return {
+      tl: dimensions
+        .multiply(new Point(-0.5, -0.5))
+        .transform(transform)
+        .add(new Point(-cosPMinusSinP, -cosPSinP)),
+      tr: dimensions
+        .multiply(new Point(0.5, -0.5))
+        .transform(transform)
+        .add(new Point(cosPSinP, -cosPMinusSinP)),
+      bl: dimensions
+        .multiply(new Point(-0.5, 0.5))
+        .transform(transform)
+        .add(new Point(-cosPSinP, cosPMinusSinP)),
+      br: dimensions
+        .multiply(new Point(0.5, 0.5))
+        .transform(transform)
+        .add(new Point(cosPMinusSinP, cosPSinP)),
     };
-
-    if (padding) {
-      lineCoords.tl.x -= cosPMinusSinP;
-      lineCoords.tl.y -= cosPSinP;
-      lineCoords.tr.x += cosPSinP;
-      lineCoords.tr.y -= cosPMinusSinP;
-      lineCoords.bl.x -= cosPSinP;
-      lineCoords.bl.y += cosPMinusSinP;
-      lineCoords.br.x += cosPMinusSinP;
-      lineCoords.br.y += cosPSinP;
-    }
-
-    return lineCoords;
   }
 
   /**
@@ -652,31 +653,58 @@ export class ObjectGeometry<
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
+  protected getCoordsCalculationContext({
+    applyViewportTransform = false,
+    applyPadding = false,
+  }: {
+    applyViewportTransform?: boolean;
+    applyPadding?: boolean;
+  } = {}) {
+    const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
+    const center = this.getCenterPoint();
+    const transformOptions = this.group
+      ? qrDecompose(this.calcTransformMatrix())
+      : ({
+          scaleX: this.scaleX,
+          scaleY: this.scaleY,
+          skewX: this.skewX,
+          skewY: this.skewY,
+          angle: this.angle,
+          translateX: this.left,
+          translateY: this.top,
+        } as Required<Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>>);
+
+    return {
+      dimensions: this._getTransformedDimensions(transformOptions)
+        .transform(vpt, true)
+        .scalarAdd(applyPadding ? 2 * this.padding : 0),
+      transform: multiplyTransformMatricesRight([
+        vpt,
+        [1, 0, 0, 1, center.x, center.y],
+        calcRotateMatrix({
+          angle:
+            transformOptions.angle -
+            // this is nonsense
+            (!!this.group && this.flipX ? 180 : 0),
+        }),
+        [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0],
+      ]),
+      options: transformOptions,
+    };
+  }
+
   /**
    * Calculates the coordinates of the 4 corner of the bbox, in absolute coordinates.
    * those never change with zoom or viewport changes.
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
-      center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      positionMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
-      finalMatrix = this.group
-        ? multiplyTransformMatrices(
-            this.group.calcTransformMatrix(),
-            positionMatrix
-          )
-        : positionMatrix,
-      dim = this._getTransformedDimensions(),
-      w = dim.x / 2,
-      h = dim.y / 2;
+    const { dimensions, transform } = this.getCoordsCalculationContext();
     return {
-      // corners
-      tl: transformPoint({ x: -w, y: -h }, finalMatrix),
-      tr: transformPoint({ x: w, y: -h }, finalMatrix),
-      bl: transformPoint({ x: -w, y: h }, finalMatrix),
-      br: transformPoint({ x: w, y: h }, finalMatrix),
+      tl: dimensions.multiply(new Point(-0.5, -0.5)).transform(transform),
+      tr: dimensions.multiply(new Point(0.5, -0.5)).transform(transform),
+      bl: dimensions.multiply(new Point(-0.5, 0.5)).transform(transform),
+      br: dimensions.multiply(new Point(0.5, 0.5)).transform(transform),
     };
   }
 
@@ -692,7 +720,7 @@ export class ObjectGeometry<
     this.aCoords = this.calcACoords();
     // in case we are in a group, for how the inner group target check works,
     // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
-    this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
+    this.lineCoords = this.calcLineCoords();
   }
 
   transformMatrixKey(skipGroup = false): string {

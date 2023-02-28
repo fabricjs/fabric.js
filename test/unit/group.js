@@ -348,13 +348,16 @@
     group.scale(2);
     assert.ok(group.containsPoint({ x: 50, y: 120 }));
     assert.ok(group.containsPoint({ x: 100, y: 160 }));
+    assert.ok(!group.containsPoint({ x: 100, y: 170 }));
     assert.ok(!group.containsPoint({ x: 0, y: 0 }));
 
     group.scale(1);
     group.padding = 30;
     group.setCoords();
     assert.ok(group.containsPoint({ x: 50, y: 120 }));
-    assert.ok(!group.containsPoint({ x: 100, y: 170 }));
+    assert.ok(group.containsPoint({ x: 100, y: 170 }));
+    assert.ok(group.containsPoint({ x: 100, y: 190 }));
+    assert.ok(!group.containsPoint({ x: 100, y: 191 }));
     assert.ok(!group.containsPoint({ x: 0, y: 0 }));
   });
 

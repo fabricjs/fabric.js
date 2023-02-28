@@ -1014,10 +1014,7 @@ export class SelectableCanvas<
       obj.evented &&
       // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
       // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(
-        sendPointToPlane(globalPointer, undefined, this.viewportTransform),
-        true
-      )
+      obj.containsPoint(globalPointer)
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
