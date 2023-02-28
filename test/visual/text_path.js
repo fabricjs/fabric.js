@@ -1,6 +1,6 @@
 (function() {
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
   }
   else {

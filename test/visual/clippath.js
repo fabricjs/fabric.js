@@ -1,9 +1,10 @@
-(function() {
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = true;
+(function () {
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
   }
   else {

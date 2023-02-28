@@ -1,33 +1,34 @@
 (function() {
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     if (process.env.launcher === 'Firefox') {
-      fabric.browserShadowBlurConstant = 0.9;
+      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
     if (process.env.launcher === 'Node') {
-      fabric.browserShadowBlurConstant = 1;
+      fabric.config.configure({ browserShadowBlurConstant: 1 });
     }
     if (process.env.launcher === 'Chrome') {
-      fabric.browserShadowBlurConstant = 1.5;
+      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
     }
     if (process.env.launcher === 'Edge') {
-      fabric.browserShadowBlurConstant = 1.75;
+      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
-      fabric.browserShadowBlurConstant = 0.9;
+      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
     if (navigator.userAgent.indexOf('Chrome') !== -1) {
-      fabric.browserShadowBlurConstant = 1.5;
+      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
     }
     if (navigator.userAgent.indexOf('Edge') !== -1) {
-      fabric.browserShadowBlurConstant = 1.75;
+      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
   }
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
   }
   else {
@@ -52,7 +53,7 @@
     newModule: 'DataURL exports',
     percentage: 0.10,
     beforeEachHandler: function() {
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 
@@ -219,7 +220,7 @@
 
   function toDataURL10(fabricCanvas, callback) {
     fabricCanvas.enableRetinaScaling = true;
-    fabric.devicePixelRatio = 2;
+    fabric.config.configure({ devicePixelRatio: 2 });
     fabricCanvas.setDimensions({
       width: 300,
       height: 300,
@@ -261,7 +262,7 @@
 
   function toDataURL11(fabricCanvas, callback) {
     fabricCanvas.enableRetinaScaling = false;
-    fabric.devicePixelRatio = 1;
+    fabric.config.configure({ devicePixelRatio: 1 });
     fabricCanvas.setDimensions({
       width: 300,
       height: 300,
@@ -302,8 +303,8 @@
   });
 
   function toDataURL12(fabricCanvas, callback) {
-    fabricCanvas.enableRetinaScaling = 2;
-    fabric.devicePixelRatio = 2;
+    fabricCanvas.enableRetinaScaling = true;
+    fabric.config.configure({ devicePixelRatio: 2 });
     fabricCanvas.setDimensions({
       width: 300,
       height: 300,
@@ -330,7 +331,7 @@
     rect.shadow = new fabric.Shadow(shadow);
     fabricCanvas.add(rect);
     var dataUrl = fabricCanvas.toDataURL({ multiplier: 0.5, enableRetinaScaling: true });
-    fabric.devicePixelRatio = 1;
+    fabric.config.configure({ devicePixelRatio: 1 });
     callback(dataUrl);
   }
 
@@ -449,8 +450,8 @@
     var actualTest = test.code;
     test.code = function(fabricCanvas, callback) {
       actualTest(fabricCanvas, function(dataURL) {
-        var img = fabric.document.createElement('img');
-        var canvas = fabric.document.createElement('canvas');
+        var img = fabric.getDocument().createElement('img');
+        var canvas = fabric.getDocument().createElement('canvas');
         img.onload = function() {
           canvas.width = img.width;
           canvas.height = img.height;

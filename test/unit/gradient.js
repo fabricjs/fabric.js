@@ -200,9 +200,9 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
-    var stop1 = fabric.document.createElement('stop');
-    var stop2 = fabric.document.createElement('stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
+    var stop1 = fabric.getDocument().createElement('stop');
+    var stop2 = fabric.getDocument().createElement('stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -215,7 +215,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
     assert.equal(gradient.type, 'linear');
@@ -238,14 +238,14 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
     element.setAttributeNS(namespace, 'gradientUnits', 'objectBoundingBox');
     element.setAttributeNS(namespace, 'x1', '10%');
     element.setAttributeNS(namespace, 'y1', '0.2%');
     element.setAttributeNS(namespace, 'x2', '200');
     element.setAttributeNS(namespace, 'y2', '20%');
-    var stop1 = fabric.document.createElement('stop');
-    var stop2 = fabric.document.createElement('stop');
+    var stop1 = fabric.getDocument().createElement('stop');
+    var stop2 = fabric.getDocument().createElement('stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -258,7 +258,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -273,14 +273,14 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
     element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
     element.setAttributeNS(namespace, 'x1', '10%');
     element.setAttributeNS(namespace, 'y1', '0.2%');
     element.setAttributeNS(namespace, 'x2', '200');
     element.setAttributeNS(namespace, 'y2', '20%');
-    var stop1 = fabric.document.createElement('stop');
-    var stop2 = fabric.document.createElement('stop');
+    var stop1 = fabric.getDocument().createElement('stop');
+    var stop2 = fabric.getDocument().createElement('stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -293,7 +293,8 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({left: 10, top: 15, width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '', {
+    var gradient = fabric.Gradient.fromElement(element, object, {
+      opacity: '',
       viewBoxWidth: 400,
       viewBoxHeight: 300,
     });
@@ -312,9 +313,9 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -331,7 +332,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 300, top: 20, left: 30 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -353,9 +354,9 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
 
@@ -367,7 +368,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -379,7 +380,7 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
 
     element.setAttributeNS(namespace, 'x1', '30%');
     element.setAttributeNS(namespace, 'x2', '20%');
@@ -387,13 +388,13 @@
     element.setAttributeNS(namespace, 'y2', 'Infinity');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 0.3);
     assert.equal(gradient.coords.y1, 0.1);
     assert.equal(gradient.coords.x2, 0.2);
     assert.equal(gradient.coords.y2, 1);
     object = new fabric.Object({ width: 200, height: 200, top: 50, left: 10 });
-    gradient = fabric.Gradient.fromElement(element, object, '');
+    gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 0.3, 'top and left do not change the output');
     assert.equal(gradient.coords.y1, 0.1, 'top and left do not change the output');
     assert.equal(gradient.coords.x2, 0.2, 'top and left do not change the output');
@@ -404,7 +405,7 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'radialGradient');
+    var element = fabric.getDocument().createElementNS(namespace, 'radialGradient');
 
     element.setAttributeNS(namespace, 'fx', '30%');
     element.setAttributeNS(namespace, 'fy', '20%');
@@ -413,7 +414,7 @@
     element.setAttributeNS(namespace, 'r', '100%');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 0.3, 'should not change with width height');
     assert.equal(gradient.coords.y1, 0.2, 'should not change with width height');
     assert.equal(gradient.coords.x2, 0.1, 'should not change with width height');
@@ -422,7 +423,7 @@
     assert.equal(gradient.coords.r2, 1, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 10, left: 10 });
-    gradient = fabric.Gradient.fromElement(element, object, '');
+    gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 0.3, 'should not change with top left');
     assert.equal(gradient.coords.y1, 0.2, 'should not change with top left');
     assert.equal(gradient.coords.x2, 0.1, 'should not change with top left');
@@ -435,7 +436,7 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'radialGradient');
+    var element = fabric.getDocument().createElementNS(namespace, 'radialGradient');
 
     element.setAttributeNS(namespace, 'fx', '30');
     element.setAttributeNS(namespace, 'fy', '20');
@@ -445,7 +446,7 @@
     element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 30, 'should not change with width height');
     assert.equal(gradient.coords.y1, 20, 'should not change with width height');
     assert.equal(gradient.coords.x2, 15, 'should not change with width height');
@@ -454,7 +455,7 @@
     assert.equal(gradient.coords.r2, 100, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 50, left: 60 });
-    gradient = fabric.Gradient.fromElement(element, object, '');
+    gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 30, 'should not change with top left');
     assert.equal(gradient.coords.y1, 20, 'should not change with top left');
     assert.equal(gradient.coords.x2, 15, 'should not change with top left');
@@ -467,7 +468,7 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace,  'linearGradient');
+    var element = fabric.getDocument().createElementNS(namespace,  'linearGradient');
 
     element.setAttributeNS(namespace, 'x1', '30');
     element.setAttributeNS(namespace, 'y1', '20');
@@ -476,14 +477,14 @@
     element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
 
     var object = new fabric.Object({ width: 200, height: 200 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 30, 'should not change with width height');
     assert.equal(gradient.coords.y1, 20, 'should not change with width height');
     assert.equal(gradient.coords.x2, 15, 'should not change with width height');
     assert.equal(gradient.coords.y2, 18, 'should not change with width height');
 
     object = new fabric.Object({ width: 200, height: 200, top: 40, left: 40 });
-    gradient = fabric.Gradient.fromElement(element, object, '');
+    gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
     assert.equal(gradient.coords.x1, 30, 'should not change with top left');
     assert.equal(gradient.coords.y1, 20, 'should not change with top left');
     assert.equal(gradient.coords.x2, 15, 'should not change with top left');
@@ -494,9 +495,9 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'radialGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'radialGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -508,7 +509,7 @@
     element.appendChild(stop2);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '', {});
+    var gradient = fabric.Gradient.fromElement(element, object, {});
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -530,9 +531,9 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'radialGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'radialGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', 'white');
@@ -544,7 +545,7 @@
     element.appendChild(stop2);
     element.setAttributeNS(namespace, 'gradientTransform', 'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)');
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '', {});
+    var gradient = fabric.Gradient.fromElement(element, object, {});
     assert.deepEqual(gradient.gradientTransform, [3.321, -0.6998, 0.4077, 1.9347, -440.9168, -408.0598]);
   });
 
@@ -552,11 +553,11 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'linearGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
-    var stop3 = fabric.document.createElementNS(namespace, 'stop');
-    var stop4 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'linearGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop3 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop4 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', '');
@@ -581,7 +582,7 @@
     element.appendChild(stop4);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -610,11 +611,11 @@
     assert.ok(typeof fabric.Gradient.fromElement === 'function');
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'radialGradient');
-    var stop1 = fabric.document.createElementNS(namespace, 'stop');
-    var stop2 = fabric.document.createElementNS(namespace, 'stop');
-    var stop3 = fabric.document.createElementNS(namespace, 'stop');
-    var stop4 = fabric.document.createElementNS(namespace, 'stop');
+    var element = fabric.getDocument().createElementNS(namespace, 'radialGradient');
+    var stop1 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop2 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop3 = fabric.getDocument().createElementNS(namespace, 'stop');
+    var stop4 = fabric.getDocument().createElementNS(namespace, 'stop');
 
     stop1.setAttributeNS(namespace, 'offset', '0%');
     stop1.setAttributeNS(namespace, 'stop-color', '');
@@ -639,7 +640,7 @@
     element.appendChild(stop4);
 
     var object = new fabric.Object({ width: 100, height: 100 });
-    var gradient = fabric.Gradient.fromElement(element, object, '');
+    var gradient = fabric.Gradient.fromElement(element, object, { opacity: '' });
 
     assert.ok(gradient instanceof fabric.Gradient);
 
@@ -665,45 +666,43 @@
   });
 
   QUnit.test('toSVG linear', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createLinearGradient();
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_LINEAR);
+    assert.equalSVG(gradient.toSVG(obj), SVG_LINEAR);
   });
 
   QUnit.test('toSVG radial', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createRadialGradient();
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_RADIAL);
+    assert.equalSVG(gradient.toSVG(obj), SVG_RADIAL);
   });
 
   QUnit.test('toSVG radial with r1 > 0', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createRadialGradientWithInternalRadius();
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_INTERNALRADIUS);
+    assert.equalSVG(gradient.toSVG(obj), SVG_INTERNALRADIUS);
   });
 
   QUnit.test('toSVG radial with r1 > 0 swapped', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createRadialGradientSwapped();
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_SWAPPED);
+    const gradientColorStops = JSON.stringify(gradient.colorStops);
+    assert.equalSVG(gradient.toSVG(obj), SVG_SWAPPED, 'it exports as expected');
+    const gradientColorStopsAfterExport = JSON.stringify(gradient.colorStops);
+    assert.equalSVG(gradient.toSVG(obj), SVG_SWAPPED, 'it exports as expected a second time');
+    assert.equalSVG(gradientColorStops, gradientColorStopsAfterExport, 'colorstops do not change')
   });
 
   QUnit.test('toSVG linear objectBoundingBox', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createLinearGradient('percentage');
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_LINEAR_PERCENTAGE);
+    assert.equalSVG(gradient.toSVG(obj), SVG_LINEAR_PERCENTAGE);
   });
 
   QUnit.test('toSVG radial objectBoundingBox', function(assert) {
-    fabric.Object.__uid = 0;
     var gradient = createRadialGradient('percentage');
     var obj = new fabric.Object({ width: 100, height: 100 });
-    assert.equal(gradient.toSVG(obj), SVG_RADIAL_PERCENTAGE);
+    assert.equalSVG(gradient.toSVG(obj), SVG_RADIAL_PERCENTAGE);
   });
 
 })();

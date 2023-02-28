@@ -2,12 +2,10 @@
 *.iml
 change-output.md
 /.nyc_output/
-/.vscode/
 /node_modules/
 /npm-debug.log
 before_commit
 /coverage/
 .idea/
-/dist/fabric.require.js
-/dist/fabric.min.js.gz
+/dist
 /cli_output/

@@ -1,9 +1,10 @@
 (function() {
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
   var visualTestLoop;
   var getAssetName;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAssetName = global.getAssetName;
   }
@@ -22,7 +23,7 @@
   function toSVGCanvas(canvas, callback) {
     var svg = canvas.toSVG();
     var dataUrl = svgToDataURL(svg);
-    var image = fabric.document.createElement('img');
+    var image = fabric.getDocument().createElement('img');
     image.onload = function() {
       var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
@@ -31,7 +32,7 @@
       callback(newCanvas);
     };
     image.onerror = console.log;
-    if (fabric.isLikelyNode) {
+    if (isNode()) {
       image.src = dataUrl;
     }
     else {
@@ -56,8 +57,8 @@
     newModule: 'Export clippaths to SVG',
     percentage: 0.06,
     beforeEachHandler: function() {
-      fabric.Object.NUM_FRACTION_DIGITS = 4;
-      fabric.Object.prototype.objectCaching = false;
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 4 });
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 

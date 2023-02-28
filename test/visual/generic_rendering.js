@@ -1,37 +1,38 @@
 (function() {
   var getFixture;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     if (process.env.launcher === 'Firefox') {
-      fabric.browserShadowBlurConstant = 0.9;
+      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
     if (process.env.launcher === 'Node') {
-      fabric.browserShadowBlurConstant = 1;
+      fabric.config.configure({ browserShadowBlurConstant: 1 });
     }
     if (process.env.launcher === 'Chrome') {
-      fabric.browserShadowBlurConstant = 1.5;
+      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
     }
     if (process.env.launcher === 'Edge') {
-      fabric.browserShadowBlurConstant = 1.75;
+      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
     getFixture = global.getFixture;
   }
   else {
     if (navigator.userAgent.indexOf('Firefox') !== -1) {
-      fabric.browserShadowBlurConstant = 0.9;
+      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
     }
     if (navigator.userAgent.indexOf('Chrome') !== -1) {
-      fabric.browserShadowBlurConstant = 1.5;
+      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
     }
     if (navigator.userAgent.indexOf('Edge') !== -1) {
-      fabric.browserShadowBlurConstant = 1.75;
+      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
     }
     getFixture = window.getFixture;
   }
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = true;
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
   }
   else {
@@ -104,7 +105,7 @@
     code: renderStrokeWithNegativeScale,
     golden: 'strokeNegativeScale.png',
     percentage: 0.011,
-    disabled: fabric.isLikelyNode,
+    disabled: isNode(),
     width: 100,
     height: 100,
   });
@@ -446,7 +447,8 @@
     code: gradientStroke,
     golden: 'gradientStroke.png',
     newModule: 'Gradient stroke',
-    percentage: 0.02,
+    // loose diff because firefox
+    percentage: 0.04,
     width: 300,
     height: 300,
   });

@@ -1,12 +1,12 @@
 (function(exports) {
 
-  exports.getFixture = function(name, original, callback) {
-    getImage(getFixtureName(name), original, callback);
+  exports.getFixture = async function(name, original, callback) {
+    callback(await getImage(getFixtureName(name), original));
   };
 
   exports.getAsset = function(name, callback) {
     var finalName = getAssetName(name);
-    if (fabric.isLikelyNode) {
+    if (isNode()) {
       var plainFileName = finalName.replace('file://', '');
       return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
     }
@@ -29,16 +29,6 @@
       options.height = opts.height;
     }
     return new fabric[fabricClass](null, options);
-  };
-
-  function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
-    if (isAbsolute) { return path; };
-    var imgEl = fabric.document.createElement('img');
-    imgEl.src = path;
-    var src = imgEl.src;
-    imgEl = null;
-    return src;
   }
 
   function localPath(path, filename) {
@@ -47,80 +37,92 @@
 
   function getAssetName(filename) {
     var finalName = '/assets/' + filename + '.svg';
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
+    return isNode() ? localPath('/../visual', finalName) : finalName;
   }
   exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
     var finalName = '/golden/' + filename;
-    return fabric.isLikelyNode ? localPath('/../visual', finalName) : getAbsolutePath('/test/visual' + finalName);
+    return isNode() ? localPath('/../visual', finalName) : finalName;
   }
 
   function getFixtureName(filename) {
     var finalName = '/fixtures/' + filename;
-    return fabric.isLikelyNode ? localPath('/..', finalName) : getAbsolutePath('/test' + finalName);
+    return isNode() ? localPath('/..', finalName) : finalName;
   }
 
   function generateGolden(filename, original) {
-    if (fabric.isLikelyNode && original) {
+    if (isNode() && original) {
       var plainFileName = filename.replace('file://', '');
       var dataUrl = original.toDataURL().split(',')[1];
       console.log('creating golden for ', filename);
       fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
     }
     else if (original) {
-      original.toBlob(blob => {
-        const formData = new FormData();
-        formData.append('file', blob, filename);
-        const request = new XMLHttpRequest();
-        request.open('POST', '/goldens', true);
-        request.send(formData);
+      return new Promise((resolve, reject) => {
+        return original.toBlob(blob => {
+          const formData = new FormData();
+          formData.append('file', blob, filename);
+          formData.append('filename', filename);
+          const request = new XMLHttpRequest();
+          request.open('POST', '/goldens', true);
+          request.onreadystatechange = () => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+              const status = request.status;
+              if (status === 0 || (status >= 200 && status < 400)) {
+                resolve();
+              } else {
+                reject();
+              }
+            }
+          };
+          request.send(formData);
+        });
       }, 'image/png');
     }
   }
 
-  function getImage(filename, original, callback) {
-    if (fabric.isLikelyNode && original) {
+  async function getImage(filename, original) {
+    if (isNode() && original) {
       var plainFileName = filename.replace('file://', '');
       if (!fs.existsSync(plainFileName)) {
         generateGolden(filename, original);
       }
     }
     else if (original) {
-      fetch(`/goldens/${filename}`, { method: 'GET' })
+      await fetch(`/goldens/${filename}`, { method: 'GET' })
         .then(res => res.json())
-        .then(res => {
-          !res.exists && generateGolden(filename, original);
-        });
+        .then(res => !res.exists && generateGolden(filename, original));
     }
-    var img = fabric.document.createElement('img');
-    img.onload = function() {
-      img.onload = null;
-      callback(img, false);
-    };
-    img.onerror = function(err) {
-      img.onerror = null;
-      callback(img, true);
-      console.log('Image loading errored', err);
-    };
-    img.src = filename;
+    return new Promise((resolve, reject) => {
+      const img = fabric.getDocument().createElement('img');
+      img.onload = function () {
+        img.onerror = null;
+        img.onload = null;
+        resolve(img);
+      };
+      img.onerror = function (err) {
+        img.onerror = null;
+        img.onload = null;
+        reject(err);
+      };
+      img.src = filename;
+    });
+
   }
 
   exports.visualTestLoop = function(QUnit) {
     var _pixelMatch;
     var visualCallback;
-    var imageDataToChalk;
-    if (fabric.isLikelyNode) {
+    if (isNode()) {
       _pixelMatch = global.pixelmatch;
       visualCallback = global.visualCallback;
-      imageDataToChalk = global.imageDataToChalk;
     }
     else {
       if (window) {
         _pixelMatch = window.pixelmatch;
         visualCallback = window.visualCallback;
       }
-      imageDataToChalk = function() { return ''; };
     }
 
     var pixelmatchOptions = {
@@ -146,45 +148,40 @@
       QUnit.test(testName, function(assert) {
         var done = assert.async();
         var fabricCanvas = createCanvasForTest(testObj);
-        code(fabricCanvas, function(renderedCanvas) {
+        code(fabricCanvas, async function (renderedCanvas) {
           var width = renderedCanvas.width;
           var height = renderedCanvas.height;
           var totalPixels = width * height;
           var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height);
-          var canvas = fabric.document.createElement('canvas');
+          var canvas = fabric.getDocument().createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           var ctx = canvas.getContext('2d');
           var output = ctx.getImageData(0, 0, width, height);
-          getImage(getGoldeName(golden), renderedCanvas, function(goldenImage) {
-            ctx.drawImage(goldenImage, 0, 0);
-            visualCallback.addArguments({
-              enabled: true,
-              golden: canvas,
-              fabric: imageDataCanvas,
-              diff: output,
-              goldenName: golden
-            });
-            var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
-            var differentPixels = _pixelMatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
-            var percDiff = differentPixels / totalPixels * 100;
-            var okDiff = totalPixels * percentage;
-            var isOK = differentPixels <= okDiff;
-            assert.ok(
-              isOK,
-              testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
-            );
-            if (!isOK) {
-              var stringa = imageDataToChalk(output);
-              console.log(stringa);
-            }
-            if ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs) {
-              generateGolden(getGoldeName(golden), renderedCanvas);
-            }
-            fabricCanvas.dispose();
-            done();
+          const goldenImage = await getImage(getGoldeName(golden), renderedCanvas);
+          ctx.drawImage(goldenImage, 0, 0);
+          visualCallback.addArguments({
+            enabled: true,
+            golden: canvas,
+            fabric: imageDataCanvas,
+            diff: output,
+            goldenName: golden
           });
-        });
+          var imageDataGolden = ctx.getImageData(0, 0, width, height).data;
+          var differentPixels = _pixelMatch(imageDataCanvas.data, imageDataGolden, output.data, width, height, pixelmatchOptions);
+          var percDiff = differentPixels / totalPixels * 100;
+          var okDiff = totalPixels * percentage;
+          var isOK = differentPixels <= okDiff;
+          assert.ok(
+            isOK,
+            testName + ' [' + golden + '] has too many different pixels ' + differentPixels + '(' + okDiff + ') representing ' + percDiff + '% (>' + (percentage * 100) + '%)'
+          );
+          if (!testObj.testOnly && ((!isOK && QUnit.debugVisual) || QUnit.recreateVisualRefs)) {
+            await generateGolden(getGoldeName(golden), renderedCanvas);
+          }
+          await fabricCanvas.dispose();
+          done();
+        }, assert);
       });
     }
   }

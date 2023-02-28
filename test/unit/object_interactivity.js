@@ -24,8 +24,6 @@
 
     var cObj = new fabric.Object({ });
     assert.ok(typeof cObj.setControlVisible === 'function', 'setControlVisible should exist');
-    assert.equal(cObj.setControlVisible('tl'), cObj, 'chainable');
-
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false);
     cObj.setControlVisible('tl', true);
@@ -54,8 +52,6 @@
 
     var cObj = new fabric.Object({ });
     assert.ok(typeof cObj.setControlsVisibility === 'function', 'setControlsVisibility should exist');
-    assert.equal(cObj.setControlsVisibility(), cObj, 'chainable');
-
     cObj.setControlsVisibility({
       bl: false,
       br: false,
@@ -101,9 +97,8 @@
     assert.equal(cObj.isControlVisible('mtr'), true);
   });
 
-  QUnit.test('_setCornerCoords', function(assert) {
+  QUnit.test('corner coords', function(assert) {
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
-    assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
@@ -150,13 +145,12 @@
   });
 
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
-  QUnit.test('_setCornerCoords_customControlSize', function(assert) {
+  QUnit.test('corner coords: custom control size', function(assert) {
     //set custom corner size
     fabric.Object.prototype.controls.bl.sizeX = 30;
     fabric.Object.prototype.controls.bl.sizeY = 10;
 
     var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
-    assert.ok(typeof cObj._setCornerCoords === 'function', '_setCornerCoords should exist');
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);

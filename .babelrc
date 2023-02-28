@@ -1,0 +1,11 @@
+{
+  "presets": [
+    ["@babel/env"],
+    [
+      "@babel/typescript",
+      {
+        "allowDeclareFields": true
+      }
+    ]
+  ]
+}

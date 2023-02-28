@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -20,7 +20,11 @@
     return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
   }
 
-  var IMG_URL = fabric.isLikelyNode
+  function roundArray(array) {
+    return array.map((val) => val.toFixed(4));
+  }
+
+  var IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -121,27 +125,6 @@
     assert.ok(!areAllTheSame);
   });
 
-  QUnit.test('String.prototype.trim', function(assert) {
-    assert.ok(typeof String.prototype.trim === 'function');
-    assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
-  });
-
-  QUnit.test('fabric.util.string.camelize', function(assert) {
-    var camelize = fabric.util.string.camelize;
-
-    assert.ok(typeof camelize === 'function');
-
-    assert.equal(camelize('foo'), 'foo');
-    assert.equal(camelize('foo-bar'), 'fooBar');
-    assert.equal(camelize('Foo-bar-Baz'), 'FooBarBaz');
-    assert.equal(camelize('FooBarBaz'), 'FooBarBaz');
-    assert.equal(camelize('-bar'), 'Bar');
-    assert.equal(camelize(''), '');
-    assert.equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
-    assert.equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
-    assert.equal(camelize('--double'), 'Double');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
@@ -183,178 +166,22 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  QUnit.test('fabric.util.object.extend', function(assert) {
-    var extend = fabric.util.object.extend;
-
-    assert.ok(typeof extend === 'function');
-
-    var destination = { x: 1 },
-        source = { y: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 1);
-    assert.equal(destination.y, 2);
-    assert.equal(source.x, undefined);
-    assert.equal(source.y, 2);
-
-    destination = { x: 1 };
-    source = { x: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 2);
-    assert.equal(source.x, 2);
-  });
-
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
-    var extend = fabric.util.object.extend;
-    var d = function() { };
-    var destination = { x: 1 },
-        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
-
-    extend(destination, source, true);
-
-    assert.equal(destination.x, 1, 'x is still in destination');
-    assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
-  });
-
-  QUnit.test('fabric.util.object.clone', function(assert) {
-    var clone = fabric.util.object.clone;
-
-    assert.ok(typeof clone === 'function');
-
-    var obj = { x: 1, y: [1, 2, 3] },
-        _clone = clone(obj);
-
-    assert.equal(_clone.x, 1);
-    assert.notEqual(obj, _clone);
-    assert.equal(_clone.y, obj.y);
-  });
-
-  QUnit.test('Function.prototype.bind', function(assert) {
-    assert.ok(typeof Function.prototype.bind === 'function');
-
-    var obj = { };
-    function fn() {
-      return [this, arguments[0], arguments[1]];
-    }
-
-    var bound = fn.bind(obj);
-    assert.deepEqual([obj, undefined, undefined], bound());
-    assert.deepEqual([obj, 1, undefined], bound(1));
-    assert.deepEqual([obj, 1, null], bound(1, null));
-
-    bound = fn.bind(obj, 1);
-    assert.deepEqual([obj, 1, undefined], bound());
-    assert.deepEqual([obj, 1, 2], bound(2));
-
-    function Point(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    obj = { };
-    var YAxisPoint = Point.bind(obj, 0);
-    var axisPoint = new YAxisPoint(5);
-
-    assert.deepEqual(0, axisPoint.x);
-    assert.deepEqual(5, axisPoint.y);
-
-    assert.ok(axisPoint instanceof Point);
-    // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
-  });
-
-  QUnit.test('fabric.util.getById', function(assert) {
-    assert.ok(typeof fabric.util.getById === 'function');
-
-    var el = fabric.document.createElement('div');
-    el.id = 'foobarbaz';
-    fabric.document.body.appendChild(el);
-
-    assert.equal(el, fabric.util.getById(el));
-    assert.equal(el, fabric.util.getById('foobarbaz'));
-    assert.equal(null, fabric.util.getById('likely-non-existent-id'));
-  });
-
-  QUnit.test('fabric.util.toArray', function(assert) {
-    assert.ok(typeof fabric.util.toArray === 'function');
-
-    assert.deepEqual(['x', 'y'], fabric.util.toArray({ 0: 'x', 1: 'y', length: 2 }));
-    assert.deepEqual([1, 3], fabric.util.toArray((function(){ return arguments; })(1, 3)));
-
-    var nodelist = fabric.document.getElementsByTagName('div'),
-        converted = fabric.util.toArray(nodelist);
-
-    assert.ok(converted instanceof Array);
-    assert.equal(nodelist.length, converted.length);
-    assert.equal(nodelist[0], converted[0]);
-    assert.equal(nodelist[1], converted[1]);
-  });
-
-  QUnit.test('fabric.util.makeElement', function(assert) {
-    var makeElement = fabric.util.makeElement;
-    assert.ok(typeof makeElement === 'function');
-
-    var el = makeElement('div');
-
-    assert.equal(el.tagName.toLowerCase(), 'div');
-    assert.equal(el.nodeType, 1);
-
-    el = makeElement('p', { 'class': 'blah', 'for': 'boo_hoo', 'some_random-attribute': 'woot' });
-
-    assert.equal(el.tagName.toLowerCase(), 'p');
-    assert.equal(el.nodeType, 1);
-    assert.equal(el.className, 'blah');
-    assert.equal(el.htmlFor, 'boo_hoo');
-    assert.equal(el.getAttribute('some_random-attribute'), 'woot');
-  });
-
-  QUnit.test('fabric.util.addClass', function(assert) {
-    var addClass = fabric.util.addClass;
-    assert.ok(typeof addClass === 'function');
-
-    var el = fabric.document.createElement('div');
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo');
-
-    addClass(el, 'bar');
-    assert.equal(el.className, 'foo bar');
-
-    addClass(el, 'baz qux');
-    assert.equal(el.className, 'foo bar baz qux');
-
-    addClass(el, 'foo');
-    assert.equal(el.className, 'foo bar baz qux');
-  });
-
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-
-    var el = fabric.document.createElement('p');
-    var wrapper = wrapElement(el, 'div');
-
-    assert.equal(wrapper.tagName.toLowerCase(), 'div');
-    assert.equal(wrapper.firstChild, el);
-
-    el = fabric.document.createElement('p');
-    wrapper = wrapElement(el, 'div', { 'class': 'foo' });
+    var wrapper = fabric.getDocument().createElement('div');
+    var el = fabric.getDocument().createElement('p');
+    var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
-    assert.equal(wrapper.className, 'foo');
 
-    var childEl = fabric.document.createElement('span');
-    var parentEl = fabric.document.createElement('p');
+    var childEl = fabric.getDocument().createElement('span');
+    var parentEl = fabric.getDocument().createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, 'strong');
+    wrapper = wrapElement(childEl, fabric.getDocument().createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -366,8 +193,8 @@
 
     assert.ok(typeof makeElementUnselectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
 
@@ -391,8 +218,8 @@
 
     assert.ok(typeof makeElementSelectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     makeElementUnselectable(el);
     makeElementSelectable(el);
@@ -556,176 +383,66 @@
     });
   });
 
-  QUnit.test('fabric.util.createClass', function(assert) {
-    var Klass = fabric.util.createClass();
-
-    assert.ok(typeof Klass === 'function');
-    assert.ok(typeof new Klass() === 'object');
-
-    var Person = fabric.util.createClass({
-      initialize: function(firstName, lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-      },
-      toString: function() {
-        return 'My name is ' + this.firstName + ' ' + this.lastName;
-      }
-    });
-
-    assert.ok(typeof Person === 'function');
-    assert.ok(typeof new Person() === 'object');
-
-    var john = new Person('John', 'Meadows');
-    assert.ok(john instanceof Person);
-
-    assert.equal(john.firstName, 'John');
-    assert.equal(john.lastName, 'Meadows');
-    assert.equal(john + '', 'My name is John Meadows');
-
-
-    var WebDeveloper = fabric.util.createClass(Person, {
-      initialize: function(firstName, lastName, skills) {
-        this.callSuper('initialize', firstName, lastName);
-        this.skills = skills;
-      },
-      toString: function() {
-        return this.callSuper('toString') + ' and my skills are ' + this.skills.join(', ');
-      }
-    });
-
-    assert.ok(typeof WebDeveloper === 'function');
-    var dan = new WebDeveloper('Dan', 'Trink', ['HTML', 'CSS', 'Javascript']);
-    assert.ok(dan instanceof Person);
-    assert.ok(dan instanceof WebDeveloper);
-
-    assert.equal(dan.firstName, 'Dan');
-    assert.equal(dan.lastName, 'Trink');
-    assert.deepEqual(dan.skills, ['HTML', 'CSS', 'Javascript']);
-
-    assert.equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
-  });
-
   // element doesn't seem to have style on node
-  if (!fabric.isLikelyNode) {
+  if (!isNode()) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.document.createElement('div');
+      var el = fabric.getDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
+      fabric.util.setStyle(el, 'color:blue;border-radius:3px');
+      assert.equal(el.style.color, 'blue');
+      assert.equal(el.style.borderRadius, '3px');
+      fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
+      assert.equal(el.style.color, 'yellow');
+      assert.equal(el.style.width, '45px');
     });
   }
 
-  QUnit.test('fabric.util.addListener', function(assert) {
-    assert.ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
-    fabric.util.addListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element addListener');
-  });
-
-  QUnit.test('fabric.util.removeListener', function(assert) {
-    assert.ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
-    fabric.util.removeListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element removeListener');
-  });
-
-  QUnit.test('fabric.util.array.invoke', function(assert) {
-    assert.ok(typeof fabric.util.array.invoke === 'function');
-
-    var obj1 = { toString: function(){ return 'obj1'; } };
-    var obj2 = { toString: function(){ return 'obj2'; } };
-    var obj3 = { toString: function(){ return 'obj3'; } };
-
-    assert.deepEqual(['obj1', 'obj2', 'obj3'],
-      fabric.util.array.invoke([obj1, obj2, obj3], 'toString'));
-
-    assert.deepEqual(['f', 'b', 'b'],
-      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 0));
-
-    assert.deepEqual(['o', 'a', 'a'],
-      fabric.util.array.invoke(['foo', 'bar', 'baz'], 'charAt', 1));
-  });
-
-  QUnit.test('fabric.util.array.min', function(assert) {
-    assert.ok(typeof fabric.util.array.min === 'function');
-
-    assert.equal(1, fabric.util.array.min([1, 3, 2]));
-    assert.equal(-1, fabric.util.array.min([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-3, fabric.util.array.min([-1, -2, -3]));
-    assert.equal('a', fabric.util.array.min(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj1, fabric.util.array.min([obj1, obj3, obj2]));
-  });
-
-  QUnit.test('fabric.util.array.max', function(assert) {
-    assert.ok(typeof fabric.util.array.max === 'function');
-
-    assert.equal(3, fabric.util.array.max([1, 3, 2]));
-    assert.equal(3, fabric.util.array.max([3, 1, 'f', 3, -1, 3]));
-    assert.equal(-1, fabric.util.array.max([-1, -2, -3]));
-    assert.equal('c', fabric.util.array.max(['a', 'c', 'b']));
-
-    var obj1 = { valueOf: function(){ return 1; } };
-    var obj2 = { valueOf: function(){ return 2; } };
-    var obj3 = { valueOf: function(){ return 3; } };
-
-    assert.equal(obj3, fabric.util.array.max([obj1, obj3, obj2]));
-  });
-
-  QUnit.test('fabric.util.populateWithProperties', function(assert) {
-    assert.ok(typeof fabric.util.populateWithProperties === 'function');
+  QUnit.test('fabric.util.pick', function(assert) {
+    assert.ok(typeof fabric.util.pick === 'function');
 
     var source = {
-          foo: 'bar',
-          baz: 123,
-          qux: function() { }
-        },
-        destination = { };
+      foo: 'bar',
+      baz: 123,
+      qux: function () { }
+    };
 
-    fabric.util.populateWithProperties(source, destination);
+    let destination = fabric.util.pick(source);
     assert.ok(typeof destination.foo === 'undefined');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo']);
+    destination = fabric.util.pick(source, ['foo']);
     assert.equal(destination.foo, 'bar');
     assert.ok(typeof destination.baz === 'undefined');
     assert.ok(typeof destination.qux === 'undefined');
 
-    fabric.util.populateWithProperties(source, destination, ['foo', 'baz', 'ffffffffff']);
+    destination = fabric.util.pick(source, ['foo', 'baz', 'ffffffffff']);
     assert.equal(destination.foo, 'bar');
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');
     assert.ok(typeof destination.ffffffffff === 'undefined');
   });
 
-  QUnit.test('getKlass', function(assert) {
-    assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
-    assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
-    assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
-    assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
+  QUnit.test('clearFontCache', function(assert) {
+    assert.ok(typeof fabric.cache.clearFontCache === 'function');
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('arial');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+    fabric.cache.clearFontCache();
+    assert.deepEqual(fabric.cache.charWidthsCache, { }, 'all cache is deleted');
   });
 
-  QUnit.test('clearFabricFontCache', function(assert) {
-    assert.ok(typeof fabric.util.clearFabricFontCache === 'function');
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('arial');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
-    fabric.util.clearFabricFontCache();
-    assert.deepEqual(fabric.charWidthsCache, { }, 'all cache is deleted');
-  });
-
-  QUnit.test('clearFabricFontCache wrong case', function(assert) {
-    fabric.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
-    fabric.util.clearFabricFontCache('ARIAL');
-    assert.equal(fabric.charWidthsCache.arial,  undefined, 'arial cache is deleted');
-    assert.equal(fabric.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
+  QUnit.test('clearFontCache wrong case', function(assert) {
+    fabric.cache.charWidthsCache = { arial: { some: 'cache'}, helvetica: { some: 'cache'} };
+    fabric.cache.clearFontCache('ARIAL');
+    assert.equal(fabric.cache.charWidthsCache.arial,  undefined, 'arial cache is deleted');
+    assert.equal(fabric.cache.charWidthsCache.helvetica.some, 'cache', 'helvetica cache is still available');
   });
 
   QUnit.test('parsePreserveAspectRatioAttribute', function(assert) {
@@ -813,6 +530,11 @@
     assert.equal(transform.angle, 30);
   });
 
+  QUnit.test('isIdentityMatrix', function(assert) {
+    assert.equal(fabric.util.isIdentityMatrix([1, 0, 0, 1, 0, 0]), true, 'is identity');
+    assert.equal(fabric.util.isIdentityMatrix([1, 2, 3, 4, 5, 6]), false, 'is not identity');
+  });
+
   QUnit.test('invertTransform', function(assert) {
     assert.ok(typeof fabric.util.invertTransform === 'function');
     var m1 = [1, 2, 3, 4, 5, 6], m3;
@@ -870,6 +592,19 @@
     })
   }
 
+  QUnit.test('calcPlaneChangeMatrix', function (assert) {
+    assert.ok(typeof fabric.util.calcPlaneChangeMatrix === 'function');
+    const m1 = [1, 2, 3, 4, 5, 6];
+    const s = [2, 0, 0, 0.5, 0, 0];
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(undefined, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(fabric.iMatrix, m1), fabric.util.invertTransform(m1));
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, undefined), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, fabric.iMatrix), m1);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, m1), fabric.iMatrix);
+    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, s), fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(s), m1));
+  })
+
   QUnit.test('sendPointToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendPointToPlane === 'function');
     var m1 = [3, 0, 0, 2, 10, 4],
@@ -888,10 +623,10 @@
         point,
         from ?
           relationFrom === 'child' ? from.calcTransformMatrix() : from.group?.calcTransformMatrix() :
-          null,
+          undefined,
         to ?
           relationTo === 'child' ? to.calcTransformMatrix() : to.group?.calcTransformMatrix() :
-          null
+          undefined
       );
     }
 
@@ -992,6 +727,20 @@
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
+    assert.deepEqual(fabric.util.makeBoundingBoxFromPoints([
+      new fabric.Point(50, 50),
+      new fabric.Point(-50, 50),
+      new fabric.Point(50, -50),
+      new fabric.Point(-50, -50),
+      new fabric.Point(50, 50),
+      new fabric.Point(80, -30),
+      new fabric.Point(100, 50),
+    ]), {
+      left: -50,
+      top: -50,
+      width: 150,
+      height: 100
+    }, 'bbox should match');
   });
 
   QUnit.test('parseUnit', function(assert) {
@@ -1015,10 +764,6 @@
     assert.equal(element.naturalHeight, 0);
     assert.equal(element.naturalWidth, 0);
   });
-
-  // QUnit.test('createAccessors', function(assert) {
-  //   assert.ok(typeof fabric.util.createAccessors === 'function');
-  // });
 
   QUnit.test('qrDecompose with identity matrix', function(assert) {
     assert.ok(typeof fabric.util.qrDecompose === 'function');
@@ -1063,25 +808,6 @@
     assert.ok(typeof fabric.util.composeMatrix === 'function');
     var matrix = fabric.util.composeMatrix({});
     assert.deepEqual(matrix, fabric.iMatrix, 'default is identity matrix');
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea', function(assert) {
-    assert.ok(typeof fabric.util.limitDimsByArea === 'function');
-    var dims = fabric.util.limitDimsByArea(1, 10000);
-    assert.equal(dims.x, 100);
-    assert.equal(dims.y, 100);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar > 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(3, 10000);
-    assert.equal(dims.x, 173);
-    assert.equal(dims.y, 57);
-  });
-
-  QUnit.test('fabric.util.limitDimsByArea ar < 1', function(assert) {
-    var dims = fabric.util.limitDimsByArea(1 / 3, 10000);
-    assert.equal(dims.x, 57);
-    assert.equal(dims.y, 173);
   });
 
   QUnit.test('fabric.util.capValue ar < 1', function(assert) {
@@ -1242,5 +968,53 @@
       0
     ];
     assert.deepEqual(matrix, expected, 'dimensions matrix flipped is equal');
+  });
+  QUnit.test('mergeClipPaths', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18 });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36 });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    var expectedMatrix = roundArray([
+      0.5877852522924731,
+      0.2696723314583158,
+      -0.41255083562929973,
+      0.37782470175621224,
+      -153.32445710769997,
+      1.7932869074173539,
+    ]);
+    assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
+    assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
+    assert.deepEqual(roundArray(resultingMatrix), expectedMatrix, 'the clipPath has a new transform');
+  });
+  QUnit.test('mergeClipPaths with swapping', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18, inverted: true });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36 });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    var expectedMatrix = roundArray([
+      1.1335,
+      -0.8090,
+      1.2377,
+      1.7634,
+      171.5698,
+      -127.2043,
+    ]);
+    assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
+    assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');
+    assert.deepEqual(roundArray(resultingMatrix), expectedMatrix, 'the clipPath has a new transform');
+  });
+  QUnit.test('mergeClipPaths with swapping', function(assert) {
+    var rectA = new fabric.Rect({ width: 100, height: 100, scaleX: 2, skewX: 3, angle: 10 });
+    var clipPathA = new fabric.Group([rectA], { scaleY: 3, angle: -18, inverted: true });
+    var rectB = new fabric.Rect({ width: 100, height: 100, scaleY: 2.4, skewX: 3, skewY: 5, angle: 10 });
+    var clipPathB = new fabric.Group([rectB], { skewX: 34, angle: 36, inverted: true });
+    var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
+    var resultingMatrix = result.clipPath.calcTransformMatrix();
+    assert.equal(result.inverted, true, 'the final clipPathB is inverted')
+    assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
   });
 })();

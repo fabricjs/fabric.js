@@ -65,7 +65,7 @@
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -78,60 +78,29 @@
     return src;
   }
 
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
+  var IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/test_image.gif') : getAbsolutePath('../fixtures/test_image.gif');
 
-  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
-  var upperCanvasEl = canvas.upperCanvasEl;
-  var lowerCanvasEl = canvas.lowerCanvasEl;
+  let canvas, upperCanvasEl, lowerCanvasEl;
 
-  function makeRect(options) {
+  function makeRect(options = {}) {
     var defaultOptions = { width: 10, height: 10 };
-    return new fabric.Rect(fabric.util.object.extend(defaultOptions, options || { }));
+    return new fabric.Rect({ ...defaultOptions, ...options });
   }
 
-  function makeTriangle(options) {
+  function makeTriangle(options = {}) {
     var defaultOptions = { width: 30, height: 30 };
-    return new fabric.Triangle(fabric.util.object.extend(defaultOptions, options || { }));
-  }
-
-  function basename(path) {
-    return path.slice(Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/')) + 1);
-  }
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} [expected]
-   */
-  QUnit.assert.sameImageObject = function (actual, expected) {
-    var a = {}, b = {};
-    Object.assign(a, actual, { src: basename(actual.src) });
-    Object.assign(b, expected, { src: basename(expected.src) });
-    this.pushResult({
-      result: QUnit.equiv(a, b),
-      actual: actual,
-      expected: expected,
-      message: 'image object equal to ref'
-    })
+    return new fabric.Triangle({ ...defaultOptions, ...options });
   }
 
   QUnit.module('fabric.Canvas', {
-    beforeEach: function() {
-      upperCanvasEl.style.display = '';
-      canvas.controlsAboveOverlay = fabric.Canvas.prototype.controlsAboveOverlay;
-      canvas.preserveObjectStacking = fabric.Canvas.prototype.preserveObjectStacking;
+    beforeEach: function () {
+      canvas = new fabric.Canvas(null, { enableRetinaScaling: false, width: 600, height: 600 });
+      upperCanvasEl = canvas.upperCanvasEl;
+      lowerCanvasEl = canvas.lowerCanvasEl;
     },
-    afterEach: function() {
-      canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-      canvas.clear();
-      canvas.cancelRequestedRender();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
-      canvas.overlayColor = fabric.Canvas.prototype.overlayColor;
-      canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
-      canvas.off();
-      canvas.calcOffset();
-      canvas.cancelRequestedRender();
-      upperCanvasEl.style.display = 'none';
+    afterEach: function () {
+      fabric.config.restoreDefaults();
+      return canvas.dispose();
     }
   });
 
@@ -210,8 +179,7 @@
     assert.ok(canvas.selection, 'default is true');
   });
 
-  QUnit.test('_initInteractive', function(assert) {
-    assert.ok(typeof canvas._initInteractive === 'function');
+  QUnit.test('init', function(assert) {
     assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
     assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
     assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');
@@ -219,7 +187,6 @@
 
   QUnit.test('renderTop', function(assert) {
     assert.ok(typeof canvas.renderTop === 'function');
-    assert.equal(canvas, canvas.renderTop());
   });
 
   QUnit.test('_chooseObjectsToRender', function(assert) {
@@ -247,7 +214,7 @@
 
   QUnit.test('calcOffset', function(assert) {
     assert.ok(typeof canvas.calcOffset === 'function', 'should respond to `calcOffset`');
-    assert.equal(canvas.calcOffset(), canvas, 'should be chainable');
+    assert.deepEqual(canvas.calcOffset(), { left: 0, top: 0 }, 'should retrun offset');
   });
 
   QUnit.test('add', function(assert) {
@@ -257,7 +224,7 @@
         rect4 = makeRect();
 
     assert.ok(typeof canvas.add === 'function');
-    assert.equal(canvas.add(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.add(rect1), 1, 'should return the new length of objects array');
     assert.strictEqual(canvas.item(0), rect1);
 
     canvas.add(rect2, rect3, rect4);
@@ -277,11 +244,10 @@
     assert.ok(typeof canvas.insertAt === 'function', 'should respond to `insertAt` method');
 
     var rect = makeRect();
-    canvas.insertAt(rect, 1);
+    canvas.insertAt(1, rect);
     assert.strictEqual(canvas.item(1), rect);
-    canvas.insertAt(rect, 2);
+    canvas.insertAt(2, rect);
     assert.strictEqual(canvas.item(2), rect);
-    assert.equal(canvas.insertAt(rect, 2), canvas, 'should be chainable');
   });
 
   QUnit.test('remove', function(assert) {
@@ -293,7 +259,7 @@
     canvas.add(rect1, rect2, rect3, rect4);
 
     assert.ok(typeof canvas.remove === 'function');
-    assert.equal(canvas.remove(rect1), canvas, 'should be chainable');
+    assert.equal(canvas.remove(rect1)[0], rect1, 'should return the number of objects removed');
     assert.strictEqual(canvas.item(0), rect2, 'should be second object');
 
     canvas.remove(rect2, rect3);
@@ -328,22 +294,25 @@
   });
 
   QUnit.test('before:selection:cleared gets target the active object', function(assert) {
-    var passedTarget;
+    var deselected;
     canvas.on('before:selection:cleared', function(options) {
-      passedTarget = options.target;
+      deselected = options.deselected;
     });
     var rect = new fabric.Rect();
     canvas.add(rect);
     canvas.setActiveObject(rect);
     canvas.discardActiveObject();
-    assert.equal(passedTarget, rect, 'options.target was the removed object');
+    assert.equal(deselected.length, 1, 'options.deselected was the removed object');
+    assert.equal(deselected[0], rect, 'options.deselected was the removed object');
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
-    var activeSelection = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    var activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     canvas.discardActiveObject();
-    assert.equal(passedTarget, activeSelection, 'removing an activeSelection pass that as a target');
+    assert.equal(deselected.length, 1, 'options.deselected was the removed object');
+    assert.equal(deselected[0], activeSelection, 'removing an activeSelection pass that as a target');
   });
 
   QUnit.test('selection:cleared', function(assert) {
@@ -363,26 +332,66 @@
     canvas.off('selection:cleared');
   });
 
+  function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.multiSelectionStacking = multiSelectionStacking;
+    canvas.setActiveObject(activeObject);
+    canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
+  }
+
+  function updateActiveSelection(canvas, existing, target, multiSelectionStacking) {
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.multiSelectionStacking = multiSelectionStacking;
+    activeSelection.add(...existing);
+    canvas.setActiveObject(activeSelection);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, target);
+  }
+
   QUnit.test('create active selection fires selection:created', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     canvas.on('selection:created', function( ) { isFired = true; });
-    canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    initActiveSelection(canvas, rect1, rect2, 'selection-order');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
+    canvas.clear();
   });
 
   QUnit.test('create active selection fires selected on new object', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
     rect2.on('selected', function( ) { isFired = true; });
-    canvas.setActiveObject(rect1);
-    canvas._createActiveSelection(rect2, {});
+    initActiveSelection(canvas, rect1, rect2, 'selection-order');
+    const activeSelection = canvas.getActiveObjects();
     assert.equal(isFired, true, 'selected fired on rect2');
+    assert.equal(activeSelection[0], rect1, 'first rec1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
+    canvas.clear();
+  });
+
+  QUnit.test('start multiselection: default', function(assert) {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    initActiveSelection(canvas, rect2, rect1, 'selection-order');
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[0], rect2, 'first rect2');
+    assert.equal(activeSelection[1], rect1, 'then rect1');
+  });
+
+  QUnit.test('start multiselection: preserve', function (assert) {
+    var rect1 = new fabric.Rect();
+    var rect2 = new fabric.Rect();
+    canvas.add(rect1, rect2);
+    initActiveSelection(canvas, rect2, rect1, 'canvas-stacking');
+    const activeSelection = canvas.getActiveObjects();
+    assert.equal(activeSelection[0], rect1, 'first rect1');
+    assert.equal(activeSelection[1], rect2, 'then rect2');
   });
 
   QUnit.test('update active selection selection:updated', function(assert) {
@@ -390,21 +399,20 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
+    canvas.add(rect1, rect2, rect3);
     canvas.on('selection:updated', function( ) { isFired = true; });
-    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selection:updated fired');
     assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
-    canvas.off('selection:updated');
   });
 
   QUnit.test('update active selection fires deselected on an object', function(assert) {
     var isFired = false;
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
+    var rect1 = new fabric.Rect({ width: 10, height: 10 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10 });
+    canvas.add(rect1, rect2);
     rect2.on('deselected', function( ) { isFired = true; });
-    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect2, {});
+    updateActiveSelection(canvas, [rect1, rect2], rect2, 'selection-order');
     assert.equal(isFired, true, 'deselected on rect2 fired');
   });
 
@@ -413,10 +421,95 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
+    canvas.add(rect1, rect2, rect3);
     rect3.on('selected', function( ) { isFired = true; });
-    canvas.setActiveObject(new fabric.ActiveSelection([rect1, rect2]));
-    canvas._updateActiveSelection(rect3, {});
+    updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selected on rect3 fired');
+  });
+
+
+  QUnit.test('continuing multiselection respects order of objects', function (assert) {
+    const rect1 = new fabric.Rect();
+    const rect2 = new fabric.Rect();
+    const rect3 = new fabric.Rect();
+    canvas.add(rect1, rect2, rect3);
+    function assertObjectsInOrder(init, added) {
+      updateActiveSelection(canvas, init, added, 'canvas-stacking');
+      assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'updated selection while preserving canvas stacking order');
+      canvas.discardActiveObject();
+      updateActiveSelection(canvas, init, added, 'selection-order');
+      assert.deepEqual(canvas.getActiveObjects(), [...init, added], 'updated selection while preserving click order');
+      canvas.discardActiveObject();
+    }
+    function assertObjectsInOrderOnCanvas(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, rect2, rect3]);
+    }
+    assertObjectsInOrderOnCanvas([rect1, rect2], rect3);
+    assertObjectsInOrderOnCanvas([rect1, rect3], rect2);
+    assertObjectsInOrderOnCanvas([rect2, rect3], rect1);
+    canvas.remove(rect2, rect3);
+    const group = new fabric.Group([rect2, rect3], { subTargetCheck: true, interactive: true });
+    canvas.add(group);
+    function assertNestedObjectsInOrder(init, added) {
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [rect1, group]);
+      assert.deepEqual(group.getObjects(), [rect2, rect3]);
+    }
+    assertNestedObjectsInOrder([rect1, rect2], rect3);
+    assertNestedObjectsInOrder([rect1, rect3], rect2);
+    assertNestedObjectsInOrder([rect2, rect3], rect1);
+    canvas.remove(rect1);
+    group.insertAt(0, rect1);
+    group.remove(rect3);
+    canvas.add(rect3);
+    function assertNestedObjectsInOrder2(init, added) {
+      assert.deepEqual(canvas.getObjects(), [group, rect3]);
+      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+      assertObjectsInOrder(init, added);
+      assert.deepEqual(canvas.getObjects(), [group, rect3]);
+      assert.deepEqual(group.getObjects(), [rect1, rect2]);
+    }
+    assertNestedObjectsInOrder2([rect1, rect2], rect3);
+    assertNestedObjectsInOrder2([rect1, rect3], rect2);
+    assertNestedObjectsInOrder2([rect2, rect3], rect1);
+  });
+
+  QUnit.test('multiselection: toggle', assert => {
+    const rect1 = new fabric.Rect();
+    const rect2 = new fabric.Rect();
+    const rect3 = new fabric.Rect();
+    let isFired = false;
+    rect2.on('deselected', () => { isFired = true; });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], rect2, 'selection-order');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'rect2 was deselected');
+    assert.ok(isFired, 'fired deselected');
+  });
+
+  QUnit.test('multiselection: clicking nested target of active selection toggles nested target', assert => {
+    const rect1 = new fabric.Rect({ width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ width: 10, height: 10 });
+    const rect3 = new fabric.Rect({ width: 10, height: 10 });
+    let isFired = false;
+    rect3.on('deselected', () => { isFired = true; });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect3 was deselected');
+    assert.ok(isFired, 'fired deselected');
+  });
+
+  QUnit.test('multiselection: clicking active selection does nothing', assert => {
+    const rect1 = new fabric.Rect({ left: 10, width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ left: -10, width: 5, height: 5 });
+    const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
+    canvas.add(rect1, rect2, rect3);
+    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
 
   QUnit.test('setActiveObject fires deselected', function(assert) {
@@ -430,221 +523,94 @@
     assert.equal(isFired, true, 'switching active group fires deselected');
   });
 
-  QUnit.test('_createGroup respect order of objects', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect1);
-    var selection = canvas._createGroup(rect2);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  });
-
-  QUnit.test('_createGroup respect order of objects (inverted)', function(assert) {
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.setActiveObject(rect2);
-    var selection = canvas._createGroup(rect1);
-    assert.equal(selection.getObjects().indexOf(rect1), 0, 'rect1 is the first object in the active selection');
-    assert.equal(selection.getObjects().indexOf(rect2), 1, 'rect2 is the second object in the active selection');
-  });
-
-  QUnit.test('_groupSelectedObjects fires selected for objects', function(assert) {
-    var fired = 0;
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    var rect3 = new fabric.Rect();
-    canvas._collectObjects = function() {
-      return [rect1, rect2, rect3];
+  function setGroupSelector(canvas, { x = 0, y = 0, deltaX = 0, deltaY = 0 } = {}) {
+    canvas._groupSelector = {
+      x, y, deltaX, deltaY
     };
+  }
+
+  QUnit.test('group selected objects fires selected for objects', function(assert) {
+    var fired = 0;
+    var rect1 = new fabric.Rect({ width: 10, height: 10 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10 });
     rect1.on('selected', function() { fired++; });
     rect2.on('selected', function() { fired++; });
-    rect3.on('selected', function() { fired++; });
-    canvas._groupSelectedObjects({});
+    rect3.on('selected', function () { fired++; });
+    canvas.add(rect1, rect2, rect3);
+    setGroupSelector(canvas, {
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
+    });
+    canvas.__onMouseUp({});
     assert.equal(fired, 3, 'event fired for each of 3 rects');
-    canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
   });
 
-  QUnit.test('_groupSelectedObjects fires selection:created if more than one object is returned', function(assert) {
+  QUnit.test('group selected objects fires selection:created if more than one object is returned', function(assert) {
     var isFired = false;
-    var rect1 = new fabric.Rect();
-    var rect2 = new fabric.Rect();
-    var rect3 = new fabric.Rect();
-    canvas._collectObjects = function() {
-      return [rect1, rect2, rect3];
-    };
-    canvas.on('selection:created', function() { isFired = true; });
-    canvas._groupSelectedObjects({});
+    var rect1 = new fabric.Rect({ width: 10, height: 10 });
+    var rect2 = new fabric.Rect({ width: 10, height: 10 });
+    var rect3 = new fabric.Rect({ width: 10, height: 10 });
+    canvas.on('selection:created', function () { isFired = true; });
+    canvas.add(rect1, rect2, rect3);
+    setGroupSelector(canvas, {
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
+    });
+    canvas.__onMouseUp({});
     assert.equal(isFired, true, 'selection created fired');
     assert.equal(canvas.getActiveObject().type, 'activeSelection', 'an active selection is created');
-    assert.equal(canvas.getActiveObjects()[2], rect1, 'rect1 is first object');
+    assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
-    assert.equal(canvas.getActiveObjects()[0], rect3, 'rect3 is third object');
+    assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
     assert.equal(canvas.getActiveObjects().length, 3, 'contains exactly 3 objects');
-    canvas._collectObjects = fabric.Canvas.prototype._collectObjects;
   });
 
-  QUnit.test('_groupSelectedObjects fires selection:created if one only object is returned', function(assert) {
+  QUnit.test('group selected objects fires selection:created if one only object is returned', function(assert) {
     var isFired = false;
-    var rect1 = new fabric.Rect();
-    canvas._collectObjects = function() {
-      return [rect1];
-    };
+    var rect1 = new fabric.Rect({ width: 10, height: 10 });
     canvas.on('selection:created', function() { isFired = true; });
-    canvas._groupSelectedObjects({});
-    assert.equal(isFired, true, 'selection:created fired for _groupSelectedObjects');
+    canvas.add(rect1);
+    setGroupSelector(canvas, {
+      x: 1,
+      y: 1,
+      deltaX: 5,
+      deltaY: 5
+    });
+    canvas.__onMouseUp({});
+    assert.equal(isFired, true, 'selection:created fired');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
-  QUnit.test('_collectObjects collects object contained in area', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 15,
-      left: 15,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
-    assert.equal(collected[3], rect1, 'contains rect1 as last object');
-    assert.equal(collected[2], rect2, 'contains rect2');
-    assert.equal(collected[1], rect3, 'contains rect3');
-    assert.equal(collected[0], rect4, 'contains rect4 as first object');
-  });
-
-  QUnit.test('_collectObjects do not collects object if area is outside', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 1,
-      left: 1,
-      ex: 24,
-      ey: 24
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 0, 'a rect outside objects do not collect any of them');
-  });
-
-  QUnit.test('_collectObjects collect included objects that are not touched by the selection sides', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 5, left: 5 });
-    canvas.add(rect1);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect1, 'rect1 is collected');
-  });
-
-  QUnit.test('_collectObjects collect topmost object if no dragging occurs', function(assert) {
+  QUnit.test('handleSelection collect topmost object if no dragging occurs', function (assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     canvas.add(rect1, rect2, rect3);
-    canvas._groupSelector = {
-      top: 0,
-      left: 0,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect3, 'rect3 is collected');
+    setGroupSelector(canvas, { x: 1, y: 1, deltaX: 0, deltaY: 0 });
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObjects().length, 1, 'a rect that contains all objects collects them all');
+    assert.equal(canvas.getActiveObjects()[0], rect3, 'rect3 is collected');
   });
 
-  QUnit.test('_collectObjects collect objects if the drag is inside the object', function(assert) {
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    canvas.add(rect1, rect2, rect3);
-    canvas._groupSelector = {
-      top: 2,
-      left: 2,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 3, 'a rect that contains all objects collects them all');
-    assert.equal(collected[0], rect3, 'rect3 is collected');
-    assert.equal(collected[1], rect2, 'rect2 is collected');
-    assert.equal(collected[2], rect1, 'rect1 is collected');
-  });
-
-  QUnit.test('_collectObjects collects object fully contained in area', function(assert) {
-    canvas.selectionFullyContained = true;
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 30,
-      left: 30,
-      ex: -1,
-      ey: -1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 4, 'a rect that contains all objects collects them all');
-    assert.equal(collected[3], rect1, 'contains rect1 as last object');
-    assert.equal(collected[2], rect2, 'contains rect2');
-    assert.equal(collected[1], rect3, 'contains rect3');
-    assert.equal(collected[0], rect4, 'contains rect4 as first object');
-    canvas.selectionFullyContained = false;
-  });
-
-  QUnit.test('_collectObjects does not collect objects not fully contained', function(assert) {
-    canvas.selectionFullyContained = true;
-    var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
-    var rect3 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 0 });
-    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
-    canvas.add(rect1, rect2, rect3, rect4);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 5,
-      ey: 5
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'a rect intersecting objects does not collect those');
-    assert.equal(collected[0], rect4, 'contains rect1 as only one fully contained');
-    canvas.selectionFullyContained = false;
-  });
-
-  QUnit.test('_collectObjects does not collect objects that have onSelect returning true', function(assert) {
-    canvas.selectionFullyContained = false;
+  QUnit.test('handleSelection does not collect objects that have onSelect returning true', function(assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     rect1.onSelect = function() {
       return true;
     };
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 2, left: 2 });
     canvas.add(rect1, rect2);
-    canvas._groupSelector = {
-      top: 20,
-      left: 20,
-      ex: 1,
-      ey: 1
-    };
-    var collected = canvas._collectObjects();
-    assert.equal(collected.length, 1, 'objects are in the same position buy only one gets selected');
-    assert.equal(collected[0], rect2, 'contains rect2 but not rect 1');
+    setGroupSelector(canvas, { x: 1, y: 1, deltaX: 20, deltaY: 20 });
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObjects().length, 1, 'objects are in the same position buy only one gets selected');
+    assert.equal(canvas.getActiveObjects()[0], rect2, 'contains rect2 but not rect 1');
   });
 
-  QUnit.test('_collectObjects does not call onSelect on objects that are not intersected', function(assert) {
-    canvas.selectionFullyContained = false;
+  QUnit.test('handleSelection does not call onSelect on objects that are not intersected', function(assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 10 });
     var onSelectRect1CallCount = 0;
@@ -659,38 +625,25 @@
     };
     canvas.add(rect1, rect2);
     // Intersects none
-    canvas._groupSelector = {
-      top: 1,
-      left: 1,
-      ex: 25,
-      ey: 25
-    };
-    canvas._collectObjects();
+    setGroupSelector(canvas, { x: 25, y: 25, deltaX: 1, deltaY: 1 });
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
     var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
     assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
     // Intersects one
-    canvas._groupSelector = {
-      top: 5,
-      left: 5,
-      ex: 0,
-      ey: 0
-    };
-    canvas._collectObjects();
-    assert.equal(onSelectRect1CallCount, 0, 'rect1 onSelect was not called. It will be called in _setActiveObject()');
+    setGroupSelector(canvas, { x: 0, y: 0, deltaX: 5, deltaY: 5 });
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.getActiveObject(), rect1, 'rect1 was selected');
+    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called while setting active object');
     assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
     // Intersects both
-    canvas._groupSelector = {
-      top: 5,
-      left: 15,
-      ex: 0,
-      ey: 0
-    };
-    canvas._collectObjects();
-    assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called');
+    setGroupSelector(canvas, { x: 0, y: 0, deltaX: 15, deltaY: 5 });
+    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect1 selected');
+    assert.equal(onSelectRect1CallCount, 2, 'rect1 onSelect was called once when collectiong it and once when selecting it');
     assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
   });
 
-  QUnit.test('_shouldGroup return false if onSelect return true', function(assert) {
+  QUnit.test('handleMultiSelection return false if onSelect return true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -700,11 +653,11 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = true;
-    var returned = canvas._shouldGroup(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, false, 'if onSelect returns true, shouldGroup return false');
   });
 
-  QUnit.test('_shouldGroup return true if onSelect return false and selectionKey is true', function(assert) {
+  QUnit.test('handleMultiSelection return true if onSelect return false and selectionKey is true', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -714,11 +667,11 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = true;
-    var returned = canvas._shouldGroup(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, true, 'if onSelect returns false, shouldGroup return true');
   });
 
-  QUnit.test('_shouldGroup return false if selectionKey is false', function(assert) {
+  QUnit.test('handleMultiSelection return false if selectionKey is false', function(assert) {
     var rect = new fabric.Rect();
     var rect2 = new fabric.Rect();
     rect.onSelect = function() {
@@ -728,7 +681,7 @@
     var selectionKey = canvas.selectionKey;
     var event = {};
     event[selectionKey] = false;
-    var returned = canvas._shouldGroup(event, rect);
+    var returned = canvas.handleMultiSelection(event, rect);
     assert.equal(returned, false, 'shouldGroup return false');
   });
 
@@ -738,7 +691,8 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
-    var activeSelection = new fabric.ActiveSelection([rect1, rect2]);
+    var activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     rect1.on('deselected', function( ) {
       rect1Deselected = true;
@@ -760,19 +714,18 @@
 
   QUnit.test('clearContext', function(assert) {
     assert.ok(typeof canvas.clearContext === 'function');
-    assert.equal(canvas.clearContext(canvas.getContext()), canvas, 'should be chainable');
+    canvas.clearContext(canvas.getContext());
   });
 
   QUnit.test('clear', function(assert) {
     assert.ok(typeof canvas.clear === 'function');
 
-    assert.equal(canvas.clear(), canvas, 'should be chainable');
+    canvas.clear();
     assert.equal(canvas.getObjects().length, 0);
   });
 
   QUnit.test('renderAll', function(assert) {
     assert.ok(typeof canvas.renderAll === 'function');
-    assert.equal(canvas, canvas.renderAll());
   });
 
   QUnit.test('_drawSelection', function(assert) {
@@ -840,7 +793,7 @@
 
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
+    });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
@@ -907,42 +860,42 @@
 
     var target = canvas.findTarget({
       clientX: 96, clientY: 186
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 96');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 96');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 98, clientY: 188
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 98');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 98');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 100, clientY: 190
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 100');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 100');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 102, clientY: 192
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 102');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 102');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 104, clientY: 194
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 104');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 104');
     canvas.targets = [];
 
     target = canvas.findTarget({
       clientX: 106, clientY: 196
-    }, true);
+    });
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
     canvas.targets = [];
@@ -1112,18 +1065,21 @@
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], triangle2, 'The deepest target should be triangle2');
-    canvas.perPixelTargetFind = false;
     canvas.remove(group3);
   });
 
-  QUnit.test('findTarget on activegroup', function(assert) {
+  QUnit.test('findTarget on active selection', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
     var rect3 = makeRect({ left: 20, top: 0 });
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    var group = new fabric.ActiveSelection([rect1, rect2], { subTargetCheck: true });
+    const group = canvas.getActiveSelection();
+    group.subTargetCheck = true;
+    group.add(rect1, rect2);
+    group.cornerSize = 2;
+    group.setCoords();
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 5, clientY: 5
@@ -1133,28 +1089,38 @@
       clientX: 40, clientY: 15
     });
     assert.equal(target, null, 'Should miss the activegroup');
+    assert.ok(!group.__corner, 'not over control');
+    target = canvas.findTarget({
+      clientX: 0, clientY: 0
+    });
+    assert.equal(group.__corner, 'tl', 'over control');
+    assert.ok(target, group, 'should return active selection if over control');
     target = canvas.findTarget({
       clientX: 5, clientY: 5
-    }, true);
-    assert.equal(target, rect1, 'Should return the rect inside activegroup');
+    });
+    assert.ok(target, group, 'should return active selection');
+    assert.equal(canvas.targets[0], rect1, 'Should return the rect inside active selection');
     target = canvas.findTarget({
       clientX: 25, clientY: 5
     });
-    assert.equal(target, group, 'Should return the activegroup');
+    assert.equal(target, group, 'Should return the active selection');
+    assert.deepEqual(canvas.targets, [], 'Should not return the rect behind active selection');
+    canvas.discardActiveObject();
     target = canvas.findTarget({
       clientX: 25, clientY: 5
-    }, true);
-    assert.equal(target, rect3, 'Should return the rect behind activegroup');
+    });
+    assert.equal(target, rect3, 'Should return the rect3 now that active selection has been cleared');
   });
 
-  QUnit.test('findTarget on activegroup with perPixelTargetFind', function(assert) {
+  QUnit.test('findTarget on active selection with perPixelTargetFind', function(assert) {
     var rect1 = makeRect({ left: 0, top: 0 }), target;
     var rect2 = makeRect({ left: 20, top: 20 });
     canvas.perPixelTargetFind = true;
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    var group = new fabric.ActiveSelection([rect1, rect2], { canvas: canvas });
+    const group = canvas.getActiveSelection();
+    group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
       clientX: 8, clientY: 8
@@ -1165,109 +1131,6 @@
       clientX: 15, clientY: 15
     });
     assert.equal(target, null, 'Should miss the activegroup');
-    canvas.perPixelTargetFind = false;
-    canvas.preserveObjectStacking = false;
-  });
-
-  QUnit.test('ActiveSelection sendToBack', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendToBack(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
-  });
-
-  QUnit.test('activeGroup bringToFront', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringToFront(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect3 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 should be on top now');
-  });
-
-  QUnit.test('activeGroup bringForward', function(assert) {
-
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect1, rect2]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect1, 'rect1 should be the new second');
-    assert.equal(canvas._objects[2], rect2, 'rect2 should be the third object');
-    assert.equal(canvas._objects[3], rect4, 'rect4 did not move');
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be the third object');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.bringForward(activeSel);
-    canvas.bringForward(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 should be the new last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be the new second');
-    assert.equal(canvas._objects[2], rect1, 'rect1 is still third');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still new top');
-  });
-
-  QUnit.test('activeGroup sendBackwards', function(assert) {
-    var rect1 = makeRect(),
-        rect2 = makeRect(),
-        rect3 = makeRect(),
-        rect4 = makeRect();
-
-    canvas.add(rect1, rect2, rect3, rect4);
-
-    var activeSel = new fabric.ActiveSelection([rect3, rect4]);
-    canvas.setActiveObject(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 should be last');
-    assert.equal(canvas._objects[1], rect2, 'rect2 should be second');
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect1, 'rect1 is still last');
-    assert.equal(canvas._objects[1], rect3, 'rect3 should be shifted down by 1');
-    assert.equal(canvas._objects[2], rect4, 'rect4 should be shifted down by 1');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is the new top');
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 is  last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be shifted down by 1');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be shifted down by 1');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still on top');
-    canvas.sendBackwards(activeSel);
-    canvas.sendBackwards(activeSel);
-    assert.equal(canvas._objects[0], rect3, 'rect3 is still last');
-    assert.equal(canvas._objects[1], rect4, 'rect4 should be steady');
-    assert.equal(canvas._objects[2], rect1, 'rect1 should be steady');
-    assert.equal(canvas._objects[3], rect2, 'rect2 is still on top');
   });
 
   QUnit.test('toDataURL', function(assert) {
@@ -1339,30 +1202,14 @@
     assert.equal(rect.getCenterPoint().x, upperCanvasEl.width / 2, 'object\'s "left" property should correspond to canvas element\'s center');
   });
 
-  QUnit.test('straightenObject', function(assert) {
-    assert.ok(typeof canvas.straightenObject === 'function');
-    var rect = makeRect({ angle: 10 });
-    canvas.add(rect);
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 0, 'angle should be coerced to 0 (from 10)');
-
-    rect.rotate('60');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 60)');
-
-    rect.rotate('100');
-    canvas.straightenObject(rect);
-    assert.equal(rect.get('angle'), 90, 'angle should be coerced to 90 (from 100)');
-  });
-
   QUnit.test('toJSON', function(assert) {
     assert.ok(typeof canvas.toJSON === 'function');
     assert.equal(JSON.stringify(canvas.toJSON()), EMPTY_JSON);
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
-    assert.equal(JSON.stringify(canvas.toJSON()), '{"version":"' + fabric.version + '","objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}', '`background` and `overlayColor` value should be reflected in json');
+    assert.deepEqual(canvas.toJSON(), { "version": fabric.version,"objects":[],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}, '`background` and `overlayColor` value should be reflected in json');
     canvas.add(makeRect());
-    assert.deepEqual(JSON.stringify(canvas.toJSON()), RECT_JSON);
+    assert.deepEqual(canvas.toJSON(), JSON.parse(RECT_JSON));
   });
 
   QUnit.test('toJSON with active group', function(assert) {
@@ -1371,7 +1218,9 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle], { canvas: canvas }));
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect, circle);
+    canvas.setActiveObject(activeSelection);
     var jsonWithActiveGroup = JSON.stringify(canvas);
 
     assert.equal(json, jsonWithActiveGroup);
@@ -1382,7 +1231,7 @@
       sourcePath: 'http://example.com/'
     });
     canvas.add(path);
-    assert.equal(JSON.stringify(canvas.toDatalessJSON()), PATH_DATALESS_JSON);
+    assert.deepEqual(canvas.toDatalessJSON(), JSON.parse(PATH_DATALESS_JSON));
   });
 
   QUnit.test('toObject', function(assert) {
@@ -1600,8 +1449,8 @@
 
   QUnit.test('loadFromJSON with no objects', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1619,8 +1468,8 @@
 
   QUnit.test('loadFromJSON without "objects" property', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1641,8 +1490,8 @@
 
   QUnit.test('loadFromJSON with empty fabric.Group', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.document.createElement('canvas'),
-        canvas2 = fabric.document.createElement('canvas'),
+    var canvas1 = fabric.getDocument().createElement('canvas'),
+        canvas2 = fabric.getDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
         c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
@@ -1687,8 +1536,8 @@
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.controlsAboveOverlay, true);
@@ -1706,8 +1555,8 @@
     };
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     // before callback the properties are still false.
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.preserveObjectStacking, false);
@@ -1722,7 +1571,7 @@
 
   QUnit.test('normalize pointer', function(assert) {
     assert.ok(typeof canvas._normalizePointer === 'function');
-    var pointer = { x: 10, y: 20 },
+    var pointer = new fabric.Point({ x: 10, y: 20 }),
         object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
         normalizedPointer = canvas._normalizePointer(object, pointer);
     assert.equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
@@ -1745,7 +1594,7 @@
 
   QUnit.test('restorePointerVpt', function(assert) {
     assert.ok(typeof canvas.restorePointerVpt === 'function');
-    var pointer = { x: 10, y: 20 },
+    var pointer = new fabric.Point({ x: 10, y: 20 }),
         restoredPointer = canvas.restorePointerVpt(pointer);
     assert.equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
     assert.equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
@@ -1776,8 +1625,8 @@
   // });
 
 
-  QUnit.test('sendToBack', function(assert) {
-    assert.ok(typeof canvas.sendToBack === 'function');
+  QUnit.test('sendObjectToBack', function(assert) {
+    assert.ok(typeof canvas.sendObjectToBack === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1785,18 +1634,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.sendToBack(rect3);
+    canvas.sendObjectToBack(rect3);
     assert.equal(canvas.item(0), rect3, 'third should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should now be the first one');
 
-    canvas.sendToBack(rect2);
+    canvas.sendObjectToBack(rect2);
     assert.equal(canvas.item(0), rect2, 'second should *still* be the first one');
   });
 
-  QUnit.test('bringToFront', function(assert) {
-    assert.ok(typeof canvas.bringToFront === 'function');
+  QUnit.test('bringObjectToFront', function(assert) {
+    assert.ok(typeof canvas.bringObjectToFront === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1804,18 +1653,18 @@
 
     canvas.add(rect1, rect2, rect3);
 
-    canvas.bringToFront(rect1);
+    canvas.bringObjectToFront(rect1);
     assert.equal(canvas.item(2), rect1, 'first should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should now be the last one');
 
-    canvas.bringToFront(rect2);
+    canvas.bringObjectToFront(rect2);
     assert.equal(canvas.item(2), rect2, 'second should *still* be the last one');
   });
 
-  QUnit.test('sendBackwards', function(assert) {
-    assert.ok(typeof canvas.sendBackwards === 'function');
+  QUnit.test('sendObjectBackwards', function(assert) {
+    assert.ok(typeof canvas.sendObjectBackwards === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1828,42 +1677,42 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [1, 3, 2]
     assert.equal(canvas.item(0), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // moved 3 one level back — [3, 1, 2]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect3);
+    canvas.sendObjectBackwards(rect3);
 
     // 3 stays at the deepEqual position — [2, 3, 1]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(2), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(0), rect3);
 
-    canvas.sendBackwards(rect2);
+    canvas.sendObjectBackwards(rect2);
 
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
   });
 
-  QUnit.test('bringForward', function(assert) {
-    assert.ok(typeof canvas.bringForward === 'function');
+  QUnit.test('bringObjectForward', function(assert) {
+    assert.ok(typeof canvas.bringObjectForward === 'function');
 
     var rect1 = makeRect(),
         rect2 = makeRect(),
@@ -1876,28 +1725,28 @@
     assert.equal(canvas.item(1), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(2), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 moves one way up again — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect1);
+    canvas.bringObjectForward(rect1);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 3, 1 ]
     assert.equal(canvas.item(2), rect1);
     assert.equal(canvas.item(0), rect2);
     assert.equal(canvas.item(1), rect3);
 
-    canvas.bringForward(rect3);
+    canvas.bringObjectForward(rect3);
 
     // 1 is already all the way on top and so doesn't change position — [ 2, 1, 3 ]
     assert.equal(canvas.item(1), rect1);
@@ -1913,10 +1762,11 @@
 
     canvas.add(rect1, rect2);
 
-    canvas.setActiveObject(rect1);
+    assert.ok(canvas.setActiveObject(rect1), 'selected');
     assert.ok(rect1 === canvas._activeObject);
 
-    canvas.setActiveObject(rect2);
+    assert.ok(canvas.setActiveObject(rect2), 'selected');
+    assert.ok(!canvas.setActiveObject(rect2), 'no effect');
     assert.ok(rect2 === canvas._activeObject);
   });
 
@@ -1943,8 +1793,13 @@
       makeRect({ left: 20, top: 20 })
     ]);
 
-    assert.equal(canvas.setActiveObject(group), canvas, 'should be chainable');
+    canvas.setActiveObject(group);
     assert.equal(canvas.getActiveObject(), group);
+  });
+
+  QUnit.test('getActiveSelection', function(assert) {
+    assert.ok(canvas.getActiveSelection() === canvas._activeSelection, 'should equal');
+    assert.ok(canvas.getActiveSelection() instanceof fabric.ActiveSelection, 'is active selection');
   });
 
   QUnit.test('item', function(assert) {
@@ -1966,7 +1821,7 @@
   QUnit.test('discardActiveObject on ActiveSelection', function(assert) {
     var group = new fabric.ActiveSelection([makeRect(), makeRect()]);
     canvas.setActiveObject(group);
-    assert.equal(canvas.discardActiveObject(), canvas, 'should be chainable');
+    canvas.discardActiveObject();
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
   });
 
@@ -1975,7 +1830,8 @@
     canvas.add(makeRect());
     canvas.setActiveObject(canvas.item(0));
 
-    canvas._discardActiveObject();
+    assert.ok(canvas._discardActiveObject(), 'discarded');
+    assert.ok(!canvas._discardActiveObject(), 'no effect');
     assert.equal(canvas.getActiveObject(), null);
   });
 
@@ -2014,14 +1870,25 @@
       eventsFired.selectionCleared = true;
     });
 
-    canvas.discardActiveObject();
-    assert.equal(canvas.getActiveObject(), null);
+    assert.ok(canvas.discardActiveObject(), 'deselected');
+    assert.ok(!canvas.getActiveObject(), 'no active object');
+    assert.ok(!canvas.discardActiveObject(), 'no effect');
     assert.equal(canvas.getActiveObject(), null);
 
     for (var prop in eventsFired) {
       assert.ok(eventsFired[prop]);
     }
   });
+
+  QUnit.test('refuse discarding active object', function (assert) {
+    const rect = makeRect();
+    rect.onDeselect = () => true;
+    canvas.setActiveObject(rect);
+    assert.ok(!canvas.discardActiveObject(), 'no effect');
+    assert.ok(canvas.getActiveObject() === rect, 'active object');
+    canvas.clear();
+    assert.ok(!canvas.getActiveObject(), 'cleared the stubborn ref');
+  })
 
   QUnit.test('complexity', function(assert) {
     assert.ok(typeof canvas.complexity === 'function');
@@ -2037,10 +1904,10 @@
   QUnit.test('toString', function(assert) {
     assert.ok(typeof canvas.toString === 'function');
 
-    assert.equal(canvas.toString(), '#<fabric.Canvas (0): { objects: 0 }>');
+    assert.equal(canvas.toString(), '#<Canvas (0): { objects: 0 }>');
 
     canvas.add(makeRect());
-    assert.equal(canvas.toString(), '#<fabric.Canvas (1): { objects: 1 }>');
+    assert.equal(canvas.toString(), '#<Canvas (1): { objects: 1 }>');
   });
 
   QUnit.test('toSVG with active group', function(assert) {
@@ -2048,178 +1915,51 @@
     var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
-
-    canvas.setActiveObject(new fabric.ActiveSelection([rect, circle]));
+    const activeSelection = canvas.getActiveSelection();
+    activeSelection.add(rect, circle);
+    canvas.setActiveObject(activeSelection);
     var svgWithActiveGroup = canvas.toSVG();
 
     assert.equal(svg, svgWithActiveGroup);
   });
 
-  QUnit.test('active group objects reordering', function(assert) {
-    var rect1 = new fabric.Rect({ width: 30, height: 30, left: 130, top: 130 });
-    var rect2 = new fabric.Rect({ width: 50, height: 50, left: 100, top: 100 });
-    var circle1 = new fabric.Circle({ radius: 10, left: 60, top: 60 });
-    var circle2 = new fabric.Circle({ radius: 50, left: 50, top: 50 });
-    canvas.add(rect1, rect2, circle1, circle2);
-    assert.equal(canvas._objects[0], rect1);
-    assert.equal(canvas._objects[1], rect2);
-    assert.equal(canvas._objects[2], circle1);
-    assert.equal(canvas._objects[3], circle2);
-    var aGroup = new fabric.ActiveSelection([rect2, circle2, rect1, circle1], { canvas: canvas });
-    // before rendering objects are ordered in insert order
-    assert.equal(aGroup._objects[0], rect2);
-    assert.equal(aGroup._objects[1], circle2);
-    assert.equal(aGroup._objects[2], rect1);
-    assert.equal(aGroup._objects[3], circle1);
-    canvas.setActiveObject(aGroup).renderAll();
-    // after rendering objects are ordered in canvas stack order
-    assert.equal(aGroup._objects[0], rect1);
-    assert.equal(aGroup._objects[1], rect2);
-    assert.equal(aGroup._objects[2], circle1);
-    assert.equal(aGroup._objects[3], circle2);
+  [true, false].forEach(enableRetinaScaling => {
+    QUnit.test(`set dimensions, enableRetinaScaling ${enableRetinaScaling}`, async function (assert) {
+      var el = fabric.getDocument().createElement('canvas'),
+        parentEl = fabric.getDocument().createElement('div');
+      el.width = 200; el.height = 200;
+      parentEl.className = 'rootNode';
+      parentEl.appendChild(el);
+
+      const dpr = 1.25;
+      fabric.config.configure({ devicePixelRatio: dpr });
+
+      assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+      assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+      el.style.position = 'relative';
+      var elStyle = el.style.cssText;
+      assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+      var canvas = new fabric.Canvas(el, { enableRetinaScaling, renderOnAddRemove: false });
+
+      canvas.setDimensions({ width: 500, height: 500 });
+      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+      assert.equal(el.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
+      assert.equal(el.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
+      assert.equal(canvas.upperCanvasEl.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
+      assert.equal(canvas.upperCanvasEl.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
+
+      await canvas.dispose();
+      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+      assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+      assert.equal(el.width, 500, 'restored width');
+      assert.equal(el.height, 500, 'restored height');
+
+    });
   });
 
-  QUnit.test('dispose', function(assert) {
-    //made local vars to do not dispose the external canvas
-    var el = fabric.document.createElement('canvas'),
-        parentEl = fabric.document.createElement('div'),
-        wrapperEl, lowerCanvasEl, upperCanvasEl;
-    el.width = 200; el.height = 200;
-    parentEl.className = 'rootNode';
-    parentEl.appendChild(el);
-
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
-
-    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
-
-    el.style.position = 'relative';
-    var elStyle = el.style.cssText;
-    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
-
-    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-    wrapperEl = canvas.wrapperEl;
-    lowerCanvasEl = canvas.lowerCanvasEl;
-    upperCanvasEl = canvas.upperCanvasEl;
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
-    assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
-    assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
-    assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
-    assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
-    assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-    if (!fabric.isLikelyNode) {
-      assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
-    }
-    //looks like i cannot use parentNode
-    //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
-    //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
-    //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
-    assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
-    assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
-    assert.ok(typeof canvas.dispose === 'function');
-    canvas.add(makeRect(), makeRect(), makeRect());
-    canvas.item(0).animate('scaleX', 10);
-    assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
-    canvas.dispose();
-    canvas.cancelRequestedRender();
-    assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
-    assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-    assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
-    if (!fabric.isLikelyNode) {
-      assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
-    }
-    assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
-    assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
-    assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
-    assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
-    assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
-    assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
-    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-    assert.equal(el.width, 200, 'restored width');
-    assert.equal(el.height, 200, 'restored height');
-
-    fabric.devicePixelRatio = originalDevicePixelRatio;
-  });
-
-  QUnit.test('dispose + set dimensions', function (assert) {
-    //made local vars to do not dispose the external canvas
-    var el = fabric.document.createElement('canvas'),
-      parentEl = fabric.document.createElement('div');
-    el.width = 200; el.height = 200;
-    parentEl.className = 'rootNode';
-    parentEl.appendChild(el);
-
-    var originalDevicePixelRatio = fabric.devicePixelRatio;
-    fabric.devicePixelRatio = 1.25;
-
-    assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
-    assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
-
-    el.style.position = 'relative';
-    var elStyle = el.style.cssText;
-    assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
-
-    var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-
-    canvas.setDimensions({ width: 500, height: 500 });
-    assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-    assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
-
-    canvas.dispose();
-    assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
-    assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
-    assert.equal(el.width, 500, 'restored width');
-    assert.equal(el.height, 500, 'restored height');
-
-    fabric.devicePixelRatio = originalDevicePixelRatio;
-
-  });
-
-  // QUnit.test('dispose', function(assert) {
-  //   function invokeEventsOnCanvas() {
-  //     // nextSibling because we need to invoke events on upper canvas
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mouseup');
-  //     simulateEvent(canvas.getElement().nextSibling, 'mousemove');
-  //   }
-  //   var assertInvocationsCount = function() {
-  //     var message = 'event handler should not be invoked after `dispose`';
-  //     assert.equal(handlerInvocationCounts.__onMouseDown, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseUp, 1);
-  //     assert.equal(handlerInvocationCounts.__onMouseMove, 1);
-  //   };
-
-  //   assert.ok(typeof canvas.dispose === 'function');
-  //   canvas.add(makeRect(), makeRect(), makeRect());
-
-  //   var handlerInvocationCounts = {
-  //     __onMouseDown: 0, __onMouseUp: 0, __onMouseMove: 0
-  //   };
-
-  //   // hijack event handlers
-  //   canvas.__onMouseDown = function() {
-  //     handlerInvocationCounts.__onMouseDown++;
-  //   };
-  //   canvas.__onMouseUp = function() {
-  //     handlerInvocationCounts.__onMouseUp++;
-  //   };
-  //   canvas.__onMouseMove = function() {
-  //     handlerInvocationCounts.__onMouseMove++;
-  //   };
-
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
-
-  //   canvas.dispose();
-  //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-
-  //   invokeEventsOnCanvas();
-  //   assertInvocationsCount();
-  // });
 
   QUnit.test('clone', function(assert) {
     var done = assert.async();
@@ -2242,28 +1982,25 @@
   });
 
   QUnit.test('cloneWithoutData', function(assert) {
-    var done = assert.async();
     assert.ok(typeof canvas.cloneWithoutData === 'function');
 
     canvas.add(new fabric.Rect({ width: 100, height: 110, top: 120, left: 130, fill: 'rgba(0,1,2,0.3)' }));
 
-    canvas.cloneWithoutData().then(function(clone) {
+    const clone = canvas.cloneWithoutData();
 
-      assert.ok(clone instanceof fabric.Canvas);
+    assert.ok(clone instanceof fabric.Canvas);
 
-      assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
+    assert.equal(JSON.stringify(clone), EMPTY_JSON, 'data on cloned canvas should be empty');
 
-      assert.equal(canvas.getWidth(), clone.getWidth());
-      assert.equal(canvas.getHeight(), clone.getHeight());
-      clone.renderAll();
-      done();
-    });
+    assert.equal(canvas.getWidth(), clone.getWidth());
+    assert.equal(canvas.getHeight(), clone.getHeight());
+    clone.renderAll();
   });
 
   QUnit.test('getSetWidth', function(assert) {
     assert.ok(typeof canvas.getWidth === 'function');
     assert.equal(canvas.getWidth(), 600);
-    assert.equal(canvas.setWidth(444), canvas, 'should be chainable');
+    canvas.setWidth(444);
     assert.equal(canvas.getWidth(), 444);
     assert.equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
   });
@@ -2271,7 +2008,7 @@
   QUnit.test('getSetHeight', function(assert) {
     assert.ok(typeof canvas.getHeight === 'function');
     assert.equal(canvas.getHeight(), 600);
-    assert.equal(canvas.setHeight(765), canvas, 'should be chainable');
+    canvas.setHeight(765);
     assert.equal(canvas.getHeight(), 765);
     assert.equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
   });
@@ -2293,7 +2030,7 @@
     assert.equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.upperCanvasEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.wrapperEl.style.height, '100%', 'Should be as the css only value');
-    assert.equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+    assert.equal(canvas.getHeight(), 123, 'Should be as the none css only value');
   });
 
   QUnit.test('setWidth backstore only', function(assert) {
@@ -2435,7 +2172,7 @@
   //   assert.equal(rect.originY, 'bottom');
   // });
 
-  QUnit.test('fxRemove', function(assert) {
+  QUnit.skip('fxRemove', function(assert) {
     var done = assert.async();
     assert.ok(typeof canvas.fxRemove === 'function');
 
@@ -2448,7 +2185,7 @@
     }
 
     assert.equal(canvas.item(0), rect);
-    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }) === 'function', 'should return animation abort function');
+    assert.ok(typeof canvas.fxRemove(rect, { onComplete: onComplete }).abort === 'function', 'should return animation abort function');
 
     setTimeout(function() {
       assert.equal(canvas.item(0), undefined);
@@ -2470,12 +2207,12 @@
   //     assert.deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.document.location.protocol +
+  //       "backgroundImage": (fabric.getDocument().location.protocol +
   //                           '//' +
-  //                           fabric.document.location.hostname +
-  //                           ((fabric.document.location.port === '' || parseInt(fabric.document.location.port, 10) === 80)
+  //                           fabric.getDocument().location.hostname +
+  //                           ((fabric.getDocument().location.port === '' || parseInt(fabric.getDocument().location.port, 10) === 80)
   //                               ? ''
-  //                               : (':' + fabric.document.location.port)) +
+  //                               : (':' + fabric.getDocument().location.port)) +
   //                           '/assets/pug.jpg'),
   //       "backgroundImageOpacity": 1,
   //       "backgroundImageStretch": true
@@ -2506,7 +2243,8 @@
     assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    // disabled this pixel because firefox 110 updates
+    // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
     assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
     assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
     assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
@@ -2535,7 +2273,8 @@
     assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
     assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
     assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
+    // disabled this pixel because firefox 110 updates
+    // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
     assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
     assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
     assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
@@ -2575,7 +2314,8 @@
     assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
     assert.equal(canvas.isTargetTransparent(rect, 17, 17), true, 'transparent 17, 17');
     assert.equal(canvas.isTargetTransparent(rect, 18, 18), true, 'transparent 18, 18');
-    assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
+    // disabled this pixel because firefox 110 updates
+    // assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
     assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
     assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
     assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
@@ -2589,18 +2329,6 @@
     assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
     assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
 
-  });
-
-  QUnit.test('canvas inheritance', function(assert) {
-
-    // this should not error out
-    var InheritedCanvasClass = fabric.util.createClass(fabric.Canvas, {
-      initialize: function() {
-
-      }
-    });
-
-    assert.ok(typeof InheritedCanvasClass === 'function');
   });
 
   QUnit.test('canvas getTopContext', function(assert) {
