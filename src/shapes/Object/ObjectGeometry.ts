@@ -299,15 +299,11 @@ export class ObjectGeometry<
     absolute = false,
     calculate = false
   ): boolean {
-    const points = this.getCoords(absolute, calculate),
-      otherCoords = absolute ? other.aCoords : other.lineCoords,
-      lines = other._getImageLines(otherCoords);
-    for (let i = 0; i < 4; i++) {
-      if (!other.containsPoint(points[i], lines)) {
-        return false;
-      }
-    }
-    return true;
+    return !other.containsPoints(
+      this.getCoords(absolute, calculate),
+      absolute,
+      calculate
+    );
   }
 
   /**
@@ -342,26 +338,37 @@ export class ObjectGeometry<
   }
 
   /**
+   * @todo this method must be refactored to support plane changes
+   *
    * Checks if point is inside the object
-   * @param {Point} point Point to check against
-   * @param {Object} [lines] object returned from @method _getImageLines
+   * @param {Point} points Point to check against
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(
-    point: Point,
-    lines?: TBBoxLines,
-    absolute = false,
-    calculate = false
-  ): boolean {
-    const coords = this._getCoords(absolute, calculate),
-      imageLines = lines || this._getImageLines(coords),
-      xPoints = this._findCrossPoints(point, imageLines);
-    // if xPoints is odd then point is inside the object
-    return xPoints !== 0 && xPoints % 2 === 1;
+  containsPoint(point: Point, absolute = false, calculate = false) {
+    return this.containsPoints([point], absolute, calculate);
   }
 
+  /**
+   * @todo this method must be refactored to support plane changes
+   *
+   * Checks if point is inside the object
+   * @param {Point[]} points Points to check against
+   * @param {Boolean} [absolute] use coordinates without viewportTransform
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
+   * @return {Boolean} true if points are inside the object
+   */
+  containsPoints(points: Point[], absolute = false, calculate = false) {
+    const imageLines = this._getImageLines(
+      this._getCoords(absolute, calculate)
+    );
+    return points.every((point) => {
+      const xPoints = this._findCrossPoints(point, imageLines);
+      // if xPoints is odd then point is inside the object
+      return xPoints !== 0 && xPoints % 2 === 1;
+    });
+  }
   /**
    * Checks if object is contained within the canvas with current viewportTransform
    * the check is done stopping at first point that appears on screen
@@ -409,7 +416,7 @@ export class ObjectGeometry<
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, undefined, true, calculate);
+    return this.containsPoint(centerPoint, true, calculate);
   }
 
   /**
