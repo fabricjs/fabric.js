@@ -2,6 +2,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import {fragmentSource} from './saturation.shaders';
 
 /**
  * Saturate filter class
@@ -14,21 +15,6 @@ import { classRegistry } from '../ClassRegistry';
  */
 
 export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uSaturation;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      float rgMax = max(color.r, color.g);
-      float rgbMax = max(rgMax, color.b);
-      color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
-      color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
-      color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
-      gl_FragColor = color;
-    }
-  `,
   saturation: 0,
   mainParameter: 'saturation',
 };
@@ -45,6 +31,10 @@ export class Saturation extends BaseFilter {
   declare saturation: number;
 
   static defaults = saturationDefaultValues;
+
+  getFragmentSource() {
+    return fragmentSource;
+  }
 
   /**
    * Apply the Saturation operation to a Uint8ClampedArray representing the pixels of an image.
