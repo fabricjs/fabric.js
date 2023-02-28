@@ -20,8 +20,6 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Blur extends BaseFilter {
-  static readonly type = 'Blur';
-
   /**
    * blur value, in percentage of image dimensions.
    * specific to keep the image blur constant at different resolutions

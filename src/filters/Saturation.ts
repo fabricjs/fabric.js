@@ -13,8 +13,6 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Saturation extends BaseFilter {
-  static readonly type = 'Saturation';
-
   /**
    * Saturation value, from -1 to 1.
    * Increases/decreases the color saturation.

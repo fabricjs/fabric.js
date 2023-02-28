@@ -15,8 +15,6 @@ import { createCanvasElement } from '../util/misc/dom';
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
 export class Resize extends BaseFilter {
-  static readonly type = 'Resize';
-
   /**
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:

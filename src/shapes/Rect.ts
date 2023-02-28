@@ -11,8 +11,6 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
 };
 
 export class Rect extends FabricObject {
-  static readonly type = 'rect';
-
   /**
    * Horizontal border radius
    * @type Number

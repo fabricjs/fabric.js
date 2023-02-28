@@ -26,11 +26,6 @@ export interface AnyFilter
 
 export abstract class AbstractBaseFilter<T> {
   /**
-   * Filter type
-   */
-  static readonly type = 'filter' as string;
-
-  /**
    * Array of attributes to send with buffers. do not modify
    * @private
    */
@@ -262,7 +257,7 @@ export abstract class AbstractBaseFilter<T> {
   abstract applyTo2d(options: T2DPipelineState): void;
 
   protected getType() {
-    return (this.constructor as typeof BaseFilter).type;
+    return this.constructor.name;
   }
 
   getCacheKey() {

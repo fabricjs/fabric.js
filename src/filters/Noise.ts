@@ -14,8 +14,6 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Noise extends BaseFilter {
-  static readonly type = 'Noise';
-
   /**
    * Noise value, from
    * @param {Number} noise

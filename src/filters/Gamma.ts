@@ -15,8 +15,6 @@ export type GammaInput = [number, number, number];
  * object.applyFilters();
  */
 export class Gamma extends BaseFilter {
-  static readonly type = 'Gamma';
-
   /**
    * Gamma array value, from 0.01 to 2.2.
    * @param {Array} gamma

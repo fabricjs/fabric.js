@@ -40,7 +40,6 @@ export interface CircleProps extends FabricObjectProps {
 }
 
 export class Circle extends FabricObject implements CircleProps {
-  static readonly type = 'circle';
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;

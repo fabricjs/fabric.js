@@ -12,8 +12,6 @@ import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
  * object.applyFilters();
  */
 export class MyFilter extends BaseFilter {
-  static readonly type = 'MyFilter';
-
   /**
    * MyFilter value, from -1 to 1.
    * translated to -255 to 255 for 2d

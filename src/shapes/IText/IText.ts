@@ -86,8 +86,6 @@ export const iTextDefaultValues = {
 export class IText<
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextClickBehavior<EventSpec> {
-  static readonly type = 'i-text';
-
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number

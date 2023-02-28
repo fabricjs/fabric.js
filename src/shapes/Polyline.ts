@@ -16,8 +16,6 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
 };
 
 export class Polyline extends FabricObject {
-  static readonly type = 'polyline';
-
   /**
    * Points array
    * @type Array

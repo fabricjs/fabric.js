@@ -163,8 +163,6 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
 export class Text<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends StyledText<EventSpec> {
-  static readonly type = 'text';
-
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]

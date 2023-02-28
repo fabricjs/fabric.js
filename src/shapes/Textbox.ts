@@ -22,8 +22,6 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
  * wrapping of lines.
  */
 export class Textbox extends IText {
-  static readonly type = 'textbox';
-
   /**
    * Minimum width of textbox, in pixels.
    * @type Number

@@ -11,8 +11,6 @@ export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
 };
 
 export class Ellipse extends FabricObject {
-  static readonly type = 'ellipse';
-
   /**
    * Horizontal radius
    * @type Number

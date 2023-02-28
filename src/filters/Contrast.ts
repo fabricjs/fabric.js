@@ -13,8 +13,6 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Contrast extends BaseFilter {
-  static readonly type = 'Contrast';
-
   /**
    * contrast value, range from -1 to 1.
    * @param {Number} contrast

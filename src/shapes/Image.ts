@@ -36,8 +36,6 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 export class Image extends FabricObject {
-  static readonly type = 'image';
-
   /**
    * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.

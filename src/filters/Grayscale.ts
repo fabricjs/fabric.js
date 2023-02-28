@@ -11,8 +11,6 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Grayscale extends AbstractBaseFilter<Record<string, string>> {
-  static readonly type = 'Grayscale';
-
   declare mode: 'average' | 'lightness' | 'luminosity';
 
   /**

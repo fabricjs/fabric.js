@@ -11,8 +11,6 @@ import { isFiller } from '../util/types';
 const coordProps = ['x1', 'x2', 'y1', 'y2'];
 
 export class Line extends FabricObject {
-  static readonly type = 'line';
-
   /**
    * x value or first line edge
    * @type number

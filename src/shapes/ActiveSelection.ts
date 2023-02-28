@@ -4,8 +4,6 @@ import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
-  static readonly type = 'activeSelection';
-
   declare _objects: FabricObject[];
 
   /**

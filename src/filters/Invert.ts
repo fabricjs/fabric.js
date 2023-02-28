@@ -10,8 +10,6 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
 export class Invert extends BaseFilter {
-  static readonly type = 'Invert';
-
   /**
    * Invert also alpha.
    * @param {Boolean} alpha

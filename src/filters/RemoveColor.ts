@@ -15,8 +15,6 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class RemoveColor extends BaseFilter {
-  static readonly type = 'RemoveColor';
-
   /**
    * Color to remove, in any format understood by {@link Color}.
    * @type string

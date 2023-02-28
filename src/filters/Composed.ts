@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import {
   type AnyFilter,
   BaseFilter,
@@ -13,8 +12,6 @@ import { classRegistry } from '../ClassRegistry';
  */
 // @ts-expect-error doesn't implement abstract methods
 export class Composed extends BaseFilter {
-  static readonly type = 'Composed';
-
   /**
    * A non sparse array of filters to apply
    */

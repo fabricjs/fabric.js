@@ -17,8 +17,6 @@ import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 
 export class Path extends FabricObject {
-  static readonly type = 'path';
-
   /**
    * Array of path points
    * @type Array

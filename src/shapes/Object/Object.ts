@@ -87,8 +87,6 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   extends AnimatableObject<EventSpec>
   implements ObjectProps
 {
-  static readonly type = 'object' as string;
-
   declare opacity: number;
   declare cornerSize: number;
   declare touchCornerSize: number;

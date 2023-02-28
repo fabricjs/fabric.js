@@ -13,8 +13,6 @@ import { classRegistry } from '../ClassRegistry';
  * object.applyFilters();
  */
 export class Pixelate extends BaseFilter {
-  static readonly type = 'Pixelate';
-
   declare blocksize: number;
 
   /**

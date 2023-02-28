@@ -22,8 +22,6 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
-  static readonly type = 'BlendColor';
-
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.

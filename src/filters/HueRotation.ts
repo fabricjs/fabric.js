@@ -14,10 +14,7 @@ import { classRegistry } from '../ClassRegistry';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-// @ts-expect-error fromObject
 export class HueRotation extends ColorMatrix {
-  static readonly type = 'HueRotation';
-
   /**
    * HueRotation value, from -1 to 1.
    */

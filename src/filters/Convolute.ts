@@ -44,8 +44,6 @@ import { classRegistry } from '../ClassRegistry';
  * canvas.renderAll();
  */
 export class Convolute extends AbstractBaseFilter<Record<string, string>> {
-  static readonly type = 'Convolute';
-
   /*
    * Opaque value (true/false)
    */
