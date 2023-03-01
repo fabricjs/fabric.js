@@ -662,14 +662,19 @@ export class ObjectGeometry<
     const vpt = this.getViewportTransform();
     const coords = mapValues(aCoords, (coord) => coord.transform(vpt));
 
+    // // debug code
     // setTimeout(() => {
     //   const canvas = this.canvas;
     //   if (!canvas) return;
-    //   canvas.clearContext(canvas.contextTop);
-    //   canvas.contextTop.fillStyle = 'blue';
+    //   const ctx = canvas.contextTop;
+    //   canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'blue';
     //   Object.keys(coords).forEach((key) => {
     //     const control = coords[key];
-    //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+    //     ctx.beginPath();
+    //     ctx.ellipse(control.x, control.y, 6, 6, 0, 0, 360);
+    //     ctx.closePath();
+    //     ctx.fill();
     //   });
     // }, 50);
 

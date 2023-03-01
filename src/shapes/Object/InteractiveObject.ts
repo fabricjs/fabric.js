@@ -225,15 +225,19 @@ export class InteractiveFabricObject<
       );
     });
 
-    // debug code
+    // // debug code
     // setTimeout(() => {
     //   const canvas = this.canvas;
     //   if (!canvas) return;
-    //   canvas.clearContext(canvas.contextTop);
-    //   canvas.contextTop.fillStyle = 'green';
+    //   const ctx = canvas.contextTop;
+    //   // canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'magenta';
     //   Object.keys(coords).forEach((key) => {
     //     const control = coords[key];
-    //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+    //     ctx.beginPath();
+    //     ctx.ellipse(control.x, control.y, 3, 3, 0, 0, 360);
+    //     ctx.closePath();
+    //     ctx.fill();
     //   });
     // }, 50);
 
