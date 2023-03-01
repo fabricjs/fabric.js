@@ -16,6 +16,7 @@ import {
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
+  multiplyTransformMatrixChain,
   qrDecompose,
   transformPoint,
 } from '../../util/misc/matrix';
@@ -209,14 +210,14 @@ export class ObjectGeometry<
    */
   _getCoords(absolute = false, calculate = false): TCornerPoint {
     if (calculate) {
-      return absolute ? this.calcACoords() : this.calcLineCoords();
+      return absolute
+        ? this.calcACoords()
+        : this.calcLineCoords(this.calcACoords());
     }
     // swapped this double if in place of setCoords();
     if (!this.aCoords) {
       this.aCoords = this.calcACoords();
-    }
-    if (!this.lineCoords) {
-      this.lineCoords = this.calcLineCoords();
+      this.lineCoords = this.calcLineCoords(this.aCoords);
     }
     return absolute ? this.aCoords : this.lineCoords;
   }
@@ -611,7 +612,7 @@ export class ObjectGeometry<
    * used for bounding box interactivity with the mouse
    * @returns {TCornerPoint}
    */
-  calcLineCoords(): TCornerPoint {
+  calcLineCoords(aCoords = this.calcACoords()): TCornerPoint {
     const vpt = this.getViewportTransform(),
       padding = this.padding,
       angle = degreesToRadians(this.getTotalAngle()),
@@ -619,13 +620,13 @@ export class ObjectGeometry<
       sinP = sin(angle) * padding,
       cosPSinP = cosP + sinP,
       cosPMinusSinP = cosP - sinP,
-      { tl, tr, bl, br } = this.calcACoords();
+      { tl, tr, bl, br } = aCoords;
 
     const lineCoords: TCornerPoint = {
-      tl: transformPoint(tl, vpt),
-      tr: transformPoint(tr, vpt),
-      bl: transformPoint(bl, vpt),
-      br: transformPoint(br, vpt),
+      tl: tl.transform(vpt),
+      tr: tr.transform(vpt),
+      bl: bl.transform(vpt),
+      br: br.transform(vpt),
     };
 
     if (padding) {
@@ -658,19 +659,15 @@ export class ObjectGeometry<
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
-      center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      positionMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
-      finalMatrix = this.group
-        ? multiplyTransformMatrices(
-            this.group.calcTransformMatrix(),
-            positionMatrix
-          )
-        : positionMatrix,
+    const center = this.getRelativeCenterPoint(),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;
+    const finalMatrix = multiplyTransformMatrixChain([
+      this.group?.calcTransformMatrix() || iMatrix,
+      [1, 0, 0, 1, center.x, center.y],
+      calcRotateMatrix({ angle: this.angle }),
+    ]);
     return {
       // corners
       tl: transformPoint({ x: -w, y: -h }, finalMatrix),
@@ -690,7 +687,7 @@ export class ObjectGeometry<
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
-    this.lineCoords = this.calcLineCoords();
+    this.lineCoords = this.calcLineCoords(this.aCoords);
   }
 
   transformMatrixKey(skipGroup = false): string {

@@ -21,6 +21,7 @@ export {
   calcDimensionsMatrix,
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixChain,
   isIdentityMatrix,
 } from './misc/matrix';
 export {

@@ -83,12 +83,15 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
+ * Multiplies the chain such that a matrix defines the plane for the rest of the matrices after it
  *
- * @param param0 an array of matrices stacked from first to last in order of application to a context and last to first in order of multiplication
+ * `multiplyTransformMatrixChain([A, B, C, D])` is equivalent to `A(B(C(D)))`
+ *
+ * @param param0 an array of matrices
  * @param is2x2
  * @returns
  */
-export const multiplyTransformMatricesRight = (
+export const multiplyTransformMatrixChain = (
   matrices: TMat2D[],
   is2x2?: boolean
 ): TMat2D =>
