@@ -644,6 +644,28 @@ export class ObjectGeometry<
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
+  protected calcDimensionsVector(
+    origin = new Point(1, 1),
+    {
+      applyViewportTransform = false,
+    }: {
+      applyViewportTransform?: boolean;
+    } = {}
+  ) {
+    const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
+    const dimVector = origin
+      .multiply(new Point(this.width, this.height))
+      .scalarAdd(!this.strokeUniform ? this.strokeWidth * 2 : 0)
+      .transform(
+        multiplyTransformMatrices(vpt, this.calcTransformMatrix()),
+        true
+      );
+    const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
+      this.strokeUniform ? this.strokeWidth * 2 : 0
+    );
+    return dimVector.add(strokeUniformVector);
+  }
+
   protected calcCoord(
     origin: Point,
     offset = new Point(),
@@ -656,19 +678,6 @@ export class ObjectGeometry<
     } = {}
   ) {
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
-    const dimVector = origin
-      .multiply(
-        new Point(this.width, this.height).scalarAdd(
-          !this.strokeUniform ? this.strokeWidth * 2 : 0
-        )
-      )
-      .transform(
-        multiplyTransformMatrices(vpt, this.calcTransformMatrix()),
-        true
-      );
-    const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
-      this.strokeUniform ? this.strokeWidth * 2 : 0
-    );
     const offsetVector = rotateVector(
       offset
         .add(origin.scalarMultiply(padding * 2))
@@ -676,7 +685,9 @@ export class ObjectGeometry<
       degreesToRadians(this.getTotalAngle())
     );
     const realCenter = this.getCenterPoint().transform(vpt);
-    return realCenter.add(dimVector).add(strokeUniformVector).add(offsetVector);
+    return realCenter
+      .add(this.calcDimensionsVector(origin, { applyViewportTransform }))
+      .add(offsetVector);
   }
 
   /**
