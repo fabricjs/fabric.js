@@ -466,21 +466,21 @@
     assert.equal(parsed.alignY, 'min');
   });
 
-  QUnit.test('multiplyTransformMatrixChain', function(assert) {
-    assert.ok(typeof fabric.util.multiplyTransformMatrixChain === 'function');
-    var m1 = [1, 1, 1, 1, 1, 1], m2 = [1, 1, 1, 1, 1, 1], m3;
-    m3 = fabric.util.multiplyTransformMatrixChain([m1, m2]);
-    assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
-    m3 = fabric.util.multiplyTransformMatrixChain([m1, m2], true);
-    assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
-  });
-
   QUnit.test('multiplyTransformMatrices', function(assert) {
     assert.ok(typeof fabric.util.multiplyTransformMatrices === 'function');
     var m1 = [1, 1, 1, 1, 1, 1], m2 = [1, 1, 1, 1, 1, 1], m3;
     m3 = fabric.util.multiplyTransformMatrices(m1, m2);
     assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
     m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
+    assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+  });
+
+  QUnit.test('multiplyTransformMatrixChain', function (assert) {
+    assert.ok(typeof fabric.util.multiplyTransformMatrixChain === 'function');
+    var m1 = [1, 1, 1, 1, 1, 1], m2 = [1, 1, 1, 1, 1, 1], m3;
+    m3 = fabric.util.multiplyTransformMatrixChain([m1, m2]);
+    assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
+    m3 = fabric.util.multiplyTransformMatrixChain([m1, m2], true);
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
   });
 
