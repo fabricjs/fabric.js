@@ -5,6 +5,7 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
   calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixChain,
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
@@ -197,23 +198,21 @@ export class InteractiveFabricObject<
       center = this.getCenterPoint(),
       tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
+        // TODO: fix this and use transformOptions for the angle
         angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
-      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
-        0,
-        0,
-        1 / vpt[3],
-        0,
-        0,
-      ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
         : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
+
+    const finalMatrix = multiplyTransformMatrixChain([
+      vpt,
+      tMatrix,
+      rMatrix,
+      [1 / vpt[0], 0, 0, 1 / vpt[3], 0, 0],
+    ]);
 
     this.forEachControl((control, key) => {
       const position = control.positionHandler(dim, finalMatrix, this, control);
