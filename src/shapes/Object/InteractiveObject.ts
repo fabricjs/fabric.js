@@ -21,8 +21,13 @@ import { FabricObjectProps } from './ObjectProps';
 import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { iMatrix } from '../../constants';
 import { mapValues } from '../../util/internals';
-import { createVector } from '../../util/misc/vectors';
+import {
+  createVector,
+  getOrthonormalVector,
+  rotateVector,
+} from '../../util/misc/vectors';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { Intersection } from '../../Intersection';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -224,6 +229,43 @@ export class InteractiveFabricObject<
     const b1 = createVector(tl, tr); //.divide(dimVector);
     const b2 = createVector(tl, bl); //.divide(dimVector);
     const t: TMat2D = [b1.x, b1.y, b2.x, b2.y, center.x, center.y];
+
+    // const t: TMat2D = [
+    //   b1.x / Math.max(width, 1),
+    //   b1.y / Math.max(height, 1),
+    //   b2.x / Math.max(width, 1),
+    //   b2.y / Math.max(height, 1),
+    //   center.x,
+    //   center.y,
+    // ];
+
+    const {
+      status,
+      points: [bl2],
+    } = Intersection.intersectLineLine(
+      tl,
+      tl.add(new Point(-b1.y, b1.x)),
+      br,
+      bl
+    );
+
+    console.log(status, bl2);
+
+    const bbox2 = makeBoundingBoxFromPoints(
+      [tl, tr, bl, br].map((coord) => coord.rotate(-angle, center))
+    );
+    const out = [
+      new Point(bbox2.left, bbox2.top),
+      new Point(bbox2.left + bbox2.width, bbox2.top),
+      new Point(bbox2.left, bbox2.top + bbox2.height),
+    ].map((point) => point.rotate(angle, center));
+    const w1 = createVector(out[0], out[1]); //.divide(dimVector);
+    const w2 = createVector(out[0], out[2]); //.divide(dimVector);
+    const t3: TMat2D = [w1.x, w1.y, w2.x, w2.y, center.x, center.y];
+
+    const v2 = createVector(tl, bl2); //.divide(dimVector);
+    const t2: TMat2D = [b1.x, b1.y, v2.x, v2.y, center.x, center.y];
+
     const coords = mapValues(this.controls, (control, key) => {
       // const position = this.calcViewportCoord(
       //   new Point(control.x, control.y),
@@ -231,8 +273,8 @@ export class InteractiveFabricObject<
       // );
       const position = control.positionHandler(
         new Point(width, height),
-        t,
-        t,
+        t3,
+        t3,
         this,
         control[key]
       );

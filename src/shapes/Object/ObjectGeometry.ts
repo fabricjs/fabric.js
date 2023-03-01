@@ -612,14 +612,15 @@ export class ObjectGeometry<
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
-    if (this.group) {
-      const { flipX, flipY } = this;
-      const { angle } = qrDecompose(this.calcTransformMatrix());
-      this.flipX = flipX;
-      this.flipY = flipY;
-      return angle;
-    }
-    return this.angle;
+    // if (this.group) {
+    //   const { flipX, flipY } = this;
+    //   const { angle } = qrDecompose(this.calcTransformMatrix());
+    //   this.flipX = flipX;
+    //   this.flipY = flipY;
+    //   return angle;
+    // }
+    // return this.angle;
+    return qrDecompose(this.calcTransformMatrix()).angle;
   }
 
   getFlipFactor() {
