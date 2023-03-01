@@ -333,8 +333,6 @@ export class ObjectGeometry<
   }
 
   /**
-   * @todo this method must be refactored to support plane changes
-   *
    * Checks if point is inside the object
    * @param {Point} points Point to check against
    * @param {Boolean} [absolute] use coordinates without viewportTransform
@@ -346,8 +344,6 @@ export class ObjectGeometry<
   }
 
   /**
-   * @todo this method must be refactored to support plane changes
-   *
    * Checks if point is inside the object
    * @param {Point[]} points Points to check against
    * @param {Boolean} [absolute] use coordinates without viewportTransform
