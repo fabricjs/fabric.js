@@ -10,7 +10,6 @@ import { iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import { cos } from '../../util/misc/cos';
 import {
   calcRotateMatrix,
   composeMatrix,
@@ -20,12 +19,13 @@ import {
   qrDecompose,
   transformPoint,
 } from '../../util/misc/matrix';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
+import { sendVectorToPlane } from '../../util/misc/planeChange';
+import { mapValues } from '../../util/internals';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 
 type TLineDescriptor = {
   o: Point;
@@ -608,42 +608,6 @@ export class ObjectGeometry<
   }
 
   /**
-   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
-   * used for bounding box interactivity with the mouse
-   * @returns {TCornerPoint}
-   */
-  calcLineCoords(aCoords = this.calcACoords()): TCornerPoint {
-    const vpt = this.getViewportTransform(),
-      padding = this.padding,
-      angle = degreesToRadians(this.getTotalAngle()),
-      cosP = cos(angle) * padding,
-      sinP = sin(angle) * padding,
-      cosPSinP = cosP + sinP,
-      cosPMinusSinP = cosP - sinP,
-      { tl, tr, bl, br } = aCoords;
-
-    const lineCoords: TCornerPoint = {
-      tl: tl.transform(vpt),
-      tr: tr.transform(vpt),
-      bl: bl.transform(vpt),
-      br: br.transform(vpt),
-    };
-
-    if (padding) {
-      lineCoords.tl.x -= cosPMinusSinP;
-      lineCoords.tl.y -= cosPSinP;
-      lineCoords.tr.x += cosPSinP;
-      lineCoords.tr.y -= cosPMinusSinP;
-      lineCoords.bl.x -= cosPSinP;
-      lineCoords.bl.y += cosPMinusSinP;
-      lineCoords.br.x += cosPMinusSinP;
-      lineCoords.br.y += cosPSinP;
-    }
-
-    return lineCoords;
-  }
-
-  /**
    * Retrieves viewportTransform from Object's canvas if possible
    * @method getViewportTransform
    * @memberOf FabricObject.prototype
@@ -658,23 +622,62 @@ export class ObjectGeometry<
    * those never change with zoom or viewport changes.
    * @return {TCornerPoint}
    */
-  calcACoords(): TCornerPoint {
-    const center = this.getRelativeCenterPoint(),
-      dim = this._getTransformedDimensions(),
-      w = dim.x / 2,
-      h = dim.y / 2;
+  calcACoords(applyViewportTransform = false): TCornerPoint {
+    const center = this.getRelativeCenterPoint();
+    const dim = this._getTransformedDimensions();
+    // padding is not affected by viewportTransform
+    // aCoords are, so we send the padding vector to our plane
+    const paddingVector = sendVectorToPlane(
+      new Point(this.padding, this.padding),
+      undefined,
+      this.getViewportTransform()
+    );
     const finalMatrix = multiplyTransformMatrixChain([
+      applyViewportTransform ? this.getViewportTransform() : iMatrix,
       this.group?.calcTransformMatrix() || iMatrix,
       [1, 0, 0, 1, center.x, center.y],
       calcRotateMatrix({ angle: this.angle }),
     ]);
-    return {
-      // corners
-      tl: transformPoint({ x: -w, y: -h }, finalMatrix),
-      tr: transformPoint({ x: w, y: -h }, finalMatrix),
-      bl: transformPoint({ x: -w, y: h }, finalMatrix),
-      br: transformPoint({ x: w, y: h }, finalMatrix),
+    const { angle: totalAngle } = qrDecompose(finalMatrix);
+    const factorize = (x: number, y: number) => {
+      const paddingRotationMatrix = calcRotateMatrix({
+        // the vector initially points to 45deg so we rotate it back
+        angle: -45 + totalAngle + radiansToDegrees(Math.atan2(y, x)),
+      });
+      return new Point(x, y)
+        .multiply(dim)
+        .transform(finalMatrix)
+        .add(paddingVector.transform(paddingRotationMatrix, true));
     };
+    return {
+      tl: factorize(-0.5, -0.5),
+      tr: factorize(0.5, -0.5),
+      bl: factorize(-0.5, 0.5),
+      br: factorize(0.5, 0.5),
+    };
+  }
+
+  /**
+   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
+   * used for bounding box interactivity with the mouse
+   * @returns {TCornerPoint}
+   */
+  calcLineCoords(aCoords = this.calcACoords()): TCornerPoint {
+    const vpt = this.getViewportTransform();
+    const coords = mapValues(aCoords, (coord) => coord.transform(vpt));
+
+    // setTimeout(() => {
+    //   const canvas = this.canvas;
+    //   if (!canvas) return;
+    //   canvas.clearContext(canvas.contextTop);
+    //   canvas.contextTop.fillStyle = 'blue';
+    //   Object.keys(coords).forEach((key) => {
+    //     const control = coords[key];
+    //     canvas.contextTop.fillRect(control.x, control.y, 3, 3);
+    //   });
+    // }, 50);
+
+    return coords;
   }
 
   /**
