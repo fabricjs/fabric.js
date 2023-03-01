@@ -5,12 +5,14 @@ import type {
   TMat2D,
   TOriginX,
   TOriginY,
+  TRadian,
 } from '../../typedefs';
 import { iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import {
+  calcDimensionsMatrix,
   calcRotateMatrix,
   composeMatrix,
   invertTransform,
@@ -25,7 +27,19 @@ import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { mapValues } from '../../util/internals';
-import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from '../../util/misc/radiansDegreesConversion';
+import {
+  calcAngleBetweenVectors,
+  calcVectorRotation,
+  createVector,
+  getUnitVector,
+  rotateVector,
+} from '../../util/misc/vectors';
+import { cos } from '../../util/misc/cos';
+import { sin } from '../../util/misc/sin';
 
 type TLineDescriptor = {
   o: Point;
@@ -598,9 +612,26 @@ export class ObjectGeometry<
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
-    return this.group
-      ? qrDecompose(this.calcTransformMatrix()).angle
-      : this.angle;
+    if (this.group) {
+      const { flipX, flipY } = this;
+      const { angle } = qrDecompose(this.calcTransformMatrix());
+      this.flipX = flipX;
+      this.flipY = flipY;
+      return angle;
+    }
+    return this.angle;
+  }
+
+  getFlipFactor() {
+    let flipX = this.flipX ? -1 : 1,
+      flipY = this.flipY ? -1 : 1;
+    let target = this.group;
+    while (target) {
+      flipX *= target.flipX ? -1 : 1;
+      flipY *= target.flipY ? -1 : 1;
+      target = target.group;
+    }
+    return new Point(flipX, flipY);
   }
 
   /**
@@ -613,39 +644,56 @@ export class ObjectGeometry<
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
-  /**
-   * Calculates the coordinates of the 4 corner of the bbox, in absolute coordinates.
-   * those never change with zoom or viewport changes.
-   * @return {TCornerPoint}
-   */
-  calcCoords<T extends Point, K extends string>(
-    originPoints: Record<K, T>,
-    applyViewportTransform = false
+  protected calcCoord(
+    origin: Point,
+    offset = new Point(),
+    {
+      applyViewportTransform = false,
+      padding = 0,
+    }: {
+      applyViewportTransform?: boolean;
+      padding?: number;
+    } = {}
   ) {
-    const center = this.getRelativeCenterPoint();
-    const dim = this._getTransformedDimensions();
-    const finalMatrix = multiplyTransformMatrixChain([
-      applyViewportTransform ? this.getViewportTransform() : iMatrix,
-      this.group ? this.group.calcTransformMatrix() : iMatrix,
-      [1, 0, 0, 1, center.x, center.y],
-      calcRotateMatrix({ angle: this.angle }),
-    ]);
-    const { angle: totalAngle } = qrDecompose(finalMatrix);
-    return mapValues(originPoints, (point) => {
-      // padding is not affected by viewportTransform
-      // aCoords are, so we send the padding vector to our planes
-      const paddingVector = sendVectorToPlane(
-        point.scalarMultiply(this.padding * 2),
-        undefined,
-        this.getViewportTransform()
+    const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
+    const dimVector = origin
+      .multiply(
+        new Point(this.width, this.height).scalarAdd(
+          !this.strokeUniform ? this.strokeWidth * 2 : 0
+        )
+      )
+      .transform(
+        multiplyTransformMatrices(vpt, this.calcTransformMatrix()),
+        true
       );
-      const paddingRotationMatrix = calcRotateMatrix({
-        angle: totalAngle,
-      });
-      return point
-        .multiply(dim)
-        .transform(finalMatrix)
-        .add(paddingVector.transform(paddingRotationMatrix, true));
+    const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
+      this.strokeUniform ? this.strokeWidth * 2 : 0
+    );
+    const offsetVector = rotateVector(
+      offset
+        .add(origin.scalarMultiply(padding * 2))
+        .multiply(this.getFlipFactor()),
+      degreesToRadians(this.getTotalAngle())
+    );
+    const realCenter = this.getCenterPoint().transform(vpt);
+    return realCenter.add(dimVector).add(strokeUniformVector).add(offsetVector);
+  }
+
+  /**
+   * **CAUTION**
+   * can be used only after aCoords are set
+   * @param origin
+   * @param offset
+   * @returns
+   */
+  protected calcViewportCoord(
+    origin: Point,
+    offset: Point,
+    padding = this.padding
+  ) {
+    return this.calcCoord(origin, offset, {
+      applyViewportTransform: true,
+      padding,
     });
   }
 
@@ -655,12 +703,15 @@ export class ObjectGeometry<
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    return this.calcCoords({
-      tl: new Point(-0.5, -0.5),
-      tr: new Point(0.5, -0.5),
-      bl: new Point(-0.5, 0.5),
-      br: new Point(0.5, 0.5),
-    });
+    return mapValues(
+      {
+        tl: new Point(-0.5, -0.5),
+        tr: new Point(0.5, -0.5),
+        bl: new Point(-0.5, 0.5),
+        br: new Point(0.5, 0.5),
+      },
+      (origin) => this.calcCoord(origin)
+    );
   }
 
   /**
@@ -672,21 +723,21 @@ export class ObjectGeometry<
     const vpt = this.getViewportTransform();
     const coords = mapValues(aCoords, (coord) => coord.transform(vpt));
 
-    // // debug code
-    // setTimeout(() => {
-    //   const canvas = this.canvas;
-    //   if (!canvas) return;
-    //   const ctx = canvas.contextTop;
-    //   canvas.clearContext(ctx);
-    //   ctx.fillStyle = 'blue';
-    //   Object.keys(coords).forEach((key) => {
-    //     const control = coords[key];
-    //     ctx.beginPath();
-    //     ctx.ellipse(control.x, control.y, 6, 6, 0, 0, 360);
-    //     ctx.closePath();
-    //     ctx.fill();
-    //   });
-    // }, 50);
+    // debug code
+    setTimeout(() => {
+      const canvas = this.canvas;
+      if (!canvas) return;
+      const ctx = canvas.contextTop;
+      canvas.clearContext(ctx);
+      ctx.fillStyle = 'blue';
+      Object.keys(coords).forEach((key) => {
+        const control = coords[key];
+        ctx.beginPath();
+        ctx.ellipse(control.x, control.y, 6, 6, 0, 0, 360);
+        ctx.closePath();
+        ctx.fill();
+      });
+    }, 50);
 
     return coords;
   }
