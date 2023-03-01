@@ -273,13 +273,12 @@ export class Control {
   positionHandler(
     dim: Point,
     finalMatrix: TMat2D,
+    finalMatrix2: TMat2D,
     fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return new Point(
-      this.x * dim.x + this.offsetX,
-      this.y * dim.y + this.offsetY
-    ).transform(finalMatrix);
+    return new Point(this.x, this.y).transform(finalMatrix);
+    // .add(new Point(this.offsetX, this.offsetY).transform(finalMatrix2, true));
   }
 
   /**
