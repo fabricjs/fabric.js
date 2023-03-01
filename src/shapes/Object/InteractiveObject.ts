@@ -28,6 +28,7 @@ import {
 } from '../../util/misc/vectors';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { Intersection } from '../../Intersection';
+import { capValue } from '../../util/misc/capValue';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -254,10 +255,15 @@ export class InteractiveFabricObject<
     const bbox2 = makeBoundingBoxFromPoints(
       [tl, tr, bl, br].map((coord) => coord.rotate(-angle, center))
     );
+    // const out = [
+    //   new Point(bbox2.left, bbox2.top),
+    //   new Point(bbox2.left + bbox2.width, bbox2.top),
+    //   new Point(bbox2.left, bbox2.top + bbox2.height),
+    // ].map((point) => point.rotate(angle, center));
     const out = [
       new Point(bbox2.left, bbox2.top),
-      new Point(bbox2.left + bbox2.width, bbox2.top),
-      new Point(bbox2.left, bbox2.top + bbox2.height),
+      new Point(bbox2.left + bbox2.width / width, bbox2.top),
+      new Point(bbox2.left, bbox2.top + bbox2.height / height),
     ].map((point) => point.rotate(angle, center));
     const w1 = createVector(out[0], out[1]); //.divide(dimVector);
     const w2 = createVector(out[0], out[2]); //.divide(dimVector);
@@ -273,8 +279,9 @@ export class InteractiveFabricObject<
       // );
       const position = control.positionHandler(
         new Point(width, height),
+        // [width, 0, 0, height, center.x, center.y],
         t3,
-        t3,
+        t,
         this,
         control[key]
       );

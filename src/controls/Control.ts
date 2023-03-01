@@ -8,6 +8,7 @@ import {
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
+import { rotateVector } from '../util/misc/vectors';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
@@ -277,9 +278,20 @@ export class Control {
     fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return new Point(this.x, this.y)
-      .transform(finalMatrix)
-      .add(new Point(this.offsetX, this.offsetY));
+    const position = new Point(this.x, this.y)
+      .multiply(dim)
+      .transform(finalMatrix);
+    const offset = rotateVector(
+      new Point(this.offsetX, this.offsetY),
+      degreesToRadians(fabricObject.getTotalAngle())
+    );
+    return position.add(offset);
+    return (
+      new Point(this.x, this.y)
+        .transform(finalMatrix)
+        // .multiply(dim)
+        .add(new Point(this.offsetX, this.offsetY))
+    );
     return new Point(this.x, this.y)
       .multiply(dim)
       .add(fabricObject.getCenterPoint());
