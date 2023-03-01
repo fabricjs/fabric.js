@@ -699,6 +699,14 @@
     assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
   });
 
+  QUnit.test('sendVectorToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendVectorToPlane === 'function');
+    assert.deepEqual(
+      fabric.util.sendVectorToPlane(new fabric.Point(1, 1), [0.5, 0, 0, 1, 500, 600], [1, 0, 0, 0.5, 200, -600]),
+      new fabric.Point(0.5, 2)
+    );
+  });
+
   QUnit.test('sendObjectToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
     var m = [6, Math.SQRT1_2, 0, 3, 2, 1],
