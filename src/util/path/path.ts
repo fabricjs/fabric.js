@@ -26,8 +26,10 @@ import {
   TPathSegmentInfo,
   rePathCommand,
   numberRegExStr,
+  isLineCommand,
+  TComplexParsedCommand,
 } from './path_types';
-import {Point} from "fabric";
+import { Point } from 'fabric';
 
 /**
  * The number of parameters per command
@@ -376,74 +378,78 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
   let destinationPath: TSimplePathData = [],
-    previous,
+    previous: string | undefined,
     // placeholders
     controlX = 0,
     controlY = 0;
   for (const parsedCommand of path) {
-    let converted = false;
-    const current: TParsedCommand = Object.assign([], parsedCommand);
+    const current: TComplexParsedCommand = Object.assign([], parsedCommand);
+    let converted: TSimpleParsedCommand | undefined;
     switch (
       current[0] // first letter
     ) {
       case 'l': // lineto, relative
-        current[0] = 'L';
-        (current as TParsedAbsoluteLineCommand)[1] += x;
-        (current as TParsedAbsoluteLineCommand)[2] += y;
+        current[1] += x;
+        current[2] += y;
       // falls through
       case 'L':
-        x = (current as TParsedAbsoluteLineCommand)[1];
-        y = (current as TParsedAbsoluteLineCommand)[2];
+        x = current[1];
+        y = current[2];
+        converted = ['L', current[1], current[2]];
         break;
       case 'h': // horizontal lineto, relative
-        (current as TParsedAbsoluteHorizontalLineCommand)[1] += x;
+        current[1] += x;
       // falls through
       case 'H':
-        current[0] = 'L';
-        x = (current as TParsedAbsoluteHorizontalLineCommand)[1];
-        current[2] = y;
+        x = current[1];
+        converted = ['L', x, y];
         break;
       case 'v': // vertical lineto, relative
-        (current as TParsedAbsoluteVerticalLineCommand)[1] += y;
+        current[1] += y;
       // falls through
       case 'V':
-        current[0] = 'L';
-        y = (current as TParsedAbsoluteVerticalLineCommand)[1];
-        current[1] = x;
-        current[2] = y;
+        y = current[1];
+        converted = ['L', x, y];
         break;
       case 'm': // moveTo, relative
-        current[0] = 'M';
-        (current as TParsedAbsoluteMoveToCommand)[1] += x;
-        (current as TParsedAbsoluteMoveToCommand)[2] += y;
+        current[1] += x;
+        current[2] += y;
       // falls through
       case 'M':
-        x = (current as TParsedAbsoluteMoveToCommand)[1];
-        y = (current as TParsedAbsoluteMoveToCommand)[2];
-        x1 = (current as TParsedAbsoluteMoveToCommand)[1];
-        y1 = (current as TParsedAbsoluteMoveToCommand)[2];
+        x = current[1];
+        y = current[2];
+        x1 = current[1];
+        y1 = current[2];
+        converted = ['M', current[1], current[2]];
         break;
       case 'c': // bezierCurveTo, relative
-        current[0] = 'C';
-        (current as TParsedAbsoluteCubicCurveCommand)[1] += x;
-        (current as TParsedAbsoluteCubicCurveCommand)[2] += y;
-        (current as TParsedAbsoluteCubicCurveCommand)[3] += x;
-        (current as TParsedAbsoluteCubicCurveCommand)[4] += y;
-        (current as TParsedAbsoluteCubicCurveCommand)[5] += x;
-        (current as TParsedAbsoluteCubicCurveCommand)[6] += y;
+        current[1] += x;
+        current[2] += y;
+        current[3] += x;
+        current[4] += y;
+        current[5] += x;
+        current[6] += y;
       // falls through
       case 'C':
-        controlX = (current as TParsedAbsoluteCubicCurveCommand)[3];
-        controlY = (current as TParsedAbsoluteCubicCurveCommand)[4];
-        x = (current as TParsedAbsoluteCubicCurveCommand)[5];
-        y = (current as TParsedAbsoluteCubicCurveCommand)[6];
+        controlX = current[3];
+        controlY = current[4];
+        x = current[5];
+        y = current[6];
+        converted = [
+          'C',
+          current[1],
+          current[2],
+          current[3],
+          current[4],
+          current[5],
+          current[6],
+        ];
         break;
       case 's': // shorthand cubic bezierCurveTo, relative
-        current[0] = 'S';
-        (current as TParsedAbsoluteCubicCurveShortcutCommand)[1] += x;
-        (current as TParsedAbsoluteCubicCurveShortcutCommand)[2] += y;
-        (current as TParsedAbsoluteCubicCurveShortcutCommand)[3] += x;
-        (current as TParsedAbsoluteCubicCurveShortcutCommand)[4] += y;
+        current[1] += x;
+        current[2] += y;
+        current[3] += x;
+        current[4] += y;
       // falls through
       case 'S':
         // would be sScC but since we are swapping sSc for C, we check just that.
@@ -457,37 +463,38 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
           controlX = x;
           controlY = y;
         }
-        x = (current as TParsedAbsoluteCubicCurveShortcutCommand)[3];
-        y = (current as TParsedAbsoluteCubicCurveShortcutCommand)[4];
-        current[0] = 'C';
-        current[5] = current[3];
-        current[6] = current[4];
-        current[3] = current[1];
-        current[4] = current[2];
-        current[1] = controlX;
-        current[2] = controlY;
-        // current[3] and current[4] are NOW the second control point.
+        x = current[3];
+        y = current[4];
+        converted = [
+          'C',
+          controlX,
+          controlY,
+          current[1],
+          current[2],
+          current[3],
+          current[4],
+        ];
+        // converted[3] and converted[4] are NOW the second control point.
         // we keep it for the next reflection.
-        controlX = (current as TParsedAbsoluteCubicCurveCommand)[3];
-        controlY = (current as TParsedAbsoluteCubicCurveCommand)[4];
+        controlX = converted[3];
+        controlY = converted[4];
         break;
       case 'q': // quadraticCurveTo, relative
-        current[0] = 'Q';
-        (current as TParsedAbsoluteQuadraticCurveCommand)[1] += x;
-        (current as TParsedAbsoluteQuadraticCurveCommand)[2] += y;
-        (current as TParsedAbsoluteQuadraticCurveCommand)[3] += x;
-        (current as TParsedAbsoluteQuadraticCurveCommand)[4] += y;
+        current[1] += x;
+        current[2] += y;
+        current[3] += x;
+        current[4] += y;
       // falls through
       case 'Q':
-        controlX = (current as TParsedAbsoluteQuadraticCurveCommand)[1];
-        controlY = (current as TParsedAbsoluteQuadraticCurveCommand)[2];
-        x = (current as TParsedAbsoluteQuadraticCurveCommand)[3];
-        y = (current as TParsedAbsoluteQuadraticCurveCommand)[4];
+        controlX = current[1];
+        controlY = current[2];
+        x = current[3];
+        y = current[4];
+        converted = ['Q', current[1], current[2], current[3], current[4]];
         break;
       case 't': // shorthand quadraticCurveTo, relative
-        current[0] = 'T';
-        (current as TParsedAbsoluteQuadraticCurveShortcutCommand)[1] += x;
-        (current as TParsedAbsoluteQuadraticCurveShortcutCommand)[2] += y;
+        current[1] += x;
+        current[2] += y;
       // falls through
       case 'T':
         if (previous === 'Q') {
@@ -500,39 +507,40 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
           controlX = x;
           controlY = y;
         }
-        current[0] = 'Q';
-        x = (current as TParsedAbsoluteQuadraticCurveCommand)[1];
-        y = (current as TParsedAbsoluteQuadraticCurveCommand)[2];
+        x = current[1];
+        y = current[2];
         current[1] = controlX;
         current[2] = controlY;
-        current[3] = x;
-        current[4] = y;
+        converted = ['Q', current[1], current[2], x, y];
         break;
       case 'a':
-        current[0] = 'A';
-        (current as TParsedAbsoluteArcCommand)[6] += x;
-        (current as TParsedAbsoluteArcCommand)[7] += y;
+        current[6] += x;
+        current[7] += y;
       // falls through
       case 'A':
-        converted = true;
         destinationPath = destinationPath.concat(
           fromArcToBeziers(x, y, current as TParsedAbsoluteArcCommand)
         );
-        x = (current as TParsedAbsoluteArcCommand)[6];
-        y = (current as TParsedAbsoluteArcCommand)[7];
+        x = current[6];
+        y = current[7];
         break;
       case 'z':
       case 'Z':
-        // current[0] = 'Z';
         x = x1;
         y = y1;
+        // TODO: remove lowercase z from
+        if (current[0] == 'Z') {
+          converted = ['Z'];
+        } else {
+          (converted as any) = ['z'];
+        }
         break;
       default:
     }
-    if (!converted) {
-      destinationPath.push(current as TSimpleParsedCommand);
+    if (converted) {
+      destinationPath.push(converted);
     }
-    previous = current[0];
+    previous = converted?.[0];
   }
   return destinationPath;
 };

@@ -121,6 +121,17 @@ export const reMoveToCommand = new RegExp(
   'gi'
 );
 
+export function isAbsMoveToCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteMoveToCommand {
+  return cmd.length == 3 && cmd[0] == 'M';
+}
+export function isRelMoveToCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeMoveToCommand {
+  return cmd.length == 3 && cmd[0] == 'm';
+}
+
 export type TParsedAbsoluteLineCommand = [command: 'L', x: number, y: number];
 export type TParsedRelativeLineCommand = [command: 'l', dx: number, dy: number];
 export type TParsedLineCommand =
@@ -129,6 +140,22 @@ export type TParsedLineCommand =
 
 export type TLineCommand = TCommand3<TParsedLineCommand>;
 export const reLineCommand = new RegExp(String.raw`(L) (?:${p} ${p} ?)+`, 'gi');
+
+export function isAbsLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteLineCommand {
+  return cmd.length == 3 && cmd[0] == 'L';
+}
+export function isRelLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeLineCommand {
+  return cmd.length == 3 && cmd[0] == 'l';
+}
+export function isLineCommand(
+  cmd: TComplexParsedCommand
+): cmd is TParsedLineCommand {
+  return isAbsLineCmd(cmd) || isRelLineCmd(cmd);
+}
 
 export type TParsedAbsoluteHorizontalLineCommand = [command: 'H', x: number];
 export type TParsedRelativeHorizontalLineCommand = [command: 'h', dx: number];
@@ -142,6 +169,17 @@ export const reHorizontalLineCommand = new RegExp(
   'gi'
 );
 
+export function isAbsHorizontalLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteHorizontalLineCommand {
+  return cmd.length == 2 && cmd[0] == 'H';
+}
+export function isRelHorizontalLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeHorizontalLineCommand {
+  return cmd.length == 2 && cmd[0] == 'h';
+}
+
 export type TParsedAbsoluteVerticalLineCommand = [command: 'V', y: number];
 export type TParsedRelativeVerticalLineCommand = [command: 'v', dy: number];
 export type TParsedVerticalLineCommand =
@@ -154,6 +192,17 @@ export const reVerticalLineCommand = new RegExp(
   'gi'
 );
 
+export function isAbsVerticalLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteVerticalLineCommand {
+  return cmd.length == 2 && cmd[0] == 'V';
+}
+export function isRelVerticalLineCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeVerticalLineCommand {
+  return cmd.length == 2 && cmd[0] == 'v';
+}
+
 export type TParsedAbsoluteClosePathCommand = [command: 'Z'];
 export type TParsedRelativeClosePathCommand = [command: 'z'];
 export type TParsedClosePathCommand =
@@ -162,6 +211,22 @@ export type TParsedClosePathCommand =
 
 export type TClosePathCommand = TCommand1<TParsedClosePathCommand>;
 export const reClosePathCommand = new RegExp(String.raw`(Z)\s*`, 'gi');
+
+export function isAbsClosePathCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteClosePathCommand {
+  return cmd.length == 1 && cmd[0] == 'Z';
+}
+export function isRelClosePathCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeClosePathCommand {
+  return cmd.length == 1 && cmd[0] == 'z';
+}
+export function isClosePathCommand(
+  cmd: TComplexParsedCommand
+): cmd is TParsedClosePathCommand {
+  return cmd.length == 1 && (cmd[0] == 'z' || cmd[0] == 'Z');
+}
 
 export type TParsedAbsoluteCubicCurveCommand = [
   command: 'C',
@@ -191,6 +256,17 @@ export const reCubicCurveCommand = new RegExp(
   'gi'
 );
 
+export function isAbsCubicCurveCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteCubicCurveCommand {
+  return cmd.length == 7 && cmd[0] == 'C';
+}
+export function isRelCubicCurveCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeCubicCurveCommand {
+  return cmd.length == 7 && cmd[0] == 'c';
+}
+
 export type TParsedAbsoluteCubicCurveShortcutCommand = [
   command: 'S',
   controlPoint2X: number,
@@ -216,6 +292,17 @@ export const reCubicCurveShortcutCommand = new RegExp(
   'gi'
 );
 
+export function isAbsCubicCurveShortcutCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteCubicCurveShortcutCommand {
+  return cmd.length == 5 && cmd[0] == 'S';
+}
+export function isRelCubicCurveShortcutCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeCubicCurveShortcutCommand {
+  return cmd.length == 5 && cmd[0] == 's';
+}
+
 export type TParsedAbsoluteQuadraticCurveCommand = [
   command: 'Q',
   controlPointX: number,
@@ -240,6 +327,17 @@ export const reQuadraticCurveCommand = new RegExp(
   'gi'
 );
 
+export function isAbsQuadraticCurveCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteQuadraticCurveCommand {
+  return cmd.length == 5 && cmd[0] == 'Q';
+}
+export function isRelQuadraticCurveCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeQuadraticCurveCommand {
+  return cmd.length == 5 && cmd[0] == 'q';
+}
+
 export type TParsedAbsoluteQuadraticCurveShortcutCommand = [
   command: 'T',
   endX: number,
@@ -253,13 +351,24 @@ export type TParsedRelativeQuadraticCurveShortcutCommand = [
 export type TParsedQuadraticCurveShortcutCommand =
   | TParsedAbsoluteQuadraticCurveShortcutCommand
   | TParsedRelativeQuadraticCurveShortcutCommand;
+
+export type TQuadraticCurveShortcutCommand =
+  TCommand3<TParsedQuadraticCurveShortcutCommand>;
 export const reQuadraticCurveShortcutCommand = new RegExp(
   String.raw`(T) (?:${p} ${p} ?)+`,
   'gi'
 );
 
-export type TQuadraticCurveShortcutCommand =
-  TCommand3<TParsedQuadraticCurveShortcutCommand>;
+export function isAbsQuadraticCurveShortcutCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteQuadraticCurveShortcutCommand {
+  return cmd.length == 3 && cmd[0] == 'T';
+}
+export function isRelQuadraticCurveShortcutCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeQuadraticCurveShortcutCommand {
+  return cmd.length == 3 && cmd[0] == 't';
+}
 
 export type TParsedAbsoluteArcCommand = [
   command: 'A',
@@ -295,6 +404,17 @@ export const reArcCommand = new RegExp(
   String.raw`(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`,
   'gi'
 );
+export function isAbsArcCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedAbsoluteArcCommand {
+  return cmd.length == 8 && cmd[0] == 'A';
+}
+export function isRelArcCmd(
+  cmd: TComplexParsedCommand
+): cmd is TParsedRelativeArcCommand {
+  return cmd.length == 8 && cmd[0] == 'a';
+}
+
 /**
  * End parsed path commands
  */
