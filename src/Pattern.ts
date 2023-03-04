@@ -39,7 +39,6 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
-
   /**
    * Legacy identifier of the class. Prefer using this.constructor.name 'Pattern'
    * or utils like isPattern
@@ -53,7 +52,7 @@ export class Pattern {
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value)
+    console.warn('Setting type has no effect', value);
   }
 
   /**
