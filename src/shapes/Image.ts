@@ -23,6 +23,15 @@ export type ImageSource =
   | HTMLVideoElement
   | HTMLCanvasElement;
 
+export const imageDefaultValues: Partial<TClassProperties<Image>> = {
+  strokeWidth: 0,
+  srcFromAttribute: false,
+  minimumScaleTrigger: 0.5,
+  cropX: 0,
+  cropY: 0,
+  imageSmoothing: true,
+};
+
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
@@ -119,6 +128,15 @@ export class Image extends FabricObject {
   protected declare _filteredEl: ImageSource;
 
   static cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
+
+  static ownDefaults: Record<string, any> = imageDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Image.ownDefaults,
+    };
+  }
   /**
    * Constructor
    * Image can be initialized with any canvas drawable or a string.
@@ -769,19 +787,8 @@ export class Image extends FabricObject {
   }
 }
 
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
-Object.assign(Image.prototype, {
-  ...imageDefaultValues,
-});
+// @ts-expect-error
+Image.prototype.type = 'image';
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

@@ -19,7 +19,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
-import { SelectableCanvas } from './SelectableCanvas';
+import { SelectableCanvas, TDestroyedCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
@@ -1600,7 +1600,7 @@ export class Canvas extends SelectableCanvas {
   /**
    * @override clear {@link textEditingManager}
    */
-  destroy() {
+  destroy(this: TDestroyedCanvas<this>) {
     this.removeListeners();
     // @ts-ignore
     super.destroy();

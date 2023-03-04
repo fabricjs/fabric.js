@@ -6,14 +6,21 @@ import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TClassProperties } from '../typedefs';
+import { FabricObjectProps } from './Object/ObjectProps';
 
-export class Circle extends FabricObject {
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+};
+
+export interface CircleProps extends FabricObjectProps {
   /**
    * Radius of this circle
    * @type Number
    * @default 0
    */
-  declare radius: number;
+  radius: number;
 
   /**
    * degrees of start of the circle.
@@ -21,7 +28,7 @@ export class Circle extends FabricObject {
    * @type Number 0 - 359
    * @default 0
    */
-  declare startAngle: number;
+  startAngle: number;
 
   /**
    * End angle of the circle
@@ -29,6 +36,12 @@ export class Circle extends FabricObject {
    * @type Number 1 - 360
    * @default 360
    */
+  endAngle: number;
+}
+
+export class Circle extends FabricObject implements CircleProps {
+  declare radius: number;
+  declare startAngle: number;
   declare endAngle: number;
 
   static cacheProperties = [
@@ -37,6 +50,19 @@ export class Circle extends FabricObject {
     'startAngle',
     'endAngle',
   ];
+
+  static ownDefaults: Record<string, any> = circleDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Circle.ownDefaults,
+    };
+  }
+
+  constructor(options?: CircleProps) {
+    super(options);
+  }
 
   /**
    * @private
@@ -196,16 +222,8 @@ export class Circle extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-};
-
-Object.assign(Circle.prototype, {
-  ...circleDefaultValues,
-});
+// @ts-expect-error
+Circle.prototype.type = 'circle';
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

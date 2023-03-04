@@ -3,6 +3,18 @@ import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
+export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
+  minWidth: 20,
+  dynamicMinWidth: 2,
+  lockScalingFlip: true,
+  noScaleCache: false,
+  _wordJoiners: /[ \t\r]/,
+  splitByGrapheme: false,
+};
+
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
@@ -35,6 +47,15 @@ export class Textbox extends IText {
   declare splitByGrapheme: boolean;
 
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
+
+  static ownDefaults: Record<string, any> = textboxDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Textbox.ownDefaults,
+    };
+  }
 
   /**
    * Unlike superclass's version of this function, Textbox does not update
@@ -451,19 +472,7 @@ export class Textbox extends IText {
   }
 }
 
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
-  type: 'textbox',
-  minWidth: 20,
-  dynamicMinWidth: 2,
-  lockScalingFlip: true,
-  noScaleCache: false,
-  _wordJoiners: /[ \t\r]/,
-  splitByGrapheme: false,
-};
-
-Object.assign(Textbox.prototype, textboxDefaultValues);
+// @ts-expect-error
+Textbox.prototype.type = 'textbox';
 
 classRegistry.setClass(Textbox);
