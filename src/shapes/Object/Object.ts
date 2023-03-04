@@ -93,8 +93,6 @@ export class FabricObject<
   extends AnimatableObject<EventSpec>
   implements ObjectProps
 {
-  declare readonly type: string;
-
   declare minScaleLimit: number;
 
   declare opacity: number;
@@ -267,7 +265,11 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    return this.constructor.name.toLowerCase();
+    const name = this.constructor.name;
+    if (name === 'FabricObject') {
+      return 'object';
+    }
+    return name.toLowerCase();
   }
 
   set type(value) {
@@ -1438,11 +1440,12 @@ export class FabricObject<
   }
 
   /**
-   * Returns true if specified type is identical to the type of an instance
+   * Returns true if any of the specified types is identical to the type of an instance
    * @param {String} type Type to check against
    * @return {Boolean}
    */
   isType(...types: string[]) {
+    console.log(...types, this.type, this.constructor.name)
     return types.includes(this.constructor.name) || types.includes(this.type);
   }
 

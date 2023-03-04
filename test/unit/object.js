@@ -109,13 +109,13 @@
   });
 
   QUnit.test('toJSON', function(assert) {
-    var emptyObjectJSON = '{"type":"Object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+    var emptyObjectJSON = '{"type":"FabricObject","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"skewX":0,"skewY":0}';
 
-    var augmentedJSON = '{"type":"Object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+    var augmentedJSON = '{"type":"FabricObject","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
@@ -141,7 +141,7 @@
   QUnit.test('toObject', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'Object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -175,7 +175,7 @@
 
     var augmentedObjectRepr = {
       version:                  fabric.version,
-      type:                     'Object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     10,
@@ -247,11 +247,11 @@
 
   QUnit.test('toObject without default values', function(assert) {
 
-    var emptyObjectRepr = { version: fabric.version, type: 'Object', top: 0, left: 0 };
+    var emptyObjectRepr = { version: fabric.version, type: 'FabricObject', top: 0, left: 0 };
 
     var augmentedObjectRepr = {
       version: fabric.version,
-      type: 'Object',
+      type: 'FabricObject',
       left: 10,
       top: 20,
       width: 30,
@@ -296,7 +296,7 @@
       static type = 'moo'
     }
     var cObj = new fabric.Object();
-    assert.equal(cObj.toString(), '#<Object>');
+    assert.equal(cObj.toString(), '#<FabricObject>');
     assert.equal(new Moo().toString(), '#<Moo>');
   });
 
@@ -478,10 +478,12 @@
   QUnit.test('isType', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.isType === 'function');
-    assert.ok(cObj.isType('Object'));
+    assert.ok(cObj.isType('FabricObject'));
+    assert.ok(cObj.isType('object'));
     assert.ok(!cObj.isType('Rect'));
     cObj = new fabric.Rect();
     assert.ok(cObj.isType('Rect'));
+    assert.ok(cObj.isType('rect'));
     assert.ok(!cObj.isType('Object'));
     assert.ok(cObj.isType('Object', 'Rect'));
     assert.ok(!cObj.isType('Object', 'Circle'));
