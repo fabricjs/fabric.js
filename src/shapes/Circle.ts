@@ -1,12 +1,12 @@
-import { classRegistry } from '../ClassRegistry';
 import { ObjectEvents } from '../EventTypeDefs';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
+import { classRegistry } from '../ClassRegistry';
 import { cacheProperties, FabricObject } from './Object/FabricObject';
+import { TClassProperties } from '../typedefs';
 import {
   FabricObjectProps,
   SerializedObjectProps,
