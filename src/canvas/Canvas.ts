@@ -801,6 +801,7 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
+    const transform = this._currentTransform;
     this._cacheTransformEventData(e);
     const target = this._target;
     const isClick = this._isClick;
@@ -858,25 +859,24 @@ export class Canvas extends SelectableCanvas {
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           const pointer = this.getPointer(e);
-          mouseUpHandler(e, this._currentTransform!, pointer.x, pointer.y);
+          mouseUpHandler(e, transform!, pointer.x, pointer.y);
         }
       }
     }
     // if we are ending up a transform on a different control or a new object
     // fire the original mouse up from the corner that started the transform
     if (
-      this._currentTransform &&
-      (this._currentTransform.target !== target ||
-        this._currentTransform.corner !== target.__corner)
+      transform &&
+      (transform.target !== target || transform.corner !== target.__corner)
     ) {
-      const { target, corner } = this._currentTransform;
+      const { target, corner } = transform;
       const originalControl = target && target.controls[corner],
         originalMouseUpHandler =
           originalControl &&
           originalControl.getMouseUpHandler(e, target, originalControl);
       const pointer = this.getPointer(e);
       originalMouseUpHandler &&
-        originalMouseUpHandler(e, this._currentTransform, pointer.x, pointer.y);
+        originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up', LEFT_CLICK, isClick);
