@@ -1445,7 +1445,6 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    console.log(...types, this.type, this.constructor.name);
     return types.includes(this.constructor.name) || types.includes(this.type);
   }
 
