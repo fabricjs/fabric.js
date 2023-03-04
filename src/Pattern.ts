@@ -6,7 +6,6 @@ import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
 import { classRegistry } from './ClassRegistry';
-import {deprecate} from 'util';
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
