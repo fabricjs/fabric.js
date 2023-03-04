@@ -869,11 +869,11 @@ export class Canvas extends SelectableCanvas {
       transform &&
       (transform.target !== target || transform.corner !== target.__corner)
     ) {
-      const { target, corner } = transform;
-      const originalControl = target && target.controls[corner],
+      const { target: originalTarget, corner } = transform;
+      const originalControl = originalTarget && originalTarget.controls[corner],
         originalMouseUpHandler =
           originalControl &&
-          originalControl.getMouseUpHandler(e, target, originalControl);
+          originalControl.getMouseUpHandler(e, originalTarget, originalControl);
       const pointer = this.getPointer(e);
       originalMouseUpHandler &&
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
