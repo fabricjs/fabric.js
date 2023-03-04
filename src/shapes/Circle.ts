@@ -240,8 +240,5 @@ export class Circle<
   }
 }
 
-// @ts-expect-error
-Circle.prototype.type = 'circle';
-
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

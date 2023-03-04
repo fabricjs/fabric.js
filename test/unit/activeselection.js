@@ -54,7 +54,7 @@
 
     var expectedObject = {
       version:                  fabric.version,
-      type:                     'activeSelection',
+      type:                     'ActiveSelection',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -103,7 +103,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -111,7 +111,7 @@
       strokeWidth: 0
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -120,7 +120,7 @@
     }];
     var expectedObject = {
       version:            fabric.version,
-      type:               'activeSelection',
+      type:               'ActiveSelection',
       left:               50,
       top:                100,
       width:              80,

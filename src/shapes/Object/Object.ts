@@ -15,7 +15,6 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
@@ -94,8 +93,6 @@ export class FabricObject<
   extends AnimatableObject<EventSpec>
   implements ObjectProps
 {
-  declare readonly type: string;
-
   declare minScaleLimit: number;
 
   declare opacity: number;
@@ -256,6 +253,27 @@ export class FabricObject<
 
   static getDefaults(): Record<string, any> {
     return { ...FabricObject.ownDefaults };
+  }
+
+  /**
+   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
+   * Will be removed in fabric 7 or 8.
+   * The setter exists because is very hard to catch all the ways in which a type value
+   * could be set in the instance
+   * @TODO add sustainable warning message
+   * @type string
+   * @deprecated
+   */
+  get type() {
+    const name = this.constructor.name;
+    if (name === 'FabricObject') {
+      return 'object';
+    }
+    return name.toLowerCase();
+  }
+
+  set type(value) {
+    console.warn('Setting type has no effect', value);
   }
 
   /**
@@ -487,7 +505,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude),
-        type: this.type,
+        type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -584,7 +602,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${capitalize(this.type)}>`;
+    return `#<${this.constructor.name}>`;
   }
 
   /**
@@ -1422,12 +1440,12 @@ export class FabricObject<
   }
 
   /**
-   * Returns true if specified type is identical to the type of an instance
+   * Returns true if any of the specified types is identical to the type of an instance
    * @param {String} type Type to check against
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.type);
+    return types.includes(this.constructor.name) || types.includes(this.type);
   }
 
   /**
@@ -1520,7 +1538,7 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, ...rest } = allOptions;
+          const { [extraParam]: arg0, type, ...rest } = allOptions;
           // @ts-ignore;
           return new this(arg0, rest);
         } else {
@@ -1545,7 +1563,5 @@ export class FabricObject<
   }
 }
 
-// @ts-expect-error
-FabricObject.prototype.type = 'object';
-
 classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'object');

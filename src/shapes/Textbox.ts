@@ -472,7 +472,4 @@ export class Textbox extends IText {
   }
 }
 
-// @ts-expect-error
-Textbox.prototype.type = 'textbox';
-
 classRegistry.setClass(Textbox);
