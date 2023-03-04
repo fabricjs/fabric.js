@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): type Object props [#8677](https://github.com/fabricjs/fabric.js/issues/8677)
 - chore(TS): remove default values from filter prototypes [#8742](https://github.com/fabricjs/fabric.js/issues/8742)
 - chore(TS): remove default values from Objects prototypes, ( filters in a followup ) [#8719](https://github.com/fabricjs/fabric.js/issues/8719)
 - fix(Intersection): bug causing selection edge case [#8735](https://github.com/fabricjs/fabric.js/pull/8735)
