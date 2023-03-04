@@ -10,14 +10,7 @@ import {
   TComplexPathData,
   TParsedAbsoluteArcCommand,
   TParsedAbsoluteCubicCurveCommand,
-  TParsedAbsoluteCubicCurveShortcutCommand,
-  TParsedAbsoluteHorizontalLineCommand,
   TParsedAbsoluteLineCommand,
-  TParsedAbsoluteMoveToCommand,
-  TParsedAbsoluteQuadraticCurveCommand,
-  TParsedAbsoluteQuadraticCurveShortcutCommand,
-  TParsedAbsoluteVerticalLineCommand,
-  TParsedCommand,
   TParsedCubicCurveCommand,
   TPathSegmentsInfo,
   TPointAngle,
@@ -26,25 +19,9 @@ import {
   TPathSegmentInfo,
   rePathCommand,
   numberRegExStr,
-  isLineCommand,
   TComplexParsedCommand,
 } from './path_types';
 import { Point } from 'fabric';
-
-/**
- * The number of parameters per command
- */
-const commandLengths: Record<string, number> = {
-  m: 2,
-  l: 2,
-  h: 1,
-  v: 1,
-  c: 6,
-  s: 4,
-  q: 4,
-  t: 2,
-  a: 7,
-};
 
 /**
  * Commands that may be repeated
