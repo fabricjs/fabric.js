@@ -105,7 +105,9 @@ export type TModificationEvents =
   | 'skewing'
   | 'resizing';
 
-export type ModifiedEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export type ModifiedEvent<E extends Event = TPointerEvent> = Partial<
+  TEvent<E>
+> & {
   transform: Transform;
   target: FabricObject;
   action: string;

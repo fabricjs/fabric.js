@@ -451,14 +451,6 @@ export class SelectableCanvas<
   _objectsToRender?: FabricObject[] = [];
 
   /**
-   * hold a referenfce to a data structure that contains information
-   * on the current on going transform
-   * @type
-   * @private
-   */
-  _currentTransform: Transform | null = null;
-
-  /**
    * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
@@ -747,149 +739,6 @@ export class SelectableCanvas<
       (target && !target.evented) ||
       (target && !target.selectable && activeObject && activeObject !== target)
     );
-  }
-
-  /**
-   * This method will take in consideration a modifier key pressed and the control we are
-   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
-   * This should be really in the realm of controls, and we should remove specific code for legacy
-   * embedded actions.
-   * @TODO this probably deserve discussion/rediscovery and change/refactor
-   * @private
-   * @deprecated
-   * @param {FabricObject} target
-   * @param {string} action
-   * @param {boolean} altKey
-   * @returns {boolean} true if the transformation should be centered
-   */
-  private _shouldCenterTransform(
-    target: FabricObject,
-    action: string,
-    modifierKeyPressed: boolean
-  ) {
-    if (!target) {
-      return;
-    }
-
-    let centerTransform;
-
-    if (
-      action === 'scale' ||
-      action === 'scaleX' ||
-      action === 'scaleY' ||
-      action === 'resizing'
-    ) {
-      centerTransform = this.centeredScaling || target.centeredScaling;
-    } else if (action === 'rotate') {
-      centerTransform = this.centeredRotation || target.centeredRotation;
-    }
-
-    return centerTransform ? !modifierKeyPressed : modifierKeyPressed;
-  }
-
-  /**
-   * Given the control clicked, determine the origin of the transform.
-   * This is bad because controls can totally have custom names
-   * should disappear before release 4.0
-   * @private
-   * @deprecated
-   */
-  _getOriginFromCorner(
-    target: FabricObject,
-    controlName: string
-  ): { x: TOriginX; y: TOriginY } {
-    const origin = {
-      x: target.originX,
-      y: target.originY,
-    };
-    // is a left control ?
-    if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
-      // is a right control ?
-    } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
-    }
-    // is a top control ?
-    if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
-      // is a bottom control ?
-    } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
-    }
-    return origin;
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object
-   * @param {FaricObject} target
-   */
-  _setupCurrentTransform(
-    e: TPointerEvent,
-    target: FabricObject,
-    alreadySelected: boolean
-  ): void {
-    if (!target) {
-      return;
-    }
-    const pointer = target.group
-      ? // transform pointer to target's containing coordinate plane
-        sendPointToPlane(
-          this.getPointer(e),
-          undefined,
-          target.group.calcTransformMatrix()
-        )
-      : this.getPointer(e);
-    const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
-      actionHandler =
-        alreadySelected && control
-          ? control.getActionHandler(e, target, control)
-          : dragHandler,
-      action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
-      altKey = e[this.centeredKey as ModifierKey],
-      /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
-       **/
-      transform: Transform = {
-        target: target,
-        action: action,
-        actionHandler,
-        actionPerformed: false,
-        corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
-        originX: origin.x,
-        originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey: altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
-
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
-    }
-    this._currentTransform = transform;
-    // @ts-ignore
-    this._beforeTransform(e);
   }
 
   /**
@@ -1453,19 +1302,20 @@ export class SelectableCanvas<
       if (obj.onDeselect({ e, object })) {
         return false;
       }
-      // clear active selection
-      if (obj === this._activeSelection) {
-        this._activeSelection.removeAll();
-        resetObjectTransform(this._activeSelection);
-      }
-      if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-ignore
-        this.endCurrentTransform(e);
-      }
+      this.onObjectDiscarded(obj, e);
       this._activeObject = undefined;
       return true;
     }
     return false;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected onObjectDiscarded(target: FabricObject, e?: TPointerEvent) {
+    // clear active selection
+    if (target === this._activeSelection) {
+      this._activeSelection.removeAll();
+      resetObjectTransform(this._activeSelection);
+    }
   }
 
   /**
