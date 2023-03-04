@@ -6,11 +6,12 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import { ObjectBaseProps } from './ObjectProps';
+import { BaseProps } from './types/BaseProps';
+import { FillStrokeProps } from './types/FillStrokeProps';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
-  implements ObjectBaseProps
+  implements BaseProps, Pick<FillStrokeProps, 'strokeWidth' | 'strokeUniform'>
 {
   declare top: number;
   declare left: number;
@@ -27,7 +28,6 @@ export class ObjectOrigin<EventSpec>
   declare angle: TDegree;
   declare strokeWidth: number;
   declare strokeUniform: boolean;
-  declare padding: number;
 
   /**
    * Object containing this object.
