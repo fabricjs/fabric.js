@@ -262,8 +262,6 @@ export class InteractiveFabricObject<
     this.forEachControl((control, key) => {
       const position = control.positionHandler(dim, finalMatrix, this, control);
       coords[key] = {
-        // TODO: remove backward compatibility
-        ...position,
         position,
         connection: control.connectionPositionHandler(
           position,

@@ -207,15 +207,15 @@
     cObj.canvas = {
       _activeObject: cObj
     };
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.br), 'br');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.tl), 'tl');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.tr), 'tr');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.bl), 'bl');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mr), 'mr');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.ml), 'ml');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mt), 'mt');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.br.position), 'br');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.tl.position), 'tl');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.tr.position), 'tr');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.bl.position), 'bl');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mr.position), 'mr');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.ml.position), 'ml');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mt.position), 'mt');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mb.position), 'mb');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr.position), 'mtr');
     assert.equal(cObj._findTargetCorner({ x: 0, y: 0 }), false);
   });
 
@@ -226,14 +226,14 @@
       _activeObject: cObj
     };
     var pointNearBr = {
-      x: cObj.oCoords.br.x + cObj.cornerSize / 3,
-      y: cObj.oCoords.br.y + cObj.cornerSize / 3
+      x: cObj.oCoords.br.position.x + cObj.cornerSize / 3,
+      y: cObj.oCoords.br.position.y + cObj.cornerSize / 3
     };
     assert.equal(cObj._findTargetCorner(pointNearBr), 'br', 'cornerSize/3 near br returns br');
     assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event cornerSize/3 near br returns br');
     pointNearBr = {
-      x: cObj.oCoords.br.x + cObj.touchCornerSize / 3,
-      y: cObj.oCoords.br.y + cObj.touchCornerSize / 3,
+      x: cObj.oCoords.br.position.x + cObj.touchCornerSize / 3,
+      y: cObj.oCoords.br.position.y + cObj.touchCornerSize / 3,
     };
     assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
     assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
