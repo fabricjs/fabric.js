@@ -16,51 +16,13 @@ export function wrapElement(element: HTMLElement, wrapper: HTMLDivElement) {
 }
 
 /**
- * Returns element scroll offsets
- * @param {HTMLElement} element Element to operate on
- * @return {Object} Object with left/top values
- */
-export function getScrollLeftTop(element: HTMLElement) {
-  let left = 0,
-    top = 0;
-
-  const docElement = getDocument().documentElement,
-    body = getDocument().body || {
-      scrollLeft: 0,
-      scrollTop: 0,
-    };
-  // While loop checks (and then sets element to) .parentNode OR .host
-  //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
-  //  but the .parentNode of a root ShadowDOM node will always be null, instead
-  //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
-  // @ts-ignore
-  while (element && (element.parentNode || element.host)) {
-    // Set element to element parent, or 'host' in case of ShadowDOM
-    // @ts-ignore
-    element = element.parentNode || element.host;
-    // @ts-expect-error because element is typed as HTMLElement but it can go up to document
-    if (element === getDocument()) {
-      left = body.scrollLeft || docElement.scrollLeft || 0;
-      top = body.scrollTop || docElement.scrollTop || 0;
-    } else {
-      left += element.scrollLeft || 0;
-      top += element.scrollTop || 0;
-    }
-
-    if (element.nodeType === 1 && element.style.position === 'fixed') {
-      break;
-    }
-  }
-
-  return { left, top };
-}
-
-/**
  * Returns offset for a given element
  * @param {HTMLElement} element Element to get offset for
  * @return {Object} Object with "left" and "top" properties
+ * TODO convert to getBoundingClientRect + window.scrollX/Y
  */
 export function getElementOffset(element: HTMLElement) {
+
   let box = { left: 0, top: 0 };
   const doc = element && element.ownerDocument,
     offset = { left: 0, top: 0 },
@@ -85,12 +47,10 @@ export function getElementOffset(element: HTMLElement) {
     box = element.getBoundingClientRect();
   }
 
-  const scrollLeftTop = getScrollLeftTop(element);
-
   return {
     left:
-      box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
-    top: box.top + scrollLeftTop.top - (docElem.clientTop || 0) + offset.top,
+      box.left - (docElem.clientLeft || 0) + offset.left,
+    top: box.top - (docElem.clientTop || 0) + offset.top,
   };
 }
 

@@ -1144,9 +1144,6 @@ export class SelectableCanvas<
       }
     }
 
-    this.calcOffset();
-    pointer.x = pointer.x - this._offset.left;
-    pointer.y = pointer.y - this._offset.top;
     if (!ignoreVpt) {
       pointer = this.restorePointerVpt(pointer);
     }

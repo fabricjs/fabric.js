@@ -1,6 +1,5 @@
 //@ts-nocheck
 import { Point } from '../Point';
-import { getScrollLeftTop } from './dom_misc';
 
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
@@ -13,10 +12,12 @@ function getTouchInfo(event) {
 }
 
 export const getPointer = (event) => {
-  const element = event.target,
-    scroll = getScrollLeftTop(element),
-    _evt = getTouchInfo(event);
-  return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
+  if (isTouchEvent(event)) {
+    const _evt = getTouchInfo(event);
+    // write code for safari < 13
+    return new Point(0,0);
+  }
+  return new Point(_evt.offsetX, _evt.offsetY);
 };
 
 export const isTouchEvent = (event) =>
