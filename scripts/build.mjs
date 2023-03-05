@@ -23,11 +23,7 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
           .slice(2)}"`
     ),
   ].join(' ');
-    const cmd2 = [
-    'npm',
-    'run',
-    'babel-fabric-node'
-  ].join(' ');
+  const cmd2 = ['npm', 'run', 'babel-fabric-node'].join(' ');
   const processOptions = {
     stdio: 'inherit',
     shell: true,
