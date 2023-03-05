@@ -14,7 +14,6 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   noScaleCache: false,
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
-  controls: createTextboxDefaultControls(),
 };
 
 /**
@@ -55,6 +54,7 @@ export class Textbox extends IText {
   static getDefaults() {
     return {
       ...super.getDefaults(),
+      controls: createTextboxDefaultControls(),
       ...Textbox.ownDefaults,
     };
   }

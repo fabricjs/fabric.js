@@ -44,8 +44,8 @@ export interface DragMethods {
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
 const interactiveDefaults = {
-  controls: createObjectDefaultControls(),
-}
+
+};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
@@ -152,6 +152,7 @@ export class InteractiveFabricObject<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
+      controls: createObjectDefaultControls(),
       ...InteractiveFabricObject.ownDefaults,
     };
   }

@@ -40,7 +40,7 @@
     assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
     assert.equal(cObj2.isControlVisible('tl'), true, 'setting to false did not work for cObj2');
     cObj.controls.tl.setVisibility(false);
-    assert.equal(cObj2.isControlVisible('tl'), false, 'setting directly on controls works for every object');
+    assert.equal(cObj2.isControlVisible('tl'), true, 'setting directly on controls does not affect other objects');
     cObj.setControlVisible('tl', true);
     assert.equal(cObj.isControlVisible('tl'), true, 'object setting takes precedence');
     // restore original visibility
@@ -151,7 +151,7 @@
     sharedControls.bl.sizeX = 30;
     sharedControls.bl.sizeY = 10;
 
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0, controls: sharedControls });
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
