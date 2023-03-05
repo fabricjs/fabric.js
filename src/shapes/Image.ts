@@ -38,6 +38,9 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
+  crossOrigin: string | null;
+  filters: BaseFilter[];
+  resizeFilter?: BaseFilter;
 }
 
 export const imageDefaultValues: UniqueImageProps & Partial<FabricObjectProps> = {

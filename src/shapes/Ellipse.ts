@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import {
+import type {
   FabricObjectProps,
   SerializedObjectProps,
   TProps,
