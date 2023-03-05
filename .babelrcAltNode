@@ -3,7 +3,6 @@
     [
       "@babel/env",
       {
-        "modules": false,
         "useBuiltIns": "usage",
         "loose": true,
         "targets": {
