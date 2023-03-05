@@ -280,7 +280,7 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Props) {
+  constructor(options: Props = {} as Props) {
     super();
     Object.assign(
       this,

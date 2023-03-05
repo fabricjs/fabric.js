@@ -11,7 +11,7 @@ import {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
+export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
   ry: 0,
 };
@@ -23,7 +23,7 @@ interface UniqueEllipseProps {
 
 export interface SerializedEllipseProps
   extends SerializedObjectProps,
-    UniqueEllipseProps {}
+    UniqueEllipseProps {};
 
 export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 

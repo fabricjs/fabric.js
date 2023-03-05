@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 import { getDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
@@ -17,13 +17,28 @@ import {
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { WebGLFilterBackend } from '../filters';
 
 export type ImageSource =
   | HTMLImageElement
   | HTMLVideoElement
   | HTMLCanvasElement;
 
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
+interface UniqueImageProps {
+  srcFromAttribute: boolean;
+  minimumScaleTrigger: number;
+  cropX: number;
+  cropY: number;
+  imageSmoothing: boolean;
+}
+
+export const imageDefaultValues: UniqueImageProps & Partial<FabricObjectProps> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
@@ -32,10 +47,30 @@ export const imageDefaultValues: Partial<TClassProperties<Image>> = {
   imageSmoothing: true,
 };
 
+export interface SerializedImageProps
+  extends SerializedObjectProps {
+    src: string;
+    crossOrigin: string | null;
+    filters: any[];
+    resizeFilter?: any;
+    cropX: number;
+    cropY: number;
+  };
+
+export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
+
+const IMAGE_PROPS = ['cropX', 'cropY'] as const;
+
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image extends FabricObject {
+export class Image<
+    Props extends TProps<ImageProps> = Partial<ImageProps>,
+    SProps extends SerializedImageProps = SerializedImageProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements UniqueImageProps {
   /**
    * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
@@ -127,7 +162,7 @@ export class Image extends FabricObject {
   protected declare _originalElement: ImageSource;
   protected declare _filteredEl: ImageSource;
 
-  static cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
+  static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
   static ownDefaults: Record<string, any> = imageDefaultValues;
 
@@ -146,13 +181,13 @@ export class Image extends FabricObject {
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: any = {});
-  constructor(element: ImageSource, options: any = {});
-  constructor(arg0: ImageSource | string, options: any = {}) {
+  constructor(elementId: string, options: Props);
+  constructor(element: ImageSource, options: Props);
+  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
-      (typeof arg0 === 'string' && getDocument().getElementById(arg0)) || arg0,
+      typeof arg0 === 'string' ? (getDocument().getElementById(arg0) as ImageSource) : arg0,
       options
     );
   }
@@ -195,7 +230,7 @@ export class Image extends FabricObject {
    */
   removeTexture(key: string) {
     const backend = getFilterBackend(false);
-    if (backend && backend.evictCachesForKey) {
+    if (backend instanceof WebGLFilterBackend) {
       backend.evictCachesForKey(key);
     }
   }
@@ -209,10 +244,10 @@ export class Image extends FabricObject {
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
-      (element) => {
-        getEnv().dispose(this[element as keyof this]);
+      (elementKey) => {
+        getEnv().dispose(this[elementKey as keyof this] as Element);
         // @ts-expect-error disposing
-        this[element] = undefined;
+        this[elementKey] = undefined;
       }
     );
   }
@@ -220,7 +255,7 @@ export class Image extends FabricObject {
   /**
    * Get the crossOrigin value (of the corresponding image element)
    */
-  getCrossOrigin() {
+  getCrossOrigin(): string | null {
     return (
       this._originalElement &&
       ((this._originalElement as any).crossOrigin || null)
@@ -268,13 +303,18 @@ export class Image extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []): Record<string, any> {
+  // @ts-expect-error
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
     });
     return {
-      ...super.toObject(['cropX', 'cropY', ...propertiesToInclude]),
+      // @ts-expect-error
+      ...super.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
       filters,
@@ -349,7 +389,7 @@ export class Image extends FabricObject {
       '" width="',
       element.width || element.naturalWidth,
       '" height="',
-      element.height || element.height,
+      element.height || element.naturalHeight,
       imageRendering,
       '"',
       clipPath,
@@ -388,7 +428,7 @@ export class Image extends FabricObject {
    * @param {Boolean} filtered indicates if the src is needed for svg
    * @return {String} Source of an image
    */
-  getSrc(filtered?: boolean) {
+  getSrc(filtered?: boolean): string {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
       if (element.toDataURL) {
