@@ -1162,19 +1162,9 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} [e] pass down the mouse event that finalized the transform, so it can be used in the event
    * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
    */
-  endCurrentTransform(e?: TPointerEvent) {
-    const modifiedEventFired = this._finalizeCurrentTransform(e);
-    this._currentTransform = null;
-    return modifiedEventFired;
-  }
-
-  /**
-   * @private
-   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
-   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
-   */
-  protected _finalizeCurrentTransform(e?: TPointerEvent) {
+  protected endCurrentTransform(e?: TPointerEvent) {
     const transform = this._currentTransform;
+    this._currentTransform = null;
     if (!transform) {
       return false;
     }
