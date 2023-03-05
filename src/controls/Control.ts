@@ -283,8 +283,17 @@ export class Control {
     ).transform(finalMatrix);
   }
 
+  /**
+   *
+   * @param position control center, result of {@link positionHandler}
+   * @param dim
+   * @param finalMatrix
+   * @param fabricObject
+   * @param currentControl
+   * @returns
+   */
   connectionPositionHandler(
-    to: Point,
+    position: Point,
     dim: Point,
     finalMatrix: TMat2D,
     fabricObject: FabricObject,
@@ -292,7 +301,7 @@ export class Control {
   ) {
     return {
       from: new Point(this.x * dim.x, this.y * dim.y).transform(finalMatrix),
-      to,
+      to: position,
     };
   }
 
