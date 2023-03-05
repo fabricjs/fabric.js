@@ -1,6 +1,7 @@
-import type { Constructor } from './typedefs';
+import type { Constructor, TBBox } from './typedefs';
 import type { BaseFabricObject } from './EventTypeDefs';
 import { removeFromArray } from './util/internals';
+import { Point } from './Point';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
@@ -99,7 +100,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       if (types.length === 0) {
         return [...this._objects];
       }
-      return this._objects.filter((o) => types.includes(o.type));
+      return this._objects.filter((o) => o.isType(...types));
     }
 
     /**
@@ -303,6 +304,38 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       }
 
       return newIdx;
+    }
+
+    /**
+     * Given a bounding box, return all the objects of the collection that are contained in the bounding box.
+     * If `includeIntersecting` is true, return also the objects that intersect the bounding box as well.
+     * @returns array of objects contained in the bounding box, ordered from top to bottom stacking wise
+     */
+    collectObjects(
+      { left, top, width, height }: TBBox,
+      { includeIntersecting = true }: { includeIntersecting?: boolean } = {}
+    ) {
+      const objects: BaseFabricObject[] = [],
+        tl = new Point(left, top),
+        br = tl.add(new Point(width, height));
+
+      // we iterate reverse order to collect top first in case of click.
+      for (let i = this._objects.length - 1; i >= 0; i--) {
+        const object = this._objects[i];
+        if (
+          object.selectable &&
+          object.visible &&
+          ((includeIntersecting && object.intersectsWithRect(tl, br, true)) ||
+            object.isContainedWithinRect(tl, br, true) ||
+            (includeIntersecting &&
+              object.containsPoint(tl, undefined, true)) ||
+            (includeIntersecting && object.containsPoint(br, undefined, true)))
+        ) {
+          objects.push(object);
+        }
+      }
+
+      return objects;
     }
   }
 

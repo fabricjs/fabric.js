@@ -1,7 +1,13 @@
 import type { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/convolute';
+
+export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
+  opaque: false,
+  matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
+};
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -43,7 +49,7 @@ import { classRegistry } from '../util/class_registry';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends AbstractBaseFilter<Record<string, string>> {
+export class Convolute extends BaseFilter {
   /*
    * Opaque value (true/false)
    */
@@ -54,14 +60,16 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
    */
   declare matrix: number[];
 
+  static defaults = convoluteDefaultValues;
+
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
-    }`;
+    }` as keyof typeof fragmentSource;
   }
 
   getFragmentSource() {
-    return this.fragmentSource[this.getCacheKey()];
+    return fragmentSource[this.getCacheKey()];
   }
 
   /**
@@ -171,171 +179,6 @@ export class Convolute extends AbstractBaseFilter<Record<string, string>> {
       matrix: [...this.matrix],
     };
   }
-
-  static async fromObject(object: any) {
-    return new Convolute(object);
-  }
 }
 
-export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
-  type: 'Convolute',
-  opaque: false,
-  matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
-  fragmentSource: {
-    Convolute_3_1: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[9];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 0);
-        for (float h = 0.0; h < 3.0; h+=1.0) {
-          for (float w = 0.0; w < 3.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 1), uStepH * (h - 1));
-            color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 3.0 + w)];
-          }
-        }
-        gl_FragColor = color;
-      }
-      `,
-    Convolute_3_0: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[9];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 1);
-        for (float h = 0.0; h < 3.0; h+=1.0) {
-          for (float w = 0.0; w < 3.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 1.0), uStepH * (h - 1.0));
-            color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 3.0 + w)];
-          }
-        }
-        float alpha = texture2D(uTexture, vTexCoord).a;
-        gl_FragColor = color;
-        gl_FragColor.a = alpha;
-      }
-      `,
-    Convolute_5_1: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[25];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 0);
-        for (float h = 0.0; h < 5.0; h+=1.0) {
-          for (float w = 0.0; w < 5.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));
-            color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 5.0 + w)];
-          }
-        }
-        gl_FragColor = color;
-      }
-      `,
-    Convolute_5_0: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[25];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 1);
-        for (float h = 0.0; h < 5.0; h+=1.0) {
-          for (float w = 0.0; w < 5.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));
-            color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 5.0 + w)];
-          }
-        }
-        float alpha = texture2D(uTexture, vTexCoord).a;
-        gl_FragColor = color;
-        gl_FragColor.a = alpha;
-      }
-      `,
-    Convolute_7_1: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[49];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 0);
-        for (float h = 0.0; h < 7.0; h+=1.0) {
-          for (float w = 0.0; w < 7.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));
-            color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 7.0 + w)];
-          }
-        }
-        gl_FragColor = color;
-      }
-      `,
-    Convolute_7_0: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[49];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 1);
-        for (float h = 0.0; h < 7.0; h+=1.0) {
-          for (float w = 0.0; w < 7.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));
-            color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 7.0 + w)];
-          }
-        }
-        float alpha = texture2D(uTexture, vTexCoord).a;
-        gl_FragColor = color;
-        gl_FragColor.a = alpha;
-      }
-      `,
-    Convolute_9_1: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[81];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 0);
-        for (float h = 0.0; h < 9.0; h+=1.0) {
-          for (float w = 0.0; w < 9.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));
-            color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];
-          }
-        }
-        gl_FragColor = color;
-      }
-      `,
-    Convolute_9_0: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform float uMatrix[81];
-      uniform float uStepW;
-      uniform float uStepH;
-      varying vec2 vTexCoord;
-      void main() {
-        vec4 color = vec4(0, 0, 0, 1);
-        for (float h = 0.0; h < 9.0; h+=1.0) {
-          for (float w = 0.0; w < 9.0; w+=1.0) {
-            vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));
-            color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];
-          }
-        }
-        float alpha = texture2D(uTexture, vTexCoord).a;
-        gl_FragColor = color;
-        gl_FragColor.a = alpha;
-      }
-      `,
-  },
-};
-
-Object.assign(Convolute.prototype, convoluteDefaultValues);
 classRegistry.setClass(Convolute);

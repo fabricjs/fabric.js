@@ -2,7 +2,7 @@
 
   var REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
-    type:                     'path',
+    type:                     'Path',
     originX:                  'left',
     originY:                  'top',
     left:                     100,
@@ -76,7 +76,7 @@
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
 
-      assert.equal(path.get('type'), 'path');
+      assert.equal(path.constructor.name, 'Path');
 
       var error;
       try {
@@ -158,12 +158,12 @@
   QUnit.test('toObject', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
-      path.top = fabric.Object.prototype.top;
-      path.left = fabric.Object.prototype.left;
+      path.top = fabric.Path.getDefaults().top;
+      path.left = fabric.Path.getDefaults().left;
       path.includeDefaultValues = false;
       var obj = path.toObject();
-      assert.equal(obj.top, fabric.Object.prototype.top, 'top is available also when equal to prototype');
-      assert.equal(obj.left, fabric.Object.prototype.left, 'left is available also when equal to prototype');
+      assert.equal(obj.top, fabric.Path.getDefaults().top, 'top is available also when equal to prototype');
+      assert.equal(obj.left, fabric.Path.getDefaults().left, 'left is available also when equal to prototype');
       done();
     });
   });

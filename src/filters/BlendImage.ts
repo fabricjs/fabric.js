@@ -1,14 +1,33 @@
 import { Image } from '../shapes/Image';
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
-import { AbstractBaseFilter } from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import type {
   T2DPipelineState,
   TWebGLPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/blendImage';
+
+export type TBlendImageMode = 'multiply' | 'mask';
+
+export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
+  mode: 'multiply',
+  alpha: 1,
+  vertexSource: `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    uniform mat3 uTransformMatrix;
+    void main() {
+      vTexCoord = aPosition;
+      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }
+    `,
+};
 
 /**
  * Image Blend filter class
@@ -27,14 +46,14 @@ import { classRegistry } from '../util/class_registry';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
+export class BlendImage extends BaseFilter {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    **/
   declare image: Image;
 
-  declare mode: 'multiply' | 'mask';
+  declare mode: TBlendImageMode;
 
   /**
    * alpha value. represent the strength of the blend image operation.
@@ -42,12 +61,14 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
    **/
   declare alpha: number;
 
+  static defaults = blendImageDefaultValues;
+
   getCacheKey() {
     return `${this.type}_${this.mode}`;
   }
 
   getFragmentSource(): string {
-    return this.fragmentSource[this.mode];
+    return fragmentSource[this.mode];
   }
 
   applyToWebGL(options: TWebGLPipelineState) {
@@ -203,52 +224,4 @@ export class BlendImage extends AbstractBaseFilter<Record<string, string>> {
   }
 }
 
-export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
-  type: 'BlendImage',
-  mode: 'multiply',
-  alpha: 1,
-  vertexSource: `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    varying vec2 vTexCoord2;
-    uniform mat3 uTransformMatrix;
-    void main() {
-      vTexCoord = aPosition;
-      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }
-    `,
-  fragmentSource: {
-    multiply: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform sampler2D uImage;
-      uniform vec4 uColor;
-      varying vec2 vTexCoord;
-      varying vec2 vTexCoord2;
-      void main() {
-        vec4 color = texture2D(uTexture, vTexCoord);
-        vec4 color2 = texture2D(uImage, vTexCoord2);
-        color.rgba *= color2.rgba;
-        gl_FragColor = color;
-      }
-      `,
-    mask: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      uniform sampler2D uImage;
-      uniform vec4 uColor;
-      varying vec2 vTexCoord;
-      varying vec2 vTexCoord2;
-      void main() {
-        vec4 color = texture2D(uTexture, vTexCoord);
-        vec4 color2 = texture2D(uImage, vTexCoord2);
-        color.a = color2.a;
-        gl_FragColor = color;
-      }
-      `,
-  },
-};
-
-Object.assign(BlendImage.prototype, blendImageDefaultValues);
 classRegistry.setClass(BlendImage);

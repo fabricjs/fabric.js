@@ -36,7 +36,7 @@ export default [
         sourcemap: true,
       },
       {
-        file: path.resolve(dirname, `${basename}.cjs`),
+        file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
         format: 'umd',
         sourcemap: true,

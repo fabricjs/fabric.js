@@ -3,7 +3,7 @@
 
   var ITEXT_OBJECT = {
     version:                  fabric.version,
-    type:                     'text',
+    type:                     'IText',
     originX:                  'left',
     originY:                  'top',
     left:                     0,
@@ -73,7 +73,7 @@
       assert.ok(iText instanceof fabric.IText);
 
       assert.equal(iText.text, 'test');
-      assert.equal(iText.type, 'i-text');
+      assert.equal(iText.constructor.name, 'IText');
       assert.deepEqual(iText.styles, { });
     });
 
@@ -82,7 +82,7 @@
       assert.ok(typeof fabric.IText.fromObject === 'function');
       fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
-        assert.deepEqual(ITEXT_OBJECT, iText.toObject());
+        assert.deepEqual(iText.toObject(), ITEXT_OBJECT);
         done();
       });
     });

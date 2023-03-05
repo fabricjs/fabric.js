@@ -1,8 +1,27 @@
 import { Color } from '../color/Color';
 import { TClassProperties } from '../typedefs';
-import { AbstractBaseFilter } from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
+import { blendColorFragmentSource } from './shaders/blendColor';
+
+type TBlendMode =
+  | 'multiply'
+  | 'add'
+  | 'difference'
+  | 'screen'
+  | 'subtract'
+  | 'darken'
+  | 'lighten'
+  | 'overlay'
+  | 'exclusion'
+  | 'tint';
+
+export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
+  color: '#F95C63',
+  mode: 'multiply',
+  alpha: 1,
+};
 
 /**
  * Color Blend filter class
@@ -21,7 +40,7 @@ import { classRegistry } from '../util/class_registry';
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
+export class BlendColor extends BaseFilter {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
@@ -30,18 +49,13 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    **/
   declare color: string;
 
-  declare mode:
-    | 'multiply'
-    | 'add'
-    | 'diff'
-    | 'difference'
-    | 'screen'
-    | 'subtract'
-    | 'darken'
-    | 'lighten'
-    | 'overlay'
-    | 'exclusion'
-    | 'tint';
+  /**
+   * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
+   * darken, lighten, overlay, exclusion, tint.
+   * @type String
+   * @default
+   **/
+  declare mode: TBlendMode;
 
   /**
    * alpha value. represent the strength of the blend color operation.
@@ -50,14 +64,13 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
    **/
   declare alpha: number;
 
-  /**
-   * build the fragment source for the filters, joining the common part with
-   * the specific one.
-   * @param {String} mode the mode of the filter, a key of this.fragmentSource
-   * @return {String} the source to be compiled
-   * @private
-   */
-  buildSource(mode: string) {
+  static defaults = blendColorDefaultValues;
+
+  getCacheKey() {
+    return `${this.type}_${this.mode}`;
+  }
+
+  protected getFragmentSource(): string {
     return `
       precision highp float;
       uniform sampler2D uTexture;
@@ -67,18 +80,10 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
         vec4 color = texture2D(uTexture, vTexCoord);
         gl_FragColor = color;
         if (color.a > 0.0) {
-          ${this.fragmentSource[mode]}
+          ${blendColorFragmentSource[this.mode]}
         }
       }
       `;
-  }
-
-  getCacheKey() {
-    return `${this.type}_${this.mode}`;
-  }
-
-  getFragmentSource(): string {
-    return this.buildSource(this.mode);
   }
 
   /**
@@ -115,7 +120,6 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
           data[i + 1] = g + tg;
           data[i + 2] = b + tb;
           break;
-        case 'diff':
         case 'difference':
           data[i] = Math.abs(r - tr);
           data[i + 1] = Math.abs(g - tg);
@@ -208,51 +212,6 @@ export class BlendColor extends AbstractBaseFilter<Record<string, string>> {
       alpha: this.alpha,
     };
   }
-
-  static async fromObject(object: any) {
-    return new BlendColor(object);
-  }
 }
 
-export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
-  type: 'BlendColor',
-  color: '#F95C63',
-  mode: 'multiply',
-  alpha: 1,
-  fragmentSource: {
-    multiply: 'gl_FragColor.rgb *= uColor.rgb;\n',
-    screen:
-      'gl_FragColor.rgb = 1.0 - (1.0 - gl_FragColor.rgb) * (1.0 - uColor.rgb);\n',
-    add: 'gl_FragColor.rgb += uColor.rgb;\n',
-    diff: 'gl_FragColor.rgb = abs(gl_FragColor.rgb - uColor.rgb);\n',
-    subtract: 'gl_FragColor.rgb -= uColor.rgb;\n',
-    lighten: 'gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n',
-    darken: 'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n',
-    exclusion:
-      'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n',
-    overlay: `
-      if (uColor.r < 0.5) {
-        gl_FragColor.r *= 2.0 * uColor.r;
-      } else {
-        gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);
-      }
-      if (uColor.g < 0.5) {
-        gl_FragColor.g *= 2.0 * uColor.g;
-      } else {
-        gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);
-      }
-      if (uColor.b < 0.5) {
-        gl_FragColor.b *= 2.0 * uColor.b;
-      } else {
-        gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);
-      }
-      `,
-    tint: `
-      gl_FragColor.rgb *= (1.0 - uColor.a);
-      gl_FragColor.rgb += uColor.rgb;
-      `,
-  },
-};
-
-Object.assign(BlendColor.prototype, blendColorDefaultValues);
 classRegistry.setClass(BlendColor);

@@ -30,7 +30,7 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  fabric.Object.prototype.objectCaching = true;
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
   if (isNode()) {
     visualTestLoop = global.visualTestLoop;
@@ -447,7 +447,8 @@
     code: gradientStroke,
     golden: 'gradientStroke.png',
     newModule: 'Gradient stroke',
-    percentage: 0.02,
+    // loose diff because firefox
+    percentage: 0.04,
     width: 300,
     height: 300,
   });
