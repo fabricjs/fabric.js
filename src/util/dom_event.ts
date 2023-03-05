@@ -17,7 +17,7 @@ export const getPointer = (event) => {
     // write code for safari < 13
     return new Point(0,0);
   }
-  return new Point(_evt.offsetX, _evt.offsetY);
+  return new Point(event.offsetX, event.offsetY);
 };
 
 export const isTouchEvent = (event) =>
