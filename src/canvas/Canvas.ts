@@ -952,58 +952,6 @@ export class Canvas extends SelectableCanvas {
     }
   }
 
-  protected onObjectDiscarded(target: FabricObject, e?: TPointerEvent) {
-    super.onObjectDiscarded(target, e);
-    if (this._currentTransform && this._currentTransform.target === target) {
-      this.endCurrentTransform(e);
-    }
-  }
-
-  /**
-   * End the current transform.
-   * You don't usually need to call this method unless you are interrupting a user initiated transform
-   * because of some other event ( a press of key combination, or something that blocks the user UX )
-   * @param {Event} [e] pass down the mouse event that finalized the transform, so it can be used in the event
-   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
-   */
-  endCurrentTransform(e?: TPointerEvent) {
-    const modifiedEventFired = this._finalizeCurrentTransform(e);
-    this._currentTransform = null;
-    return modifiedEventFired;
-  }
-
-  /**
-   * @private
-   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
-   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
-   */
-  protected _finalizeCurrentTransform(e?: TPointerEvent) {
-    const transform = this._currentTransform;
-    if (!transform) {
-      return false;
-    }
-    const { target, action, actionPerformed } = transform;
-
-    // reset object transform state
-    target._scaling = false;
-    target.isMoving = false;
-
-    target.setCoords();
-
-    if (actionPerformed) {
-      const options = {
-        e,
-        target,
-        transform,
-        action,
-      };
-      this.fire('object:modified', options);
-      target.fire('modified', options);
-      return true;
-    }
-    return false;
-  }
-
   /**
    * @private
    * @param {Event} e Event object fired on mousedown
@@ -1197,6 +1145,58 @@ export class Canvas extends SelectableCanvas {
       e,
       transform,
     });
+  }
+
+  protected onObjectDiscarded(target: FabricObject, e?: TPointerEvent) {
+    super.onObjectDiscarded(target, e);
+    if (this._currentTransform && this._currentTransform.target === target) {
+      this.endCurrentTransform(e);
+    }
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that blocks the user UX )
+   * @param {Event} [e] pass down the mouse event that finalized the transform, so it can be used in the event
+   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const modifiedEventFired = this._finalizeCurrentTransform(e);
+    this._currentTransform = null;
+    return modifiedEventFired;
+  }
+
+  /**
+   * @private
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
+   */
+  protected _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    if (!transform) {
+      return false;
+    }
+    const { target, action, actionPerformed } = transform;
+
+    // reset object transform state
+    target._scaling = false;
+    target.isMoving = false;
+
+    target.setCoords();
+
+    if (actionPerformed) {
+      const options = {
+        e,
+        target,
+        transform,
+        action,
+      };
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+      return true;
+    }
+    return false;
   }
 
   /**
