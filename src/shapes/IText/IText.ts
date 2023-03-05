@@ -178,6 +178,10 @@ export class IText<
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
+  get type() {
+    return 'i-text';
+  }
+
   /**
 
    * Constructor
@@ -667,7 +671,6 @@ export class IText<
   }
 }
 
-// @ts-expect-error
-IText.prototype.type = 'i-text';
-
 classRegistry.setClass(IText);
+// legacy
+classRegistry.setClass(IText, 'i-text');
