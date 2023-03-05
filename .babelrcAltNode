@@ -3,7 +3,7 @@
     [
       "@babel/env",
       {
-        "modules": "cjs",
+        "modules": false,
         "useBuiltIns": "usage",
         "loose": true,
         "targets": {

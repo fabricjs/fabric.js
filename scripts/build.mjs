@@ -23,6 +23,11 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
           .slice(2)}"`
     ),
   ].join(' ');
+    const cmd2 = [
+    'npm',
+    'run',
+    'babel-fabric-node'
+  ].join(' ');
   const processOptions = {
     stdio: 'inherit',
     shell: true,
@@ -37,9 +42,11 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
   };
   if (watch) {
     cp.spawn(cmd, processOptions);
+    cp.spawn(cmd2, processOptions);
   } else {
     try {
       cp.execSync(cmd, processOptions);
+      cp.execSync(cmd2, processOptions);
     } catch (error) {
       // minimal logging, no need for stack trace
       console.error(error.message);
