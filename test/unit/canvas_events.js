@@ -382,6 +382,27 @@
     assert.equal(opt.transform.action, 'drag', 'options match model - target');
   });
 
+  QUnit.test('fires object:modified once', function(assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
+    canvas.add(rect);
+    var count = 0;
+    var opt;
+    canvas.on('object:modified', function(_opt) {
+      count++;
+      opt = _opt;
+      canvas.remove(rect);
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(count, 1, 'object:modified fired once though `endCurrentTransform` was called twice - a spy would be great here');
+    assert.equal(opt.e, e2, 'options match model - event');
+    assert.equal(opt.target, rect, 'options match model - target');
+    assert.equal(opt.transform.action, 'drag', 'options match model - target');
+  });
+
   QUnit.test('drag small object when mousemove + drag, not active', function(assert) {
     var e = { clientX: 2, clientY: 2, which: 1 };
     var e1 = { clientX: 4, clientY: 4, which: 1 };
