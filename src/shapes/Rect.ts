@@ -4,13 +4,28 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
   rx: 0,
   ry: 0,
 };
 
-export class Rect extends FabricObject {
+export interface SerializedRectProps
+  extends SerializedObjectProps {};
+
+export class Rect<
+    Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements FabricObjectProps {
   /**
    * Horizontal border radius
    * @type Number
@@ -122,7 +137,10 @@ export class Rect extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 
