@@ -15,10 +15,11 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './ObjectProps';
 
-export type TOCoord = Point & {
+export type TControlCoord = {
+  position: Point;
+  connection: { from: Point; to: Point };
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
-  connection: Point;
 };
 
 type TControlSet = Record<string, Control>;
@@ -57,7 +58,7 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  declare oCoords: Record<string, TOCoord>;
+  declare oCoords: Record<string, TControlCoord>;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -191,14 +192,15 @@ export class InteractiveFabricObject<
    * This basically just delegates to each control positionHandler
    * WARNING: changing what is passed to positionHandler is a breaking change, since position handler
    * is a public api and should be done just if extremely necessary
-   * @return {Record<string, TOCoord>}
+   * @return {Record<string, TControlCoord>}
    */
-  calcOCoords(): Record<string, TOCoord> {
+  calcOCoords(): Record<string, TControlCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
+      angle = this.getTotalAngle(),
       tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
       rMatrix = calcRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
+        angle: angle - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
       startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
@@ -214,24 +216,36 @@ export class InteractiveFabricObject<
         ? qrDecompose(this.calcTransformMatrix())
         : undefined,
       dim = this._calculateCurrentDimensions(transformOptions),
-      coords: Record<string, TOCoord> = {};
+      coords: Record<string, TControlCoord> = {};
 
     this.forEachControl((control, key) => {
       const position = control.positionHandler(dim, finalMatrix, this, control);
-      const connectionPosition = control.connectionPositionHandler(
-        dim,
-        finalMatrix,
-        this,
-        control
-      );
-      // coords[key] are sometimes used as points. Those are points to which we add
-      // the property corner and touchCorner from `_calcCornerCoords`.
-      // don't remove this assign for an object spread.
-      coords[key] = Object.assign(
+      coords[key] = {
+        // TODO: remove backward compatibility
+        ...position,
         position,
-        { connection: connectionPosition },
-        this._calcCornerCoords(control, position)
-      );
+        connection: control.connectionPositionHandler(
+          position,
+          dim,
+          finalMatrix,
+          this,
+          control
+        ),
+        corner: control.calcCornerCoords(
+          angle,
+          this.cornerSize,
+          position.x,
+          position.y,
+          false
+        ),
+        touchCorner: control.calcCornerCoords(
+          angle,
+          this.touchCornerSize,
+          position.x,
+          position.y,
+          true
+        ),
+      };
     });
 
     // debug code
@@ -248,31 +262,6 @@ export class InteractiveFabricObject<
       } 50);
     */
     return coords;
-  }
-
-  /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  private _calcCornerCoords(control: Control, position: Point) {
-    const corner = control.calcCornerCoords(
-      this.angle,
-      this.cornerSize,
-      position.x,
-      position.y,
-      false
-    );
-    const touchCorner = control.calcCornerCoords(
-      this.angle,
-      this.touchCornerSize,
-      position.x,
-      position.y,
-      true
-    );
-    return { corner, touchCorner };
   }
 
   /**
@@ -467,7 +456,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        control.render(ctx, this.oCoords[key], options, this);
+        control.renderControl(ctx, this.oCoords[key], options, this);
       }
     });
     ctx.restore();

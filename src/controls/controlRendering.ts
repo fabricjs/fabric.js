@@ -1,5 +1,4 @@
 import { twoMathPi } from '../constants';
-import { TOCoord } from '../shapes/Object/InteractiveObject';
 import type { FabricObject } from '../shapes/Object/Object';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
@@ -20,7 +19,8 @@ export type ControlRenderingStyleOverride = Partial<
 
 export type ControlRenderer = (
   ctx: CanvasRenderingContext2D,
-  position: TOCoord,
+  x: number,
+  y: number,
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: FabricObject
 ) => void;
@@ -31,14 +31,16 @@ export type ControlRenderer = (
  * cornerColor, cornerStrokeColor
  * plus the addition of offsetY and offsetX.
  * @param {CanvasRenderingContext2D} ctx context to render on
- * @param {TOCoord} position coordinate where the control center should be
+ * @param {number} x control center x
+ * @param {number} y control center y
  * @param {Object} styleOverride override for FabricObject controls style
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderCircleControl(
   this: Control,
   ctx: CanvasRenderingContext2D,
-  { x, y }: TOCoord,
+  x: number,
+  y: number,
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: FabricObject
 ) {
@@ -88,14 +90,16 @@ export function renderCircleControl(
  * cornerColor, cornerStrokeColor
  * plus the addition of offsetY and offsetX.
  * @param {CanvasRenderingContext2D} ctx context to render on
- * @param {TOCoord} position coordinate where the control center should be
+ * @param {number} x control center x
+ * @param {number} y control center y
  * @param {Object} styleOverride override for FabricObject controls style
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderSquareControl(
   this: Control,
   ctx: CanvasRenderingContext2D,
-  position: TOCoord,
+  x: number,
+  y: number,
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: FabricObject
 ) {
@@ -119,7 +123,7 @@ export function renderSquareControl(
     styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // this is still wrong
   ctx.lineWidth = 1;
-  ctx.translate(position.x, position.y);
+  ctx.translate(x, y);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();
   ctx.rotate(degreesToRadians(angle));
