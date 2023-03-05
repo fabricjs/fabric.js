@@ -103,7 +103,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
   If that doesn't work, once the PR is ready run `npm run prettier:write` and commit the changes.
   Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
 - **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#-testing). We are here to help.
+  PRs must be backed with relevant tests, follow [TESTING](#-testing). If you never wrote a test or you find our tests unclear to extend, just ask for help.
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
