@@ -43,9 +43,7 @@ export interface DragMethods {
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
-const interactiveDefaults = {
-
-};
+const interactiveDefaults = {};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
