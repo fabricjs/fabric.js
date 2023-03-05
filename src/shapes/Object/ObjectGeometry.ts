@@ -612,27 +612,13 @@ export class ObjectGeometry<
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
-    // if (this.group) {
-    //   const { flipX, flipY } = this;
-    //   const { angle } = qrDecompose(this.calcTransformMatrix());
-    //   this.flipX = flipX;
-    //   this.flipY = flipY;
-    //   return angle;
-    // }
-    // return this.angle;
-    return qrDecompose(this.calcTransformMatrix()).angle;
-  }
-
-  getFlipFactor() {
-    let flipX = this.flipX ? -1 : 1,
-      flipY = this.flipY ? -1 : 1;
-    let target = this.group;
-    while (target) {
-      flipX *= target.flipX ? -1 : 1;
-      flipY *= target.flipY ? -1 : 1;
-      target = target.group;
-    }
-    return new Point(flipX, flipY);
+    const { flipX, flipY } = this;
+    this.flipX = false;
+    this.flipY = false;
+    const { angle } = qrDecompose(this.calcTransformMatrix());
+    this.flipX = flipX;
+    this.flipY = flipY;
+    return angle;
   }
 
   /**
@@ -680,9 +666,7 @@ export class ObjectGeometry<
   ) {
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
     const offsetVector = rotateVector(
-      offset
-        .add(origin.scalarMultiply(padding * 2))
-        .multiply(this.getFlipFactor()),
+      offset.add(origin.scalarMultiply(padding * 2)),
       degreesToRadians(this.getTotalAngle())
     );
     const realCenter = this.getCenterPoint().transform(vpt);
