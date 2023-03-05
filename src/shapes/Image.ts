@@ -25,6 +25,8 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters';
 
+// @todo Would be nice to have filtering code not imported directly.
+
 export type ImageSource =
   | HTMLImageElement
   | HTMLVideoElement
