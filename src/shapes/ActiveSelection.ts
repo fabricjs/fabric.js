@@ -1,5 +1,4 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
@@ -201,7 +200,5 @@ export class ActiveSelection extends Group {
   }
 }
 
-// @ts-expect-error
-ActiveSelection.prototype.type = 'activeSelection';
-
 classRegistry.setClass(ActiveSelection);
+classRegistry.setClass(ActiveSelection, 'activeSelection');
