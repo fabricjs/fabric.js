@@ -80,7 +80,6 @@ export {
 export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
 export {
-  // getScrollLeftTop,
   getElementOffset,
   makeElementUnselectable,
   makeElementSelectable,
