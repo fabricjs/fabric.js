@@ -1,14 +1,9 @@
 import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
 import { FabricObject } from './Object';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../../util/misc/radiansDegreesConversion';
-import {
-  calcRotateMatrix,
   multiplyTransformMatrices,
-  multiplyTransformMatrixChain,
   qrDecompose,
   TQrDecomposeOut,
 } from '../../util/misc/matrix';
@@ -18,17 +13,10 @@ import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './ObjectProps';
-import { sendVectorToPlane } from '../../util/misc/planeChange';
-import { iMatrix } from '../../constants';
 import { mapValues } from '../../util/internals';
-import {
-  createVector,
-  getOrthonormalVector,
-  rotateVector,
-} from '../../util/misc/vectors';
+import { createVector } from '../../util/misc/vectors';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { Intersection } from '../../Intersection';
-import { capValue } from '../../util/misc/capValue';
 
 type TOCoord = Point & {
   corner: TCornerPoint;

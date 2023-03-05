@@ -5,19 +5,15 @@ import type {
   TMat2D,
   TOriginX,
   TOriginY,
-  TRadian,
 } from '../../typedefs';
 import { iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import {
-  calcDimensionsMatrix,
-  calcRotateMatrix,
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
-  multiplyTransformMatrixChain,
   qrDecompose,
   transformPoint,
 } from '../../util/misc/matrix';
@@ -25,21 +21,9 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
-import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { mapValues } from '../../util/internals';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../../util/misc/radiansDegreesConversion';
-import {
-  calcAngleBetweenVectors,
-  calcVectorRotation,
-  createVector,
-  getUnitVector,
-  rotateVector,
-} from '../../util/misc/vectors';
-import { cos } from '../../util/misc/cos';
-import { sin } from '../../util/misc/sin';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { getUnitVector, rotateVector } from '../../util/misc/vectors';
 
 type TLineDescriptor = {
   o: Point;
