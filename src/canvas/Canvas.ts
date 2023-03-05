@@ -831,7 +831,7 @@ export class Canvas extends SelectableCanvas {
     if (!this._isMainEvent(e)) {
       return;
     }
-    let shouldRender = this._finalizeCurrentTransform(e);
+    let shouldRender = this.endCurrentTransform(e);
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
       this.handleSelection(e);
@@ -879,7 +879,7 @@ export class Canvas extends SelectableCanvas {
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+    this._handleEvent(e, 'up', LEFT_CLICK, isClick, transform);
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
@@ -926,19 +926,20 @@ export class Canvas extends SelectableCanvas {
     e: TPointerEvent,
     eventType: TPointerEventNames,
     button = LEFT_CLICK,
-    isClick = false
+    isClick = false,
+    transform = this._currentTransform
   ) {
     const target = this._target,
       targets = this.targets || [],
       options: TPointerEventInfo = {
-        e: e,
-        target: target,
+        e,
+        target,
         subTargets: targets,
         button,
         isClick,
         pointer: this.getPointer(e),
         absolutePointer: this.getPointer(e, true),
-        transform: this._currentTransform,
+        transform,
       };
     if (eventType === 'up') {
       options.currentTarget = this.findTarget(e);
