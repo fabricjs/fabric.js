@@ -4,13 +4,38 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   rx: 0,
   ry: 0,
 };
 
-export class Ellipse extends FabricObject {
+interface UniqueEllipseProps {
+  rx: number;
+  ry: number;
+}
+
+export interface SerializedEllipseProps
+  extends SerializedObjectProps,
+    UniqueEllipseProps {}
+
+export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
+
+const ELLIPSE_PROPS = ['rx', 'ry'] as const;
+
+export class Ellipse<
+    Props extends TProps<EllipseProps> = Partial<EllipseProps>,
+    SProps extends SerializedEllipseProps = SerializedEllipseProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements UniqueEllipseProps {
   /**
    * Horizontal radius
    * @type Number
@@ -25,7 +50,7 @@ export class Ellipse extends FabricObject {
    */
   declare ry: number;
 
-  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+  static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
   static ownDefaults: Record<string, any> = ellipseDefaultValues;
 
@@ -34,15 +59,6 @@ export class Ellipse extends FabricObject {
       ...super.getDefaults(),
       ...Ellipse.ownDefaults,
     };
-  }
-
-  /**
-   * Constructor
-   * @param {Object} [options] Options object
-   * @return {Ellipse} thisArg
-   */
-  constructor(options: Record<string, unknown>) {
-    super(options);
   }
 
   /**
@@ -88,8 +104,13 @@ export class Ellipse extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(['rx', 'ry', ...propertiesToInclude]);
+  // @ts-expect-error
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    // @ts-expect-error
+    return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 
   /**

@@ -1,4 +1,4 @@
-import { ObjectEvents } from '../EventTypeDefs';
+import type { ObjectEvents } from '../EventTypeDefs';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { cos } from '../util/misc/cos';
@@ -136,10 +136,12 @@ export class Circle<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
+  // @ts-expect-error
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    // @ts-expect-error
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
