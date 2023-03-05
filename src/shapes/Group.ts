@@ -1069,7 +1069,4 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   }
 }
 
-// @ts-expect-error
-Group.prototype.type = 'group';
-
 classRegistry.setClass(Group);

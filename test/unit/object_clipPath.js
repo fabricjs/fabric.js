@@ -17,7 +17,7 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -53,7 +53,7 @@
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.clipPath = new fabric.Object();
-    
+
     assert.deepEqual({
       ...emptyObjectRepr,
       clipPath: {

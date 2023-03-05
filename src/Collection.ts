@@ -100,7 +100,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       if (types.length === 0) {
         return [...this._objects];
       }
-      return this._objects.filter((o) => types.includes(o.type));
+      return this._objects.filter((o) => o.isType(...types));
     }
 
     /**

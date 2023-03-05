@@ -200,8 +200,5 @@ export class Rect extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-// @ts-expect-error
-Rect.prototype.type = 'rect';
-
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);
