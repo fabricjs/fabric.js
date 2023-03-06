@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
 - chore(TS): remove controls from prototype. BREAKING: controls aren't shared anymore [#8753](https://github.com/fabricjs/fabric.js/pull/8753)
 - chore(TS): remove object `type` from prototype [#8714](https://github.com/fabricjs/fabric.js/pull/8714)
 - chore(TS): type Object props [#8677](https://github.com/fabricjs/fabric.js/issues/8677)
