@@ -116,11 +116,6 @@
 
   });
 
-  QUnit.test('has not applyTo2d', function(assert) {
-    var filter = new fabric.filters.Composed();
-    assert.ok(typeof filter.applyTo2d === 'undefined');
-  });
-
   QUnit.test('toObject', function(assert) {
     var filter = new fabric.filters.Composed();
     assert.ok(typeof filter.toObject === 'function');

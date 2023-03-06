@@ -1,9 +1,14 @@
 import type { TClassProperties } from '../typedefs';
-import { BaseFilter, BaseFilterOptions } from './BaseFilter';
+import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
-
+import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/gamma';
 export type GammaInput = [number, number, number];
+
+export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
+  mainParameter: 'gamma',
+  gamma: [1, 1, 1],
+};
 
 /**
  * Gamma filter class
@@ -27,12 +32,15 @@ export class Gamma extends BaseFilter {
     b: Uint8Array;
   };
 
-  constructor({
-    gamma,
-    ...options
-  }: Partial<BaseFilterOptions> & { gamma?: GammaInput } = {}) {
+  static defaults = gammaDefaultValues;
+
+  getFragmentSource() {
+    return fragmentSource;
+  }
+
+  constructor({ gamma = [1, 1, 1], ...options }: { gamma?: GammaInput } = {}) {
     super(options);
-    this.gamma = gamma || [1, 1, 1];
+    this.gamma = gamma;
   }
 
   /**
@@ -57,15 +65,16 @@ export class Gamma extends BaseFilter {
 
     // This is an optimization - pre-compute a look-up table for each color channel
     // instead of performing these pow calls for each pixel in the image.
+    const rgb = this.rgbValues;
     for (let i = 0; i < 256; i++) {
-      this.rgbValues.r[i] = Math.pow(i / 255, rInv) * 255;
-      this.rgbValues.g[i] = Math.pow(i / 255, gInv) * 255;
-      this.rgbValues.b[i] = Math.pow(i / 255, bInv) * 255;
+      rgb.r[i] = Math.pow(i / 255, rInv) * 255;
+      rgb.g[i] = Math.pow(i / 255, gInv) * 255;
+      rgb.b[i] = Math.pow(i / 255, bInv) * 255;
     }
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = this.rgbValues.r[data[i]];
-      data[i + 1] = this.rgbValues.g[data[i + 1]];
-      data[i + 2] = this.rgbValues.b[data[i + 2]];
+      data[i] = rgb.r[data[i]];
+      data[i + 1] = rgb.g[data[i + 1]];
+      data[i + 2] = rgb.b[data[i + 2]];
     }
   }
 
@@ -96,32 +105,6 @@ export class Gamma extends BaseFilter {
   ) {
     gl.uniform3fv(uniformLocations.uGamma, this.gamma);
   }
-
-  static async fromObject(object: any) {
-    return new Gamma(object);
-  }
 }
 
-export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
-  type: 'Gamma',
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform vec3 uGamma;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      vec3 correction = (1.0 / uGamma);
-      color.r = pow(color.r, correction.r);
-      color.g = pow(color.g, correction.g);
-      color.b = pow(color.b, correction.b);
-      gl_FragColor = color;
-      gl_FragColor.rgb *= color.a;
-    }
-  `,
-  mainParameter: 'gamma',
-  gamma: [1, 1, 1],
-};
-
-Object.assign(Gamma.prototype, gammaDefaultValues);
 classRegistry.setClass(Gamma);

@@ -1,7 +1,7 @@
 (function(){
   var canvas = fabric.getDocument().createElement('canvas'),
     ctx = canvas.getContext('2d');
-  
+
   async function assertCursorAnimation(assert, text, active = false, delay = false) {
     delay && await wait(typeof delay === 'number' ? delay : undefined);
     const cursorState = [text._currentTickState, text._currentTickCompleteState].some(
@@ -15,7 +15,7 @@
   function wait(ms = 16) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  
+
   function setSelection(assert, iText, start, end) {
     iText.selectionStart = start;
     iText.selectionEnd = end;
@@ -39,7 +39,7 @@
     hooks.beforeEach(() => {
       selection = 0;
     });
-    
+
     QUnit.test('enterEditing', async function (assert) {
       iText.enterEditing();
       await _assertCursorAnimation(true);
@@ -55,7 +55,7 @@
       await _assertCursorAnimation(false, true);
       done();
     });
-    
+
     QUnit.test('selectWord', async function (assert) {
       const done = assert.async();
       await _setSelection(2, 2);
@@ -245,7 +245,7 @@
       await _assertCursorAnimation(true, true);
       done();
     });
-    
+
     // TODO verify and dp
     // iText.selectionStart = 0;
     // iText.selectionEnd = 0;
@@ -254,152 +254,153 @@
     // assert.equal(iText.selectionStart, 5, 'should be at end of text inserted');
     // assert.equal(iText.selectionEnd, 5, 'should be at end of text inserted');
 
-  });
+    QUnit.test('mousedown calls key maps', function (assert) {
+      const event = {
+        stopPropagation: function () { },
+        stopImmediatePropagation: function () { },
+        preventDefault: function () { },
+        ctrlKey: false,
+        keyCode: 0
+      };
+      class TestIText extends fabric.IText {
 
-  QUnit.test('mousedown calls key maps', function (assert) {
-    const event = {
-      stopPropagation: function () { },
-      stopImmediatePropagation: function () { },
-      preventDefault: function () { },
-      ctrlKey: false,
-      keyCode: 0
-    };
-    class TestIText extends fabric.IText {
+      }
+      ['default', 'rtl', 'ctrl'].forEach(x => { TestIText.prototype[`__test_${x}`] = () => fired.push(x) });
+      const iText = new TestIText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
+      iText.isEditing = true;
+      const fired = [];
+      iText.keysMap = { 0: `__test_default` };
+      iText.keysMapRtl = { 0: `__test_rtl` };
+      iText.ctrlKeysMapDown = { 1: `__test_ctrl` };
+      iText.onKeyDown(event);
+      assert.deepEqual(fired, ['default']);
+      iText.direction = 'rtl';
+      iText.onKeyDown(event);
+      assert.deepEqual(fired, ['default', 'rtl']);
+      iText.onKeyDown({ ...event, ctrlKey: true, keyCode: 1 });
+      assert.deepEqual(fired, ['default', 'rtl', 'ctrl']);
+    });
 
-    }
-    ['default', 'rtl', 'ctrl'].forEach(x => { TestIText.prototype[`__test_${x}`] = () => fired.push(x) });
-    const iText = new TestIText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } } });
-    iText.isEditing = true;
-    const fired = [];
-    iText.keysMap = { 0: `__test_default` };
-    iText.keysMapRtl = { 0: `__test_rtl` };
-    iText.ctrlKeysMapDown = { 1: `__test_ctrl` };
-    iText.onKeyDown(event);
-    assert.deepEqual(fired, ['default']);
-    iText.direction = 'rtl';
-    iText.onKeyDown(event);
-    assert.deepEqual(fired, ['default', 'rtl']);
-    iText.onKeyDown({ ...event, ctrlKey: true, keyCode: 1 });
-    assert.deepEqual(fired, ['default', 'rtl', 'ctrl']);
-  });
+    // QUnit.test('copy and paste', function(assert) {
+    //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
+    //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+    //   iText.enterEditing();
+    //   iText.selectionStart = 0;
+    //   iText.selectionEnd = 2;
+    //   iText.hiddenTextarea.selectionStart = 0
+    //   iText.hiddenTextarea.selectionEnd = 2
+    //   iText.copy(event);
+    //   assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
+    //   assert.equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
+    //   assert.equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
+    //   iText.selectionStart = 2;
+    //   iText.selectionEnd = 2;
+    //   iText.hiddenTextarea.value = 'tetest';
+    //   iText.paste(event);
+    //   assert.equal(iText.text, 'tetest', 'text has been copied');
+    //   assert.notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
+    //   assert.notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
+    //   assert.deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
+    //   assert.deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
+    // });
+    QUnit.test('copy', function(assert) {
+      var event = { stopPropagation: function(){}, preventDefault: function(){} };
+      const { copyPasteData } = fabric.getEnv()
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.selectionStart = 0;
+      iText.selectionEnd = 2;
+      iText.copy(event);
+      assert.equal(copyPasteData.copiedText, 'te', 'it copied first 2 characters');
+      assert.equal(copyPasteData.copiedTextStyle[0].fill, iText.styles[0][0].fill, 'style is cloned');
+      assert.equal(copyPasteData.copiedTextStyle[1].fill, iText.styles[0][1].fill, 'style is referenced');
+      assert.equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
+      assert.equal(copyPasteData.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
+    });
 
-  // QUnit.test('copy and paste', function(assert) {
-  //   var event = { stopPropagation: function(){}, preventDefault: function(){} };
-  //   var iText = new fabric.IText('test', { styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-  //   iText.enterEditing();
-  //   iText.selectionStart = 0;
-  //   iText.selectionEnd = 2;
-  //   iText.hiddenTextarea.selectionStart = 0
-  //   iText.hiddenTextarea.selectionEnd = 2
-  //   iText.copy(event);
-  //   assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
-  //   assert.equal(fabric.copiedTextStyle[0], iText.styles[0][0], 'style is referenced');
-  //   assert.equal(fabric.copiedTextStyle[1], iText.styles[0][1], 'style is referenced');
-  //   iText.selectionStart = 2;
-  //   iText.selectionEnd = 2;
-  //   iText.hiddenTextarea.value = 'tetest';
-  //   iText.paste(event);
-  //   assert.equal(iText.text, 'tetest', 'text has been copied');
-  //   assert.notEqual(iText.styles[0][0], iText.styles[0][2], 'style is not referenced');
-  //   assert.notEqual(iText.styles[0][1], iText.styles[0][3], 'style is not referenced');
-  //   assert.deepEqual(iText.styles[0][0], iText.styles[0][2], 'style is copied');
-  //   assert.deepEqual(iText.styles[0][1], iText.styles[0][3], 'style is copied');
-  // });
-  QUnit.test('copy', function(assert) {
-    var event = { stopPropagation: function(){}, preventDefault: function(){} };
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.selectionStart = 0;
-    iText.selectionEnd = 2;
-    iText.copy(event);
-    assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
-    assert.equal(fabric.copiedTextStyle[0].fill, iText.styles[0][0].fill, 'style is cloned');
-    assert.equal(fabric.copiedTextStyle[1].fill, iText.styles[0][1].fill, 'style is referenced');
-    assert.equal(iText.styles[0][1].fontSize, undefined, 'style had not fontSize');
-    assert.equal(fabric.copiedTextStyle[1].fontSize, 25, 'style took fontSize from text element');
-  });
+    QUnit.test('copy with fabric.config.disableStyleCopyPaste', function(assert) {
+      var event = { stopPropagation: function(){}, preventDefault: function(){} };
+      const { copyPasteData } = fabric.getEnv()
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.selectionStart = 0;
+      iText.selectionEnd = 2;
+      fabric.config.configure({ disableStyleCopyPaste: true });
+      iText.copy(event);
+      assert.equal(copyPasteData.copiedText, 'te', 'it copied first 2 characters');
+      assert.equal(copyPasteData.copiedTextStyle, null, 'style is not cloned');
+      fabric.config.configure({ disableStyleCopyPaste: false });
+    });
 
-  QUnit.test('copy with fabric.config.disableStyleCopyPaste', function(assert) {
-    var event = { stopPropagation: function(){}, preventDefault: function(){} };
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.selectionStart = 0;
-    iText.selectionEnd = 2;
-    fabric.config.configure({ disableStyleCopyPaste: true });
-    iText.copy(event);
-    assert.equal(fabric.copiedText, 'te', 'it copied first 2 characters');
-    assert.equal(fabric.copiedTextStyle, null, 'style is not cloned');
-    fabric.config.configure({ disableStyleCopyPaste: false });
-  });
+    QUnit.test('removeChars', function(assert) {
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      assert.ok(typeof iText.removeChars === 'function');
+      iText.removeChars(1,3);
+      assert.equal(iText.text, 'tt', 'text has been removed');
+      assert.deepEqual(iText._text, ['t','t'], 'text has been removed');
+      assert.equal(iText.styles[0][1], undefined, 'style has been removed');
+    });
 
-  QUnit.test('removeChars', function(assert) {
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    assert.ok(typeof iText.removeChars === 'function');
-    iText.removeChars(1,3);
-    assert.equal(iText.text, 'tt', 'text has been removed');
-    assert.deepEqual(iText._text, ['t','t'], 'text has been removed');
-    assert.equal(iText.styles[0][1], undefined, 'style has been removed');
-  });
+    QUnit.test('insertChars', function(assert) {
+      var iText = new fabric.IText('test');
+      assert.ok(typeof iText.insertChars === 'function');
+      iText.insertChars('ab', null, 1);
+      assert.equal(iText.text, 'tabest', 'text has been added');
+      assert.deepEqual(iText._text.join(''), 'tabest', '_text has been updated');
+    });
 
-  QUnit.test('insertChars', function(assert) {
-    var iText = new fabric.IText('test');
-    assert.ok(typeof iText.insertChars === 'function');
-    iText.insertChars('ab', null, 1);
-    assert.equal(iText.text, 'tabest', 'text has been added');
-    assert.deepEqual(iText._text.join(''), 'tabest', '_text has been updated');
-  });
+    QUnit.test('insertChars can remove chars', function(assert) {
+      var iText = new fabric.IText('test');
+      iText.insertChars('ab', null, 1, 2);
+      assert.equal(iText.text, 'tabst', 'text has added');
+      assert.deepEqual(iText._text.join(''), 'tabst', '_text has been updated');
+      var iText = new fabric.IText('test');
+      iText.insertChars('ab', null, 1, 4);
+      assert.equal(iText.text, 'tab', 'text has added');
+      assert.deepEqual(iText._text.join(''), 'tab', '_text has been updated');
+    });
 
-  QUnit.test('insertChars can remove chars', function(assert) {
-    var iText = new fabric.IText('test');
-    iText.insertChars('ab', null, 1, 2);
-    assert.equal(iText.text, 'tabst', 'text has added');
-    assert.deepEqual(iText._text.join(''), 'tabst', '_text has been updated');
-    var iText = new fabric.IText('test');
-    iText.insertChars('ab', null, 1, 4);
-    assert.equal(iText.text, 'tab', 'text has added');
-    assert.deepEqual(iText._text.join(''), 'tab', '_text has been updated');
-  });
+    QUnit.test('insertChars pick up the style of the character behind and replicates it', function(assert) {
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.insertChars('ab', null, 1);
+      assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+      assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+      assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+      assert.equal(iText.styles[0][3].fill, 'blue', 'style 0 3 was the old blue moved 2 char later');
+    });
 
-  QUnit.test('insertChars pick up the style of the character behind and replicates it', function(assert) {
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.insertChars('ab', null, 1);
-    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
-    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
-    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
-    assert.equal(iText.styles[0][3].fill, 'blue', 'style 0 3 was the old blue moved 2 char later');
-  });
+    QUnit.test('insertChars removes style from the removed text', function(assert) {
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.insertChars('ab', null, 1, 2);
+      assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+      assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+      assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+      assert.equal(iText.styles[0][3], undefined, 'style 0 3 has been removed');
+    });
 
-  QUnit.test('insertChars removes style from the removed text', function(assert) {
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.insertChars('ab', null, 1, 2);
-    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
-    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
-    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
-    assert.equal(iText.styles[0][3], undefined, 'style 0 3 has been removed');
-  });
+    QUnit.test('insertChars handles new lines correctly', function(assert) {
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.insertChars('ab\n\n', null, 1);
+      assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+      assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
+      assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
+      assert.equal(iText.styles[2][0].fill, 'blue', 'blue has been moved down');
+    });
 
-  QUnit.test('insertChars handles new lines correctly', function(assert) {
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.insertChars('ab\n\n', null, 1);
-    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
-    assert.equal(iText.styles[0][1].fill, 'red', 'style 0 1 has been inserted red');
-    assert.equal(iText.styles[0][2].fill, 'red', 'style 0 2 has been inserted red');
-    assert.equal(iText.styles[2][0].fill, 'blue', 'blue has been moved down');
-  });
+    QUnit.test('insertChars can accept some style for the new text', function(assert) {
+      var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
+      iText.insertChars('ab\n\na', [{ fill: 'col1'},{ fill: 'col2'},{ fill: 'col3'},{ fill: 'col4'},{ fill: 'col5'}], 1);
+      assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
+      assert.equal(iText.styles[0][1].fill, 'col1', 'style 0 1 has been inserted col1');
+      assert.equal(iText.styles[0][2].fill, 'col2', 'style 0 2 has been inserted col2');
+      assert.equal(iText.styles[1][0].fill, 'col4', 'style 1 0 has been inserted col4');
+      assert.equal(iText.styles[2][0].fill, 'col5', 'style 2 0 has been inserted col5');
+      assert.equal(iText.styles[2][1].fill, 'blue', 'style 2 1 has been inserted blue');
+    });
 
-  QUnit.test('insertChars can accept some style for the new text', function(assert) {
-    var iText = new fabric.IText('test', { fontSize: 25, styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' }}}});
-    iText.insertChars('ab\n\na', [{ fill: 'col1'},{ fill: 'col2'},{ fill: 'col3'},{ fill: 'col4'},{ fill: 'col5'}], 1);
-    assert.equal(iText.styles[0][0].fill, 'red', 'style 0 0 did not change');
-    assert.equal(iText.styles[0][1].fill, 'col1', 'style 0 1 has been inserted col1');
-    assert.equal(iText.styles[0][2].fill, 'col2', 'style 0 2 has been inserted col2');
-    assert.equal(iText.styles[1][0].fill, 'col4', 'style 1 0 has been inserted col4');
-    assert.equal(iText.styles[2][0].fill, 'col5', 'style 2 0 has been inserted col5');
-    assert.equal(iText.styles[2][1].fill, 'blue', 'style 2 1 has been inserted blue');
-  });
+    QUnit.test('missingNewlineOffset', function(assert) {
+      var iText = new fabric.IText('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂');
 
-  QUnit.test('missingNewlineOffset', function(assert) {
-    var iText = new fabric.IText('由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂');
-
-    var offset = iText.missingNewlineOffset(0);
-    assert.equal(offset, 1, 'it returns always 1');
+      var offset = iText.missingNewlineOffset(0);
+      assert.equal(offset, 1, 'it returns always 1');
+    });
   });
 })();

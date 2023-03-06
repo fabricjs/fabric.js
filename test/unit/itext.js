@@ -3,7 +3,7 @@
 
   var ITEXT_OBJECT = {
     version:                  fabric.version,
-    type:                     'text',
+    type:                     'IText',
     originX:                  'left',
     originY:                  'top',
     left:                     0,
@@ -73,7 +73,7 @@
       assert.ok(iText instanceof fabric.IText);
 
       assert.equal(iText.text, 'test');
-      assert.equal(iText.type, 'i-text');
+      assert.equal(iText.constructor.name, 'IText');
       assert.deepEqual(iText.styles, { });
     });
 
@@ -82,7 +82,7 @@
       assert.ok(typeof fabric.IText.fromObject === 'function');
       fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
-        assert.deepEqual(ITEXT_OBJECT, iText.toObject());
+        assert.deepEqual(iText.toObject(), ITEXT_OBJECT);
         done();
       });
     });
@@ -651,7 +651,7 @@
       });
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
-      var parser = new DOMParser(),
+      var parser = new (fabric.getWindow().DOMParser)(),
           svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
@@ -690,7 +690,7 @@
       canvas.add(group);
       assert.equal(typeof iText1.toSVG, 'function');
       assert.equal(typeof iText2.toSVG, 'function');
-      var parser = new DOMParser();
+      var parser = new (fabric.getWindow().DOMParser)();
       var svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;

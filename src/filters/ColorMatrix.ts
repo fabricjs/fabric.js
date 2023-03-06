@@ -1,7 +1,15 @@
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/colorMatrix';
+export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
+  {
+    matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    mainParameter: 'matrix',
+    colorsOnly: true,
+  };
+
 /**
    * Color Matrix filter class
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
@@ -37,12 +45,18 @@ export class ColorMatrix extends BaseFilter {
    */
   declare colorsOnly: boolean;
 
+  static defaults = colorMatrixDefaultValues;
+
   setOptions({ matrix, ...options }: Record<string, any>) {
     if (matrix) {
       // safeguard against mutation
       this.matrix = [...matrix];
     }
     Object.assign(this, options);
+  }
+
+  getFragmentSource(): string {
+    return fragmentSource;
   }
 
   /**
@@ -126,31 +140,6 @@ export class ColorMatrix extends BaseFilter {
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
     gl.uniform4fv(uniformLocations.uConstants, constants);
   }
-
-  static async fromObject(object: any) {
-    return new ColorMatrix(object);
-  }
 }
 
-export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
-  {
-    type: 'ColorMatrix',
-    fragmentSource: `
-      precision highp float;
-      uniform sampler2D uTexture;
-      varying vec2 vTexCoord;
-      uniform mat4 uColorMatrix;
-      uniform vec4 uConstants;
-      void main() {
-        vec4 color = texture2D(uTexture, vTexCoord);
-        color *= uColorMatrix;
-        color += uConstants;
-        gl_FragColor = color;
-      }`,
-    matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-    mainParameter: 'matrix',
-    colorsOnly: true,
-  };
-
-Object.assign(ColorMatrix.prototype, colorMatrixDefaultValues);
 classRegistry.setClass(ColorMatrix);

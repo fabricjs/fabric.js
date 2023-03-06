@@ -1,7 +1,13 @@
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
+import { fragmentSource } from './shaders/brightness';
+export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
+  brightness: 0,
+  mainParameter: 'brightness',
+};
+
 /**
  * Brightness filter class
  * @example
@@ -20,6 +26,12 @@ export class Brightness extends BaseFilter {
    * @default
    */
   declare brightness: number;
+
+  static defaults = brightnessDefaultValues;
+
+  getFragmentSource() {
+    return fragmentSource;
+  }
 
   /**
    * Apply the Brightness operation to a Uint8ClampedArray representing the pixels of an image.
@@ -66,28 +78,6 @@ export class Brightness extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uBrightness, this.brightness);
   }
-
-  static async fromObject(object: any) {
-    return new Brightness(object);
-  }
 }
 
-export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
-  type: 'Brightness',
-  fragmentSource: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform float uBrightness;
-    varying vec2 vTexCoord;
-    void main() {
-      vec4 color = texture2D(uTexture, vTexCoord);
-      color.rgb += uBrightness;
-      gl_FragColor = color;
-    }
-  `,
-  brightness: 0,
-  mainParameter: 'brightness',
-};
-
-Object.assign(Brightness.prototype, brightnessDefaultValues);
 classRegistry.setClass(Brightness);

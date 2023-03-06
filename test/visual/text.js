@@ -2,24 +2,20 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  var visualTestLoop;
-  if (fabric.getEnv().isLikelyNode) {
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
+  if (isNode()) {
+    const { registerFont } = require('canvas');
+    registerFont(__dirname + '/../fixtures/Ubuntu-Regular.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'normal'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-Bold.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'normal'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-Italic.ttf', {
       family: 'Ubuntu', weight: 'regular', style: 'italic'
     });
-    fabric.getEnv().nodeCanvas.registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
+    registerFont(__dirname + '/../fixtures/Ubuntu-BoldItalic.ttf', {
       family: 'Ubuntu', weight: 'bold', style: 'italic'
     });
-    visualTestLoop = global.visualTestLoop;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
   }
 
   var tests = [];
@@ -48,7 +44,7 @@
     width: 300,
     height: 300,
     beforeEachHandler: function() {
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 
@@ -209,7 +205,7 @@
     test: 'Text with custom fonts',
     code: text6,
     golden: 'text6.png',
-    disabled: !fabric.getEnv().isLikelyNode,
+    disabled: !isNode(),
     percentage: 0.06,
   });
 
@@ -453,7 +449,7 @@
 
   function text12(canvas, callback) {
     fabric.Text.fromObject(
-      JSON.parse('{"type":"i-text","version":"4.4.0","left":1.28,"top":0.19,"width":740.57,"height":150.06,"fill":"#e38644","scaleX":0.48,"scaleY":0.48,"angle":0.2,"text":"השועל החום והזריז קופץ מעל הכלב העצלן\\nהשועל החום והזר33יז  קופץ מעל הכל העצלן\\nשלום עולם","fontWeight":"","fontFamily":"Arial","textAlign":"right","textBackgroundColor":"#d72323","direction":"rtl","styles":{"0":{"6":{"fill":"red"},"7":{"fill":"red"},"8":{"fill":"red","linethrough":true},"9":{"fill":"red","linethrough":true},"10":{"linethrough":true,"textBackgroundColor":"red"},"11":{"linethrough":true,"textBackgroundColor":"green"},"12":{"linethrough":true},"13":{"linethrough":true}},"1":{"8":{"underline":true},"9":{"underline":true},"10":{"underline":true},"11":{"underline":true},"12":{"underline":true},"13":{"underline":true,"fontSize":22},"14":{"underline":true,"fontSize":22},"15":{"underline":true,"fontSize":22},"16":{"underline":true,"fontSize":22},"17":{"fontSize":22},"18":{"fontSize":22},"19":{"fontSize":22},"20":{"fontSize":22},"21":{"fontSize":22},"22":{"fontSize":22,"textBackgroundColor":"blue"}}},"path":null}')
+      JSON.parse('{"type":"IText","version":"4.4.0","left":1.28,"top":0.19,"width":740.57,"height":150.06,"fill":"#e38644","scaleX":0.48,"scaleY":0.48,"angle":0.2,"text":"השועל החום והזריז קופץ מעל הכלב העצלן\\nהשועל החום והזר33יז  קופץ מעל הכל העצלן\\nשלום עולם","fontWeight":"","fontFamily":"Arial","textAlign":"right","textBackgroundColor":"#d72323","direction":"rtl","styles":{"0":{"6":{"fill":"red"},"7":{"fill":"red"},"8":{"fill":"red","linethrough":true},"9":{"fill":"red","linethrough":true},"10":{"linethrough":true,"textBackgroundColor":"red"},"11":{"linethrough":true,"textBackgroundColor":"green"},"12":{"linethrough":true},"13":{"linethrough":true}},"1":{"8":{"underline":true},"9":{"underline":true},"10":{"underline":true},"11":{"underline":true},"12":{"underline":true},"13":{"underline":true,"fontSize":22},"14":{"underline":true,"fontSize":22},"15":{"underline":true,"fontSize":22},"16":{"underline":true,"fontSize":22},"17":{"fontSize":22},"18":{"fontSize":22},"19":{"fontSize":22},"20":{"fontSize":22},"21":{"fontSize":22},"22":{"fontSize":22,"textBackgroundColor":"blue"}}},"path":null}')
     ).then(function(text) {
       canvas.add(text);
       canvas.renderAll();
@@ -466,14 +462,14 @@
     code: text12,
     width: 400,
     height: 150,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'text12.png',
     percentage: 0.095,
   });
 
   function text13(canvas, callback) {
     fabric.Textbox.fromObject(
-      JSON.parse('{"type":"textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"Arial","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"splitByGrapheme":false,"styles":{},"path":null}')
+      JSON.parse('{"type":"Textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"Arial","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"splitByGrapheme":false,"styles":{},"path":null}')
     ).then(function(text) {
       canvas.add(text);
       canvas.renderAll();
@@ -486,7 +482,7 @@
     code: text13,
     width: 232,
     height: 255,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'text13.png',
     percentage: 0.092,
   });
@@ -518,44 +514,44 @@
   tests.push({
     test: 'Draggable text drag image',
     code: dragImage.bind(null, {}),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image.png',
     width: 120,
     height: 220,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
   tests.push({
     test: 'Draggable text drag image + retina scaling',
     code: dragImage.bind(null, { retinaScaling: 3 }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image.png',
     width: 110,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
   tests.push({
     test: 'Draggable text drag image + vpt',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250] }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
   tests.push({
     test: 'Draggable text drag image + vpt + retina',
     code: dragImage.bind(null, { viewportTransform: [2, 0, 0, 1, 250, -250], retinaScaling: 1.25 }),
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'drag_image_vpt.png',
     width: 220,
     height: 250,
-    percentage: 0.04,
+    percentage: 0.01,
     fabricClass: 'Canvas'
   });
 
@@ -574,17 +570,17 @@
       clientX: 5,
       clientY: 5,
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       },
       dataTransfer: {
         setData() {
-          
+
         },
         setDragImage(imageSource, x, y) {
-          
+
         }
       }
     });
@@ -592,10 +588,10 @@
       clientX: 25,
       clientY: 25,
       preventDefault() {
-        
+
       },
       stopPropagation() {
-        
+
       },
     });
     canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
@@ -605,7 +601,7 @@
   tests.push({
     test: 'Overlapping draggable text effects',
     code: draggableTextEffects,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'overlapping_draggable_text_effects.png',
     width: 270,
     height: 120,
@@ -646,13 +642,13 @@
     code: selectionClearingEdgeCases,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing.png',
     percentage: 0.02,
     fabricClass: 'Canvas'
   });
 
-  function selectionClearingEdgeCases2(canvas, callback, assert) {   
+  function selectionClearingEdgeCases2(canvas, callback, assert) {
     const text = new TestTextbox('lorem ipsum dolor sit Amet sit Amet', {
       width: 200,
     });
@@ -675,7 +671,7 @@
     code: selectionClearingEdgeCases2,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing2.png',
     percentage: 0.02,
     fabricClass: 'Canvas'
@@ -702,7 +698,7 @@
     code: selectionClearingEdgeCases3,
     width: 200,
     height: 200,
-    disabled: fabric.getEnv().isLikelyNode,
+    disabled: isNode(),
     golden: 'textSelectionClearing3.png',
     percentage: 0.03,
     fabricClass: 'Canvas'

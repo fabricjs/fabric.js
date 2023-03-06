@@ -16,3 +16,4 @@ before_commit
 /test/
 .next/
 .parcel-cache/
+/docs/

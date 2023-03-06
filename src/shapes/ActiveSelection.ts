@@ -1,11 +1,20 @@
-import { ControlRenderingStyleOverride } from '../controls/controls.render';
-import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
+import { classRegistry } from '../ClassRegistry';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
+
+  /**
+   * controls how selected objects are added during a multiselection event
+   * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
+   * - `selection-order` adds the selected object to the top of the stack,
+   * meaning that the stack is ordered by the order in which objects were selected
+   * @default `canvas-stacking`
+   */
+  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
+    'canvas-stacking';
 
   constructor(
     objects?: FabricObject[],
@@ -21,6 +30,36 @@ export class ActiveSelection extends Group {
    */
   _shouldSetNestedCoords() {
     return true;
+  }
+
+  /**
+   * @private
+   * @override we don't want the selection monitor to be active
+   */
+  __objectSelectionMonitor() {
+    //  noop
+  }
+
+  /**
+   * Adds objects with respect to {@link multiSelectionStacking}
+   * @param targets object to add to selection
+   */
+  multiSelectAdd(...targets: FabricObject[]) {
+    if (this.multiSelectionStacking === 'selection-order') {
+      this.add(...targets);
+    } else {
+      //  respect object stacking as it is on canvas
+      //  perf enhancement for large ActiveSelection: consider a binary search of `isInFrontOf`
+      targets.forEach((target) => {
+        const index = this._objects.findIndex((obj) => obj.isInFrontOf(target));
+        const insertAt =
+          index === -1
+            ? //  `target` is in front of all other objects
+              this.size()
+            : index;
+        this.insertAt(insertAt, target);
+      });
+    }
   }
 
   /**
@@ -51,7 +90,7 @@ export class ActiveSelection extends Group {
     const parent = object.__owningGroup;
     if (parent) {
       //  return to owning group
-      parent.enterGroup(object);
+      parent._enterGroup(object, true);
       delete object.__owningGroup;
     }
   }
@@ -146,12 +185,5 @@ export class ActiveSelection extends Group {
   }
 }
 
-export const activeSelectionDefaultValues: Partial<
-  TClassProperties<ActiveSelection>
-> = {
-  type: 'activeSelection',
-};
-
-Object.assign(ActiveSelection.prototype, activeSelectionDefaultValues);
-
 classRegistry.setClass(ActiveSelection);
+classRegistry.setClass(ActiveSelection, 'activeSelection');

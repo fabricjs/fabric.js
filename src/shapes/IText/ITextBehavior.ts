@@ -1,4 +1,4 @@
-import { getEnv } from '../../env';
+import { getDocument } from '../../env';
 import {
   ObjectEvents,
   TPointerEvent,
@@ -12,7 +12,19 @@ import { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { TextStyleDeclaration } from '../Text/StyledText';
 
-// extend this regex to support non english languages
+/**
+ *  extend this regex to support non english languages
+ *
+ *  - ` `      Matches a SPACE character (char code 32).
+ *  - `\n`     Matches a LINE FEED character (char code 10).
+ *  - `\.`     Matches a "." character (char code 46).
+ *  - `,`      Matches a "," character (char code 44).
+ *  - `;`      Matches a ";" character (char code 59).
+ *  - `!`      Matches a "!" character (char code 33).
+ *  - `\?`     Matches a "?" character (char code 63).
+ *  - `\-`     Matches a "-" character (char code 45).
+ */
+// eslint-disable-next-line no-useless-escape
 const reNonWord = /[ \n\.,;!\?\-]/;
 
 export type ITextEvents = ObjectEvents & {
@@ -388,7 +400,7 @@ export abstract class ITextBehavior<
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
     // regain focus
-    getEnv().document.activeElement !== this.hiddenTextarea &&
+    getDocument().activeElement !== this.hiddenTextarea &&
       this.hiddenTextarea!.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),

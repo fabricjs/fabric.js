@@ -3,6 +3,7 @@ import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { FabricObject as BaseFabricObject } from '../shapes/Object/Object';
 import { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
@@ -22,7 +23,7 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 /**
  * Gradient class
@@ -200,7 +201,11 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    if (object.type === 'path' && this.gradientUnits !== 'percentage') {
+    if (
+      object instanceof BaseFabricObject &&
+      object.isType('Path') &&
+      this.gradientUnits !== 'percentage'
+    ) {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }

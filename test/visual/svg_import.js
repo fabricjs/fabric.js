@@ -2,10 +2,10 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  fabric.Object.prototype.objectCaching = true;
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
   var getAsset;
-  if (fabric.getEnv().isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAsset = global.getAsset;
   }

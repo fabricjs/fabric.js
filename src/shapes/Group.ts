@@ -17,9 +17,9 @@ import {
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import { FabricObject, stateProperties } from './Object/FabricObject';
+import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 
 export type LayoutContextType =
   | 'initialization'
@@ -77,6 +77,13 @@ export type LayoutResult = {
   height: number;
 };
 
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
+  layout: 'fit-content',
+  strokeWidth: 0,
+  subTargetCheck: false,
+  interactive: false,
+};
+
 /**
  * @fires object:added
  * @fires object:removed
@@ -116,6 +123,20 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @private
    */
   protected _activeObjects: FabricObject[] = [];
+
+  static stateProperties: string[] = [
+    ...FabricObject.stateProperties,
+    'layout',
+  ];
+
+  static ownDefaults: Record<string, any> = groupDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Group.ownDefaults,
+    };
+  }
 
   /**
    * Constructor
@@ -483,7 +504,18 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
-      this._objects[i].render(ctx);
+      // TODO: handle rendering edge case somehow
+      if (
+        this.canvas?.preserveObjectStacking &&
+        this._objects[i].group !== this
+      ) {
+        ctx.save();
+        ctx.transform(...invertTransform(this.calcTransformMatrix()));
+        this._objects[i].render(ctx);
+        ctx.restore();
+      } else if (this._objects[i].group === this) {
+        this._objects[i].render(ctx);
+      }
     }
     this._drawClipPath(ctx, this.clipPath);
   }
@@ -571,7 +603,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       //  adjust objects to account for new center
       !context.objectsRelativeToGroup &&
         this.forEachObject((object) => {
-          this._adjustObjectPosition(object, diff);
+          object.group === this && this._adjustObjectPosition(object, diff);
         });
       //  clip path as well
       !isFirstLayout &&
@@ -1036,18 +1068,5 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     );
   }
 }
-
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
-  type: 'group',
-  layout: 'fit-content',
-  strokeWidth: 0,
-  subTargetCheck: false,
-  interactive: false,
-};
-
-Object.assign(Group.prototype, {
-  ...groupDefaultValues,
-  stateProperties: [...stateProperties, 'layout'],
-});
 
 classRegistry.setClass(Group);
