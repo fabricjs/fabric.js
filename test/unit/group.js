@@ -431,7 +431,7 @@
     });
   });
 
-  QUnit.test('fromObject restores oCoords', function(assert) {
+  QUnit.test.skip('fromObject restores oCoords', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
 

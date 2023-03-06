@@ -24,6 +24,11 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { mapValues } from '../../util/internals';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
+import {
+  sendPointToPlane,
+  sendVectorToPlane,
+} from '../../util/misc/planeChange';
+import { projectStrokeOnPoints } from '../../util/misc/projectStroke';
 
 type TLineDescriptor = {
   o: Point;
@@ -58,16 +63,7 @@ export class ObjectGeometry<
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
    */
-  declare aCoords: TACoords;
-
-  /**
-   * Describe object's corner position in canvas element coordinates.
-   * includes padding. Used of object detection.
-   * set and refreshed with setCoords.
-   * Those could go away
-   * @todo investigate how to get rid of those
-   */
-  declare lineCoords: TCornerPoint;
+  declare cornerCoords: TACoords;
 
   /**
    * storage cache for object transform matrix
@@ -207,17 +203,22 @@ export class ObjectGeometry<
    * @return {Object} {tl, tr, br, bl} points
    */
   _getCoords(absolute = false, calculate = false): TCornerPoint {
+    const from = this.needsViewportCoords()
+      ? this.getViewportTransform()
+      : undefined;
+    const to = absolute ? undefined : this.getViewportTransform();
     if (calculate) {
-      return absolute
-        ? this.calcACoords()
-        : this.calcLineCoords(this.calcACoords());
+      return mapValues(this.calcCoords(), (coord) =>
+        sendPointToPlane(coord, from, to)
+      );
     }
     // swapped this double if in place of setCoords();
-    if (!this.aCoords) {
-      this.aCoords = this.calcACoords();
-      this.lineCoords = this.calcLineCoords(this.aCoords);
+    if (!this.cornerCoords) {
+      this.cornerCoords = this.calcCoords();
     }
-    return absolute ? this.aCoords : this.lineCoords;
+    return mapValues(this.cornerCoords, (coord) =>
+      sendPointToPlane(coord, from, to)
+    );
   }
 
   /**
@@ -615,11 +616,17 @@ export class ObjectGeometry<
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
+  protected needsViewportCoords() {
+    return this.strokeUniform || !this.padding;
+  }
+
   protected calcDimensionsVector(
     origin = new Point(1, 1),
     {
-      applyViewportTransform = false,
+      // origin = new Point(1, 1),
+      applyViewportTransform = this.needsViewportCoords(),
     }: {
+      // origin?: Point;
       applyViewportTransform?: boolean;
     } = {}
   ) {
@@ -639,11 +646,12 @@ export class ObjectGeometry<
 
   protected calcCoord(
     origin: Point,
-    offset = new Point(),
     {
-      applyViewportTransform = false,
+      offset = new Point(),
+      applyViewportTransform = this.needsViewportCoords(),
       padding = 0,
     }: {
+      offset?: Point;
       applyViewportTransform?: boolean;
       padding?: number;
     } = {}
@@ -655,34 +663,36 @@ export class ObjectGeometry<
     );
     const realCenter = this.getCenterPoint().transform(vpt);
     return realCenter
-      .add(this.calcDimensionsVector(origin, { applyViewportTransform }))
+      .add(
+        this.calcDimensionsVector(origin, { origin, applyViewportTransform })
+      )
       .add(offsetVector);
   }
 
   /**
-   * **CAUTION**
-   * can be used only after aCoords are set
-   * @param origin
-   * @param offset
-   * @returns
-   */
-  protected calcViewportCoord(
-    origin: Point,
-    offset: Point,
-    padding = this.padding
-  ) {
-    return this.calcCoord(origin, offset, {
-      applyViewportTransform: true,
-      padding,
-    });
-  }
-
-  /**
-   * Calculates the coordinates of the 4 corner of the bbox, in absolute coordinates.
-   * those never change with zoom or viewport changes.
+   * Calculates the coordinates of the 4 corner of the bbox
    * @return {TCornerPoint}
    */
-  calcACoords(): TCornerPoint {
+  calcCoords(): TCornerPoint {
+    // const size = new Point(this.width, this.height);
+    // return projectStrokeOnPoints(
+    //   [
+    //     new Point(-0.5, -0.5),
+    //     new Point(0.5, -0.5),
+    //     new Point(-0.5, 0.5),
+    //     new Point(0.5, 0.5),
+    //   ].map((origin) => origin.multiply(size)),
+    //   {
+    //     ...this,
+    //     ...qrDecompose(
+    //       multiplyTransformMatrices(
+    //         this.needsViewportCoords() ? this.getViewportTransform() : iMatrix,
+    //         this.calcTransformMatrix()
+    //       )
+    //     ),
+    //   }
+    // );
+
     return mapValues(
       {
         tl: new Point(-0.5, -0.5),
@@ -695,14 +705,12 @@ export class ObjectGeometry<
   }
 
   /**
-   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
-   * used for bounding box interactivity with the mouse
-   * @returns {TCornerPoint}
+   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
+   * aCoords are used to quickly find an object on the canvas
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
-  calcLineCoords(aCoords = this.calcACoords()): TCornerPoint {
-    const vpt = this.getViewportTransform();
-    const coords = mapValues(aCoords, (coord) => coord.transform(vpt));
-
+  setCoords(): void {
+    this.cornerCoords = this.calcCoords();
     // debug code
     setTimeout(() => {
       const canvas = this.canvas;
@@ -710,29 +718,14 @@ export class ObjectGeometry<
       const ctx = canvas.contextTop;
       canvas.clearContext(ctx);
       ctx.fillStyle = 'blue';
-      Object.keys(coords).forEach((key) => {
-        const control = coords[key];
+      Object.keys(this.cornerCoords).forEach((key) => {
+        const control = this.cornerCoords[key];
         ctx.beginPath();
         ctx.ellipse(control.x, control.y, 6, 6, 0, 0, 360);
         ctx.closePath();
         ctx.fill();
       });
     }, 50);
-
-    return coords;
-  }
-
-  /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   * @param {Boolean} [skipCorners] skip calculation of aCoord, lineCoords.
-   * @return {void}
-   */
-  setCoords(): void {
-    this.aCoords = this.calcACoords();
-    this.lineCoords = this.calcLineCoords(this.aCoords);
   }
 
   transformMatrixKey(skipGroup = false): string {
@@ -834,6 +827,7 @@ export class ObjectGeometry<
 
   /**
    * Calculate object dimensions from its properties
+   * @deprecated
    * @private
    * @returns {Point} dimensions
    */
@@ -842,8 +836,34 @@ export class ObjectGeometry<
   }
 
   /**
+   * Calculate object bounding box dimensions from its properties scale, skew.
+   * @deprecated
+   * @param {Object} [options]
+   * @param {Number} [options.scaleX]
+   * @param {Number} [options.scaleY]
+   * @param {Number} [options.skewX]
+   * @param {Number} [options.skewY]
+   * @private
+   * @returns {Point} dimensions
+   */
+  _getTransformedDimensions1(options: any = {}): Point {
+    return sendVectorToPlane(
+      this.calcDimensionsVector(/*new Point(options.width||)*/),
+      this.group?.calcTransformMatrix(),
+      composeMatrix({
+        scaleX: this.scaleX,
+        scaleY: this.scaleY,
+        skewX: this.skewX,
+        skewY: this.skewY,
+        ...options,
+      })
+    );
+  }
+
+  /**
    * Calculate object dimensions for controls box, including padding and canvas zoom.
    * and active selection
+   * @deprecated
    * @private
    * @param {object} [options] transform options
    * @returns {Point} dimensions

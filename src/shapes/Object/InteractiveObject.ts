@@ -59,7 +59,7 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  declare oCoords: Record<string, TOCoord>;
+  declare controlCoords: Record<string, TOCoord>;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -157,7 +157,7 @@ export class InteractiveFabricObject<
 
     this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
-    const cornerEntries = Object.entries(this.oCoords);
+    const cornerEntries = Object.entries(this.controlCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [cornerKey, corner] = cornerEntries[i];
       if (!this.isControlVisible(cornerKey)) {
@@ -269,7 +269,7 @@ export class InteractiveFabricObject<
         new Point(width, height),
         // [width, 0, 0, height, center.x, center.y],
         t3,
-        t,
+        // t,
         this,
         control[key]
       );
@@ -334,7 +334,7 @@ export class InteractiveFabricObject<
   setCoords(): void {
     super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
+    this.controlCoords = this.calcOCoords();
   }
 
   /**
@@ -545,7 +545,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        const p = this.oCoords[key];
+        const p = this.controlCoords[key];
         control.render(ctx, p.x, p.y, options, this);
       }
     });

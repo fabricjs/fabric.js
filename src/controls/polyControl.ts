@@ -22,12 +22,7 @@ const getSize = (poly: Polyline) => {
  * It'll be used both for drawing and for interaction.
  */
 const factoryPolyPositionHandler = (pointIndex: number) => {
-  return function (
-    dim: Point,
-    finalMatrix: TMat2D,
-    finalMatrix2: TMat2D,
-    polyObject: Polyline
-  ) {
+  return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
     return new Point(x, y).transform(
