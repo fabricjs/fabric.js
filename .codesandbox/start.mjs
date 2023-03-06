@@ -36,18 +36,18 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
 
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
-    !locked &&
-      fs.writeFileSync(
+    if (!locked) {
+      const packageJSON = fs.readJsonSync(pathToTrigger);
+      fs.writeJSONSync(
         pathToTrigger,
-        JSON.stringify(
-          {
-            ...JSON.parse(fs.readFileSync(pathToTrigger)),
-            trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
-          },
-          null,
-          2
-        )
+        {
+          ...packageJSON,
+          trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
+        },
+        { spaces: 2 }
       );
+      fs.writeJSONSync(pathToTrigger, packageJSON, { spaces: 2 });
+    }
   }, 500);
 
   console.log(
