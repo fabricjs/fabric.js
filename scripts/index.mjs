@@ -593,7 +593,6 @@ website
   .option('-w, --watch')
   .action(exportToWebsite);
 
-
 const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
 
 const sandbox = program.command('sandbox').description('sandbox commands');
