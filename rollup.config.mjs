@@ -3,6 +3,7 @@ import terser from '@rollup/plugin-terser';
 import ts from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
 import path from 'path';
+import chalk from 'chalk';
 // import dts from "rollup-plugin-dts";
 
 const splitter = /\n|\s|,/g;
@@ -31,9 +32,10 @@ const plugins = [
  * @param {*} warn
  */
 function onwarn(warning, warn) {
-  if (warning.code === 'CIRCULAR_DEPENDENCY')
+  if (warning.code === 'CIRCULAR_DEPENDENCY') {
+    console.error(chalk.redBright(warning.message));
     throw Object.assign(new Error(), warning);
-  // Use default for everything else
+  }
   warn(warning);
 }
 
