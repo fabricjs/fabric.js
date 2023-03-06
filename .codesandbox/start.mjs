@@ -14,6 +14,13 @@ import { wd } from '../scripts/dirname.mjs';
  * @param {string} destination
  */
 export function startSandbox(destination, buildAndWatch, installDeps = false) {
+  console.log(chalk.blue('\n> linking fabric'));
+  cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
+  cp.execSync('npm link fabric --include=dev', {
+    cwd: destination,
+    stdio: 'inherit',
+  });
+
   if (
     installDeps ||
     !fs.existsSync(path.resolve(destination, 'node_modules'))
@@ -21,13 +28,6 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
     console.log(chalk.blue('\n> installing dependencies'));
     cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   }
-
-  console.log(chalk.blue('\n> linking fabric'));
-  cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
-  cp.execSync('npm link fabric --include=dev', {
-    cwd: destination,
-    stdio: 'inherit',
-  });
 
   if (buildAndWatch) {
     console.log(chalk.blue('\n> building and watching for changes'));
