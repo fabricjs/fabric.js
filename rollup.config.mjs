@@ -24,6 +24,19 @@ const plugins = [
   }),
 ];
 
+/**
+ * disallow circular deps
+ * @see https://rollupjs.org/configuration-options/#onwarn
+ * @param {*} warning
+ * @param {*} warn
+ */
+function onwarn(warning, warn) {
+  if (warning.code === 'CIRCULAR_DEPENDENCY')
+    throw Object.assign(new Error(), warning);
+  // Use default for everything else
+  warn(warning);
+}
+
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
@@ -51,6 +64,7 @@ export default [
         : null,
     ],
     plugins,
+    onwarn,
   },
   {
     input: ['./index.node.ts'],
@@ -69,6 +83,7 @@ export default [
       },
     ],
     plugins,
+    onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
 ];
