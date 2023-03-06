@@ -1,4 +1,4 @@
-import { getDocument } from '../env';
+import { getWindow } from '../env';
 
 /**
  * Wraps element with another element
@@ -19,39 +19,13 @@ export function wrapElement(element: HTMLElement, wrapper: HTMLDivElement) {
  * Returns offset for a given element
  * @param {HTMLElement} element Element to get offset for
  * @return {Object} Object with "left" and "top" properties
- * TODO convert to getBoundingClientRect + window.scrollX/Y
  */
 export function getElementOffset(element: HTMLElement) {
-
-  let box = { left: 0, top: 0 };
-  const doc = element && element.ownerDocument,
-    offset = { left: 0, top: 0 },
-    offsetAttributes = {
-      borderLeftWidth: 'left',
-      borderTopWidth: 'top',
-      paddingLeft: 'left',
-      paddingTop: 'top',
-    } as const;
-
-  if (!doc) {
-    return offset;
-  }
-  const elemStyle = getDocument().defaultView!.getComputedStyle(element, null);
-  for (const attr in offsetAttributes) {
-    // @ts-expect-error TS learn to iterate!
-    offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
-  }
-
-  const docElem = doc.documentElement;
-  if (typeof element.getBoundingClientRect !== 'undefined') {
-    box = element.getBoundingClientRect();
-  }
-
+  const box = element.getBoundingClientRect();
   return {
-    left:
-      box.left - (docElem.clientLeft || 0) + offset.left,
-    top: box.top - (docElem.clientTop || 0) + offset.top,
-  };
+    top: box.top + getWindow().scrollY,
+    left: box.left + getWindow().scrollX,
+  }
 }
 
 /**

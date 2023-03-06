@@ -1,6 +1,6 @@
 //@ts-nocheck
 import { Point } from '../Point';
-
+import { getElementOffset } from './dom_misc';
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
 function getTouchInfo(event) {
@@ -15,7 +15,8 @@ export const getPointer = (event) => {
   if (isTouchEvent(event)) {
     const _evt = getTouchInfo(event);
     // write code for safari < 13
-    return new Point(0,0);
+    const { left, top } = getElementOffset(event.target);
+    return new Point(_evt.clientX, _evt.clientY).subtract(new Point(left, top));
   }
   return new Point(event.offsetX, event.offsetY);
 };
