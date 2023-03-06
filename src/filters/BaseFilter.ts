@@ -259,7 +259,9 @@ export class BaseFilter {
     }
   }
 
-  applyTo2d(options: T2DPipelineState): void {}
+  applyTo2d(options: T2DPipelineState): void {
+    // override by subclass
+  }
 
   /**
    * Returns a string that represent the current selected shader code for the filter.
@@ -354,7 +356,9 @@ export class BaseFilter {
   sendUniformData(
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
-  ): void {}
+  ): void {
+    // override by subclass
+  }
 
   /**
    * If needed by a 2d filter, this functions can create an helper canvas to be used
