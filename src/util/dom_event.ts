@@ -12,13 +12,12 @@ function getTouchInfo(event) {
 }
 
 export const getPointer = (event) => {
+  let _evt = event;
   if (isTouchEvent(event)) {
-    const _evt = getTouchInfo(event);
-    // write code for safari < 13
-    const { left, top } = getElementOffset(event.target);
-    return new Point(_evt.clientX, _evt.clientY).subtract(new Point(left, top));
+    _evt = getTouchInfo(event);
   }
-  return new Point(event.offsetX, event.offsetY);
+  const { left, top } = getElementOffset(event.target);
+  return new Point(_evt.clientX, _evt.clientY).subtract(new Point(left, top));
 };
 
 export const isTouchEvent = (event) =>
