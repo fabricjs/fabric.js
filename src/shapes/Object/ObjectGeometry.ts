@@ -28,7 +28,6 @@ import {
   sendPointToPlane,
   sendVectorToPlane,
 } from '../../util/misc/planeChange';
-import { projectStrokeOnPoints } from '../../util/misc/projectStroke';
 
 type TLineDescriptor = {
   o: Point;
@@ -663,9 +662,7 @@ export class ObjectGeometry<
     );
     const realCenter = this.getCenterPoint().transform(vpt);
     return realCenter
-      .add(
-        this.calcDimensionsVector(origin, { origin, applyViewportTransform })
-      )
+      .add(this.calcDimensionsVector(origin, { applyViewportTransform }))
       .add(offsetVector);
   }
 
