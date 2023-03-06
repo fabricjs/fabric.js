@@ -622,23 +622,21 @@ export class ObjectGeometry<
   protected calcDimensionsVector(
     origin = new Point(1, 1),
     {
-      // origin = new Point(1, 1),
       applyViewportTransform = this.needsViewportCoords(),
     }: {
-      // origin?: Point;
       applyViewportTransform?: boolean;
     } = {}
   ) {
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
     const dimVector = origin
       .multiply(new Point(this.width, this.height))
-      .scalarAdd(!this.strokeUniform ? this.strokeWidth * 2 : 0)
+      .add(origin.scalarMultiply(!this.strokeUniform ? this.strokeWidth : 0))
       .transform(
         multiplyTransformMatrices(vpt, this.calcTransformMatrix()),
         true
       );
     const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
-      this.strokeUniform ? this.strokeWidth * 2 : 0
+      this.strokeUniform ? this.strokeWidth : 0
     );
     return dimVector.add(strokeUniformVector);
   }
