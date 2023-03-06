@@ -29,8 +29,8 @@ export function useCanvas(
         fc.current = null;
         return;
       }
-      const canvas = new fabric.Canvas(el, { backgroundColor: 'white' });
-      fc.current = canvas;
+      const canvas = new fabric.Canvas(el);
+      window.canvas = fc.current = canvas;
       // invoke callback
       init && init(canvas);
       // restore state

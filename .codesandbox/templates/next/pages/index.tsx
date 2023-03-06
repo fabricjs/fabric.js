@@ -1,20 +1,12 @@
-import { NextPage } from 'next';
-import dynamic from 'next/dynamic';
-import React, { useCallback } from 'react';
 import * as fabric from 'fabric';
-
-// https://nextjs.org/docs/advanced-features/dynamic-import#with-no-ssr
-const Canvas = dynamic(
-  () => import('../components/Canvas').then(({ Canvas }) => Canvas),
-  {
-    ssr: false,
-  }
-);
+import { NextPage } from 'next';
+import { useCallback } from 'react';
+import { Canvas } from '../components/Canvas';
 
 const IndexPage: NextPage = () => {
   const onLoad = useCallback(async (canvas: fabric.Canvas) => {
     canvas.setDimensions({
-      width: 500,
+      width: window.innerWidth,
       height: 500,
     });
     const text = new fabric.Text('fabric.js sandbox', {
