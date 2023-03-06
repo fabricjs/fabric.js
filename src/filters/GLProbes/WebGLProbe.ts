@@ -1,5 +1,4 @@
-import { createCanvasElement } from '../../util/misc/dom';
-import { GLProbe, GLPrecision } from './GLProbe';
+import { GLPrecision, GLProbe } from './GLProbe';
 
 /**
  * Lazy initialize WebGL constants
