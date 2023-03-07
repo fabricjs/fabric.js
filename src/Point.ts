@@ -11,8 +11,9 @@ export interface IPoint {
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
 export class Point implements IPoint {
-  declare x: number;
+  static ZERO = new Point();
 
+  declare x: number;
   declare y: number;
 
   constructor();
@@ -28,12 +29,20 @@ export class Point implements IPoint {
     }
   }
 
+  create(): this;
+  create(x: number, y: number): this;
+  create(point: IPoint): this;
+  create(arg0: number | IPoint = 0, y = 0): this {
+    // @ts-expect-error constructor is not recognized
+    return new this.constructor(arg0, y);
+  }
+
   /**
    * Adds another point to this one and returns another one
    * @param {IPoint} that
    * @return {Point} new Point instance with added values
    */
-  add(that: IPoint): Point {
+  add(that: IPoint) {
     return this.create(this.x + that.x, this.y + that.y);
   }
 
@@ -44,7 +53,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  addEquals(that: IPoint): Point {
+  addEquals(that: IPoint) {
     this.x += that.x;
     this.y += that.y;
     return this;
@@ -55,7 +64,7 @@ export class Point implements IPoint {
    * @param {Number} scalar
    * @return {Point} new Point with added value
    */
-  scalarAdd(scalar: number): Point {
+  scalarAdd(scalar: number) {
     return this.create(this.x + scalar, this.y + scalar);
   }
 
@@ -66,7 +75,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  scalarAddEquals(scalar: number): Point {
+  scalarAddEquals(scalar: number) {
     this.x += scalar;
     this.y += scalar;
     return this;
@@ -77,7 +86,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point} new Point object with subtracted values
    */
-  subtract(that: IPoint): Point {
+  subtract(that: IPoint) {
     return this.create(this.x - that.x, this.y - that.y);
   }
 
@@ -88,7 +97,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  subtractEquals(that: IPoint): Point {
+  subtractEquals(that: IPoint) {
     this.x -= that.x;
     this.y -= that.y;
     return this;
@@ -99,7 +108,7 @@ export class Point implements IPoint {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarSubtract(scalar: number): Point {
+  scalarSubtract(scalar: number) {
     return this.create(this.x - scalar, this.y - scalar);
   }
 
@@ -110,7 +119,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  scalarSubtractEquals(scalar: number): Point {
+  scalarSubtractEquals(scalar: number) {
     this.x -= scalar;
     this.y -= scalar;
     return this;
@@ -121,7 +130,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point}
    */
-  multiply(that: IPoint): Point {
+  multiply(that: IPoint) {
     return this.create(this.x * that.x, this.y * that.y);
   }
 
@@ -130,7 +139,7 @@ export class Point implements IPoint {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarMultiply(scalar: number): Point {
+  scalarMultiply(scalar: number) {
     return this.create(this.x * scalar, this.y * scalar);
   }
 
@@ -141,7 +150,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  scalarMultiplyEquals(scalar: number): Point {
+  scalarMultiplyEquals(scalar: number) {
     this.x *= scalar;
     this.y *= scalar;
     return this;
@@ -152,7 +161,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point}
    */
-  divide(that: IPoint): Point {
+  divide(that: IPoint) {
     return this.create(this.x / that.x, this.y / that.y);
   }
 
@@ -161,7 +170,7 @@ export class Point implements IPoint {
    * @param {Number} scalar
    * @return {Point}
    */
-  scalarDivide(scalar: number): Point {
+  scalarDivide(scalar: number) {
     return this.create(this.x / scalar, this.y / scalar);
   }
 
@@ -172,7 +181,7 @@ export class Point implements IPoint {
    * @chainable
    * @deprecated
    */
-  scalarDivideEquals(scalar: number): Point {
+  scalarDivideEquals(scalar: number) {
     this.x /= scalar;
     this.y /= scalar;
     return this;
@@ -230,7 +239,7 @@ export class Point implements IPoint {
    * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
    * @return {Point}
    */
-  lerp(that: IPoint, t = 0.5): Point {
+  lerp(that: IPoint, t = 0.5) {
     t = Math.max(Math.min(1, t), 0);
     return this.create(
       this.x + (that.x - this.x) * t,
@@ -243,7 +252,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Number}
    */
-  distanceFrom(that: IPoint): number {
+  distanceFrom(that: IPoint = Point.ZERO): number {
     const dx = this.x - that.x,
       dy = this.y - that.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -254,7 +263,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point}
    */
-  midPointFrom(that: IPoint): Point {
+  midPointFrom(that: IPoint) {
     return this.lerp(that);
   }
 
@@ -263,7 +272,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point}
    */
-  min(that: IPoint): Point {
+  min(that: IPoint) {
     return this.create(Math.min(this.x, that.x), Math.min(this.y, that.y));
   }
 
@@ -272,7 +281,7 @@ export class Point implements IPoint {
    * @param {IPoint} that
    * @return {Point}
    */
-  max(that: IPoint): Point {
+  max(that: IPoint) {
     return this.create(Math.max(this.x, that.x), Math.max(this.y, that.y));
   }
 
@@ -347,14 +356,6 @@ export class Point implements IPoint {
     return this.create(this);
   }
 
-  create(): this;
-  create(x: number, y: number): this;
-  create(point: IPoint): this;
-  create(arg0: number | IPoint = 0, y = 0): this {
-    // @ts-expect-error constructor is not recognized
-    return new this.constructor(arg0, y);
-  }
-
   /**
    * Rotates `point` around `origin` with `radians`
    * @static
@@ -363,7 +364,7 @@ export class Point implements IPoint {
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(radians: TRadian, origin: IPoint = originZero): Point {
+  rotate(radians: TRadian, origin: IPoint = originZero) {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
     const sinus = sin(radians),
@@ -384,7 +385,7 @@ export class Point implements IPoint {
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point
    */
-  transform(t: TMat2D, ignoreOffset = false): Point {
+  transform(t: TMat2D, ignoreOffset = false) {
     return this.create(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
       t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
