@@ -43,6 +43,10 @@ export class Vector extends Point {
     };
   }
 
+  asPoint() {
+    return new Point(this);
+  }
+
   magnitude() {
     return this.distanceFrom();
   }
