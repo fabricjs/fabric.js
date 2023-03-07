@@ -10,11 +10,12 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
+import { Vector } from '../Vector';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
 const getSize = (poly: Polyline) => {
-  return new Point(poly.width, poly.height);
+  return new Vector(poly.width, poly.height);
 };
 
 /**
