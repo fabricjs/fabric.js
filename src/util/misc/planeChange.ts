@@ -18,13 +18,13 @@ export const calcPlaneChangeMatrix = (
 ) => multiplyTransformMatrices(invertTransform(to), from);
 
 export const calcBaseChangeMatrix = (
-  from: { v1: Point; v2: Point },
-  to: { v1: Point; v2: Point },
+  from: [Point, Point] | undefined,
+  to: [Point, Point],
   destinationCenter: Point = new Point()
 ) => {
   const [a, b, c, d] = calcPlaneChangeMatrix(
-    [from.v1.x, from.v1.y, from.v2.x, from.v2.y, 0, 0],
-    [to.v1.x, to.v1.y, to.v2.x, to.v2.y, 0, 0]
+    from ? [from[0].x, from[0].y, from[1].x, from[1].y, 0, 0] : undefined,
+    [to[0].x, to[0].y, to[1].x, to[1].y, 0, 0]
   );
   return [a, b, c, d, destinationCenter.x, destinationCenter.y] as TMat2D;
 };
