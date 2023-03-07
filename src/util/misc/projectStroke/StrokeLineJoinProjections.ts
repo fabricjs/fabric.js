@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../../Point';
+import { XY, Point } from '../../../Point';
 import { Vector } from '../../../Vector';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
@@ -34,12 +34,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    */
   declare bisector: ReturnType<typeof Vector['getBisector']>;
 
-  constructor(
-    A: IPoint,
-    B: IPoint,
-    C: IPoint,
-    options: TProjectStrokeOnPointsOptions
-  ) {
+  constructor(A: XY, B: XY, C: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.B = new Point(B);

@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../Point';
+import { XY, Point } from '../../Point';
 import { TRadian } from '../../typedefs';
 import { Vector } from '../../Vector';
 
@@ -20,5 +20,5 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: IPoint, to: IPoint): Point =>
+export const createVector = (from: XY, to: XY): Point =>
   Vector.create(from, to);

@@ -1,5 +1,5 @@
 import { halfPI } from '../../../constants';
-import { IPoint, Point } from '../../../Point';
+import { XY, Point } from '../../../Point';
 import { Vector } from '../../../Vector';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { TProjectStrokeOnPointsOptions, TProjection } from './types';
@@ -32,7 +32,7 @@ export abstract class StrokeProjectionsBase {
   /**
    * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
    */
-  protected createSideVector(from: IPoint, to: IPoint) {
+  protected createSideVector(from: XY, to: XY) {
     const v = Vector.create(from, to);
     return this.options.strokeUniform ? v.multiply(this.scale) : v;
   }

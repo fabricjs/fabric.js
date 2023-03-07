@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../../Point';
+import { XY, Point } from '../../../Point';
 import { Vector } from '../../../Vector';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
@@ -26,7 +26,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    */
   declare T: Point;
 
-  constructor(A: IPoint, T: IPoint, options: TProjectStrokeOnPointsOptions) {
+  constructor(A: XY, T: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.T = new Point(T);

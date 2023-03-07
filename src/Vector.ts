@@ -1,4 +1,4 @@
-import { IPoint, Point } from './Point';
+import { XY, Point } from './Point';
 import { TMat2D, TRadian } from './typedefs';
 
 export class Vector extends Point {
@@ -11,7 +11,7 @@ export class Vector extends Point {
    */
   static Y = new Vector(0, 1);
 
-  static create(from: IPoint, to: IPoint) {
+  static create(from: XY, to: XY) {
     return new Vector(to).subtract(from);
   }
 
