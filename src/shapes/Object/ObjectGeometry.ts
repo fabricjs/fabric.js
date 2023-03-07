@@ -51,18 +51,8 @@ type TACoords = TCornerPoint;
 export class ObjectGeometry<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectOrigin<EventSpec> {
-  /**
-   * Describe object's corner position in canvas object absolute coordinates
-   * properties are tl,tr,bl,br and describe the four main corner.
-   * each property is an object with x, y, instance of Fabric.Point.
-   * The coordinates depends from this properties: width, height, scaleX, scaleY
-   * skewX, skewY, angle, strokeWidth, top, left.
-   * Those coordinates are useful to understand where an object is. They get updated
-   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
-   * The coordinates get updated with @method setCoords.
-   * You can calculate them without updating with @method calcACoords();
-   */
-  declare cornerCoords: TACoords;
+  declare bboxCoords: TACoords;
+  declare bbox: TBBox;
 
   /**
    * storage cache for object transform matrix
@@ -212,10 +202,10 @@ export class ObjectGeometry<
       );
     }
     // swapped this double if in place of setCoords();
-    if (!this.cornerCoords) {
-      this.cornerCoords = this.calcCoords();
+    if (!this.bboxCoords) {
+      this.bboxCoords = this.calcCoords();
     }
-    return mapValues(this.cornerCoords, (coord) =>
+    return mapValues(this.bboxCoords, (coord) =>
       sendPointToPlane(coord, from, to)
     );
   }
@@ -705,7 +695,8 @@ export class ObjectGeometry<
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
   setCoords(): void {
-    this.cornerCoords = this.calcCoords();
+    this.bboxCoords = this.calcCoords();
+    this.bbox = makeBoundingBoxFromPoints(Object.values(this.bboxCoords));
     // debug code
     setTimeout(() => {
       const canvas = this.canvas;
@@ -713,8 +704,8 @@ export class ObjectGeometry<
       const ctx = canvas.contextTop;
       canvas.clearContext(ctx);
       ctx.fillStyle = 'blue';
-      Object.keys(this.cornerCoords).forEach((key) => {
-        const control = this.cornerCoords[key];
+      Object.keys(this.bboxCoords).forEach((key) => {
+        const control = this.bboxCoords[key];
         ctx.beginPath();
         ctx.ellipse(control.x, control.y, 6, 6, 0, 0, 360);
         ctx.closePath();

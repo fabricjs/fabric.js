@@ -17,6 +17,10 @@ import { mapValues } from '../../util/internals';
 import { createVector } from '../../util/misc/vectors';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { Intersection } from '../../Intersection';
+import {
+  calcBaseChangeMatrix,
+  calcBaseChangeMatrixFromPoints,
+} from '../../util/misc/planeChange';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -219,15 +223,6 @@ export class InteractiveFabricObject<
     const b2 = createVector(tl, bl); //.divide(dimVector);
     const t: TMat2D = [b1.x, b1.y, b2.x, b2.y, center.x, center.y];
 
-    // const t: TMat2D = [
-    //   b1.x / Math.max(width, 1),
-    //   b1.y / Math.max(height, 1),
-    //   b2.x / Math.max(width, 1),
-    //   b2.y / Math.max(height, 1),
-    //   center.x,
-    //   center.y,
-    // ];
-
     const {
       status,
       points: [bl2],
@@ -238,24 +233,17 @@ export class InteractiveFabricObject<
       bl
     );
 
-    console.log(status, bl2);
-
-    const bbox2 = makeBoundingBoxFromPoints(
+    const rotatedBBox = makeBoundingBoxFromPoints(
       [tl, tr, bl, br].map((coord) => coord.rotate(-angle, center))
     );
-    // const out = [
-    //   new Point(bbox2.left, bbox2.top),
-    //   new Point(bbox2.left + bbox2.width, bbox2.top),
-    //   new Point(bbox2.left, bbox2.top + bbox2.height),
-    // ].map((point) => point.rotate(angle, center));
-    const out = [
-      new Point(bbox2.left, bbox2.top),
-      new Point(bbox2.left + bbox2.width / width, bbox2.top),
-      new Point(bbox2.left, bbox2.top + bbox2.height / height),
-    ].map((point) => point.rotate(angle, center));
-    const w1 = createVector(out[0], out[1]); //.divide(dimVector);
-    const w2 = createVector(out[0], out[2]); //.divide(dimVector);
-    const t3: TMat2D = [w1.x, w1.y, w2.x, w2.y, center.x, center.y];
+    const t3 = calcBaseChangeMatrix(
+      undefined,
+      [
+        new Point(rotatedBBox.width / width, 0).rotate(angle),
+        new Point(0, rotatedBBox.height / height).rotate(angle),
+      ],
+      center
+    );
 
     const v2 = createVector(tl, bl2); //.divide(dimVector);
     const t2: TMat2D = [b1.x, b1.y, v2.x, v2.y, center.x, center.y];
@@ -403,6 +391,7 @@ export class InteractiveFabricObject<
     size: Point,
     styleOverride: TStyleOverride = {}
   ): void {
+    return;
     const options = {
       hasControls: this.hasControls,
       borderColor: this.borderColor,
