@@ -29,10 +29,10 @@ export class Point implements XY {
     }
   }
 
-  create(): this;
-  create(x: number, y: number): this;
-  create(point: XY): this;
-  create(arg0: number | XY = 0, y = 0): this {
+  protected create(): this;
+  protected create(x: number, y: number): this;
+  protected create(point: XY): this;
+  protected create(arg0: number | XY = 0, y = 0): this {
     // @ts-expect-error constructor is not recognized
     return new this.constructor(arg0, y);
   }
