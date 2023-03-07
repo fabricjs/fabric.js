@@ -34,7 +34,7 @@ export class Point implements IPoint {
    * @return {Point} new Point instance with added values
    */
   add(that: IPoint): Point {
-    return new Point(this.x + that.x, this.y + that.y);
+    return this.create(this.x + that.x, this.y + that.y);
   }
 
   /**
@@ -56,7 +56,7 @@ export class Point implements IPoint {
    * @return {Point} new Point with added value
    */
   scalarAdd(scalar: number): Point {
-    return new Point(this.x + scalar, this.y + scalar);
+    return this.create(this.x + scalar, this.y + scalar);
   }
 
   /**
@@ -78,7 +78,7 @@ export class Point implements IPoint {
    * @return {Point} new Point object with subtracted values
    */
   subtract(that: IPoint): Point {
-    return new Point(this.x - that.x, this.y - that.y);
+    return this.create(this.x - that.x, this.y - that.y);
   }
 
   /**
@@ -100,7 +100,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   scalarSubtract(scalar: number): Point {
-    return new Point(this.x - scalar, this.y - scalar);
+    return this.create(this.x - scalar, this.y - scalar);
   }
 
   /**
@@ -122,7 +122,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   multiply(that: IPoint): Point {
-    return new Point(this.x * that.x, this.y * that.y);
+    return this.create(this.x * that.x, this.y * that.y);
   }
 
   /**
@@ -131,7 +131,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   scalarMultiply(scalar: number): Point {
-    return new Point(this.x * scalar, this.y * scalar);
+    return this.create(this.x * scalar, this.y * scalar);
   }
 
   /**
@@ -153,7 +153,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   divide(that: IPoint): Point {
-    return new Point(this.x / that.x, this.y / that.y);
+    return this.create(this.x / that.x, this.y / that.y);
   }
 
   /**
@@ -162,7 +162,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   scalarDivide(scalar: number): Point {
-    return new Point(this.x / scalar, this.y / scalar);
+    return this.create(this.x / scalar, this.y / scalar);
   }
 
   /**
@@ -232,7 +232,7 @@ export class Point implements IPoint {
    */
   lerp(that: IPoint, t = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
-    return new Point(
+    return this.create(
       this.x + (that.x - this.x) * t,
       this.y + (that.y - this.y) * t
     );
@@ -264,7 +264,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   min(that: IPoint): Point {
-    return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
+    return this.create(Math.min(this.x, that.x), Math.min(this.y, that.y));
   }
 
   /**
@@ -273,7 +273,7 @@ export class Point implements IPoint {
    * @return {Point}
    */
   max(that: IPoint): Point {
-    return new Point(Math.max(this.x, that.x), Math.max(this.y, that.y));
+    return this.create(Math.max(this.x, that.x), Math.max(this.y, that.y));
   }
 
   /**
@@ -342,10 +342,17 @@ export class Point implements IPoint {
 
   /**
    * return a cloned instance of the point
-   * @return {Point}
    */
-  clone(): Point {
-    return new Point(this.x, this.y);
+  clone(): this {
+    return this.create(this);
+  }
+
+  create(): this;
+  create(x: number, y: number): this;
+  create(point: IPoint): this;
+  create(arg0: number | IPoint = 0, y = 0): this {
+    // @ts-expect-error constructor is not recognized
+    return new this.constructor(arg0, y);
   }
 
   /**
@@ -362,7 +369,7 @@ export class Point implements IPoint {
     const sinus = sin(radians),
       cosinus = cos(radians);
     const p = this.subtract(origin);
-    const rotated = new Point(
+    const rotated = this.create(
       p.x * cosinus - p.y * sinus,
       p.x * sinus + p.y * cosinus
     );
@@ -378,7 +385,7 @@ export class Point implements IPoint {
    * @return {Point} The transformed point
    */
   transform(t: TMat2D, ignoreOffset = false): Point {
-    return new Point(
+    return this.create(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
       t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
     );
