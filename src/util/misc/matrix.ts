@@ -140,10 +140,20 @@ export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
   return [cosin, sinus, -sinus, cosin, 0, 0];
 };
 
-export const calcShearMatrix = (skewX: TDegree, skewY: TDegree) =>
+export const calcShearMatrix = ({
+  skewX,
+  skewY,
+  shearX,
+  shearY,
+}: {
+  skewX?: TDegree;
+  skewY?: TDegree;
+  shearX?: number;
+  shearY?: number;
+}) =>
   multiplyTransformMatrices(
-    [1, 0, Math.tan(degreesToRadians(skewX)), 1, 0, 0],
-    [1, Math.tan(degreesToRadians(skewY)), 0, 1, 0, 0]
+    [1, 0, shearX ?? (skewX ? Math.tan(degreesToRadians(skewX)) : 0), 1, 0, 0],
+    [1, shearY ?? (skewY ? Math.tan(degreesToRadians(skewY)) : 0), 0, 1, 0, 0]
   );
 
 /**
