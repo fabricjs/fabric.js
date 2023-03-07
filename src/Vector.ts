@@ -52,7 +52,7 @@ export class Vector extends Point {
   }
 
   /**
-   * @returns vector representing the unit vector pointing to the direction of `v`
+   * @returns {Vector} vector representing the unit vector pointing to the direction of `v`
    */
   getUnitVector() {
     return this.scalarDivide(this.magnitude());
