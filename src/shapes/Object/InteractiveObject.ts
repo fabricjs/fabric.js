@@ -218,20 +218,10 @@ export class InteractiveFabricObject<
 
     const { tl, tr, bl, br } = this._getCoords();
     const { width, height } = makeBoundingBoxFromPoints([tl, tr, bl, br]);
-    const dimVector = new Point(width, height); //this.calcDimensionsVector();
-    const b1 = createVector(tl, tr); //.divide(dimVector);
-    const b2 = createVector(tl, bl); //.divide(dimVector);
-    const t: TMat2D = [b1.x, b1.y, b2.x, b2.y, center.x, center.y];
-
-    const {
-      status,
-      points: [bl2],
-    } = Intersection.intersectLineLine(
-      tl,
-      tl.add(new Point(-b1.y, b1.x)),
-      br,
-      bl
-    );
+    const dimVector = new Point(width, height);
+    // const b1 = createVector(tl, tr);
+    // const b2 = createVector(tl, bl);
+    // const t: TMat2D = [b1.x, b1.y, b2.x, b2.y, center.x, center.y];
 
     const rotatedBBox = makeBoundingBoxFromPoints(
       [tl, tr, bl, br].map((coord) => coord.rotate(-angle, center))
@@ -245,19 +235,33 @@ export class InteractiveFabricObject<
       center
     );
 
-    const v2 = createVector(tl, bl2); //.divide(dimVector);
-    const t2: TMat2D = [b1.x, b1.y, v2.x, v2.y, center.x, center.y];
+    const legacyBBox = dimVector.transform(
+      calcBaseChangeMatrix(undefined, [
+        new Point(rotatedBBox.width / width, 0),
+        new Point(0, rotatedBBox.height / height),
+      ]),
+      true
+    );
+    const legacyTransform = calcBaseChangeMatrix(
+      undefined,
+      [new Point(1, 0).rotate(angle), new Point(0, 1).rotate(angle)],
+      center
+    );
 
     const coords = mapValues(this.controls, (control, key) => {
       // const position = this.calcViewportCoord(
       //   new Point(control.x, control.y),
       //   new Point(control.offsetX, control.offsetY)
       // );
+      // const position = control.positionHandler(
+      //   dimVector,
+      //   t3,
+      //   this,
+      //   control[key]
+      // );
       const position = control.positionHandler(
-        new Point(width, height),
-        // [width, 0, 0, height, center.x, center.y],
-        t3,
-        // t,
+        legacyBBox,
+        legacyTransform,
         this,
         control[key]
       );
