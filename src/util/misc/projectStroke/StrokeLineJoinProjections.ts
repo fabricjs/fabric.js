@@ -128,7 +128,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     const correctSide = new Point(
         StrokeProjectionsBase.getAcuteAngleFactor(this.bisectorVector),
         StrokeProjectionsBase.getAcuteAngleFactor(
-          new Point(this.bisectorVector.y, this.bisectorVector.x)
+          new Vector(this.bisectorVector.y, this.bisectorVector.x)
         )
       ),
       radiusOnAxisX = new Point(1, 0)
