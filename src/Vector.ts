@@ -16,6 +16,18 @@ export class Vector extends Point {
   }
 
   /**
+   * Calculates the angle between 2 vectors
+   * @param {Point} a
+   * @param {Point} b
+   * @returns the angle in radians from `a` to `b`
+   */
+  static calcAngleBetweenVectors(a: Vector, b: Vector): TRadian {
+    const dot = a.x * b.x + a.y * b.y,
+      det = a.x * b.y - a.y * b.x;
+    return Math.atan2(det, dot) as TRadian;
+  }
+
+  /**
    * @param {Point} A
    * @param {Point} B
    * @param {Point} C
@@ -59,18 +71,6 @@ export class Vector extends Point {
 
   transform(t: TMat2D) {
     return super.transform(t, true);
-  }
-
-  /**
-   * Calculates the angle between 2 vectors
-   * @param {Point} a
-   * @param {Point} b
-   * @returns the angle in radians from `a` to `b`
-   */
-  static calcAngleBetweenVectors(a: Vector, b: Vector): TRadian {
-    const dot = a.x * b.x + a.y * b.y,
-      det = a.x * b.y - a.y * b.x;
-    return Math.atan2(det, dot) as TRadian;
   }
 
   /**

@@ -1,12 +1,11 @@
 import { Color } from './color/Color';
 import { config } from './config';
-import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
-import { rotateVector } from './util/misc/vectors';
+import { Vector } from './Vector';
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   color: 'rgb(0,0,0)',
@@ -126,8 +125,7 @@ export class Shadow {
    * @return {String} SVG representation of a shadow
    */
   toSVG(object: FabricObject) {
-    const offset = rotateVector(
-        new Point(this.offsetX, this.offsetY),
+    const offset = new Vector(this.offsetX, this.offsetY).rotate(
         degreesToRadians(-object.angle)
       ),
       BLUR_BOX = 20,

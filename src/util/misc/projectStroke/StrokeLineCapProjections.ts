@@ -1,5 +1,5 @@
 import { IPoint, Point } from '../../../Point';
-import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
+import { Vector } from '../../../Vector';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -38,7 +38,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
     magnitude: number = this.strokeProjectionMagnitude
   ) {
     const vector = this.createSideVector(from, to);
-    return this.scaleUnitVector(getOrthonormalVector(vector), magnitude);
+    return this.scaleUnitVector(vector.getOrthonormalVector(), magnitude);
   }
 
   /**
@@ -82,7 +82,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
       this.strokeProjectionMagnitude
     );
     const strokePointingOut = this.scaleUnitVector(
-      getUnitVector(createVector(this.A, this.T)),
+      Vector.create(this.A, this.T).getUnitVector(),
       -this.strokeProjectionMagnitude
     );
     const projectedA = this.A.add(strokePointingOut);

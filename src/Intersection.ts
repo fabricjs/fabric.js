@@ -1,5 +1,5 @@
 import { Point } from './Point';
-import { createVector } from './util/misc/vectors';
+import { Vector } from './Vector';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
@@ -72,8 +72,8 @@ export class Intersection {
       // we check that AT has the same slope as AB
       // for the segment case we need both the vectors to have the same direction and for AT to be lte AB in size
       // for the infinite case we check the absolute value of the slope, since direction is meaningless
-      const AB = createVector(A, B);
-      const AT = createVector(A, T);
+      const AB = Vector.create(A, B);
+      const AT = Vector.create(A, T);
       const s = AT.divide(AB);
       return infinite
         ? Math.abs(s.x) === Math.abs(s.y)

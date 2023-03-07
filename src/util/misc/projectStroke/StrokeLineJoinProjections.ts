@@ -1,6 +1,6 @@
 import { IPoint, Point } from '../../../Point';
+import { Vector } from '../../../Vector';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
@@ -32,7 +32,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   /**
    * The bisector of A (∠BAC)
    */
-  declare bisector: ReturnType<typeof getBisector>;
+  declare bisector: ReturnType<typeof Vector['getBisector']>;
 
   constructor(
     A: IPoint,
@@ -47,12 +47,12 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     // First we calculate the bisector between the points. Used in `round` and `miter` cases
     // When the stroke is uniform, scaling changes the arrangement of the points, so we have to take it into account
     this.bisector = this.options.strokeUniform
-      ? getBisector(
+      ? Vector.getBisector(
           this.A.multiply(this.scale),
           this.B.multiply(this.scale),
           this.C.multiply(this.scale)
         )
-      : getBisector(this.A, this.B, this.C);
+      : Vector.getBisector(this.A, this.B, this.C);
   }
 
   get bisectorVector() {
@@ -69,7 +69,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     magnitude: number = this.strokeProjectionMagnitude
   ) {
     const vector = this.createSideVector(from, to);
-    const orthogonalProjection = getOrthonormalVector(vector);
+    const orthogonalProjection = vector.getOrthonormalVector();
     const correctSide = StrokeProjectionsBase.getAcuteAngleFactor(
       orthogonalProjection,
       this.bisectorVector
@@ -112,7 +112,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       : this.options.strokeMiterLimit;
 
     if (
-      magnitude(miterVector) / this.strokeProjectionMagnitude <=
+      miterVector.magnitude() / this.strokeProjectionMagnitude <=
       strokeMiterLimit
     ) {
       return [this.applySkew(this.A.add(miterVector))];

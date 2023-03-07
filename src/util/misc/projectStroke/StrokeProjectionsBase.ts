@@ -1,11 +1,7 @@
 import { halfPI } from '../../../constants';
 import { IPoint, Point } from '../../../Point';
+import { Vector } from '../../../Vector';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import {
-  calcAngleBetweenVectors,
-  calcVectorRotation,
-  createVector,
-} from '../vectors';
 import { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 /**
@@ -17,10 +13,10 @@ export abstract class StrokeProjectionsBase {
   declare strokeUniformScalar: Point;
   declare strokeProjectionMagnitude: number;
 
-  static getAcuteAngleFactor(vector1: Point, vector2?: Point) {
+  static getAcuteAngleFactor(vector1: Vector, vector2?: Vector) {
     const angle = vector2
-      ? calcAngleBetweenVectors(vector1, vector2)
-      : calcVectorRotation(vector1);
+      ? Vector.calcAngleBetweenVectors(vector1, vector2)
+      : vector1.calcVectorRotation();
     return Math.abs(angle) < halfPI ? -1 : 1;
   }
 
@@ -37,7 +33,7 @@ export abstract class StrokeProjectionsBase {
    * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
    */
   protected createSideVector(from: IPoint, to: IPoint) {
-    const v = createVector(from, to);
+    const v = Vector.create(from, to);
     return this.options.strokeUniform ? v.multiply(this.scale) : v;
   }
 
@@ -65,7 +61,7 @@ export abstract class StrokeProjectionsBase {
     return p;
   }
 
-  protected scaleUnitVector(unitVector: Point, scalar: number) {
+  protected scaleUnitVector(unitVector: Vector, scalar: number) {
     return unitVector.multiply(this.strokeUniformScalar).scalarMultiply(scalar);
   }
 

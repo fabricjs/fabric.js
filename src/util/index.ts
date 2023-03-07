@@ -1,12 +1,6 @@
 export { cos } from './misc/cos';
 export { sin } from './misc/sin';
-export {
-  rotateVector,
-  createVector,
-  calcAngleBetweenVectors,
-  getUnitVector,
-  getBisector,
-} from './misc/vectors';
+export { rotateVector, createVector } from './misc/vectors';
 export {
   degreesToRadians,
   radiansToDegrees,
