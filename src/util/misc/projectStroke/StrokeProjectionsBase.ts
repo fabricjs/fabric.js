@@ -16,7 +16,7 @@ export abstract class StrokeProjectionsBase {
   static getAcuteAngleFactor(vector1: Vector, vector2?: Vector) {
     const angle = vector2
       ? Vector.calcAngleBetweenVectors(vector1, vector2)
-      : vector1.calcVectorRotation();
+      : vector1.calcRotation();
     return Math.abs(angle) < halfPI ? -1 : 1;
   }
 
