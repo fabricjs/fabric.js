@@ -10,11 +10,11 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  TClassProperties,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
@@ -38,7 +38,9 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { ObjectProps } from './ObjectProps';
+import { SerializedObjectProps } from './types/SerializedObjectProps';
+import { ObjectProps } from './types/ObjectProps';
+import { TProps } from './types';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -83,62 +85,39 @@ export type TCachedFabricObject = FabricObject &
  * @fires dragleave
  * @fires drop
  */
-export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
+export class FabricObject<
+    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
   extends AnimatableObject<EventSpec>
   implements ObjectProps
 {
-  declare readonly type: string;
+  declare minScaleLimit: number;
 
   declare opacity: number;
-  declare cornerSize: number;
-  declare touchCornerSize: number;
-  declare transparentCorners: boolean;
-  declare hoverCursor: CSSStyleDeclaration['cursor'] | null;
-  declare moveCursor: CSSStyleDeclaration['cursor'] | null;
-  declare borderColor: string;
-  declare borderDashArray: number[] | null;
-  declare cornerColor: string;
-  declare cornerStrokeColor: string;
-  declare cornerStyle: 'rect' | 'circle';
-  declare cornerDashArray: number[] | null;
-  declare centeredScaling: false;
-  declare centeredRotation: true;
-  declare stroke: string | TFiller | null;
+
+  declare paintFirst: 'fill' | 'stroke';
   declare fill: string | TFiller | null;
   declare fillRule: CanvasFillRule;
-  declare globalCompositeOperation: GlobalCompositeOperation;
-  declare backgroundColor: string;
-  declare selectionBackgroundColor: string;
+  declare stroke: string | TFiller | null;
   declare strokeDashArray: number[] | null;
   declare strokeDashOffset: number;
   declare strokeLineCap: CanvasLineCap;
   declare strokeLineJoin: CanvasLineJoin;
   declare strokeMiterLimit: number;
+
+  declare globalCompositeOperation: GlobalCompositeOperation;
+  declare backgroundColor: string;
+
   declare shadow: Shadow | null;
-  declare borderOpacityWhenMoving: number;
-  declare borderScaleFactor: number;
-  declare minScaleLimit: number;
-  declare selectable: boolean;
-  declare evented: boolean;
+
   declare visible: boolean;
-  declare hasControls: boolean;
-  declare hasBorders: boolean;
-  declare perPixelTargetFind: boolean;
+
   declare includeDefaultValues: boolean;
   declare excludeFromExport: boolean;
 
-  declare lockMovementX: boolean;
-  declare lockMovementY: boolean;
-  declare lockRotation: boolean;
-  declare lockScalingX: boolean;
-  declare lockScalingY: boolean;
-  declare lockSkewingX: boolean;
-  declare lockSkewingY: boolean;
-  declare lockScalingFlip: boolean;
-
   declare objectCaching: boolean;
-  declare paintFirst: 'fill' | 'stroke';
-  declare activeOn: 'down' | 'up';
 
   declare clipPath?: FabricObject;
   declare inverted: boolean;
@@ -277,10 +256,31 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
+   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
+   * Will be removed in fabric 7 or 8.
+   * The setter exists because is very hard to catch all the ways in which a type value
+   * could be set in the instance
+   * @TODO add sustainable warning message
+   * @type string
+   * @deprecated
+   */
+  get type() {
+    const name = this.constructor.name;
+    if (name === 'FabricObject') {
+      return 'object';
+    }
+    return name.toLowerCase();
+  }
+
+  set type(value) {
+    console.warn('Setting type has no effect', value);
+  }
+
+  /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Partial<ObjectProps>) {
+  constructor(options?: Props) {
     super();
     Object.assign(
       this,
@@ -490,7 +490,10 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): Record<string, any> {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -501,8 +504,8 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
             }
           : null,
       object = {
-        ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.type,
+        ...pick(this, propertiesToInclude),
+        type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -564,7 +567,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @private
    * @param {Object} object
    */
-  _removeDefaultValues(object: Record<string, any>) {
+  _removeDefaultValues<T extends object>(object: T): Partial<T> {
     // getDefaults() ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
     // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
     const defaults = (this.constructor as typeof FabricObject).getDefaults();
@@ -599,7 +602,7 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {String}
    */
   toString() {
-    return `#<${capitalize(this.type)}>`;
+    return `#<${this.constructor.name}>`;
   }
 
   /**
@@ -1437,12 +1440,12 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Returns true if specified type is identical to the type of an instance
+   * Returns true if any of the specified types is identical to the type of an instance
    * @param {String} type Type to check against
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.type);
+    return types.includes(this.constructor.name) || types.includes(this.type);
   }
 
   /**
@@ -1522,27 +1525,27 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject(
+  static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
     {
       extraParam,
       ...options
     }: { extraParam?: string; signal?: AbortSignal } = {}
-  ): Promise<FabricObject> {
+  ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
         const allOptions = { ...options, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, ...rest } = allOptions;
+          const { [extraParam]: arg0, type, ...rest } = allOptions;
           // @ts-ignore;
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
         }
       }
-    );
+    ) as Promise<S>;
   }
 
   /**
@@ -1552,15 +1555,13 @@ export class FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject(
-    object: ReturnType<FabricObject['toObject']>,
+  static fromObject<T extends TProps<SerializedObjectProps>>(
+    object: T,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
     return this._fromObject(object, options);
   }
 }
 
-// @ts-expect-error
-FabricObject.prototype.type = 'object';
-
 classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'object');

@@ -28,6 +28,7 @@ import {
   sendPointToPlane,
   sendVectorToPlane,
 } from '../../util/misc/planeChange';
+import { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;
@@ -48,9 +49,34 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectOrigin<EventSpec> {
+export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
+  extends ObjectOrigin<EventSpec>
+  implements Pick<ControlProps, 'padding'>
+{
+  declare padding: number;
+
+  /**
+   * Describe object's corner position in canvas object absolute coordinates
+   * properties are tl,tr,bl,br and describe the four main corner.
+   * each property is an object with x, y, instance of Fabric.Point.
+   * The coordinates depends from this properties: width, height, scaleX, scaleY
+   * skewX, skewY, angle, strokeWidth, top, left.
+   * Those coordinates are useful to understand where an object is. They get updated
+   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
+   * The coordinates get updated with @method setCoords.
+   * You can calculate them without updating with @method calcACoords();
+   */
+  declare aCoords: TACoords;
+
+  /**
+   * Describe object's corner position in canvas element coordinates.
+   * includes padding. Used of object detection.
+   * set and refreshed with setCoords.
+   * Those could go away
+   * @todo investigate how to get rid of those
+   */
+  declare lineCoords: TCornerPoint;
+
   declare bboxCoords: TACoords;
   declare bbox: TBBox;
 

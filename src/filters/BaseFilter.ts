@@ -260,7 +260,7 @@ export class BaseFilter {
   }
 
   applyTo2d(options: T2DPipelineState): void {
-    // subclass should override
+    // override by subclass
   }
 
   /**
@@ -357,7 +357,7 @@ export class BaseFilter {
     gl: WebGLRenderingContext,
     uniformLocations: TWebGLUniformLocationMap
   ): void {
-    // subclass should override
+    // override by subclass
   }
 
   /**

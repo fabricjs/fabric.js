@@ -1,5 +1,5 @@
 import { Point } from '../../Point';
-import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
@@ -12,15 +12,15 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
-import { FabricObjectProps } from './ObjectProps';
 import { mapValues } from '../../util/internals';
-import { createVector } from '../../util/misc/vectors';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import { Intersection } from '../../Intersection';
+import { calcBaseChangeMatrix } from '../../util/misc/planeChange';
 import {
-  calcBaseChangeMatrix,
-  calcBaseChangeMatrixFromPoints,
-} from '../../util/misc/planeChange';
+  TFabricObjectProps,
+  SerializedObjectProps,
+  FabricObjectProps,
+} from './types';
+import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -30,13 +30,13 @@ type TOCoord = Point & {
 type TControlSet = Record<string, Control>;
 
 type TBorderRenderingStyleOverride = Partial<
-  Pick<FabricObject, 'borderColor' | 'borderDashArray'>
+  Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
 
 type TStyleOverride = ControlRenderingStyleOverride &
   TBorderRenderingStyleOverride &
   Partial<
-    Pick<FabricObject, 'hasBorders' | 'hasControls'> & {
+    Pick<InteractiveFabricObject, 'hasBorders' | 'hasControls'> & {
       forActiveSelection: boolean;
     }
   >;
@@ -48,12 +48,56 @@ export interface DragMethods {
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
+const interactiveDefaults = {};
+
 export class InteractiveFabricObject<
+    Props extends TFabricObjectProps = Partial<FabricObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<EventSpec>
+  extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
+  declare noScaleCache: boolean;
+  declare centeredScaling: false;
+
+  declare snapAngle?: TDegree;
+  declare snapThreshold?: TDegree;
+  declare centeredRotation: true;
+
+  declare lockMovementX: boolean;
+  declare lockMovementY: boolean;
+  declare lockRotation: boolean;
+  declare lockScalingX: boolean;
+  declare lockScalingY: boolean;
+  declare lockSkewingX: boolean;
+  declare lockSkewingY: boolean;
+  declare lockScalingFlip: boolean;
+
+  declare cornerSize: number;
+  declare touchCornerSize: number;
+  declare transparentCorners: boolean;
+  declare cornerColor: string;
+  declare cornerStrokeColor: string;
+  declare cornerStyle: 'rect' | 'circle';
+  declare cornerDashArray: number[] | null;
+  declare hasControls: boolean;
+
+  declare borderColor: string;
+  declare borderDashArray: number[] | null;
+  declare borderOpacityWhenMoving: number;
+  declare borderScaleFactor: number;
+  declare hasBorders: boolean;
+  declare selectionBackgroundColor: string;
+
+  declare selectable: boolean;
+  declare evented: boolean;
+  declare perPixelTargetFind: boolean;
+  declare activeOn: 'down' | 'up';
+
+  declare hoverCursor: CSSStyleDeclaration['cursor'] | null;
+  declare moveCursor: CSSStyleDeclaration['cursor'] | null;
+
   /**
    * Describe object's corner position in canvas element coordinates.
    * properties are depending on control keys and padding the main controls.
@@ -82,10 +126,6 @@ export class InteractiveFabricObject<
    */
   declare _controlsVisibility: Record<string, boolean>;
 
-  declare noScaleCache: boolean;
-  declare snapAngle?: TDegree;
-  declare snapThreshold?: TDegree;
-
   /**
    * holds the controls for the object.
    * controls are added by default_controls.js
@@ -110,12 +150,14 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
-  /**
-   * Constructor
-   * @param {Object} [options] Options object
-   */
-  constructor(options?: FabricObjectProps) {
-    super(options);
+  static ownDefaults: Record<string, any> = interactiveDefaults;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      controls: createObjectDefaultControls(),
+      ...InteractiveFabricObject.ownDefaults,
+    };
   }
 
   /**
@@ -129,10 +171,7 @@ export class InteractiveFabricObject<
     if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
       const target = targetCanvas._currentTransform.target,
         action = targetCanvas._currentTransform.action;
-      if (
-        this === (target as InteractiveFabricObject) &&
-        action.startsWith('scale')
-      ) {
+      if (this === (target as unknown as this) && action.startsWith('scale')) {
         return false;
       }
     }
@@ -143,7 +182,7 @@ export class InteractiveFabricObject<
    * Determines which corner is under the mouse cursor, represented by `pointer`.
    * This function is return a corner only if the object is the active one.
    * This is done to avoid selecting corner of non active object and activating transformations
-   * rather than drag action. The default behaviour of fabricJS is that if you want to trasform
+   * rather than drag action. The default behavior of fabricJS is that if you want to transform
    * an object, first you select it to show the control set
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
@@ -154,7 +193,7 @@ export class InteractiveFabricObject<
     if (
       !this.hasControls ||
       !this.canvas ||
-      (this.canvas._activeObject as InteractiveFabricObject) !== this
+      (this.canvas._activeObject as unknown as this) !== this
     ) {
       return 0;
     }
@@ -358,8 +397,7 @@ export class InteractiveFabricObject<
     if (
       !this.selectionBackgroundColor ||
       (this.canvas && !this.canvas.interactive) ||
-      (this.canvas &&
-        (this.canvas._activeObject as InteractiveFabricObject) !== this)
+      (this.canvas && (this.canvas._activeObject as unknown as this) !== this)
     ) {
       return;
     }
