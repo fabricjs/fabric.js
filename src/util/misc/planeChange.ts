@@ -1,5 +1,5 @@
 import { iMatrix } from '../../constants';
-import type { Point } from '../../Point';
+import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TMat2D } from '../../typedefs';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
@@ -16,6 +16,18 @@ export const calcPlaneChangeMatrix = (
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix
 ) => multiplyTransformMatrices(invertTransform(to), from);
+
+export const calcBaseChangeMatrix = (
+  from: { v1: Point; v2: Point },
+  to: { v1: Point; v2: Point },
+  destinationCenter: Point = new Point()
+) => {
+  const [a, b, c, d] = calcPlaneChangeMatrix(
+    [from.v1.x, from.v1.y, from.v2.x, from.v2.y, 0, 0],
+    [to.v1.x, to.v1.y, to.v2.x, to.v2.y, 0, 0]
+  );
+  return [a, b, c, d, destinationCenter.x, destinationCenter.y] as TMat2D;
+};
 
 const send2DToPlane = (
   point: Point,
