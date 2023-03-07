@@ -77,12 +77,12 @@ export class Vector extends Point {
   }
 
   /**
-   * Calculates the angle between the x axis and the vector
+   * Calculates the angle between {@link from} and the vector
    * @returns the angle in radians of the vector
    */
-  calcRotation() {
+  calcRotation(from: Vector = Vector.X) {
     return (this.constructor as typeof Vector).calcAngleBetweenVectors(
-      Vector.X,
+      from,
       this
     );
   }
