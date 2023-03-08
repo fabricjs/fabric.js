@@ -48,18 +48,18 @@ export function invertOrigin(origin: TOriginX | TOriginY) {
   return -resolveOrigin(origin) + 0.5;
 }
 
-export const isLocked = (
-  target: FabricObject,
-  lockingKey:
-    | 'lockMovementX'
-    | 'lockMovementY'
-    | 'lockRotation'
-    | 'lockScalingX'
-    | 'lockScalingY'
-    | 'lockSkewingX'
-    | 'lockSkewingY'
-    | 'lockScalingFlip'
-) => target[lockingKey];
+export type TLockingKey =
+  | 'lockMovementX'
+  | 'lockMovementY'
+  | 'lockRotation'
+  | 'lockScalingX'
+  | 'lockScalingY'
+  | 'lockSkewingX'
+  | 'lockSkewingY'
+  | 'lockScalingFlip';
+
+export const isLocked = (target: FabricObject, lockingKey: TLockingKey) =>
+  target[lockingKey];
 
 export const commonEventInfo: TransformAction<
   Transform,

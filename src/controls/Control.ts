@@ -139,7 +139,7 @@ export class Control {
    */
   withConnection = false;
 
-  constructor(options: Partial<Control>) {
+  constructor(options: Partial<Control> = {}) {
     Object.assign(this, options);
   }
 
@@ -317,7 +317,8 @@ export class Control {
     objectCornerSize: number,
     centerX: number,
     centerY: number,
-    isTouch: boolean
+    isTouch: boolean,
+    fabricObject: FabricObject
   ) {
     let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
     const xSize = isTouch ? this.touchSizeX : this.sizeX,

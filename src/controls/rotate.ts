@@ -4,6 +4,7 @@ import {
 } from '../EventTypeDefs';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
+import { wrapWithDisableAction } from './wrapWithDisableAction';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
@@ -19,12 +20,10 @@ export const rotationStyleHandler: ControlCursorCallback = (
   eventData,
   control,
   fabricObject
-) => {
-  if (fabricObject.lockRotation) {
-    return NOT_ALLOWED_CURSOR;
-  }
-  return control.cursorStyle;
-};
+) =>
+  isLocked(fabricObject, 'lockRotation')
+    ? NOT_ALLOWED_CURSOR
+    : control.cursorStyle;
 
 /**
  * Action handler for rotation and snapping, without anchor point.
@@ -47,11 +46,6 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     originX,
     originY
   );
-
-  if (isLocked(target, 'lockRotation')) {
-    return false;
-  }
-
   const lastAngle = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
     curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
   let angle = radiansToDegrees(curAngle - lastAngle + theta);
@@ -81,7 +75,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   return hasRotated;
 };
 
-export const rotationWithSnapping = wrapWithFireEvent(
-  'rotating',
-  wrapWithFixedAnchor(rotateObjectWithSnapping)
+export const rotationWithSnapping = wrapWithDisableAction(
+  wrapWithFireEvent('rotating', wrapWithFixedAnchor(rotateObjectWithSnapping)),
+  'lockRotation'
 );
