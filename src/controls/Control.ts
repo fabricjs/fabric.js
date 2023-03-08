@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { mapValues } from 'lodash';
 import {
   ControlActionHandler,
   TPointerEvent,
@@ -8,6 +7,7 @@ import {
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
+import { mapValues } from '../util/internals';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   ControlRenderingStyleOverride,
