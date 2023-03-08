@@ -1,27 +1,54 @@
 import { Point } from '../../Point';
-import { TBBox, TCornerPoint, TMat2D } from '../../typedefs';
+import { TCornerPoint, TMat2D } from '../../typedefs';
 import { mapValues } from '../../util/internals';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { multiplyTransformMatrices } from '../../util/misc/matrix';
-import { calcBaseChangeMatrix } from '../../util/misc/planeChange';
+import {
+  calcBaseChangeMatrix,
+  sendPointToPlane,
+} from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { createVector } from '../../util/misc/vectors';
 import type { ObjectGeometry } from './ObjectGeometry';
 
 export class BBox {
   protected coords: TCornerPoint;
-  bbox: TBBox;
-  transform: TMat2D;
+  readonly transform: TMat2D;
   protected vpt: TMat2D;
 
   constructor(coords: TCornerPoint, transform: TMat2D, vpt: TMat2D) {
     this.coords = coords;
-    this.bbox = makeBoundingBoxFromPoints(Object.values(this.coords));
-    this.transform = transform;
+    // @ts-expect-error mutable frozen type
+    this.transform = Object.freeze(transform);
     this.vpt = vpt;
   }
 
-  protected applyTo2D(origin: Point, inViewport = false, isVector = false) {
+  getBBox(inViewport: boolean) {
+    return makeBoundingBoxFromPoints(this.getCoords(inViewport));
+  }
+
+  getCanvasBBox() {
+    return this.getBBox(false);
+  }
+
+  getViewportBBox() {
+    return this.getBBox(true);
+  }
+
+  getDimensionsVector(inViewport: boolean) {
+    const { width, height } = this.getBBox(inViewport);
+    return new Point(width, height);
+  }
+
+  getDimensionsInCanvas() {
+    return this.getDimensionsVector(true);
+  }
+
+  getDimensionsInViewport() {
+    return this.getDimensionsVector(false);
+  }
+
+  protected applyTo2D(origin: Point, inViewport: boolean, isVector = false) {
     return origin.transform(
       inViewport
         ? this.transform
@@ -31,7 +58,7 @@ export class BBox {
   }
 
   applyToPointInCanvas(origin: Point) {
-    return this.applyTo2D(origin);
+    return this.applyTo2D(origin, false);
   }
 
   applyToPointInViewport(origin: Point) {
@@ -47,20 +74,31 @@ export class BBox {
   }
 
   getCoords(inViewport = true) {
-    return inViewport
+    const { tl, tr, br, bl } = inViewport
       ? this.coords
       : mapValues(this.coords, (coord) => coord.transform(this.vpt));
+    return Object.assign([tl, tr, br, bl], { tl, tr, br, bl });
+  }
+
+  containsPoint(point: Point, inViewport = true) {
+    const pointAsOrigin = sendPointToPlane(
+      point,
+      !inViewport ? this.vpt : undefined,
+      this.transform
+    );
+    return (
+      pointAsOrigin.x >= -0.5 &&
+      pointAsOrigin.x <= 0.5 &&
+      pointAsOrigin.y >= -0.5 &&
+      pointAsOrigin.y <= 0.5
+    );
   }
 
   static getCoords(target: ObjectGeometry) {
-    return target._getCoords();
+    return target.bboxCoords;
   }
 
-  static build(target: ObjectGeometry) {
-    return this.rotated(target);
-  }
-
-  static inViewport(target: ObjectGeometry) {
+  static canvas(target: ObjectGeometry) {
     const coords = this.getCoords(target);
     const bbox = makeBoundingBoxFromPoints(Object.values(coords));
     const transform = calcBaseChangeMatrix(
