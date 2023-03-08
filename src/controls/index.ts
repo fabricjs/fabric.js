@@ -18,5 +18,7 @@ export {
 } from './scaleSkew';
 export { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 export { getLocalPoint } from './util';
+export { wrapWithDisableAction } from './wrapWithDisableAction';
 export { wrapWithFireEvent } from './wrapWithFireEvent';
 export { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+export { wrapWithTransformAdaptor } from './wrapWithTransformAdaptor';
