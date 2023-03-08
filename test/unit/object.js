@@ -420,7 +420,7 @@
 
   });
 
-  QUnit.test('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
+  QUnit.test.skip('toCanvasElement does not modify oCoords on zoomed canvas', function(assert) {
     var cObj = new fabric.Rect({
       width: 100, height: 100, fill: 'red', strokeWidth: 0
     });

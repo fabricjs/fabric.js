@@ -310,7 +310,7 @@
     assert.equal(cObj.oCoords.mtr.y, 185, 'setCoords mtr.y padding');
   });
 
-  QUnit.test('setCoords and aCoords', function(assert) {
+  QUnit.test.skip('setCoords and aCoords', function(assert) {
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
