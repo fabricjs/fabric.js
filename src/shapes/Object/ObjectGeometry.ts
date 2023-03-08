@@ -591,10 +591,12 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
         draw(BBox.canvas(this).applyToPointInViewport(origin), 'red', 10);
         draw(BBox.rotated(this).applyToPointInViewport(origin), 'magenta', 8);
         draw(BBox.transformed(this).applyToPointInViewport(origin), 'blue', 6);
+        ctx.save();
         ctx.transform(...this.getViewportTransform());
         draw(BBox.canvas(this).applyToPointInCanvas(origin), 'red', 10);
         draw(BBox.rotated(this).applyToPointInCanvas(origin), 'magenta', 8);
         draw(BBox.transformed(this).applyToPointInCanvas(origin), 'blue', 6);
+        ctx.restore();
       });
       ctx.restore();
     }, 50);
