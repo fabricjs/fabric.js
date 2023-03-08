@@ -205,10 +205,12 @@ export class InteractiveFabricObject<
       if (!this.isControlVisible(cornerKey)) {
         continue;
       }
-      const lines = this._getImageLines(
-        forTouch ? corner.touchCorner : corner.corner
-      );
-      const xPoints = this._findCrossPoints(pointer, lines);
+      const lines = (
+        this.constructor as typeof InteractiveFabricObject
+      ).getImageLines(forTouch ? corner.touchCorner : corner.corner);
+      const xPoints = (
+        this.constructor as typeof InteractiveFabricObject
+      ).findCrossPoints(pointer, lines);
       if (xPoints !== 0 && xPoints % 2 === 1) {
         this.__corner = cornerKey;
         return cornerKey;
