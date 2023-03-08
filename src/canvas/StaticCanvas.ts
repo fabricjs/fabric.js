@@ -13,7 +13,6 @@ import type { Rect } from '../shapes/Rect';
 import {
   Constructor,
   ImageFormat,
-  TCornerPoint,
   TDataUrlOptions,
   TFiller,
   TMat2D,
@@ -210,15 +209,6 @@ export class StaticCanvas<
   declare enableRetinaScaling: boolean;
 
   /**
-   * Describe the visible bounding box of the canvas
-   * if canvas is **NOT** transformed the points are equal to the four corners of the `HTMLCanvasElement`
-   * if canvas is transformed the points describe the distance from canvas origin,
-   * `tl` being the viewport origin (= `tl` corner of the `HTMLCanvasElement`).
-   * The coordinates get updated with @method calcViewportBoundaries.
-   */
-  declare vptCoords: TCornerPoint;
-
-  /**
    * Skip rendering of objects that are not included in current viewport.
    * May greatly help in applications with crowded canvas and use of zoom/pan
    * If One of the corner of the bounding box of the object is on the canvas
@@ -310,7 +300,6 @@ export class StaticCanvas<
       height: this.height || this.lowerCanvasEl.height || 0,
     });
     this.viewportTransform = [...this.viewportTransform];
-    this.calcViewportBoundaries();
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
@@ -578,7 +567,6 @@ export class StaticCanvas<
     if (overlayObject) {
       overlayObject.setCoords();
     }
-    this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
   }
 
@@ -709,10 +697,12 @@ export class StaticCanvas<
   }
 
   /**
-   * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport
+   * Describe the visible bounding box of the canvas
+   * if canvas is **NOT** transformed the points are equal to the four corners of the `HTMLCanvasElement`
+   * if canvas is transformed the points describe the distance from canvas origin,
+   * `tl` being the viewport origin which is the `tl` corner of the `HTMLCanvasElement`.
    */
-  calcViewportBoundaries(): TCornerPoint {
+  getViewportBBox() {
     // we don't support vpt flipping
     // but the code is robust enough to mostly work with flipping
     const iVpt = invertTransform(this.viewportTransform),
@@ -720,12 +710,12 @@ export class StaticCanvas<
       b = new Point(this.width, this.height).transform(iVpt),
       min = a.min(b),
       max = a.max(b);
-    return (this.vptCoords = {
+    return {
       tl: min,
       tr: new Point(max.x, min.y),
       bl: new Point(min.x, max.y),
       br: max,
-    });
+    };
   }
 
   cancelRequestedRender() {
@@ -751,7 +741,6 @@ export class StaticCanvas<
 
     const v = this.viewportTransform,
       path = this.clipPath;
-    this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     // @ts-ignore node-canvas stuff
@@ -1624,12 +1613,10 @@ export class StaticCanvas<
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
-    this.calcViewportBoundaries();
     this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
-    this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
     return canvasEl;
   }

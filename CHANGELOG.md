@@ -1055,7 +1055,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Perform subtargetCheck also if the group is an active object and on activeGroup [#3688](https://github.com/kangax/fabric.js/pull/3688)
 - Fix: Made cursor operation more precise at high canvas zoom level [#3671](https://github.com/kangax/fabric.js/pull/3671)
 - Add: Made getBoundingRect available to return both absolute or standard bounding rect [#3614](https://github.com/kangax/fabric.js/pull/3614)
-- Add: Introduced calcViewportBoundaries() function for fabric.StaticCanvas [#3614](https://github.com/kangax/fabric.js/pull/3614)
+- Add: Introduced getViewportBBox() function for fabric.StaticCanvas [#3614](https://github.com/kangax/fabric.js/pull/3614)
 - Add: Introduced isOnScreen() function for fabric.Object [#3614](https://github.com/kangax/fabric.js/pull/3614)
 - Subclassed Polygon from polyline [#3614](https://github.com/kangax/fabric.js/pull/3614)
 - Fix: Removed reference to hovered target when target gets removed [#3657](https://github.com/kangax/fabric.js/pull/3657)

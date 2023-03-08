@@ -20,11 +20,6 @@
     brush.onMouseUp(options);
   }
 
-  // function eraserDrawer(points, brush, fireUp = false) {
-  //   brush.canvas.calcViewportBoundaries();
-  //   pointDrawer(points, brush, fireUp);
-  // }
-
   var points = [
     {
       "x": 24.9,
