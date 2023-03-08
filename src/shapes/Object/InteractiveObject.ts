@@ -186,15 +186,15 @@ export class InteractiveFabricObject<
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
-   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
+   * @return {String} corner code (tl, tr, bl, br, etc.), or an empty string if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
+  _findTargetCorner(pointer: Point, forTouch = false): string {
     if (
       !this.hasControls ||
       !this.canvas ||
       (this.canvas._activeObject as unknown as this) !== this
     ) {
-      return 0;
+      return '';
     }
 
     this.__corner = undefined;
@@ -205,31 +205,17 @@ export class InteractiveFabricObject<
       if (!this.isControlVisible(cornerKey)) {
         continue;
       }
-      const lines = (
-        this.constructor as typeof InteractiveFabricObject
-      ).getImageLines(forTouch ? corner.touchCorner : corner.corner);
-      const xPoints = (
-        this.constructor as typeof InteractiveFabricObject
-      ).findCrossPoints(pointer, lines);
-      if (xPoints !== 0 && xPoints % 2 === 1) {
+      if (
+        BBox.build(forTouch ? corner.touchCorner : corner.corner).containsPoint(
+          pointer,
+          true
+        )
+      ) {
         this.__corner = cornerKey;
         return cornerKey;
       }
-      // // debugging
-      //
-      // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return 0;
+    return '';
   }
 
   /**

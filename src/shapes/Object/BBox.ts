@@ -1,3 +1,4 @@
+import { iMatrix } from '../../constants';
 import { Point } from '../../Point';
 import { TCornerPoint, TMat2D } from '../../typedefs';
 import { mapValues } from '../../util/internals';
@@ -162,5 +163,20 @@ export class BBox {
       target.getCenterPoint()
     );
     return new this(coords, transform, target.getViewportTransform());
+  }
+
+  static build(coords: TCornerPoint, vpt = iMatrix) {
+    return new BBox(
+      coords,
+      calcBaseChangeMatrix(
+        undefined,
+        [
+          createVector(coords.tl, coords.tr),
+          createVector(coords.tl, coords.bl),
+        ],
+        coords.tl.midPointFrom(coords.br)
+      ),
+      vpt
+    );
   }
 }
