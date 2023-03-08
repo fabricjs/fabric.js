@@ -77,7 +77,7 @@ export class BBox {
   getCoords(inViewport = true) {
     const { tl, tr, br, bl } = inViewport
       ? this.coords
-      : mapValues(this.coords, (coord) => coord.transform(this.vpt));
+      : mapValues(this.coords, (coord) => sendPointToPlane(coord, this.vpt));
     return Object.assign([tl, tr, br, bl], { tl, tr, br, bl });
   }
 
@@ -95,25 +95,31 @@ export class BBox {
     );
   }
 
-  static getCoords(target: ObjectGeometry) {
-    return target.bboxCoords;
+  static getViewportCoords(target: ObjectGeometry) {
+    const coords = target.bboxCoords;
+    if (target.needsViewportCoords()) {
+      return coords;
+    } else {
+      const vpt = target.getViewportTransform();
+      return mapValues(coords, (coord) => sendPointToPlane(coord, vpt));
+    }
   }
 
   static canvas(target: ObjectGeometry) {
-    const coords = this.getCoords(target);
+    const coords = this.getViewportCoords(target);
     const bbox = makeBoundingBoxFromPoints(Object.values(coords));
     const transform = calcBaseChangeMatrix(
       undefined,
       [new Point(bbox.width, 0), new Point(0, bbox.height)],
-      target.getCenterPoint()
+      coords.tl.midPointFrom(coords.br)
     );
     return new this(coords, transform, target.getViewportTransform());
   }
 
   static rotated(target: ObjectGeometry) {
-    const center = target.getCenterPoint();
     const rotation = degreesToRadians(target.getTotalAngle());
-    const coords = this.getCoords(target);
+    const coords = this.getViewportCoords(target);
+    const center = coords.tl.midPointFrom(coords.br);
     const bbox = makeBoundingBoxFromPoints(
       Object.values(coords).map((coord) => coord.rotate(-rotation, center))
     );
@@ -129,9 +135,9 @@ export class BBox {
   }
 
   static legacy(target: ObjectGeometry) {
-    const center = target.getCenterPoint();
     const rotation = degreesToRadians(target.getTotalAngle());
-    const coords = this.getCoords(target);
+    const coords = this.getViewportCoords(target);
+    const center = coords.tl.midPointFrom(coords.br);
     const viewportBBox = makeBoundingBoxFromPoints(Object.values(coords));
     const rotatedBBox = makeBoundingBoxFromPoints(
       Object.values(coords).map((coord) => coord.rotate(-rotation, center))
@@ -156,11 +162,11 @@ export class BBox {
   }
 
   static transformed(target: ObjectGeometry) {
-    const coords = this.getCoords(target);
+    const coords = this.getViewportCoords(target);
     const transform = calcBaseChangeMatrix(
       undefined,
       [createVector(coords.tl, coords.tr), createVector(coords.tl, coords.bl)],
-      target.getCenterPoint()
+      coords.tl.midPointFrom(coords.br)
     );
     return new this(coords, transform, target.getViewportTransform());
   }

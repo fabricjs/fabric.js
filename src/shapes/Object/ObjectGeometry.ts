@@ -476,7 +476,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
-  protected needsViewportCoords() {
+  needsViewportCoords() {
     return this.strokeUniform || !this.padding;
   }
 
