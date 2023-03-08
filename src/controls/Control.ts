@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { halfPI } from '../constants';
+import { mapValues } from 'lodash';
 import {
   ControlActionHandler,
   TPointerEvent,
@@ -8,9 +8,7 @@ import {
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
-import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
 import {
   ControlRenderingStyleOverride,
   renderCircleControl,
@@ -298,38 +296,26 @@ export class Control {
     centerY: number,
     isTouch: boolean
   ) {
-    let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
-    const xSize = isTouch ? this.touchSizeX : this.sizeX,
-      ySize = isTouch ? this.touchSizeY : this.sizeY;
-    if (xSize && ySize && xSize !== ySize) {
-      // handle rectangular corners
-      const controlTriangleAngle = Math.atan2(ySize, xSize);
-      const cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      const newTheta = controlTriangleAngle - degreesToRadians(objectAngle);
-      const newThetaComp =
-        halfPI - controlTriangleAngle - degreesToRadians(objectAngle);
-      cosHalfOffset = cornerHypotenuse * cos(newTheta);
-      sinHalfOffset = cornerHypotenuse * sin(newTheta);
-      // use complementary angle for two corners
-      cosHalfOffsetComp = cornerHypotenuse * cos(newThetaComp);
-      sinHalfOffsetComp = cornerHypotenuse * sin(newThetaComp);
-    } else {
-      // handle square corners
-      // use default object corner size unless size is defined
-      const cornerSize = xSize && ySize ? xSize : objectCornerSize;
-      const cornerHypotenuse = cornerSize * Math.SQRT1_2;
-      // complementary angles are equal since they're both 45 degrees
-      const newTheta = degreesToRadians(45 - objectAngle);
-      cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * cos(newTheta);
-      sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * sin(newTheta);
-    }
-
-    return {
-      tl: new Point(centerX - sinHalfOffsetComp, centerY - cosHalfOffsetComp),
-      tr: new Point(centerX + cosHalfOffset, centerY - sinHalfOffset),
-      bl: new Point(centerX - cosHalfOffset, centerY + sinHalfOffset),
-      br: new Point(centerX + sinHalfOffsetComp, centerY + cosHalfOffsetComp),
-    };
+    const size = isTouch
+      ? new Point(
+          this.touchSizeX || objectCornerSize,
+          this.touchSizeY || objectCornerSize
+        )
+      : new Point(
+          this.sizeX || objectCornerSize,
+          this.sizeY || objectCornerSize
+        );
+    const rotation = degreesToRadians(objectAngle);
+    const center = new Point(centerX, centerY);
+    return mapValues(
+      {
+        tl: new Point(-0.5, -0.5),
+        tr: new Point(0.5, -0.5),
+        bl: new Point(-0.5, 0.5),
+        br: new Point(0.5, 0.5),
+      },
+      (origin) => origin.multiply(size).rotate(rotation).add(center)
+    );
   }
 
   /**
