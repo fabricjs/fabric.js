@@ -744,13 +744,13 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
         new Point(-0.5, 0.5),
         new Point(0.5, 0.5),
       ].forEach((origin) => {
-        draw(BBox.inViewport(this).applyToPointInViewport(origin), 'red');
-        draw(BBox.rotated(this).applyToPointInViewport(origin), 'magenta');
-        draw(BBox.transformed(this).applyToPointInViewport(origin), 'blue');
+        draw(BBox.inViewport(this).applyToPointInViewport(origin), 'red', 10);
+        draw(BBox.rotated(this).applyToPointInViewport(origin), 'magenta', 8);
+        draw(BBox.transformed(this).applyToPointInViewport(origin), 'blue', 6);
         ctx.transform(...this.getViewportTransform());
-        draw(BBox.inViewport(this).applyToPointInCanvas(origin), 'red');
-        draw(BBox.rotated(this).applyToPointInCanvas(origin), 'magenta');
-        draw(BBox.transformed(this).applyToPointInCanvas(origin), 'blue');
+        draw(BBox.inViewport(this).applyToPointInCanvas(origin), 'red', 10);
+        draw(BBox.rotated(this).applyToPointInCanvas(origin), 'magenta', 8);
+        draw(BBox.transformed(this).applyToPointInCanvas(origin), 'blue', 6);
       });
       ctx.restore();
     }, 50);
