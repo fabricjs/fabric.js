@@ -21,7 +21,7 @@ export class BBox {
     this.vpt = vpt;
   }
 
-  protected applyToPoint(origin: Point, inViewport = false, isVector = false) {
+  protected applyTo2D(origin: Point, inViewport = false, isVector = false) {
     return origin.transform(
       inViewport
         ? this.transform
@@ -31,19 +31,19 @@ export class BBox {
   }
 
   applyToPointInCanvas(origin: Point) {
-    return this.applyToPoint(origin);
+    return this.applyTo2D(origin);
   }
 
   applyToPointInViewport(origin: Point) {
-    return this.applyToPoint(origin, true);
+    return this.applyTo2D(origin, true);
   }
 
   applyToVectorInCanvas(origin: Point) {
-    return this.applyToPoint(origin, false, true);
+    return this.applyTo2D(origin, false, true);
   }
 
   applyToVectorInViewport(origin: Point) {
-    return this.applyToPoint(origin, true, true);
+    return this.applyTo2D(origin, true, true);
   }
 
   getCoords(inViewport = true) {
