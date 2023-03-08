@@ -1,6 +1,6 @@
 import { iMatrix } from '../../constants';
 import { IPoint, Point } from '../../Point';
-import { TDegree, TMat2D } from '../../typedefs';
+import { TDegree, TMat2D, TRadian } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
@@ -31,8 +31,10 @@ export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
 
-export const isIdentityMatrix = (mat: TMat2D) =>
-  mat.every((value, index) => value === iMatrix[index]);
+export const isIdentityMatrix = (mat: TMat2D) => isMatrixEqual(mat, iMatrix);
+
+export const isMatrixEqual = (a: TMat2D, b: TMat2D) =>
+  a.every((value, index) => value === b[index]);
 
 /**
  * Apply transform t to point p
@@ -130,11 +132,14 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
  * @param  {Number} [options.angle] angle in degrees
  * @return {TMat2D} transform matrix
  */
-export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
-  if (!angle) {
+export const calcRotateMatrix = ({
+  angle = 0,
+  rotation,
+}: TRotateMatrixArgs & { rotation?: TRadian }): TMat2D => {
+  if (!angle && !rotation) {
     return iMatrix;
   }
-  const theta = degreesToRadians(angle),
+  const theta = rotation ?? degreesToRadians(angle),
     cosin = cos(theta),
     sinus = sin(theta);
   return [cosin, sinus, -sinus, cosin, 0, 0];
