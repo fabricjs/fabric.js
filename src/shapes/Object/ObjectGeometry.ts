@@ -28,43 +28,16 @@ import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { ControlProps } from './types/ControlProps';
 import { BBox } from './BBox';
 
-type TLineDescriptor = {
-  o: Point;
-  d: Point;
-};
-
-type TBBoxLines = {
-  topline: TLineDescriptor;
-  leftline: TLineDescriptor;
-  bottomline: TLineDescriptor;
-  rightline: TLineDescriptor;
-};
-
 type TMatrixCache = {
   key: string;
   value: TMat2D;
 };
-
-type TACoords = TCornerPoint;
 
 export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   extends ObjectOrigin<EventSpec>
   implements Pick<ControlProps, 'padding'>
 {
   declare padding: number;
-
-  /**
-   * Describe object's corner position in canvas object absolute coordinates
-   * properties are tl,tr,bl,br and describe the four main corner.
-   * each property is an object with x, y, instance of Fabric.Point.
-   * The coordinates depends from this properties: width, height, scaleX, scaleY
-   * skewX, skewY, angle, strokeWidth, top, left.
-   * Those coordinates are useful to understand where an object is. They get updated
-   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
-   * The coordinates get updated with @method setCoords.
-   * You can calculate them without updating with @method calcACoords();
-   */
-  declare aCoords: TACoords;
 
   /**
    * Describe object's corner position in canvas element coordinates.
@@ -75,7 +48,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    */
   declare lineCoords: TCornerPoint;
 
-  declare bboxCoords: TACoords;
+  declare bboxCoords: TCornerPoint;
   declare bbox: BBox;
 
   /**
@@ -95,6 +68,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @private
    */
   declare canvas?: StaticCanvas | Canvas;
+
+  skipOffscreen = true;
 
   /**
    * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
@@ -325,10 +300,11 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     return this.containsPoint(centerPoint, absolute);
   }
 
+  isVisibleInParent() {}
+
   /**
    * Checks if object is contained within the canvas with current viewportTransform
    * the check is done stopping at first point that appears on screen
-   * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
    * @return {Boolean} true if object is fully or partially contained within canvas
    */
   isOnScreen(): boolean {
@@ -384,7 +360,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
    * the box is intended as aligned to axis of canvas.
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of .lineCoords / .aCoords
    * @return {Object} Object with left, top, width, height properties
    */
   getBoundingRect(absolute = false): TBBox {
@@ -561,8 +536,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * aCoords are used to quickly find an object on the canvas
+   * Sets corner and controls position coordinates based on current angle, dimensions and position.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
   setCoords(): void {

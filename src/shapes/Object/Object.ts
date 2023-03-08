@@ -735,14 +735,6 @@ export class FabricObject<
     if (this.isNotVisible()) {
       return;
     }
-    if (
-      this.canvas &&
-      this.canvas.skipOffscreen &&
-      !this.group &&
-      !this.isOnScreen()
-    ) {
-      return;
-    }
     ctx.save();
     this._setupCompositeOperation(ctx);
     this.drawSelectionBackground(ctx);

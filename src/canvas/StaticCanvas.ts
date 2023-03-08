@@ -210,18 +210,16 @@ export class StaticCanvas<
   declare enableRetinaScaling: boolean;
 
   /**
-   * Describe canvas element extension over design
-   * properties are tl,tr,bl,br.
-   * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
+   * Describe the visible bounding box of the canvas
+   * if canvas is **NOT** transformed the points are equal to the four corners of the `HTMLCanvasElement`
+   * if canvas is transformed the points describe the distance from canvas origin,
+   * `tl` being the viewport origin (= `tl` corner of the `HTMLCanvasElement`).
    * The coordinates get updated with @method calcViewportBoundaries.
    */
   declare vptCoords: TCornerPoint;
 
   /**
-   * Based on vptCoords and object.aCoords, skip rendering of objects that
-   * are not included in current viewport.
+   * Skip rendering of objects that are not included in current viewport.
    * May greatly help in applications with crowded canvas and use of zoom/pan
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
@@ -712,19 +710,14 @@ export class StaticCanvas<
 
   /**
    * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport using
-   * object absolute coordinates ( aCoords )
-   * @return {Object} points.tl
-   * @chainable
+   * helps to determinate when an object is in the current rendering viewport
    */
   calcViewportBoundaries(): TCornerPoint {
-    const width = this.width,
-      height = this.height,
-      iVpt = invertTransform(this.viewportTransform),
-      a = transformPoint({ x: 0, y: 0 }, iVpt),
-      b = transformPoint({ x: width, y: height }, iVpt),
-      // we don't support vpt flipping
-      // but the code is robust enough to mostly work with flipping
+    // we don't support vpt flipping
+    // but the code is robust enough to mostly work with flipping
+    const iVpt = invertTransform(this.viewportTransform),
+      a = new Point().transform(iVpt),
+      b = new Point(this.width, this.height).transform(iVpt),
       min = a.min(b),
       max = a.max(b);
     return (this.vptCoords = {
@@ -824,9 +817,11 @@ export class StaticCanvas<
    * @param {Array} objects to render
    */
   _renderObjects(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
-    for (let i = 0, len = objects.length; i < len; ++i) {
-      objects[i] && objects[i].render(ctx);
-    }
+    objects.forEach((object) => {
+      object &&
+        (!this.skipOffscreen || !object.skipOffscreen || object.isOnScreen()) &&
+        object.render(ctx);
+    });
   }
 
   /**

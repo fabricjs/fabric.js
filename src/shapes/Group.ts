@@ -503,20 +503,20 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    */
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
-    for (let i = 0; i < this._objects.length; i++) {
+    this._objects.forEach((object) => {
       // TODO: handle rendering edge case somehow
-      if (
-        this.canvas?.preserveObjectStacking &&
-        this._objects[i].group !== this
-      ) {
+      if (this.canvas?.preserveObjectStacking && object.group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
-        this._objects[i].render(ctx);
+        object.render(ctx);
         ctx.restore();
-      } else if (this._objects[i].group === this) {
-        this._objects[i].render(ctx);
+      } else if (
+        object.group === this &&
+        (!object.skipOffscreen || object.isOverlapping(this))
+      ) {
+        object.render(ctx);
       }
-    }
+    });
     this._drawClipPath(ctx, this.clipPath);
   }
 
