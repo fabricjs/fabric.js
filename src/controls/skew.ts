@@ -4,11 +4,15 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
+  composeMatrix,
+  isMatrixEqual,
+  multiplyTransformMatrixChain,
+} from '../util/misc/matrix';
+import { applyTransformToObject } from '../util/misc/objectTransforms';
+import { calcBaseChangeMatrix } from '../util/misc/planeChange';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import {
   findCornerQuadrant,
@@ -83,57 +87,44 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
 function skewObject(
   axis: TAxis,
   eventData: TPointerEvent,
-  { target, skewingSide, ...transform }: SkewTransform,
+  { target, ex, ey, original, skewingSide }: SkewTransform,
   x: number,
   y: number
 ) {
-  const { scale: scaleKey, skew: skewKey } = AXIS_KEYS[axis],
-    offset = ({ x, y }[axis] - transform[`e${axis}`]) / target[scaleKey],
-    skewingBefore = target[skewKey],
-    skewingStart = transform[skewKey],
-    shearingStart = Math.tan(degreesToRadians(skewingStart)),
-    // let a, b be the size of target
-    // let a' be the value of a after applying skewing
-    // then:
-    // a' = a + b * skewA => skewA = (a' - a) / b
-    // the value b is tricky since skewY is applied before skewX
-    b =
-      axis === 'y'
-        ? target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-            // since skewY is applied before skewX, b (=width) is not affected by skewX
-            skewX: 0,
-          }).x
-        : target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-          }).y;
+  const ownMatrix = composeMatrix(original);
+  const d = new Point(x, y).subtract(new Point(ex, ey));
 
-  const shearing =
-    (2 * offset * skewingSide) /
-      // we max out fractions to safeguard from asymptotic behavior
-      Math.max(b, 1) +
-    // add starting state
-    shearingStart;
+  const shearingChange = calcBaseChangeMatrix(
+    [new Point(1, 0), new Point(0, 1)],
+    [
+      new Point(
+        1,
+        axis === 'y' ? (d.y * skewingSide) / (target.height * 0.5) : 0
+      ),
+      new Point(
+        axis === 'x' ? (d.x * skewingSide) / (target.width * 0.5) : 0,
+        1
+      ),
+    ]
+  );
 
-  const skewing = radiansToDegrees(Math.atan(shearing));
+  applyTransformToObject(
+    target,
+    multiplyTransformMatrixChain([
+      ownMatrix,
+      shearingChange,
+      // [
+      //   axis === 'y' ? (1 + shearX * shearY) / (1 + shearX * shearing) : 1,
+      //   0,
+      //   0,
+      //   1,
+      //   0,
+      //   0,
+      // ],
+    ])
+  );
 
-  target.set(skewKey, skewing);
-  const changed = skewingBefore !== target[skewKey];
-
-  if (changed && axis === 'y') {
-    // we don't want skewing to affect scaleX
-    // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
-    const { skewX, scaleX } = target,
-      dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
-      dimAfter = target._getTransformedDimensions(),
-      compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
-    compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
-  }
-
-  return changed;
+  return !isMatrixEqual(target.calcOwnMatrix(), ownMatrix);
 }
 
 /**
