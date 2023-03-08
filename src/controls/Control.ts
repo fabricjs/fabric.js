@@ -15,7 +15,7 @@ import {
   ControlRenderingStyleOverride,
   renderCircleControl,
   renderSquareControl,
-} from './controls.render';
+} from './controlRendering';
 
 export class Control {
   /**

@@ -2,8 +2,13 @@ import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+
+export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
+  rx: 0,
+  ry: 0,
+};
 
 export class Ellipse extends FabricObject {
   /**
@@ -19,6 +24,17 @@ export class Ellipse extends FabricObject {
    * @default
    */
   declare ry: number;
+
+  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
+  static ownDefaults: Record<string, any> = ellipseDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Ellipse.ownDefaults,
+    };
+  }
 
   /**
    * Constructor
@@ -138,17 +154,6 @@ export class Ellipse extends FabricObject {
 
   /* _FROM_SVG_END_ */
 }
-
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
-  type: 'ellipse',
-  rx: 0,
-  ry: 0,
-};
-
-Object.assign(Ellipse.prototype, {
-  ...ellipseDefaultValues,
-  cacheProperties: [...cacheProperties, 'rx', 'ry'],
-});
 
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);

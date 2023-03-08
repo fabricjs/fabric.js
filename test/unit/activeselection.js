@@ -28,7 +28,7 @@
   QUnit.module('fabric.ActiveSelection', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -54,7 +54,7 @@
 
     var expectedObject = {
       version:                  fabric.version,
-      type:                     'activeSelection',
+      type:                     'ActiveSelection',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -103,7 +103,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -111,7 +111,7 @@
       strokeWidth: 0
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -120,7 +120,7 @@
     }];
     var expectedObject = {
       version:            fabric.version,
-      type:               'activeSelection',
+      type:               'ActiveSelection',
       left:               50,
       top:                100,
       width:              80,
@@ -182,13 +182,6 @@
     //
     // assert.equal(group.get('lockMovementY'), true);
     // assert.equal(group.get('lockRotation'), true);
-  });
-
-  QUnit.test('inherited methods', function (assert) {
-    var methods = ['add', 'insertAt', 'remove', 'removeAll'];
-    methods.forEach(method => {
-      assert.strictEqual(fabric.ActiveSelection.prototype[method], fabric.Group.prototype[method]);
-    });
   });
 
   QUnit.test('ActiveSelection shouldCache', function(assert) {

@@ -6,16 +6,15 @@ import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
-  TClassProperties,
   TDegree,
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  TClassProperties,
 } from '../../typedefs';
-import { classRegistry } from '../../util/class_registry';
+import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { capitalize } from '../../util/lang_string';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
@@ -24,12 +23,13 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
+import { sendObjectToPlane } from '../../util/misc/planeChange';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
-import { Image } from '../Image';
+import type { Image } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -38,7 +38,9 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { removeTransformMatrixForSvgParsing } from '../../util/transform_matrix_removal';
+import { SerializedObjectProps } from './types/SerializedObjectProps';
+import { ObjectProps } from './types/ObjectProps';
+import { TProps } from './types';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -84,384 +86,42 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends AnimatableObject<EventSpec> {
-  declare type: string;
-
-  /**
-   * Opacity of an object
-   * @type Number
-   * @default 1
-   */
-  declare opacity: number;
-
-  /**
-   * Size of object's controlling corners (in pixels)
-   * @type Number
-   * @default 13
-   */
-  declare cornerSize: number;
-
-  /**
-   * Size of object's controlling corners when touch interaction is detected
-   * @type Number
-   * @default 24
-   */
-  declare touchCornerSize: number;
-
-  /**
-   * When true, object's controlling corners are rendered as transparent inside (i.e. stroke instead of fill)
-   * @type Boolean
-   * @default true
-   */
-  declare transparentCorners: boolean;
-
-  /**
-   * Default cursor value used when hovering over this object on canvas
-   * @type CSSStyleDeclaration['cursor'] | null
-   * @default null
-   */
-  declare hoverCursor: CSSStyleDeclaration['cursor'] | null;
-
-  /**
-   * Default cursor value used when moving this object on canvas
-   * @type CSSStyleDeclaration['cursor'] | null
-   * @default null
-   */
-  declare moveCursor: CSSStyleDeclaration['cursor'] | null;
-
-  /**
-   * Color of controlling borders of an object (when it's active)
-   * @type String
-   * @default rgb(178,204,255)
-   */
-  declare borderColor: string;
-
-  /**
-   * Array specifying dash pattern of an object's borders (hasBorder must be true)
-   * @since 1.6.2
-   * @type Array | null
-   * default null;
-   */
-  declare borderDashArray: number[] | null;
-
-  /**
-   * Color of controlling corners of an object (when it's active)
-   * @type String
-   * @default rgb(178,204,255)
-   */
-  declare cornerColor: string;
-
-  /**
-   * Color of controlling corners of an object (when it's active and transparentCorners false)
-   * @since 1.6.2
-   * @type String
-   * @default null
-   */
-  declare cornerStrokeColor: string;
-
-  /**
-   * Specify style of control, 'rect' or 'circle'
-   * This is deprecated. In the futuer there will be a standard control render
-   * And you can swap it with one of the alternative proposed with the control api
-   * @since 1.6.2
-   * @type 'rect' | 'circle'
-   * @default rect
-   * @deprecated
-   */
-  declare cornerStyle: 'rect' | 'circle';
-
-  /**
-   * Array specifying dash pattern of an object's control (hasBorder must be true)
-   * @since 1.6.2
-   * @type Array | null
-   */
-  declare cornerDashArray: number[] | null;
-
-  /**
-   * When true, this object will use center point as the origin of transformation
-   * when being scaled via the controls.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  declare centeredScaling: false;
-
-  /**
-   * When true, this object will use center point as the origin of transformation
-   * when being rotated via the controls.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  declare centeredRotation: true;
-
-  /**
-   * When defined, an object is rendered via stroke and this property specifies its color
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default null
-   */
-  declare stroke: string | TFiller | null;
-
-  /**
-   * Color of object's fill
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default rgb(0,0,0)
-   */
-  declare fill: string | TFiller | null;
-
-  /**
-   * Fill rule used to fill an object
-   * accepted values are nonzero, evenodd
-   * <b>Backwards incompatibility note:</b> This property was used for setting globalCompositeOperation until v1.4.12 (use `globalCompositeOperation` instead)
-   * @type String
-   * @default nonzero
-   */
-  declare fillRule: CanvasFillRule;
-
-  /**
-   * Composite rule used for canvas globalCompositeOperation
-   * @type String
-   * @default
-   */
-  declare globalCompositeOperation: GlobalCompositeOperation;
-
-  /**
-   * Background color of an object.
-   * takes css colors https://www.w3.org/TR/css-color-3/
-   * @type String
-   * @default
-   */
-  declare backgroundColor: string;
-
-  /**
-   * Selection Background color of an object. colored layer behind the object when it is active.
-   * does not mix good with globalCompositeOperation methods.
-   * @type String
-   * @deprecated
-   * @default
-   */
-  declare selectionBackgroundColor: string;
-
-  /**
-   * Array specifying dash pattern of an object's stroke (stroke must be defined)
-   * @type Array
-   * @default null;
-   */
-  declare strokeDashArray: number[] | null;
-
-  /**
-   * Line offset of an object's stroke
-   * @type Number
-   * @default 0
-   */
-  declare strokeDashOffset: number;
-
-  /**
-   * Line endings style of an object's stroke (one of "butt", "round", "square")
-   * @type String
-   * @default butt
-   */
-  declare strokeLineCap: CanvasLineCap;
-
-  /**
-   * Corner style of an object's stroke (one of "bevel", "round", "miter")
-   * @type String
-   * @default
-   */
-  declare strokeLineJoin: CanvasLineJoin;
-
-  /**
-   * Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
-   * @type Number
-   * @default 4
-   */
-  declare strokeMiterLimit: number;
-
-  /**
-   * Shadow object representing shadow of this shape
-   * @type Shadow
-   * @default null
-   */
-  declare shadow: Shadow | null;
-
-  /**
-   * Opacity of object's controlling borders when object is active and moving
-   * @type Number
-   * @default 0.4
-   */
-  declare borderOpacityWhenMoving: number;
-
-  /**
-   * Scale factor of object's controlling borders
-   * bigger number will make a thicker border
-   * border is 1, so this is basically a border thickness
-   * since there is no way to change the border itself.
-   * @type Number
-   * @default 1
-   */
-  declare borderScaleFactor: number;
-
-  /**
-   * Minimum allowed scale value of an object
-   * @type Number
-   * @default 0
-   */
+    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends AnimatableObject<EventSpec>
+  implements ObjectProps
+{
   declare minScaleLimit: number;
 
-  /**
-   * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).
-   * But events still fire on it.
-   * @type Boolean
-   * @default
-   */
-  declare selectable: boolean;
+  declare opacity: number;
 
-  /**
-   * When set to `false`, an object can not be a target of events. All events propagate through it. Introduced in v1.3.4
-   * @type Boolean
-   * @default
-   */
-  declare evented: boolean;
+  declare paintFirst: 'fill' | 'stroke';
+  declare fill: string | TFiller | null;
+  declare fillRule: CanvasFillRule;
+  declare stroke: string | TFiller | null;
+  declare strokeDashArray: number[] | null;
+  declare strokeDashOffset: number;
+  declare strokeLineCap: CanvasLineCap;
+  declare strokeLineJoin: CanvasLineJoin;
+  declare strokeMiterLimit: number;
 
-  /**
-   * When set to `false`, an object is not rendered on canvas
-   * @type Boolean
-   * @default
-   */
+  declare globalCompositeOperation: GlobalCompositeOperation;
+  declare backgroundColor: string;
+
+  declare shadow: Shadow | null;
+
   declare visible: boolean;
 
-  /**
-   * When set to `false`, object's controls are not displayed and can not be used to manipulate object
-   * @type Boolean
-   * @default
-   */
-  declare hasControls: boolean;
-
-  /**
-   * When set to `false`, object's controlling borders are not rendered
-   * @type Boolean
-   * @default
-   */
-  declare hasBorders: boolean;
-
-  /**
-   * When set to `true`, objects are "found" on canvas on per-pixel basis rather than according to bounding box
-   * @type Boolean
-   * @default
-   */
-  declare perPixelTargetFind: boolean;
-
-  /**
-   * When `false`, default object's values are not included in its serialization
-   * @type Boolean
-   * @default
-   */
   declare includeDefaultValues: boolean;
-
-  /**
-   * When `true`, object horizontal movement is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockMovementX: boolean;
-
-  /**
-   * When `true`, object vertical movement is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockMovementY: boolean;
-
-  /**
-   * When `true`, object rotation is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockRotation: boolean;
-
-  /**
-   * When `true`, object horizontal scaling is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockScalingX: boolean;
-
-  /**
-   * When `true`, object vertical scaling is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockScalingY: boolean;
-
-  /**
-   * When `true`, object horizontal skewing is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockSkewingX: boolean;
-
-  /**
-   * When `true`, object vertical skewing is locked
-   * @type Boolean
-   * @default
-   */
-  declare lockSkewingY: boolean;
-
-  /**
-   * When `true`, object cannot be flipped by scaling into negative values
-   * @type Boolean
-   * @default
-   */
-  declare lockScalingFlip: boolean;
-
-  /**
-   * When `true`, object is not exported in OBJECT/JSON
-   * @since 1.6.3
-   * @type Boolean
-   * @default
-   */
   declare excludeFromExport: boolean;
 
-  /**
-   * When `true`, object is cached on an additional canvas.
-   * When `false`, object is not cached unless necessary ( clipPath )
-   * default to true
-   * @since 1.7.0
-   * @type Boolean
-   * @default true
-   */
   declare objectCaching: boolean;
 
-  /**
-   * When set to `true`, object's cache will be rerendered next render call.
-   * since 1.7.0
-   * @type Boolean
-   * @default true
-   */
-  declare dirty: boolean;
-
-  /**
-   * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
-   * @type String
-   * @default
-   */
-  declare paintFirst: 'fill' | 'stroke';
-
-  /**
-   * When 'down', object is set to active on mousedown/touchstart
-   * When 'up', object is set to active on mouseup/touchend
-   * Experimental. Let's see if this breaks anything before supporting officially
-   * @private
-   * since 4.4.0
-   * @type String
-   * @default 'down'
-   */
-  declare activeOn: 'down' | 'up';
+  declare clipPath?: FabricObject;
+  declare inverted: boolean;
+  declare absolutePositioned: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
@@ -469,7 +129,7 @@ export class FabricObject<
    * needs its cache regenerated during a .set call
    * @type Array
    */
-  declare stateProperties: string[];
+  static stateProperties: string[] = stateProperties;
 
   /**
    * List of properties to consider when checking if cache needs refresh
@@ -478,37 +138,15 @@ export class FabricObject<
    * and refreshed at the next render
    * @type Array
    */
-  declare cacheProperties: string[];
+  static cacheProperties: string[] = cacheProperties;
 
   /**
-   * a fabricObject that, without stroke define a clipping area with their shape. filled in black
-   * the clipPath object gets used when the object has rendered, and the context is placed in the center
-   * of the object cacheCanvas.
-   * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
-   * @type FabricObject
+   * When set to `true`, object's cache will be rerendered next render call.
+   * since 1.7.0
+   * @type Boolean
+   * @default true
    */
-  declare clipPath?: FabricObject;
-
-  /**
-   * Meaningful ONLY when the object is used as clipPath.
-   * if true, the clipPath will make the object clip to the outside of the clipPath
-   * since 2.4.0
-   * @type boolean
-   * @default false
-   */
-  declare inverted: boolean;
-
-  /**
-   * Meaningful ONLY when the object is used as clipPath.
-   * if true, the clipPath will have its top and left relative to canvas, and will
-   * not be influenced by the object transform. This will make the clipPath relative
-   * to the canvas, but clipping just a particular object.
-   * WARNING this is beta, this feature may change or be renamed.
-   * since 2.4.0
-   * @type boolean
-   * @default false
-   */
-  declare absolutePositioned: boolean;
+  declare dirty: boolean;
 
   /**
    * Quick access for the _cacheCanvas rendering context
@@ -594,12 +232,6 @@ export class FabricObject<
   declare group?: Group;
 
   /**
-   * A reference to the parent of the object
-   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
-   */
-  declare __owningGroup?: Group;
-
-  /**
    * Indicate if the object is sitting on a cache dedicated to it
    * or is part of a larger cache for many object ( a group for example)
    * @type number
@@ -617,12 +249,43 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
+  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return { ...FabricObject.ownDefaults };
+  }
+
+  /**
+   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
+   * Will be removed in fabric 7 or 8.
+   * The setter exists because is very hard to catch all the ways in which a type value
+   * could be set in the instance
+   * @TODO add sustainable warning message
+   * @type string
+   * @deprecated
+   */
+  get type() {
+    const name = this.constructor.name;
+    if (name === 'FabricObject') {
+      return 'object';
+    }
+    return name.toLowerCase();
+  }
+
+  set type(value) {
+    console.warn('Setting type has no effect', value);
+  }
+
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Partial<TClassProperties<FabricObject>>) {
+  constructor(options?: Props) {
     super();
+    Object.assign(
+      this,
+      (this.constructor as typeof FabricObject).getDefaults()
+    );
     this.setOptions(options);
   }
 
@@ -827,7 +490,10 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): Record<string, any> {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -838,8 +504,8 @@ export class FabricObject<
             }
           : null,
       object = {
-        ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.type,
+        ...pick(this, propertiesToInclude),
+        type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -901,21 +567,28 @@ export class FabricObject<
    * @private
    * @param {Object} object
    */
-  _removeDefaultValues(object: Record<string, any>) {
-    const prototype = classRegistry.getClass(object.type).prototype;
+  _removeDefaultValues<T extends object>(object: T): Partial<T> {
+    // getDefaults() ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
+    // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
+    const defaults = (this.constructor as typeof FabricObject).getDefaults();
+    const hasStaticDefaultValues = Object.keys(defaults).length > 0;
+    const baseValues = hasStaticDefaultValues
+      ? defaults
+      : Object.getPrototypeOf(this);
+
     Object.keys(object).forEach(function (prop) {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
       }
-      if (object[prop] === prototype[prop]) {
+      if (object[prop] === baseValues[prop]) {
         delete object[prop];
       }
       // basically a check for [] === []
       if (
         Array.isArray(object[prop]) &&
-        Array.isArray(prototype[prop]) &&
+        Array.isArray(baseValues[prop]) &&
         object[prop].length === 0 &&
-        prototype[prop].length === 0
+        baseValues[prop].length === 0
       ) {
         delete object[prop];
       }
@@ -929,7 +602,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${capitalize(this.type)}>`;
+    return `#<${this.constructor.name}>`;
   }
 
   /**
@@ -996,7 +669,8 @@ export class FabricObject<
   }
 
   /**
-   * @private
+   * Handles setting values on the instance and handling internal side effects
+   * @protected
    * @param {String} key
    * @param {*} value
    */
@@ -1023,10 +697,15 @@ export class FabricObject<
 
     if (isChanged) {
       const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (this.cacheProperties.includes(key)) {
+      if (
+        (this.constructor as typeof FabricObject).cacheProperties.includes(key)
+      ) {
         this.dirty = true;
         groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (groupNeedsUpdate && this.stateProperties.includes(key)) {
+      } else if (
+        groupNeedsUpdate &&
+        (this.constructor as typeof FabricObject).stateProperties.includes(key)
+      ) {
         this.group!.set('dirty', true);
       }
     }
@@ -1613,10 +1292,9 @@ export class FabricObject<
    */
   clone(propertiesToInclude: string[]) {
     const objectForm = this.toObject(propertiesToInclude);
-    // todo ok understand this. is static or it isn't?
-    // TS is more an issue here than an helper.
-    // @ts-ignore
-    return this.constructor.fromObject(objectForm);
+    return (this.constructor as typeof FabricObject).fromObject(
+      objectForm
+    ) as unknown as this;
   }
 
   /**
@@ -1626,6 +1304,7 @@ export class FabricObject<
    * and format option. toCanvasElement is faster and produce no loss of quality.
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
+   * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
    * @param {Object} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
@@ -1640,7 +1319,8 @@ export class FabricObject<
   cloneAsImage(options: any): Image {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    return new Image(canvasEl);
+    const ImageClass = classRegistry.getClass('image');
+    return new ImageClass(canvasEl);
   }
 
   /**
@@ -1654,6 +1334,7 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
+   * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options: any = {}) {
@@ -1671,6 +1352,9 @@ export class FabricObject<
     }
     if (options.withoutShadow) {
       this.shadow = null;
+    }
+    if (options.viewportTransform) {
+      sendObjectToPlane(this, this.getViewportTransform());
     }
 
     const el = createCanvasElement(),
@@ -1756,12 +1440,12 @@ export class FabricObject<
   }
 
   /**
-   * Returns true if specified type is identical to the type of an instance
+   * Returns true if any of the specified types is identical to the type of an instance
    * @param {String} type Type to check against
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.type);
+    return types.includes(this.constructor.name) || types.includes(this.type);
   }
 
   /**
@@ -1827,11 +1511,9 @@ export class FabricObject<
    * override if necessary to dispose artifacts such as `clipPath`
    */
   dispose() {
-    // todo verify this.
-    // runningAnimations is always truthy
-    if (runningAnimations) {
-      runningAnimations.cancelByTarget(this);
-    }
+    runningAnimations.cancelByTarget(this);
+    this.off();
+    this._set('canvas', undefined);
   }
 
   /**
@@ -1843,27 +1525,27 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static _fromObject(
+  static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
     {
       extraParam,
       ...options
     }: { extraParam?: string; signal?: AbortSignal } = {}
-  ): Promise<FabricObject> {
+  ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
         const allOptions = { ...options, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, ...rest } = allOptions;
+          const { [extraParam]: arg0, type, ...rest } = allOptions;
           // @ts-ignore;
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
         }
       }
-    );
+    ) as Promise<S>;
   }
 
   /**
@@ -1873,23 +1555,13 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject(
-    object: Record<string, unknown>,
+  static fromObject<T extends TProps<SerializedObjectProps>>(
+    object: T,
     options?: { signal?: AbortSignal }
   ): Promise<FabricObject> {
     return this._fromObject(object, options);
   }
 }
 
-/*
- * Properties that at minimum needs to stay on the prototype
- * That shouldn't be either on the instance and that can't be used as static
- * For inheritance reasons ( used in the superclass but static in the subclass )
- */
-Object.assign(FabricObject.prototype, {
-  cacheProperties,
-  stateProperties,
-  ...fabricObjectDefaultValues,
-});
-
 classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'object');

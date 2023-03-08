@@ -2,7 +2,7 @@
 
   var REFERENCE_RECT = {
     version:                  fabric.version,
-    type:                     'rect',
+    type:                     'Rect',
     originX:                  'left',
     originY:                  'top',
     left:                     0,
@@ -46,7 +46,7 @@
     assert.ok(rect instanceof fabric.Rect);
     assert.ok(rect instanceof fabric.Object);
 
-    assert.deepEqual(rect.get('type'), 'rect');
+    assert.deepEqual(rect.constructor.name, 'Rect');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -58,8 +58,8 @@
   QUnit.test('cache properties', function(assert) {
     var rect = new fabric.Rect();
 
-    assert.ok(rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
-    assert.ok(rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
   });
 
   QUnit.test('toObject', function(assert) {
@@ -94,7 +94,7 @@
   QUnit.test('fabric.Rect.fromObject with pattern fill', function(assert) {
     var done = assert.async();
     var fillObj = {
-      type: 'pattern',
+      type: 'Pattern',
       source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
     };
     fabric.Rect.fromObject({ fill: fillObj }).then(function(rect) {
@@ -206,7 +206,7 @@
   });
 
   QUnit.test('toObject without default values', function(assert) {
-    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
+    var options = { type: 'Rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
     var rect = new fabric.Rect(options);
     rect.includeDefaultValues = false;
     assert.deepEqual(rect.toObject(), options);

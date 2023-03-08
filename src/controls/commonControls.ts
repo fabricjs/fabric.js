@@ -1,15 +1,13 @@
-import { FabricObject } from '../shapes/Object/FabricObject';
-import { Textbox } from '../shapes/Textbox';
-import { scaleCursorStyleHandler, scalingEqually } from './scale';
 import { changeWidth } from './changeWidth';
+import { Control } from './Control';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
+import { scaleCursorStyleHandler, scalingEqually } from './scale';
 import {
   scaleOrSkewActionName,
   scaleSkewCursorStyleHandler,
   scalingXOrSkewingY,
   scalingYOrSkewingX,
 } from './scaleSkew';
-import { Control } from './Control';
 
 // use this function if you want to generate new controls for every instance
 export const createObjectDefaultControls = () => ({
@@ -105,28 +103,3 @@ export const createTextboxDefaultControls = () => ({
   ...createObjectDefaultControls(),
   ...createResizeControls(),
 });
-
-export const defaultControls = createObjectDefaultControls();
-
-// shared with the default object on purpose
-export const textboxDefaultControls = {
-  ...defaultControls,
-  ...createResizeControls(),
-};
-
-FabricObject.prototype.controls = {
-  ...(FabricObject.prototype.controls || {}),
-  ...defaultControls,
-};
-
-if (Textbox) {
-  // this is breaking the prototype inheritance, no time / ideas to fix it.
-  // is important to document that if you want to have all objects to have a
-  // specific custom control, you have to add it to Object prototype and to Textbox
-  // prototype. The controls are shared as references. So changes to control `tr`
-  // can still apply to all objects if needed.
-  Textbox.prototype.controls = {
-    ...(Textbox.prototype.controls || {}),
-    ...textboxDefaultControls,
-  };
-}

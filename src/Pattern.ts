@@ -5,7 +5,7 @@ import { uid } from './util/internals/uid';
 import { loadImage } from './util/misc/objectEnlive';
 import { pick } from './util/misc/pick';
 import { toFixed } from './util/misc/toFixed';
-import { classRegistry } from './util/class_registry';
+import { classRegistry } from './ClassRegistry';
 
 export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
@@ -39,7 +39,21 @@ type TCanvasSource = { source: HTMLCanvasElement };
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
-  type = 'pattern';
+  /**
+   * Legacy identifier of the class. Prefer using this.constructor.name 'Pattern'
+   * or utils like isPattern
+   * Will be removed in fabric 7 or 8.
+   * @TODO add sustainable warning message
+   * @type string
+   * @deprecated
+   */
+  get type() {
+    return 'pattern';
+  }
+
+  set type(value) {
+    console.warn('Setting type has no effect', value);
+  }
 
   /**
    * @type TPatternRepeat
@@ -208,4 +222,6 @@ export class Pattern {
   }
 }
 
+classRegistry.setClass(Pattern);
+// kept for compatibility reason
 classRegistry.setClass(Pattern, 'pattern');

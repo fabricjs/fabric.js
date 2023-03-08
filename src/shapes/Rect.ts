@@ -2,8 +2,13 @@ import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
-import { classRegistry } from '../util/class_registry';
+import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+
+export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
+  rx: 0,
+  ry: 0,
+};
 
 export class Rect extends FabricObject {
   /**
@@ -19,6 +24,17 @@ export class Rect extends FabricObject {
    * @default
    */
   declare ry: number;
+
+  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+
+  static ownDefaults: Record<string, any> = rectDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Rect.ownDefaults,
+    };
+  }
 
   /**
    * Constructor
@@ -183,17 +199,6 @@ export class Rect extends FabricObject {
 
   /* _FROM_SVG_END_ */
 }
-
-export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
-  type: 'rect',
-  rx: 0,
-  ry: 0,
-};
-
-Object.assign(Rect.prototype, {
-  ...rectDefaultValues,
-  cacheProperties: [...cacheProperties, 'rx', 'ry'],
-});
 
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);

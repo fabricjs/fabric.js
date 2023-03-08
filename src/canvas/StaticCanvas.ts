@@ -1,4 +1,4 @@
-import { getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import {
+  Constructor,
   ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
@@ -25,11 +26,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import {
-  cleanUpJsdomNode,
-  getElementOffset,
-  getNodeCanvas,
-} from '../util/dom_misc';
+import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -66,6 +63,25 @@ export type TSVGExportOptions = {
 
 type TCanvasHydrationOption = {
   signal?: AbortSignal;
+};
+
+export const StaticCanvasDefaults = {
+  backgroundColor: '',
+  backgroundImage: null,
+  overlayColor: '',
+  overlayImage: null,
+  includeDefaultValues: true,
+  renderOnAddRemove: true,
+  controlsAboveOverlay: false,
+  allowTouchScrolling: false,
+  imageSmoothingEnabled: true,
+  viewportTransform: iMatrix.concat(),
+  backgroundVpt: true,
+  overlayVpt: true,
+  enableRetinaScaling: true,
+  svgViewportTransformation: true,
+  skipOffscreen: true,
+  clipPath: undefined,
 };
 
 /**
@@ -271,14 +287,24 @@ export class StaticCanvas<
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
+  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+
   // reference to
   protected declare __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
 
+  static getDefaults(): Record<string, any> {
+    return StaticCanvas.ownDefaults;
+  }
+
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    Object.assign(
+      this,
+      (this.constructor as typeof StaticCanvas).getDefaults()
+    );
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({
@@ -400,7 +426,7 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        (getEnv().document.getElementById(canvasEl) as HTMLCanvasElement) ||
+        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
         this._createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
@@ -1491,9 +1517,8 @@ export class StaticCanvas<
   /**
    * Clones canvas instance
    * @param {string[]} [properties] Array of properties to include in the cloned canvas and children
-   * @returns {Promise<Canvas | StaticCanvas>}
    */
-  clone(properties: string[]): Promise<StaticCanvas> {
+  clone(properties: string[]) {
     const data = this.toObject(properties);
     const canvas = this.cloneWithoutData();
     return canvas.loadFromJSON(data);
@@ -1502,14 +1527,12 @@ export class StaticCanvas<
   /**
    * Clones canvas instance without cloning existing data.
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
-   * @returns {StaticCanvas}
    */
-  cloneWithoutData(): StaticCanvas {
+  cloneWithoutData() {
     const el = createCanvasElement();
     el.width = this.width;
     el.height = this.height;
-    // this seems wrong. either Canvas or StaticCanvas
-    return new StaticCanvas(el);
+    return new (this.constructor as Constructor<this>)(el);
   }
 
   /**
@@ -1660,11 +1683,11 @@ export class StaticCanvas<
     this.cancelRequestedRender();
     this.forEachObject((object) => object.dispose());
     this._objects = [];
-    if (this.backgroundImage && this.backgroundImage.dispose) {
+    if (this.backgroundImage) {
       this.backgroundImage.dispose();
     }
     this.backgroundImage = null;
-    if (this.overlayImage && this.overlayImage.dispose) {
+    if (this.overlayImage) {
       this.overlayImage.dispose();
     }
     this.overlayImage = null;
@@ -1681,7 +1704,7 @@ export class StaticCanvas<
     canvasElement.setAttribute('height', `${this.height}`);
     canvasElement.style.cssText = this._originalCanvasStyle || '';
     this._originalCanvasStyle = undefined;
-    cleanUpJsdomNode(canvasElement);
+    getEnv().dispose(canvasElement);
   }
 
   /**
@@ -1693,40 +1716,4 @@ export class StaticCanvas<
       this._objects.length
     } }>`;
   }
-}
-
-Object.assign(StaticCanvas.prototype, {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-});
-
-if (getEnv().isLikelyNode) {
-  Object.assign(StaticCanvas.prototype, {
-    createPNGStream() {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createPNGStream();
-    },
-    createJPEGStream(opts: any) {
-      const impl = getNodeCanvas(
-        (this as unknown as StaticCanvas).lowerCanvasEl
-      );
-      return impl && impl.createJPEGStream(opts);
-    },
-  });
 }

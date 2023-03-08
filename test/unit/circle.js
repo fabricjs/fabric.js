@@ -10,7 +10,7 @@
     assert.ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
     assert.ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.deepEqual(circle.type, 'circle');
+    assert.deepEqual(circle.constructor.name, 'Circle');
   });
 
   QUnit.test('constructor with radius', function(assert) {
@@ -87,7 +87,7 @@
     var circle = new fabric.Circle();
     var defaultProperties = {
       version:                  fabric.version,
-      type:                     'circle',
+      type:                     'Circle',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -135,6 +135,18 @@
       width: 30,
       height: 30,
       radius: 15
+    });
+  });
+
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Circle({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "Circle",
+      version: fabric.version,
+      left: 0,
+      top: 0
     });
   });
 
