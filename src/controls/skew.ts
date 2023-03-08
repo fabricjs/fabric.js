@@ -7,13 +7,14 @@ import {
 import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
-  composeMatrix,
   isMatrixEqual,
   multiplyTransformMatrixChain,
 } from '../util/misc/matrix';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { calcBaseChangeMatrix } from '../util/misc/planeChange';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { createVector } from '../util/misc/vectors';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -33,6 +34,7 @@ const AXIS_KEYS: Record<
     counterAxis: TAxis;
     scale: TAxisKey<'scale'>;
     skew: TAxisKey<'skew'>;
+    shear: TAxisKey<'shear'>;
     lockSkewing: TAxisKey<'lockSkewing'>;
     origin: TAxisKey<'origin'>;
     flip: TAxisKey<'flip'>;
@@ -42,6 +44,7 @@ const AXIS_KEYS: Record<
     counterAxis: 'y',
     scale: 'scaleX',
     skew: 'skewX',
+    shear: 'shearX',
     lockSkewing: 'lockSkewingX',
     origin: 'originX',
     flip: 'flipX',
@@ -50,6 +53,7 @@ const AXIS_KEYS: Record<
     counterAxis: 'x',
     scale: 'scaleY',
     skew: 'skewY',
+    shear: 'shearY',
     lockSkewing: 'lockSkewingY',
     origin: 'originY',
     flip: 'flipY',
@@ -87,41 +91,30 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
 function skewObject(
   axis: TAxis,
   eventData: TPointerEvent,
-  { target, ex, ey, original, skewingSide }: SkewTransform,
+  { target, skewingSide, lastX, lastY }: SkewTransform,
   x: number,
   y: number
 ) {
-  const ownMatrix = composeMatrix(original);
-  const d = new Point(x, y).subtract(new Point(ex, ey));
+  const ownMatrix = target.calcOwnMatrix();
+  const d = createVector(new Point(lastX, lastY), new Point(x, y));
+  const size = new Point(target.width, target.height);
 
   const shearingChange = calcBaseChangeMatrix(
-    [new Point(1, 0), new Point(0, 1)],
+    [new Point(size.x, 0), new Point(0, size.y)],
     [
       new Point(
-        1,
-        axis === 'y' ? (d.y * skewingSide) / (target.height * 0.5) : 0
+        size.x,
+        axis === 'y'
+          ? d.y * skewingSide * 2
+          : Math.tan(degreesToRadians(target.skewY)) * size.x
       ),
-      new Point(
-        axis === 'x' ? (d.x * skewingSide) / (target.width * 0.5) : 0,
-        1
-      ),
+      new Point(axis === 'x' ? d.x * skewingSide * 2 : 0, size.y),
     ]
   );
 
   applyTransformToObject(
     target,
-    multiplyTransformMatrixChain([
-      ownMatrix,
-      shearingChange,
-      // [
-      //   axis === 'y' ? (1 + shearX * shearY) / (1 + shearX * shearing) : 1,
-      //   0,
-      //   0,
-      //   1,
-      //   0,
-      //   0,
-      // ],
-    ])
+    multiplyTransformMatrixChain([ownMatrix, shearingChange])
   );
 
   return !isMatrixEqual(target.calcOwnMatrix(), ownMatrix);
