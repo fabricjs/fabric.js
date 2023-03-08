@@ -13,14 +13,13 @@ import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { mapValues } from '../../util/internals';
-import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import { calcBaseChangeMatrix } from '../../util/misc/planeChange';
 import {
   TFabricObjectProps,
   SerializedObjectProps,
   FabricObjectProps,
 } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import { BBox } from './BBox';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -239,68 +238,11 @@ export class InteractiveFabricObject<
    * @return {Record<string, TOCoord>}
    */
   calcOCoords(): Record<string, TOCoord> {
-    // const coords: Record<string, TOCoord> = mapValues(
-    //   this.controls,
-    //   (control, key) => {
-    //     const position = this.calcViewportCoord(
-    //       new Point(control.x, control.y),
-    //       new Point(control.offsetX, control.offsetY)
-    //     );
-    //     return Object.assign(
-    //       position,
-    //       this._calcCornerCoords(this.controls[key], position)
-    //     );
-    //   }
-    // );
-    const angle = degreesToRadians(this.getTotalAngle());
-    const center = this.getCenterPoint();
-
-    const { tl, tr, bl, br } = this._getCoords();
-    const { width, height } = makeBoundingBoxFromPoints([tl, tr, bl, br]);
-    const dimVector = new Point(width, height);
-    // const b1 = createVector(tl, tr);
-    // const b2 = createVector(tl, bl);
-    // const t: TMat2D = [b1.x, b1.y, b2.x, b2.y, center.x, center.y];
-
-    const rotatedBBox = makeBoundingBoxFromPoints(
-      [tl, tr, bl, br].map((coord) => coord.rotate(-angle, center))
-    );
-    const t3 = calcBaseChangeMatrix(
-      undefined,
-      [
-        new Point(rotatedBBox.width / width, 0).rotate(angle),
-        new Point(0, rotatedBBox.height / height).rotate(angle),
-      ],
-      center
-    );
-
-    const legacyBBox = dimVector.transform(
-      calcBaseChangeMatrix(undefined, [
-        new Point(rotatedBBox.width / width, 0),
-        new Point(0, rotatedBBox.height / height),
-      ]),
-      true
-    );
-    const legacyTransform = calcBaseChangeMatrix(
-      undefined,
-      [new Point(1, 0).rotate(angle), new Point(0, 1).rotate(angle)],
-      center
-    );
-
+    const legacyBBox = BBox.legacy(this);
     const coords = mapValues(this.controls, (control, key) => {
-      // const position = this.calcViewportCoord(
-      //   new Point(control.x, control.y),
-      //   new Point(control.offsetX, control.offsetY)
-      // );
-      // const position = control.positionHandler(
-      //   dimVector,
-      //   t3,
-      //   this,
-      //   control[key]
-      // );
       const position = control.positionHandler(
-        legacyBBox,
-        legacyTransform,
+        new Point(legacyBBox.bbox.width, legacyBBox.bbox.height),
+        legacyBBox.transform,
         this,
         control[key]
       );
@@ -316,7 +258,7 @@ export class InteractiveFabricObject<
       if (!canvas) return;
       const ctx = canvas.contextTop;
       // canvas.clearContext(ctx);
-      ctx.fillStyle = 'magenta';
+      ctx.fillStyle = 'cyan';
       Object.keys(coords).forEach((key) => {
         const control = coords[key];
         ctx.beginPath();
