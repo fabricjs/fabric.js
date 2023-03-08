@@ -7,10 +7,7 @@ import {
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -19,6 +16,14 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { applyTransformToObject } from '../util/misc/objectTransforms';
+import {
+  calcRotateMatrix,
+  multiplyTransformMatrixChain,
+  invertTransform,
+  calcShearMatrix,
+  isMatrixEqual,
+} from '../util/misc/matrix';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -28,6 +33,7 @@ const AXIS_KEYS: Record<
     counterAxis: TAxis;
     scale: TAxisKey<'scale'>;
     skew: TAxisKey<'skew'>;
+    shear: TAxisKey<'shear'>;
     lockSkewing: TAxisKey<'lockSkewing'>;
     origin: TAxisKey<'origin'>;
     flip: TAxisKey<'flip'>;
@@ -37,6 +43,7 @@ const AXIS_KEYS: Record<
     counterAxis: 'y',
     scale: 'scaleX',
     skew: 'skewX',
+    shear: 'shearX',
     lockSkewing: 'lockSkewingX',
     origin: 'originX',
     flip: 'flipX',
@@ -45,6 +52,7 @@ const AXIS_KEYS: Record<
     counterAxis: 'x',
     scale: 'scaleY',
     skew: 'skewY',
+    shear: 'shearY',
     lockSkewing: 'lockSkewingY',
     origin: 'originY',
     flip: 'flipY',
@@ -81,14 +89,13 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
  */
 function skewObject(
   axis: TAxis,
-  { target, ex, ey, skewingSide, ...transform }: SkewTransform,
+  { target, ex, ey, skewingSide, theta: angle, ...transform }: SkewTransform,
   pointer: Point
 ) {
-  const { skew: skewKey } = AXIS_KEYS[axis],
+  const { skew: skewKey, shear: shearKey } = AXIS_KEYS[axis],
     offset = pointer
       .subtract(new Point(ex, ey))
       .divide(new Point(target.scaleX, target.scaleY))[axis],
-    skewingBefore = target[skewKey],
     skewingStart = transform[skewKey],
     shearingStart = Math.tan(degreesToRadians(skewingStart)),
     // let a, b be the size of target
@@ -116,23 +123,37 @@ function skewObject(
     // add starting state
     shearingStart;
 
-  const skewing = radiansToDegrees(Math.atan(shearing));
+  const ownMatrix = target.calcOwnMatrix();
+  const rotationMatrix = calcRotateMatrix({ rotation: angle });
 
-  target.set(skewKey, skewing);
-  const changed = skewingBefore !== target[skewKey];
+  const mat = multiplyTransformMatrixChain([
+    invertTransform(rotationMatrix),
+    ownMatrix,
+  ]);
+  const [_, shearY, shearX] = mat;
+  applyTransformToObject(
+    target,
+    multiplyTransformMatrixChain([
+      rotationMatrix,
+      mat,
+      invertTransform(calcShearMatrix({ shearX, shearY })),
+      calcShearMatrix({
+        shearX,
+        shearY,
+        [shearKey]: shearing,
+      }),
+      // [
+      //   axis === 'y' ? (1 + shearX * shearY) / (1 + shearX * shearing) : 1,
+      //   0,
+      //   0,
+      //   1,
+      //   0,
+      //   0,
+      // ],
+    ])
+  );
 
-  if (changed && axis === 'y') {
-    // we don't want skewing to affect scaleX
-    // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
-    const { skewX, scaleX } = target,
-      dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
-      dimAfter = target._getTransformedDimensions(),
-      compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
-    compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
-  }
-
-  return changed;
+  return !isMatrixEqual(target.calcOwnMatrix(), ownMatrix);
 }
 
 /**
