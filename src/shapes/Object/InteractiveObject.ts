@@ -243,7 +243,7 @@ export class InteractiveFabricObject<
     const legacyBBox = BBox.legacy(this);
     const coords = mapValues(this.controls, (control, key) => {
       const position = control.positionHandler(
-        new Point(legacyBBox.bbox.width, legacyBBox.bbox.height),
+        legacyBBox.getDimensionsInViewport(),
         legacyBBox.transform,
         this,
         control[key]
