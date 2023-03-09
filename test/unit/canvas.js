@@ -2273,8 +2273,8 @@
         { start: 20, end: 28, message: 'stroke', transparent: false },
         { start: 28, end: 40, message: 'outside', transparent: true },
       ].forEach(({ start, end, message, transparent }) => {
-        // make less sensitive be skipping edges
-        for (let index = start+1; index < end-1; index++) {
+        // make less sensitive by skipping edges
+        for (let index = start + 1; index < end - 1; index++) {
           assert.equal(canvas.isTargetTransparent(rect, index, index), transparent, `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}`);
         }
       });
