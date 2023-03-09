@@ -1269,9 +1269,8 @@ export class SelectableCanvas<
     })!;
     const retina = this.getRetinaScaling();
     this.contextCache.scale(retina, retina);
-    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = Math.max(
-      2 * this.targetFindTolerance * retina,
-      10
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = Math.ceil(
+      Math.max(2 * this.targetFindTolerance * retina, retina)
     );
   }
 
