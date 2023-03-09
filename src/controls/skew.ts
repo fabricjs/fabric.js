@@ -19,6 +19,11 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import {
+  calcDimensionsMatrix,
+  calcShearMatrix,
+  invertTransform,
+} from '../util/misc/matrix';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -84,7 +89,7 @@ function skewObject(
   { target, ex, ey, skewingSide, ...transform }: SkewTransform,
   pointer: Point
 ) {
-  const { skew: skewKey } = AXIS_KEYS[axis],
+  const { skew: skewKey, counterAxis } = AXIS_KEYS[axis],
     offset = pointer
       .subtract(new Point(ex, ey))
       .divide(new Point(target.scaleX, target.scaleY))[axis],
@@ -96,18 +101,17 @@ function skewObject(
     // then:
     // a' = a + b * skewA => skewA = (a' - a) / b
     // the value b is tricky since skewY is applied before skewX
-    b =
-      axis === 'y'
-        ? target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-            // since skewY is applied before skewX, b (=width) is not affected by skewX
-            skewX: 0,
-          }).x
-        : target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-          }).y;
+    b = target.bbox.getDimensionsInParent().transform(
+      invertTransform(
+        calcDimensionsMatrix({
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+          // since skewY is applied before skewX, b (=width) is not affected by skewX
+          skewX: axis === 'y' ? 0 : target.skewX,
+        })
+      ),
+      true
+    )[counterAxis];
 
   const shearing =
     (2 * offset * skewingSide) /
@@ -125,8 +129,15 @@ function skewObject(
     // we don't want skewing to affect scaleX
     // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
     const { skewX, scaleX } = target,
-      dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
-      dimAfter = target._getTransformedDimensions(),
+      dimBefore = target.target.bbox.getDimensionsInParent().transform(
+        invertTransform(
+          calcShearMatrix({
+            skewY: skewingBefore,
+          })
+        ),
+        true
+      ),
+      dimAfter = target.target.bbox.getDimensionsInParent(),
       compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
     compensationFactor !== 1 &&
       target.set('scaleX', compensationFactor * scaleX);

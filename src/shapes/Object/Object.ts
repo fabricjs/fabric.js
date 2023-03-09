@@ -8,7 +8,6 @@ import { Shadow } from '../../Shadow';
 import type {
   TDegree,
   TFiller,
-  TSize,
   TCacheCanvasDimensions,
   TClassProperties,
 } from '../../typedefs';
@@ -17,13 +16,20 @@ import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
-import { invertTransform, qrDecompose } from '../../util/misc/matrix';
+import {
+  calcShearMatrix,
+  invertTransform,
+  qrDecompose,
+} from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
-import { sendObjectToPlane } from '../../util/misc/planeChange';
+import {
+  sendObjectToPlane,
+  sendVectorToPlane,
+} from '../../util/misc/planeChange';
 import { pick } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
@@ -41,6 +47,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
 import { TProps } from './types';
+import { BBox } from './BBox';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -316,13 +323,12 @@ export class FabricObject<
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
-  _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
-  ) {
+  _limitCacheSize(dims = this._getCacheCanvasDimensions()) {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
       min = config.minCacheSideLimit;
+    let capped = false;
     if (
       width <= max &&
       height <= max &&
@@ -334,7 +340,7 @@ export class FabricObject<
       if (height < min) {
         dims.height = min;
       }
-      return dims;
+      return { ...dims, capped };
     }
     const ar = width / height,
       [limX, limY] = cache.limitDimsByArea(ar),
@@ -343,14 +349,14 @@ export class FabricObject<
     if (width > x) {
       dims.zoomX /= width / x;
       dims.width = x;
-      dims.capped = true;
+      capped = true;
     }
     if (height > y) {
       dims.zoomY /= height / y;
       dims.height = y;
-      dims.capped = true;
+      capped = true;
     }
-    return dims;
+    return { ...dims, capped };
   }
 
   /**
@@ -367,7 +373,14 @@ export class FabricObject<
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
       // calculate dimensions without skewing
-      dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
+      dim = this.bbox
+        .getDimensionsInParent()
+        .transform(
+          invertTransform(
+            calcShearMatrix({ skewX: this.skewX, skewY: this.skewY })
+          ),
+          true
+        ),
       neededX = (dim.x * objectScale.x) / this.scaleX,
       neededY = (dim.y * objectScale.y) / this.scaleY;
     return {
@@ -392,7 +405,7 @@ export class FabricObject<
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
       context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+      dims = this._limitCacheSize(),
       minCacheSize = config.minCacheSideLimit,
       width = dims.width,
       height = dims.height,
@@ -982,7 +995,12 @@ export class FabricObject<
     if (!this.backgroundColor) {
       return;
     }
-    const dim = this._getNonTransformedDimensions();
+    const dim = sendVectorToPlane(
+      // should this be the rotated bbox?
+      BBox.transformed(this).getDimensionsInCanvas(),
+      undefined,
+      this.group?.calcTransformMatrix()
+    );
     ctx.fillStyle = this.backgroundColor;
 
     ctx.fillRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);
@@ -1231,7 +1249,7 @@ export class FabricObject<
     ctx: CanvasRenderingContext2D,
     filler: TFiller
   ) {
-    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+    const dims = this._limitCacheSize(),
       pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,

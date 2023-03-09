@@ -32,7 +32,7 @@ export const calcBaseChangeMatrix = (
   return [a, b, c, d, destinationCenter.x, destinationCenter.y] as TMat2D;
 };
 
-const send2DToPlane = (
+export const send2DToPlane = (
   point: Point,
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix,

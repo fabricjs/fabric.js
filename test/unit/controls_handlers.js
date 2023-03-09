@@ -277,7 +277,7 @@
       const isX = axis === 'x';
       QUnit.test(`scaling ${AXIS} from ${controlKey} keeps the same sign when scale = 0`, function (assert) {
         transform = prepareTransform(transform.target, controlKey);
-        const size = transform.target._getTransformedDimensions()[axis];
+        const size = transform.target.bbox.getDimensionsInParent()[axis];
         const factor = 0.5;
         const fn = fabric.controlsUtils[`scaling${AXIS}`];
         const exec = point => {

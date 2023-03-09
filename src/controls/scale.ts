@@ -161,7 +161,7 @@ function scaleObject(
       return false;
     }
 
-    dim = target._getTransformedDimensions();
+    dim = target.bbox.getDimensionsInParent();
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling

@@ -4,7 +4,6 @@ import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { TClassProperties } from '../typedefs';
-import { cos } from '../util/misc/cos';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -15,8 +14,6 @@ import {
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
@@ -682,7 +679,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       return this.prepareBoundingBox(layoutDirective, objects, context);
     } else if (layoutDirective === 'clip-path' && this.clipPath) {
       const clipPath = this.clipPath;
-      const clipPathSizeAfter = clipPath._getTransformedDimensions();
+      const clipPathSizeAfter = clipPath.getDimensionsVectorForPositioning();
       if (
         clipPath.absolutePositioned &&
         (context.type === 'initialization' || context.type === 'layout_change')
@@ -811,20 +808,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         resolveOrigin(this.originY)
       ),
       size = new Point(width, height),
-      strokeWidthVector = this._getTransformedDimensions({
-        width: 0,
-        height: 0,
-      }),
-      sizeAfter = this._getTransformedDimensions({
-        width: width,
-        height: height,
-        strokeWidth: 0,
-      }),
-      bboxSizeAfter = this._getTransformedDimensions({
-        width: bbox.width,
-        height: bbox.height,
-        strokeWidth: 0,
-      }),
+      strokeWidthVector = new Point(),
+      sizeAfter = new Point(width, height),
+      bboxSizeAfter = bbox,
       rotationCorrection = new Point(0, 0);
 
     //  calculate center and correction
@@ -887,15 +873,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     let min: Point, max: Point;
     objects.forEach((object, i) => {
       const objCenter = object.getRelativeCenterPoint();
-      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
-      if (object.angle) {
-        const rad = degreesToRadians(object.angle),
-          sine = Math.abs(sin(rad)),
-          cosine = Math.abs(cos(rad)),
-          rx = sizeVector.x * cosine + sizeVector.y * sine,
-          ry = sizeVector.x * sine + sizeVector.y * cosine;
-        sizeVector = new Point(rx, ry);
-      }
+      const sizeVector = object.bbox.getDimensionsInParent().scalarDivide(2);
       const a = objCenter.subtract(sizeVector);
       const b = objCenter.add(sizeVector);
       if (i === 0) {

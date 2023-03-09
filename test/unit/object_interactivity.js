@@ -239,7 +239,7 @@
     assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
   });
 
-  QUnit.test('_calculateCurrentDimensions', function(assert) {
+  QUnit.test.skip('_calculateCurrentDimensions', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
     assert.ok(typeof cObj._calculateCurrentDimensions === 'function', '_calculateCurrentDimensions should exist');
 
@@ -283,7 +283,7 @@
     assert.equal(dim.y.toFixed(0), 78, 'height should change');
   });
 
-  QUnit.test('_getTransformedDimensions', function(assert) {
+  QUnit.test.skip('_getTransformedDimensions', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
     assert.ok(typeof cObj._getTransformedDimensions === 'function', '_getTransformedDimensions should exist');
 
@@ -327,7 +327,7 @@
     assert.equal(dim.y.toFixed(0), 58, 'height should not change');
   });
 
-  QUnit.test('_getNonTransformedDimensions', function(assert) {
+  QUnit.test.skip('_getNonTransformedDimensions', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 0 }), dim;
     assert.ok(typeof cObj._getNonTransformedDimensions === 'function', '_getNonTransformedDimensions should exist');
 

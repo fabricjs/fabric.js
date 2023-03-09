@@ -2,13 +2,8 @@ import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import {
-  multiplyTransformMatrices,
-  qrDecompose,
-  TQrDecomposeOut,
-} from '../../util/misc/matrix';
+import { multiplyTransformMatrices, qrDecompose } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
-import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
@@ -325,7 +320,7 @@ export class InteractiveFabricObject<
     }
     ctx.save();
     const center = this.getRelativeCenterPoint(),
-      wh = this._calculateCurrentDimensions(),
+      wh = this.bbox.getDimensionsInViewport(),
       vpt = this.getViewportTransform();
     ctx.translate(center.x, center.y);
     ctx.scale(1 / vpt[0], 1 / vpt[3]);
@@ -345,28 +340,26 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * @private
+   * Draws borders of an object's bounding box.
+   * Requires public properties: width, height
+   * Requires public options: padding, borderColor
    * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size
-   * @param {TStyleOverride} styleOverride object to override the object style
+   * @param {object} options object representing current object parameters
+   * @param {TStyleOverride} [styleOverride] object to override the object style
    */
-  _drawBorders(
+  drawBorders(
     ctx: CanvasRenderingContext2D,
-    size: Point,
-    styleOverride: TStyleOverride = {}
+    styleOverride: TStyleOverride
   ): void {
-    return;
-    const options = {
-      hasControls: this.hasControls,
+    const { borderColor, borderDashArray } = {
       borderColor: this.borderColor,
       borderDashArray: this.borderDashArray,
       ...styleOverride,
     };
     ctx.save();
-    ctx.strokeStyle = options.borderColor;
-    this._setLineDash(ctx, options.borderDashArray);
-    this.strokeBorders(ctx, size);
-    options.hasControls && this.drawControlsConnectingLines(ctx, size);
+    ctx.strokeStyle = borderColor;
+    this._setLineDash(ctx, borderDashArray);
+    this.strokeBorders(ctx, this.bbox.getDimensionsInViewport());
     ctx.restore();
   }
 
@@ -402,41 +395,9 @@ export class InteractiveFabricObject<
       options.angle -= 180;
     }
     ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
+    shouldDrawBorders && this.drawBorders(ctx, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
-  }
-
-  /**
-   * Draws borders of an object's bounding box.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {object} options object representing current object parameters
-   * @param {TStyleOverride} [styleOverride] object to override the object style
-   */
-  drawBorders(
-    ctx: CanvasRenderingContext2D,
-    options: TQrDecomposeOut,
-    styleOverride: TStyleOverride
-  ): void {
-    let size;
-    if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
-      size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
-    } else {
-      size = this._calculateCurrentDimensions().scalarAdd(
-        this.borderScaleFactor
-      );
-    }
-    this._drawBorders(ctx, size, styleOverride);
   }
 
   /**

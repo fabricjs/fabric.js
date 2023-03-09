@@ -157,34 +157,6 @@ export class Polyline extends FabricObject {
   }
 
   /**
-   * @override stroke is taken in account in size
-   */
-  _getNonTransformedDimensions() {
-    return this.exactBoundingBox
-      ? new Point(this.width, this.height)
-      : super._getNonTransformedDimensions();
-  }
-
-  /**
-   * @override stroke and skewing are taken into account when projecting stroke on points,
-   * therefore we don't want the default calculation to account for skewing as well
-   *
-   * @private
-   */
-  _getTransformedDimensions(options?: any) {
-    return this.exactBoundingBox
-      ? super._getTransformedDimensions({
-          ...(options || {}),
-          // disable stroke bbox calculations
-          strokeWidth: 0,
-          // disable skewing bbox calculations
-          skewX: 0,
-          skewY: 0,
-        })
-      : super._getTransformedDimensions(options);
-  }
-
-  /**
    * Recalculates dimensions when changing skew and scale
    * @private
    */

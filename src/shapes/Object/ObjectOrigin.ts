@@ -1,8 +1,7 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
-import { TDegree, TOriginX, TOriginY } from '../../typedefs';
-import { transformPoint } from '../../util/misc/matrix';
-import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
+import { calcDimensionsMatrix, transformPoint } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
@@ -39,50 +38,10 @@ export class ObjectOrigin<EventSpec>
 
   declare _originalOriginY?: TOriginY;
 
-  /**
-   * Calculate object bounding box dimensions from its properties scale, skew.
-   * @param {Object} [options]
-   * @param {Number} [options.scaleX]
-   * @param {Number} [options.scaleY]
-   * @param {Number} [options.skewX]
-   * @param {Number} [options.skewY]
-   * @private
-   * @returns {Point} dimensions
-   */
-  _getTransformedDimensions(options: any = {}): Point {
-    const dimOptions = {
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      skewX: this.skewX,
-      skewY: this.skewY,
-      width: this.width,
-      height: this.height,
-      strokeWidth: this.strokeWidth,
-      ...options,
-    };
-    // stroke is applied before/after transformations are applied according to `strokeUniform`
-    const strokeWidth = dimOptions.strokeWidth;
-    let preScalingStrokeValue = strokeWidth,
-      postScalingStrokeValue = 0;
-
-    if (this.strokeUniform) {
-      preScalingStrokeValue = 0;
-      postScalingStrokeValue = strokeWidth;
-    }
-    const dimX = dimOptions.width + preScalingStrokeValue,
-      dimY = dimOptions.height + preScalingStrokeValue,
-      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
-    let finalDimensions;
-    if (noSkew) {
-      finalDimensions = new Point(
-        dimX * dimOptions.scaleX,
-        dimY * dimOptions.scaleY
-      );
-    } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
-    }
-
-    return finalDimensions.scalarAdd(postScalingStrokeValue);
+  getDimensionsVectorForPositioning(
+    plane: TMat2D = calcDimensionsMatrix(this)
+  ) {
+    return new Point(this.width, this.height).transform(plane, true);
   }
 
   /**
@@ -99,20 +58,14 @@ export class ObjectOrigin<EventSpec>
     fromOriginX: TOriginX,
     fromOriginY: TOriginY,
     toOriginX: TOriginX,
-    toOriginY: TOriginY
+    toOriginY: TOriginY,
+    plane?: TMat2D
   ): Point {
-    let x = point.x,
-      y = point.y;
-    const offsetX = resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
-      offsetY = resolveOrigin(toOriginY) - resolveOrigin(fromOriginY);
-
-    if (offsetX || offsetY) {
-      const dim = this._getTransformedDimensions();
-      x += offsetX * dim.x;
-      y += offsetY * dim.y;
-    }
-
-    return new Point(x, y);
+    const originOffset = new Point(
+      resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
+      resolveOrigin(toOriginY) - resolveOrigin(fromOriginY)
+    ).multiply(this.getDimensionsVectorForPositioning(plane));
+    return point.add(originOffset);
   }
 
   /**

@@ -11,6 +11,7 @@ import { iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import {
+  calcDimensionsMatrix,
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
@@ -24,9 +25,9 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { mapValues } from '../../util/internals';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
-import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { ControlProps } from './types/ControlProps';
 import { BBox } from './BBox';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 type TMatrixCache = {
   key: string;
@@ -183,7 +184,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   getCoords(absolute = false) {
-    return this.bbox.getCoords(!absolute);
+    return this.bbox.getCoordsInCanvas(!absolute);
   }
 
   /**
@@ -300,8 +301,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     return this.containsPoint(centerPoint, absolute);
   }
 
-  isVisibleInParent() {}
-
   /**
    * Checks if object is contained within the canvas with current viewportTransform
    * the check is done stopping at first point that appears on screen
@@ -400,7 +399,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     const transformed = BBox.transformed(this).getDimensionsVector(false);
     const rotated = this.bbox.getDimensionsVector(absolute);
     const boundingRectFactor = rotated[axis] / transformed[axis];
-    this.scale(value / this.width / boundingRectFactor);
+    this.scale(
+      value / new Point(this.width, this.height)[axis] / boundingRectFactor
+    );
   }
 
   /**
@@ -494,6 +495,14 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       offset.add(origin.scalarMultiply(padding * 2)),
       degreesToRadians(this.getTotalAngle())
     );
+    const relativeCenter = new Point(this.left, this.top).subtract(
+      new Point(
+        resolveOrigin(this.originX),
+        resolveOrigin(this.originY)
+      ).multiply(
+        new Point(this.width, this.height).transform(calcDimensionsMatrix(this))
+      )
+    );
     const realCenter = this.getCenterPoint().transform(vpt);
     return realCenter
       .add(this.calcDimensionsVector(origin, { applyViewportTransform }))
@@ -504,7 +513,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * Calculates the coordinates of the 4 corner of the bbox
    * @return {TCornerPoint}
    */
-  calcCoords(): TCornerPoint {
+  calcCoords() {
     // const size = new Point(this.width, this.height);
     // return projectStrokeOnPoints(
     //   [
@@ -671,54 +680,5 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       value,
     };
     return value;
-  }
-
-  /**
-   * Calculate object dimensions from its properties
-   * @deprecated
-   * @private
-   * @returns {Point} dimensions
-   */
-  _getNonTransformedDimensions(): Point {
-    return new Point(this.width, this.height).scalarAdd(this.strokeWidth);
-  }
-
-  /**
-   * Calculate object bounding box dimensions from its properties scale, skew.
-   * @deprecated
-   * @param {Object} [options]
-   * @param {Number} [options.scaleX]
-   * @param {Number} [options.scaleY]
-   * @param {Number} [options.skewX]
-   * @param {Number} [options.skewY]
-   * @private
-   * @returns {Point} dimensions
-   */
-  _getTransformedDimensions1(options: any = {}): Point {
-    return sendVectorToPlane(
-      this.calcDimensionsVector(/*new Point(options.width||)*/),
-      this.group?.calcTransformMatrix(),
-      composeMatrix({
-        scaleX: this.scaleX,
-        scaleY: this.scaleY,
-        skewX: this.skewX,
-        skewY: this.skewY,
-        ...options,
-      })
-    );
-  }
-
-  /**
-   * Calculate object dimensions for controls box, including padding and canvas zoom.
-   * and active selection
-   * @deprecated
-   * @private
-   * @param {object} [options] transform options
-   * @returns {Point} dimensions
-   */
-  _calculateCurrentDimensions(options?: any): Point {
-    return this._getTransformedDimensions(options)
-      .transform(this.getViewportTransform(), true)
-      .scalarAdd(2 * this.padding);
   }
 }
