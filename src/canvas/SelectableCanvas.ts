@@ -696,8 +696,8 @@ export class SelectableCanvas<
         this.targetFindTolerance * 2,
         0,
         0,
-        this.targetFindTolerance * 2,
-        this.targetFindTolerance * 2
+        this.targetFindTolerance * 2 * retina,
+        this.targetFindTolerance * 2 * retina
       );
 
       return isTransparent(
