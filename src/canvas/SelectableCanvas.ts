@@ -705,19 +705,19 @@ export class SelectableCanvas<
         target._cacheCanvas,
         Math.floor(targetRelativeX - tolerance.x),
         Math.floor(targetRelativeY - tolerance.y),
-        size.x,
-        size.y,
+        Math.ceil(size.x),
+        Math.ceil(size.y),
         0,
         0,
-        size.x * retina,
-        size.y * retina
+        Math.ceil(size.x * retina),
+        Math.ceil(size.y * retina)
       );
 
       return isTransparent(
         ctx,
         tolerance.x,
         tolerance.y,
-        this.targetFindTolerance
+        Math.max(tolerance.x, tolerance.y)
       );
     }
 

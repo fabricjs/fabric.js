@@ -15,9 +15,9 @@ export const isTransparent = (
   y: number,
   tolerance: number
 ): boolean => {
-  tolerance = Math.max(tolerance, 0);
-  const sx = Math.max(x - tolerance, 0);
-  const sy = Math.max(y - tolerance, 0);
+  tolerance = Math.round(Math.max(tolerance, 0));
+  const sx = Math.floor(Math.max(x - tolerance, 0));
+  const sy = Math.floor(Math.max(y - tolerance, 0));
   const { data } = ctx.getImageData(
     sx,
     sy,
