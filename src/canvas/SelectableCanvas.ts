@@ -717,7 +717,7 @@ export class SelectableCanvas<
         ctx,
         tolerance.x,
         tolerance.y,
-        Math.max(tolerance.x, tolerance.y)
+        this.targetFindTolerance
       );
     }
 
