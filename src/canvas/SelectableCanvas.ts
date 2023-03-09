@@ -689,7 +689,7 @@ export class SelectableCanvas<
           0
         );
       ctx.drawImage(
-        target._cacheContext,
+        target._cacheCanvas,
         Math.round(targetRelativeX) - this.targetFindTolerance,
         Math.round(targetRelativeY) - this.targetFindTolerance,
         this.targetFindTolerance * 2,
