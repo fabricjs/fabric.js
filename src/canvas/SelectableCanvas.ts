@@ -518,13 +518,13 @@ export class SelectableCanvas<
   static ownDefaults: Record<string, any> = DefaultCanvasProperties;
 
   static getDefaults(): Record<string, any> {
-    return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
+    return { ...super.getDefaults(), ...this.ownDefaults };
   }
 
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  declare cacheCanvasEl: HTMLCanvasElement;
+  declare pixelFindCanvasEl: HTMLCanvasElement;
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
@@ -667,10 +667,18 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
+    const ctx = this.contextCache;
+    const retina = this.getRetinaScaling();
+    const size = Math.max(2 * this.targetFindTolerance * retina, 10);
+    if (this.pixelFindCanvasEl.width < size) {
+      this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    } else {
+      this.clearContext(ctx);
+    }
     // in case the target is the activeObject, we cannot execute this optimization
     // because we need to draw controls too.
     if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimizatio: we can reuse the cache
+      // optimization: we can reuse the cache
       const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
         targetRelativeX = Math.max(
           target.cacheTranslationX + normalizedPointer.x * target.zoomX,
@@ -680,31 +688,37 @@ export class SelectableCanvas<
           target.cacheTranslationY + normalizedPointer.y * target.zoomY,
           0
         );
+      ctx.drawImage(
+        target._cacheContext,
+        Math.round(targetRelativeX) - this.targetFindTolerance,
+        Math.round(targetRelativeY) - this.targetFindTolerance,
+        this.targetFindTolerance * 2,
+        this.targetFindTolerance * 2,
+        0,
+        0,
+        this.targetFindTolerance * 2,
+        this.targetFindTolerance * 2
+      );
 
       return isTransparent(
-        target._cacheContext,
-        Math.round(targetRelativeX),
-        Math.round(targetRelativeY),
+        ctx,
+        this.targetFindTolerance,
+        this.targetFindTolerance,
         this.targetFindTolerance
       );
     }
 
-    const ctx = this.contextCache,
-      originalColor = target.selectionBackgroundColor,
-      v = this.viewportTransform;
-
-    target.selectionBackgroundColor = '';
-
-    this.clearContext(ctx);
-
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
+    ctx.transform(...this.viewportTransform);
     target.render(ctx);
     ctx.restore();
-
-    target.selectionBackgroundColor = originalColor;
-
-    return isTransparent(ctx, x, y, this.targetFindTolerance);
+    return isTransparent(
+      ctx,
+      this.targetFindTolerance,
+      this.targetFindTolerance,
+      this.targetFindTolerance
+    );
   }
 
   /**
@@ -1195,7 +1209,6 @@ export class SelectableCanvas<
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     super._setBackstoreDimension(prop, value);
     this.upperCanvasEl[prop] = value;
-    this.cacheCanvasEl[prop] = value;
   }
 
   /**
@@ -1237,8 +1250,16 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
+    this.pixelFindCanvasEl = this._createCanvasElement();
+    this.contextCache = this.pixelFindCanvasEl.getContext('2d', {
+      willReadFrequently: true,
+    })!;
+    const retina = this.getRetinaScaling();
+    this.contextCache.scale(retina, retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = Math.max(
+      2 * this.targetFindTolerance * retina,
+      10
+    );
   }
 
   protected _initWrapperElement() {

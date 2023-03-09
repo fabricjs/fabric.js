@@ -28,24 +28,18 @@ export const isTransparent = (
     }
   }
 
-  let _isTransparent = true;
   const { data } = ctx.getImageData(
     x,
     y,
     tolerance * 2 || 1,
     tolerance * 2 || 1
   );
-  const l = data.length;
-
-  // Split image data - for tolerance > 1, pixelDataSize = 4;
-  for (let i = 3; i < l; i += 4) {
+  for (let i = 3; i < data.length; i += 4) {
     const alphaChannel = data[i];
     if (alphaChannel > 0) {
-      // Stop if colour found
-      _isTransparent = false;
-      break;
+      return false;
     }
   }
 
-  return _isTransparent;
+  return true;
 };
