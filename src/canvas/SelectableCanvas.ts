@@ -671,6 +671,7 @@ export class SelectableCanvas<
     const retina = this.getRetinaScaling();
     const size = Math.max(2 * this.targetFindTolerance * retina, 10);
     if (this.pixelFindCanvasEl.width < size) {
+      // TODO: handle in set
       this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
     } else {
       this.clearContext(ctx);
