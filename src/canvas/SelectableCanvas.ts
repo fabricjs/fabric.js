@@ -701,7 +701,7 @@ export class SelectableCanvas<
       const size = tolerance.scalarMultiply(2).max(new Point(1, 1));
       // performance optimization:
       // we draw the hit area to the dedicated canvas instead of using `getImageData` on the target's cache canvas
-      // since `size` is transformed according to vpt the image is drawn as if transformed as well
+      // since `size` is transformed according to vpt the image is drawn as if transformed as well so `targetFindTolerance` can be used as the tolerance value
       ctx.drawImage(
         target._cacheCanvas,
         Math.floor(targetRelativeX - tolerance.x),
