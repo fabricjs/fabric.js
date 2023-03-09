@@ -677,7 +677,11 @@ export class SelectableCanvas<
     }
     // in case the target is the activeObject, we cannot execute this optimization
     // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
+    if (
+      isFabricObjectCached(target) &&
+      target !== this._activeObject &&
+      !target.dirty
+    ) {
       // optimization: we can reuse the cache
       const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
         targetRelativeX = Math.max(
@@ -688,22 +692,30 @@ export class SelectableCanvas<
           target.cacheTranslationY + normalizedPointer.y * target.zoomY,
           0
         );
+      // transform tolerance according to vpt
+      // TODO: use sendVectorToPlane
+      const tolerance = new Point()
+        .scalarAdd(this.targetFindTolerance)
+        .transform(invertTransform(this.viewportTransform), true);
+      const size = tolerance.scalarMultiply(2).max(new Point(1, 1));
+      // performance optimization:
+      // we draw the hit area to the dedicated canvas instead of using `getImageData` on the target's cache canvas
       ctx.drawImage(
         target._cacheCanvas,
-        Math.round(targetRelativeX) - this.targetFindTolerance,
-        Math.round(targetRelativeY) - this.targetFindTolerance,
-        this.targetFindTolerance * 2,
-        this.targetFindTolerance * 2,
+        Math.floor(targetRelativeX - tolerance.x),
+        Math.floor(targetRelativeY - tolerance.y),
+        size.x,
+        size.y,
         0,
         0,
-        this.targetFindTolerance * 2 * retina,
-        this.targetFindTolerance * 2 * retina
+        size.x * retina,
+        size.y * retina
       );
 
       return isTransparent(
         ctx,
-        this.targetFindTolerance,
-        this.targetFindTolerance,
+        tolerance.x,
+        tolerance.y,
         this.targetFindTolerance
       );
     }
