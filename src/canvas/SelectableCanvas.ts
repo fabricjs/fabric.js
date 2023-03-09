@@ -16,7 +16,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import { isCollection } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -671,43 +671,11 @@ export class SelectableCanvas<
     const retina = this.getRetinaScaling();
     const size = Math.max(2 * this.targetFindTolerance * retina, 10);
     if (this.pixelFindCanvasEl.width < size) {
+      // TODO: handle via set
       this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
     } else {
       this.clearContext(ctx);
     }
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimization: we can reuse the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-      ctx.drawImage(
-        target._cacheCanvas,
-        Math.round(targetRelativeX) - this.targetFindTolerance,
-        Math.round(targetRelativeY) - this.targetFindTolerance,
-        this.targetFindTolerance * 2,
-        this.targetFindTolerance * 2,
-        0,
-        0,
-        this.targetFindTolerance * 2,
-        this.targetFindTolerance * 2
-      );
-
-      return isTransparent(
-        ctx,
-        this.targetFindTolerance,
-        this.targetFindTolerance,
-        this.targetFindTolerance
-      );
-    }
-
     ctx.save();
     ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
     ctx.transform(...this.viewportTransform);
