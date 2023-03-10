@@ -8,7 +8,6 @@ import { Shadow } from '../../Shadow';
 import type {
   TDegree,
   TFiller,
-  TSize,
   TCacheCanvasDimensions,
   TClassProperties,
 } from '../../typedefs';
@@ -22,6 +21,7 @@ import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
   resetObjectTransform,
   saveObjectTransform,
+  sizeAfterTransform,
 } from '../../util/misc/objectTransforms';
 import { sendObjectToPlane } from '../../util/misc/planeChange';
 import { pick } from '../../util/misc/pick';
@@ -306,51 +306,67 @@ export class FabricObject<
    * and each side do not cross fabric.cacheSideLimit
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
-   * @param {Object} dims
-   * @param {Object} dims.width width of canvas
-   * @param {Object} dims.height height of canvas
-   * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @param {Object} arg0
+   * @param {Object} arg0.width width of canvas
+   * @param {Object} arg0.height height of canvas
+   * @param {Object} arg0.zoomX zoomX zoom value to unscale the canvas before drawing cache
+   * @param {Object} arg0.zoomY zoomY zoom value to unscale the canvas before drawing cache
    * @return {Object}.width width of canvas
    * @return {Object}.height height of canvas
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+    {
+      width,
+      height,
+      zoomX,
+      zoomY,
+      x: cacheX,
+      y: cacheY,
+    } = this._getCacheCanvasDimensions()
   ) {
-    const width = dims.width,
-      height = dims.height,
-      max = config.maxCacheSideLimit,
+    const max = config.maxCacheSideLimit,
       min = config.minCacheSideLimit;
     if (
       width <= max &&
       height <= max &&
       width * height <= config.perfLimitSizeTotal
     ) {
-      if (width < min) {
-        dims.width = min;
-      }
-      if (height < min) {
-        dims.height = min;
-      }
-      return dims;
+      return {
+        width: Math.max(width, min),
+        height: Math.max(height, min),
+        zoomX,
+        zoomY,
+        x: cacheX,
+        y: cacheY,
+        capped: false,
+      };
     }
     const ar = width / height,
       [limX, limY] = cache.limitDimsByArea(ar),
       x = capValue(min, limX, max),
       y = capValue(min, limY, max);
+    let capped = false;
     if (width > x) {
-      dims.zoomX /= width / x;
-      dims.width = x;
-      dims.capped = true;
+      zoomX /= width / x;
+      width = x;
+      capped = true;
     }
     if (height > y) {
-      dims.zoomY /= height / y;
-      dims.height = y;
-      dims.capped = true;
+      zoomY /= height / y;
+      height = y;
+      capped = true;
     }
-    return dims;
+    return {
+      width,
+      height,
+      zoomX,
+      zoomY,
+      x,
+      y,
+      capped,
+    };
   }
 
   /**
@@ -366,8 +382,12 @@ export class FabricObject<
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
-      // calculate dimensions without skewing
-      dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
+      // calculate dimensions without skewing or strokeUniform
+      dim = sizeAfterTransform(
+        this.width + this.strokeWidth,
+        this.height + this.strokeWidth,
+        { scaleX: this.scaleX, scaleY: this.scaleY }
+      ),
       neededX = (dim.x * objectScale.x) / this.scaleX,
       neededY = (dim.y * objectScale.y) / this.scaleY;
     return {
@@ -392,12 +412,8 @@ export class FabricObject<
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
       context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+      { width, height, x, y, zoomX, zoomY, capped } = this._limitCacheSize(),
       minCacheSize = config.minCacheSideLimit,
-      width = dims.width,
-      height = dims.height,
-      zoomX = dims.zoomX,
-      zoomY = dims.zoomY,
       dimensionsChanged =
         width !== this.cacheWidth || height !== this.cacheHeight,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
@@ -424,7 +440,7 @@ export class FabricObject<
       shouldResizeCanvas = sizeGrowing || sizeShrinking;
       if (
         sizeGrowing &&
-        !dims.capped &&
+        !capped &&
         (width > minCacheSize || height > minCacheSize)
       ) {
         additionalWidth = width * 0.1;
@@ -446,8 +462,8 @@ export class FabricObject<
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      drawingWidth = dims.x / 2;
-      drawingHeight = dims.y / 2;
+      drawingWidth = x / 2;
+      drawingHeight = y / 2;
       this.cacheTranslationX =
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
@@ -1231,11 +1247,11 @@ export class FabricObject<
     ctx: CanvasRenderingContext2D,
     filler: TFiller
   ) {
-    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+    const { x, y, zoomX, zoomY } = this._limitCacheSize(),
       pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
-      width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
+      width = x / this.scaleX / retinaScaling,
+      height = y / this.scaleY / retinaScaling;
     pCanvas.width = width;
     pCanvas.height = height;
     const pCtx = pCanvas.getContext('2d');
@@ -1250,8 +1266,8 @@ export class FabricObject<
     pCtx.closePath();
     pCtx.translate(width / 2, height / 2);
     pCtx.scale(
-      dims.zoomX / this.scaleX / retinaScaling,
-      dims.zoomY / this.scaleY / retinaScaling
+      zoomX / this.scaleX / retinaScaling,
+      zoomY / this.scaleY / retinaScaling
     );
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fillStyle = filler.toLive(ctx)!;
@@ -1261,8 +1277,8 @@ export class FabricObject<
       -this.height / 2 - this.strokeWidth / 2
     );
     ctx.scale(
-      (retinaScaling * this.scaleX) / dims.zoomX,
-      (retinaScaling * this.scaleY) / dims.zoomY
+      (retinaScaling * this.scaleX) / zoomX,
+      (retinaScaling * this.scaleY) / zoomY
     );
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
