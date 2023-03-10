@@ -19,8 +19,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { calcDimensionsMatrix, invertTransform } from '../util/misc/matrix';
-import { BBox } from '../shapes/Object/BBox';
+import { sizeAfterTransform } from '../util/misc/objectTransforms';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -87,9 +86,10 @@ function skewObject(
   pointer: Point
 ) {
   const { skew: skewKey, counterAxis } = AXIS_KEYS[axis],
+    { scaleX, scaleY, skewX, skewY, width, height } = target,
     offset = pointer
       .subtract(new Point(ex, ey))
-      .divide(new Point(target.scaleX, target.scaleY))[axis],
+      .divide(new Point(scaleX, scaleY))[axis],
     skewingBefore = target[skewKey],
     skewingStart = transform[skewKey],
     shearingStart = Math.tan(degreesToRadians(skewingStart)),
@@ -98,20 +98,11 @@ function skewObject(
     // then:
     // a' = a + b * skewA => skewA = (a' - a) / b
     // the value b is tricky since skewY is applied before skewX
-    b = target.bbox
-      .sendToParent()
-      .getDimensionsVector()
-      .transform(
-        invertTransform(
-          calcDimensionsMatrix({
-            scaleX: target.scaleX,
-            scaleY: target.scaleY,
-            // since skewY is applied before skewX, b (=width) is not affected by skewX
-            skewX: axis === 'y' ? target.skewX : 0,
-          })
-        ),
-        true
-      )[counterAxis];
+    b = sizeAfterTransform(width, height, {
+      skewY,
+      // since skewY is applied before skewX, b (=width) is not affected by skewX
+      skewX: axis === 'y' ? 0 : skewX,
+    })[counterAxis];
 
   const shearing =
     (2 * offset * skewingSide) /
@@ -121,21 +112,22 @@ function skewObject(
     shearingStart;
 
   const skewing = radiansToDegrees(Math.atan(shearing));
-  // TODO: use setCoords instead?
-  const bboxBefore = BBox.rotated(target);
   target.set(skewKey, skewing);
   const changed = skewingBefore !== target[skewKey];
 
   if (changed && axis === 'y') {
     // we don't want skewing to affect scaleX
     // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
-    const bboxAfter = BBox.rotated(target);
-    const { skewX, scaleX } = target,
-      dimBefore = bboxAfter.sendToParent().getDimensionsVector(),
-      dimAfter = bboxBefore.sendToParent().getDimensionsVector(),
-      compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
+    const dimBefore = sizeAfterTransform(target.width, target.height, {
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+      }),
+      dimAfter = sizeAfterTransform(target.width, target.height, target),
+      compensationFactor = target.skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
     compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
+      target.set('scaleX', compensationFactor * target.scaleX);
   }
 
   return changed;
