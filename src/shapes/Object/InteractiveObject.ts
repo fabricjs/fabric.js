@@ -227,7 +227,6 @@ export class InteractiveFabricObject<
    */
   protected calcControlCoords(): Record<string, TControlCoord> {
     const legacyBBox = BBox.legacy(this);
-    const angle = this.getTotalAngle();
     const coords = mapValues(this.controls, (control, key) => {
       const position = control.positionHandler(
         legacyBBox.sendToCanvas().getDimensionsVector(),
@@ -235,12 +234,6 @@ export class InteractiveFabricObject<
         this,
         control[key]
       );
-      // const position = control.positionHandler2(
-      //   this.bbox.getDimensionsVector(),
-      //   this.bbox.getTransformation(),
-      //   this,
-      //   control[key]
-      // );
       return {
         position,
         // Sets the coordinates that determine the interaction area of each control
@@ -248,14 +241,14 @@ export class InteractiveFabricObject<
         // everything would resolve to a single point and a pythagorean theorem for the distance
         // @todo evaluate simplification of code switching to circle interaction area at runtime
         corner: control.calcCornerCoords(
-          angle,
+          legacyBBox.angle,
           this.cornerSize,
           position.x,
           position.y,
           false
         ),
         touchCorner: control.calcCornerCoords(
-          angle,
+          legacyBBox.angle,
           this.touchCornerSize,
           position.x,
           position.y,

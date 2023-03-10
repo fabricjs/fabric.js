@@ -26,7 +26,7 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
 import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { ControlProps } from './types/ControlProps';
-import { BBox } from './BBox';
+import { BBox, TRotatedBBox } from './BBox';
 
 type TMatrixCache = {
   key: string;
@@ -49,7 +49,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   declare lineCoords: TCornerPoint;
 
   declare bboxCoords: TCornerPoint;
-  declare bbox: BBox;
+  declare bbox: TRotatedBBox;
 
   /**
    * storage cache for object transform matrix

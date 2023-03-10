@@ -274,25 +274,16 @@ export class Control {
     fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return new Point(
-      this.x * dim.x + this.offsetX,
-      this.y * dim.y + this.offsetY
-    ).transform(finalMatrix);
-  }
+    // // legacy
+    // return new Point(
+    //   this.x * dim.x + this.offsetX,
+    //   this.y * dim.y + this.offsetY
+    // ).transform(finalMatrix);
 
-  positionHandler2(
-    dim: Point,
-    finalMatrix: TMat2D,
-    fabricObject: FabricObject,
-    currentControl: Control
-  ) {
+    const bbox = fabricObject.bbox;
     return new Point(this.x, this.y)
-      .transform(finalMatrix)
-      .add(
-        new Point(this.offsetX, this.offsetY).rotate(
-          degreesToRadians(fabricObject.getTotalAngle())
-        )
-      );
+      .transform(bbox.getTransformation())
+      .add(new Point(this.offsetX, this.offsetY).rotate(bbox.rotation));
   }
 
   /**
