@@ -85,6 +85,10 @@ export class ObjectOrigin<EventSpec>
     return finalDimensions.scalarAdd(postScalingStrokeValue);
   }
 
+  getDimensionsVectorForPositioning() {
+    return sizeAfterTransform(this.width, this.height, this);
+  }
+
   /**
    * Translates the coordinates from a set of origin to another (based on the object's dimensions)
    * @param {Point} point The point which corresponds to the originX and originY params
@@ -101,18 +105,11 @@ export class ObjectOrigin<EventSpec>
     toOriginX: TOriginX,
     toOriginY: TOriginY
   ): Point {
-    let x = point.x,
-      y = point.y;
-    const offsetX = resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
-      offsetY = resolveOrigin(toOriginY) - resolveOrigin(fromOriginY);
-
-    if (offsetX || offsetY) {
-      const dim = this._getTransformedDimensions();
-      x += offsetX * dim.x;
-      y += offsetY * dim.y;
-    }
-
-    return new Point(x, y);
+    const originOffset = new Point(
+      resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
+      resolveOrigin(toOriginY) - resolveOrigin(fromOriginY)
+    ).multiply(this.getDimensionsVectorForPositioning());
+    return point.add(originOffset);
   }
 
   /**
