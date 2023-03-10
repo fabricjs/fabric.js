@@ -1,6 +1,6 @@
 import { iMatrix } from '../../constants';
 import { Point } from '../../Point';
-import { TCornerPoint, TMat2D } from '../../typedefs';
+import { TCornerPoint, TMat2D, TOriginX, TOriginY } from '../../typedefs';
 import { mapValues } from '../../util/internals';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import {
@@ -12,6 +12,7 @@ import {
   sendPointToPlane,
 } from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { createVector } from '../../util/misc/vectors';
 import type { ObjectGeometry } from './ObjectGeometry';
 
@@ -83,6 +84,29 @@ export class PlaneBBox {
 
   applyToVector(origin: Point) {
     return this.applyTo2D(origin, true);
+  }
+
+  /**
+   * Translates the coordinates from a set of origin to another (based on the object's dimensions)
+   * @param {Point} point The point which corresponds to the originX and originY params
+   * @param {TOriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
+   * @param {TOriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
+   * @return {Point}
+   */
+  translateToGivenOrigin(
+    point: Point,
+    fromOriginX: TOriginX,
+    fromOriginY: TOriginY,
+    toOriginX: TOriginX,
+    toOriginY: TOriginY
+  ): Point {
+    const originOffset = new Point(
+      resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
+      resolveOrigin(toOriginY) - resolveOrigin(fromOriginY)
+    ).multiply(this.getDimensionsVector());
+    return point.add(originOffset);
   }
 
   containsPoint(point: Point) {
