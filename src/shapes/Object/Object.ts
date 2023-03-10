@@ -1,4 +1,3 @@
-import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
@@ -326,13 +325,12 @@ export class FabricObject<
       y: cacheY,
     } = this._getCacheCanvasDimensions()
   ) {
-    const max = config.maxCacheSideLimit,
-      min = config.minCacheSideLimit;
-    if (
-      width <= max &&
-      height <= max &&
-      width * height <= config.perfLimitSizeTotal
-    ) {
+    const {
+      minCacheSideLimit: min,
+      maxCacheSideLimit: max,
+      perfLimitSizeTotal,
+    } = config;
+    if (width <= max && height <= max && width * height <= perfLimitSizeTotal) {
       return {
         width: Math.max(width, min),
         height: Math.max(height, min),
@@ -344,7 +342,9 @@ export class FabricObject<
       };
     }
     const ar = width / height,
-      [limX, limY] = cache.limitDimsByArea(ar),
+      roughWidth = Math.sqrt(perfLimitSizeTotal * ar),
+      limX = Math.floor(roughWidth),
+      limY = Math.floor(perfLimitSizeTotal / roughWidth),
       x = capValue(min, limX, max),
       y = capValue(min, limY, max);
     let capped = false;
