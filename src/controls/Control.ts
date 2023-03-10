@@ -280,6 +280,21 @@ export class Control {
     ).transform(finalMatrix);
   }
 
+  positionHandler2(
+    dim: Point,
+    finalMatrix: TMat2D,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
+    return new Point(this.x, this.y)
+      .transform(finalMatrix)
+      .add(
+        new Point(this.offsetX, this.offsetY).rotate(
+          degreesToRadians(fabricObject.getTotalAngle())
+        )
+      );
+  }
+
   /**
    * Returns the coords for this control based on object values.
    * @param {Number} objectAngle angle from the fabric object holding the control
