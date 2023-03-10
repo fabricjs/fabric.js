@@ -130,23 +130,6 @@ export class Line extends FabricObject {
     return { ...super.toObject(propertiesToInclude), ...this.calcLinePoints() };
   }
 
-  /*
-   * Calculate object dimensions from its properties
-   * @private
-   */
-  _getNonTransformedDimensions(): Point {
-    const dim = super._getNonTransformedDimensions();
-    if (this.strokeLineCap === 'butt') {
-      if (this.width === 0) {
-        dim.y -= this.strokeWidth;
-      }
-      if (this.height === 0) {
-        dim.x -= this.strokeWidth;
-      }
-    }
-    return dim;
-  }
-
   /**
    * Recalculates line points given width and height
    * @private

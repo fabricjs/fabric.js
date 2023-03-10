@@ -2,12 +2,12 @@ import { Point } from '../../Point';
 import type { Group } from '../Group';
 import { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
-import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { BaseProps } from './types/BaseProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
+import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
@@ -38,52 +38,6 @@ export class ObjectOrigin<EventSpec>
   declare _originalOriginX?: TOriginX;
 
   declare _originalOriginY?: TOriginY;
-
-  /**
-   * Calculate object bounding box dimensions from its properties scale, skew.
-   * @param {Object} [options]
-   * @param {Number} [options.scaleX]
-   * @param {Number} [options.scaleY]
-   * @param {Number} [options.skewX]
-   * @param {Number} [options.skewY]
-   * @private
-   * @returns {Point} dimensions
-   */
-  _getTransformedDimensions(options: any = {}): Point {
-    const dimOptions = {
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      skewX: this.skewX,
-      skewY: this.skewY,
-      width: this.width,
-      height: this.height,
-      strokeWidth: this.strokeWidth,
-      ...options,
-    };
-    // stroke is applied before/after transformations are applied according to `strokeUniform`
-    const strokeWidth = dimOptions.strokeWidth;
-    let preScalingStrokeValue = strokeWidth,
-      postScalingStrokeValue = 0;
-
-    if (this.strokeUniform) {
-      preScalingStrokeValue = 0;
-      postScalingStrokeValue = strokeWidth;
-    }
-    const dimX = dimOptions.width + preScalingStrokeValue,
-      dimY = dimOptions.height + preScalingStrokeValue,
-      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
-    let finalDimensions;
-    if (noSkew) {
-      finalDimensions = new Point(
-        dimX * dimOptions.scaleX,
-        dimY * dimOptions.scaleY
-      );
-    } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
-    }
-
-    return finalDimensions.scalarAdd(postScalingStrokeValue);
-  }
 
   getDimensionsVectorForPositioning() {
     return sizeAfterTransform(this.width, this.height, this);

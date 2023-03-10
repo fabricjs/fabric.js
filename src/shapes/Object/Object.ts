@@ -40,6 +40,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
 import { TProps } from './types';
+import { BBox } from './BBox';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -998,7 +999,8 @@ export class FabricObject<
     if (!this.backgroundColor) {
       return;
     }
-    const dim = this._getNonTransformedDimensions();
+    // should this be the rotated bbox?
+    const dim = BBox.transformed(this).sendToSelf().getDimensionsVector();
     ctx.fillStyle = this.backgroundColor;
 
     ctx.fillRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);

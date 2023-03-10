@@ -140,7 +140,7 @@ export class BBox extends PlaneBBox {
   }
 
   static getViewportCoords(target: ObjectGeometry) {
-    const coords = target.bboxCoords;
+    const coords = target.calcCoords();
     if (target.needsViewportCoords()) {
       return coords;
     } else {

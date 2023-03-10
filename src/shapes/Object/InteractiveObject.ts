@@ -1,14 +1,7 @@
 import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import {
-  multiplyTransformMatrices,
-  qrDecompose,
-  TQrDecomposeOut,
-} from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
-import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
@@ -322,15 +315,28 @@ export class InteractiveFabricObject<
       return;
     }
     ctx.save();
-    const center = this.getRelativeCenterPoint(),
-      wh = this._calculateCurrentDimensions(),
-      vpt = this.getViewportTransform();
-    ctx.translate(center.x, center.y);
-    ctx.scale(1 / vpt[0], 1 / vpt[3]);
-    ctx.rotate(degreesToRadians(this.angle));
+    this.bbox.transform(ctx);
     ctx.fillStyle = this.selectionBackgroundColor;
-    ctx.fillRect(-wh.x / 2, -wh.y / 2, wh.x, wh.y);
+    ctx.fillRect(-0.5, -0.5, 1, 1);
     ctx.restore();
+  }
+
+  /**
+   * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
+   * @param {CanvasRenderingContext2D} ctx ctx is not transformed, only retina scaled
+   * @param {Point} size the control box size used
+   */
+  strokeBorders(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    this.bbox.transform(ctx);
+    ctx.beginPath();
+    ctx.moveTo(-0.5, -0.5);
+    ctx.lineTo(0.5, -0.5);
+    ctx.lineTo(0.5, 0.5);
+    ctx.lineTo(-0.5, 0.5);
+    ctx.closePath();
+    ctx.restore();
+    ctx.stroke();
   }
 
   /**
@@ -338,33 +344,38 @@ export class InteractiveFabricObject<
    * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
    * @param {Point} size the control box size used
    */
-  strokeBorders(ctx: CanvasRenderingContext2D, size: Point): void {
+  strokeBordersLegacy(ctx: CanvasRenderingContext2D, size: Point) {
     ctx.strokeRect(-size.x / 2, -size.y / 2, size.x, size.y);
   }
 
   /**
-   * @private
+   * Draws borders of an object's bounding box.
+   * Requires public properties: width, height
+   * Requires public options: padding, borderColor
    * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size
-   * @param {TStyleOverride} styleOverride object to override the object style
+   * @param {object} options object representing current object parameters
+   * @param {TStyleOverride} [styleOverride] object to override the object style
    */
-  _drawBorders(
+  drawBorders(
     ctx: CanvasRenderingContext2D,
-    size: Point,
-    styleOverride: TStyleOverride = {}
+    styleOverride: TStyleOverride
   ): void {
-    return;
-    const options = {
-      hasControls: this.hasControls,
+    const { borderColor, borderDashArray } = {
       borderColor: this.borderColor,
       borderDashArray: this.borderDashArray,
       ...styleOverride,
     };
     ctx.save();
-    ctx.strokeStyle = options.borderColor;
-    this._setLineDash(ctx, options.borderDashArray);
-    this.strokeBorders(ctx, size);
-    options.hasControls && this.drawControlsConnectingLines(ctx, size);
+    ctx.strokeStyle = borderColor;
+    this._setLineDash(ctx, borderDashArray);
+    ctx.lineWidth = this.borderScaleFactor;
+    // TODO: remove legacy?
+    ctx.save();
+    const legacy = BBox.legacy(this);
+    legacy.transform(ctx);
+    this.strokeBordersLegacy(ctx, legacy.getDimensionsVector());
+    ctx.restore();
+    this.strokeBorders(ctx);
     ctx.restore();
   }
 
@@ -380,61 +391,16 @@ export class InteractiveFabricObject<
     styleOverride: TStyleOverride = {}
   ) {
     const { hasBorders, hasControls } = this;
-    const styleOptions = {
+    const { hasBorders: shouldDrawBorders, hasControls: shouldDrawControls } = {
       hasBorders,
       hasControls,
       ...styleOverride,
     };
-    const vpt = this.getViewportTransform(),
-      shouldDrawBorders = styleOptions.hasBorders,
-      shouldDrawControls = styleOptions.hasControls;
-    const matrix = multiplyTransformMatrices(vpt, this.calcTransformMatrix());
-    const options = qrDecompose(matrix);
     ctx.save();
-    ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
+    ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+    shouldDrawBorders && this.drawBorders(ctx, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
-  }
-
-  /**
-   * Draws borders of an object's bounding box.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {object} options object representing current object parameters
-   * @param {TStyleOverride} [styleOverride] object to override the object style
-   */
-  drawBorders(
-    ctx: CanvasRenderingContext2D,
-    options: TQrDecomposeOut,
-    styleOverride: TStyleOverride
-  ): void {
-    let size;
-    if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
-      size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
-    } else {
-      size = this._calculateCurrentDimensions().scalarAdd(
-        this.borderScaleFactor
-      );
-    }
-    this._drawBorders(ctx, size, styleOverride);
   }
 
   /**
