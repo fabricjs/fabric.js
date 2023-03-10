@@ -183,7 +183,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   getCoords(absolute = false) {
-    return this.bbox.getCoords(!absolute);
+    return (absolute ? this.bbox.sendToCanvas() : this.bbox).getCoords();
   }
 
   /**
@@ -279,7 +279,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(point: Point, absolute = false) {
-    return this.bbox.containsPoint(point, !absolute);
+    return (absolute ? this.bbox.sendToCanvas() : this.bbox).containsPoint(
+      point
+    );
   }
 
   /**
@@ -363,7 +365,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Object} Object with left, top, width, height properties
    */
   getBoundingRect(absolute = false): TBBox {
-    return BBox.canvas(this).getBBox(!absolute);
+    const bbox = BBox.canvas(this);
+    return (absolute ? bbox.sendToCanvas() : bbox).getBBox();
   }
 
   /**
@@ -372,7 +375,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Number} width value
    */
   getScaledWidth(): number {
-    return BBox.transformed(this).getDimensionsVector(false).x;
+    return BBox.transformed(this).sendToCanvas().getDimensionsVector().x;
   }
 
   /**
@@ -381,7 +384,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Number} height value
    */
   getScaledHeight(): number {
-    return BBox.transformed(this).getDimensionsVector(false).y;
+    return BBox.transformed(this).sendToCanvas().getDimensionsVector().y;
   }
 
   /**
@@ -397,8 +400,12 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   protected scaleAxisTo(axis: TAxis, value: number, absolute = true) {
     // adjust to bounding rect factor so that rotated shapes would fit as well
-    const transformed = BBox.transformed(this).getDimensionsVector(false);
-    const rotated = this.bbox.getDimensionsVector(absolute);
+    const transformed = BBox.transformed(this)
+      .sendToCanvas()
+      .getDimensionsVector();
+    const rotated = (
+      absolute ? this.bbox.sendToCanvas() : this.bbox
+    ).getDimensionsVector();
     const boundingRectFactor = rotated[axis] / transformed[axis];
     this.scale(value / this.width / boundingRectFactor);
   }
@@ -562,14 +569,22 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
         new Point(-0.5, 0.5),
         new Point(0.5, 0.5),
       ].forEach((origin) => {
-        draw(BBox.canvas(this).applyToPointInViewport(origin), 'red', 10);
-        draw(BBox.rotated(this).applyToPointInViewport(origin), 'magenta', 8);
-        draw(BBox.transformed(this).applyToPointInViewport(origin), 'blue', 6);
+        draw(BBox.canvas(this).applyToPoint(origin), 'yellow', 10);
+        draw(BBox.rotated(this).applyToPoint(origin), 'orange', 8);
+        draw(BBox.transformed(this).applyToPoint(origin), 'silver', 6);
         ctx.save();
         ctx.transform(...this.getViewportTransform());
-        draw(BBox.canvas(this).applyToPointInCanvas(origin), 'red', 10);
-        draw(BBox.rotated(this).applyToPointInCanvas(origin), 'magenta', 8);
-        draw(BBox.transformed(this).applyToPointInCanvas(origin), 'blue', 6);
+        draw(BBox.canvas(this).sendToCanvas().applyToPoint(origin), 'red', 10);
+        draw(
+          BBox.rotated(this).sendToCanvas().applyToPoint(origin),
+          'magenta',
+          8
+        );
+        draw(
+          BBox.transformed(this).sendToCanvas().applyToPoint(origin),
+          'blue',
+          6
+        );
         ctx.restore();
       });
       ctx.restore();

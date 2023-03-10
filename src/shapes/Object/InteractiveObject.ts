@@ -19,7 +19,7 @@ import {
   FabricObjectProps,
 } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
-import { BBox } from './BBox';
+import { BBox, PlaneBBox } from './BBox';
 
 type TControlCoord = {
   position: Point;
@@ -207,10 +207,9 @@ export class InteractiveFabricObject<
         continue;
       }
       if (
-        BBox.build(forTouch ? coord.touchCorner : coord.corner).containsPoint(
-          pointer,
-          true
-        )
+        PlaneBBox.build(
+          forTouch ? coord.touchCorner : coord.corner
+        ).containsPoint(pointer)
       ) {
         this.__corner = key;
         return key;
@@ -231,11 +230,17 @@ export class InteractiveFabricObject<
     const angle = this.getTotalAngle();
     const coords = mapValues(this.controls, (control, key) => {
       const position = control.positionHandler(
-        legacyBBox.getDimensionsInCanvas(),
-        legacyBBox.transform,
+        legacyBBox.sendToCanvas().getDimensionsVector(),
+        legacyBBox.getTransformation(),
         this,
         control[key]
       );
+      // const position = control.positionHandler2(
+      //   this.bbox.getDimensionsVector(),
+      //   this.bbox.getTransformation(),
+      //   this,
+      //   control[key]
+      // );
       return {
         position,
         // Sets the coordinates that determine the interaction area of each control
