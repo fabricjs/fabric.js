@@ -17,6 +17,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { BBox } from '../shapes/Object/BBox';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;
@@ -160,8 +161,9 @@ function scaleObject(
     ) {
       return false;
     }
-
-    dim = target._getTransformedDimensions();
+    // TODO: use setCoords instead?
+    dim = BBox.rotated(target).sendToParent().getDimensionsVector();
+    console.log(dim);
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
