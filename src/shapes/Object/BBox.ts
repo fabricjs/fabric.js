@@ -16,6 +16,8 @@ import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { createVector } from '../../util/misc/vectors';
 import type { ObjectGeometry } from './ObjectGeometry';
 
+const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
+
 export interface BBoxPlanes {
   retina(): TMat2D;
   viewport(): TMat2D;
@@ -24,6 +26,8 @@ export interface BBoxPlanes {
 }
 
 export type Coords = [Point, Point, Point, Point] & TCornerPoint;
+
+export type OriginDiff = { x: TOriginX; y: TOriginY };
 
 export type TRotatedBBox = ReturnType<typeof BBox['rotated']>;
 
@@ -74,47 +78,39 @@ export class PlaneBBox {
     return new Point(width, height);
   }
 
-  protected applyTo2D(origin: Point, isVector = false) {
-    return origin.transform(this.getTransformation(), isVector);
+  pointFromOrigin(origin: Point) {
+    return origin.transform(this.getTransformation());
   }
 
-  applyToPoint(origin: Point) {
-    return this.applyTo2D(origin);
+  pointToOrigin(point: Point) {
+    return point.transform(invertTransform(this.getTransformation()));
   }
 
-  applyToVector(origin: Point) {
-    return this.applyTo2D(origin, true);
+  vectorFromOrigin(originVector: Point) {
+    return originVector.transform(this.getTransformation(), true);
   }
 
-  /**
-   * Translates the coordinates from a set of origin to another (based on the object's dimensions)
-   * @param {Point} point The point which corresponds to the originX and originY params
-   * @param {TOriginX} fromOriginX Horizontal origin: 'left', 'center' or 'right'
-   * @param {TOriginY} fromOriginY Vertical origin: 'top', 'center' or 'bottom'
-   * @param {TOriginX} toOriginX Horizontal origin: 'left', 'center' or 'right'
-   * @param {TOriginY} toOriginY Vertical origin: 'top', 'center' or 'bottom'
-   * @return {Point}
-   */
-  translateToGivenOrigin(
-    point: Point,
-    fromOriginX: TOriginX,
-    fromOriginY: TOriginY,
-    toOriginX: TOriginX,
-    toOriginY: TOriginY
-  ): Point {
-    const originOffset = new Point(
-      resolveOrigin(toOriginX) - resolveOrigin(fromOriginX),
-      resolveOrigin(toOriginY) - resolveOrigin(fromOriginY)
-    ).multiply(this.getDimensionsVector());
-    return point.add(originOffset);
+  vectorToOrigin(vector: Point) {
+    return vector.transform(invertTransform(this.getTransformation()), true);
+  }
+
+  static resolveOrigin({ x, y }: OriginDiff): Point {
+    return new Point(resolveOrigin(x), resolveOrigin(y));
+  }
+
+  static getOriginDiff(from: OriginDiff, to: OriginDiff) {
+    return PlaneBBox.resolveOrigin(to).subtract(PlaneBBox.resolveOrigin(from));
+  }
+
+  vectorFromOriginDiff(
+    from: OriginDiff = CENTER_ORIGIN,
+    to: OriginDiff = CENTER_ORIGIN
+  ) {
+    return this.vectorFromOrigin(PlaneBBox.getOriginDiff(from, to));
   }
 
   containsPoint(point: Point) {
-    const pointAsOrigin = sendPointToPlane(
-      point,
-      undefined,
-      this.getTransformation()
-    );
+    const pointAsOrigin = this.pointToOrigin(point);
     return (
       pointAsOrigin.x >= -0.5 &&
       pointAsOrigin.x <= 0.5 &&
