@@ -282,10 +282,7 @@
         const fn = fabric.controlsUtils[`scaling${AXIS}`];
         const exec = point => {
           const { target } = transform;
-          const origin = target.translateToGivenOrigin(
-            target.getRelativeCenterPoint(),
-            'center',
-            'center',
+          const origin = target.getRelativeXY(
             transform.originX,
             transform.originY
           );

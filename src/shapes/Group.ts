@@ -610,7 +610,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         this._adjustObjectPosition(this.clipPath, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
-        this.setPositionByOrigin(newCenter, 'center', 'center');
+        this.setRelativeCenterPoint(newCenter);
         initialTransform && this.set(initialTransform);
         this.setCoords();
       }
@@ -679,13 +679,13 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       return this.prepareBoundingBox(layoutDirective, objects, context);
     } else if (layoutDirective === 'clip-path' && this.clipPath) {
       const clipPath = this.clipPath;
-      const clipPathSizeAfter = clipPath.getDimensionsVectorForPositioning();
+      const clipPathSizeAfter = clipPath.getDimensionsVectorForLayout();
       if (
         clipPath.absolutePositioned &&
         (context.type === 'initialization' || context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        let clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getRelativeCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());

@@ -11,10 +11,13 @@ export function wrapWithFixedAnchor<T extends Transform>(
 ) {
   return ((eventData, transform, x, y) => {
     const { target, originX, originY } = transform,
-      centerPoint = target.getRelativeCenterPoint(),
-      constraint = target.translateToOriginPoint(centerPoint, originX, originY),
-      actionPerformed = actionHandler(eventData, transform, x, y);
-    target.setPositionByOrigin(constraint, originX, originY);
+      constraint = target.bbox.pointFromOrigin({ x: originX, y: originY }),
+      actionPerformed = actionHandler(eventData, transform, x, y),
+      delta = target.bbox
+        .pointFromOrigin({ x: originX, y: originY })
+        .subtract(constraint),
+      originDiff = target.bbox.sendToParent().vectorToOrigin(delta);
+    target.set({ left: target.left + delta.x, top: target.top + delta.y });
     return actionPerformed;
   }) as TransformActionHandler<T>;
 }

@@ -152,8 +152,7 @@ export class Polyline extends FabricObject {
     const { left, top, width, height, pathOffset, strokeOffset } =
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
-    adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    adjustPosition && this.setRelativeXY(new Point(left, top), 'left', 'top');
   }
 
   /**

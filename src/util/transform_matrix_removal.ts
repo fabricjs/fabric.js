@@ -56,5 +56,5 @@ export const removeTransformMatrixForSvgParsing = (
     object.width = preserveAspectRatioOptions.width;
     object.height = preserveAspectRatioOptions.height;
   }
-  object.setPositionByOrigin(center, 'center', 'center');
+  object.setRelativeCenterPoint(center);
 };

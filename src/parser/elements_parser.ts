@@ -165,10 +165,8 @@ const ElementsParser = function (
       clipPath.angle = options.angle;
       clipPath.skewX = options.skewX;
       clipPath.skewY = 0;
-      clipPath.setPositionByOrigin(
-        { x: options.translateX, y: options.translateY },
-        'center',
-        'center'
+      clipPath.setRelativeCenterPoint(
+        new Point(options.translateX, options.translateY)
       );
       obj.clipPath = clipPath;
     } else {

@@ -46,14 +46,11 @@ export class Path extends FabricObject {
   ) {
     super(options);
     const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
+    this.setRelativeXY(
       new Point(left ?? pathTL.x, top ?? pathTL.y),
       typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
+      typeof top === 'number' ? this.originY : 'top'
     );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
   }
 
   /**

@@ -97,7 +97,7 @@ const anchorWrapper = (
       .divide(polygonBaseSize)
       .multiply(adjustFlip);
 
-    poly.setPositionByOrigin(
+    poly.setRelativeXY(
       pointInParentPlane,
       newPosition.x + 0.5,
       newPosition.y + 0.5

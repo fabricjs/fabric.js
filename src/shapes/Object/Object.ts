@@ -5,7 +5,6 @@ import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
-  TDegree,
   TFiller,
   TCacheCanvasDimensions,
   TClassProperties,
@@ -1398,11 +1397,7 @@ export class FabricObject<
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
-    this.setPositionByOrigin(
-      new Point(canvas.width / 2, canvas.height / 2),
-      'center',
-      'center'
-    );
+    this.setRelativeCenterPoint(new Point(canvas.width / 2, canvas.height / 2));
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
     // @ts-ignore this needs to be fixed somehow, or ignored globally
@@ -1473,26 +1468,6 @@ export class FabricObject<
   toJSON() {
     // delegate, not alias
     return this.toObject();
-  }
-
-  /**
-   * Sets "angle" of an instance with centered rotation
-   * @param {TDegree} angle Angle value (in degrees)
-   */
-  rotate(angle: TDegree) {
-    const shouldCenterOrigin =
-      (this.originX !== 'center' || this.originY !== 'center') &&
-      this.centeredRotation;
-
-    if (shouldCenterOrigin) {
-      this._setOriginToCenter();
-    }
-
-    this.set('angle', angle);
-
-    if (shouldCenterOrigin) {
-      this._resetOrigin();
-    }
   }
 
   /**

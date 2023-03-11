@@ -99,20 +99,11 @@ function normalizePoint(
   originX: TOriginX,
   originY: TOriginY
 ): Point {
-  const center = target.getRelativeCenterPoint(),
-    p =
-      typeof originX !== 'undefined' && typeof originY !== 'undefined'
-        ? target.translateToGivenOrigin(
-            center,
-            'center',
-            'center',
-            originX,
-            originY
-          )
-        : new Point(target.left, target.top),
-    p2 = target.angle
-      ? point.rotate(-degreesToRadians(target.angle), center)
-      : point;
+  const angle = target.getTotalAngle();
+  const p = target.getRelativeXY(originX, originY);
+  const p2 = angle
+    ? point.rotate(-degreesToRadians(angle), target.getRelativeCenterPoint())
+    : point;
   return p2.subtract(p);
 }
 
