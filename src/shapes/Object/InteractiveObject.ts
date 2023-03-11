@@ -222,7 +222,7 @@ export class InteractiveFabricObject<
     const legacyBBox = BBox.legacy(this);
     const coords = mapValues(this.controls, (control, key) => {
       const position = control.positionHandler(
-        legacyBBox.sendToCanvas().getDimensionsVector(),
+        legacyBBox.getDimensionsVector(),
         legacyBBox.getTransformation(),
         this,
         control[key]
@@ -315,7 +315,7 @@ export class InteractiveFabricObject<
       return;
     }
     ctx.save();
-    this.bbox.transform(ctx);
+    this.bbox.sendToCanvas().transform(ctx);
     ctx.fillStyle = this.selectionBackgroundColor;
     ctx.fillRect(-0.5, -0.5, 1, 1);
     ctx.restore();
