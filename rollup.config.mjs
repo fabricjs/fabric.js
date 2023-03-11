@@ -69,7 +69,7 @@ export default [
     onwarn,
   },
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.offscreen.ts'],
+    input: ['./index.offscreen.ts'],
     output: [
       {
         file: path.resolve(dirname, `${basename}.offscreen.mjs`),
@@ -77,42 +77,28 @@ export default [
         format: 'es',
         sourcemap: true,
       },
-      {
-        file: path.resolve(dirname, `${basename}.offscreen.js`),
-        name: 'fabric',
-        format: 'umd',
-        sourcemap: true,
-      },
-      Number(process.env.MINIFY)
-        ? {
-            file: path.resolve(dirname, `${basename}.offscreen.min.js`),
-            name: 'fabric',
-            format: 'umd',
-            plugins: [terser()],
-          }
-        : null,
     ],
     plugins,
     onwarn,
   },
-  // {
-  //   input: ['./index.node.ts'],
-  //   output: [
-  //     {
-  //       file: path.resolve(dirname, `${basename}.node.mjs`),
-  //       name: 'fabric',
-  //       format: 'es',
-  //       sourcemap: true,
-  //     },
-  //     {
-  //       file: path.resolve(dirname, `${basename}.node.cjs`),
-  //       name: 'fabric',
-  //       format: 'cjs',
-  //       sourcemap: true,
-  //     },
-  //   ],
-  //   plugins,
-  //   onwarn,
-  //   external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
-  // },
+  {
+    input: ['./index.node.ts'],
+    output: [
+      {
+        file: path.resolve(dirname, `${basename}.node.mjs`),
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+      {
+        file: path.resolve(dirname, `${basename}.node.cjs`),
+        name: 'fabric',
+        format: 'cjs',
+        sourcemap: true,
+      },
+    ],
+    plugins,
+    onwarn,
+    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  },
 ];
