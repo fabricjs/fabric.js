@@ -123,6 +123,9 @@
       "node": [
         "dist/index.node.d.ts"
       ],
+      "offscreen": [
+        "dist/index.offscreen.d.ts"
+      ],
       "src/*": [
         "src/*"
       ]
@@ -142,6 +145,13 @@
       "default": "./dist/index.node.cjs",
       "node": "./dist/index.node.cjs",
       "types": "./dist/index.node.d.ts"
+    },
+    "./offscreen": {
+      "import": "./dist/index.offscreen.mjs",
+      "require": "./dist/index.offscreen.cjs",
+      "default": "./dist/index.offscreen.cjs",
+      "node": "./dist/index.offscreen.cjs",
+      "types": "./dist/index.offscreen.d.ts"
     }
   }
 }
