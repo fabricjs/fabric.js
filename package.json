@@ -42,11 +42,12 @@
   "scripts": {
     "docs": "typedoc --out docs fabric.ts",
     "cli": "node ./scripts/index.mjs",
+    "sandboxscript": "node ./scripts/sandbox.mjs",
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
     "build": "npm run cli -- build",
     "build:fast": "npm run build -- -f",
     "dev": "npm run cli -- dev",
-    "start": "npm run cli -- start",
+    "start": "npm run sandboxscript -- start",
     "export": "npm run cli -- website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
     "test": "npm run cli -- test",
