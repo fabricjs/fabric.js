@@ -707,8 +707,8 @@ export class SelectableCanvas<
 
       return isTransparent(
         ctx,
-        tolerance.x,
-        tolerance.y,
+        this.targetFindTolerance,
+        this.targetFindTolerance,
         this.targetFindTolerance
       );
     }
@@ -716,7 +716,10 @@ export class SelectableCanvas<
     ctx.save();
     ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
     ctx.transform(...this.viewportTransform);
+    const selectionBgc = target.backgroundSelectionColor;
+    target.backgroundSelectionColor = '';
     target.render(ctx);
+    target.backgroundSelectionColor = selectionBgc;
     ctx.restore();
     return isTransparent(
       ctx,
