@@ -361,6 +361,12 @@
     assert.equal(returned.y, Math.max(point.y, point2.y), 'point.y is the max from the points');
   });
 
+  QUnit.test('floor, round, ceil', assert => {
+    assert.deepEqual(new fabric.Point(1.9, 0.1).floor(), new fabric.Point(1, 0), 'floor');
+    assert.deepEqual(new fabric.Point(1.9, 0.1).round(), new fabric.Point(2, 0), 'round');
+    assert.deepEqual(new fabric.Point(1.9, 0.1).ceil(), new fabric.Point(2, 1), 'ceil');
+  });
+
   QUnit.test('toString', function(assert) {
     var x1 = 2, y1 = 3,
         point = new fabric.Point(x1, y1);
