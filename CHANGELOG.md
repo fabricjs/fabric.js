@@ -3,6 +3,7 @@
 ## [next]
 
 - perf(): optimize `perPixelTargetFind` [#8770](https://github.com/fabricjs/fabric.js/pull/8770)
+- ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
 - fix(): env WebGL import cycle [#8758](https://github.com/fabricjs/fabric.js/pull/8758)
 - chore(TS): remove controls from prototype. BREAKING: controls aren't shared anymore [#8753](https://github.com/fabricjs/fabric.js/pull/8753)
