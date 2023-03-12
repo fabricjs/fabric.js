@@ -1,11 +1,11 @@
 //@ts-nocheck
 
-import { config } from '../../config';
-import { getDocument, getEnv } from '../../env';
-import { TPointerEvent } from '../../EventTypeDefs';
-import { capValue } from '../../util/misc/capValue';
-import { ITextBehavior, ITextEvents } from './ITextBehavior';
-import type { TKeyMapIText } from './constants';
+import {config} from '../../config';
+import {getDocument,getEnv} from '../../env';
+import {TPointerEvent} from '../../EventTypeDefs';
+import {capValue} from '../../util/misc/capValue';
+import {ITextBehavior,ITextEvents} from './ITextBehavior';
+import type {TKeyMapIText} from './constants';
 
 export abstract class ITextKeyBehavior<
   EventSpec extends ITextEvents = ITextEvents
@@ -168,11 +168,23 @@ export abstract class ITextKeyBehavior<
    * @param {Event} e Event object
    */
   onInput(e: Event) {
-    this._forceClearCache = true;
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
+      return;
+    }
+    const updateAndFire = () => {
+      this.updateFromTextArea();
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
+      }
+    }
+    if (this.hiddenTextarea.value === '') {
+      this.styles = {};
+      updateAndFire();
       return;
     }
     // decisions about style changes.
@@ -189,16 +201,6 @@ export abstract class ITextKeyBehavior<
       charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-      return;
-    }
 
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
@@ -266,12 +268,7 @@ export abstract class ITextKeyBehavior<
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
-    this.updateFromTextArea();
-    this.fire('changed');
-    if (this.canvas) {
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+    updateAndFire();
   }
 
   /**

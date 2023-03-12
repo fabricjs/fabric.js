@@ -1,16 +1,16 @@
-import { getDocument } from '../../env';
+import {getDocument} from '../../env';
 import {
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
 } from '../../EventTypeDefs';
-import { Point } from '../../Point';
-import type { FabricObject } from '../Object/Object';
-import { Text } from '../Text/Text';
-import { animate } from '../../util/animation/animate';
-import { TOnAnimationChangeCallback } from '../../util/animation/types';
-import type { ValueAnimation } from '../../util/animation/ValueAnimation';
-import { TextStyleDeclaration } from '../Text/StyledText';
+import {Point} from '../../Point';
+import type {FabricObject} from '../Object/Object';
+import {Text} from '../Text/Text';
+import {animate} from '../../util/animation/animate';
+import {TOnAnimationChangeCallback} from '../../util/animation/types';
+import type {ValueAnimation} from '../../util/animation/ValueAnimation';
+import {TextStyleDeclaration} from '../Text/StyledText';
 
 /**
  *  extend this regex to support non english languages
@@ -511,15 +511,14 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
-    this.text = this.hiddenTextarea.value;
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    const textarea = this.hiddenTextarea;
+    this.text = textarea.value;
+    this.initDimensions();
+    this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.value
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
     if (!this.inCompositionMode) {
