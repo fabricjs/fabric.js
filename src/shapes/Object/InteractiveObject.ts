@@ -12,7 +12,8 @@ import {
   FabricObjectProps,
 } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
-import { BBox, PlaneBBox } from './BBox';
+import { BBox } from '../../BBox/BBox';
+import { PlaneBBox } from '../../BBox/PlaneBBox';
 
 type TControlCoord = {
   position: Point;

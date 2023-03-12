@@ -15,7 +15,8 @@ import {
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
-import { BBox, TRotatedBBox, CanvasBBox } from './BBox';
+import { BBox, TRotatedBBox } from '../../BBox/BBox';
+import { CanvasBBox } from '../../BBox/CanvasBBox';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';

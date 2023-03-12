@@ -17,7 +17,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { BBox } from '../shapes/Object/BBox';
+import { BBox } from '../BBox/BBox';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;

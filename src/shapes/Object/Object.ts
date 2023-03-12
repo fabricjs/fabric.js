@@ -39,7 +39,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
 import { TProps } from './types';
-import { BBox } from './BBox';
+import { BBox } from '../../BBox/BBox';
 
 export type TCachedFabricObject = FabricObject &
   Required<

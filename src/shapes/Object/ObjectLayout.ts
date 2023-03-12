@@ -7,12 +7,12 @@ import {
 } from '../../util/misc/matrix';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { PlaneBBox } from './BBox';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type { Group } from '../Group';
 import { BaseProps } from './types/BaseProps';
 import { CommonMethods } from '../../CommonMethods';
 import { FabricObjectProps } from './types';
+import { PlaneBBox } from '../../BBox/PlaneBBox';
 
 type TMatrixCache = {
   key: string;
