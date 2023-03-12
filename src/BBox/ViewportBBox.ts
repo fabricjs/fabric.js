@@ -11,6 +11,9 @@ export interface ViewportBBoxPlanes {
   viewport(): TMat2D;
 }
 
+/**
+ * This class manages operations in the canvas viewport
+ */
 export class ViewportBBox extends PlaneBBox {
   protected readonly planes: ViewportBBoxPlanes;
 
@@ -33,8 +36,8 @@ export class ViewportBBox extends PlaneBBox {
   }
 
   intersect(other: ViewportBBox) {
-    const coords = Object.values(this.getCoordMap());
-    const otherCoords = Object.values(other.getCoordMap());
+    const coords = Object.values(this.getCoords());
+    const otherCoords = Object.values(other.getCoords());
     return Intersection.intersectPolygonPolygon(coords, otherCoords);
   }
 
@@ -47,7 +50,7 @@ export class ViewportBBox extends PlaneBBox {
   }
 
   contains(other: ViewportBBox) {
-    const otherCoords = Object.values(other.getCoordMap());
+    const otherCoords = Object.values(other.getCoords());
     return otherCoords.every((coord) => this.containsPoint(coord));
   }
 

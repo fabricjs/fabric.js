@@ -164,7 +164,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   getCoords(absolute = false) {
-    return (absolute ? this.bbox.sendToCanvas() : this.bbox).getCoords();
+    return Object.values(
+      (absolute ? this.bbox.sendToCanvas() : this.bbox).getCoords()
+    );
   }
 
   /**

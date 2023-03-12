@@ -14,12 +14,12 @@ export class OwnBBox extends BBox {
     super(transform, planes);
   }
 
-  getCoordMap() {
+  getCoords() {
     const from = multiplyTransformMatrices(
       this.planes.viewport(),
       this.planes.self()
     );
-    return mapValues(super.getCoordMap(), (coord) =>
+    return mapValues(super.getCoords(), (coord) =>
       sendPointToPlane(coord, from)
     );
   }

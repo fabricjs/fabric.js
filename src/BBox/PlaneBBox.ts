@@ -11,6 +11,12 @@ export type OriginDiff = { x: TOriginX; y: TOriginY };
 
 const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
 
+/**
+ * This class is in an abstraction allowing us to operate inside a plane with origin values [-0.5, 0.5]
+ * instead of using real values that depend on the plane.
+ *
+ * Simplifies complex layout/geometry calculations.
+ */
 export class PlaneBBox {
   private readonly originTransformation: TMat2D;
 
@@ -22,7 +28,7 @@ export class PlaneBBox {
     return this.originTransformation;
   }
 
-  getCoordMap() {
+  getCoords() {
     return mapValues(
       {
         tl: new Point(-0.5, -0.5),
@@ -34,12 +40,8 @@ export class PlaneBBox {
     );
   }
 
-  getCoords() {
-    return Object.values(this.getCoordMap());
-  }
-
   getBBox() {
-    return makeBoundingBoxFromPoints(this.getCoords());
+    return makeBoundingBoxFromPoints(Object.values(this.getCoords()));
   }
 
   getCenterPoint() {
@@ -56,7 +58,7 @@ export class PlaneBBox {
   }
 
   getRotation() {
-    return PlaneBBox.calcRotation(this.getCoordMap());
+    return PlaneBBox.calcRotation(this.getCoords());
   }
 
   pointFromOrigin(origin: Point) {
