@@ -12,7 +12,8 @@ export interface ViewportBBoxPlanes {
 }
 
 /**
- * This class manages operations in the canvas viewport
+ * This class manages operations in the canvas viewport since object geometry depends on the viewport (e.g. `strokeUniform`)
+ *
  */
 export class ViewportBBox extends PlaneBBox {
   protected readonly planes: ViewportBBoxPlanes;

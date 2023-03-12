@@ -24,7 +24,7 @@ export class OwnBBox extends BBox {
     );
   }
 
-  static buildBBoxPlanes(target: ObjectGeometry): BBoxPlanes {
+  static getPlanes(target: ObjectGeometry): BBoxPlanes {
     return {
       self() {
         return target.calcTransformMatrix();

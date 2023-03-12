@@ -69,7 +69,7 @@ export class BBox extends ViewportBBox {
     }
   }
 
-  static buildBBoxPlanes(target: ObjectGeometry): BBoxPlanes {
+  static getPlanes(target: ObjectGeometry): BBoxPlanes {
     const self = target.calcTransformMatrix();
     const parent = target.group?.calcTransformMatrix() || iMatrix;
     const viewport = target.getViewportTransform();
@@ -98,7 +98,7 @@ export class BBox extends ViewportBBox {
       [new Point(bbox.width, 0), new Point(0, bbox.height)],
       coords.tl.midPointFrom(coords.br)
     );
-    return new this(transform, this.buildBBoxPlanes(target));
+    return new this(transform, this.getPlanes(target));
   }
 
   static rotated(target: ObjectGeometry) {
@@ -116,7 +116,7 @@ export class BBox extends ViewportBBox {
       ],
       center
     );
-    return Object.assign(new this(transform, this.buildBBoxPlanes(target)), {
+    return Object.assign(new this(transform, this.getPlanes(target)), {
       rotation,
     });
   }
@@ -174,6 +174,6 @@ export class BBox extends ViewportBBox {
       [createVector(coords.tl, coords.tr), createVector(coords.tl, coords.bl)],
       coords.tl.midPointFrom(coords.br)
     );
-    return new this(transform, this.buildBBoxPlanes(target));
+    return new this(transform, this.getPlanes(target));
   }
 }
