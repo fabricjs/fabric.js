@@ -1,52 +1,55 @@
+import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { iMatrix } from '../../constants';
+import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
-import { TCornerPoint, TMat2D, TOriginX, TOriginY } from '../../typedefs';
+import {
+  TBBox,
+  TCornerPoint,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+} from '../../typedefs';
 import { mapValues } from '../../util/internals';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
   multiplyTransformMatrices,
-  multiplyTransformMatrixChain,
 } from '../../util/misc/matrix';
 import {
   calcBaseChangeMatrix,
-  calcPlaneChangeMatrix,
   sendPointToPlane,
 } from '../../util/misc/planeChange';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { calcVectorRotation, createVector } from '../../util/misc/vectors';
 import type { ObjectGeometry } from './ObjectGeometry';
 
-const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
-
-export interface BBoxPlanes {
-  retina(): TMat2D;
-  viewport(): TMat2D;
-  parent(): TMat2D;
-  self(): TMat2D;
-}
-
-export type Coords = [Point, Point, Point, Point] & TCornerPoint;
-
 export type OriginDiff = { x: TOriginX; y: TOriginY };
 
-export type TRotatedBBox = ReturnType<typeof BBox['rotated']>;
+const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
 
 export class PlaneBBox {
   private readonly originTransformation: TMat2D;
 
-  static build(coords: TCornerPoint) {
-    return new this(
-      calcBaseChangeMatrix(
-        undefined,
-        [
-          createVector(coords.tl, coords.tr),
-          createVector(coords.tl, coords.bl),
-        ],
-        coords.tl.midPointFrom(coords.br)
-      )
+  static getTransformation(coords: TCornerPoint) {
+    return calcBaseChangeMatrix(
+      undefined,
+      [createVector(coords.tl, coords.tr), createVector(coords.tl, coords.bl)],
+      coords.tl.midPointFrom(coords.br)
     );
+  }
+
+  static build(coords: TCornerPoint) {
+    return new this(this.getTransformation(coords));
+  }
+
+  static rect({ left, top, width, height }: TBBox) {
+    const transform = calcBaseChangeMatrix(
+      undefined,
+      [new Point(width, 0), new Point(0, height)],
+      new Point(left + width / 2, top + height / 2)
+    );
+    return new this(transform);
   }
 
   protected constructor(transform: TMat2D) {
@@ -58,17 +61,19 @@ export class PlaneBBox {
   }
 
   getCoordMap() {
-    return {
-      tl: this.pointFromOrigin(new Point(-0.5, -0.5)),
-      tr: this.pointFromOrigin(new Point(0.5, -0.5)),
-      br: this.pointFromOrigin(new Point(0.5, 0.5)),
-      bl: this.pointFromOrigin(new Point(-0.5, 0.5)),
-    };
+    return mapValues(
+      {
+        tl: new Point(-0.5, -0.5),
+        tr: new Point(0.5, -0.5),
+        br: new Point(0.5, 0.5),
+        bl: new Point(-0.5, 0.5),
+      },
+      (origin) => this.pointFromOrigin(origin)
+    );
   }
 
   getCoords() {
-    const { tl, tr, br, bl } = this.getCoordMap();
-    return [tl, tr, br, bl];
+    return Object.values(this.getCoordMap());
   }
 
   getBBox() {
@@ -142,10 +147,14 @@ export class PlaneBBox {
   }
 }
 
-export class BBox extends PlaneBBox {
-  protected readonly planes: BBoxPlanes;
+export interface ViewportBBoxPlanes {
+  viewport(): TMat2D;
+}
 
-  protected constructor(transform: TMat2D, planes: BBoxPlanes) {
+export class ViewportBBox extends PlaneBBox {
+  protected readonly planes: ViewportBBoxPlanes;
+
+  protected constructor(transform: TMat2D, planes: ViewportBBoxPlanes) {
     super(transform);
     this.planes = planes;
   }
@@ -163,6 +172,95 @@ export class BBox extends PlaneBBox {
     return this.sendToPlane(iMatrix);
   }
 
+  intersect(other: ViewportBBox) {
+    const coords = Object.values(this.getCoordMap());
+    const otherCoords = Object.values(other.getCoordMap());
+    return Intersection.intersectPolygonPolygon(coords, otherCoords);
+  }
+
+  intersects(other: ViewportBBox) {
+    const intersection = this.intersect(other);
+    return (
+      intersection.status === 'Intersection' ||
+      intersection.status === 'Coincident'
+    );
+  }
+
+  contains(other: ViewportBBox) {
+    const otherCoords = Object.values(other.getCoordMap());
+    return otherCoords.every((coord) => this.containsPoint(coord));
+  }
+
+  isContainedBy(other: ViewportBBox) {
+    return other.contains(this);
+  }
+
+  overlaps(other: ViewportBBox) {
+    return (
+      this.intersects(other) ||
+      this.contains(other) ||
+      this.isContainedBy(other)
+    );
+  }
+}
+
+export class CanvasBBox extends ViewportBBox {
+  static getViewportCoords(canvas: StaticCanvas) {
+    const size = new Point(canvas.width, canvas.height);
+    return mapValues(
+      {
+        tl: new Point(-0.5, -0.5),
+        tr: new Point(0.5, -0.5),
+        br: new Point(0.5, 0.5),
+        bl: new Point(-0.5, 0.5),
+      },
+      (coord) => coord.multiply(size).transform(canvas.viewportTransform)
+    );
+  }
+
+  static getPlanes(canvas: StaticCanvas) {
+    const vpt: TMat2D = [...canvas.viewportTransform];
+    return {
+      viewport() {
+        return vpt;
+      },
+    };
+  }
+
+  static transformed(canvas: StaticCanvas) {
+    return new this(
+      this.getTransformation(this.getViewportCoords(canvas)),
+      this.getPlanes(canvas)
+    );
+  }
+
+  static bbox(canvas: StaticCanvas) {
+    const coords = this.getViewportCoords(canvas);
+    const bbox = makeBoundingBoxFromPoints(Object.values(coords));
+    const transform = calcBaseChangeMatrix(
+      undefined,
+      [new Point(bbox.width, 0), new Point(0, bbox.height)],
+      coords.tl.midPointFrom(coords.br)
+    );
+    return new this(transform, this.getPlanes(canvas));
+  }
+}
+
+export interface BBoxPlanes extends ViewportBBoxPlanes {
+  retina(): TMat2D;
+  parent(): TMat2D;
+  self(): TMat2D;
+}
+
+export type TRotatedBBox = ReturnType<typeof BBox['rotated']>;
+
+export class BBox extends ViewportBBox {
+  protected declare readonly planes: BBoxPlanes;
+
+  protected constructor(transform: TMat2D, planes: BBoxPlanes) {
+    super(transform, planes);
+  }
+
   sendToParent() {
     return this.sendToPlane(this.planes.parent());
   }
@@ -171,40 +269,29 @@ export class BBox extends PlaneBBox {
     return this.sendToPlane(this.planes.self());
   }
 
-  preMultiply(transform: TMat2D) {
-    // const own = multiplyTransformMatrixChain([
-    //   // back to parent
-    //   invertTransform(this.sendToParent().getTransformation()),
-    //   // apply post transform
-    //   transform,
-    //   // vpt
-    //   this.getTransformation(),
-    //   // back to origin
-    //   invertTransform(this.sendToSelf().getTransformation()),
-    //   // in self plane
-    // ]);
-    const parent = this.planes.parent();
-    const ownPreTransform = multiplyTransformMatrixChain([
-      invertTransform(parent),
-      transform,
-      parent,
-    ]);
-    const self = multiplyTransformMatrixChain([
-      parent,
-      this.getOwnTransform(),
-      ownPreTransform,
-    ]);
-    return new BBox(this.getTransformation(), {
-      ...this.planes,
-      self() {
-        return self;
-      },
-    });
-  }
+  // preMultiply(transform: TMat2D) {
+  //   const parent = this.planes.parent();
+  //   const ownPreTransform = multiplyTransformMatrixChain([
+  //     invertTransform(parent),
+  //     transform,
+  //     parent,
+  //   ]);
+  //   const self = multiplyTransformMatrixChain([
+  //     parent,
+  //     this.getOwnTransform(),
+  //     ownPreTransform,
+  //   ]);
+  //   return new BBox(this.getTransformation(), {
+  //     ...this.planes,
+  //     self() {
+  //       return self;
+  //     },
+  //   });
+  // }
 
-  getOwnTransform() {
-    return calcPlaneChangeMatrix(this.planes.self(), this.planes.parent());
-  }
+  // getOwnTransform() {
+  //   return calcPlaneChangeMatrix(this.planes.self(), this.planes.parent());
+  // }
 
   static getViewportCoords(target: ObjectGeometry) {
     const coords = target.calcCoords();
@@ -250,7 +337,6 @@ export class BBox extends PlaneBBox {
 
   static rotated(target: ObjectGeometry) {
     const coords = this.getViewportCoords(target);
-    // const angle = this.calcRotation(target);
     const rotation = this.calcRotation(coords);
     const center = coords.tl.midPointFrom(coords.br);
     const bbox = makeBoundingBoxFromPoints(
@@ -272,8 +358,7 @@ export class BBox extends PlaneBBox {
 
   static legacy(target: ObjectGeometry) {
     const coords = this.getViewportCoords(target);
-    const angle = target.getTotalAngle();
-    const rotation = degreesToRadians(angle);
+    const rotation = this.calcRotation(coords);
     const center = coords.tl.midPointFrom(coords.br);
     const viewportBBox = makeBoundingBoxFromPoints(Object.values(coords));
     const rotatedBBox = makeBoundingBoxFromPoints(
@@ -297,7 +382,7 @@ export class BBox extends PlaneBBox {
       center
     );
     return {
-      angle,
+      angle: radiansToDegrees(rotation),
       rotation,
       getCoords() {
         return legacyCoords;

@@ -15,7 +15,7 @@ import {
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
-import { BBox, TRotatedBBox } from './BBox';
+import { BBox, TRotatedBBox, CanvasBBox } from './BBox';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
@@ -317,24 +317,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Checks if the object contains the midpoint between canvas extremities
-   * Does not make sense outside the context of isOnScreen and isPartiallyOnScreen
-   * @private
-   * @param {Point} pointTL Top Left point
-   * @param {Point} pointBR Top Right point
-   * @param {Boolean} calculate use coordinates of current position instead of stored ones
-   * @return {Boolean} true if the object contains the point
-   */
-  private containsRectCenter(
-    pointTL: Point,
-    pointBR: Point,
-    absolute?: boolean
-  ): boolean {
-    const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, absolute);
-  }
-
-  /**
    * Checks if object is contained within the canvas with current viewportTransform
    * the check is done stopping at first point that appears on screen
    * @return {Boolean} true if object is fully or partially contained within canvas
@@ -343,27 +325,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     if (!this.canvas) {
       return false;
     }
-    const tl = new Point();
-    const br = new Point(this.canvas.width, this.canvas.height);
-    const points = this.getCoords();
-    // if some point is on screen, the object is on screen.
-    if (
-      points.some(
-        (point) =>
-          point.x <= br.x &&
-          point.x >= tl.x &&
-          point.y <= br.y &&
-          point.y >= tl.y
-      )
-    ) {
-      return true;
-    }
-    // no points on screen, check intersection with absolute coordinates
-    if (this.intersectsWithRect(tl, br)) {
-      return true;
-    }
-    // worst case scenario the object is so big that contains the screen
-    return this.containsRectCenter(tl, br);
+    return CanvasBBox.bbox(this.canvas).overlaps(this.bbox);
   }
 
   /**
@@ -375,17 +337,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     if (!this.canvas) {
       return false;
     }
-    const tl = new Point();
-    const br = new Point(this.canvas.width, this.canvas.height);
-    if (this.intersectsWithRect(tl, br)) {
-      return true;
-    }
-    const allPointsAreOutside = this.getCoords().every(
-      (point) =>
-        (point.x >= br.x || point.x <= tl.x) &&
-        (point.y >= br.y || point.y <= tl.y)
-    );
-    return allPointsAreOutside && this.containsRectCenter(tl, br);
+    const bbox = CanvasBBox.bbox(this.canvas);
+    return bbox.intersects(this.bbox) || bbox.isContainedBy(this.bbox);
   }
 
   /**
