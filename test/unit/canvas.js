@@ -2224,12 +2224,22 @@
 
   [true, false].forEach(objectCaching => {
     function testPixelDetection(assert, canvas, target, expectedHits) {
-      expectedHits.forEach(({ start, end, message, transparent }) => {
-        // make less sensitive by skipping edges for firefox 110
-        for (let index = start + 1; index < end - 1; index++) {
-          assert.equal(canvas.isTargetTransparent(target, index, index), transparent, `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}`);
-        }
-      });   
+      function execute(context = '') {
+        expectedHits.forEach(({ start, end, message, transparent }) => {
+          // make less sensitive by skipping edges for firefox 110
+          const round = 0;
+          for (let index = start + round; index < end - round; index++) {
+            assert.equal(
+              canvas.isTargetTransparent(target, index, index),
+              transparent,
+              `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}, ${context}`
+            );
+          }
+        });
+      }
+      execute();
+      canvas.setActiveObject(target);
+      execute('target is selected');
     }
 
     QUnit.test(`isTargetTransparent, objectCaching ${objectCaching}`, function (assert) {
@@ -2287,68 +2297,20 @@
         objectCaching,
       });
       canvas.add(rect);
-      canvas.setTargetFindTolerance(2);
+      canvas.setTargetFindTolerance(5);
       canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
       testPixelDetection(assert, canvas, rect, [
-        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: -10, end: -4, message: 'outside', transparent: true },
+        { start: -4, end: 0, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 0, end: 8, message: 'stroke', transparent: false },
-        { start: 8, end: 10, message: 'stroke tolerance not affected by vpt', transparent: false },
-        { start: 10, end: 18, message: 'fill', transparent: true },
-        { start: 18, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 8, end: 13, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 13, end: 16, message: 'fill', transparent: true },
+        { start: 16, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 20, end: 28, message: 'stroke', transparent: false },
-        { start: 28, end: 30, message: 'stroke tolerance not affected by vpt', transparent: false },
-        { start: 30, end: 40, message: 'outside', transparent: true },
+        { start: 28, end: 33, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 33, end: 40, message: 'outside', transparent: true },
       ]);
-    });
-
-    QUnit.test(`isTargetTransparent on active object, objectCaching ${objectCaching}`, function (assert) {
-      var rect = new fabric.Rect({
-        width: 20,
-        height: 20,
-        strokeWidth: 4,
-        stroke: 'red',
-        fill: '',
-        top: 0,
-        left: 0,
-        objectCaching,
-        selectionBackground: 'yellow'
-      });
-      canvas.add(rect);
-      canvas.setActiveObject(rect);
-      testPixelDetection(assert, canvas, rect, [
-        { start: 0, end: 4, message: 'stroke', transparent: false },
-        { start: 4, end: 20, message: 'fill', transparent: true },
-        { start: 20, end: 24, message: 'stroke', transparent: false },
-        { start: 24, end: 31, message: 'outside', transparent: true },
-      ]);
-    });
-
-    QUnit.test(`isTargetTransparent with tolerance, objectCaching ${objectCaching}`, function (assert) {
-      var rect = new fabric.Rect({
-        width: 20,
-        height: 20,
-        strokeWidth: 4,
-        stroke: 'red',
-        fill: '',
-        top: 0,
-        left: 0,
-        objectCaching,
-        selectionBackground: 'yellow'
-      });
-      canvas.add(rect);
-      canvas.setActiveObject(rect);
-      canvas.setTargetFindTolerance(2);
-      testPixelDetection(assert, canvas, rect, [
-        { start: -5, end: 0, message: 'outside', transparent: true },
-        { start: 0, end: 4, message: 'stroke', transparent: false },
-        { start: 4, end: 6, message: 'stroke tolerance', transparent: false },
-        { start: 6, end: 18, message: 'fill', transparent: true },
-        { start: 18, end: 20, message: 'stroke tolerance', transparent: false },
-        { start: 20, end: 24, message: 'stroke', transparent: false },
-        { start: 24, end: 26, message: 'stroke tolerance', transparent: false },
-        { start: 26, end: 31, message: 'outside', transparent: true },
-      ]);
-    });
+    });   
   });
 
   QUnit.test('canvas getTopContext', function(assert) {
