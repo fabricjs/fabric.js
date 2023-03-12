@@ -51,7 +51,7 @@
     "export": "npm run cli -- website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
     "test": "npm run cli -- test",
-    "sandbox": "npm run cli -- sandbox",
+    "sandbox": "npm run sandboxscript -- sandbox",
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c chrome firefox",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
