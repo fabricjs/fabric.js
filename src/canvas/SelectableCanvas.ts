@@ -16,7 +16,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import { isCollection } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -673,48 +673,7 @@ export class SelectableCanvas<
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
     const ctx = this.pixelFindContext;
-    const retina = this.getRetinaScaling();
     this.clearContext(ctx);
-    if (isFabricObjectCached(target) && !target.dirty) {
-      // optimization: use the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-      // transform tolerance according to vpt
-      // TODO: use sendVectorToPlane
-      const tolerance = new Point()
-        .scalarAdd(this.targetFindTolerance)
-        .transform(invertTransform(this.viewportTransform), true);
-      const size = tolerance.scalarMultiply(2).max(new Point(1, 1));
-      // performance optimization:
-      // we draw the hit area to the dedicated canvas instead of using `getImageData` on the target's cache canvas
-      // since `size` is transformed according to vpt the image is drawn as if transformed as well so `targetFindTolerance` can be used as the tolerance value
-      ctx.drawImage(
-        target._cacheCanvas,
-        Math.floor(targetRelativeX - tolerance.x),
-        Math.floor(targetRelativeY - tolerance.y),
-        Math.ceil(size.x),
-        Math.ceil(size.y),
-        0,
-        0,
-        Math.ceil(size.x * retina),
-        Math.ceil(size.y * retina)
-      );
-
-      return isTransparent(
-        ctx,
-        this.targetFindTolerance,
-        this.targetFindTolerance,
-        this.targetFindTolerance
-      );
-    }
-
     ctx.save();
     ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
     ctx.transform(...this.viewportTransform);
