@@ -1,8 +1,8 @@
-import { getDocument, getEnv } from '../env';
-import { dragHandler } from '../controls/drag';
-import { getActionFromCorner } from '../controls/util';
-import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import {getDocument,getEnv} from '../env';
+import {dragHandler} from '../controls/drag';
+import {getActionFromCorner} from '../controls/util';
+import {Point} from '../Point';
+import {FabricObject} from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
@@ -15,21 +15,21 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
-import { isTransparent } from '../util/misc/isTransparent';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { getPointer, isTouchEvent } from '../util/dom_event';
-import type { IText } from '../shapes/IText/IText';
-import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
-import type { BaseBrush } from '../brushes/BaseBrush';
-import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
-import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/ActiveSelection';
+import {StaticCanvas,TCanvasSizeOptions} from './StaticCanvas';
+import {isCollection,isFabricObjectCached} from '../util/types';
+import {invertTransform,transformPoint} from '../util/misc/matrix';
+import {isTransparent} from '../util/misc/isTransparent';
+import {AssertKeys,TMat2D,TOriginX,TOriginY,TSize} from '../typedefs';
+import {degreesToRadians} from '../util/misc/radiansDegreesConversion';
+import {getPointer,isTouchEvent} from '../util/dom_event';
+import type {IText} from '../shapes/IText/IText';
+import {makeElementUnselectable,wrapElement} from '../util/dom_misc';
+import {setStyle} from '../util/dom_style';
+import type {BaseBrush} from '../brushes/BaseBrush';
+import {pick} from '../util/misc/pick';
+import {TSVGReviver} from '../typedefs';
+import {sendPointToPlane} from '../util/misc/planeChange';
+import {ActiveSelection} from '../shapes/ActiveSelection';
 
 type TDestroyed<T, K extends keyof any> = {
   // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
@@ -516,7 +516,7 @@ export class SelectableCanvas<
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
   private declare pixelFindCanvasEl: HTMLCanvasElement;
-  private declare pixelFindContext: CanvasRenderingContext2D;
+  declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
@@ -651,12 +651,8 @@ export class SelectableCanvas<
 
   setTargetFindTolerance(value: number) {
     this.targetFindTolerance = value;
-    const size = Math.ceil(
-      2 * Math.max(this.targetFindTolerance, 1) * this.getRetinaScaling()
-    );
-    if (this.pixelFindCanvasEl.width < size) {
-      this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
-    }
+    const size = 2 * value + 1
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
   }
 
   /**
@@ -670,59 +666,38 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    const ctx = this.pixelFindContext;
+    const pixelCtx = this.pixelFindContext;
     const retina = this.getRetinaScaling();
-    this.clearContext(ctx);
+    pixelCtx.resetTransform();
+    this.clearContext(pixelCtx);
+    const tolerance = this.targetFindTolerance;
+    // normalized pointer is independendent from zoom and scale and retina.
+    const normalizedPointer = this._normalizePointer(target, new Point(x, y));
     if (isFabricObjectCached(target) && !target.dirty) {
       // optimization: use the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-      // transform tolerance according to vpt
-      // TODO: use sendVectorToPlane
-      const tolerance = new Point()
-        .scalarAdd(this.targetFindTolerance)
-        .transform(invertTransform(this.viewportTransform), true);
-      const size = tolerance.scalarMultiply(2).max(new Point(1, 1));
+      pixelCtx.translate(
+        -target.cacheTranslationX / retina - normalizedPointer.x * target.zoomX / retina + tolerance,
+        -target.cacheTranslationY / retina - normalizedPointer.y * target.zoomY / retina + tolerance
+      );
+      // the cache is retina scaled. we want to counter that.
+      pixelCtx.scale(1 / retina, 1 / retina);
       // performance optimization:
       // we draw the hit area to the dedicated canvas instead of using `getImageData` on the target's cache canvas
-      // since `size` is transformed according to vpt the image is drawn as if transformed as well so `targetFindTolerance` can be used as the tolerance value
-      ctx.drawImage(
+      pixelCtx.drawImage(
         target._cacheCanvas,
-        Math.floor(targetRelativeX - tolerance.x),
-        Math.floor(targetRelativeY - tolerance.y),
-        Math.ceil(size.x),
-        Math.ceil(size.y),
         0,
         0,
-        Math.ceil(size.x * retina),
-        Math.ceil(size.y * retina)
       );
-
-      return isTransparent(
-        ctx,
-        tolerance.x,
-        tolerance.y,
-        this.targetFindTolerance
-      );
+    } else {
+      pixelCtx.translate(-x + tolerance, -y + tolerance);
+      pixelCtx.transform(...this.viewportTransform);
+      target.render(pixelCtx);
     }
-
-    ctx.save();
-    ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
-    ctx.transform(...this.viewportTransform);
-    target.render(ctx);
-    ctx.restore();
     return isTransparent(
-      ctx,
-      this.targetFindTolerance,
-      this.targetFindTolerance,
-      this.targetFindTolerance
+      pixelCtx,
+      tolerance,
+      tolerance,
+      tolerance
     );
   }
 
@@ -1259,8 +1234,6 @@ export class SelectableCanvas<
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
-    const retina = this.getRetinaScaling();
-    this.pixelFindContext.scale(retina, retina);
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 

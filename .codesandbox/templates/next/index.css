@@ -1,0 +1,13 @@
+#test {
+  border: 1px solid red;
+  display: inline-block;
+  box-sizing: content-box;
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  padding: 0;
+}
+
+#test canvas {
+  transform: scale(8,8);
+}
