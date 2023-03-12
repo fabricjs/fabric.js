@@ -656,6 +656,8 @@ export class SelectableCanvas<
     );
     if (this.pixelFindCanvasEl.width < size) {
       this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+      const retina = this.getRetinaScaling();
+      this.pixelFindContext.scale(retina, retina);
     }
   }
 
@@ -1262,8 +1264,6 @@ export class SelectableCanvas<
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
-    const retina = this.getRetinaScaling();
-    this.pixelFindContext.scale(retina, retina);
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
