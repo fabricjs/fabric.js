@@ -27,10 +27,34 @@ export class BBox extends ViewportBBox {
     super(transform, planes);
   }
 
+  /**
+   * Use this to operate on the object's own transformation.\
+   * Used to position the object in the relative plane
+   */
   sendToParent() {
     return this.sendToPlane(this.planes.parent());
   }
 
+  /**
+   * Use this to operate in a transform-less plane
+   *
+   * e.g.
+   * {@link getBBox} will return the following:
+   *
+   * ```js
+   * let w = object.width;
+   * let h = object.height;
+   * let s = object.strokeWidth;
+   * let sx, sy, px, py; // non linear stroke/padding factors transformed back to the object plane
+   * ```
+   *
+   * | case                              | left          |  top          |  width       |  height      |
+   * | ---                               | ---           |  ---          |  ---         |  ---         |
+   * | no `stroke`/`padding`             | `-w / 2`      | `-h / 2`      | `w`          | `h`          |
+   * | `strokeUniform = false`           | `-w / 2 - s`  | `-h / 2 - s`  | `w + s * 2`  | `h + s * 2`  |
+   * | `strokeUniform = true || padding` | `-w / 2 - sx` | `-h / 2 - sy` | `w + sx * 2` | `h + sy * 2` |
+   *
+   */
   sendToSelf() {
     return this.sendToPlane(this.planes.self());
   }
