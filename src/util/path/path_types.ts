@@ -1,14 +1,14 @@
 import { TRadian } from '../../typedefs';
 import { IPoint, Point } from '../../Point';
 
-type TPathSegmentInfoCommon = {
+export type TPathSegmentInfoCommon<C extends string> = {
   x: number;
   y: number;
-  command?: string;
+  command?: C;
   length: number;
 };
 
-export type TCurveInfo = TPathSegmentInfoCommon & {
+export type TCurveInfo<C extends string> = TPathSegmentInfoCommon<C> & {
   /**
    * Get the Point a certain percent distance along the curve
    * @param pct
@@ -25,15 +25,17 @@ export type TCurveInfo = TPathSegmentInfoCommon & {
   length: number;
 };
 
+export type TEndPathInfo = TPathSegmentInfoCommon<'Z'> & { destX: number; destY: number }
+
 /**
  * Info about various paths
  */
 export type TPathSegmentInfo = {
-  M: TPathSegmentInfoCommon;
-  L: TPathSegmentInfoCommon;
-  C: TCurveInfo;
-  Q: TCurveInfo;
-  Z: TPathSegmentInfoCommon & { destX: number; destY: number };
+  M: TPathSegmentInfoCommon<'M'>;
+  L: TPathSegmentInfoCommon<'L'>;
+  C: TCurveInfo<'C'>;
+  Q: TCurveInfo<'Q'>;
+  Z: TEndPathInfo;
 };
 
 export type TPathSegmentsInfo = TPathSegmentInfo[keyof TPathSegmentInfo];
@@ -460,8 +462,6 @@ export type TComplexPathData = TComplexParsedCommand[];
 export type TSimpleParsedCommand =
   | TParsedAbsoluteMoveToCommand
   | TParsedAbsoluteLineCommand
-  | TParsedAbsoluteHorizontalLineCommand
-  | TParsedAbsoluteVerticalLineCommand
   | TParsedAbsoluteClosePathCommand
   | TParsedAbsoluteCubicCurveCommand
   | TParsedAbsoluteQuadraticCurveCommand;

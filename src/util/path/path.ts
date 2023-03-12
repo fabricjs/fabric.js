@@ -19,14 +19,14 @@ import {
   TPathSegmentInfo,
   rePathCommand,
   numberRegExStr,
-  TComplexParsedCommand,
+  TComplexParsedCommand, TPathSegmentInfoCommon, TEndPathInfo, isAbsLineCmd, TParsedArcCommand,
 } from './path_types';
 import { Point } from 'fabric';
 
 /**
  * Commands that may be repeated
  */
-const repeatedCommands: { m: 'l'; M: 'L' } = {
+const repeatedCommands: Record<string, string | undefined> = {
   m: 'l',
   M: 'L',
 };
@@ -315,7 +315,7 @@ export function getBoundsOfCurve(
 export const fromArcToBeziers = (
   fx: number,
   fy: number,
-  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedAbsoluteArcCommand
+  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedArcCommand
 ): TParsedAbsoluteCubicCurveCommand[] => {
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
@@ -354,8 +354,8 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
     y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath: TSimplePathData = [],
-    previous: string | undefined,
+  const destinationPath: TSimplePathData = [];
+    let previous: string | undefined,
     // placeholders
     controlX = 0,
     controlY = 0;
@@ -495,9 +495,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         current[7] += y;
       // falls through
       case 'A':
-        destinationPath = destinationPath.concat(
-          fromArcToBeziers(x, y, current as TParsedAbsoluteArcCommand)
-        );
+        fromArcToBeziers(x, y, current).forEach(b => destinationPath.push(b));
         x = current[6];
         y = current[7];
         break;
@@ -505,12 +503,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
       case 'Z':
         x = x1;
         y = y1;
-        // TODO: remove lowercase z from
-        if (current[0] == 'Z') {
-          converted = ['Z'];
-        } else {
-          (converted as any) = ['z'];
-        }
+        converted = ['Z'];
         break;
       default:
     }
@@ -658,7 +651,7 @@ const pathIterator = (
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
 const findPercentageForDistance = (
-  segInfo: TCurveInfo,
+  segInfo: TCurveInfo<"Q" | "C">,
   distance: number
 ): TPointAngle => {
   let perc = 0,
@@ -711,22 +704,27 @@ export const getPathSegmentsInfo = (
     angleFinder;
   const info: TPathSegmentsInfo[] = [];
   for (const current of path) {
-    tempInfo = {
+    const basicInfo: TPathSegmentInfoCommon<keyof TPathSegmentInfo> = {
       x: x1,
       y: y1,
-      command: current[0] as string,
+      command: current[0],
       length: 0,
     };
     switch (
       current[0] //first letter
     ) {
       case 'M':
-        tempInfo.length = 0;
+        tempInfo = <TPathSegmentInfoCommon<"M">>{
+          ...basicInfo,
+        }
         x2 = x1 = current[1];
         y2 = y1 = current[2];
         break;
       case 'L':
-        tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
+        tempInfo = <TPathSegmentInfoCommon<"L">>{
+          ...basicInfo,
+          length: calcLineLength(x1, y1, current[1], current[2])
+        }
         x1 = current[1];
         y1 = current[2];
         break;
@@ -751,9 +749,12 @@ export const getPathSegmentsInfo = (
           current[5],
           current[6]
         );
-        (tempInfo as TPathSegmentInfo['C']).iterator = iterator;
-        (tempInfo as TPathSegmentInfo['C']).angleFinder = angleFinder;
-        tempInfo.length = pathIterator(iterator, x1, y1);
+        tempInfo = <TCurveInfo<"C">>{
+          ...basicInfo,
+          iterator,
+          angleFinder,
+          length: pathIterator(iterator, x1, y1)
+        }
         x1 = current[5];
         y1 = current[6];
         break;
@@ -774,17 +775,23 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4]
         );
-        (tempInfo as TCurveInfo).iterator = iterator;
-        (tempInfo as TCurveInfo).angleFinder = angleFinder;
-        tempInfo.length = pathIterator(iterator, x1, y1);
+        tempInfo = <TCurveInfo<"Q">>{
+          ...basicInfo,
+          iterator,
+          angleFinder,
+          length: pathIterator(iterator, x1, y1)
+        };
         x1 = current[3];
         y1 = current[4];
         break;
       case 'Z':
         // we add those in order to ease calculations later
-        (tempInfo as TPathSegmentInfo['Z']).destX = x2;
-        (tempInfo as TPathSegmentInfo['Z']).destY = y2;
-        tempInfo.length = calcLineLength(x1, y1, x2, y2);
+        tempInfo = <TEndPathInfo>{
+          ...basicInfo,
+          destX: x2,
+          destY: y2,
+          length: calcLineLength(x1, y1, x2, y2)
+        };
         x1 = x2;
         y1 = y2;
         break;
@@ -805,64 +812,67 @@ export const getPathSegmentsInfo = (
 export const getPointOnPath = (
   path: TSimplePathData,
   distance: number,
-  infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
+  infos: TPathSegmentsInfo[] = getPathSegmentsInfo(path)
 ): TPointAngle | undefined => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;
     i++;
   }
-  // var distance = infos[infos.length - 1] * perc;
   const segInfo = infos[i],
     segPercent = distance / segInfo.length,
     command = segInfo.command,
     segment = path[i];
   let info: TPointAngle;
 
-  switch (command) {
+  switch (segInfo.command) {
     case 'M':
       return { x: segInfo.x, y: segInfo.y, angle: 0 };
-    case 'z':
     case 'Z':
       info = {
         ...new Point(segInfo.x, segInfo.y).lerp(
           new Point(
-            (segInfo as TPathSegmentInfo['Z']).destX,
-            (segInfo as TPathSegmentInfo['Z']).destY
+            segInfo.destX,
+            segInfo.destY
           ),
           segPercent
         ),
         angle: 0,
       };
       info.angle = Math.atan2(
-        (segInfo as TPathSegmentInfo['Z']).destY - segInfo.y,
-        (segInfo as TPathSegmentInfo['Z']).destX - segInfo.x
+        segInfo.destY - segInfo.y,
+        segInfo.destX - segInfo.x
       );
       return info;
     case 'L':
-      info = {
-        ...new Point(segInfo.x, segInfo.y).lerp(
-          new Point(
-            (segment as TParsedAbsoluteLineCommand)[1],
-            (segment as TParsedAbsoluteLineCommand)[2]
+      if(isAbsLineCmd(segment)) {
+        info = {
+          ...new Point(segInfo.x, segInfo.y).lerp(
+            new Point(
+              segment[1],
+              segment[2]
+            ),
+            segPercent
           ),
-          segPercent
-        ),
-        angle: 0,
-      };
-      info.angle = Math.atan2(
-        (segment as TParsedAbsoluteLineCommand)[2] - segInfo.y,
-        (segment as TParsedAbsoluteLineCommand)[1] - segInfo.x
-      );
+          angle: 0,
+        };
+        info.angle = Math.atan2(
+          segment[2] - segInfo.y,
+          segment[1] - segInfo.x
+        );
+      } else {
+        // TODO: provide a proper error
+        throw Error(`Segment/path info mismatch, expected L, got ${segment[0]}`);
+      }
       return info;
     case 'C':
       return findPercentageForDistance(
-        segInfo as TPathSegmentInfo['C'],
+        segInfo,
         distance
       );
     case 'Q':
       return findPercentageForDistance(
-        segInfo as TPathSegmentInfo['Q'],
+        segInfo,
         distance
       );
     default:
@@ -904,6 +914,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
         break;
       }
       const filteredGroups = paramArr.filter((g) => g);
+      // indices is a JS regex thing that apparently isn't nicely supported by TS (set from the 'd' flag)
       const filteredIndices = (paramArr as any).indices.filter((i: never) => i);
       // remove the first element from the match array since it's just the whole command
       filteredGroups.shift();
@@ -927,9 +938,9 @@ export const parsePath = (pathString: string): TComplexPathData => {
     } while (paramArr);
     // add the chain, convert multiple m's to l's in the process
     chain.reverse().forEach((c, idx) => {
-      // use weird 'M' | 'm' because otherwise ts complains
-      if (idx > 0 && repeatedCommands[c[0] as 'M' | 'm']) {
-        c[0] = repeatedCommands[c[0] as 'M' | 'm'];
+      const transformed = repeatedCommands[c[0]];
+      if (idx > 0 && (transformed == 'l' || transformed == 'L')) {
+        c[0] = transformed;
       }
       res.push(c);
     });
