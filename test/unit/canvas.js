@@ -2223,6 +2223,15 @@
   // });
 
   [true, false].forEach(objectCaching => {
+    function testPixelDetection(assert, canvas, target, expectedHits) {
+      expectedHits.forEach(({ start, end, message, transparent }) => {
+        // make less sensitive by skipping edges for firefox 110
+        for (let index = start + 1; index < end - 1; index++) {
+          assert.equal(canvas.isTargetTransparent(target, index, index), transparent, `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}`);
+        }
+      });   
+    }
+
     QUnit.test(`isTargetTransparent, objectCaching ${objectCaching}`, function (assert) {
       var rect = new fabric.Rect({
         width: 10,
@@ -2235,22 +2244,13 @@
         objectCaching,
       });
       canvas.add(rect);
-      assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
-      assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
-      assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
-      assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-      assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
-      assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
-      assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
-      assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
-      assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-      // disabled this pixel because firefox 110 updates
-      // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
-      assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
-      assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
-      assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
-      assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
-      assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
+      testPixelDetection(assert, canvas, rect, [
+        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: 0, end: 4, message: 'stroke', transparent: false },
+        { start: 4, end: 10, message: 'fill', transparent: true },
+        { start: 10, end: 14, message: 'stroke', transparent: false },
+        { start: 14, end: 20, message: 'outside', transparent: true },
+      ]);
     });
 
     QUnit.test(`isTargetTransparent, vpt, objectCaching ${objectCaching}`, function (assert) {
@@ -2266,21 +2266,42 @@
       });
       canvas.add(rect);
       canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
-      [
+      testPixelDetection(assert, canvas, rect, [
         { start: -5, end: 0, message: 'outside', transparent: true },
         { start: 0, end: 8, message: 'stroke', transparent: false },
         { start: 8, end: 20, message: 'fill', transparent: true },
         { start: 20, end: 28, message: 'stroke', transparent: false },
         { start: 28, end: 40, message: 'outside', transparent: true },
-      ].forEach(({ start, end, message, transparent }) => {
-        // make less sensitive by skipping edges
-        for (let index = start + 1; index < end - 1; index++) {
-          assert.equal(canvas.isTargetTransparent(rect, index, index), transparent, `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}`);
-        }
-      });
+      ]);
     });
 
-    QUnit.test(`isTargetTransparent as active object, objectCaching ${objectCaching}`, function (assert) {
+    QUnit.test(`isTargetTransparent, vpt, tolerance, objectCaching ${objectCaching}`, function (assert) {
+      var rect = new fabric.Rect({
+        width: 10,
+        height: 10,
+        strokeWidth: 4,
+        stroke: 'red',
+        fill: '',
+        top: 0,
+        left: 0,
+        objectCaching,
+      });
+      canvas.add(rect);
+      canvas.setTargetFindTolerance(2);
+      canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+      testPixelDetection(assert, canvas, rect, [
+        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: 0, end: 8, message: 'stroke', transparent: false },
+        { start: 8, end: 10, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 10, end: 18, message: 'fill', transparent: true },
+        { start: 18, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 20, end: 28, message: 'stroke', transparent: false },
+        { start: 28, end: 30, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 30, end: 40, message: 'outside', transparent: true },
+      ]);
+    });
+
+    QUnit.test(`isTargetTransparent on active object, objectCaching ${objectCaching}`, function (assert) {
       var rect = new fabric.Rect({
         width: 20,
         height: 20,
@@ -2290,46 +2311,44 @@
         top: 0,
         left: 0,
         objectCaching,
+        selectionBackground: 'yellow'
       });
       canvas.add(rect);
       canvas.setActiveObject(rect);
-      assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
-      assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
-      assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
-      assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-      assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
-      assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
-      assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
-      assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
-      assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-      assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
-      assert.equal(canvas.isTargetTransparent(rect, 10, 10), true, 'transparent 10, 10');
-      assert.equal(canvas.isTargetTransparent(rect, 11, 11), true, 'transparent 11, 11');
-      assert.equal(canvas.isTargetTransparent(rect, 12, 12), true, 'transparent 12, 12');
-      assert.equal(canvas.isTargetTransparent(rect, 13, 13), true, 'transparent 13, 13');
-      assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent 14, 14');
-      assert.equal(canvas.isTargetTransparent(rect, 15, 15), true, 'transparent 15, 15');
-      assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
-      assert.equal(canvas.isTargetTransparent(rect, 17, 17), true, 'transparent 17, 17');
-      assert.equal(canvas.isTargetTransparent(rect, 18, 18), true, 'transparent 18, 18');
-      // disabled this pixel because firefox 110 updates
-      // assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
-      assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
-      assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
-      assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
-      assert.equal(canvas.isTargetTransparent(rect, 23, 23), false, 'opaque 23, 23');
-      assert.equal(canvas.isTargetTransparent(rect, 24, 24), true, 'transparent 24, 24');
-      assert.equal(canvas.isTargetTransparent(rect, 25, 25), true, 'transparent 25, 25');
-      assert.equal(canvas.isTargetTransparent(rect, 26, 26), true, 'transparent 26, 26');
-      assert.equal(canvas.isTargetTransparent(rect, 27, 27), true, 'transparent 27, 27');
-      assert.equal(canvas.isTargetTransparent(rect, 28, 28), true, 'transparent 28, 28');
-      assert.equal(canvas.isTargetTransparent(rect, 29, 29), true, 'transparent 29, 29');
-      assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
-      assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
-
+      testPixelDetection(assert, canvas, rect, [
+        { start: 0, end: 4, message: 'stroke', transparent: false },
+        { start: 4, end: 20, message: 'fill', transparent: true },
+        { start: 20, end: 24, message: 'stroke', transparent: false },
+        { start: 24, end: 31, message: 'outside', transparent: true },
+      ]);
     });
-    
-    
+
+    QUnit.test(`isTargetTransparent with tolerance, objectCaching ${objectCaching}`, function (assert) {
+      var rect = new fabric.Rect({
+        width: 20,
+        height: 20,
+        strokeWidth: 4,
+        stroke: 'red',
+        fill: '',
+        top: 0,
+        left: 0,
+        objectCaching,
+        selectionBackground: 'yellow'
+      });
+      canvas.add(rect);
+      canvas.setActiveObject(rect);
+      canvas.setTargetFindTolerance(2);
+      testPixelDetection(assert, canvas, rect, [
+        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: 0, end: 4, message: 'stroke', transparent: false },
+        { start: 4, end: 6, message: 'stroke tolerance', transparent: false },
+        { start: 6, end: 18, message: 'fill', transparent: true },
+        { start: 18, end: 20, message: 'stroke tolerance', transparent: false },
+        { start: 20, end: 24, message: 'stroke', transparent: false },
+        { start: 24, end: 26, message: 'stroke tolerance', transparent: false },
+        { start: 26, end: 31, message: 'outside', transparent: true },
+      ]);
+    });
   });
 
   QUnit.test('canvas getTopContext', function(assert) {
