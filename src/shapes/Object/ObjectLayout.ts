@@ -1,18 +1,19 @@
-import type { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
+import { CommonMethods } from '../../CommonMethods';
+import { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
+import type { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
 import {
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
 } from '../../util/misc/matrix';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
+import { createVector } from '../../util/misc/vectors';
 import type { Group } from '../Group';
-import { BaseProps } from './types/BaseProps';
-import { CommonMethods } from '../../CommonMethods';
 import { FabricObjectProps } from './types';
-import { PlaneBBox } from '../../BBox/PlaneBBox';
+import { BaseProps } from './types/BaseProps';
 
 type TMatrixCache = {
   key: string;
@@ -119,6 +120,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
+   *
    * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    */
   getRelativeXY(
@@ -127,16 +129,17 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   ): Point {
     return new Point(this.left, this.top).add(
       this.getDimensionsVectorForLayout(
-        PlaneBBox.getOriginDiff(
-          { x: this.originX, y: this.originY },
-          { x: originX, y: originY }
+        createVector(
+          resolveOriginPoint({ x: this.originX, y: this.originY }),
+          resolveOriginPoint({ x: originX, y: originY })
         )
       )
     );
   }
 
   /**
-   * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
+   * Same as {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
+   *
    * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
@@ -148,9 +151,9 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   ) {
     const position = point.add(
       this.getDimensionsVectorForLayout(
-        PlaneBBox.getOriginDiff(
-          { x: originX, y: originY },
-          { x: this.originX, y: this.originY }
+        createVector(
+          resolveOriginPoint({ x: originX, y: originY }),
+          resolveOriginPoint({ x: this.originX, y: this.originY })
         )
       )
     );

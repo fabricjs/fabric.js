@@ -1,13 +1,14 @@
 import { Point } from '../Point';
-import { TBBox, TCornerPoint, TMat2D, TOriginX, TOriginY } from '../typedefs';
+import { TBBox, TCornerPoint, TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { invertTransform } from '../util/misc/matrix';
 import { calcBaseChangeMatrix } from '../util/misc/planeChange';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
+import {
+  OriginDescriptor,
+  resolveOriginPoint,
+} from '../util/misc/resolveOrigin';
 import { calcVectorRotation, createVector } from '../util/misc/vectors';
-
-export type OriginDiff = { x: TOriginX; y: TOriginY };
 
 const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
 
@@ -69,27 +70,35 @@ export class PlaneBBox {
     return point.transform(invertTransform(this.getTransformation()));
   }
 
+  /**
+   * This is where point and vector meet since point is a vector from its origin
+   *
+   * Let `O` be the origin, `P` the point, `O'` the desired origin, `P'` the point described by `O'`
+   * ```latex
+   * P = OP = (left, top)
+   * P' = O'P = O'O + OP
+   * ```
+   *
+   * @returns a point that is positioned in the same place as {@link point} but refers to {@link to} as its origin instead of {@link from}
+   */
+  changeOrigin(
+    point: Point,
+    from: OriginDescriptor = CENTER_ORIGIN,
+    to: OriginDescriptor = CENTER_ORIGIN
+  ) {
+    return point.add(
+      this.vectorFromOrigin(
+        createVector(resolveOriginPoint(to), resolveOriginPoint(from))
+      )
+    );
+  }
+
   vectorFromOrigin(originVector: Point) {
     return originVector.transform(this.getTransformation(), true);
   }
 
   vectorToOrigin(vector: Point) {
     return vector.transform(invertTransform(this.getTransformation()), true);
-  }
-
-  static resolveOrigin({ x, y }: OriginDiff): Point {
-    return new Point(resolveOrigin(x), resolveOrigin(y));
-  }
-
-  static getOriginDiff(
-    from: OriginDiff = CENTER_ORIGIN,
-    to: OriginDiff = CENTER_ORIGIN
-  ) {
-    return PlaneBBox.resolveOrigin(to).subtract(PlaneBBox.resolveOrigin(from));
-  }
-
-  vectorFromOriginDiff(from?: OriginDiff, to?: OriginDiff) {
-    return this.vectorFromOrigin(PlaneBBox.getOriginDiff(from, to));
   }
 
   calcOriginTranslation(origin: Point, prev: this) {

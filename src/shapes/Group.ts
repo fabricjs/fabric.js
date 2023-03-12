@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { TClassProperties } from '../typedefs';
 import {
@@ -803,10 +803,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     const width = hasWidth ? this.width : bbox.width || 0,
       height = hasHeight ? this.height : bbox.height || 0,
       calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
-      origin = new Point(
-        resolveOrigin(this.originX),
-        resolveOrigin(this.originY)
-      ),
+      origin = resolveOriginPoint({ x: this.originX, y: this.originY }),
       size = new Point(width, height),
       strokeWidthVector = new Point(),
       sizeAfter = new Point(width, height),
