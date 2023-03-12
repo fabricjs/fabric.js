@@ -155,8 +155,5 @@ export class Ellipse extends FabricObject {
   /* _FROM_SVG_END_ */
 }
 
-// @ts-expect-error
-Ellipse.prototype.type = 'ellipse';
-
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);

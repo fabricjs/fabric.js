@@ -195,7 +195,7 @@ export class Shadow {
     }
 
     const defaults = Shadow.ownDefaults;
-    const out: Record<string, unknown> = {};
+    const out: Partial<typeof data> = {};
     for (const key in data) {
       if (
         data[key as keyof typeof data] !== defaults[key as keyof typeof data]

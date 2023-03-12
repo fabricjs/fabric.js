@@ -103,11 +103,3 @@ export const createTextboxDefaultControls = () => ({
   ...createObjectDefaultControls(),
   ...createResizeControls(),
 });
-
-export const defaultControls = createObjectDefaultControls();
-
-// shared with the default object on purpose
-export const textboxDefaultControls = {
-  ...defaultControls,
-  ...createResizeControls(),
-};

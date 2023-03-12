@@ -385,9 +385,6 @@ export class Path extends FabricObject {
   }
 }
 
-// @ts-expect-error
-Path.prototype.type = 'path';
-
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);
 
