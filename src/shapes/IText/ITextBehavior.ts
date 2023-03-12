@@ -1,16 +1,16 @@
-import {getDocument} from '../../env';
+import { getDocument } from '../../env';
 import {
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
 } from '../../EventTypeDefs';
-import {Point} from '../../Point';
-import type {FabricObject} from '../Object/Object';
-import {Text} from '../Text/Text';
-import {animate} from '../../util/animation/animate';
-import {TOnAnimationChangeCallback} from '../../util/animation/types';
-import type {ValueAnimation} from '../../util/animation/ValueAnimation';
-import {TextStyleDeclaration} from '../Text/StyledText';
+import { Point } from '../../Point';
+import type { FabricObject } from '../Object/Object';
+import { Text } from '../Text/Text';
+import { animate } from '../../util/animation/animate';
+import { TOnAnimationChangeCallback } from '../../util/animation/types';
+import type { ValueAnimation } from '../../util/animation/ValueAnimation';
+import { TextStyleDeclaration } from '../Text/StyledText';
 
 /**
  *  extend this regex to support non english languages
