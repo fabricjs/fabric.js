@@ -14,5 +14,7 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": false,
     "source.removeUnusedImports": true
-  }
+  },
+  "prettier.configPath": ".prettierrc",
+  "prettier.bracketSpacing": true
 }

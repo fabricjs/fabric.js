@@ -1,11 +1,11 @@
 //@ts-nocheck
 
-import {config} from '../../config';
-import {getDocument,getEnv} from '../../env';
-import {TPointerEvent} from '../../EventTypeDefs';
-import {capValue} from '../../util/misc/capValue';
-import {ITextBehavior,ITextEvents} from './ITextBehavior';
-import type {TKeyMapIText} from './constants';
+import { config } from '../../config';
+import { getDocument, getEnv } from '../../env';
+import { TPointerEvent } from '../../EventTypeDefs';
+import { capValue } from '../../util/misc/capValue';
+import { ITextBehavior, ITextEvents } from './ITextBehavior';
+import type { TKeyMapIText } from './constants';
 
 export abstract class ITextKeyBehavior<
   EventSpec extends ITextEvents = ITextEvents
@@ -181,7 +181,7 @@ export abstract class ITextKeyBehavior<
         this.canvas.fire('text:changed', { target: this });
         this.canvas.requestRenderAll();
       }
-    }
+    };
     if (this.hiddenTextarea.value === '') {
       this.styles = {};
       updateAndFire();
