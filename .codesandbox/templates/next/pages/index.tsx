@@ -1,7 +1,7 @@
 import * as fabric from 'fabric';
-import {NextPage} from 'next';
-import {useCallback} from 'react';
-import {Canvas} from '../components/Canvas';
+import { NextPage } from 'next';
+import { useCallback } from 'react';
+import { Canvas } from '../components/Canvas';
 
 const IndexPage: NextPage = () => {
   const onLoad = useCallback(async (canvas: fabric.Canvas) => {

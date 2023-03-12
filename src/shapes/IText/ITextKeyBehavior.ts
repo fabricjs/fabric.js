@@ -168,6 +168,7 @@ export abstract class ITextKeyBehavior<
    * @param {Event} e Event object
    */
   onInput(e: Event) {
+    this._forceClearCache = true;
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
