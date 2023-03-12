@@ -39,10 +39,10 @@ type TDestroyed<T, K extends keyof any> = {
 export type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
   T,
   | 'contextTop'
-  | 'contextCache'
+  | 'pixelFindContext'
   | 'lowerCanvasEl'
   | 'upperCanvasEl'
-  | 'cacheCanvasEl'
+  | 'pixelFindCanvasEl'
   | 'wrapperEl'
   | '_activeSelection'
 >;
@@ -481,15 +481,6 @@ export class SelectableCanvas<
   contextTopDirty = false;
 
   /**
-   * a reference to the context of an additional canvas that is used for scratch operations
-   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
-   * and is a memory waste. We should either have one that gets added/deleted
-   * @type CanvasRenderingContext2D
-   * @private
-   */
-  declare contextCache: CanvasRenderingContext2D;
-
-  /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
    * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
@@ -524,7 +515,9 @@ export class SelectableCanvas<
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
+
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
@@ -656,6 +649,16 @@ export class SelectableCanvas<
     );
   }
 
+  setTargetFindTolerance(value: number) {
+    this.targetFindTolerance = value;
+    const size = Math.ceil(
+      2 * Math.max(this.targetFindTolerance, 1) * this.getRetinaScaling()
+    );
+    if (this.pixelFindCanvasEl.width < size) {
+      this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    }
+  }
+
   /**
    * Returns true if object is transparent at a certain location
    * Clarification: this is `is target transparent at location X or are controls there`
@@ -667,23 +670,11 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    const ctx = this.contextCache;
+    const ctx = this.pixelFindContext;
     const retina = this.getRetinaScaling();
-    const size = Math.max(2 * this.targetFindTolerance * retina, 10);
-    if (this.pixelFindCanvasEl.width < size) {
-      // TODO: handle in set
-      this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
-    } else {
-      this.clearContext(ctx);
-    }
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (
-      isFabricObjectCached(target) &&
-      target !== this._activeObject &&
-      !target.dirty
-    ) {
-      // optimization: we can reuse the cache
+    this.clearContext(ctx);
+    if (isFabricObjectCached(target) && !target.dirty) {
+      // optimization: use the cache
       const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
         targetRelativeX = Math.max(
           target.cacheTranslationX + normalizedPointer.x * target.zoomX,
@@ -1265,14 +1256,12 @@ export class SelectableCanvas<
 
   protected _createCacheCanvas() {
     this.pixelFindCanvasEl = this._createCanvasElement();
-    this.contextCache = this.pixelFindCanvasEl.getContext('2d', {
+    this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
     const retina = this.getRetinaScaling();
-    this.contextCache.scale(retina, retina);
-    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = Math.ceil(
-      Math.max(2 * this.targetFindTolerance * retina, retina)
-    );
+    this.pixelFindContext.scale(retina, retina);
+    this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
   protected _initWrapperElement() {
@@ -1552,7 +1541,7 @@ export class SelectableCanvas<
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!,
+      pixelFindCanvasEl = this.pixelFindCanvasEl!,
       activeSelection = this._activeSelection!;
     // dispose of active selection
     activeSelection.removeAll();
@@ -1561,13 +1550,13 @@ export class SelectableCanvas<
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this.contextCache = null;
+    this.pixelFindContext = null;
     this.contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
     getEnv().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    getEnv().dispose(cacheCanvasEl);
-    this.cacheCanvasEl = undefined;
+    getEnv().dispose(pixelFindCanvasEl);
+    this.pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
