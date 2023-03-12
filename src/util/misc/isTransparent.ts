@@ -1,5 +1,3 @@
-import { Point } from '../../Point';
-
 /**
  * Returns true if context has transparent pixel
  * at specified location (taking tolerance into account)
@@ -15,21 +13,30 @@ export const isTransparent = (
   y: number,
   tolerance: number
 ): boolean => {
-  tolerance = Math.ceil(Math.max(tolerance, 0));
-  const point = new Point(x, y);
-  const start = point.scalarSubtract(tolerance).floor();
-  const end = point
-    .scalarAdd(Math.max(tolerance, 1))
-    .ceil()
-    .min(new Point(ctx.canvas.width - 1, ctx.canvas.height - 1));
-  const boundStart = start.max(new Point());
-  const size = end.subtract(boundStart);
-  if (size.x <= 0 || size.y <= 0) {
-    // out of bounds
-    return true;
+  // If tolerance is > 0 adjust start coords to take into account.
+  // If moves off Canvas fix to 0
+  // If x, y exceed bounds a blank pixel will be returned so the return value will be true as it should
+  if (tolerance > 0) {
+    if (x > tolerance) {
+      x -= tolerance;
+    } else {
+      x = 0;
+    }
+    if (y > tolerance) {
+      y -= tolerance;
+    } else {
+      y = 0;
+    }
   }
 
-  const { data } = ctx.getImageData(boundStart.x, boundStart.y, size.x, size.y);
+  const { data } = ctx.getImageData(
+    x,
+    y,
+    tolerance * 2 || 1,
+    tolerance * 2 || 1
+  );
+
+  // Split image data - for tolerance > 1, pixelDataSize = 4;
   for (let i = 3; i < data.length; i += 4) {
     const alphaChannel = data[i];
     if (alphaChannel > 0) {
