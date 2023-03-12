@@ -716,10 +716,10 @@ export class SelectableCanvas<
     ctx.save();
     ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
     ctx.transform(...this.viewportTransform);
-    const selectionBgc = target.backgroundSelectionColor;
-    target.backgroundSelectionColor = '';
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
     target.render(ctx);
-    target.backgroundSelectionColor = selectionBgc;
+    target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
     return isTransparent(
       ctx,
