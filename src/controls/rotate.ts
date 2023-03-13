@@ -38,17 +38,20 @@ export const rotationStyleHandler: ControlCursorCallback = (
  */
 const rotateObjectWithSnapping: TransformActionHandler = (
   eventData,
-  { target, ex, ey, theta, originX, originY },
+  { target, pointer, ex, ey, theta, originX, originY },
   x,
   y
 ) => {
-  const pivotPoint = target.getRelativeXY(originX, originY);
-
   if (isLocked(target, 'lockRotation')) {
     return false;
   }
 
-  const lastAngle = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
+  const pivotPoint = target.getXY(originX, originY);
+  const ownAngle = target.angle;
+  const lastAngle = Math.atan2(
+      pointer.y - pivotPoint.y,
+      pointer.x - pivotPoint.x
+    ),
     curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
   let angle = radiansToDegrees(curAngle - lastAngle + theta);
 
@@ -65,16 +68,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     }
   }
 
-  // normalize angle to positive value
-  if (angle < 0) {
-    angle = 360 + angle;
-  }
-  angle %= 360;
-
-  const hasRotated = target.angle !== angle;
-  // TODO: why aren't we using set?
-  target.angle = angle;
-  return hasRotated;
+  return target.rotate(angle) !== ownAngle;
 };
 
 export const rotationWithSnapping = wrapWithFireEvent(
