@@ -81,10 +81,10 @@ const anchorWrapper = (
   ) {
     const poly = transform.target as Polyline,
       anchorIndex = (pointIndex > 0 ? pointIndex : poly.points.length) - 1,
-      pointInParentPlane = new Point(
+      pointInCanvasPlane = new Point(
         poly.points[anchorIndex].x - poly.pathOffset.x,
         poly.points[anchorIndex].y - poly.pathOffset.y
-      ).transform(poly.calcOwnMatrix()),
+      ).transform(poly.calcTransformMatrix()),
       actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
       polygonBaseSize = getSize(poly),
       adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
@@ -97,11 +97,7 @@ const anchorWrapper = (
       .divide(polygonBaseSize)
       .multiply(adjustFlip);
 
-    poly.setRelativeXY(
-      pointInParentPlane,
-      newPosition.x + 0.5,
-      newPosition.y + 0.5
-    );
+    poly.setXY(pointInCanvasPlane, newPosition.x + 0.5, newPosition.y + 0.5);
     return actionPerformed;
   };
 };

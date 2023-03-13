@@ -58,9 +58,7 @@ export class PatternBrush extends PencilBrush {
    */
   createPath(pathData: PathData) {
     const path = super.createPath(pathData),
-      topLeft = path
-        .getRelativeXY('left', 'top')
-        .scalarAdd(path.strokeWidth / 2);
+      topLeft = path.getXY('left', 'top').scalarAdd(path.strokeWidth / 2);
 
     path.stroke = new Pattern({
       source: this.source || this.getPatternSrc(),

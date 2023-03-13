@@ -282,9 +282,10 @@
         const fn = fabric.controlsUtils[`scaling${AXIS}`];
         const exec = point => {
           const { target } = transform;
-          const origin = target.getRelativeXY(
-            transform.originX,
-            transform.originY
+          const origin = fabric.util.sendPointToPlane(
+            target.getXY(transform.originX, transform.originY),
+            undefined,
+            target.group?.calcTransformMatrix()
           );
           const pointer = point.add(origin);
           fn(eventData, transform, pointer.x, pointer.y);

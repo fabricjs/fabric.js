@@ -13,6 +13,7 @@ import {
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -100,7 +101,11 @@ function normalizePoint(
   originY: TOriginY
 ): Point {
   const angle = target.getTotalAngle();
-  const p = target.getRelativeXY(originX, originY);
+  const p = sendPointToPlane(
+    target.getXY(originX, originY),
+    undefined,
+    target.group?.calcTransformMatrix()
+  );
   const p2 = angle
     ? point.rotate(-degreesToRadians(angle), target.getRelativeCenterPoint())
     : point;

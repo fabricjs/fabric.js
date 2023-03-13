@@ -4,13 +4,12 @@ import { Point } from '../../Point';
 import type { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
 import {
   composeMatrix,
-  invertTransform,
   multiplyTransformMatrices,
 } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { sendPointToPlane } from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
-import { createVector } from '../../util/misc/vectors';
 import type { Group } from '../Group';
 import { FabricObjectProps } from './types';
 import { BaseProps } from './types/BaseProps';
@@ -62,114 +61,26 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
-   */
-  getX(): number {
-    return this.getXY().x;
-  }
-
-  /**
-   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
-   */
-  setX(value: number) {
-    this.setXY(this.getXY().setX(value));
-  }
-
-  /**
-   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
-   */
-  getY(): number {
-    return this.getXY().y;
-  }
-
-  /**
-   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
-   */
-  setY(value: number) {
-    this.setXY(this.getXY().setY(value));
-  }
-
-  /**
-   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
-   */
-  getXY(originX?: TOriginX, originY?: TOriginY): Point {
-    const relativePosition = this.getRelativeXY(originX, originY);
-    return this.group
-      ? relativePosition.transform(this.group.calcTransformMatrix())
-      : relativePosition;
-  }
-
-  /**
-   * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify {@link originX} and {@link originY} values,
-   * that otherwise are the object's current values.
-   * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
-   * object.setXY(new Point(5, 5), 'left', 'bottom').
-   * @param {Point} point position in canvas coordinate plane
-   * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
-   * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
-   */
-  setXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
-    this.setRelativeXY(
-      this.group
-        ? point.transform(invertTransform(this.group.calcTransformMatrix()))
-        : point,
-      originX,
-      originY
-    );
-  }
-
-  /**
-   *
-   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
-   */
-  getRelativeXY(
-    originX: TOriginX = this.originX,
-    originY: TOriginY = this.originY
-  ): Point {
-    return new Point(this.left, this.top).add(
-      this.getDimensionsVectorForLayout(
-        createVector(
-          resolveOriginPoint({ x: this.originX, y: this.originY }),
-          resolveOriginPoint({ x: originX, y: originY })
-        )
-      )
-    );
-  }
-
-  /**
-   * Same as {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
-   *
-   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
-   * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
-   * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
-   */
-  setRelativeXY(
-    point: Point,
-    originX: TOriginX = this.originX,
-    originY: TOriginY = this.originY
-  ) {
-    const position = point.add(
-      this.getDimensionsVectorForLayout(
-        createVector(
-          resolveOriginPoint({ x: originX, y: originY }),
-          resolveOriginPoint({ x: this.originX, y: this.originY })
-        )
-      )
-    );
-    this.set({ left: position.x, top: position.y });
-  }
-
-  /**
    * Returns the center coordinates of the object relative to it's parent
    * @return {Point}
    */
   getRelativeCenterPoint(): Point {
-    return this.getRelativeXY('center', 'center');
+    return new Point(this.left, this.top).add(
+      this.getDimensionsVectorForLayout(
+        resolveOriginPoint({ x: this.originX, y: this.originY }).scalarMultiply(
+          -1
+        )
+      )
+    );
   }
 
   setRelativeCenterPoint(point: Point): void {
-    this.setRelativeXY(point, 'center', 'center');
+    const position = point.add(
+      this.getDimensionsVectorForLayout(
+        resolveOriginPoint({ x: this.originX, y: this.originY })
+      )
+    );
+    this.set({ left: position.x, top: position.y });
   }
 
   /**
@@ -177,11 +88,16 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Point}
    */
   getCenterPoint(): Point {
-    return this.getXY('center', 'center');
+    return sendPointToPlane(
+      this.getRelativeCenterPoint(),
+      this.group?.calcTransformMatrix()
+    );
   }
 
   setCenterPoint(point: Point) {
-    this.setXY(point, 'center', 'center');
+    this.setRelativeCenterPoint(
+      sendPointToPlane(point, undefined, this.group?.calcTransformMatrix())
+    );
   }
 
   transformMatrixKey(skipGroup = false): string {
@@ -212,7 +128,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
           this.height +
           sep +
           // TODO: why is this here?
-          this.strokeWidth +
+          // this.strokeWidth +
           this.flipX +
           this.flipY;
   }
