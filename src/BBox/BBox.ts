@@ -9,7 +9,7 @@ import {
 } from '../util/misc/planeChange';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { createVector } from '../util/misc/vectors';
-import type { ObjectGeometry } from '../shapes/Object/ObjectGeometry';
+import type { ObjectPosition } from '../shapes/Object/ObjectPosition';
 import { ViewportBBox, ViewportBBoxPlanes } from './ViewportBBox';
 
 export interface BBoxPlanes extends ViewportBBoxPlanes {
@@ -83,7 +83,7 @@ export class BBox extends ViewportBBox {
   //   return calcPlaneChangeMatrix(this.planes.self(), this.planes.parent());
   // }
 
-  static getViewportCoords(target: ObjectGeometry) {
+  static getViewportCoords(target: ObjectPosition) {
     const coords = target.calcCoords();
     if (target.needsViewportCoords()) {
       return coords;
@@ -93,7 +93,7 @@ export class BBox extends ViewportBBox {
     }
   }
 
-  static getPlanes(target: ObjectGeometry): BBoxPlanes {
+  static getPlanes(target: ObjectPosition): BBoxPlanes {
     const self = target.calcTransformMatrix();
     const parent = target.group?.calcTransformMatrix() || iMatrix;
     const viewport = target.getViewportTransform();
@@ -114,7 +114,7 @@ export class BBox extends ViewportBBox {
     };
   }
 
-  static canvas(target: ObjectGeometry) {
+  static canvas(target: ObjectPosition) {
     const coords = this.getViewportCoords(target);
     const bbox = makeBoundingBoxFromPoints(Object.values(coords));
     const transform = calcBaseChangeMatrix(
@@ -125,7 +125,7 @@ export class BBox extends ViewportBBox {
     return new this(transform, this.getPlanes(target));
   }
 
-  static rotated(target: ObjectGeometry) {
+  static rotated(target: ObjectPosition) {
     const coords = this.getViewportCoords(target);
     const rotation = this.calcRotation(coords);
     const center = coords.tl.midPointFrom(coords.br);
@@ -145,7 +145,7 @@ export class BBox extends ViewportBBox {
     });
   }
 
-  static legacy(target: ObjectGeometry) {
+  static legacy(target: ObjectPosition) {
     const coords = this.getViewportCoords(target);
     const rotation = this.calcRotation(coords);
     const center = coords.tl.midPointFrom(coords.br);
@@ -191,7 +191,7 @@ export class BBox extends ViewportBBox {
     };
   }
 
-  static transformed(target: ObjectGeometry) {
+  static transformed(target: ObjectPosition) {
     const coords = this.getViewportCoords(target);
     const transform = calcBaseChangeMatrix(
       undefined,

@@ -1,9 +1,9 @@
 import { iMatrix } from '../constants';
+import type { ObjectPosition } from '../shapes/Object/ObjectPosition';
 import { TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { ObjectGeometry } from '../shapes/Object/ObjectGeometry';
 import { BBox, BBoxPlanes } from './BBox';
 
 /**
@@ -24,7 +24,7 @@ export class OwnBBox extends BBox {
     );
   }
 
-  static getPlanes(target: ObjectGeometry): BBoxPlanes {
+  static getPlanes(target: ObjectPosition): BBoxPlanes {
     return {
       self() {
         return target.calcTransformMatrix();

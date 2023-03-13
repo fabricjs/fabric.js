@@ -10,7 +10,7 @@ import {
 } from '../util/misc/resolveOrigin';
 import { calcVectorRotation, createVector } from '../util/misc/vectors';
 
-const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
+export const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
 
 /**
  * This class is in an abstraction allowing us to operate inside a plane with origin values [-0.5, 0.5]
@@ -102,7 +102,20 @@ export class PlaneBBox {
   }
 
   calcOriginTranslation(origin: Point, prev: this) {
-    return this.pointFromOrigin(origin).subtract(prev.pointFromOrigin(origin));
+    return prev.getOriginTranslation(this.pointFromOrigin(origin), origin);
+  }
+
+  /**
+   *
+   * @param point new position
+   * @param origin origin of position
+   * @returns the translation to apply to the bbox to respect the new position
+   */
+  getOriginTranslation(point: Point, origin: Point) {
+    const prev = this.pointFromOrigin(origin);
+    const originDiff = createVector(prev, point);
+    console.log(originDiff, prev, point);
+    return this.vectorFromOrigin(originDiff);
   }
 
   containsPoint(point: Point) {
