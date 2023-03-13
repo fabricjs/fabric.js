@@ -9,7 +9,7 @@
     // github links
     "../../**"
   ],
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": false,

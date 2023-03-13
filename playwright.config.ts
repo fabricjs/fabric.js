@@ -1,5 +1,5 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
-import { devices } from '@playwright/test';
+import type {PlaywrightTestConfig} from '@playwright/test';
+import {devices} from '@playwright/test';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -41,7 +41,7 @@ const config: PlaywrightTestConfig = {
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    viewport: { width: 1280, height: 1080 },
+    viewport: { width: 900, height: 700 },
   },
 
   /* Configure projects for major browsers */

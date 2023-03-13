@@ -1,21 +1,19 @@
-import { test, expect } from '@playwright/test';
+import {test} from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test('text typing works', async ({ page }) => {
+  await page.goto('http://127.0.0.1:8080/e2e/site');
+  await page.evaluate(() => {
+    const textbox = new fabric.Textbox('HELLO');
+    fabricCanvas.add(textbox);
+  });
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+  await page.click('canvas.upper-canvas', {
+    position: { x: 15, y: 15 },
+    clickCount: 2,
+    delay: 200
+  });
+
+  await page.locator('textarea').type('test typing', { delay: 100 })
+
 });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Click the get started link.
-  // await page.getByRole('link', { name: 'Get started' }).click();
-
-  // make it fail on purpose
-  await page.getByRole('link', { name: 'Failure' }).click();
-
-  // Expects the URL to contain intro.
-  await expect(page).toHaveURL(/.*intro/);
-});
