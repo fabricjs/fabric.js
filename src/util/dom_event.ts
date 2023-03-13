@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { Point } from '../point.class';
+import { Point } from '../Point';
 import { getScrollLeftTop } from './dom_misc';
 
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];

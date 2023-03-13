@@ -2,7 +2,7 @@
 
   var REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
-    type:                     'path',
+    type:                     'Path',
     originX:                  'left',
     originY:                  'top',
     left:                     100,
@@ -76,7 +76,7 @@
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
 
-      assert.equal(path.get('type'), 'path');
+      assert.equal(path.constructor.name, 'Path');
 
       var error;
       try {
@@ -127,7 +127,7 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var opts = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+    var opts = { ...REFERENCE_PATH_OBJECT };
     delete opts.path;
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -158,12 +158,12 @@
   QUnit.test('toObject', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
-      path.top = fabric.Object.prototype.top;
-      path.left = fabric.Object.prototype.left;
+      path.top = fabric.Path.getDefaults().top;
+      path.left = fabric.Path.getDefaults().left;
       path.includeDefaultValues = false;
       var obj = path.toObject();
-      assert.equal(obj.top, fabric.Object.prototype.top, 'top is available also when equal to prototype');
-      assert.equal(obj.left, fabric.Object.prototype.left, 'left is available also when equal to prototype');
+      assert.equal(obj.top, fabric.Path.getDefaults().top, 'top is available also when equal to prototype');
+      assert.equal(obj.left, fabric.Path.getDefaults().left, 'left is available also when equal to prototype');
       done();
     });
   });
@@ -226,7 +226,7 @@
     makePathObject(function(path) {
       var src = 'http://example.com/';
       path.sourcePath = src;
-      var clonedRef = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+      var clonedRef = { ...REFERENCE_PATH_OBJECT };
       clonedRef.sourcePath = src;
       delete clonedRef.path;
       assert.deepEqual(path.toDatalessObject(), clonedRef, 'if sourcePath the object looses path');
@@ -285,12 +285,13 @@
     fabric.Path.fromElement(elPath, function(path) {
       assert.ok(path instanceof fabric.Path);
 
-      assert.deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+      assert.deepEqual(path.toObject(), {
+        ...REFERENCE_PATH_OBJECT,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
         strokeLineJoin:   'bevel',
         strokeMiterLimit: 5
-      }));
+      });
 
       var ANGLE_DEG = 90;
       elPath.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');

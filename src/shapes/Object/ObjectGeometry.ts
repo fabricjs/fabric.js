@@ -7,8 +7,8 @@ import type {
   TOriginY,
 } from '../../typedefs';
 import { iMatrix } from '../../constants';
-import { Intersection } from '../../intersection.class';
-import { Point } from '../../point.class';
+import { Intersection } from '../../Intersection';
+import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
 import {
@@ -21,10 +21,11 @@ import {
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { sin } from '../../util/misc/sin';
-import type { Canvas } from '../../canvas/canvas_events';
-import type { StaticCanvas } from '../../canvas/static_canvas.class';
+import type { Canvas } from '../../canvas/Canvas';
+import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
+import { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;
@@ -45,28 +46,10 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectOrigin<EventSpec> {
-  /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  declare flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  declare flipY: boolean;
-
-  /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
+export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
+  extends ObjectOrigin<EventSpec>
+  implements Pick<ControlProps, 'padding'>
+{
   declare padding: number;
 
   /**

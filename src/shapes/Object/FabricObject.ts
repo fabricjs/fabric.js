@@ -1,19 +1,29 @@
 import { ObjectEvents } from '../../EventTypeDefs';
-import { FabricObjectSVGExportMixin } from '../../mixins/object.svg_export';
+import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
 import { applyMixins } from '../../util/applyMixins';
-import { StatefulMixin } from '../../mixins/stateful.mixin';
+import { FabricObjectProps } from './types/FabricObjectProps';
+import { TFabricObjectProps, SerializedObjectProps } from './types';
+import { classRegistry } from '../../ClassRegistry';
 
 // TODO somehow we have to make a tree-shakeable import
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
-export interface FabricObject<EventSpec extends ObjectEvents = ObjectEvents>
-  extends FabricObjectSVGExportMixin {}
+export interface FabricObject<
+  Props extends TFabricObjectProps = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObjectSVGExportMixin {}
 
 export class FabricObject<
+  Props extends TFabricObjectProps = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends InteractiveFabricObject<EventSpec> {}
+> extends InteractiveFabricObject<Props, SProps, EventSpec> {}
 
-applyMixins(FabricObject, [FabricObjectSVGExportMixin, StatefulMixin]);
+applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-export { cacheProperties, stateProperties } from './defaultValues';
+classRegistry.setClass(FabricObject);
+classRegistry.setClass(FabricObject, 'object');
+
+export { cacheProperties } from './defaultValues';

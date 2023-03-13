@@ -17,7 +17,7 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -53,14 +53,16 @@
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.clipPath = new fabric.Object();
-    var expected = fabric.util.object.clone(emptyObjectRepr);
-    var expectedClipPath = fabric.util.object.clone(emptyObjectRepr);
-    expectedClipPath = fabric.util.object.extend(expectedClipPath, {
-      inverted: cObj.clipPath.inverted,
+
+    assert.deepEqual({
+      ...emptyObjectRepr,
+      clipPath: {
+        ...emptyObjectRepr,
+        inverted: cObj.clipPath.inverted,
       absolutePositioned: cObj.clipPath.absolutePositioned,
-    });
-    expected.clipPath = expectedClipPath;
-    assert.deepEqual(expected, cObj.toObject());
+      }
+    }, cObj.toObject());
+
     cObj.clipPath.excludeFromExport = true;
     assert.ok(cObj.toObject().clipPath === undefined);
   });

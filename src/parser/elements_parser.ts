@@ -1,8 +1,8 @@
 //@ts-nocheck
-import { Gradient } from '../gradient/gradient.class';
-import { Group } from '../shapes/group.class';
-import { Image } from '../shapes/image.class';
-import { classRegistry } from '../util/class_registry';
+import { Gradient } from '../gradient/Gradient';
+import { Group } from '../shapes/Group';
+import { Image } from '../shapes/Image';
+import { classRegistry } from '../ClassRegistry';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -116,7 +116,7 @@ const ElementsParser = function (
   };
 
   proto.resolveClipPath = function (obj, usingElement) {
-    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
+    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
       element,
       klass,
       objTransformInv,

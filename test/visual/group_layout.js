@@ -1,7 +1,7 @@
 (function () {
-    fabric.Object.prototype.objectCaching = true;
+    fabric.Object.ownDefaults.objectCaching = true;
     var visualTestLoop;
-    if (fabric.getEnv().isLikelyNode) {
+    if (isNode()) {
         visualTestLoop = global.visualTestLoop;
     }
     else {

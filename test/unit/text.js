@@ -17,7 +17,7 @@
 
   var REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
-    type:                      'text',
+    type:                      'Text',
     originX:                   'left',
     originY:                   'top',
     left:                      0,
@@ -75,7 +75,7 @@
     assert.ok(text instanceof fabric.Text);
     assert.ok(text instanceof fabric.Object);
 
-    assert.equal(text.get('type'), 'text');
+    assert.equal(text.constructor.name, 'Text');
     assert.equal(text.get('text'), 'x');
   });
 
@@ -208,14 +208,15 @@
 
     fabric.Text.fromElement(elText, function(text) {
       assert.ok(text instanceof fabric.Text);
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         left: 0,
         top: -14.05,
         width: 8,
         height: 18.08,
         fontSize: 16,
         originX: 'left'
-      });
+      };
       assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
   });
@@ -249,7 +250,8 @@
 
       assert.ok(textWithAttrs instanceof fabric.Text);
 
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
         top:              -88.03,
@@ -270,7 +272,7 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-      });
+      };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
     });
   });
@@ -887,7 +889,7 @@
     });
     var toObject = text.toObject();
     fabric.Text.fromObject(toObject).then(function(text) {
-      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.equal(text.path.constructor.name, 'Path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');
       done();
@@ -896,7 +898,7 @@
 
   QUnit.test('cacheProperties for text', function(assert) {
     var text = new fabric.Text('a');
-    assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-direction-path-pathStartOffset-pathSide-pathAlign');
+    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-direction-path-pathStartOffset-pathSide-pathAlign');
   });
 
   QUnit.test('_getLineLeftOffset', function(assert) {

@@ -42,7 +42,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
-- Typed and modular
+- [Typed and modular](#migrating-to-v6)
 - [Unit tested](CONTRIBUTING.md#%F0%9F%A7%AA%20testing)
 
 #### Supported Browsers/Environments
@@ -60,6 +60,17 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 Fabric.js Does not use transpilation by default, the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
 
+## Migrating to v6
+
+v6 is a **MAJOR** effort including migrating to TS and es6, countless fixes, rewrites and features.\
+Currently in beta, refer to [#8299](../../issues/8299) for guidance.
+
+```bash
+$ npm install fabric@beta --save
+// or
+$ yarn add fabric@beta
+```
+
 ## Installation
 
 ```bash
@@ -69,11 +80,12 @@ $ yarn add fabric
 ```
 
 ```js
-// es6 imports
-import { fabric } from 'fabric';
+// v6
+import { Canvas, Rect } from 'fabric'; // browser
+import { StaticCanvas, Rect } from 'fabric/node'; // node
 
-//  or cjs
-const fabric = require('fabric').fabric;
+// v5
+import { fabric } from 'fabric';
 ```
 
 #### Browser
@@ -117,10 +129,11 @@ Follow these [instructions][node_canvas_install] to get `node-canvas` up and run
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
-import { fabric } from 'fabric';
+import * as fabric from 'fabric'; // v6
+import { fabric } from 'fabric'; // v5
 
 export const FabricJSCanvas = () => {
-  const canvasEl = useRef(null);
+  const canvasEl = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const options = { ... };
     const canvas = new fabric.Canvas(canvasEl.current, options);
@@ -132,8 +145,8 @@ export const FabricJSCanvas = () => {
     }
   }, []);
 
-  return (<canvas width="300" height="300" ref={canvasEl}/>)
-});
+  return <canvas width="300" height="300" ref={canvasEl}/>;
+};
 
 ```
 
@@ -142,8 +155,9 @@ export const FabricJSCanvas = () => {
 <details><summary><b>Node.js</b></summary>
 
 ```js
-const http = require('http');
-const { fabric } = require('fabric');
+import http from 'http';
+import * as fabric from 'fabric/node'; // v6
+import { fabric } from 'fabric'; // v5
 
 const port = 8080;
 

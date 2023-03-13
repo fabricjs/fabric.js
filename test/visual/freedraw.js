@@ -2031,8 +2031,8 @@ QUnit.module('Free Drawing', hooks => {
     return ['chrome', 'firefox', 'edge'].find(name => navigator.userAgent.toLowerCase().indexOf(name) > -1);
   }
   hooks.before(() => {
-    objectCachingDefault = fabric.Object.prototype.objectCaching;
-    if (fabric.getEnv().isLikelyNode) {
+    objectCachingDefault = fabric.Object.ownDefaults.objectCaching;
+    if (isNode()) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
       });
@@ -2043,11 +2043,11 @@ QUnit.module('Free Drawing', hooks => {
     fabric.config.configure({
       enableGLFiltering: false
     });
-    fabric.Object.prototype.objectCaching = true;
+    fabric.Object.ownDefaults.objectCaching = true;
   });
   hooks.after(() => {
     // fabric.config.restoreDefaults();
-    fabric.Object.prototype.objectCaching = objectCachingDefault;
+    fabric.Object.ownDefaults.objectCaching = objectCachingDefault;
   });
 
   const tests = [];
@@ -2291,7 +2291,7 @@ QUnit.module('Free Drawing', hooks => {
           await test.build(canvas);
           callback(canvas.upperCanvasEl);
         },
-        disabled: fabric.getEnv().isLikelyNode
+        disabled: isNode()
       }));
     }
     options.main && visualTester(Object.assign({}, test, {
@@ -2302,7 +2302,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.getEnv().isLikelyNode
+      disabled: isNode()
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
@@ -2313,7 +2313,7 @@ QUnit.module('Free Drawing', hooks => {
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.getEnv().isLikelyNode
+      disabled: isNode()
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,

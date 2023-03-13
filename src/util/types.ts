@@ -1,15 +1,15 @@
-import type { ActiveSelection } from '../shapes/active_selection.class';
-import type { Group } from '../shapes/group.class';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
+import type { Group } from '../shapes/Group';
 import type {
   FabricObject,
   TCachedFabricObject,
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
-import type { Text } from '../shapes/text.class';
-import type { Pattern } from '../pattern.class';
-import type { IText } from '../shapes/itext.class';
-import type { Textbox } from '../shapes/textbox.class';
+import type { Text } from '../shapes/Text/Text';
+import type { Pattern } from '../Pattern';
+import type { IText } from '../shapes/IText/IText';
+import type { Textbox } from '../shapes/Textbox';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -40,7 +40,7 @@ export const isCollection = (
 export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection => {
-  return !!fabricObject && fabricObject.type === 'activeSelection';
+  return !!fabricObject && fabricObject.isType('ActiveSelection');
 };
 
 export const isTextObject = (
@@ -48,7 +48,7 @@ export const isTextObject = (
 ): fabricObject is Text => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.type.includes('text');
+  return !!fabricObject && fabricObject.isType('Text', 'IText', 'Textbox');
 };
 
 export const isInteractiveTextObject = (
@@ -56,7 +56,7 @@ export const isInteractiveTextObject = (
 ): fabricObject is IText | Textbox => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && ['i-text', 'textbox'].includes(fabricObject.type);
+  return !!fabricObject && fabricObject.isType('IText', 'Textbox');
 };
 
 export const isFabricObjectCached = (

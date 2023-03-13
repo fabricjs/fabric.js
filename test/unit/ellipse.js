@@ -12,7 +12,7 @@
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.equal(ellipse.type, 'ellipse');
+    assert.equal(ellipse.constructor.name, 'Ellipse');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -25,7 +25,7 @@
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
       version:                  fabric.version,
-      type:                     'ellipse',
+      type:                     'Ellipse',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -61,9 +61,13 @@
     assert.ok(typeof ellipse.toObject === 'function');
     assert.deepEqual(ellipse.toObject(), defaultProperties);
 
-    ellipse.set('left', 100).set('top', 200).set('rx', 15).set('ry', 25);
+    ellipse.set('left', 100);
+    ellipse.set('top', 200);
+    ellipse.set('rx', 15);
+    ellipse.set('ry', 25);
 
-    var augmentedProperties = fabric.util.object.extend(fabric.util.object.clone(defaultProperties), {
+    assert.deepEqual(ellipse.toObject(), {
+      ...defaultProperties,
       left: 100,
       top: 200,
       rx: 15,
@@ -72,8 +76,6 @@
       height: 50
     });
 
-    assert.deepEqual(ellipse.toObject(), augmentedProperties);
-
     ellipse.set('rx', 30);
     assert.deepEqual(ellipse.width, ellipse.rx * 2);
 
@@ -81,9 +83,22 @@
     assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Ellipse({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "Ellipse",
+      version: fabric.version,
+      left: 0,
+      top: 0
+    });
+  });
+
   QUnit.test('isNotVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
-    ellipse.set('rx', 0).set('ry', 0);
+    ellipse.set('rx', 0);
+    ellipse.set('ry', 0);
 
     assert.equal(ellipse.isNotVisible(), false, 'isNotVisible false when rx/ry are 0 because strokeWidth is > 0');
 
