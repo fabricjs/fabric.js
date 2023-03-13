@@ -859,6 +859,10 @@ export class SelectableCanvas<
         actionHandler,
         actionPerformed: false,
         corner,
+        pointer: this.getPointer(e),
+        viewportPointer: this.getPointer(e, true),
+        canvas: this,
+
         scaleX: target.scaleX,
         scaleY: target.scaleY,
         skewX: target.skewX,
@@ -871,7 +875,7 @@ export class SelectableCanvas<
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
+        theta: degreesToRadians(target.getTotalAngle()),
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,
@@ -1118,11 +1122,12 @@ export class SelectableCanvas<
    */
   getPointer(e: TPointerEvent, ignoreVpt = false): Point {
     // return cached values if we are in the event processing chain
+    // safeguard from mutation by cloning
     if (this._absolutePointer && !ignoreVpt) {
-      return this._absolutePointer;
+      return this._absolutePointer.clone();
     }
     if (this._pointer && ignoreVpt) {
-      return this._pointer;
+      return this._pointer.clone();
     }
 
     const upperCanvasEl = this.upperCanvasEl,
