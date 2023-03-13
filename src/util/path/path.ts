@@ -8,9 +8,7 @@ import { sin } from '../misc/sin';
 import {
   TCurveInfo,
   TComplexPathData,
-  TParsedAbsoluteArcCommand,
   TParsedAbsoluteCubicCurveCommand,
-  TParsedAbsoluteLineCommand,
   TParsedCubicCurveCommand,
   TPathSegmentsInfo,
   TPointAngle,
@@ -19,9 +17,13 @@ import {
   TPathSegmentInfo,
   rePathCommand,
   numberRegExStr,
-  TComplexParsedCommand, TPathSegmentInfoCommon, TEndPathInfo, isAbsLineCmd, TParsedArcCommand,
+  TComplexParsedCommand,
+  TPathSegmentInfoCommon,
+  TEndPathInfo,
+  isAbsLineCmd,
+  TParsedArcCommand,
 } from './path_types';
-import { Point } from 'fabric';
+import { Point } from '../../Point';
 
 /**
  * Commands that may be repeated
@@ -355,7 +357,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
   const destinationPath: TSimplePathData = [];
-    let previous: string | undefined,
+  let previous: string | undefined,
     // placeholders
     controlX = 0,
     controlY = 0;
@@ -495,7 +497,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         current[7] += y;
       // falls through
       case 'A':
-        fromArcToBeziers(x, y, current).forEach(b => destinationPath.push(b));
+        fromArcToBeziers(x, y, current).forEach((b) => destinationPath.push(b));
         x = current[6];
         y = current[7];
         break;
@@ -651,7 +653,7 @@ const pathIterator = (
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
 const findPercentageForDistance = (
-  segInfo: TCurveInfo<"Q" | "C">,
+  segInfo: TCurveInfo<'Q' | 'C'>,
   distance: number
 ): TPointAngle => {
   let perc = 0,
@@ -714,17 +716,17 @@ export const getPathSegmentsInfo = (
       current[0] //first letter
     ) {
       case 'M':
-        tempInfo = <TPathSegmentInfoCommon<"M">>{
+        tempInfo = <TPathSegmentInfoCommon<'M'>>{
           ...basicInfo,
-        }
+        };
         x2 = x1 = current[1];
         y2 = y1 = current[2];
         break;
       case 'L':
-        tempInfo = <TPathSegmentInfoCommon<"L">>{
+        tempInfo = <TPathSegmentInfoCommon<'L'>>{
           ...basicInfo,
-          length: calcLineLength(x1, y1, current[1], current[2])
-        }
+          length: calcLineLength(x1, y1, current[1], current[2]),
+        };
         x1 = current[1];
         y1 = current[2];
         break;
@@ -749,12 +751,12 @@ export const getPathSegmentsInfo = (
           current[5],
           current[6]
         );
-        tempInfo = <TCurveInfo<"C">>{
+        tempInfo = <TCurveInfo<'C'>>{
           ...basicInfo,
           iterator,
           angleFinder,
-          length: pathIterator(iterator, x1, y1)
-        }
+          length: pathIterator(iterator, x1, y1),
+        };
         x1 = current[5];
         y1 = current[6];
         break;
@@ -775,11 +777,11 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4]
         );
-        tempInfo = <TCurveInfo<"Q">>{
+        tempInfo = <TCurveInfo<'Q'>>{
           ...basicInfo,
           iterator,
           angleFinder,
-          length: pathIterator(iterator, x1, y1)
+          length: pathIterator(iterator, x1, y1),
         };
         x1 = current[3];
         y1 = current[4];
@@ -790,7 +792,7 @@ export const getPathSegmentsInfo = (
           ...basicInfo,
           destX: x2,
           destY: y2,
-          length: calcLineLength(x1, y1, x2, y2)
+          length: calcLineLength(x1, y1, x2, y2),
         };
         x1 = x2;
         y1 = y2;
@@ -831,10 +833,7 @@ export const getPointOnPath = (
     case 'Z':
       info = {
         ...new Point(segInfo.x, segInfo.y).lerp(
-          new Point(
-            segInfo.destX,
-            segInfo.destY
-          ),
+          new Point(segInfo.destX, segInfo.destY),
           segPercent
         ),
         angle: 0,
@@ -845,36 +844,26 @@ export const getPointOnPath = (
       );
       return info;
     case 'L':
-      if(isAbsLineCmd(segment)) {
+      if (isAbsLineCmd(segment)) {
         info = {
           ...new Point(segInfo.x, segInfo.y).lerp(
-            new Point(
-              segment[1],
-              segment[2]
-            ),
+            new Point(segment[1], segment[2]),
             segPercent
           ),
           angle: 0,
         };
-        info.angle = Math.atan2(
-          segment[2] - segInfo.y,
-          segment[1] - segInfo.x
-        );
+        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
       } else {
         // TODO: provide a proper error
-        throw Error(`Segment/path info mismatch, expected L, got ${segment[0]}`);
+        throw Error(
+          `Segment/path info mismatch, expected L, got ${segment[0]}`
+        );
       }
       return info;
     case 'C':
-      return findPercentageForDistance(
-        segInfo,
-        distance
-      );
+      return findPercentageForDistance(segInfo, distance);
     case 'Q':
-      return findPercentageForDistance(
-        segInfo,
-        distance
-      );
+      return findPercentageForDistance(segInfo, distance);
     default:
     // throw Error('Invalid command');
   }
