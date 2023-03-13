@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ${{ (matrix.node-version == '14.x' && 'i --legacy-peer-deps') || ci }}
+      - run: npm ${{ (matrix.node-version == '14.x' && 'i --legacy-peer-deps') || 'ci' }}
       - name: Build
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests
