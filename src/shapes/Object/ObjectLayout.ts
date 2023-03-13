@@ -175,7 +175,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
       return cache.value;
     }
     const center = this.getRelativeCenterPoint(),
-      options = {
+      value = composeMatrix({
         angle: this.angle,
         translateX: center.x,
         translateY: center.y,
@@ -185,8 +185,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
         skewY: this.skewY,
         flipX: this.flipX,
         flipY: this.flipY,
-      },
-      value = composeMatrix(options);
+      });
     this.ownMatrixCache = {
       key,
       value,
