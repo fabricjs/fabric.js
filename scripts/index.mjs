@@ -487,6 +487,7 @@ program
   .name('fabric.js')
   .description('fabric.js DEV CLI tools')
   .version(process.env.npm_package_version)
+program
   .showSuggestionAfterError();
 
 program
