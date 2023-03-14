@@ -78,14 +78,24 @@ export class ObjectTransformations<
   }
 
   /**
+   * Rotates object to angle
    * @param {TDegree} angle Angle value (in degrees)
    * @returns own decomposed angle
    */
   rotate(angle: TDegree) {
+    return this.rotateBy(angle - this.getTotalAngle());
+  }
+
+  /**
+   * Rotates object by angle
+   * @param {TDegree} angle Angle value (in degrees)
+   * @returns own decomposed angle
+   */
+  rotateBy(angle: TDegree) {
     const origin = this.centeredRotation ? this.getCenterPoint() : this.getXY();
     const t = multiplyTransformMatrixChain([
       this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
-      calcRotateMatrix({ angle: angle - this.getTotalAngle() }),
+      calcRotateMatrix({ angle }),
       this.calcTransformMatrix(),
     ]);
     const { angle: decomposedAngle } = qrDecompose(t);
