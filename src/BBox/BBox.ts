@@ -18,8 +18,6 @@ export interface BBoxPlanes extends ViewportBBoxPlanes {
   self(): TMat2D;
 }
 
-export type TRotatedBBox = ReturnType<typeof BBox['rotated']>;
-
 export class BBox extends ViewportBBox {
   protected declare readonly planes: BBoxPlanes;
 
