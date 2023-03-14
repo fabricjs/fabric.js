@@ -43,9 +43,7 @@ export class ObjectPosition<
     originX: TOriginX = this.originX,
     originY: TOriginY = this.originY
   ): Point {
-    return this.bbox.pointFromOrigin(
-      resolveOriginPoint({ x: originX, y: originY })
-    );
+    return this.bbox.pointFromOrigin(resolveOriginPoint(originX, originY));
   }
 
   /**
@@ -67,7 +65,7 @@ export class ObjectPosition<
       .sendToParent()
       .getOriginTranslation(
         sendPointToPlane(point, undefined, this.group?.calcTransformMatrix()),
-        resolveOriginPoint({ x: originX, y: originY })
+        resolveOriginPoint(originX, originY)
       );
     this.set({
       left: this.left + delta.x,

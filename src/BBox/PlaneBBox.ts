@@ -4,13 +4,7 @@ import { mapValues } from '../util/internals';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { invertTransform } from '../util/misc/matrix';
 import { calcBaseChangeMatrix } from '../util/misc/planeChange';
-import {
-  OriginDescriptor,
-  resolveOriginPoint,
-} from '../util/misc/resolveOrigin';
 import { calcVectorRotation, createVector } from '../util/misc/vectors';
-
-export const CENTER_ORIGIN = { x: 'center', y: 'center' } as const;
 
 /**
  * This class is in an abstraction allowing us to operate inside a plane with origin values [-0.5, 0.5]
@@ -81,16 +75,8 @@ export class PlaneBBox {
    *
    * @returns a point that is positioned in the same place as {@link point} but refers to {@link to} as its origin instead of {@link from}
    */
-  changeOrigin(
-    point: Point,
-    from: OriginDescriptor = CENTER_ORIGIN,
-    to: OriginDescriptor = CENTER_ORIGIN
-  ) {
-    return point.add(
-      this.vectorFromOrigin(
-        createVector(resolveOriginPoint(to), resolveOriginPoint(from))
-      )
-    );
+  changeOrigin(point: Point, from: Point, to: Point) {
+    return point.add(this.vectorFromOrigin(createVector(to, from)));
   }
 
   vectorFromOrigin(originVector: Point) {

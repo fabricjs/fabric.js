@@ -65,9 +65,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   getRelativeCenterPoint(): Point {
     return new Point(this.left, this.top).add(
       this.getDimensionsVectorForLayout(
-        resolveOriginPoint({ x: this.originX, y: this.originY }).scalarMultiply(
-          -1
-        )
+        resolveOriginPoint(this.originX, this.originY).scalarMultiply(-1)
       )
     );
   }
@@ -75,7 +73,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   setRelativeCenterPoint(point: Point): void {
     const position = point.add(
       this.getDimensionsVectorForLayout(
-        resolveOriginPoint({ x: this.originX, y: this.originY })
+        resolveOriginPoint(this.originX, this.originY)
       )
     );
     this.set({ left: position.x, top: position.y });

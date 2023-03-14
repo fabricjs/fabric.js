@@ -803,7 +803,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     const width = hasWidth ? this.width : bbox.width || 0,
       height = hasHeight ? this.height : bbox.height || 0,
       calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
-      origin = resolveOriginPoint({ x: this.originX, y: this.originY }),
+      origin = resolveOriginPoint(this.originX, this.originY),
       size = new Point(width, height),
       strokeWidthVector = new Point(),
       sizeAfter = new Point(width, height),
