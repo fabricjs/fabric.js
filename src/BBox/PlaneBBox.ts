@@ -93,14 +93,13 @@ export class PlaneBBox {
 
   /**
    *
-   * @param point new position
-   * @param origin origin of position
+   * @param point new position of {@link origin}
+   * @param origin
    * @returns the translation to apply to the bbox to respect the new position
    */
-  getOriginTranslation(point: Point, origin: Point) {
+  getOriginTranslation(point: Point, origin: Point = new Point()) {
     const prev = this.pointFromOrigin(origin);
     const originDiff = createVector(prev, point);
-    console.log(originDiff, prev, point);
     return this.vectorFromOrigin(originDiff);
   }
 
