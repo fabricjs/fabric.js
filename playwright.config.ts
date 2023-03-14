@@ -1,5 +1,5 @@
-import type {PlaywrightTestConfig} from '@playwright/test';
-import {devices} from '@playwright/test';
+import type { PlaywrightTestConfig } from '@playwright/test';
+import { devices } from '@playwright/test';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -7,7 +7,7 @@ import {devices} from '@playwright/test';
 const config: PlaywrightTestConfig = {
   testDir: './e2e/tests',
   /* Maximum time one test can run for. */
-  timeout: 10 * 1000,
+  timeout: 30 * 1000,
   expect: {
     /**
      * Maximum time expect() should wait for the condition to be met.
@@ -55,10 +55,10 @@ const config: PlaywrightTestConfig = {
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   port: 3000,
-  // },
+  webServer: {
+    command: 'npm run local-server',
+    port: 8080,
+  },
 };
 
 export default config;
