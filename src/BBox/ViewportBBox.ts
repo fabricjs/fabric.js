@@ -3,7 +3,7 @@ import { iMatrix } from '../constants';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
 import { TBBox, TMat2D } from '../typedefs';
-import { makeBoundingBoxFromPoints } from '../util';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
   multiplyTransformMatrices,
