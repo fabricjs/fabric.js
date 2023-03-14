@@ -54,6 +54,13 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
     return this.canvas?.viewportTransform || (iMatrix.concat() as TMat2D);
   }
 
+  calcTransformMatrixInViewport() {
+    return multiplyTransformMatrices(
+      this.getViewportTransform(),
+      this.calcTransformMatrix()
+    );
+  }
+
   /**
    * Returns the object angle relative to canvas counting also the group property
    * @returns {TDegree}

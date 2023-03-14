@@ -1,3 +1,4 @@
+import { BBox } from '../../BBox/BBox';
 import { iMatrix } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
@@ -15,10 +16,10 @@ import {
   multiplyTransformMatrices,
   multiplyTransformMatrixChain,
 } from '../../util/misc/matrix';
-import { BBox } from '../../BBox/BBox';
-import { ObjectPosition } from './ObjectPosition';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { applyTransformToObject } from '../../util/misc/objectTransforms';
+import { sendPointToPlane } from '../../util/misc/planeChange';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { ObjectPosition } from './ObjectPosition';
 
 type ObjectTransformOptions = {
   originX?: TOriginX;
@@ -89,6 +90,43 @@ export class ObjectTransformations<
    * @param param1 options
    * @returns own transform
    */
+  transformObjectInPlane(
+    transform: TMat2D,
+    {
+      originX = this.originX,
+      originY = this.originY,
+      plane = iMatrix,
+    }: {
+      originX?: TOriginX;
+      originY?: TOriginY;
+      plane?: TMat2D;
+    } = {}
+  ) {
+    const transformCenter = sendPointToPlane(
+      this.getXY(originX, originY),
+      undefined,
+      plane
+    );
+    const ownTransform = multiplyTransformMatrixChain([
+      invertTransform(plane),
+      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
+      transform,
+      [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
+      plane,
+      this.calcOwnMatrix(),
+    ]);
+    // TODO: stop using decomposed values in favor of a matrix
+    applyTransformToObject(this, ownTransform);
+    this.setCoords();
+    return this.calcOwnMatrix();
+  }
+
+  /**
+   * Transforms object with respect to origin
+   * @param transform
+   * @param param1 options
+   * @returns own transform
+   */
   transformObject(
     transform: TMat2D,
     {
@@ -97,26 +135,26 @@ export class ObjectTransformations<
       inViewport = false,
     }: ObjectTransformOptions = {}
   ) {
-    const transformCenter = this.getXY(originX, originY);
-    const t = multiplyTransformMatrixChain([
-      this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
-      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
-      inViewport ? invertTransform(this.getViewportTransform()) : iMatrix,
-      transform,
-      [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
-      this.calcTransformMatrix(),
-    ]);
-    // TODO: stop using decomposed values in favor of a matrix
-    applyTransformToObject(this, t);
-    this.setCoords();
-    return this.calcOwnMatrix();
+    return this.transformObjectInPlane(
+      inViewport
+        ? multiplyTransformMatrices(
+            invertTransform(this.getViewportTransform()),
+            transform
+          )
+        : transform,
+      { originX, originY, plane: this.group?.calcTransformMatrix() }
+    );
   }
 
   setObjectTransform(transform: TMat2D, options?: ObjectTransformOptions) {
     return this.transformObject(
       multiplyTransformMatrices(
         transform,
-        invertTransform(this.calcTransformMatrix())
+        invertTransform(
+          options?.inViewport
+            ? this.calcTransformMatrixInViewport()
+            : this.calcTransformMatrix()
+        )
       ),
       options
     );
@@ -127,7 +165,11 @@ export class ObjectTransformations<
   }
 
   scale(x: number, y: number, options?: ObjectTransformOptions) {
-    return this.transformObject([x, 0, 0, y, 0, 0], options);
+    const [a, b, c, d] = options?.inViewport
+      ? this.calcTransformMatrixInViewport()
+      : this.calcTransformMatrix();
+    console.log(a, d);
+    return this.transformObject([x / a, 0, 0, y / d, 0, 0], options);
   }
 
   scaleBy(x: number, y: number, options?: ObjectTransformOptions) {
@@ -151,7 +193,9 @@ export class ObjectTransformations<
   }
 
   shear(x: number, y: number, options?: ObjectTransformOptions) {
-    const [_, b, c] = this.calcTransformMatrix();
+    const [_, b, c] = options?.inViewport
+      ? this.calcTransformMatrixInViewport()
+      : this.calcTransformMatrix();
     return this.transformObject(
       multiplyTransformMatrices(
         calcShearMatrix({ shearX: x, shearY: y }),
@@ -176,7 +220,12 @@ export class ObjectTransformations<
   rotate(angle: TDegree, options?: ObjectTransformOptions) {
     return this.transformObject(
       calcRotateMatrix({
-        rotation: degreesToRadians(angle) - this.bbox.getRotation(),
+        rotation:
+          degreesToRadians(angle) -
+          (options?.inViewport
+            ? this.bbox
+            : this.bbox.sendToCanvas()
+          ).getRotation(),
       }),
       options
     );
