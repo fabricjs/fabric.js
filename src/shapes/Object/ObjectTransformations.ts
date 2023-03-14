@@ -1,15 +1,30 @@
 import { iMatrix } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
-import type { TAxis, TDegree } from '../../typedefs';
+import type {
+  TAxis,
+  TDegree,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+} from '../../typedefs';
 import {
   calcRotateMatrix,
+  calcShearMatrix,
   invertTransform,
+  multiplyTransformMatrices,
   multiplyTransformMatrixChain,
-  qrDecompose,
 } from '../../util/misc/matrix';
 import { BBox } from '../../BBox/BBox';
 import { ObjectPosition } from './ObjectPosition';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import { applyTransformToObject } from '../../util/misc/objectTransforms';
+
+type ObjectTransformOptions = {
+  originX?: TOriginX;
+  originY?: TOriginY;
+  inViewport?: boolean;
+};
 
 export class ObjectTransformations<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -17,6 +32,7 @@ export class ObjectTransformations<
   /**
    * Returns width of an object's bounding box counting transformations
    * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
+   * @deprecated
    * @return {Number} width value
    */
   getScaledWidth(): number {
@@ -26,21 +42,11 @@ export class ObjectTransformations<
   /**
    * Returns height of an object bounding box counting transformations
    * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
+   * @deprecated
    * @return {Number} height value
    */
   getScaledHeight(): number {
     return BBox.transformed(this).sendToCanvas().getDimensionsVector().y;
-  }
-
-  /**
-   * Scales an object (equally by x and y)
-   * @param {Number} value Scale factor
-   * @return {void}
-   */
-  scale(value: number): void {
-    this._set('scaleX', value);
-    this._set('scaleY', value);
-    this.setCoords();
   }
 
   protected scaleAxisTo(axis: TAxis, value: number, absolute = true) {
@@ -52,9 +58,9 @@ export class ObjectTransformations<
       absolute ? this.bbox.sendToCanvas() : this.bbox
     ).getDimensionsVector();
     const boundingRectFactor = rotated[axis] / transformed[axis];
-    this.scale(
-      value / new Point(this.width, this.height)[axis] / boundingRectFactor
-    );
+    const scale =
+      value / new Point(this.width, this.height)[axis] / boundingRectFactor;
+    this.scale(scale, scale);
   }
 
   /**
@@ -78,30 +84,112 @@ export class ObjectTransformations<
   }
 
   /**
+   * Transforms object with respect to origin
+   * @param transform
+   * @param param1 options
+   * @returns own transform
+   */
+  transformObject(
+    transform: TMat2D,
+    {
+      originX = this.originX,
+      originY = this.originY,
+      inViewport = false,
+    }: ObjectTransformOptions = {}
+  ) {
+    const transformCenter = this.getXY(originX, originY);
+    const t = multiplyTransformMatrixChain([
+      this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
+      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
+      inViewport ? invertTransform(this.getViewportTransform()) : iMatrix,
+      transform,
+      [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
+      this.calcTransformMatrix(),
+    ]);
+    // TODO: stop using decomposed values in favor of a matrix
+    applyTransformToObject(this, t);
+    this.setCoords();
+    return this.calcOwnMatrix();
+  }
+
+  setObjectTransform(transform: TMat2D, options?: ObjectTransformOptions) {
+    return this.transformObject(
+      multiplyTransformMatrices(
+        transform,
+        invertTransform(this.calcTransformMatrix())
+      ),
+      options
+    );
+  }
+
+  translate(x: number, y: number, inViewport?: boolean) {
+    return this.transformObject([1, 0, 0, 1, x, y], { inViewport });
+  }
+
+  scale(x: number, y: number, options?: ObjectTransformOptions) {
+    return this.transformObject([x, 0, 0, y, 0, 0], options);
+  }
+
+  scaleBy(x: number, y: number, options?: ObjectTransformOptions) {
+    return this.transformObject([x, 0, 0, y, 0, 0], options);
+  }
+
+  skew(x: TDegree, y: TDegree, options?: ObjectTransformOptions) {
+    return this.shear(
+      Math.tan(degreesToRadians(x)),
+      Math.tan(degreesToRadians(y)),
+      options
+    );
+  }
+
+  skewBy(x: TDegree, y: TDegree, options?: ObjectTransformOptions) {
+    return this.shearBy(
+      Math.tan(degreesToRadians(x)),
+      Math.tan(degreesToRadians(y)),
+      options
+    );
+  }
+
+  shear(x: number, y: number, options?: ObjectTransformOptions) {
+    const [_, b, c] = this.calcTransformMatrix();
+    return this.transformObject(
+      multiplyTransformMatrices(
+        calcShearMatrix({ shearX: x, shearY: y }),
+        invertTransform([1, b, c, 1, 0, 0])
+      ),
+      options
+    );
+  }
+
+  shearBy(x: number, y: number, options?: ObjectTransformOptions) {
+    return this.transformObject(
+      calcShearMatrix({ shearX: x, shearY: y }),
+      options
+    );
+  }
+
+  /**
    * Rotates object to angle
    * @param {TDegree} angle Angle value (in degrees)
-   * @returns own decomposed angle
+   * @returns own transform
    */
-  rotate(angle: TDegree) {
-    return this.rotateBy(angle - this.getTotalAngle());
+  rotate(angle: TDegree, options?: ObjectTransformOptions) {
+    return this.rotateBy(
+      angle - this.getTotalAngle(options?.inViewport),
+      options
+    );
   }
 
   /**
    * Rotates object by angle
    * @param {TDegree} angle Angle value (in degrees)
-   * @returns own decomposed angle
+   * @returns own transform
    */
-  rotateBy(angle: TDegree) {
-    const origin = this.centeredRotation ? this.getCenterPoint() : this.getXY();
-    const t = multiplyTransformMatrixChain([
-      this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
-      calcRotateMatrix({ angle }),
-      this.calcTransformMatrix(),
-    ]);
-    const { angle: decomposedAngle } = qrDecompose(t);
-    this.set({ angle: decomposedAngle });
-    this.centeredRotation ? this.setCenterPoint(origin) : this.setXY(origin);
-    this.setCoords();
-    return decomposedAngle;
+  rotateBy(angle: TDegree, options?: ObjectTransformOptions) {
+    return this.transformObject(calcRotateMatrix({ angle }), options);
+  }
+
+  flip(x: boolean, y: boolean, options?: ObjectTransformOptions) {
+    return this.transformObject([x ? -1 : 1, 0, 0, y ? -1 : 1, 0, 0], options);
   }
 }
