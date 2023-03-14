@@ -11,7 +11,6 @@ import { sendPointToPlane } from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
 import type { Group } from '../Group';
-import { FabricObjectProps } from './types';
 import { BaseProps } from './types/BaseProps';
 
 type TMatrixCache = {
@@ -21,7 +20,7 @@ type TMatrixCache = {
 
 export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   extends CommonMethods<EventSpec>
-  implements BaseProps, Pick<FabricObjectProps, 'centeredRotation'>
+  implements BaseProps
 {
   declare left: number;
   declare top: number;
@@ -36,7 +35,6 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
   declare originX: TOriginX;
   declare originY: TOriginY;
   declare angle: TDegree;
-  declare centeredRotation: true;
 
   /**
    * Object containing this object.

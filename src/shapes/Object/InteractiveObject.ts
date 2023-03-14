@@ -53,10 +53,11 @@ export class InteractiveFabricObject<
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: false;
+  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
+  declare centeredRotation: boolean;
 
   declare lockMovementX: boolean;
   declare lockMovementY: boolean;
