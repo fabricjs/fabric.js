@@ -114,7 +114,7 @@ export class BBox extends ViewportBBox {
     };
   }
 
-  static canvas(target: ObjectPosition) {
+  static bbox(target: ObjectPosition) {
     const coords = this.getViewportCoords(target);
     const bbox = makeBoundingBoxFromPoints(Object.values(coords));
     const transform = calcBaseChangeMatrix(

@@ -1,10 +1,17 @@
+import type { StaticCanvas } from '../canvas/StaticCanvas';
 import { iMatrix } from '../constants';
 import { Intersection } from '../Intersection';
-import { TMat2D } from '../typedefs';
+import { Point } from '../Point';
+import { TBBox, TMat2D } from '../typedefs';
+import { makeBoundingBoxFromPoints } from '../util';
 import {
   invertTransform,
   multiplyTransformMatrices,
 } from '../util/misc/matrix';
+import {
+  calcBaseChangeMatrix,
+  sendPointToPlane,
+} from '../util/misc/planeChange';
 import { PlaneBBox } from './PlaneBBox';
 
 export interface ViewportBBoxPlanes {
@@ -64,6 +71,44 @@ export class ViewportBBox extends PlaneBBox {
       this.intersects(other) ||
       this.contains(other) ||
       this.isContainedBy(other)
+    );
+  }
+
+  static rect({ left, top, width, height }: TBBox, vpt: TMat2D = iMatrix) {
+    const transform = calcBaseChangeMatrix(
+      undefined,
+      [new Point(width, 0), new Point(0, height)],
+      new Point(left + width / 2, top + height / 2)
+    );
+    return new this(transform, {
+      viewport() {
+        return vpt;
+      },
+    });
+  }
+
+  static bounds(tl: Point, br: Point, vpt: TMat2D) {
+    return this.rect(makeBoundingBoxFromPoints([tl, br]), vpt);
+  }
+
+  static canvas(canvas: StaticCanvas) {
+    return this.rect(
+      {
+        left: 0,
+        top: 0,
+        width: canvas.width,
+        height: canvas.height,
+      },
+      [...canvas.viewportTransform]
+    );
+  }
+
+  static canvasBounds(tl: Point, br: Point, vpt: TMat2D) {
+    return this.rect(
+      makeBoundingBoxFromPoints(
+        [tl, br].map((point) => sendPointToPlane(point, undefined, vpt))
+      ),
+      vpt
     );
   }
 }
