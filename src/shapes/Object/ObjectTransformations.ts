@@ -192,15 +192,27 @@ export class ObjectTransformations<
     );
   }
 
+  // shear(x: number, y: number, options?: ObjectTransformOptions) {
+  //   const { tl, tr, bl } = BBox.rotated2(this).getCoords();
+  //   const unitX = getUnitVector(createVector(tl, tr));
+  //   const unitY = getUnitVector(createVector(tl, bl));
+  //   return this.transformObject(
+  //     calcBaseChangeMatrix(
+  //       [unitX, unitY],
+  //       [unitX.add(unitY.scalarMultiply(y)), unitY.add(unitX.scalarMultiply(x))]
+  //     ),
+  //     options
+  //   );
+  // }
+
   shear(x: number, y: number, options?: ObjectTransformOptions) {
-    const [_, b, c] = options?.inViewport
-      ? this.calcTransformMatrixInViewport()
-      : this.calcTransformMatrix();
+    const rotation = calcRotateMatrix({ rotation: this.bbox.getRotation() });
     return this.transformObject(
-      multiplyTransformMatrices(
-        calcShearMatrix({ shearX: x, shearY: y }),
-        invertTransform([1, b, c, 1, 0, 0])
-      ),
+      multiplyTransformMatrixChain([
+        rotation,
+        [1, y, x, 1, 0, 0],
+        invertTransform(rotation),
+      ]),
       options
     );
   }
