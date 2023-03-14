@@ -2,6 +2,7 @@ import {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { isMatrixEqual } from '../util/misc/matrix';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -47,7 +48,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   }
 
   const pivotPoint = target.getXY(originX, originY);
-  const ownAngle = target.angle;
+  const ownTransform = target.calcOwnMatrix();
   const lastAngle = Math.atan2(
       pointer.y - pivotPoint.y,
       pointer.x - pivotPoint.x
@@ -68,7 +69,10 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     }
   }
 
-  return target.rotate(angle) !== ownAngle;
+  return !isMatrixEqual(
+    target.rotate(angle, { originX, originY, inViewport: true }),
+    ownTransform
+  );
 };
 
 export const rotationWithSnapping = wrapWithFireEvent(
