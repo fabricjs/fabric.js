@@ -140,9 +140,7 @@ export class BBox extends ViewportBBox {
       ],
       center
     );
-    return Object.assign(new this(transform, this.getPlanes(target)), {
-      rotation,
-    });
+    return new this(transform, this.getPlanes(target));
   }
 
   static legacy(target: ObjectPosition) {

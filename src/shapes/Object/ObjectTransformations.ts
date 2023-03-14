@@ -174,8 +174,10 @@ export class ObjectTransformations<
    * @returns own transform
    */
   rotate(angle: TDegree, options?: ObjectTransformOptions) {
-    return this.rotateBy(
-      angle - this.getTotalAngle(options?.inViewport),
+    return this.transformObject(
+      calcRotateMatrix({
+        rotation: degreesToRadians(angle) - this.bbox.getRotation(),
+      }),
       options
     );
   }

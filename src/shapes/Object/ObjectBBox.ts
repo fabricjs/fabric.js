@@ -8,7 +8,7 @@ import { mapValues } from '../../util/internals';
 import { multiplyTransformMatrices, qrDecompose } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
-import { BBox, TRotatedBBox } from '../../BBox/BBox';
+import { BBox } from '../../BBox/BBox';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
@@ -23,7 +23,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   declare strokeUniform: boolean;
   declare padding: number;
 
-  declare bbox: TRotatedBBox;
+  declare bbox: BBox;
 
   /**
    * A Reference of the Canvas where the object is actually added
@@ -37,7 +37,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
    * Override this method if needed
    */
   needsViewportCoords() {
-    return this.strokeUniform || !this.padding;
+    return (this.strokeUniform && this.strokeWidth > 0) || !!this.padding;
   }
 
   getCanvasRetinaScaling() {

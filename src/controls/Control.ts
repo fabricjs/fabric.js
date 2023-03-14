@@ -283,7 +283,7 @@ export class Control {
     const bbox = fabricObject.bbox;
     return new Point(this.x, this.y)
       .transform(bbox.getTransformation())
-      .add(new Point(this.offsetX, this.offsetY).rotate(bbox.rotation));
+      .add(new Point(this.offsetX, this.offsetY).rotate(bbox.getRotation()));
   }
 
   /**
