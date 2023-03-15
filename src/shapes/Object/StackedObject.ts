@@ -2,8 +2,8 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { isActiveSelection } from '../../util/types';
 import { ObjectGeometry } from './ObjectGeometry';
+import { isActiveSelection } from '../../util/types';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
