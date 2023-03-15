@@ -199,20 +199,13 @@ export class ObjectTransformations<
   }
 
   shear(x: number, y: number, options?: ObjectTransformOptions) {
-    const { tl, tr, bl } = BBox.bbox(this).getCoords();
-    const [a, b, c, d] = this.calcTransformMatrix();
-    const xTVector = getUnitVector(new Point(a, b));
-    const yTVector = getUnitVector(new Point(c, d));
-    const xVector = getUnitVector(createVector(tl, tr));
-    const yVector = getUnitVector(createVector(tl, bl));
-    const newXVector = xVector.add(
-      getOrthonormalVector(xVector).scalarMultiply(y)
-    );
-    const newYVector = yVector.add(
-      getOrthonormalVector(yVector).scalarMultiply(x)
-    );
-    return this.transformObject(
-      calcBaseChangeMatrix([xTVector, yTVector], [newXVector, newYVector]),
+    const bbox = BBox.bbox(this);
+    const { tl, tr, bl } = (
+      options?.inViewport ? bbox : bbox.sendToCanvas()
+    ).getCoords();
+    return this.shearSides(
+      [createVector(tl, tr), createVector(tl, bl)],
+      [x, y],
       options
     );
   }
@@ -225,12 +218,29 @@ export class ObjectTransformations<
    * @returns
    */
   shearBy(x: number, y: number, options?: ObjectTransformOptions) {
-    const { tl, tr, bl } = BBox.transformed(this).getCoords();
-    const [a, b, c, d] = this.calcTransformMatrix();
+    const bbox = BBox.transformed(this);
+    const { tl, tr, bl } = (
+      options?.inViewport ? bbox : bbox.sendToCanvas()
+    ).getCoords();
+    return this.shearSides(
+      [createVector(tl, tr), createVector(tl, bl)],
+      [x, y],
+      options
+    );
+  }
+
+  shearSides(
+    [vx, vy]: [Point, Point],
+    [x, y]: [number, number],
+    options?: ObjectTransformOptions
+  ) {
+    const [a, b, c, d] = options?.inViewport
+      ? this.calcTransformMatrixInViewport()
+      : this.calcTransformMatrix();
     const xTVector = getUnitVector(new Point(a, b));
     const yTVector = getUnitVector(new Point(c, d));
-    const xVector = getUnitVector(createVector(tl, tr));
-    const yVector = getUnitVector(createVector(tl, bl));
+    const xVector = getUnitVector(vx);
+    const yVector = getUnitVector(vy);
     const newXVector = getUnitVector(
       xVector.add(getOrthonormalVector(xVector).scalarMultiply(y))
     );
