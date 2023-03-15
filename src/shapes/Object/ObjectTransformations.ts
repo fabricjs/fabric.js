@@ -16,8 +16,16 @@ import {
   multiplyTransformMatrixChain,
 } from '../../util/misc/matrix';
 import { applyTransformToObject } from '../../util/misc/objectTransforms';
-import { sendPointToPlane } from '../../util/misc/planeChange';
+import {
+  calcBaseChangeMatrix,
+  sendPointToPlane,
+} from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import {
+  createVector,
+  getOrthonormalVector,
+  getUnitVector,
+} from '../../util/misc/vectors';
 import { ObjectPosition } from './ObjectPosition';
 
 type ObjectTransformOptions = {
@@ -190,6 +198,13 @@ export class ObjectTransformations<
     );
   }
 
+  /**
+   * @todo this is far from perfect when dealing with rotation
+   * @param x
+   * @param y
+   * @param options
+   * @returns
+   */
   shear(x: number, y: number, options?: ObjectTransformOptions) {
     const [a, b, c, d] = this.calcTransformMatrix();
     return this.transformObject(
@@ -202,24 +217,20 @@ export class ObjectTransformations<
     );
   }
 
-  // shearBy(x: number, y: number, options?: ObjectTransformOptions) {
-  //   const { tl, tr, bl } = this.bbox.getCoords();
-  //   const xVector = createVector(tl, tr);
-  //   const yVector = createVector(tl, bl);
-  //   return this.transformObject(
-  //     calcBaseChangeMatrix(
-  //       [xVector, yVector],
-  //       [
-  //         xVector.add(yVector.scalarMultiply(y)),
-  //         yVector.add(xVector.scalarMultiply(x)),
-  //       ]
-  //     ),
-  //     options
-  //   );
-  // }
-
   shearBy(x: number, y: number, options?: ObjectTransformOptions) {
-    return this.transformObject([1, y, x, 1, 0, 0], options);
+    const { tl, tr, bl } = BBox.transformed(this).getCoords();
+    const xVector = getUnitVector(createVector(tl, tr));
+    const yVector = getUnitVector(createVector(tl, bl));
+    const newYVector = yVector.add(
+      getOrthonormalVector(yVector).scalarMultiply(x)
+    );
+    const newXVector = xVector.add(
+      getOrthonormalVector(xVector).scalarMultiply(y)
+    );
+    return this.transformObject(
+      calcBaseChangeMatrix([xVector, yVector], [newXVector, newYVector]),
+      options
+    );
   }
 
   /**
