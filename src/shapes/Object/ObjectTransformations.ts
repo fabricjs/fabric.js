@@ -200,17 +200,17 @@ export class ObjectTransformations<
     }: ObjectTransformOptions = {}
   ) {
     const transformCenter = this.getXY(originX, originY);
-    const [a, b, c, d] = this.calcTransformMatrix();
     const rotation = calcRotateMatrix({
       rotation: this.bbox.getRotation(),
     });
+    const [a, b, c, d] = multiplyTransformMatrixChain([
+      invertTransform(rotation),
+      this.calcTransformMatrix(),
+    ]);
     const ownTransform = multiplyTransformMatrixChain([
       this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
       [1, 0, 0, 1, transformCenter.x, transformCenter.y],
-      [1, y, x, 1, 0, 0],
-      rotation,
-      [a, 0, 0, d, 0, 0],
-      invertTransform(rotation),
+      [a, y, x, d, 0, 0],
     ]);
     // TODO: stop using decomposed values in favor of a matrix
     applyTransformToObject(this, ownTransform);
