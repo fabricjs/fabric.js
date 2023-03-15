@@ -9,19 +9,14 @@ import type {
   TOriginX,
   TOriginY,
 } from '../../typedefs';
-import { createVector } from '../../util';
 import {
   calcRotateMatrix,
-  calcShearMatrix,
   invertTransform,
   multiplyTransformMatrices,
   multiplyTransformMatrixChain,
 } from '../../util/misc/matrix';
 import { applyTransformToObject } from '../../util/misc/objectTransforms';
-import {
-  calcBaseChangeMatrix,
-  sendPointToPlane,
-} from '../../util/misc/planeChange';
+import { sendPointToPlane } from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { ObjectPosition } from './ObjectPosition';
 
@@ -195,79 +190,52 @@ export class ObjectTransformations<
     );
   }
 
-  // shear(x: number, y: number, options?: ObjectTransformOptions) {
-  //   const rotation = this.bbox.getRotation();
-  //   const t = multiplyTransformMatrices(
-  //     invertTransform(calcRotateMatrix({ rotation })),
-  //     this.calcTransformMatrix()
-  //   );
+  shear(
+    x: number,
+    y: number,
+    {
+      originX = this.originX,
+      originY = this.originY,
+      inViewport = false,
+    }: ObjectTransformOptions = {}
+  ) {
+    const transformCenter = this.getXY(originX, originY);
+    const [a, b, c, d] = this.calcTransformMatrix();
+    const rotation = calcRotateMatrix({
+      rotation: this.bbox.getRotation(),
+    });
+    const ownTransform = multiplyTransformMatrixChain([
+      this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
+      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
+      [1, y, x, 1, 0, 0],
+      rotation,
+      [a, 0, 0, d, 0, 0],
+      invertTransform(rotation),
+    ]);
+    // TODO: stop using decomposed values in favor of a matrix
+    applyTransformToObject(this, ownTransform);
+    this.setCoords();
+    return this.calcOwnMatrix();
+  }
+
+  // shearBy(x: number, y: number, options?: ObjectTransformOptions) {
+  //   const { tl, tr, bl } = this.bbox.getCoords();
+  //   const xVector = createVector(tl, tr);
+  //   const yVector = createVector(tl, bl);
   //   return this.transformObject(
   //     calcBaseChangeMatrix(
+  //       [xVector, yVector],
   //       [
-  //         // new Point(1, 0).rotate(rotation).scalarMultiply(1 + b),
-  //         // new Point(0, 1).rotate(rotation).scalarMultiply(1 + c),
-  //         new Point(1, 0).transform(this.calcTransformMatrix(), true),
-  //         new Point(0, 1).transform(this.calcTransformMatrix(), true),
-  //       ],
-  //       [
-  //         new Point(1, 0).rotate(rotation).scalarMultiply(1 + y),
-  //         new Point(0, 1).rotate(rotation).scalarMultiply(1 + x),
+  //         xVector.add(yVector.scalarMultiply(y)),
+  //         yVector.add(xVector.scalarMultiply(x)),
   //       ]
   //     ),
   //     options
   //   );
   // }
 
-  // shear(
-  //   x: number,
-  //   y: number,
-  //   {
-  //     originX = this.originX,
-  //     originY = this.originY,
-  //     inViewport = false,
-  //   }: ObjectTransformOptions = {}
-  // ) {
-  //   const transformCenter = this.getXY(originX, originY);
-  //   const { scaleX: a, scaleY: d } = qrDecompose(this.calcTransformMatrix());
-  //   const rotation = calcRotateMatrix({
-  //     rotation: this.bbox.getRotation(),
-  //   });
-  //   const ownTransform = multiplyTransformMatrixChain([
-  //     this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
-  //     [1, 0, 0, 1, transformCenter.x, transformCenter.y],
-  //     rotation,
-  //     [a, 0, 0, d, 0, 0],
-  //     [1, y, x, 1, 0, 0],
-  //   ]);
-  //   // TODO: stop using decomposed values in favor of a matrix
-  //   applyTransformToObject(this, ownTransform);
-  //   this.setCoords();
-  //   return this.calcOwnMatrix();
-  // }
-  shear(x: number, y: number, options?: ObjectTransformOptions) {
-    const { tl, tr, bl } = this.bbox.getCoords();
-    const rotation = this.bbox.getRotation();
-    const xVector = createVector(tl, tr);
-    const yVector = createVector(tl, bl);
-    return this.transformObject(
-      calcBaseChangeMatrix(
-        [
-          new Point(bbox.width, 0).rotate(rotation),
-          new Point(0, bbox.height).rotate(rotation),
-        ],
-        [
-          new Point(bbox.width, y * bbox.height).rotate(rotation),
-          new Point(x * bbox.width, bbox.height).rotate(rotation),
-        ]
-      )
-    );
-  }
-
   shearBy(x: number, y: number, options?: ObjectTransformOptions) {
-    return this.transformObject(
-      calcShearMatrix({ shearX: x, shearY: y }),
-      options
-    );
+    return this.transformObject([1, y, x, 1, 0, 0], options);
   }
 
   /**
