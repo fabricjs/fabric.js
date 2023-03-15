@@ -23,10 +23,10 @@ export const calcBaseChangeMatrix = (
   destinationCenter: Point = new Point()
 ) => {
   const [a, b, c, d] = multiplyTransformMatrices(
+    [to[0].x, to[0].y, to[1].x, to[1].y, 0, 0],
     from
       ? invertTransform([from[0].x, from[0].y, from[1].x, from[1].y, 0, 0])
       : iMatrix,
-    [to[0].x, to[0].y, to[1].x, to[1].y, 0, 0],
     true
   );
   return [a, b, c, d, destinationCenter.x, destinationCenter.y] as TMat2D;
