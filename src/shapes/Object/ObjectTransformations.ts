@@ -190,32 +190,23 @@ export class ObjectTransformations<
     );
   }
 
-  shear(
-    x: number,
-    y: number,
-    {
-      originX = this.originX,
-      originY = this.originY,
-      inViewport = false,
-    }: ObjectTransformOptions = {}
-  ) {
-    const transformCenter = this.getXY(originX, originY);
+  shear(x: number, y: number, options?: ObjectTransformOptions) {
     const rotation = calcRotateMatrix({
       rotation: this.bbox.getRotation(),
     });
-    const [a, b, c, d] = multiplyTransformMatrixChain([
+    const [a, b, c, d] = multiplyTransformMatrices(
       invertTransform(rotation),
       this.calcTransformMatrix(),
-    ]);
-    const ownTransform = multiplyTransformMatrixChain([
-      this.group ? invertTransform(this.group.calcTransformMatrix()) : iMatrix,
-      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
-      [a, y, x, d, 0, 0],
-    ]);
-    // TODO: stop using decomposed values in favor of a matrix
-    applyTransformToObject(this, ownTransform);
-    this.setCoords();
-    return this.calcOwnMatrix();
+      true
+    );
+    return this.transformObject(
+      multiplyTransformMatrices(
+        [a, y, x, d, 0, 0],
+        invertTransform(this.calcTransformMatrix()),
+        true
+      ),
+      options
+    );
   }
 
   // shearBy(x: number, y: number, options?: ObjectTransformOptions) {
