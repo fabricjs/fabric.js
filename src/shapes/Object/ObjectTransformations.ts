@@ -198,6 +198,25 @@ export class ObjectTransformations<
     );
   }
 
+  shear(x: number, y: number, options?: ObjectTransformOptions) {
+    const { tl, tr, bl } = BBox.bbox(this).getCoords();
+    const [a, b, c, d] = this.calcTransformMatrix();
+    const xTVector = getUnitVector(new Point(a, b));
+    const yTVector = getUnitVector(new Point(c, d));
+    const xVector = getUnitVector(createVector(tl, tr));
+    const yVector = getUnitVector(createVector(tl, bl));
+    const newXVector = xVector.add(
+      getOrthonormalVector(xVector).scalarMultiply(y)
+    );
+    const newYVector = yVector.add(
+      getOrthonormalVector(yVector).scalarMultiply(x)
+    );
+    return this.transformObject(
+      calcBaseChangeMatrix([xTVector, yTVector], [newXVector, newYVector]),
+      options
+    );
+  }
+
   /**
    * @todo this is far from perfect when dealing with rotation
    * @param x
@@ -206,38 +225,20 @@ export class ObjectTransformations<
    * @returns
    */
   shearBy(x: number, y: number, options?: ObjectTransformOptions) {
-    const [a, b, c, d] = this.calcTransformMatrix();
     const { tl, tr, bl } = BBox.transformed(this).getCoords();
+    const [a, b, c, d] = this.calcTransformMatrix();
+    const xTVector = getUnitVector(new Point(a, b));
+    const yTVector = getUnitVector(new Point(c, d));
     const xVector = getUnitVector(createVector(tl, tr));
     const yVector = getUnitVector(createVector(tl, bl));
-    const newYVector = yVector.add(
-      getOrthonormalVector(yVector).scalarMultiply(x)
+    const newXVector = getUnitVector(
+      xVector.add(getOrthonormalVector(xVector).scalarMultiply(y))
     );
-    const newXVector = xVector.add(
-      getOrthonormalVector(xVector).scalarMultiply(y)
-    );
-    return this.transformObject(
-      calcBaseChangeMatrix(
-        [new Point(a, b), new Point(c, d)],
-        [newXVector, newYVector]
-      ),
-      options
-    );
-  }
-
-  shearBy1(x: number, y: number, options?: ObjectTransformOptions) {
-    const [a, b, c, d] = this.calcTransformMatrix();
-    const { tl, tr, bl } = BBox.transformed(this).getCoords();
-    const xVector = getUnitVector(createVector(tl, tr));
-    const yVector = getUnitVector(createVector(tl, bl));
-    const newYVector = yVector.add(
-      getOrthonormalVector(yVector).scalarMultiply(x)
-    );
-    const newXVector = xVector.add(
-      getOrthonormalVector(xVector).scalarMultiply(y)
+    const newYVector = getUnitVector(
+      yVector.add(getOrthonormalVector(yVector).scalarMultiply(x))
     );
     return this.transformObject(
-      calcBaseChangeMatrix([xVector, yVector], [newXVector, newYVector]),
+      calcBaseChangeMatrix([xTVector, yTVector], [newXVector, newYVector]),
       options
     );
   }
