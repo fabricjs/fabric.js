@@ -14,7 +14,6 @@ import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
-import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
@@ -1355,52 +1354,33 @@ export class Canvas extends SelectableCanvas {
    * @param {Event} e Event fired on mousemove
    */
   _transformObject(e: TPointerEvent) {
-    const pointer = this.getPointer(e),
-      transform = this._currentTransform!,
-      target = transform.target,
-      //  transform pointer to target's containing coordinate plane
-      //  both pointer and object should agree on every point
-      localPointer = target.group
-        ? sendPointToPlane(
-            pointer,
-            undefined,
-            target.group.calcTransformMatrix()
-          )
-        : pointer;
-    // seems used only here.
-    // @TODO: investigate;
-    // @ts-ignore
-    transform.reset = false;
-    transform.shiftKey = e.shiftKey;
-    transform.altKey = !!this.centeredKey && e[this.centeredKey];
-
-    this._performTransformAction(e, transform, localPointer);
-    transform.actionPerformed && this.requestRenderAll();
+    this._performTransformAction(
+      e,
+      Object.assign(this._currentTransform!, {
+        shiftKey: e.shiftKey,
+        altKey: !!this.centeredKey && e[this.centeredKey],
+      })
+    ) && this.requestRenderAll();
   }
 
   /**
    * @private
    */
-  _performTransformAction(
-    e: TPointerEvent,
-    transform: Transform,
-    pointer: Point
-  ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
+  _performTransformAction(e: TPointerEvent, transform: Transform) {
+    const { action, actionHandler } = transform;
     let actionPerformed = false;
-    // this object could be created from the function in the control handlers
-
     if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
+      const pointer = this.getPointer(e);
+      actionPerformed = actionHandler(e, transform, pointer.x, pointer.y);
+      transform.lastX = pointer.x;
+      transform.lastY = pointer.y;
     }
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
     }
-    transform.actionPerformed = transform.actionPerformed || actionPerformed;
+    return (transform.actionPerformed =
+      transform.actionPerformed || actionPerformed);
   }
 
   /**
