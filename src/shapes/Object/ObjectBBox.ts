@@ -86,18 +86,17 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
     origin = new Point(1, 1),
     {
       applyViewportTransform = this.needsViewportCoords(),
+      transform = this.calcTransformMatrix(),
     }: {
       applyViewportTransform?: boolean;
+      transform?: TMat2D;
     } = {}
   ) {
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
     const dimVector = origin
       .multiply(new Point(this.width, this.height))
       .add(origin.scalarMultiply(!this.strokeUniform ? this.strokeWidth : 0))
-      .transform(
-        multiplyTransformMatrices(vpt, this.calcTransformMatrix()),
-        true
-      );
+      .transform(multiplyTransformMatrices(vpt, transform), true);
     const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
       this.strokeUniform ? this.strokeWidth : 0
     );
