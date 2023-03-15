@@ -205,19 +205,28 @@ export class ObjectTransformations<
    * @param options
    * @returns
    */
-  shear(x: number, y: number, options?: ObjectTransformOptions) {
+  shearBy(x: number, y: number, options?: ObjectTransformOptions) {
     const [a, b, c, d] = this.calcTransformMatrix();
+    const { tl, tr, bl } = BBox.transformed(this).getCoords();
+    const xVector = getUnitVector(createVector(tl, tr));
+    const yVector = getUnitVector(createVector(tl, bl));
+    const newYVector = yVector.add(
+      getOrthonormalVector(yVector).scalarMultiply(x)
+    );
+    const newXVector = xVector.add(
+      getOrthonormalVector(xVector).scalarMultiply(y)
+    );
     return this.transformObject(
-      multiplyTransformMatrices(
-        [a, y, x, d, 0, 0],
-        invertTransform(this.calcTransformMatrix()),
-        true
+      calcBaseChangeMatrix(
+        [new Point(a, b), new Point(c, d)],
+        [newXVector, newYVector]
       ),
       options
     );
   }
 
-  shearBy(x: number, y: number, options?: ObjectTransformOptions) {
+  shearBy1(x: number, y: number, options?: ObjectTransformOptions) {
+    const [a, b, c, d] = this.calcTransformMatrix();
     const { tl, tr, bl } = BBox.transformed(this).getCoords();
     const xVector = getUnitVector(createVector(tl, tr));
     const yVector = getUnitVector(createVector(tl, bl));
