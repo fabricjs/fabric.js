@@ -223,15 +223,42 @@ export class ObjectTransformations<
       options?.inViewport ? bbox : bbox.sendToCanvas()
     ).getCoords();
     return this.shearSides(
-      [createVector(tl, tr), createVector(tl, bl)],
+      [
+        getUnitVector(createVector(tl, tr)),
+        getUnitVector(createVector(tl, bl)),
+      ],
       [x, y],
       options
     );
   }
 
-  shearSides(
+  protected shearSides(
     [vx, vy]: [Point, Point],
     [x, y]: [number, number],
+    options?: ObjectTransformOptions
+  ) {
+    const xVector = getUnitVector(vx);
+    const yVector = getUnitVector(vy);
+    return this.shearSidesBy(
+      [xVector, yVector],
+      [
+        getOrthonormalVector(xVector).scalarMultiply(y),
+        getOrthonormalVector(yVector).scalarMultiply(x),
+      ],
+      options
+    );
+  }
+
+  /**
+   *
+   * @param param0 2 vectors representing the sides of the object
+   * @param param1 2 vectors representing the shearing offset affecting the 2 side vectors respectively (dy affects vx and dx affects vy)
+   * @param options
+   * @returns
+   */
+  shearSidesBy(
+    [vx, vy]: [Point, Point],
+    [dy, dx]: [Point, Point],
     options?: ObjectTransformOptions
   ) {
     const [a, b, c, d] = options?.inViewport
@@ -239,14 +266,8 @@ export class ObjectTransformations<
       : this.calcTransformMatrix();
     const xTVector = getUnitVector(new Point(a, b));
     const yTVector = getUnitVector(new Point(c, d));
-    const xVector = getUnitVector(vx);
-    const yVector = getUnitVector(vy);
-    const newXVector = getUnitVector(
-      xVector.add(getOrthonormalVector(xVector).scalarMultiply(y))
-    );
-    const newYVector = getUnitVector(
-      yVector.add(getOrthonormalVector(yVector).scalarMultiply(x))
-    );
+    const newXVector = getUnitVector(vx.add(dy));
+    const newYVector = getUnitVector(vy.add(dx));
     return this.transformObject(
       calcBaseChangeMatrix([xTVector, yTVector], [newXVector, newYVector]),
       options
