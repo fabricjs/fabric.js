@@ -17,15 +17,15 @@ export const dragHandler: TransformActionHandler = (
   x,
   y
 ) => {
-  const { target, offsetX, offsetY } = transform,
-    newLeft = x - offsetX,
-    newTop = y - offsetY,
-    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
-    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
-  moveX && target.set('left', newLeft);
-  moveY && target.set('top', newTop);
-  if (moveX || moveY) {
+  const { target, lastX, lastY } = transform;
+  if (
+    target.translate(
+      !isLocked(target, 'lockMovementX') ? x - lastX : 0,
+      !isLocked(target, 'lockMovementY') ? y - lastY : 0
+    )
+  ) {
     fireEvent('moving', commonEventInfo(eventData, transform, x, y));
+    return true;
   }
-  return moveX || moveY;
+  return false;
 };
