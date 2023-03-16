@@ -939,7 +939,7 @@ export const getRegularPolygonPath = (numVertexes, radius) => {
  * @param {number} fractionDigits  number of fraction digits to "leave"
  * @return {String} joined path 'M 0 0 L 20 30'
  */
-export const joinPath = (pathData: PathData, fractionDigits?: number) =>
+export const joinPath = (pathData: PathData, fractionDigits: number) =>
   pathData
     .map((segment) => {
       return segment
