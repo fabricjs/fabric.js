@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
+- BREAKING fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
 - fix(): env WebGL import cycle [#8758](https://github.com/fabricjs/fabric.js/pull/8758)
