@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
 - fix(): env WebGL import cycle [#8758](https://github.com/fabricjs/fabric.js/pull/8758)
 - chore(TS): remove controls from prototype. BREAKING: controls aren't shared anymore [#8753](https://github.com/fabricjs/fabric.js/pull/8753)
