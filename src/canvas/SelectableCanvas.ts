@@ -832,14 +832,7 @@ export class SelectableCanvas<
     if (!target) {
       return;
     }
-    const pointer = target.group
-      ? // transform pointer to target's containing coordinate plane
-        sendPointToPlane(
-          this.getPointer(e),
-          undefined,
-          target.group.calcTransformMatrix()
-        )
-      : this.getPointer(e);
+    const pointer = this.getPointer(e, true);
     const corner = target.__corner || '',
       control = !!corner && target.controls[corner],
       actionHandler =

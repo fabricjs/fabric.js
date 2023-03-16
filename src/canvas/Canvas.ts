@@ -1370,7 +1370,7 @@ export class Canvas extends SelectableCanvas {
     const { action, actionHandler } = transform;
     let actionPerformed = false;
     if (actionHandler) {
-      const pointer = this.getPointer(e);
+      const pointer = this.getPointer(e, true);
       actionPerformed = actionHandler(e, transform, pointer.x, pointer.y);
       transform.lastX = pointer.x;
       transform.lastY = pointer.y;

@@ -21,7 +21,8 @@ export const dragHandler: TransformActionHandler = (
   if (
     target.translate(
       !isLocked(target, 'lockMovementX') ? x - lastX : 0,
-      !isLocked(target, 'lockMovementY') ? y - lastY : 0
+      !isLocked(target, 'lockMovementY') ? y - lastY : 0,
+      true
     )
   ) {
     fireEvent('moving', commonEventInfo(eventData, transform, x, y));
