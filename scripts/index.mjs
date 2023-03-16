@@ -28,7 +28,10 @@ import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
 
-const program = new commander.Command();
+const program = new commander.Command()
+  .showHelpAfterError()
+  .allowUnknownOption(false)
+  .allowExcessArguments(false);
 
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 
@@ -255,6 +258,7 @@ async function runTestem({
 
   if (launch) {
     // open localhost
+    // consider using open instead https://github.com/sindresorhus/open
     const url = `http://localhost:${port}/`;
     const start =
       os.platform() === 'darwin'
@@ -359,7 +363,7 @@ async function test(suite, tests, options = {}) {
 
 /**
  *
- * @param {'unit'|'visual'} type correspondes to the test directories
+ * @param {'unit'|'visual'} type corresponds to the test directories
  * @returns
  */
 function listTestFiles(type) {
@@ -451,7 +455,7 @@ async function selectTestFile() {
   return filteredTests;
 }
 
-async function runIntreactiveTestSuite(options) {
+async function runInteractiveTestSuite(options) {
   //  some tests fail because of some pollution when run from the same context
   // test(_.map(await selectTestFile(), curr => `test/${curr.type}/${curr.file}`))
   const tests = _.reduce(
@@ -482,16 +486,6 @@ program
   .description('fabric.js DEV CLI tools')
   .version(process.env.npm_package_version)
   .showSuggestionAfterError();
-
-program
-  .command('start')
-  .description('start fabricjs.com dev server and watch for changes')
-  .action((options) => {
-    exportToWebsite({
-      watch: true,
-    });
-    startWebsite();
-  });
 
 program
   .command('dev')
@@ -569,7 +563,7 @@ program
         )
       );
     } else {
-      results.push(...(await runIntreactiveTestSuite(options)));
+      results.push(...(await runInteractiveTestSuite(options)));
     }
     if (_.some(results)) {
       // inform ci that tests have failed

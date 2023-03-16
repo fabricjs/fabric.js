@@ -1,0 +1,53 @@
+{
+  "setupTasks": [
+    {
+      "name": "Installing Dependencies",
+      "command": "npm install"
+    }
+  ],
+  "tasks": {
+    "install-dependencies": {
+      "name": "Install Dependencies",
+      "command": "npm install",
+      "restartOn": {
+        "files": ["package-lock.json", "package.json"],
+        "branch": true
+      }
+    },
+    "build": {
+      "name": "Build & Watch",
+      "command": "npm run build -- -f -w",
+      "runAtStart": true,
+      "restartOn": {
+        "branch": true
+      }
+    },
+    "node": {
+      "name": "Run Node Template",
+      "command": "npm start node -- --no-watch",
+      "runAtStart": true,
+      "preview": {
+        "port": 8080,
+        "prLink": "direct"
+      }
+    },
+    "next": {
+      "name": "Run Next Template",
+      "command": "npm start next -- --no-watch",
+      "runAtStart": true,
+      "preview": {
+        "port": 3000,
+        "prLink": "direct"
+      }
+    },
+    "vanilla": {
+      "name": "Run Vanilla Template",
+      "command": "npm start vanilla -- --no-watch",
+      "runAtStart": true,
+      "preview": {
+        "port": 1234,
+        "prLink": "direct"
+      }
+    }
+  }
+}
