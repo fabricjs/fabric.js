@@ -936,7 +936,7 @@ export const getRegularPolygonPath = (numVertexes, radius) => {
 /**
  * Join path commands to go back to svg format
  * @param {Array} pathData fabricJS parsed path commands
- * @param {number} fractionDigits  number of fraction digits to "leave"
+ * @param {number} fractionDigits number of fraction digits to "leave"
  * @return {String} joined path 'M 0 0 L 20 30'
  */
 export const joinPath = (pathData: PathData, fractionDigits?: number) =>
@@ -945,7 +945,9 @@ export const joinPath = (pathData: PathData, fractionDigits?: number) =>
       return segment
         .map((arg, i) => {
           if (i === 0) return arg;
-          return fractionDigits === undefined ? arg : toFixed(arg, fractionDigits);
+          return fractionDigits === undefined
+            ? arg
+            : toFixed(arg, fractionDigits);
         })
         .join(' ');
     })
