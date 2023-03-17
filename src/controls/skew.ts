@@ -7,19 +7,11 @@ import {
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
-import {
-  findCornerQuadrant,
-  getLocalPoint,
-  isLocked,
-  NOT_ALLOWED_CURSOR,
-} from './util';
+import { findCornerQuadrant, isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { sizeAfterTransform } from '../util/misc/objectTransforms';
+import { BBox } from '../BBox/BBox';
+import { createVector, getOrthonormalVector } from '../util/misc/vectors';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -82,55 +74,28 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
  */
 function skewObject(
   axis: TAxis,
-  { target, ex, ey, skewingSide, ...transform }: SkewTransform,
+  { target, lastX, lastY, originX, originY }: SkewTransform,
   pointer: Point
 ) {
-  const { skew: skewKey, counterAxis } = AXIS_KEYS[axis],
-    { scaleX, scaleY, skewX, skewY, width, height } = target,
-    offset = pointer
-      .subtract(new Point(ex, ey))
-      .divide(new Point(scaleX, scaleY))[axis],
-    skewingBefore = target[skewKey],
-    skewingStart = transform[skewKey],
-    shearingStart = Math.tan(degreesToRadians(skewingStart)),
-    // let a, b be the size of target
-    // let a' be the value of a after applying skewing
-    // then:
-    // a' = a + b * skewA => skewA = (a' - a) / b
-    // the value b is tricky since skewY is applied before skewX
-    b = sizeAfterTransform(width, height, {
-      skewY,
-      // since skewY is applied before skewX, b (=width) is not affected by skewX
-      skewX: axis === 'y' ? 0 : skewX,
-    })[counterAxis];
-
-  const shearing =
-    (2 * offset * skewingSide) /
-      // we max out fractions to safeguard from asymptotic behavior
-      Math.max(b, 1) +
-    // add starting state
-    shearingStart;
-
-  const skewing = radiansToDegrees(Math.atan(shearing));
-  target.set(skewKey, skewing);
-  const changed = skewingBefore !== target[skewKey];
-
-  if (changed && axis === 'y') {
-    // we don't want skewing to affect scaleX
-    // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
-    const dimBefore = sizeAfterTransform(target.width, target.height, {
-        scaleX,
-        scaleY,
-        skewX,
-        skewY,
-      }),
-      dimAfter = sizeAfterTransform(target.width, target.height, target),
-      compensationFactor = target.skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
-    compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * target.scaleX);
-  }
-
-  return changed;
+  const offset = pointer.subtract(new Point(lastX, lastY))[axis];
+  const transformed = BBox.transformed(target).getCoords();
+  const tSides = {
+    x: createVector(transformed.tl, transformed.tr),
+    y: createVector(transformed.tl, transformed.bl),
+  };
+  const shearing = 2 * offset;
+  return target.shearSidesBy(
+    [tSides.x, tSides.y],
+    [
+      getOrthonormalVector(tSides.x).scalarMultiply(
+        axis === 'y' ? shearing : 0
+      ),
+      getOrthonormalVector(tSides.y).scalarMultiply(
+        axis === 'x' ? shearing : 0
+      ),
+    ],
+    { originX, originY, inViewport: true }
+  );
 }
 
 /**
@@ -175,7 +140,7 @@ function skewHandler(
     skewingDirection =
       ((target[skewKey] === 0 &&
         // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
-        getLocalPoint(transform, 'center', 'center', x, y)[axis] > 0) ||
+        new Point(x, y).subtract(target.getCenterPoint())[axis] > 0) ||
       // in case target has skewing we use that as the direction
       target[skewKey] > 0
         ? 1
@@ -196,6 +161,7 @@ function skewHandler(
     {
       ...transform,
       [originKey]: origin,
+      // [counterOriginKey]: 'center',
       skewingSide,
     },
     x,
