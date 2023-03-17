@@ -176,45 +176,45 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   setCoords(): void {
     this.bbox = BBox.rotated(this);
 
-    // debug code
-    setTimeout(() => {
-      const canvas = this.canvas;
-      if (!canvas) return;
-      const ctx = canvas.contextTop;
-      canvas.clearContext(ctx);
-      ctx.save();
-      const draw = (point: Point, color: string, radius = 6) => {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.ellipse(point.x, point.y, radius, radius, 0, 0, 360);
-        ctx.closePath();
-        ctx.fill();
-      };
-      [
-        new Point(-0.5, -0.5),
-        new Point(0.5, -0.5),
-        new Point(-0.5, 0.5),
-        new Point(0.5, 0.5),
-      ].forEach((origin) => {
-        draw(BBox.bbox(this).pointFromOrigin(origin), 'yellow', 10);
-        draw(BBox.rotated(this).pointFromOrigin(origin), 'orange', 8);
-        draw(BBox.transformed(this).pointFromOrigin(origin), 'silver', 6);
-        ctx.save();
-        ctx.transform(...this.getViewportTransform());
-        draw(BBox.bbox(this).sendToCanvas().pointFromOrigin(origin), 'red', 10);
-        draw(
-          BBox.rotated(this).sendToCanvas().pointFromOrigin(origin),
-          'magenta',
-          8
-        );
-        draw(
-          BBox.transformed(this).sendToCanvas().pointFromOrigin(origin),
-          'blue',
-          6
-        );
-        ctx.restore();
-      });
-      ctx.restore();
-    }, 50);
+    // // debug code
+    // setTimeout(() => {
+    //   const canvas = this.canvas;
+    //   if (!canvas) return;
+    //   const ctx = canvas.contextTop;
+    //   canvas.clearContext(ctx);
+    //   ctx.save();
+    //   const draw = (point: Point, color: string, radius = 6) => {
+    //     ctx.fillStyle = color;
+    //     ctx.beginPath();
+    //     ctx.ellipse(point.x, point.y, radius, radius, 0, 0, 360);
+    //     ctx.closePath();
+    //     ctx.fill();
+    //   };
+    //   [
+    //     new Point(-0.5, -0.5),
+    //     new Point(0.5, -0.5),
+    //     new Point(-0.5, 0.5),
+    //     new Point(0.5, 0.5),
+    //   ].forEach((origin) => {
+    //     draw(BBox.bbox(this).pointFromOrigin(origin), 'yellow', 10);
+    //     draw(BBox.rotated(this).pointFromOrigin(origin), 'orange', 8);
+    //     draw(BBox.transformed(this).pointFromOrigin(origin), 'silver', 6);
+    //     ctx.save();
+    //     ctx.transform(...this.getViewportTransform());
+    //     draw(BBox.bbox(this).sendToCanvas().pointFromOrigin(origin), 'red', 10);
+    //     draw(
+    //       BBox.rotated(this).sendToCanvas().pointFromOrigin(origin),
+    //       'magenta',
+    //       8
+    //     );
+    //     draw(
+    //       BBox.transformed(this).sendToCanvas().pointFromOrigin(origin),
+    //       'blue',
+    //       6
+    //     );
+    //     ctx.restore();
+    //   });
+    //   ctx.restore();
+    // }, 50);
   }
 }

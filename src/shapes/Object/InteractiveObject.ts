@@ -251,23 +251,23 @@ export class InteractiveFabricObject<
       };
     });
 
-    // debug code
-    setTimeout(() => {
-      const canvas = this.canvas;
-      if (!canvas) return;
-      const ctx = canvas.contextTop;
-      // canvas.clearContext(ctx);
-      ctx.fillStyle = 'cyan';
-      Object.keys(coords).forEach((key) => {
-        Object.keys(coords[key].corner).forEach((k) => {
-          const control = coords[key].corner[k];
-          ctx.beginPath();
-          ctx.ellipse(control.x, control.y, 3, 3, 0, 0, 360);
-          ctx.closePath();
-          ctx.fill();
-        });
-      });
-    }, 50);
+    // // debug code
+    // setTimeout(() => {
+    //   const canvas = this.canvas;
+    //   if (!canvas) return;
+    //   const ctx = canvas.contextTop;
+    //   // canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'cyan';
+    //   Object.keys(coords).forEach((key) => {
+    //     Object.keys(coords[key].corner).forEach((k) => {
+    //       const control = coords[key].corner[k];
+    //       ctx.beginPath();
+    //       ctx.ellipse(control.x, control.y, 3, 3, 0, 0, 360);
+    //       ctx.closePath();
+    //       ctx.fill();
+    //     });
+    //   });
+    // }, 50);
 
     return coords;
   }
