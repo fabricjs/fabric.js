@@ -43,7 +43,9 @@ export class ObjectPosition<
     originX: TOriginX = this.originX,
     originY: TOriginY = this.originY
   ): Point {
-    return this.bbox.pointFromOrigin(resolveOriginPoint(originX, originY));
+    return this.bbox
+      .sendToCanvas()
+      .pointFromOrigin(resolveOriginPoint(originX, originY));
   }
 
   /**
