@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): redo object geometry [#8767](https://github.com/fabricjs/fabric.js/pull/8767)
+- fix(IText, Textbox): fix broken text input [#8775](https://github.com/fabricjs/fabric.js/pull/8775)
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
 - fix(): env WebGL import cycle [#8758](https://github.com/fabricjs/fabric.js/pull/8758)
