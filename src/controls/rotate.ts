@@ -50,7 +50,6 @@ const rotateObjectWithSnapping: TransformActionHandler = (
 
   const pivotPoint = sendPointToPlane(
     target.getXY(originX, originY),
-    undefined,
     target.getViewportTransform()
   );
   const lastAngle: TRadian = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
