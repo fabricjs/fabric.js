@@ -1,6 +1,5 @@
 import { twoMathPi } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 
 export type ControlRenderingStyleOverride = Partial<
@@ -124,9 +123,8 @@ export function renderSquareControl(
   // this is still wrong
   ctx.lineWidth = 1;
   ctx.translate(left, top);
-  //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle();
-  ctx.rotate(degreesToRadians(angle));
+  //  angle is relative to viewport
+  ctx.rotate(fabricObject.getTotalAngle());
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);

@@ -20,7 +20,6 @@ import { isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
 import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
@@ -842,9 +841,9 @@ export class SelectableCanvas<
       action = getActionFromCorner(alreadySelected, corner, e, target),
       origin = this._getOriginFromCorner(target, corner),
       altKey = e[this.centeredKey as ModifierKey],
+      offset = pointer.subtract(target.getXY('left', 'top')),
       /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
+       * relative to viewport
        **/
       transform: Transform = {
         target: target,
@@ -852,23 +851,19 @@ export class SelectableCanvas<
         actionHandler,
         actionPerformed: false,
         corner,
-        pointer: this.getPointer(e),
-        viewportPointer: this.getPointer(e, true),
-        canvas: this,
-
         scaleX: target.scaleX,
         scaleY: target.scaleY,
         skewX: target.skewX,
         skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+        offsetX: offset.x,
+        offsetY: offset.x,
         originX: origin.x,
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(target.getTotalAngle()),
+        theta: target.getTotalAngle(),
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,

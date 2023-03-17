@@ -3,15 +3,15 @@ import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { iMatrix } from '../../constants';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
-import type { TDegree, TMat2D } from '../../typedefs';
+import type { TDegree, TMat2D, TRadian } from '../../typedefs';
 import { mapValues } from '../../util/internals';
 import { multiplyTransformMatrices, qrDecompose } from '../../util/misc/matrix';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { getUnitVector, rotateVector } from '../../util/misc/vectors';
 import { BBox } from '../../BBox/BBox';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
+import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 
 export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   extends ObjectLayout<EventSpec>
@@ -37,7 +37,9 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
    * Override this method if needed
    */
   needsViewportCoords() {
-    return (this.strokeUniform && this.strokeWidth > 0) || !!this.padding;
+    // not working yet
+    return true;
+    // return (this.strokeUniform && this.strokeWidth > 0) || !!this.padding;
   }
 
   getCanvasRetinaScaling() {
@@ -65,7 +67,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
    * Returns the object angle relative to canvas counting also the group property
    * @returns {TDegree}
    */
-  getTotalAngle(inViewport = true): TDegree {
+  getTotalAngle(inViewport = true): TRadian {
     const { flipX, flipY } = this;
     this.flipX = false;
     this.flipY = false;
@@ -79,7 +81,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
     );
     this.flipX = flipX;
     this.flipY = flipY;
-    return angle;
+    return degreesToRadians(angle);
   }
 
   protected calcDimensionsVector(
@@ -118,7 +120,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
     const offsetVector = rotateVector(
       offset.add(origin.scalarMultiply(padding * 2)),
-      degreesToRadians(this.getTotalAngle())
+      this.getTotalAngle(applyViewportTransform)
     );
     const realCenter = this.getCenterPoint().transform(vpt);
     return realCenter

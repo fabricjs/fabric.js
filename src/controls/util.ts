@@ -8,10 +8,7 @@ import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
+import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 import { sendPointToPlane } from '../util/misc/planeChange';
 
@@ -84,10 +81,10 @@ export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control
 ) {
-  //  angle is relative to canvas plane
+  //  angle is relative to viewport
   const angle = fabricObject.getTotalAngle(),
     cornerAngle =
-      angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
+      radiansToDegrees(angle + Math.atan2(control.y, control.x)) + 360;
   return Math.round((cornerAngle % 360) / 45);
 }
 
@@ -107,7 +104,7 @@ function normalizePoint(
     target.group?.calcTransformMatrix()
   );
   const p2 = angle
-    ? point.rotate(-degreesToRadians(angle), target.getRelativeCenterPoint())
+    ? point.rotate(-angle, target.getRelativeCenterPoint())
     : point;
   return p2.subtract(p);
 }

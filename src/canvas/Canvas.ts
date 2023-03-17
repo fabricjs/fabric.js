@@ -1120,14 +1120,11 @@ export class Canvas extends SelectableCanvas {
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      const corner = target._findTargetCorner(
-        this.getPointer(e, true),
-        isTouchEvent(e)
-      );
+      const pointer = this.getPointer(e, true);
+      const corner = target._findTargetCorner(pointer, isTouchEvent(e));
       if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
         const control = target.controls[corner],
-          pointer = this.getPointer(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {

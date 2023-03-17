@@ -2,6 +2,8 @@ import {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { TRadian } from '../typedefs';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -38,7 +40,7 @@ export const rotationStyleHandler: ControlCursorCallback = (
  */
 const rotateObjectWithSnapping: TransformActionHandler = (
   eventData,
-  { target, pointer, ex, ey, theta, originX, originY },
+  { target, ex, ey, theta, originX, originY },
   x,
   y
 ) => {
@@ -46,12 +48,13 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     return false;
   }
 
-  const pivotPoint = target.getXY(originX, originY);
-  const lastAngle = Math.atan2(
-      pointer.y - pivotPoint.y,
-      pointer.x - pivotPoint.x
-    ),
-    curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
+  const pivotPoint = sendPointToPlane(
+    target.getXY(originX, originY),
+    undefined,
+    target.getViewportTransform()
+  );
+  const lastAngle: TRadian = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
+    curAngle: TRadian = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
   let angle = radiansToDegrees(curAngle - lastAngle + theta);
 
   if (target.snapAngle && target.snapAngle > 0) {
