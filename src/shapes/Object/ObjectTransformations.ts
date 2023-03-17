@@ -121,15 +121,6 @@ export class ObjectTransformations<
       ownTransformBefore,
     ]);
 
-    console.log(
-      multiplyTransformMatrixChain([
-        [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
-        vpt,
-        plane,
-        ownTransformBefore,
-      ])
-    );
-
     if (!isMatrixEqual(ownTransformAfter, ownTransformBefore)) {
       // TODO: stop using decomposed values in favor of a matrix
       applyTransformToObject(this, ownTransformAfter);
