@@ -105,19 +105,21 @@ export class ObjectTransformations<
     }: ObjectTransformOptions = {}
   ) {
     const ownTransformBefore = this.calcOwnMatrix();
-    const plane = this.group?.calcTransformMatrix() || iMatrix;
-    const vpt = inViewport ? this.getViewportTransform() : iMatrix;
     const transformCenter = (
       inViewport ? this.bbox : this.bbox.sendToCanvas()
     ).pointFromOrigin(resolveOriginPoint(originX, originY));
-    const ownTransformAfter = multiplyTransformMatrixChain([
-      invertTransform(plane),
-      invertTransform(vpt),
-      [1, 0, 0, 1, transformCenter.x, transformCenter.y],
-      transform,
+    const ownToTransformPlaneChange = multiplyTransformMatrixChain([
       [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
-      vpt,
-      plane,
+      inViewport ? this.getViewportTransform() : iMatrix,
+      this.group?.calcTransformMatrix() || iMatrix,
+    ]);
+    const transformToOwnPlaneChange = invertTransform(
+      ownToTransformPlaneChange
+    );
+    const ownTransformAfter = multiplyTransformMatrixChain([
+      transformToOwnPlaneChange,
+      transform,
+      ownToTransformPlaneChange,
       ownTransformBefore,
     ]);
 
