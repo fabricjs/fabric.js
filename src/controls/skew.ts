@@ -160,8 +160,10 @@ function skewHandler(
     eventData,
     {
       ...transform,
-      [originKey]: origin,
+      // [originKey]: origin,
       // [counterOriginKey]: 'center',
+      originX: 'center',
+      originY: 'center',
       skewingSide,
     },
     x,
