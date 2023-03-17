@@ -281,7 +281,12 @@ export class ObjectTransformations<
     return this.transformObject(calcRotateMatrix({ angle }), options);
   }
 
-  rotate3D(x: TDegree, y: TDegree, z: TDegree, inViewport = true) {
+  rotate3D(
+    x: TDegree,
+    y: TDegree,
+    z: TDegree,
+    options?: ObjectTransformOptions
+  ) {
     const transformed = BBox.transformed(this);
     const sideVectorX = transformed.vectorFromOrigin(new Point(1, 0));
     const sideVectorY = transformed.vectorFromOrigin(new Point(0, 1));
@@ -295,11 +300,7 @@ export class ObjectTransformations<
           Math.tan(degreesToRadians(y + z))
         ),
       ],
-      {
-        originX: 'center',
-        originY: 'center',
-        inViewport,
-      }
+      options
     );
   }
 
