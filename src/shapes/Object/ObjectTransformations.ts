@@ -22,6 +22,7 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
 import {
   createVector,
+  getOrthogonalVector,
   getOrthonormalVector,
   getUnitVector,
 } from '../../util/misc/vectors';
@@ -278,6 +279,28 @@ export class ObjectTransformations<
    */
   rotateBy(angle: TDegree, options?: ObjectTransformOptions) {
     return this.transformObject(calcRotateMatrix({ angle }), options);
+  }
+
+  rotate3D(x: TDegree, y: TDegree, z: TDegree, inViewport = true) {
+    const transformed = BBox.transformed(this);
+    const sideVectorX = transformed.vectorFromOrigin(new Point(1, 0));
+    const sideVectorY = transformed.vectorFromOrigin(new Point(0, 1));
+    return this.shearSidesBy(
+      [sideVectorX, sideVectorY],
+      [
+        getOrthogonalVector(sideVectorX).scalarMultiply(
+          Math.tan(degreesToRadians(x + z))
+        ),
+        getOrthogonalVector(sideVectorY).scalarMultiply(
+          Math.tan(degreesToRadians(y + z))
+        ),
+      ],
+      {
+        originX: 'center',
+        originY: 'center',
+        inViewport,
+      }
+    );
   }
 
   flip(x: boolean, y: boolean, options?: ObjectTransformOptions) {
