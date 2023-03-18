@@ -106,4 +106,15 @@
     const result = fabric.util.joinPath(pathData, digit);
     assert.equal(result, expected, 'path data should have the specified number or less of fraction digits.');
   });
+  
+  QUnit.test('fabric.util.joinPath without rounding', function (assert) {
+    const pathData = [
+      ["M", 3.12345678, 2.12345678],
+      ["L", 1.00001111, 2.40001111],
+      ["Z"],
+    ];
+    const expected = "M 3.12345678 2.12345678 L 1.00001111 2.40001111 Z";
+    const result = fabric.util.joinPath(pathData);
+    assert.equal(result, expected, 'path data should have the specified number or less of fraction digits.');
+  });
 })();
