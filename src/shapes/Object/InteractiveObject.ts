@@ -15,6 +15,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import { FabricObjectProps } from './types/FabricObjectProps';
 import { TFabricObjectProps, SerializedObjectProps } from './types';
+import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -41,6 +42,8 @@ export interface DragMethods {
 }
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
+
+const interactiveDefaults = {};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
@@ -141,6 +144,16 @@ export class InteractiveFabricObject<
   declare _scaling?: boolean;
 
   declare canvas?: Canvas;
+
+  static ownDefaults: Record<string, any> = interactiveDefaults;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      controls: createObjectDefaultControls(),
+      ...InteractiveFabricObject.ownDefaults,
+    };
+  }
 
   /**
    * Update width and height of the canvas for cache

@@ -511,15 +511,15 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
-    this.text = this.hiddenTextarea.value;
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    const textarea = this.hiddenTextarea;
+    this.text = textarea.value;
+    this.set('dirty', true);
+    this.initDimensions();
+    this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.value
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
     if (!this.inCompositionMode) {
