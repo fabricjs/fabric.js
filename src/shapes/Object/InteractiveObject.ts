@@ -346,7 +346,7 @@ export class InteractiveFabricObject<
    * @param {Point} size the control box size used
    */
   strokeBordersLegacy(ctx: CanvasRenderingContext2D, size: Point) {
-    ctx.strokeRect(-size.x / 2, -size.y / 2, size.x, size.y);
+    // ctx.strokeRect(-size.x / 2, -size.y / 2, size.x, size.y);
   }
 
   /**
