@@ -511,15 +511,15 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
-    this.text = this.hiddenTextarea.value;
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    const textarea = this.hiddenTextarea;
+    this.text = textarea.value;
+    this.set('dirty', true);
+    this.initDimensions();
+    this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.value
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
     if (!this.inCompositionMode) {
@@ -669,7 +669,7 @@ export abstract class ITextBehavior<
     this.selectionEnd = this.selectionStart;
     this._exitEditing();
     this._restoreEditingProps();
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache) {
       this.initDimensions();
       this.setCoords();
     }
@@ -978,18 +978,13 @@ export abstract class ITextBehavior<
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
-  removeChars(start: number, end: number) {
-    if (typeof end === 'undefined') {
-      end = start + 1;
-    }
+  removeChars(start: number, end: number = start + 1) {
     this.removeStyleFromTo(start, end);
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 
@@ -1023,10 +1018,8 @@ export abstract class ITextBehavior<
     ];
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 

@@ -174,6 +174,19 @@ export abstract class ITextKeyBehavior<
     if (!this.isEditing) {
       return;
     }
+    const updateAndFire = () => {
+      this.updateFromTextArea();
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
+      }
+    };
+    if (this.hiddenTextarea.value === '') {
+      this.styles = {};
+      updateAndFire();
+      return;
+    }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
         this.hiddenTextarea.value
@@ -188,16 +201,6 @@ export abstract class ITextKeyBehavior<
       charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-      return;
-    }
 
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
@@ -265,12 +268,7 @@ export abstract class ITextKeyBehavior<
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
-    this.updateFromTextArea();
-    this.fire('changed');
-    if (this.canvas) {
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+    updateAndFire();
   }
 
   /**
