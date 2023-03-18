@@ -850,9 +850,8 @@ export const getPointOnPath = (
             new Point(segment[1], segment[2]),
             segPercent
           ),
-          angle: 0,
+          angle: Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x),
         };
-        info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
       } else {
         // TODO: provide a proper error
         throw Error(
