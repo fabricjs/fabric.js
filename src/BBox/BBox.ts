@@ -123,6 +123,11 @@ export class BBox extends ViewportBBox {
     return new this(transform, this.getPlanes(target));
   }
 
+  /**
+   *
+   * @param target
+   * @returns the bbox that respects rotation and flipping
+   */
   static rotated(target: ObjectBBox) {
     const coords = this.getViewportCoords(target);
     const rotation = this.calcRotation(coords);
@@ -133,12 +138,9 @@ export class BBox extends ViewportBBox {
     const transform = calcBaseChangeMatrix(
       undefined,
       [
-        new Point(bbox.width /* * (target.flipX ? -1 : 1)*/, 0).rotate(
-          rotation
-        ),
-        new Point(0, bbox.height /* * (target.flipY ? -1 : 1)*/).rotate(
-          rotation
-        ),
+        // flipX is taken into consideration in `rotation`
+        new Point(bbox.width, 0).rotate(rotation),
+        new Point(0, bbox.height * (target.flipY ? -1 : 1)).rotate(rotation),
       ],
       center
     );
