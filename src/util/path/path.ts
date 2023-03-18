@@ -362,7 +362,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
     controlX = 0,
     controlY = 0;
   for (const parsedCommand of path) {
-    const current: TComplexParsedCommand = Object.assign([], parsedCommand);
+    const current: TComplexParsedCommand = [...parsedCommand];
     let converted: TSimpleParsedCommand | undefined;
     switch (
       current[0] // first letter
@@ -1016,7 +1016,7 @@ export const transformPath = (
     ]);
   }
   return path.map((pathSegment) => {
-    const newSegment: TSimpleParsedCommand = Object.assign([], pathSegment);
+    const newSegment: TSimpleParsedCommand = [...pathSegment];
     for (let i = 1; i < pathSegment.length - 1; i += 2) {
       // TODO: is there a way to get around casting to any?
       const { x, y } = transformPoint(
