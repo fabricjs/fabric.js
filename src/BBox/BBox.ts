@@ -57,30 +57,6 @@ export class BBox extends ViewportBBox {
     return this.sendToPlane(this.planes.self());
   }
 
-  // preMultiply(transform: TMat2D) {
-  //   const parent = this.planes.parent();
-  //   const ownPreTransform = multiplyTransformMatrixChain([
-  //     invertTransform(parent),
-  //     transform,
-  //     parent,
-  //   ]);
-  //   const self = multiplyTransformMatrixChain([
-  //     parent,
-  //     this.getOwnTransform(),
-  //     ownPreTransform,
-  //   ]);
-  //   return new BBox(this.getTransformation(), {
-  //     ...this.planes,
-  //     self() {
-  //       return self;
-  //     },
-  //   });
-  // }
-
-  // getOwnTransform() {
-  //   return calcPlaneChangeMatrix(this.planes.self(), this.planes.parent());
-  // }
-
   static getViewportCoords(target: ObjectBBox) {
     const coords = target.calcCoords();
     if (target.needsViewportCoords()) {
