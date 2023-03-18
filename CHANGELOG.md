@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(IText): layout change regression caused by #8663 (`text` was changed but layout was skipped) [#8711](https://github.com/fabricjs/fabric.js/pull/8711)
 - fix(IText, Textbox): fix broken text input [#8775](https://github.com/fabricjs/fabric.js/pull/8775)
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
