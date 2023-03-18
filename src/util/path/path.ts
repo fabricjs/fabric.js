@@ -836,12 +836,8 @@ export const getPointOnPath = (
           new Point(segInfo.destX, segInfo.destY),
           segPercent
         ),
-        angle: 0,
+        angle: Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x),
       };
-      info.angle = Math.atan2(
-        segInfo.destY - segInfo.y,
-        segInfo.destX - segInfo.x
-      );
       return info;
     case 'L':
       if (isAbsLineCmd(segment)) {
