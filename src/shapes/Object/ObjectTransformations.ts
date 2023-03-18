@@ -17,7 +17,10 @@ import {
   multiplyTransformMatrixChain,
 } from '../../util/misc/matrix';
 import { applyTransformToObject } from '../../util/misc/objectTransforms';
-import { calcBaseChangeMatrix } from '../../util/misc/planeChange';
+import {
+  calcBaseChangeMatrix,
+  sendVectorToPlane,
+} from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
 import {
@@ -26,7 +29,7 @@ import {
   getOrthonormalVector,
   getUnitVector,
 } from '../../util/misc/vectors';
-import { ObjectPosition } from './ObjectPosition';
+import { ObjectBBox } from './ObjectBBox';
 
 type ObjectTransformOptions = {
   originX?: TOriginX;
@@ -36,59 +39,50 @@ type ObjectTransformOptions = {
 
 export class ObjectTransformations<
   EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectPosition<EventSpec> {
+> extends ObjectBBox<EventSpec> {
   /**
-   * Returns width of an object's bounding box counting transformations
-   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
-   * @deprecated
-   * @return {Number} width value
+   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
    */
-  getScaledWidth(): number {
-    return BBox.transformed(this).sendToCanvas().getDimensionsVector().x;
-  }
-
-  /**
-   * Returns height of an object bounding box counting transformations
-   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
-   * @deprecated
-   * @return {Number} height value
-   */
-  getScaledHeight(): number {
-    return BBox.transformed(this).sendToCanvas().getDimensionsVector().y;
-  }
-
-  protected scaleAxisTo(axis: TAxis, value: number, absolute = true) {
-    // adjust to bounding rect factor so that rotated shapes would fit as well
-    const transformed = BBox.transformed(this)
+  getXY(
+    originX: TOriginX = this.originX,
+    originY: TOriginY = this.originY
+  ): Point {
+    return this.bbox
       .sendToCanvas()
-      .getDimensionsVector();
-    const rotated = (
-      absolute ? this.bbox.sendToCanvas() : this.bbox
-    ).getDimensionsVector();
-    const boundingRectFactor = rotated[axis] / transformed[axis];
-    const scale =
-      value / new Point(this.width, this.height)[axis] / boundingRectFactor;
-    this.scale(scale, scale);
+      .pointFromOrigin(resolveOriginPoint(originX, originY));
   }
 
   /**
-   * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
-   * @param {Number} value New width value
-   * @param {Boolean} absolute ignore viewport
-   * @return {void}
+   * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+   * You can specify {@link originX} and {@link originY} values,
+   * that otherwise are the object's current values.
+   * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
+   * object.setXY(new Point(5, 5), 'left', 'bottom').
+   * @see {@link translateTo}
+   * @param {Point} point position in canvas coordinate plane
+   * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
+   * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  scaleToWidth(value: number, absolute?: boolean) {
-    return this.scaleAxisTo('x', value, absolute);
+  setXY(
+    point: Point,
+    originX: TOriginX = 'center',
+    originY: TOriginY = 'center'
+  ) {
+    this.translateTo(point.x, point.y, { originX, originY, inViewport: false });
   }
 
-  /**
-   * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-   * @param {Number} value New height value
-   * @param {Boolean} absolute ignore viewport
-   * @return {void}
-   */
-  scaleToHeight(value: number, absolute?: boolean) {
-    return this.scaleAxisTo('y', value, absolute);
+  setDimensions(size: Point, inViewport = false) {
+    const strokeVector = this.bbox
+      .sendToSelf()
+      .getDimensionsVector()
+      .subtract(this.getDimensionsVectorForLayout());
+    const { x, y } = sendVectorToPlane(
+      size,
+      inViewport ? this.getViewportTransform() : undefined,
+      this.calcTransformMatrix()
+    ).subtract(strokeVector);
+    this.set({ width: x, height: y });
+    this.setCoords();
   }
 
   /**
@@ -160,6 +154,24 @@ export class ObjectTransformations<
     return this.transformObject([1, 0, 0, 1, x, y], { inViewport });
   }
 
+  translateTo(
+    x: number,
+    y: number,
+    {
+      originX = this.originX,
+      originY = this.originY,
+      inViewport = false,
+    }: ObjectTransformOptions = {}
+  ) {
+    const delta = (
+      inViewport ? this.bbox : this.bbox.sendToCanvas()
+    ).getOriginTranslation(
+      new Point(x, y),
+      resolveOriginPoint(originX, originY)
+    );
+    return this.transformObject([1, 0, 0, 1, delta.x, delta.y], { inViewport });
+  }
+
   scale(x: number, y: number, options?: ObjectTransformOptions) {
     const [a, b, c, d] = options?.inViewport
       ? this.calcTransformMatrixInViewport()
@@ -169,6 +181,60 @@ export class ObjectTransformations<
 
   scaleBy(x: number, y: number, options?: ObjectTransformOptions) {
     return this.transformObject([x, 0, 0, y, 0, 0], options);
+  }
+
+  /**
+   * Returns width of an object's bounding box counting transformations
+   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
+   * @deprecated
+   * @return {Number} width value
+   */
+  getScaledWidth(): number {
+    return BBox.transformed(this).sendToCanvas().getDimensionsVector().x;
+  }
+
+  /**
+   * Returns height of an object bounding box counting transformations
+   * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
+   * @deprecated
+   * @return {Number} height value
+   */
+  getScaledHeight(): number {
+    return BBox.transformed(this).sendToCanvas().getDimensionsVector().y;
+  }
+
+  protected scaleAxisTo(axis: TAxis, value: number, absolute = true) {
+    // adjust to bounding rect factor so that rotated shapes would fit as well
+    const transformed = BBox.transformed(this)
+      .sendToCanvas()
+      .getDimensionsVector();
+    const rotated = (
+      absolute ? this.bbox.sendToCanvas() : this.bbox
+    ).getDimensionsVector();
+    const boundingRectFactor = rotated[axis] / transformed[axis];
+    const scale =
+      value / new Point(this.width, this.height)[axis] / boundingRectFactor;
+    this.scale(scale, scale);
+  }
+
+  /**
+   * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
+   * @param {Number} value New width value
+   * @param {Boolean} absolute ignore viewport
+   * @return {void}
+   */
+  scaleToWidth(value: number, absolute?: boolean) {
+    return this.scaleAxisTo('x', value, absolute);
+  }
+
+  /**
+   * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
+   * @param {Number} value New height value
+   * @param {Boolean} absolute ignore viewport
+   * @return {void}
+   */
+  scaleToHeight(value: number, absolute?: boolean) {
+    return this.scaleAxisTo('y', value, absolute);
   }
 
   skew(x: TDegree, y: TDegree, options?: ObjectTransformOptions) {
