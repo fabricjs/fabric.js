@@ -22,7 +22,7 @@ import {
   TEndPathInfo,
   isAbsLineCmd,
   TParsedArcCommand,
-} from './path_types';
+} from './typedefs';
 import { Point } from '../../Point';
 
 /**

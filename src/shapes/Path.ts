@@ -15,7 +15,7 @@ import {
 } from '../util/path/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TSimplePathData } from '../util/path/path_types';
+import { TSimplePathData } from '../util/path/typedefs';
 
 export class Path extends FabricObject {
   /**
