@@ -19,7 +19,7 @@ import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { isCollection, isFabricObjectCached } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { AssertKeys, TMat2D, TSize } from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
 import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
@@ -787,38 +787,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Given the control clicked, determine the origin of the transform.
-   * This is bad because controls can totally have custom names
-   * should disappear before release 4.0
-   * @private
-   * @deprecated
-   */
-  _getOriginFromCorner(
-    target: FabricObject,
-    controlName: string
-  ): { x: TOriginX; y: TOriginY } {
-    const origin = {
-      x: target.originX,
-      y: target.originY,
-    };
-    // is a left control ?
-    if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
-      // is a right control ?
-    } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
-    }
-    // is a top control ?
-    if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
-      // is a bottom control ?
-    } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
-    }
-    return origin;
-  }
-
-  /**
    * @private
    * @param {Event} e Event object
    * @param {FaricObject} target
@@ -839,7 +807,9 @@ export class SelectableCanvas<
           ? control.getActionHandler(e, target, control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
+      origin = (
+        control ? new Point(-control.x, -control.y) : new Point()
+      ).scalarAdd(0.5),
       altKey = e[this.centeredKey as ModifierKey],
       offset = pointer.subtract(target.getXY('left', 'top')),
       /**
