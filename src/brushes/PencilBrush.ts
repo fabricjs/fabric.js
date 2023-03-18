@@ -10,7 +10,7 @@ import { TSimplePathData } from '../util/path/typedefs';
 /**
  * @private
  * @param {TSimplePathData} pathData SVG path commands
- * @returns {Boolean}
+ * @returns {boolean}
  */
 function isEmptySVGPath(pathData: TSimplePathData): boolean {
   return joinPath(pathData) === 'M 0 0 Q 0 0 0 0 L 0 0';

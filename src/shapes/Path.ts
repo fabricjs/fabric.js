@@ -38,8 +38,6 @@ export class Path extends FabricObject {
   /**
    * Constructor
    * @param {TSimplePathData} path Path data (sequence of coordinates and corresponding "command" tokens)
-   * @param {number} left
-   * @param {number} top
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */

@@ -204,14 +204,14 @@ const CB4 = (t: number) => (1 - t) ** 3;
  * Calculate bounding box of a cubic Bezier curve
  * Taken from http://jsbin.com/ivomiq/56/edit (no credits available)
  * TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
- * @param {Number} begx starting point
- * @param {Number} begy
- * @param {Number} cp1x first control point
- * @param {Number} cp1y
- * @param {Number} cp2x second control point
- * @param {Number} cp2y
- * @param {Number} endx end of bezier
- * @param {Number} endy
+ * @param {number} begx starting point
+ * @param {number} begy
+ * @param {number} cp1x first control point
+ * @param {number} cp1y
+ * @param {number} cp2x second control point
+ * @param {number} cp2y
+ * @param {number} endx end of bezier
+ * @param {number} endy
  */
 export function getBoundsOfCurve(
   begx: number,
@@ -310,8 +310,8 @@ export function getBoundsOfCurve(
 
 /**
  * Converts arc to a bunch of cubic Bezier curves
- * @param {Number} fx starting point x
- * @param {Number} fy starting point y
+ * @param {number} fx starting point x
+ * @param {number} fy starting point y
  * @param {TParsedArcCommand} coords Arc command
  */
 export const fromArcToBeziers = (
@@ -520,11 +520,11 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
 // todo verify if we can just use the point class here
 /**
  * Calc length from point x1,y1 to x2,y2
- * @param {Number} x1 starting point x
- * @param {Number} y1 starting point y
- * @param {Number} x2 starting point x
- * @param {Number} y2 starting point y
- * @return {Number} length of segment
+ * @param {number} x1 starting point x
+ * @param {number} y1 starting point y
+ * @param {number} x2 starting point x
+ * @param {number} y2 starting point y
+ * @return {number} length of segment
  */
 const calcLineLength = (
   x1: number,
@@ -535,14 +535,14 @@ const calcLineLength = (
 
 /**
  * Get an iterator that takes a percentage and returns a point
- * @param {Number} begx
- * @param {Number} begy
- * @param {Number} cp1x
- * @param {Number} cp1y
- * @param {Number} cp2x
- * @param {Number} cp2y
- * @param {Number} endx
- * @param {Number} endy
+ * @param {number} begx
+ * @param {number} begy
+ * @param {number} cp1x
+ * @param {number} cp1y
+ * @param {number} cp2x
+ * @param {number} cp2y
+ * @param {number} endx
+ * @param {number} endy
  */
 const getPointOnCubicBezierIterator =
   (
@@ -649,7 +649,7 @@ const pathIterator = (
  * that correspond to that pixels run over the path.
  * The percentage will be then used to find the correct point on the canvas for the path.
  * @param {Array} segInfo fabricJS collection of information on a parsed path
- * @param {Number} distance from starting point, in pixels.
+ * @param {number} distance from starting point, in pixels.
  * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
 const findPercentageForDistance = (
@@ -998,13 +998,13 @@ export const getSmoothPathFromPoints = (
  * @param {TSimplePathData} path fabricJS parsed and simplified path commands
  * @param {TMat2D} transform matrix that represent the transformation
  * @param {Point} [pathOffset] `Path.pathOffset`
- * @returns {Array} the transformed path
+ * @returns {TSimplePathData} the transformed path
  */
 export const transformPath = (
   path: TSimplePathData,
   transform: TMat2D,
   pathOffset: Point
-) => {
+): TSimplePathData => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
       1,
@@ -1016,13 +1016,13 @@ export const transformPath = (
     ]);
   }
   return path.map((pathSegment) => {
-    const newSegment = pathSegment.slice(0);
+    const newSegment: TSimpleParsedCommand = Object.assign([], pathSegment);
     for (let i = 1; i < pathSegment.length - 1; i += 2) {
       // TODO: is there a way to get around casting to any?
       const { x, y } = transformPoint(
         {
-          x: pathSegment[i] as any,
-          y: pathSegment[i + 1] as any,
+          x: pathSegment[i] as number,
+          y: pathSegment[i + 1] as number,
         },
         transform
       );
@@ -1037,7 +1037,7 @@ export const transformPath = (
  * Returns an array of path commands to create a regular polygon
  * @param {number} numVertexes
  * @param {number} radius
- * @returns {(string|number)[][]} An array of SVG path commands
+ * @returns {TSimplePathData} An array of SVG path commands
  */
 export const getRegularPolygonPath = (
   numVertexes: number,
@@ -1062,8 +1062,8 @@ export const getRegularPolygonPath = (
 
 /**
  * Join path commands to go back to svg format
- * @param {Array} pathData fabricJS parsed path commands
- * @return {String} joined path 'M 0 0 L 20 30'
+ * @param {TSimplePathData} pathData fabricJS parsed path commands
+ * @return {string} joined path 'M 0 0 L 20 30'
  */
 export const joinPath = (pathData: TSimplePathData) =>
   pathData.map((segment) => segment.join(' ')).join(' ');
