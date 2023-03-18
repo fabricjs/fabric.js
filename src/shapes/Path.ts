@@ -191,7 +191,7 @@ export class Path extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path);
+    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
     return [
       '<path ',
       'COMMON_PARTS',

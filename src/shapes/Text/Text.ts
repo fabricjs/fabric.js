@@ -442,8 +442,6 @@ export class Text<
   declare cursorWidth: number;
   declare __lineHeights: number[];
   declare __lineWidths: number[];
-  declare _forceClearCache: boolean;
-
   declare initialized?: true;
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
@@ -496,6 +494,7 @@ export class Text<
   initDimensions() {
     this._splitText();
     this._clearCache();
+    this.dirty = true;
     if (this.path) {
       this.width = this.path.width;
       this.height = this.path.height;
@@ -1506,21 +1505,10 @@ export class Text<
    * @private
    */
   _clearCache() {
+    this._forceClearCache = false;
     this.__lineWidths = [];
     this.__lineHeights = [];
     this.__charBounds = [];
-  }
-
-  /**
-   * @private
-   */
-  _shouldClearDimensionCache() {
-    const shouldClear = this._forceClearCache;
-    if (shouldClear) {
-      this.dirty = true;
-      this._forceClearCache = false;
-    }
-    return shouldClear;
   }
 
   /**
@@ -1701,7 +1689,7 @@ export class Text<
     if (!this.visible) {
       return;
     }
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache) {
       this.initDimensions();
     }
     super.render(ctx);
