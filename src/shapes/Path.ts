@@ -38,8 +38,8 @@ export class Path extends FabricObject {
   /**
    * Constructor
    * @param {TSimplePathData} path Path data (sequence of coordinates and corresponding "command" tokens)
-   * @param {Number} left
-   * @param {Number} top
+   * @param {number} left
+   * @param {number} top
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
@@ -156,7 +156,7 @@ export class Path extends FabricObject {
 
   /**
    * Returns string representation of an instance
-   * @return {String} string representation of an instance
+   * @return {string} string representation of an instance
    */
   toString() {
     return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${
@@ -216,7 +216,7 @@ export class Path extends FabricObject {
   /**
    * Returns svg clipPath representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
   toClipPathSVG(reviver) {
     const additionalTransform = this._getOffsetTransform();
@@ -232,7 +232,7 @@ export class Path extends FabricObject {
   /**
    * Returns svg representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
   toSVG(reviver) {
     const additionalTransform = this._getOffsetTransform();
@@ -244,7 +244,7 @@ export class Path extends FabricObject {
 
   /**
    * Returns number representation of an instance complexity
-   * @return {Number} complexity of this instance
+   * @return {number} complexity of this instance
    */
   complexity() {
     return this.path.length;
