@@ -99,8 +99,7 @@ export class PlaneBBox {
    */
   getOriginTranslation(point: Point, origin: Point = new Point()) {
     const prev = this.pointFromOrigin(origin);
-    const originDiff = createVector(prev, point);
-    return this.vectorFromOrigin(originDiff);
+    return createVector(prev, point);
   }
 
   containsPoint(point: Point) {
