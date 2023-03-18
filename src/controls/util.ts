@@ -4,7 +4,7 @@ import {
   TransformAction,
   BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
@@ -38,8 +38,14 @@ export const getActionFromCorner = (
  * @param {Object} transform transform data
  * @return {Boolean} true if transform is centered
  */
-export function isTransformCentered(transform: Transform) {
-  return transform.originX === 'center' && transform.originY === 'center';
+export function isTransformCentered({
+  originX,
+  originY,
+}: {
+  originX: TOriginX;
+  originY: TOriginY;
+}) {
+  return resolveOriginPoint(originX, originY).eq(new Point());
 }
 
 export function invertOrigin(origin: TOriginX | TOriginY) {
