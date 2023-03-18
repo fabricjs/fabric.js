@@ -12,7 +12,19 @@ import { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { TextStyleDeclaration } from '../Text/StyledText';
 
-// extend this regex to support non english languages
+/**
+ *  extend this regex to support non english languages
+ *
+ *  - ` `      Matches a SPACE character (char code 32).
+ *  - `\n`     Matches a LINE FEED character (char code 10).
+ *  - `\.`     Matches a "." character (char code 46).
+ *  - `,`      Matches a "," character (char code 44).
+ *  - `;`      Matches a ";" character (char code 59).
+ *  - `!`      Matches a "!" character (char code 33).
+ *  - `\?`     Matches a "?" character (char code 63).
+ *  - `\-`     Matches a "-" character (char code 45).
+ */
+// eslint-disable-next-line no-useless-escape
 const reNonWord = /[ \n\.,;!\?\-]/;
 
 export type ITextEvents = ObjectEvents & {
@@ -499,16 +511,15 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
-    const prevText = this.text;
-    this.text = this.hiddenTextarea.value;
-    if (this._forceClearCache || prevText !== this.text) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    const textarea = this.hiddenTextarea;
+    this.text = textarea.value;
+    this.set('dirty', true);
+    this.initDimensions();
+    this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.value
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
     if (!this.inCompositionMode) {

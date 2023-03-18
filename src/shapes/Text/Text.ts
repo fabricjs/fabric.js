@@ -95,6 +95,67 @@ const textLayoutProperties: string[] = [
   'pathAlign',
 ];
 
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
+export const textDefaultValues: Partial<TClassProperties<Text>> = {
+  _styleProperties: [
+    'stroke',
+    'strokeWidth',
+    'fill',
+    'fontFamily',
+    'fontSize',
+    'fontWeight',
+    'fontStyle',
+    'underline',
+    'overline',
+    'linethrough',
+    'deltaY',
+    'textBackgroundColor',
+  ],
+  _reNewline: /\r?\n/,
+  _reSpacesAndTabs: /[ \t\r]/g,
+  _reSpaceAndTab: /[ \t\r]/,
+  _reWords: /\S+/g,
+  fontSize: 40,
+  fontWeight: 'normal',
+  fontFamily: 'Times New Roman',
+  underline: false,
+  overline: false,
+  linethrough: false,
+  textAlign: 'left',
+  fontStyle: 'normal',
+  lineHeight: 1.16,
+  superscript: {
+    size: 0.6, // fontSize factor
+    baseline: -0.35, // baseline-shift factor (upwards)
+  },
+  subscript: {
+    size: 0.6, // fontSize factor
+    baseline: 0.11, // baseline-shift factor (downwards)
+  },
+  textBackgroundColor: '',
+  stroke: null,
+  shadow: null,
+  path: null,
+  pathStartOffset: 0,
+  pathSide: 'left',
+  pathAlign: 'baseline',
+  _fontSizeFraction: 0.222,
+  offsets: {
+    underline: 0.1,
+    linethrough: -0.315,
+    overline: -0.88,
+  },
+  _fontSizeMult: 1.13,
+  charSpacing: 0,
+  styles: null,
+  deltaY: 0,
+  direction: 'ltr',
+  CACHE_FONT_SIZE: 400,
+  MIN_TEXT_WIDTH: 2,
+};
+
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
@@ -384,6 +445,12 @@ export class Text<
   declare initialized?: true;
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
+
+  static ownDefaults: Record<string, any> = textDefaultValues;
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...Text.ownDefaults };
+  }
 
   constructor(text: string, options: any) {
     super({ ...options, text, styles: options?.styles || {} });
@@ -1685,6 +1752,7 @@ export class Text<
   }
 
   set(key: string | any, value?: any) {
+    const { textLayoutProperties } = this.constructor as typeof Text;
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
@@ -1693,12 +1761,11 @@ export class Text<
         if (_key === 'path') {
           this.setPathInfo();
         }
-        needsDims =
-          needsDims || this.constructor.textLayoutProperties.includes(_key);
+        needsDims = needsDims || textLayoutProperties.includes(_key);
         isAddingPath = isAddingPath || _key === 'path';
       }
     } else {
-      needsDims = this.constructor.textLayoutProperties.includes(key);
+      needsDims = textLayoutProperties.includes(key);
       isAddingPath = key === 'path';
     }
     if (isAddingPath) {
@@ -1866,70 +1933,6 @@ export class Text<
     );
   }
 }
-
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _styleProperties: [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ],
-  _reNewline: /\r?\n/,
-  _reSpacesAndTabs: /[ \t\r]/g,
-  _reSpaceAndTab: /[ \t\r]/,
-  _reWords: /\S+/g,
-  type: 'text',
-  fontSize: 40,
-  fontWeight: 'normal',
-  fontFamily: 'Times New Roman',
-  underline: false,
-  overline: false,
-  linethrough: false,
-  textAlign: 'left',
-  fontStyle: 'normal',
-  lineHeight: 1.16,
-  superscript: {
-    size: 0.6, // fontSize factor
-    baseline: -0.35, // baseline-shift factor (upwards)
-  },
-  subscript: {
-    size: 0.6, // fontSize factor
-    baseline: 0.11, // baseline-shift factor (downwards)
-  },
-  textBackgroundColor: '',
-  stroke: null,
-  shadow: null,
-  path: null,
-  pathStartOffset: 0,
-  pathSide: 'left',
-  pathAlign: 'baseline',
-  _fontSizeFraction: 0.222,
-  offsets: {
-    underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88,
-  },
-  _fontSizeMult: 1.13,
-  charSpacing: 0,
-  styles: null,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2,
-};
-
-Object.assign(Text.prototype, textDefaultValues);
 
 applyMixins(Text, [TextSVGExportMixin]);
 classRegistry.setClass(Text);

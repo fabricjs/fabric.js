@@ -12,7 +12,7 @@
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.equal(ellipse.type, 'ellipse');
+    assert.equal(ellipse.constructor.name, 'Ellipse');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -25,7 +25,7 @@
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
       version:                  fabric.version,
-      type:                     'ellipse',
+      type:                     'Ellipse',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -81,6 +81,18 @@
 
     ellipse.set('scaleX', 2);
     assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
+  });
+
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Ellipse({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "Ellipse",
+      version: fabric.version,
+      left: 0,
+      top: 0
+    });
   });
 
   QUnit.test('isNotVisible', function(assert) {

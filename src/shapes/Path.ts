@@ -3,7 +3,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { Point } from '../Point';
-import { PathData, TClassProperties } from '../typedefs';
+import { PathData } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -381,14 +381,6 @@ export class Path extends FabricObject {
     );
   }
 }
-
-export const pathDefaultValues: Partial<TClassProperties<Path>> = {
-  type: 'path',
-};
-
-Object.assign(Path.prototype, {
-  ...pathDefaultValues,
-});
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

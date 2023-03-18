@@ -27,7 +27,7 @@
     assert.ok(cObj instanceof fabric.Object);
     assert.ok(cObj.constructor === fabric.Object);
 
-    assert.equal(cObj.type, 'object');
+    assert.equal(cObj.constructor.name, 'FabricObject');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 
@@ -99,8 +99,8 @@
 
   QUnit.test('stateProperties', function(assert) {
     var cObj = new fabric.Object();
-    assert.ok(cObj.stateProperties);
-    assert.ok(cObj.stateProperties.length > 0);
+    assert.ok(cObj.constructor.stateProperties);
+    assert.ok(cObj.constructor.stateProperties.length > 0);
   });
 
   QUnit.test('transform', function(assert) {
@@ -109,13 +109,13 @@
   });
 
   QUnit.test('toJSON', function(assert) {
-    var emptyObjectJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+    var emptyObjectJSON = '{"type":"FabricObject","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
                           '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                           '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                           '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
                           '"skewX":0,"skewY":0}';
 
-    var augmentedJSON = '{"type":"object","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+    var augmentedJSON = '{"type":"FabricObject","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
                         '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
                         '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
                         '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
@@ -141,7 +141,7 @@
   QUnit.test('toObject', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -175,7 +175,7 @@
 
     var augmentedObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     10,
@@ -247,11 +247,11 @@
 
   QUnit.test('toObject without default values', function(assert) {
 
-    var emptyObjectRepr = { version: fabric.version, type: 'object', top: 0, left: 0 };
+    var emptyObjectRepr = { version: fabric.version, type: 'FabricObject', top: 0, left: 0 };
 
     var augmentedObjectRepr = {
       version: fabric.version,
-      type: 'object',
+      type: 'FabricObject',
       left: 10,
       top: 20,
       width: 30,
@@ -291,11 +291,13 @@
     assert.deepEqual(cObj.toObject(), cObj.toDatalessObject());
   });
 
-  QUnit.test('toString', function(assert) {
+  QUnit.test('toString', function (assert) {
+    class Moo extends fabric.Object {
+      static type = 'moo'
+    }
     var cObj = new fabric.Object();
-    assert.equal(cObj.toString(), '#<Object>');
-    cObj.type = 'moo';
-    assert.equal(cObj.toString(), '#<Moo>');
+    assert.equal(cObj.toString(), '#<FabricObject>');
+    assert.equal(new Moo().toString(), '#<Moo>');
   });
 
   QUnit.test('render', function(assert) {
@@ -476,13 +478,15 @@
   QUnit.test('isType', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.isType === 'function');
+    assert.ok(cObj.isType('FabricObject'));
     assert.ok(cObj.isType('object'));
-    assert.ok(!cObj.isType('rect'));
+    assert.ok(!cObj.isType('Rect'));
     cObj = new fabric.Rect();
+    assert.ok(cObj.isType('Rect'));
     assert.ok(cObj.isType('rect'));
-    assert.ok(!cObj.isType('object'));
-    assert.ok(cObj.isType('object', 'rect'));
-    assert.ok(!cObj.isType('object', 'circle'));
+    assert.ok(!cObj.isType('Object'));
+    assert.ok(cObj.isType('Object', 'Rect'));
+    assert.ok(!cObj.isType('Object', 'Circle'));
   });
 
   QUnit.test('toggle', function(assert) {
@@ -1372,17 +1376,18 @@
     assert.ok(!object.canvas, 'cleared canvas');
     assert.ok(off, 'unsubscribe events');
   });
-  QUnit.test('prototype changes', function (assert) {
-    var object = new fabric.Object();
-    var object2 = new fabric.Object();
-    object2.fill = 'red'
-    assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
-    assert.equal(object2.fill, 'red', 'once assigned object is red');
-    fabric.Object.prototype.fill = 'green';
-    assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
-    assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
-    var object3 = new fabric.Object();
-    assert.equal(object3.fill, 'green', 'newly created object have now green by default');
-    fabric.Object.prototype.fill = 'rgb(0,0,0)';
-  });
+  // this is no more valid for now
+  // QUnit.test('prototype changes', function (assert) {
+  //   var object = new fabric.Object();
+  //   var object2 = new fabric.Object();
+  //   object2.fill = 'red'
+  //   assert.equal(object.fill, 'rgb(0,0,0)', 'by default objects have a rgb(0,0,0) fill');
+  //   assert.equal(object2.fill, 'red', 'once assigned object is red');
+  //   fabric.Object.prototype.fill = 'green';
+  //   assert.equal(object.fill, 'green', 'object with no value assigned read from prototype');
+  //   assert.equal(object2.fill, 'red', 'once assigned object is red, it stays red');
+  //   var object3 = new fabric.Object();
+  //   assert.equal(object3.fill, 'green', 'newly created object have now green by default');
+  //   fabric.Object.prototype.fill = 'rgb(0,0,0)';
+  // });
 })();

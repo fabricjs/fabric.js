@@ -54,12 +54,12 @@
                       '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"Path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"Rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
@@ -563,7 +563,7 @@
     });
     canvas.__onMouseUp({});
     assert.equal(isFired, true, 'selection created fired');
-    assert.equal(canvas.getActiveObject().type, 'activeSelection', 'an active selection is created');
+    assert.equal(canvas.getActiveObject().constructor.name, 'ActiveSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
     assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
@@ -1245,7 +1245,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
   });
 
 
@@ -1256,7 +1256,7 @@
       version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
       clipPath: {
-        type: 'rect',
+        type: 'Rect',
         version: fabric.version,
         originX: 'left',
         originY: 'top',
@@ -1298,7 +1298,7 @@
     var rect = makeRect();
     canvasWithClipPath.add(rect);
 
-    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.type);
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.name);
   });
 
   QUnit.test('toDatalessObject', function(assert) {
@@ -1313,7 +1313,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1331,7 +1331,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1359,7 +1359,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1387,7 +1387,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1415,7 +1415,7 @@
     function reviver(obj, instance) {
       assert.deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
-      if (instance.type === 'path') {
+      if (instance.constructor.name === 'Path') {
         instance.customID = 'fabric_1';
       }
     }
@@ -1424,7 +1424,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1536,8 +1536,8 @@
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.controlsAboveOverlay, true);
@@ -1555,8 +1555,8 @@
     };
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     // before callback the properties are still false.
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.preserveObjectStacking, false);
