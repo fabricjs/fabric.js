@@ -2,7 +2,7 @@ import { ModifierKey, TEvent } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Path } from '../shapes/Path';
-import { getSmoothPathFromPoints, joinPath } from '../util/path/path';
+import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import { TSimplePathData } from '../util/path/typedefs';

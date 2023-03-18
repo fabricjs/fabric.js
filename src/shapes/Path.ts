@@ -11,7 +11,7 @@ import {
   makePathSimpler,
   parsePath,
   type TPathSegmentsInfo,
-} from '../util/path/path';
+} from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TSimplePathData } from '../util/path/typedefs';

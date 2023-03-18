@@ -19,7 +19,7 @@ import {
   stylesFromArray,
   stylesToArray,
 } from '../../util/misc/textStyles';
-import { getPathSegmentsInfo, getPointOnPath } from '../../util/path/path';
+import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';

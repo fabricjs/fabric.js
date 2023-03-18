@@ -15,15 +15,14 @@ import {
   TSimpleParsedCommand,
   TSimplePathData,
   TPathSegmentInfo,
-  rePathCommand,
-  numberRegExStr,
   TComplexParsedCommand,
   TPathSegmentInfoCommon,
   TEndPathInfo,
-  isAbsLineCmd,
   TParsedArcCommand,
 } from './typedefs';
 import { Point } from '../../Point';
+import { numberRegExStr, rePathCommand } from './regex';
+import { isAbsLineCmd } from './typechecks';
 
 /**
  * Commands that may be repeated
