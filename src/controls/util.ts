@@ -8,9 +8,10 @@ import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
-import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { calcVectorRotation } from '../util/misc/vectors';
+import { PIBy4, twoMathPi } from '../constants';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -87,11 +88,10 @@ export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control
 ) {
-  //  angle is relative to viewport
-  const angle = fabricObject.getTotalAngle(),
-    cornerAngle =
-      radiansToDegrees(angle + Math.atan2(control.y, control.x)) + 360;
-  return Math.round((cornerAngle % 360) / 45);
+  const rotation = calcVectorRotation(
+    fabricObject.bbox.vectorFromOrigin(new Point(control))
+  );
+  return Math.round(((rotation + twoMathPi) % twoMathPi) / PIBy4);
 }
 
 /**

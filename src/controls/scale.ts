@@ -9,23 +9,18 @@ import { TAxis } from '../typedefs';
 import type { Canvas } from '../canvas/Canvas';
 import {
   findCornerQuadrant,
-  getLocalPoint,
-  invertOrigin,
   isLocked,
   isTransformCentered,
   NOT_ALLOWED_CURSOR,
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { BBox } from '../BBox/BBox';
+import { Point } from '../Point';
+import { resolveOriginPoint } from '../util/misc/resolveOrigin';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;
-  signX?: number;
-  signY?: number;
 };
-
-type ScaleBy = TAxis | 'equally' | '' | undefined;
 
 /**
  * Inspect event and fabricObject properties to understand if the scaling action
@@ -54,7 +49,7 @@ export function scaleIsProportional(
  */
 export function scalingIsForbidden(
   fabricObject: FabricObject,
-  by: ScaleBy,
+  by: TAxis | undefined,
   scaleProportionally: boolean
 ) {
   const lockX = isLocked(fabricObject, 'lockScalingX'),
@@ -94,7 +89,7 @@ export const scaleCursorStyleHandler: ControlCursorCallback = (
         ? 'x'
         : control.x === 0 && control.y !== 0
         ? 'y'
-        : '';
+        : undefined;
   if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
     return NOT_ALLOWED_CURSOR;
   }
@@ -116,96 +111,72 @@ export const scaleCursorStyleHandler: ControlCursorCallback = (
  */
 function scaleObject(
   eventData: TPointerEvent,
-  transform: ScaleTransform,
+  { target, gestureScale, originX, originY, lastX, lastY }: ScaleTransform,
   x: number,
   y: number,
-  options: { by?: ScaleBy } = {}
+  { by }: { by?: TAxis } = {}
 ) {
-  const target = transform.target,
-    by = options.by,
-    scaleProportionally = scaleIsProportional(eventData, target),
-    forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
-  let newPoint, scaleX, scaleY, dim, signX, signY;
+  const scaleProportionally = scaleIsProportional(eventData, target);
+  let scaleX = 1,
+    scaleY = 1;
 
-  if (forbidScaling) {
+  if (scalingIsForbidden(target, by, scaleProportionally)) {
     return false;
   }
-  if (transform.gestureScale) {
-    scaleX = transform.scaleX * transform.gestureScale;
-    scaleY = transform.scaleY * transform.gestureScale;
+  if (gestureScale) {
+    scaleX = scaleY = gestureScale;
   } else {
-    newPoint = getLocalPoint(
-      transform,
-      transform.originX,
-      transform.originY,
-      x,
-      y
-    );
-    // use of sign: We use sign to detect change of direction of an action. sign usually change when
-    // we cross the origin point with the mouse. So a scale flip for example. There is an issue when scaling
-    // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
-    // cross many time the origin point and flip the object. so we need a way to filter out the noise.
-    // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
-    signX = by !== 'y' ? Math.sign(newPoint.x || transform.signX || 1) : 1;
-    signY = by !== 'x' ? Math.sign(newPoint.y || transform.signY || 1) : 1;
-    if (!transform.signX) {
-      transform.signX = signX;
-    }
-    if (!transform.signY) {
-      transform.signY = signY;
-    }
+    const anchorOrigin = resolveOriginPoint(originX, originY);
+    const distanceFromAnchorOrigin = target.bbox
+      .pointToOrigin(new Point(x, y))
+      .subtract(anchorOrigin);
+    const prevDistanceFromAnchorOrigin = target.bbox
+      .pointToOrigin(new Point(lastX, lastY))
+      .subtract(anchorOrigin);
 
-    if (
-      isLocked(target, 'lockScalingFlip') &&
-      (transform.signX !== signX || transform.signY !== signY)
-    ) {
-      return false;
-    }
-    // TODO: use setCoords instead?
-    dim = BBox.rotated(target).sendToParent().getDimensionsVector();
-    // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
-      // uniform scaling
-      const distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-        { original } = transform,
-        originalDistance =
-          Math.abs((dim.x * original.scaleX) / target.scaleX) +
-          Math.abs((dim.y * original.scaleY) / target.scaleY),
-        scale = distance / originalDistance;
-      scaleX = original.scaleX * scale;
-      scaleY = original.scaleY * scale;
+      // proportional scaling
+      const scale =
+        (Math.abs(distanceFromAnchorOrigin.x) +
+          Math.abs(distanceFromAnchorOrigin.y)) /
+        (Math.abs(prevDistanceFromAnchorOrigin.x) +
+          Math.abs(prevDistanceFromAnchorOrigin.y));
+      scaleX =
+        scale *
+        Math.sign(distanceFromAnchorOrigin.x / prevDistanceFromAnchorOrigin.x);
+      scaleY =
+        scale *
+        Math.sign(distanceFromAnchorOrigin.y / prevDistanceFromAnchorOrigin.y);
     } else {
-      scaleX = Math.abs((newPoint.x * target.scaleX) / dim.x);
-      scaleY = Math.abs((newPoint.y * target.scaleY) / dim.y);
+      const factor = distanceFromAnchorOrigin.divide(
+        prevDistanceFromAnchorOrigin
+      );
+      by && (factor[({ x: 'y', y: 'x' } as const)[by]] = 1);
+      scaleX = factor.x;
+      scaleY = factor.y;
     }
     // if we are scaling by center, we need to double the scale
-    if (isTransformCentered(transform)) {
+    if (isTransformCentered({ originX, originY })) {
       scaleX *= 2;
       scaleY *= 2;
     }
-    if (transform.signX !== signX && by !== 'y') {
-      transform.originX = invertOrigin(transform.originX);
-      scaleX *= -1;
-      transform.signX = signX;
-    }
-    if (transform.signY !== signY && by !== 'x') {
-      transform.originY = invertOrigin(transform.originY);
-      scaleY *= -1;
-      transform.signY = signY;
-    }
   }
   // minScale is taken are in the setter.
-  const oldScaleX = target.scaleX,
-    oldScaleY = target.scaleY;
-  if (!by) {
-    !isLocked(target, 'lockScalingX') && target.set('scaleX', scaleX);
-    !isLocked(target, 'lockScalingY') && target.set('scaleY', scaleY);
-  } else {
-    // forbidden cases already handled on top here.
-    by === 'x' && target.set('scaleX', scaleX);
-    by === 'y' && target.set('scaleY', scaleY);
-  }
-  return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
+  return target.scaleBy(
+    !isLocked(target, 'lockScalingX') &&
+      (!isLocked(target, 'lockScalingFlip') || scaleX > 0)
+      ? scaleX
+      : 1,
+    !isLocked(target, 'lockScalingY') &&
+      (!isLocked(target, 'lockScalingFlip') || scaleY > 0)
+      ? scaleY
+      : 1,
+    {
+      originX,
+      originY,
+      inViewport: true,
+    }
+  );
 }
 
 /**
