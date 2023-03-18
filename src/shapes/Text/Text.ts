@@ -441,7 +441,6 @@ export class Text<
   declare cursorWidth: number;
   declare __lineHeights: number[];
   declare __lineWidths: number[];
-  declare _forceClearCache: boolean;
   declare initialized?: true;
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
