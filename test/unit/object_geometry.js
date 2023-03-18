@@ -469,63 +469,6 @@
       43.50067533516962], 'translate matrix scale skewX skewY angle flipX flipY');
   });
 
-  QUnit.test('scaleToWidth', function(assert) {
-    var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToWidth === 'function', 'scaleToWidth should exist');
-    cObj.scaleToWidth(100);
-    assert.equal(cObj.getScaledWidth(), 100);
-    assert.equal(cObj.get('scaleX'), 100 / 560);
-  });
-
-  QUnit.test('scaleToWidth with zoom', function(assert) {
-    var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
-    cObj.scaleToWidth(100, true);
-    assert.equal(cObj.getScaledWidth(), 100, 'is not influenced by zoom - width');
-    assert.equal(cObj.get('scaleX'), 100 / 560);
-    cObj.scaleToWidth(100);
-    assert.equal(cObj.getScaledWidth(), 50, 'is influenced by zoom - width');
-    assert.equal(cObj.get('scaleX'), 100 / 560 / 2);
-  });
-
-
-  QUnit.test('scaleToHeight', function(assert) {
-    var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToHeight === 'function', 'scaleToHeight should exist');
-    cObj.scaleToHeight(100);
-    assert.equal(cObj.getScaledHeight(), 100);
-    assert.equal(cObj.get('scaleY'), 100 / 560);
-  });
-
-  QUnit.test('scaleToHeight with zoom', function(assert) {
-    var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
-    cObj.scaleToHeight(100, true);
-    assert.equal(cObj.getScaledHeight(), 100, 'is not influenced by zoom - height');
-    assert.equal(cObj.get('scaleY'), 100 / 560);
-    cObj.scaleToHeight(100);
-    assert.equal(cObj.getScaledHeight(), 50, 'is influenced by zoom - height');
-    assert.equal(cObj.get('scaleY'), 100 / 560 / 2);
-  });
-
-  QUnit.test('scaleToWidth on rotated object', function(assert) {
-    var obj = new fabric.Object({ height: 100, width: 100, strokeWidth: 0 });
-    obj.rotate(45);
-    obj.scaleToWidth(200);
-    assert.equal(Math.round(obj.getBoundingRect().width), 200);
-  });
-
-  QUnit.test('scaleToHeight on rotated object', function(assert) {
-    var obj = new fabric.Object({ height: 100, width: 100, strokeWidth: 0 });
-    obj.rotate(45);
-    obj.scaleToHeight(300);
-    assert.equal(Math.round(obj.getBoundingRect().height), 300);
-  });
-
   QUnit.test('getBoundingRect with absolute coords', function(assert) {
     var cObj = new fabric.Object({ strokeWidth: 0, width: 10, height: 10, top: 6, left: 5 }),
         boundingRect;
@@ -619,26 +562,6 @@
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 248);
     assert.equal(boundingRect.height.toFixed(2), 336);
-  });
-
-  QUnit.test('getScaledWidth', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.getScaledWidth === 'function');
-    assert.equal(cObj.getScaledWidth(), 0 + cObj.strokeWidth);
-    cObj.set('width', 123);
-    assert.equal(cObj.getScaledWidth(), 123 + cObj.strokeWidth);
-    cObj.set('scaleX', 2);
-    assert.equal(cObj.getScaledWidth(), 246 + cObj.strokeWidth * 2);
-  });
-
-  QUnit.test('getScaledHeight', function(assert) {
-    var cObj = new fabric.Object({strokeWidth: 0});
-    //  assert.ok(typeof cObj.getHeight === 'function');
-    assert.equal(cObj.getScaledHeight(), 0);
-    cObj.set('height', 123);
-    assert.equal(cObj.getScaledHeight(), 123);
-    cObj.set('scaleY', 2);
-    assert.equal(cObj.getScaledHeight(), 246);
   });
 
   QUnit.test('scale', function(assert) {

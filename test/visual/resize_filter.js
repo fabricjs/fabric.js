@@ -23,7 +23,8 @@
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       canvas.setZoom(zoom);
-      image.scaleToWidth(canvas.width / zoom);
+      const scale = canvas.width / zoom / image.width;
+      image.scale(scale, scale);
       canvas.add(image);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
@@ -49,7 +50,8 @@
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img);
       image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
-      image.scaleToWidth(canvas.width);
+      const scale = canvas.width / image.width;
+      image.scale(scale, scale);
       canvas.add(image);
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
@@ -96,7 +98,8 @@
       image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
       var group = new fabric.Group([image]);
       group.strokeWidth = 0;
-      group.scaleToWidth(canvas.width);
+      const scale = canvas.width / image.width;
+      image.scale(scale, scale);
       canvas.add(group);
       canvas.renderAll();
       image.dispose();
@@ -122,7 +125,8 @@
       backdropImage.scaleX = -1;
       image.filters.push(new fabric.filters.BlendImage({ image: backdropImage }));
       image.applyFilters();
-      image.scaleToWidth(400);
+      const scale = 400 / image.width;
+      image.scale(scale, scale);
       canvas.add(image);
       canvas.renderAll();
       image.dispose();
@@ -147,7 +151,8 @@
         var image = new fabric.Image(img);
         var backdropImage = new fabric.Image(backdrop);
         image.filters.push(new fabric.filters.BlendImage({image: backdropImage, alpha: 0.5 }));
-        image.scaleToWidth(400);
+        const scale = 400 / image.width;
+        image.scale(scale, scale);
         image.applyFilters();
         canvas.add(image);
         canvas.renderAll();

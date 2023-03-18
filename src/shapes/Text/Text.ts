@@ -24,6 +24,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1887,26 +1888,22 @@ export class Text<
     options.strokeWidth = 0;
 
     const text = new this(textContent, options),
-      textHeightScaleFactor = text.getScaledHeight() / text.height,
+      sizeInParent = sizeAfterTransform(text.width, text.height, text),
+      textHeightScaleFactor = sizeInParent.y / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff;
+      textHeight = sizeInParent.y + scaledDiff;
 
-    let offX = 0;
-    /*
-      Adjust positioning:
-        x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        fabric output by default at top, left.
-    */
-    if (parsedAnchor === 'center') {
-      offX = text.getScaledWidth() / 2;
-    }
-    if (parsedAnchor === 'right') {
-      offX = text.getScaledWidth();
-    }
     text.set({
-      left: text.left - offX,
+      // Adjust positioning:
+      // x/y attributes in SVG correspond to the bottom-left corner of text bounding box
+      // fabric output by default at top, left.
+      left:
+        text.left -
+        (parsedAnchor === 'center' || parsedAnchor === 'right'
+          ? sizeInParent.x / (parsedAnchor === 'center' ? 2 : 1)
+          : 0),
       top:
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /

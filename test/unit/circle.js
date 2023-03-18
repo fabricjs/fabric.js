@@ -267,9 +267,9 @@
 
     circle.clone().then(function(clone) {
       assert.equal(clone.width, 20);
-      assert.equal(clone.getScaledWidth(), 40);
       assert.equal(clone.height, 20);
-      assert.equal(clone.getScaledHeight(), 40);
+      assert.equal(clone.scaleX, 2);
+      assert.equal(clone.scaleY, 2);
       assert.equal(clone.radius, 10);
       done();
     });
