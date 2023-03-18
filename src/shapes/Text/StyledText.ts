@@ -12,7 +12,6 @@ export abstract class StyledText<
 > extends FabricObject<EventSpec> {
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
-  protected declare _forceClearCache: boolean;
   protected declare abstract _styleProperties: string[];
   abstract get2DCursorLocation(
     selectionStart: number,

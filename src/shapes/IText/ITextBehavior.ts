@@ -980,14 +980,11 @@ export abstract class ITextBehavior<
    */
   removeChars(start: number, end: number = start + 1) {
     this.removeStyleFromTo(start, end);
-    const prevText = this.text;
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._forceClearCache || this.text !== prevText) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 
@@ -1014,7 +1011,6 @@ export abstract class ITextBehavior<
     }
     const graphemes = this.graphemeSplit(text);
     this.insertNewStyleBlock(graphemes, start, style);
-    const prevText = this.text;
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,
@@ -1022,10 +1018,8 @@ export abstract class ITextBehavior<
     ];
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._forceClearCache || this.text !== prevText) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 
