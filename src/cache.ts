@@ -1,5 +1,5 @@
 import { config } from './config';
-import {TBounds} from "./typedefs";
+import { TBounds } from './typedefs';
 
 export class Cache {
   /**

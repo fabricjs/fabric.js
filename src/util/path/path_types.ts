@@ -25,7 +25,10 @@ export type TCurveInfo<C extends string> = TPathSegmentInfoCommon<C> & {
   length: number;
 };
 
-export type TEndPathInfo = TPathSegmentInfoCommon<'Z'> & { destX: number; destY: number }
+export type TEndPathInfo = TPathSegmentInfoCommon<'Z'> & {
+  destX: number;
+  destY: number;
+};
 
 /**
  * Info about various paths
