@@ -51,7 +51,7 @@ const polyActionHandler = (
     pointIndex = transform.pointIndex,
     mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
     polygonBaseSize = getSize(poly),
-    size = poly.bbox.sendToParent().getDimensionsVector(),
+    size = poly.bbox.sendToParent().getBBoxVector(),
     sizeFactor = polygonBaseSize.divide(size),
     adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 

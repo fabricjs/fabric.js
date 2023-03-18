@@ -872,7 +872,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       const objCenter = object.getRelativeCenterPoint();
       const sizeVector = object.bbox
         .sendToParent()
-        .getDimensionsVector()
+        .getBBoxVector()
         .scalarDivide(2);
       const a = objCenter.subtract(sizeVector);
       const b = objCenter.add(sizeVector);

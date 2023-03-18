@@ -999,7 +999,7 @@ export class FabricObject<
       return;
     }
     // should this be the rotated bbox?
-    const dim = BBox.transformed(this).sendToSelf().getDimensionsVector();
+    const dim = BBox.transformed(this).sendToSelf().getBBoxVector();
     ctx.fillStyle = this.backgroundColor;
 
     ctx.fillRect(-dim.x / 2, -dim.y / 2, dim.x, dim.y);

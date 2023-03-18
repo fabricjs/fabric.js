@@ -43,7 +43,7 @@ export class PlaneBBox {
     return this.pointFromOrigin(new Point());
   }
 
-  getDimensionsVector() {
+  getBBoxVector() {
     const { width, height } = this.getBBox();
     return new Point(width, height);
   }
