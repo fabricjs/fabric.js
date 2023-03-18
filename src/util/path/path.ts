@@ -872,7 +872,7 @@ export const getPointOnPath = (
 /**
  *
  * @param {string} pathString
- * @return {(string|number)[][]} An array of SVG path commands
+ * @return {TComplexPathData} An array of SVG path commands
  * @example <caption>Usage</caption>
  * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
  *   ['M', 3, 4],
@@ -884,13 +884,11 @@ export const getPointOnPath = (
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
   // add spaces around the numbers
-  pathString = pathString.replace(
-    new RegExp(`(${numberRegExStr})`, 'gi'),
-    ' $1 '
-  );
-  // replace annoying commas and arbitrary whitespace with single spaces
-  pathString = pathString.replace(/,/gi, ' ');
-  pathString = pathString.replace(/\s+/gi, ' ');
+  pathString = pathString
+    .replace(new RegExp(`(${numberRegExStr})`, 'gi'), ' $1 ')
+    // replace annoying commas and arbitrary whitespace with single spaces
+    .replace(/,/gi, ' ')
+    .replace(/\s+/gi, ' ');
 
   const res: TComplexPathData = [];
   for (const match of pathString.matchAll(rePathCommand)) {

@@ -1103,7 +1103,6 @@ export class Canvas extends SelectableCanvas {
       this.selection &&
       (!target ||
         (!target.selectable &&
-          // @ts-ignore
           !target.isEditing &&
           target !== this._activeObject))
     ) {
@@ -1369,7 +1368,6 @@ export class Canvas extends SelectableCanvas {
         : pointer;
     // seems used only here.
     // @TODO: investigate;
-    // @ts-ignore
     transform.reset = false;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
@@ -1602,7 +1600,6 @@ export class Canvas extends SelectableCanvas {
    */
   destroy(this: TDestroyedCanvas<this>) {
     this.removeListeners();
-    // @ts-ignore
     super.destroy();
     this.textEditingManager.dispose();
   }

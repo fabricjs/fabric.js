@@ -104,7 +104,7 @@ export const numberRegExStr = String.raw`[-+]?${absNumberRegExStr}`;
  * p for param
  * using "bad naming" here because it makes the regex much easier to read
  */
-const p = String.raw`(${numberRegExStr})`;
+const p = `(${numberRegExStr})`;
 
 /**
  * Begin parsed SVG path commands
