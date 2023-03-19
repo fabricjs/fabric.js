@@ -2,6 +2,7 @@
 import { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
+import { createTextboxDefaultControls } from '../controls/commonControls';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -53,6 +54,7 @@ export class Textbox extends IText {
   static getDefaults() {
     return {
       ...super.getDefaults(),
+      controls: createTextboxDefaultControls(),
       ...Textbox.ownDefaults,
     };
   }
@@ -471,8 +473,5 @@ export class Textbox extends IText {
     );
   }
 }
-
-// @ts-expect-error
-Textbox.prototype.type = 'textbox';
 
 classRegistry.setClass(Textbox);

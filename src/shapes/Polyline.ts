@@ -240,7 +240,7 @@ export class Polyline extends FabricObject {
       );
     }
     return [
-      `<${this.type} `,
+      `<${this.constructor.name.toLowerCase() as 'polyline' | 'polygon'} `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];
@@ -335,9 +335,6 @@ export class Polyline extends FabricObject {
     });
   }
 }
-
-// @ts-expect-error
-Polyline.prototype.type = 'polyline';
 
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);

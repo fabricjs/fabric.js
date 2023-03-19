@@ -3,7 +3,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { Point } from '../Point';
-import { PathData, TClassProperties } from '../typedefs';
+import { PathData } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -194,7 +194,7 @@ export class Path extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path);
+    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
     return [
       '<path ',
       'COMMON_PARTS',
@@ -381,9 +381,6 @@ export class Path extends FabricObject {
     );
   }
 }
-
-// @ts-expect-error
-Path.prototype.type = 'path';
 
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);

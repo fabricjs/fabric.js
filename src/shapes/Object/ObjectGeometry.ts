@@ -25,7 +25,7 @@ import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { sendVectorToPlane } from '../../util/misc/planeChange';
 import { mapValues } from '../../util/internals';
-import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
+import { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;
@@ -46,9 +46,12 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectOrigin<EventSpec> {
+export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
+  extends ObjectOrigin<EventSpec>
+  implements Pick<ControlProps, 'padding'>
+{
+  declare padding: number;
+
   /**
    * Describe object's corner position in canvas object absolute coordinates
    * properties are tl,tr,bl,br and describe the four main corner.
