@@ -1889,8 +1889,10 @@ export class Text<
       // fabric output by default at top, left.
       left:
         text.left -
-        (parsedAnchor === 'center' || parsedAnchor === 'right'
-          ? sizeInParent.x / (parsedAnchor === 'center' ? 2 : 1)
+        (parsedAnchor === 'center'
+          ? sizeInParent.x / 2
+          : parsedAnchor === 'right'
+          ? sizeInParent.x
           : 0),
       top:
         text.top -
