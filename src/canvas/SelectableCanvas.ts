@@ -666,7 +666,6 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    const timeStart = performance.now();
     const pixelCtx = this.pixelFindContext;
     const retina = this.getRetinaScaling();
     pixelCtx.resetTransform();
@@ -694,22 +693,8 @@ export class SelectableCanvas<
       pixelCtx.transform(...this.viewportTransform);
       target.render(pixelCtx);
     }
-    const isT = isTransparent(pixelCtx, tolerance, tolerance, tolerance);
-    // debug code
-    const timeEnd = performance.now();
-    const totalTime = timeEnd - timeStart;
-    this.logs.count++;
-    this.logs.time += totalTime;
-    this.logs.average = this.logs.time / this.logs.count;
-    // debug code
-    return isT;
+    return isTransparent(pixelCtx, tolerance, tolerance, tolerance);
   }
-
-  logs = {
-    count: 0,
-    time: 0,
-    average: 0,
-  };
 
   /**
    * takes an event and determines if selection key has been pressed
