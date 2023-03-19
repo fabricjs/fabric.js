@@ -1,5 +1,3 @@
-import { capValue } from './capValue';
-
 /**
  * Returns true if context has transparent pixel
  * at specified location (taking tolerance into account)
@@ -15,14 +13,11 @@ export const isTransparent = (
   y: number,
   tolerance: number
 ): boolean => {
-  tolerance = Math.round(Math.max(tolerance, 0));
-  const sx = Math.floor(Math.max(x - tolerance, 0));
-  const sy = Math.floor(Math.max(y - tolerance, 0));
   const { data } = ctx.getImageData(
-    sx,
-    sy,
-    capValue(1, tolerance * 2, ctx.canvas.width - sx),
-    capValue(1, tolerance * 2, ctx.canvas.height - sy)
+    Math.max(x - tolerance, 0),
+    Math.max(y - tolerance, 0),
+    Math.min(x + tolerance, ctx.canvas.width),
+    Math.min(y + tolerance, ctx.canvas.height)
   );
   for (let i = 3; i < data.length; i += 4) {
     const alphaChannel = data[i];
