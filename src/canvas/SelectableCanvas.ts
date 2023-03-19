@@ -672,22 +672,18 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
+    const tolerance = this.targetFindTolerance;
     const ctx = this.pixelFindContext;
     this.clearContext(ctx);
     ctx.save();
-    ctx.translate(-x + this.targetFindTolerance, -y + this.targetFindTolerance);
+    ctx.translate(-x + tolerance, -y + tolerance);
     ctx.transform(...this.viewportTransform);
     const selectionBgc = target.selectionBackgroundColor;
     target.selectionBackgroundColor = '';
     target.render(ctx);
     target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
-    return isTransparent(
-      ctx,
-      this.targetFindTolerance,
-      this.targetFindTolerance,
-      this.targetFindTolerance
-    );
+    return isTransparent(ctx, tolerance, tolerance, tolerance);
   }
 
   /**
