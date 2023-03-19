@@ -122,7 +122,7 @@ export function renderSquareControl(
     styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // this is still wrong
   ctx.lineWidth = 1;
-  ctx.translate(left, top);
+  ctx.translate(x, y);
   //  angle is relative to viewport
   ctx.rotate(fabricObject.getTotalAngle());
   // this does not work, and fixed with ( && ) does not make sense.

@@ -435,7 +435,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        control.renderControl(ctx, this.oCoords[key], options, this);
+        control.renderControl(ctx, this.controlCoords[key], options, this);
       }
     });
     ctx.restore();

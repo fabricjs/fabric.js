@@ -64,7 +64,8 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Returns the object angle relative to canvas counting also the group property
+   * Returns the object angle relative to canvas
+   * @param {TRadian} [inViewport] defaults to true
    * @returns {TDegree}
    */
   getTotalAngle(inViewport = true): TRadian {

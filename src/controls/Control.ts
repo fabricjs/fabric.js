@@ -298,13 +298,12 @@ export class Control {
    */
   connectionPositionHandler(
     position: Point,
-    dim: Point,
-    finalMatrix: TMat2D,
     fabricObject: FabricObject,
     currentControl: Control
   ) {
+    const bbox = fabricObject.bbox;
     return {
-      from: new Point(this.x * dim.x, this.y * dim.y).transform(finalMatrix),
+      from: new Point(this.x, this.y).transform(bbox.getTransformation()),
       to: position,
     };
   }
