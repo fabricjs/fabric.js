@@ -63,5 +63,5 @@ export const rePathCommand = new RegExp(
     `|(?:${reQuadraticCurveCommand.source})` +
     `|(?:${reQuadraticCurveShortcutCommand.source})` +
     `|(?:${reArcCommand.source}))`,
-  'dgi'
+  'gi'
 );
