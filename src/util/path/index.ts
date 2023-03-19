@@ -1,7 +1,7 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { halfPI, PiBy180 } from '../../constants';
-import type { TBounds, TMat2D, TRadian } from '../../typedefs';
+import type { TMat2D, TRadian, TRectBounds } from '../../typedefs';
 import { cos } from '../misc/cos';
 import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
 import { sin } from '../misc/sin';
@@ -21,7 +21,7 @@ import {
   TEndPathInfo,
   TParsedArcCommand,
 } from './typedefs';
-import { Point } from '../../Point';
+import { IPoint, Point } from '../../Point';
 import { numberRegExStr, rePathCommand } from './regex';
 
 /**
@@ -211,6 +211,7 @@ const CB4 = (t: number) => (1 - t) ** 3;
  * @param {number} cp2y
  * @param {number} endx end of bezier
  * @param {number} endy
+ * @return {TRectBounds} the rectangular bounds
  */
 export function getBoundsOfCurve(
   begx: number,
@@ -221,7 +222,7 @@ export function getBoundsOfCurve(
   cp2y: number,
   endx: number,
   endy: number
-): TBounds {
+): TRectBounds {
   let argsString: string;
   if (config.cachesBoundsOfCurve) {
     // eslint-disable-next-line
@@ -297,7 +298,7 @@ export function getBoundsOfCurve(
   bounds[1][jlen] = begy;
   bounds[0][jlen + 1] = endx;
   bounds[1][jlen + 1] = endy;
-  const result: TBounds = [
+  const result: TRectBounds = [
     new Point(Math.min(...bounds[0]), Math.min(...bounds[1])),
     new Point(Math.max(...bounds[0]), Math.max(...bounds[1])),
   ];

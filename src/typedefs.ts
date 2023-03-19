@@ -95,7 +95,7 @@ export type TCacheCanvasDimensions = {
   y: number;
 };
 
-export type TBounds = IPoint[];
+export type TRectBounds = [min: IPoint, max: IPoint];
 
 export type TToCanvasElementOptions = {
   left?: number;
