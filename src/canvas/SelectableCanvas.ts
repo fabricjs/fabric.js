@@ -1,8 +1,8 @@
-import {getDocument,getEnv} from '../env';
-import {dragHandler} from '../controls/drag';
-import {getActionFromCorner} from '../controls/util';
-import {Point} from '../Point';
-import {FabricObject} from '../shapes/Object/FabricObject';
+import { getDocument, getEnv } from '../env';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
+import { Point } from '../Point';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import {
   CanvasEvents,
   ModifierKey,
@@ -15,21 +15,21 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import {StaticCanvas,TCanvasSizeOptions} from './StaticCanvas';
-import {isCollection,isFabricObjectCached} from '../util/types';
-import {invertTransform,transformPoint} from '../util/misc/matrix';
-import {isTransparent} from '../util/misc/isTransparent';
-import {AssertKeys,TMat2D,TOriginX,TOriginY,TSize} from '../typedefs';
-import {degreesToRadians} from '../util/misc/radiansDegreesConversion';
-import {getPointer,isTouchEvent} from '../util/dom_event';
-import type {IText} from '../shapes/IText/IText';
-import {makeElementUnselectable,wrapElement} from '../util/dom_misc';
-import {setStyle} from '../util/dom_style';
-import type {BaseBrush} from '../brushes/BaseBrush';
-import {pick} from '../util/misc/pick';
-import {TSVGReviver} from '../typedefs';
-import {sendPointToPlane} from '../util/misc/planeChange';
-import {ActiveSelection} from '../shapes/ActiveSelection';
+import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
+import { isCollection, isFabricObjectCached } from '../util/types';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isTransparent } from '../util/misc/isTransparent';
+import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { getPointer, isTouchEvent } from '../util/dom_event';
+import type { IText } from '../shapes/IText/IText';
+import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
+import { setStyle } from '../util/dom_style';
+import type { BaseBrush } from '../brushes/BaseBrush';
+import { pick } from '../util/misc/pick';
+import { TSVGReviver } from '../typedefs';
+import { sendPointToPlane } from '../util/misc/planeChange';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 
 type TDestroyed<T, K extends keyof any> = {
   // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
@@ -651,7 +651,7 @@ export class SelectableCanvas<
 
   setTargetFindTolerance(value: number) {
     this.targetFindTolerance = value;
-    const size = 2 * value + 1
+    const size = 2 * value + 1;
     this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
   }
 
@@ -666,6 +666,7 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
+    const timeStart = performance.now();
     const pixelCtx = this.pixelFindContext;
     const retina = this.getRetinaScaling();
     pixelCtx.resetTransform();
@@ -676,30 +677,39 @@ export class SelectableCanvas<
     if (isFabricObjectCached(target) && !target.dirty) {
       // optimization: use the cache
       pixelCtx.translate(
-        -target.cacheTranslationX / retina - normalizedPointer.x * target.zoomX / retina + tolerance,
-        -target.cacheTranslationY / retina - normalizedPointer.y * target.zoomY / retina + tolerance
+        -target.cacheTranslationX / retina -
+          (normalizedPointer.x * target.zoomX) / retina +
+          tolerance,
+        -target.cacheTranslationY / retina -
+          (normalizedPointer.y * target.zoomY) / retina +
+          tolerance
       );
       // the cache is retina scaled. we want to counter that.
       pixelCtx.scale(1 / retina, 1 / retina);
       // performance optimization:
       // we draw the hit area to the dedicated canvas instead of using `getImageData` on the target's cache canvas
-      pixelCtx.drawImage(
-        target._cacheCanvas,
-        0,
-        0,
-      );
+      pixelCtx.drawImage(target._cacheCanvas, 0, 0);
     } else {
       pixelCtx.translate(-x + tolerance, -y + tolerance);
       pixelCtx.transform(...this.viewportTransform);
       target.render(pixelCtx);
     }
-    return isTransparent(
-      pixelCtx,
-      tolerance,
-      tolerance,
-      tolerance
-    );
+    const isT = isTransparent(pixelCtx, tolerance, tolerance, tolerance);
+    // debug code
+    const timeEnd = performance.now();
+    const totalTime = timeEnd - timeStart;
+    this.logs.count++;
+    this.logs.time += totalTime;
+    this.logs.average = this.logs.time / this.logs.count;
+    // debug code
+    return isT;
   }
+
+  logs = {
+    count: 0,
+    time: 0,
+    average: 0,
+  };
 
   /**
    * takes an event and determines if selection key has been pressed

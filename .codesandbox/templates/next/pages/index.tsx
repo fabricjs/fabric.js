@@ -31,6 +31,23 @@ const IndexPage: NextPage = () => {
         objectCaching: false,
       }
     );
+
+    const group = new fabric.Group(
+      [
+        new fabric.Circle({ radius: 40, fill: 'green', top: 60 }),
+        new fabric.Circle({ radius: 35, fill: 'blue', scaleY: 1.4, left: 100 }),
+        new fabric.Triangle({
+          width: 40,
+          height: 50,
+          fill: 'yellow',
+          scaleX: 2,
+          left: 50,
+          top: 90,
+        }),
+      ],
+      { top: 100, left: 200, objectCaching: false }
+    );
+    canvas.add(group);
     canvas.add(text, text2);
     canvas.perPixelTargetFind = true;
     canvas.setTargetFindTolerance(7);
