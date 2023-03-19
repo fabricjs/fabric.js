@@ -155,18 +155,23 @@ function scaleObject(
       scaleY =
         scale * (Math.sign(offsetFromAnchorOrigin.y) || 1) * originFactor.y;
     } else {
-      scaleX = dotProduct(offsetFromAnchorOrigin, sideVectorX) * originFactor.x;
-      scaleY = dotProduct(offsetFromAnchorOrigin, sideVectorY) * originFactor.y;
+      scaleX =
+        dotProduct(offsetFromAnchorOrigin, sideVectorX) * originFactor.x || 1;
+      scaleY =
+        dotProduct(offsetFromAnchorOrigin, sideVectorY) * originFactor.y || 1;
     }
   }
+
   return target.scaleBy(
     // minScale is taken care of in the setter.
-    !isLocked(target, 'lockScalingX') &&
+    scaleX &&
+      !isLocked(target, 'lockScalingX') &&
       (!isLocked(target, 'lockScalingFlip') || scaleX > 0) &&
       (!by || by === 'x')
       ? scaleX
       : 1,
-    !isLocked(target, 'lockScalingY') &&
+    scaleY &&
+      !isLocked(target, 'lockScalingY') &&
       (!isLocked(target, 'lockScalingFlip') || scaleY > 0) &&
       (!by || by === 'y')
       ? scaleY
