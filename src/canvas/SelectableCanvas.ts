@@ -639,7 +639,7 @@ export class SelectableCanvas<
 
   /**
    * Given a pointer on the canvas with a viewport applied,
-   * find out the opinter in
+   * find out the pointer in object coordinates
    * @private
    */
   _normalizePointer(object: FabricObject, pointer: Point): Point {
@@ -649,16 +649,18 @@ export class SelectableCanvas<
     );
   }
 
+  /**
+   * Set the canvas tolerance value for pixel taret find.
+   * Use only integer numbers.
+   * @private
+   */
   setTargetFindTolerance(value: number) {
+    value = Math.round(value);
     this.targetFindTolerance = value;
-    const size = Math.ceil(
-      2 * Math.max(this.targetFindTolerance, 1) * this.getRetinaScaling()
-    );
-    if (this.pixelFindCanvasEl.width < size) {
-      this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
-      const retina = this.getRetinaScaling();
-      this.pixelFindContext.scale(retina, retina);
-    }
+    const retina = this.getRetinaScaling();
+    const size = Math.ceil((value * 2 + 1) * retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    this.pixelFindContext.scale(retina, retina);
   }
 
   /**
@@ -683,7 +685,11 @@ export class SelectableCanvas<
     target.render(ctx);
     target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
-    return isTransparent(ctx, tolerance, tolerance, tolerance);
+    // our canvas is square, and made around tolerance.
+    // so we sample it at the center.
+    const center = Math.floor(ctx.canvas.width / 2);
+    const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
+    return isTransparent(ctx, center, center, enhancedTolerance);
   }
 
   /**
