@@ -881,16 +881,14 @@ export const parsePath = (pathString: string): TComplexPathData => {
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = new RegExp(rePathCommand.source, 'id').exec(matchStr);
+      paramArr = new RegExp(rePathCommand.source, 'i').exec(matchStr);
       if (!paramArr) {
         break;
       }
+      // ignore undefined match groups
       const filteredGroups = paramArr.filter((g) => g);
-      // indices is a JS regex thing that apparently isn't nicely supported by TS (set from the 'd' flag)
-      const filteredIndices = (paramArr as any).indices.filter((i: never) => i);
       // remove the first element from the match array since it's just the whole command
       filteredGroups.shift();
-      filteredIndices.shift();
       // if we can't parse the number, just interpret it as a string
       // (since it's probably the path command)
       const command = filteredGroups.map((g) => {
@@ -902,11 +900,17 @@ export const parsePath = (pathString: string): TComplexPathData => {
         }
       });
       chain.push(command as any);
-      // chop off that last set of params
-      if (filteredIndices.length <= 1) {
+      // stop now if it's a z command
+      if (filteredGroups.length <= 1) {
         break;
       }
-      matchStr = matchStr.substring(0, filteredIndices[1][0]);
+      // remove the last part of the chained command
+      filteredGroups.shift();
+      // ` ?` is to support commands with optional spaces between flags
+      matchStr = matchStr.replace(
+        new RegExp(`${filteredGroups.join(' ?')} ?$`),
+        ''
+      );
     } while (paramArr);
     // add the chain, convert multiple m's to l's in the process
     chain.reverse().forEach((c, idx) => {
