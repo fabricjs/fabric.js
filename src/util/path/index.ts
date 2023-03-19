@@ -876,12 +876,12 @@ export const parsePath = (pathString: string): TComplexPathData => {
     .replace(/\s+/gi, ' ');
 
   const res: TComplexPathData = [];
-  for (const match of pathString.matchAll(rePathCommand)) {
+  for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
     let matchStr = match[0];
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = new RegExp(rePathCommand.source, 'i').exec(matchStr);
+      paramArr = new RegExp(rePathCommand, 'i').exec(matchStr);
       if (!paramArr) {
         break;
       }

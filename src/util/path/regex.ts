@@ -1,6 +1,6 @@
 // absolute value number
 const absNumberRegExStr = String.raw`(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
-export const numberRegExStr = String.raw`[-+]?${absNumberRegExStr}`;
+export const numberRegExStr = `[-+]?${absNumberRegExStr}`;
 
 /**
  * p for param
@@ -8,60 +8,34 @@ export const numberRegExStr = String.raw`[-+]?${absNumberRegExStr}`;
  */
 const p = `(${numberRegExStr})`;
 
-export const reMoveToCommand = new RegExp(
-  String.raw`(M) (?:${p} ${p} ?)+`,
-  'gi'
-);
+export const reMoveToCommand = `(M) (?:${p} ${p} ?)+`;
 
-export const reLineCommand = new RegExp(String.raw`(L) (?:${p} ${p} ?)+`, 'gi');
+export const reLineCommand = `(L) (?:${p} ${p} ?)+`;
 
-export const reHorizontalLineCommand = new RegExp(
-  String.raw`(H) (?:${p} ?)+`,
-  'gi'
-);
+export const reHorizontalLineCommand = `(H) (?:${p} ?)+`;
 
-export const reVerticalLineCommand = new RegExp(
-  String.raw`(V) (?:${p} ?)+`,
-  'gi'
-);
+export const reVerticalLineCommand = `(V) (?:${p} ?)+`;
 
-export const reClosePathCommand = new RegExp(String.raw`(Z)\s*`, 'gi');
+export const reClosePathCommand = String.raw`(Z)\s*`;
 
-export const reCubicCurveCommand = new RegExp(
-  String.raw`(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`,
-  'gi'
-);
+export const reCubicCurveCommand = `(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`;
 
-export const reCubicCurveShortcutCommand = new RegExp(
-  String.raw`(S) (?:${p} ${p} ${p} ${p} ?)+`,
-  'gi'
-);
+export const reCubicCurveShortcutCommand = `(S) (?:${p} ${p} ${p} ${p} ?)+`;
 
-export const reQuadraticCurveCommand = new RegExp(
-  String.raw`(Q) (?:${p} ${p} ${p} ${p} ?)+`,
-  'gi'
-);
+export const reQuadraticCurveCommand = `(Q) (?:${p} ${p} ${p} ${p} ?)+`;
 
-export const reQuadraticCurveShortcutCommand = new RegExp(
-  String.raw`(T) (?:${p} ${p} ?)+`,
-  'gi'
-);
+export const reQuadraticCurveShortcutCommand = `(T) (?:${p} ${p} ?)+`;
 
-export const reArcCommand = new RegExp(
-  String.raw`(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`,
-  'gi'
-);
+export const reArcCommand = `(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`;
 
-export const rePathCommand = new RegExp(
-  `(?:(?:${reMoveToCommand.source})` +
-    `|(?:${reLineCommand.source})` +
-    `|(?:${reHorizontalLineCommand.source})` +
-    `|(?:${reVerticalLineCommand.source})` +
-    `|(?:${reClosePathCommand.source})` +
-    `|(?:${reCubicCurveCommand.source})` +
-    `|(?:${reCubicCurveShortcutCommand.source})` +
-    `|(?:${reQuadraticCurveCommand.source})` +
-    `|(?:${reQuadraticCurveShortcutCommand.source})` +
-    `|(?:${reArcCommand.source}))`,
-  'gi'
-);
+export const rePathCommand =
+  `(?:(?:${reMoveToCommand})` +
+  `|(?:${reLineCommand})` +
+  `|(?:${reHorizontalLineCommand})` +
+  `|(?:${reVerticalLineCommand})` +
+  `|(?:${reClosePathCommand})` +
+  `|(?:${reCubicCurveCommand})` +
+  `|(?:${reCubicCurveShortcutCommand})` +
+  `|(?:${reQuadraticCurveCommand})` +
+  `|(?:${reQuadraticCurveShortcutCommand})` +
+  `|(?:${reArcCommand}))`;
