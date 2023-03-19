@@ -5,6 +5,7 @@ import type { TBounds, TMat2D, TRadian } from '../../typedefs';
 import { cos } from '../misc/cos';
 import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
 import { sin } from '../misc/sin';
+import { toFixed } from '../misc/toFixed';
 import {
   TCurveInfo,
   TComplexPathData,
@@ -22,7 +23,6 @@ import {
 } from './typedefs';
 import { Point } from '../../Point';
 import { numberRegExStr, rePathCommand } from './regex';
-import { isAbsLineCmd } from './typechecks';
 
 /**
  * Commands that may be repeated
@@ -822,7 +822,6 @@ export const getPointOnPath = (
   }
   const segInfo = infos[i],
     segPercent = distance / segInfo.length,
-    command = segInfo.command,
     segment = path[i];
   let info: TPointAngle;
 
@@ -830,7 +829,7 @@ export const getPointOnPath = (
     case 'M':
       return { x: segInfo.x, y: segInfo.y, angle: 0 };
     case 'Z':
-      info = {
+      return {
         ...new Point(segInfo.x, segInfo.y).lerp(
           new Point(segInfo.destX, segInfo.destY),
           segPercent
@@ -839,21 +838,13 @@ export const getPointOnPath = (
       };
       return info;
     case 'L':
-      if (isAbsLineCmd(segment)) {
-        info = {
-          ...new Point(segInfo.x, segInfo.y).lerp(
-            new Point(segment[1], segment[2]),
-            segPercent
-          ),
-          angle: Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x),
-        };
-      } else {
-        // TODO: provide a proper error
-        throw Error(
-          `Segment/path info mismatch, expected L, got ${segment[0]}`
-        );
-      }
-      return info;
+      return {
+        ...new Point(segInfo.x, segInfo.y).lerp(
+          new Point(segment[1]!, segment[2]!),
+          segPercent
+        ),
+        angle: Math.atan2(segment[2]! - segInfo.y, segment[1]! - segInfo.x),
+      };
     case 'C':
       return findPercentageForDistance(segInfo, distance);
     case 'Q':
@@ -1059,7 +1050,19 @@ export const getRegularPolygonPath = (
 /**
  * Join path commands to go back to svg format
  * @param {TSimplePathData} pathData fabricJS parsed path commands
- * @return {string} joined path 'M 0 0 L 20 30'
+ * @param {number} fractionDigits number of fraction digits to "leave"
+ * @return {String} joined path 'M 0 0 L 20 30'
  */
-export const joinPath = (pathData: TSimplePathData) =>
-  pathData.map((segment) => segment.join(' ')).join(' ');
+export const joinPath = (pathData: TSimplePathData, fractionDigits?: number) =>
+  pathData
+    .map((segment) => {
+      return segment
+        .map((arg, i) => {
+          if (i === 0) return arg;
+          return fractionDigits === undefined
+            ? arg
+            : toFixed(arg, fractionDigits);
+        })
+        .join(' ');
+    })
+    .join(' ');

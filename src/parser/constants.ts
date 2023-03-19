@@ -17,9 +17,6 @@ export const svgNS = 'http://www.w3.org/2000/svg';
 
 export const commaWsp = String.raw`(?:\s+,?\s*|,\s*|$)`;
 
-export const rePathCommand =
-  /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/gi;
-
 export const reFontDeclaration = new RegExp(
   '(normal|italic)?\\s*(normal|small-caps)?\\s*' +
     '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' +
