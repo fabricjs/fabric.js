@@ -901,7 +901,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
       });
       chain.push(command as any);
       // stop now if it's a z command
-      if(filteredGroups.length <= 1) {
+      if (filteredGroups.length <= 1) {
         break;
       }
       // remove the last part of the chained command
