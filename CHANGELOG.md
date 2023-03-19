@@ -3,6 +3,12 @@
 ## [next]
 
 - refactor(): Control connection rendering moved to control [#8745](https://github.com/fabricjs/fabric.js/issues/8745)
+- BREAKING fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
+- fix(IText): layout change regression caused by #8663 (`text` was changed but layout was skipped) [#8711](https://github.com/fabricjs/fabric.js/pull/8711)
+- fix(IText, Textbox): fix broken text input [#8775](https://github.com/fabricjs/fabric.js/pull/8775)
+- ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
+- ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)
+- fix(): env WebGL import cycle [#8758](https://github.com/fabricjs/fabric.js/pull/8758)
 - chore(TS): remove controls from prototype. BREAKING: controls aren't shared anymore [#8753](https://github.com/fabricjs/fabric.js/pull/8753)
 - chore(TS): remove object `type` from prototype [#8714](https://github.com/fabricjs/fabric.js/pull/8714)
 - chore(TS): type Object props [#8677](https://github.com/fabricjs/fabric.js/issues/8677)
