@@ -298,6 +298,6 @@ export type TSimpleParsedCommand =
 export type TSimplePathData = TSimpleParsedCommand[];
 
 /**
- * A point and the of the vector to the point and the x-axis
+ * A point (vector) and angle between the vector and x-axis
  */
 export type TPointAngle = IPoint & { angle: TRadian };
