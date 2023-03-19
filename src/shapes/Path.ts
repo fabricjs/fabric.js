@@ -46,11 +46,11 @@ export class Path extends FabricObject {
   ) {
     super(options);
     const pathTL = this._setPath(path || []);
-    this.setRelativeXY(
-      new Point(left ?? pathTL.x, top ?? pathTL.y),
-      typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top'
-    );
+    // this.setRelativeXY(
+    //   new Point(left ?? pathTL.x, top ?? pathTL.y),
+    //   typeof left === 'number' ? this.originX : 'left',
+    //   typeof top === 'number' ? this.originY : 'top'
+    // );
   }
 
   /**
