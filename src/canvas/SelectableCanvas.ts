@@ -1509,7 +1509,6 @@ export class SelectableCanvas<
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      pixelFindCanvasEl = this.pixelFindCanvasEl!,
       activeSelection = this._activeSelection!;
     // dispose of active selection
     activeSelection.removeAll();
@@ -1523,7 +1522,7 @@ export class SelectableCanvas<
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
     getEnv().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    getEnv().dispose(pixelFindCanvasEl);
+    getEnv().dispose(this.pixelFindCanvasEl!);
     this.pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
