@@ -686,10 +686,14 @@ export class SelectableCanvas<
     target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
     // our canvas is square, and made around tolerance.
-    // so we sample it at the center.
-    const center = Math.floor(ctx.canvas.width / 2);
+    // so tolerance in this case also represent the center of the canvas.
     const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
-    return isTransparent(ctx, center, center, enhancedTolerance);
+    return isTransparent(
+      ctx,
+      enhancedTolerance,
+      enhancedTolerance,
+      enhancedTolerance
+    );
   }
 
   /**
