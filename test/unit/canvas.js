@@ -2300,12 +2300,12 @@
       canvas.setTargetFindTolerance(5);
       canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
       testPixelDetection(assert, canvas, rect, [
-        { start: -10, end: -4, message: 'outside', transparent: true },
-        { start: -4, end: 0, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: -10, end: -5, message: 'outside', transparent: true },
+        { start: -5, end: 0, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 0, end: 8, message: 'stroke', transparent: false },
         { start: 8, end: 13, message: 'stroke tolerance not affected by vpt', transparent: false },
-        { start: 13, end: 16, message: 'fill', transparent: true },
-        { start: 16, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 13, end: 15, message: 'fill', transparent: true },
+        { start: 15, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 20, end: 28, message: 'stroke', transparent: false },
         { start: 28, end: 33, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 33, end: 40, message: 'outside', transparent: true },
