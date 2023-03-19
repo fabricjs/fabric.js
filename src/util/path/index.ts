@@ -374,7 +374,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
       case 'L':
         x = current[1];
         y = current[2];
-        converted = ['L', current[1], current[2]];
+        converted = ['L', x, y];
         break;
       case 'h': // horizontal lineto, relative
         current[1] += x;
@@ -399,7 +399,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         y = current[2];
         x1 = current[1];
         y1 = current[2];
-        converted = ['M', current[1], current[2]];
+        converted = ['M', x, y];
         break;
       case 'c': // bezierCurveTo, relative
         current[1] += x;
@@ -414,15 +414,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         controlY = current[4];
         x = current[5];
         y = current[6];
-        converted = [
-          'C',
-          current[1],
-          current[2],
-          current[3],
-          current[4],
-          current[5],
-          current[6],
-        ];
+        converted = ['C', current[1], current[2], current[3], current[4], x, y];
         break;
       case 's': // shorthand cubic bezierCurveTo, relative
         current[1] += x;
@@ -444,15 +436,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         }
         x = current[3];
         y = current[4];
-        converted = [
-          'C',
-          controlX,
-          controlY,
-          current[1],
-          current[2],
-          current[3],
-          current[4],
-        ];
+        converted = ['C', controlX, controlY, current[1], current[2], x, y];
         // converted[3] and converted[4] are NOW the second control point.
         // we keep it for the next reflection.
         controlX = converted[3];
@@ -469,7 +453,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         controlY = current[2];
         x = current[3];
         y = current[4];
-        converted = ['Q', current[1], current[2], current[3], current[4]];
+        converted = ['Q', controlX, controlY, x, y];
         break;
       case 't': // shorthand quadraticCurveTo, relative
         current[1] += x;
