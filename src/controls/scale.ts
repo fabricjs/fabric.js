@@ -17,6 +17,7 @@ import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { Point } from '../Point';
 import { resolveOriginPoint } from '../util/misc/resolveOrigin';
+import { dotProduct } from '../util/misc/vectors';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;
@@ -117,58 +118,91 @@ function scaleObject(
   { by }: { by?: TAxis } = {}
 ) {
   const scaleProportionally = scaleIsProportional(eventData, target);
+  const sideVectorX = new Point(1, 0);
+  const sideVectorY = new Point(0, 1);
   let scaleX = 1,
     scaleY = 1;
 
   if (scalingIsForbidden(target, by, scaleProportionally)) {
     return false;
   }
+
   if (gestureScale) {
     scaleX = scaleY = gestureScale;
   } else {
     const anchorOrigin = resolveOriginPoint(originX, originY);
-    const distanceFromAnchorOrigin = target.bbox
+    const offsetFromAnchorOrigin = target.bbox
       .pointToOrigin(new Point(x, y))
       .subtract(anchorOrigin);
-    const prevDistanceFromAnchorOrigin = target.bbox
+    const prevOffsetFromAnchorOrigin = target.bbox
       .pointToOrigin(new Point(lastX, lastY))
       .subtract(anchorOrigin);
+    // account for scaling origin
+    const transformCenterFactor = isTransformCentered({ originX, originY })
+      ? 2
+      : 1;
 
     if (scaleProportionally && !by) {
       // proportional scaling
       const scale =
-        (Math.abs(distanceFromAnchorOrigin.x) +
-          Math.abs(distanceFromAnchorOrigin.y)) /
-        (Math.abs(prevDistanceFromAnchorOrigin.x) +
-          Math.abs(prevDistanceFromAnchorOrigin.y));
+        (Math.abs(offsetFromAnchorOrigin.x) +
+          Math.abs(offsetFromAnchorOrigin.y)) /
+        (Math.abs(prevOffsetFromAnchorOrigin.x) +
+          Math.abs(prevOffsetFromAnchorOrigin.y));
+
       scaleX =
         scale *
-        Math.sign(distanceFromAnchorOrigin.x / prevDistanceFromAnchorOrigin.x);
+        (Math.sign(offsetFromAnchorOrigin.x) || 1) *
+        transformCenterFactor;
       scaleY =
         scale *
-        Math.sign(distanceFromAnchorOrigin.y / prevDistanceFromAnchorOrigin.y);
+        (Math.sign(offsetFromAnchorOrigin.y) || 1) *
+        transformCenterFactor;
     } else {
-      const factor = distanceFromAnchorOrigin.divide(
-        prevDistanceFromAnchorOrigin
-      );
-      by && (factor[({ x: 'y', y: 'x' } as const)[by]] = 1);
-      scaleX = factor.x;
-      scaleY = factor.y;
-    }
-    // if we are scaling by center, we need to double the scale
-    if (isTransformCentered({ originX, originY })) {
-      scaleX *= 2;
-      scaleY *= 2;
+      scaleX =
+        dotProduct(offsetFromAnchorOrigin, sideVectorX) *
+        (offsetFromAnchorOrigin.x !== 0 &&
+        Math.sign(offsetFromAnchorOrigin.x) !==
+          Math.sign(prevOffsetFromAnchorOrigin.x)
+          ? -1
+          : 1) *
+        transformCenterFactor;
+      scaleY =
+        dotProduct(offsetFromAnchorOrigin, sideVectorY) *
+        (offsetFromAnchorOrigin.y !== 0 &&
+        Math.sign(offsetFromAnchorOrigin.y) !==
+          Math.sign(prevOffsetFromAnchorOrigin.y)
+          ? -1
+          : 1) *
+        transformCenterFactor;
     }
   }
-  // minScale is taken are in the setter.
   return target.scaleBy(
+    // minScale is taken care of in the setter.
+    // calcBaseChangeMatrix(
+    //   [sideVectorX, sideVectorY],
+    //   [
+    //     !isLocked(target, 'lockScalingX') &&
+    //     (!isLocked(target, 'lockScalingFlip') ||
+    //       Math.sign(sideVectorXAfter.x) !== Math.sign(sideVectorX.x)) &&
+    //     (!by || by === 'x')
+    //       ? sideVectorXAfter
+    //       : sideVectorX,
+    //     !isLocked(target, 'lockScalingY') &&
+    //     (!isLocked(target, 'lockScalingFlip') ||
+    //       Math.sign(sideVectorXAfter.y) !== Math.sign(sideVectorX.y)) &&
+    //     (!by || by === 'y')
+    //       ? sideVectorYAfter
+    //       : sideVectorY,
+    //   ]
     !isLocked(target, 'lockScalingX') &&
-      (!isLocked(target, 'lockScalingFlip') || scaleX > 0)
+      (!isLocked(target, 'lockScalingFlip') || scaleX > 0) &&
+      (!by || by === 'x')
       ? scaleX
       : 1,
     !isLocked(target, 'lockScalingY') &&
-      (!isLocked(target, 'lockScalingFlip') || scaleY > 0)
+      (!isLocked(target, 'lockScalingFlip') || scaleY > 0) &&
+      (!by || by === 'y')
       ? scaleY
       : 1,
     {
@@ -177,6 +211,27 @@ function scaleObject(
       inViewport: true,
     }
   );
+
+  // minScale is taken care of in the setter.
+  // return target.scaleBy(
+  //   !isLocked(target, 'lockScalingX') &&
+  //     (!isLocked(target, 'lockScalingFlip') || scaleX > 0)
+  //     ? Math.abs(scaleX) === Infinity
+  //       ? Math.sign(delta.x)
+  //       : scaleX
+  //     : 1,
+  //   !isLocked(target, 'lockScalingY') &&
+  //     (!isLocked(target, 'lockScalingFlip') || scaleY > 0)
+  //     ? Math.abs(scaleY) === Infinity
+  //       ? Math.sign(delta.y)
+  //       : scaleY
+  //     : 1,
+  //   {
+  //     originX,
+  //     originY,
+  //     inViewport: true,
+  //   }
+  // );
 }
 
 /**
