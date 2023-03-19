@@ -28,6 +28,10 @@ export const createVector = (from: IPoint, to: IPoint): Point =>
  */
 export const magnitude = (point: Point) => point.distanceFrom(new Point());
 
+export const dot = (a: Point, b: Point) => a.x * b.x + a.y * b.y;
+
+export const det = (a: Point, b: Point) => a.x * b.y - a.y * b.x;
+
 /**
  * Calculates the angle between 2 vectors
  * @param {Point} a
@@ -35,9 +39,7 @@ export const magnitude = (point: Point) => point.distanceFrom(new Point());
  * @returns the angle in radians from `a` to `b`
  */
 export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
-  const dot = a.x * b.x + a.y * b.y,
-    det = a.x * b.y - a.y * b.x;
-  return Math.atan2(det, dot) as TRadian;
+  return Math.atan2(det(a, b), dot(a, b)) as TRadian;
 };
 
 /**
@@ -53,6 +55,11 @@ export const calcVectorRotation = (v: Point) =>
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
 export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
+
+export const dotProduct = (v: Point, onto: Point) => {
+  const size = magnitude(v);
+  return size ? size * Math.cos(calcAngleBetweenVectors(onto, v)) : 0;
+};
 
 /**
  * @param {Point} A
