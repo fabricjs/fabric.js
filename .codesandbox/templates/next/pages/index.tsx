@@ -52,6 +52,7 @@ const IndexPage: NextPage = () => {
     canvas.perPixelTargetFind = true;
     canvas.setTargetFindTolerance(7);
     canvas.setViewportTransform([1.5, 0, 0, 1.5, 80, 90]);
+
     document.getElementById('test')?.appendChild(canvas.pixelFindCanvasEl);
     window.canvas = canvas;
   }, []);
