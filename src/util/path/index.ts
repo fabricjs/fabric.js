@@ -686,8 +686,7 @@ export const getPathSegmentsInfo = (
     x2 = 0,
     y2 = 0,
     iterator,
-    tempInfo: TPathSegmentsInfo,
-    angleFinder;
+    tempInfo: TPathSegmentsInfo;
   const info: TPathSegmentsInfo[] = [];
   for (const current of path) {
     const basicInfo: TPathSegmentInfoCommon<keyof TPathSegmentInfo> = {
@@ -700,17 +699,13 @@ export const getPathSegmentsInfo = (
       current[0] //first letter
     ) {
       case 'M':
-        tempInfo = <TPathSegmentInfoCommon<'M'>>{
-          ...basicInfo,
-        };
+        tempInfo = <TPathSegmentInfoCommon<'M'>>basicInfo;
         x2 = x1 = current[1];
         y2 = y1 = current[2];
         break;
       case 'L':
-        tempInfo = <TPathSegmentInfoCommon<'L'>>{
-          ...basicInfo,
-          length: calcLineLength(x1, y1, current[1], current[2]),
-        };
+        tempInfo = <TPathSegmentInfoCommon<'L'>>basicInfo;
+        tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
         x1 = current[1];
         y1 = current[2];
         break;
@@ -725,7 +720,9 @@ export const getPathSegmentsInfo = (
           current[5],
           current[6]
         );
-        angleFinder = getTangentCubicIterator(
+        tempInfo = <TCurveInfo<'C'>>basicInfo;
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = getTangentCubicIterator(
           x1,
           y1,
           current[1],
@@ -735,12 +732,8 @@ export const getPathSegmentsInfo = (
           current[5],
           current[6]
         );
-        tempInfo = <TCurveInfo<'C'>>{
-          ...basicInfo,
-          iterator,
-          angleFinder,
-          length: pathIterator(iterator, x1, y1),
-        };
+        tempInfo.length = pathIterator(iterator, x1, y1);
+
         x1 = current[5];
         y1 = current[6];
         break;
@@ -753,7 +746,9 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4]
         );
-        angleFinder = getTangentQuadraticIterator(
+        tempInfo = <TCurveInfo<'Q'>>basicInfo;
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = getTangentQuadraticIterator(
           x1,
           y1,
           current[1],
@@ -761,23 +756,16 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4]
         );
-        tempInfo = <TCurveInfo<'Q'>>{
-          ...basicInfo,
-          iterator,
-          angleFinder,
-          length: pathIterator(iterator, x1, y1),
-        };
+        tempInfo.length = pathIterator(iterator, x1, y1);
         x1 = current[3];
         y1 = current[4];
         break;
       case 'Z':
         // we add those in order to ease calculations later
-        tempInfo = <TEndPathInfo>{
-          ...basicInfo,
-          destX: x2,
-          destY: y2,
-          length: calcLineLength(x1, y1, x2, y2),
-        };
+        tempInfo = <TEndPathInfo>basicInfo;
+        tempInfo.destX = x2;
+        tempInfo.destY = y2;
+        tempInfo.length = calcLineLength(x1, y1, x2, y2);
         x1 = x2;
         y1 = y2;
         break;
