@@ -32,7 +32,7 @@ export class ObjectTransformations<
   EventSpec extends ObjectEvents = ObjectEvents
 > extends ObjectBBox<EventSpec> {
   /**
-   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
+   * @returns {Point} position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
    */
   getXY(
     originX: TOriginX = this.originX,
@@ -44,7 +44,7 @@ export class ObjectTransformations<
   }
 
   /**
-   * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
+   * Set position to a particular point, in canvas coordinate.
    * You can specify {@link originX} and {@link originY} values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
@@ -56,8 +56,8 @@ export class ObjectTransformations<
    */
   setXY(
     point: Point,
-    originX: TOriginX = 'center',
-    originY: TOriginY = 'center'
+    originX: TOriginX = this.originX,
+    originY: TOriginY = this.originY
   ) {
     this.translateTo(point.x, point.y, { originX, originY, inViewport: false });
   }
