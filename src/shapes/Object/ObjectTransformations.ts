@@ -150,14 +150,34 @@ export class ObjectTransformations<
   }
 
   scale(x: number, y: number, options?: ObjectTransformOptions) {
+    const rotation = calcRotateMatrix({
+      rotation: this.getTotalAngle(),
+    });
     const [a, b, c, d] = options?.inViewport
       ? this.calcTransformMatrixInViewport()
       : this.calcTransformMatrix();
-    return this.transformObject([x / a, 0, 0, y / d, 0, 0], options);
+    return this.transformObject(
+      multiplyTransformMatrixChain([
+        rotation,
+        [(x / a) * rotation[0], 0, 0, (y / d) * rotation[3], 0, 0],
+        invertTransform(rotation),
+      ]),
+      options
+    );
   }
 
   scaleBy(x: number, y: number, options?: ObjectTransformOptions) {
-    return this.transformObject([x, 0, 0, y, 0, 0], options);
+    const rotation = calcRotateMatrix({
+      rotation: this.getTotalAngle(),
+    });
+    return this.transformObject(
+      multiplyTransformMatrixChain([
+        rotation,
+        [x, 0, 0, y, 0, 0],
+        invertTransform(rotation),
+      ]),
+      options
+    );
   }
 
   skew(x: TDegree, y: TDegree, options?: ObjectTransformOptions) {
