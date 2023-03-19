@@ -5,6 +5,7 @@ import type { TBounds, TMat2D, TRadian } from '../../typedefs';
 import { cos } from '../misc/cos';
 import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
 import { sin } from '../misc/sin';
+import { toFixed } from '../misc/toFixed';
 import {
   TCurveInfo,
   TComplexPathData,
@@ -1055,7 +1056,19 @@ export const getRegularPolygonPath = (
 /**
  * Join path commands to go back to svg format
  * @param {TSimplePathData} pathData fabricJS parsed path commands
- * @return {string} joined path 'M 0 0 L 20 30'
+ * @param {number} fractionDigits number of fraction digits to "leave"
+ * @return {String} joined path 'M 0 0 L 20 30'
  */
-export const joinPath = (pathData: TSimplePathData) =>
-  pathData.map((segment) => segment.join(' ')).join(' ');
+export const joinPath = (pathData: TSimplePathData, fractionDigits?: number) =>
+  pathData
+    .map((segment) => {
+      return segment
+        .map((arg, i) => {
+          if (i === 0) return arg;
+          return fractionDigits === undefined
+            ? arg
+            : toFixed(arg, fractionDigits);
+        })
+        .join(' ');
+    })
+    .join(' ');
