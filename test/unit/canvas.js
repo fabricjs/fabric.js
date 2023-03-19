@@ -2124,8 +2124,8 @@
 
     // to be replaced with new api test
     // eventStub = {
-    //   clientX: canvasOffset.left + rect.oCoords.mtr.x,
-    //   clientY: canvasOffset.top + rect.oCoords.mtr.y,
+    //   clientX: canvasOffset.left + rect.oCoords.mtr.position.x,
+    //   clientY: canvasOffset.top + rect.oCoords.mtr.position.y,
     //   target: rect,
     // };
     // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
@@ -2145,8 +2145,8 @@
   //   var canvasEl = canvas.getElement(),
   //       canvasOffset = fabric.util.getElementOffset(canvasEl);
   //   var eventStub = {
-  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
-  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
+  //     clientX: canvasOffset.left + rect.oCoords.mtr.position.x,
+  //     clientY: canvasOffset.top + rect.oCoords.mtr.position.y,
   //     target: rect,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);
@@ -2163,8 +2163,8 @@
   //   var canvasEl = canvas.getElement(),
   //       canvasOffset = fabric.util.getElementOffset(canvasEl);
   //   var eventStub = {
-  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
-  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
+  //     clientX: canvasOffset.left + rect.oCoords.mtr.position.x,
+  //     clientY: canvasOffset.top + rect.oCoords.mtr.position.y,
   //     target: rect,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);

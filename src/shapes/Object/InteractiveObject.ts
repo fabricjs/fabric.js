@@ -15,8 +15,9 @@ import { createObjectDefaultControls } from '../../controls/commonControls';
 import { BBox } from '../../BBox/BBox';
 import { PlaneBBox } from '../../BBox/PlaneBBox';
 
-type TControlCoord = {
+export type TControlCoord = {
   position: Point;
+  connection: { from: Point; to: Point };
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
@@ -230,6 +231,7 @@ export class InteractiveFabricObject<
       );
       return {
         position,
+        connection: control.connectionPositionHandler(position, this, control),
         // Sets the coordinates that determine the interaction area of each control
         // note: if we would switch to ROUND corner area, all of this would disappear.
         // everything would resolve to a single point and a pythagorean theorem for the distance
@@ -405,36 +407,6 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size object size x = width, y = height
-   */
-  drawControlsConnectingLines(
-    ctx: CanvasRenderingContext2D,
-    size: Point
-  ): void {
-    let shouldStroke = false;
-
-    ctx.beginPath();
-    this.forEachControl((control, key) => {
-      // in this moment, the ctx is centered on the object.
-      // width and height of the above function are the size of the bbox.
-      if (control.withConnection && control.getVisibility(this, key)) {
-        // reset movement for each control
-        shouldStroke = true;
-        ctx.moveTo(control.x * size.x, control.y * size.y);
-        ctx.lineTo(
-          control.x * size.x + control.offsetX,
-          control.y * size.y + control.offsetY
-        );
-      }
-    });
-    shouldStroke && ctx.stroke();
-  }
-
-  /**
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
@@ -463,8 +435,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        const { position } = this.controlCoords[key];
-        control.render(ctx, position.x, position.y, options, this);
+        control.renderControl(ctx, this.oCoords[key], options, this);
       }
     });
     ctx.restore();

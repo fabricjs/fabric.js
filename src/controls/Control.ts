@@ -5,6 +5,7 @@ import {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { TControlCoord } from '../shapes/Object/InteractiveObject';
 import type { FabricObject } from '../shapes/Object/Object';
 import { TDegree, TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
@@ -287,6 +288,28 @@ export class Control {
   }
 
   /**
+   *
+   * @param position control center, result of {@link positionHandler}
+   * @param dim
+   * @param finalMatrix
+   * @param fabricObject
+   * @param currentControl
+   * @returns
+   */
+  connectionPositionHandler(
+    position: Point,
+    dim: Point,
+    finalMatrix: TMat2D,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
+    return {
+      from: new Point(this.x * dim.x, this.y * dim.y).transform(finalMatrix),
+      to: position,
+    };
+  }
+
+  /**
    * Returns the coords for this control based on object values.
    * @param {Number} objectAngle angle from the fabric object holding the control
    * @param {Number} objectCornerSize cornerSize from the fabric object holding the control (or touchCornerSize if
@@ -325,45 +348,80 @@ export class Control {
   }
 
   /**
+   * Override to customize connection line rendering
+   * @param ctx
+   * @param from the value returned from {@link connectionPositionHandler}
+   * @param to the control
+   * @param styleOverride
+   * @param fabricObject
+   */
+  renderConnection(
+    ctx: CanvasRenderingContext2D,
+    { from, to }: { from: Point; to: Point },
+    styleOverride: Pick<
+      ControlRenderingStyleOverride,
+      'borderColor' | 'borderDashArray'
+    > = {},
+    fabricObject: FabricObject
+  ) {
+    ctx.save();
+    ctx.strokeStyle = styleOverride.borderColor || fabricObject.borderColor;
+    fabricObject._setLineDash(
+      ctx,
+      styleOverride.borderDashArray || fabricObject.borderDashArray
+    );
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
    * Render function for the control.
    * When this function runs the context is unscaled. unrotate. Just retina scaled.
-   * all the functions will have to translate to the point left,top before starting Drawing
+   * all the functions will have to translate to the control center ({@link x}, {@link y}) before starting drawing
    * if they want to draw a control where the position is detected.
-   * left and top are the result of the positionHandler function
+   * @see {@link renderControl} for customization of rendering
    * @param {RenderingContext2D} ctx the context where the control will be drawn
-   * @param {Number} left position of the canvas where we are about to render the control.
-   * @param {Number} top position of the canvas where we are about to render the control.
+   * @param {number} x control center x, result of {@link positionHandler}
+   * @param {number} y control center y, result of {@link positionHandler}
    * @param {Object} styleOverride
    * @param {FabricObject} fabricObject the object where the control is about to be rendered
    */
   render(
     ctx: CanvasRenderingContext2D,
-    left: number,
-    top: number,
-    styleOverride: ControlRenderingStyleOverride | undefined,
+    x: number,
+    y: number,
+    styleOverride: ControlRenderingStyleOverride = {},
     fabricObject: FabricObject
   ) {
-    styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
       case 'circle':
-        renderCircleControl.call(
-          this,
-          ctx,
-          left,
-          top,
-          styleOverride,
-          fabricObject
-        );
+        renderCircleControl.call(this, ctx, x, y, styleOverride, fabricObject);
         break;
       default:
-        renderSquareControl.call(
-          this,
-          ctx,
-          left,
-          top,
-          styleOverride,
-          fabricObject
-        );
+        renderSquareControl.call(this, ctx, x, y, styleOverride, fabricObject);
     }
+  }
+
+  /**
+   * In charge of rendering all control visuals
+   * @param {RenderingContext2D} ctx the retina scaled context where the control will be drawn
+   * @param {Point} position coordinate where the control center should be, returned by {@link positionHandler}
+   * @param {Object} styleOverride
+   * @param {FabricObject} fabricObject the object where the control is about to be rendered
+   */
+  renderControl(
+    ctx: CanvasRenderingContext2D,
+    { position, connection }: TControlCoord,
+    styleOverride: ControlRenderingStyleOverride = {},
+    fabricObject: FabricObject
+  ) {
+    if (this.withConnection) {
+      this.renderConnection(ctx, connection, styleOverride, fabricObject);
+    }
+    this.render(ctx, position.x, position.y, styleOverride, fabricObject);
   }
 }

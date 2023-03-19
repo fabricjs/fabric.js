@@ -253,59 +253,59 @@
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
     cObj.setCoords();
-    assert.equal(cObj.oCoords.tl.x, 150);
-    assert.equal(cObj.oCoords.tl.y, 150);
-    assert.equal(cObj.oCoords.tr.x, 250);
-    assert.equal(cObj.oCoords.tr.y, 150);
-    assert.equal(cObj.oCoords.bl.x, 150);
-    assert.equal(cObj.oCoords.bl.y, 250);
-    assert.equal(cObj.oCoords.br.x, 250);
-    assert.equal(cObj.oCoords.br.y, 250);
-    assert.equal(cObj.oCoords.mtr.x, 200);
-    assert.equal(cObj.oCoords.mtr.y, 110);
+    assert.equal(cObj.oCoords.tl.position.x, 150);
+    assert.equal(cObj.oCoords.tl.position.y, 150);
+    assert.equal(cObj.oCoords.tr.position.x, 250);
+    assert.equal(cObj.oCoords.tr.position.y, 150);
+    assert.equal(cObj.oCoords.bl.position.x, 150);
+    assert.equal(cObj.oCoords.bl.position.y, 250);
+    assert.equal(cObj.oCoords.br.position.x, 250);
+    assert.equal(cObj.oCoords.br.position.y, 250);
+    assert.equal(cObj.oCoords.mtr.position.x, 200);
+    assert.equal(cObj.oCoords.mtr.position.y, 110);
 
     cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.x, 150);
-    assert.equal(cObj.oCoords.tl.y, 150);
-    assert.equal(cObj.oCoords.tr.x, 250);
-    assert.equal(cObj.oCoords.tr.y, 150);
-    assert.equal(cObj.oCoords.bl.x, 150);
-    assert.equal(cObj.oCoords.bl.y, 250);
-    assert.equal(cObj.oCoords.br.x, 250);
-    assert.equal(cObj.oCoords.br.y, 250);
-    assert.equal(cObj.oCoords.mtr.x, 200);
-    assert.equal(cObj.oCoords.mtr.y, 110);
+    assert.equal(cObj.oCoords.tl.position.x, 150);
+    assert.equal(cObj.oCoords.tl.position.y, 150);
+    assert.equal(cObj.oCoords.tr.position.x, 250);
+    assert.equal(cObj.oCoords.tr.position.y, 150);
+    assert.equal(cObj.oCoords.bl.position.x, 150);
+    assert.equal(cObj.oCoords.bl.position.y, 250);
+    assert.equal(cObj.oCoords.br.position.x, 250);
+    assert.equal(cObj.oCoords.br.position.y, 250);
+    assert.equal(cObj.oCoords.mtr.position.x, 200);
+    assert.equal(cObj.oCoords.mtr.position.y, 110);
 
     // recalculate coords
     cObj.setCoords();
 
     // check that coords are now updated
-    assert.equal(cObj.oCoords.tl.x, 250);
-    assert.equal(cObj.oCoords.tl.y, 250);
-    assert.equal(cObj.oCoords.tr.x, 350);
-    assert.equal(cObj.oCoords.tr.y, 250);
-    assert.equal(cObj.oCoords.bl.x, 250);
-    assert.equal(cObj.oCoords.bl.y, 350);
-    assert.equal(cObj.oCoords.br.x, 350);
-    assert.equal(cObj.oCoords.br.y, 350);
-    assert.equal(cObj.oCoords.mtr.x, 300);
-    assert.equal(cObj.oCoords.mtr.y, 210);
+    assert.equal(cObj.oCoords.tl.position.x, 250);
+    assert.equal(cObj.oCoords.tl.position.y, 250);
+    assert.equal(cObj.oCoords.tr.position.x, 350);
+    assert.equal(cObj.oCoords.tr.position.y, 250);
+    assert.equal(cObj.oCoords.bl.position.x, 250);
+    assert.equal(cObj.oCoords.bl.position.y, 350);
+    assert.equal(cObj.oCoords.br.position.x, 350);
+    assert.equal(cObj.oCoords.br.position.y, 350);
+    assert.equal(cObj.oCoords.mtr.position.x, 300);
+    assert.equal(cObj.oCoords.mtr.position.y, 210);
 
     cObj.set('padding', 25);
     cObj.setCoords();
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.x, 225, 'setCoords tl.x padding');
-    assert.equal(cObj.oCoords.tl.y, 225, 'setCoords tl.y padding');
-    assert.equal(cObj.oCoords.tr.x, 375, 'setCoords tr.x padding');
-    assert.equal(cObj.oCoords.tr.y, 225, 'setCoords tr.y padding');
-    assert.equal(cObj.oCoords.bl.x, 225, 'setCoords bl.x padding');
-    assert.equal(cObj.oCoords.bl.y, 375, 'setCoords bl.y padding');
-    assert.equal(cObj.oCoords.br.x, 375, 'setCoords br.x padding');
-    assert.equal(cObj.oCoords.br.y, 375, 'setCoords br.y padding');
-    assert.equal(cObj.oCoords.mtr.x, 300, 'setCoords mtr.x padding');
-    assert.equal(cObj.oCoords.mtr.y, 185, 'setCoords mtr.y padding');
+    assert.equal(cObj.oCoords.tl.position.x, 225, 'setCoords tl.position.x padding');
+    assert.equal(cObj.oCoords.tl.position.y, 225, 'setCoords tl.position.y padding');
+    assert.equal(cObj.oCoords.tr.position.x, 375, 'setCoords tr.position.x padding');
+    assert.equal(cObj.oCoords.tr.position.y, 225, 'setCoords tr.position.y padding');
+    assert.equal(cObj.oCoords.bl.position.x, 225, 'setCoords bl.position.x padding');
+    assert.equal(cObj.oCoords.bl.position.y, 375, 'setCoords bl.position.y padding');
+    assert.equal(cObj.oCoords.br.position.x, 375, 'setCoords br.position.x padding');
+    assert.equal(cObj.oCoords.br.position.y, 375, 'setCoords br.position.y padding');
+    assert.equal(cObj.oCoords.mtr.position.x, 300, 'setCoords mtr.position.x padding');
+    assert.equal(cObj.oCoords.mtr.position.y, 185, 'setCoords mtr.position.y padding');
   });
 
   QUnit.test.skip('setCoords and aCoords', function(assert) {
@@ -315,16 +315,16 @@
     };
     cObj.setCoords();
 
-    assert.equal(cObj.oCoords.tl.x, 300, 'oCoords are modified by viewportTransform tl.x');
-    assert.equal(cObj.oCoords.tl.y, 300, 'oCoords are modified by viewportTransform tl.y');
-    assert.equal(cObj.oCoords.tr.x, 500, 'oCoords are modified by viewportTransform tr.x');
-    assert.equal(cObj.oCoords.tr.y, 300, 'oCoords are modified by viewportTransform tr.y');
-    assert.equal(cObj.oCoords.bl.x, 300, 'oCoords are modified by viewportTransform bl.x');
-    assert.equal(cObj.oCoords.bl.y, 500, 'oCoords are modified by viewportTransform bl.y');
-    assert.equal(cObj.oCoords.br.x, 500, 'oCoords are modified by viewportTransform br.x');
-    assert.equal(cObj.oCoords.br.y, 500, 'oCoords are modified by viewportTransform br.y');
-    assert.equal(cObj.oCoords.mtr.x, 400, 'oCoords are modified by viewportTransform mtr.x');
-    assert.equal(cObj.oCoords.mtr.y, 260, 'oCoords are modified by viewportTransform mtr.y');
+    assert.equal(cObj.oCoords.tl.position.x, 300, 'oCoords are modified by viewportTransform tl.position.x');
+    assert.equal(cObj.oCoords.tl.position.y, 300, 'oCoords are modified by viewportTransform tl.position.y');
+    assert.equal(cObj.oCoords.tr.position.x, 500, 'oCoords are modified by viewportTransform tr.position.x');
+    assert.equal(cObj.oCoords.tr.position.y, 300, 'oCoords are modified by viewportTransform tr.position.y');
+    assert.equal(cObj.oCoords.bl.position.x, 300, 'oCoords are modified by viewportTransform bl.position.x');
+    assert.equal(cObj.oCoords.bl.position.y, 500, 'oCoords are modified by viewportTransform bl.position.y');
+    assert.equal(cObj.oCoords.br.position.x, 500, 'oCoords are modified by viewportTransform br.position.x');
+    assert.equal(cObj.oCoords.br.position.y, 500, 'oCoords are modified by viewportTransform br.position.y');
+    assert.equal(cObj.oCoords.mtr.position.x, 400, 'oCoords are modified by viewportTransform mtr.position.x');
+    assert.equal(cObj.oCoords.mtr.position.y, 260, 'oCoords are modified by viewportTransform mtr.position.y');
 
     assert.equal(cObj.aCoords.tl.x, 150, 'aCoords do not interfere with viewportTransform');
     assert.equal(cObj.aCoords.tl.y, 150, 'aCoords do not interfere with viewportTransform');
