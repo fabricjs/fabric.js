@@ -4,7 +4,11 @@ import { mapValues } from '../util/internals';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { invertTransform } from '../util/misc/matrix';
 import { calcBaseChangeMatrix } from '../util/misc/planeChange';
-import { calcVectorRotation, createVector } from '../util/misc/vectors';
+import {
+  calcAngleBetweenVectors,
+  calcVectorRotation,
+  createVector,
+} from '../util/misc/vectors';
 
 /**
  * This class is in an abstraction allowing us to operate inside a plane with origin values [-0.5, 0.5]
@@ -48,8 +52,24 @@ export class PlaneBBox {
     return new Point(width, height);
   }
 
-  static calcRotation({ tl, tr }: Record<'tl' | 'tr' | 'bl' | 'br', Point>) {
-    return calcVectorRotation(createVector(tl, tr));
+  /**
+   * Calculates rotation for each side vector from the x axis of the viewport
+   * @param param0 coords
+   * @returns
+   */
+  static calcRotation({
+    tl,
+    tr,
+    bl,
+  }: Record<'tl' | 'tr' | 'bl' | 'br', Point>) {
+    const sideVectorX = createVector(tl, tr);
+    const sideVectorY = createVector(tl, bl);
+    const rotationFromXAxis = calcVectorRotation(createVector(tl, tr));
+    const yIsFlipped = calcAngleBetweenVectors(sideVectorY, sideVectorX) > 0;
+    return new Point(
+      rotationFromXAxis,
+      rotationFromXAxis + (yIsFlipped ? Math.PI : 0)
+    );
   }
 
   getRotation() {

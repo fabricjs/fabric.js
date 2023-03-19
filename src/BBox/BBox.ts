@@ -109,14 +109,14 @@ export class BBox extends ViewportBBox {
     const rotation = this.calcRotation(coords);
     const center = coords.tl.midPointFrom(coords.br);
     const bbox = makeBoundingBoxFromPoints(
-      Object.values(coords).map((coord) => coord.rotate(-rotation, center))
+      Object.values(coords).map((coord) => coord.rotate(-rotation.x, center))
     );
     const transform = calcBaseChangeMatrix(
       undefined,
       [
-        // flipX is taken into consideration in `rotation`
-        new Point(bbox.width, 0).rotate(rotation),
-        new Point(0, bbox.height * (target.flipY ? -1 : 1)).rotate(rotation),
+        // flipX/Y are taken into consideration in `rotation`
+        new Point(bbox.width, 0).rotate(rotation.x),
+        new Point(0, bbox.height).rotate(rotation.y),
       ],
       center
     );
@@ -129,7 +129,7 @@ export class BBox extends ViewportBBox {
     const center = coords.tl.midPointFrom(coords.br);
     const viewportBBox = makeBoundingBoxFromPoints(Object.values(coords));
     const rotatedBBox = makeBoundingBoxFromPoints(
-      Object.values(coords).map((coord) => coord.rotate(-rotation, center))
+      Object.values(coords).map((coord) => coord.rotate(-rotation.x, center))
     );
     const bboxTransform = calcBaseChangeMatrix(
       undefined,
@@ -145,12 +145,11 @@ export class BBox extends ViewportBBox {
     const legacyBBox = makeBoundingBoxFromPoints(Object.values(legacyCoords));
     const transform = calcBaseChangeMatrix(
       undefined,
-      [new Point(1, 0).rotate(rotation), new Point(0, 1).rotate(rotation)],
+      [new Point(1, 0).rotate(rotation.x), new Point(0, 1).rotate(rotation.y)],
       center
     );
     return {
-      angle: radiansToDegrees(rotation),
-      rotation,
+      angle: radiansToDegrees(rotation.x),
       getCoords() {
         return legacyCoords;
       },

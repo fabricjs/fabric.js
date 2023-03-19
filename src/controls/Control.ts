@@ -282,9 +282,11 @@ export class Control {
     // ).transform(finalMatrix);
 
     const bbox = fabricObject.bbox;
+    const rotation = bbox.getRotation();
     return new Point(this.x, this.y)
       .transform(bbox.getTransformation())
-      .add(new Point(this.offsetX, this.offsetY).rotate(bbox.getRotation()));
+      .add(new Point(this.offsetX, 0).rotate(rotation.x))
+      .add(new Point(0, this.offsetY).rotate(rotation.y));
   }
 
   /**
