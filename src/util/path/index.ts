@@ -634,7 +634,7 @@ const pathIterator = (
  * The percentage will be then used to find the correct point on the canvas for the path.
  * @param {Array} segInfo fabricJS collection of information on a parsed path
  * @param {number} distance from starting point, in pixels.
- * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
+ * @return {TPointAngle} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
 const findPercentageForDistance = (
   segInfo: TCurveInfo<'Q' | 'C'>,
@@ -642,9 +642,9 @@ const findPercentageForDistance = (
 ): TPointAngle => {
   let perc = 0,
     tmpLen = 0,
-    tempP = { x: segInfo.x, y: segInfo.y },
-    p: TPointAngle = { ...tempP, angle: 0 },
-    nextLen,
+    tempP: IPoint = { x: segInfo.x, y: segInfo.y },
+    p: IPoint = { ...tempP },
+    nextLen: number,
     nextStep = 0.01,
     lastPerc = 0;
   // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
@@ -652,7 +652,7 @@ const findPercentageForDistance = (
   const iterator = segInfo.iterator,
     angleFinder = segInfo.angleFinder;
   while (tmpLen < distance && nextStep > 0.0001) {
-    p = { ...iterator(perc), angle: 0 };
+    p = iterator(perc);
     lastPerc = perc;
     nextLen = calcLineLength(tempP.x, tempP.y, p.x, p.y);
     // compare tmpLen each cycle with distance, decide next perc to test.
@@ -666,8 +666,7 @@ const findPercentageForDistance = (
       tmpLen += nextLen;
     }
   }
-  p.angle = angleFinder(lastPerc);
-  return p;
+  return { ...p, angle: angleFinder(lastPerc) };
 };
 
 /**
