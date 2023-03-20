@@ -795,7 +795,6 @@ export const getPointOnPath = (
   const segInfo = infos[i],
     segPercent = distance / segInfo.length,
     segment = path[i];
-  let info: TPointAngle;
 
   switch (segInfo.command) {
     case 'M':
@@ -808,7 +807,6 @@ export const getPointOnPath = (
         ),
         angle: Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x),
       };
-      return info;
     case 'L':
       return {
         ...new Point(segInfo.x, segInfo.y).lerp(
