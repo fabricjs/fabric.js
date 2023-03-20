@@ -127,8 +127,12 @@ function skewObject(
   const didChange = target.shearSidesBy(
     [tSides.x, tSides.y],
     [
-      getUnitVector(tSides.y).scalarMultiply(axis === 'y' ? shearing : 0),
-      getUnitVector(tSides.x).scalarMultiply(axis === 'x' ? shearing : 0),
+      axis === 'y'
+        ? getUnitVector(tSides.y).scalarMultiply(shearing)
+        : new Point(),
+      axis === 'x'
+        ? getUnitVector(tSides.x).scalarMultiply(shearing)
+        : new Point(),
     ],
     {
       originX: skewingOrigin.x + 0.5,
