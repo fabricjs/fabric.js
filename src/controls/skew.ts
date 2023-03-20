@@ -4,14 +4,14 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
 import { findCornerQuadrant, isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { BBox } from '../BBox/BBox';
-import { createVector, getOrthonormalVector } from '../util/misc/vectors';
+import { createVector, dotProduct, getUnitVector } from '../util/misc/vectors';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -77,22 +77,26 @@ function skewObject(
   { target, lastX, lastY, originX, originY }: SkewTransform,
   pointer: Point
 ) {
-  const offset = pointer.subtract(new Point(lastX, lastY))[axis];
-  const transformed = BBox.transformed(target).getCoords();
+  const anchorOrigin = resolveOriginPoint(originX, originY);
+  // const offset = dotProduct(pointer.subtract(new Point(lastX, lastY))[axis];
+  const transformed = BBox.transformed(target);
+  const { tl, tr, bl } = transformed.getCoords();
   const tSides = {
-    x: createVector(transformed.tl, transformed.tr),
-    y: createVector(transformed.tl, transformed.bl),
+    x: createVector(tl, tr),
+    y: createVector(tl, bl),
   };
+  const offset = dotProduct(
+    pointer.subtract(new Point(lastX, lastY)),
+    // .subtract(transformed.pointFromOrigin(anchorOrigin)),
+    tSides[axis]
+  );
+  console.log(offset);
   const shearing = 2 * offset;
   return target.shearSidesBy(
     [tSides.x, tSides.y],
     [
-      getOrthonormalVector(tSides.x).scalarMultiply(
-        axis === 'y' ? shearing : 0
-      ),
-      getOrthonormalVector(tSides.y).scalarMultiply(
-        axis === 'x' ? shearing : 0
-      ),
+      getUnitVector(tSides.y).scalarMultiply(axis === 'y' ? shearing : 0),
+      getUnitVector(tSides.x).scalarMultiply(axis === 'x' ? shearing : 0),
     ],
     { originX, originY, inViewport: true }
   );
@@ -162,9 +166,9 @@ function skewHandler(
       ...transform,
       // [originKey]: origin,
       // [counterOriginKey]: 'center',
-      originX: 'center',
-      originY: 'center',
-      skewingSide,
+      // originX: 'center',
+      // originY: 'center',
+      // skewingSide,
     },
     x,
     y
