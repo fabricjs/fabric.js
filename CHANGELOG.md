@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
 - perf(): optimize `perPixelTargetFind` [#8770](https://github.com/fabricjs/fabric.js/pull/8770)
 - BREAKING fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
