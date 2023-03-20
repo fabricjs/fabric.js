@@ -74,31 +74,16 @@ function getSkewingDirection(
   transform: { originX: TOriginX; originY: TOriginY },
   pointer: Point
 ) {
-  const {
-    counterAxis,
-    origin: originKey,
-    skew: skewKey,
-    flip: flipKey,
-  } = AXIS_KEYS[axis];
-  const { origin: counterOriginKey, flip: counterFlipKey } =
-      AXIS_KEYS[counterAxis],
-    counterOriginFactor =
-      resolveOrigin(transform[counterOriginKey]) *
-      (target[counterFlipKey] ? -1 : 1),
+  const { counterAxis } = AXIS_KEYS[axis];
+  const { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
+    counterOriginFactor = resolveOrigin(transform[counterOriginKey]),
     // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
     // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
     // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
     // so we factor skewing direction by this value.
-    skewingSide = (-Math.sign(counterOriginFactor) *
-      (target[flipKey] ? -1 : 1)) as 1 | -1,
+    skewingSide = -Math.sign(counterOriginFactor) as 1 | -1,
     skewingDirection =
-      ((target[skewKey] === 0 &&
-        // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
-        pointer.subtract(target.getCenterPoint())[axis] > 0) ||
-      // in case target has skewing we use that as the direction
-      target[skewKey] > 0
-        ? 1
-        : -1) * skewingSide,
+      Math.sign(pointer.subtract(target.getCenterPoint())[axis]) * skewingSide,
     // anchor to the opposite side of the skewing direction
     skewingOrigin = -skewingDirection * 0.5;
 
@@ -152,7 +137,11 @@ function skewObject(
     }
   );
   // we anchor to the origin of the transformed bbox
-  const position = transformed.pointFromOrigin(skewingOrigin);
+  target.setCoords();
+  const position = transformed.pointFromOrigin(
+    // resolveOriginPoint(originX, originY)
+    skewingOrigin
+  );
   const origin = target.bbox.pointToOrigin(position).scalarAdd(0.5);
   return (
     target.translateTo(position.x, position.y, {
