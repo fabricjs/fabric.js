@@ -1107,7 +1107,7 @@ export class Canvas extends SelectableCanvas {
           !target.isEditing &&
           target !== this._activeObject))
     ) {
-      const p = this.getPointer(e);
+      const p = this.getPointer(e, true);
       this._groupSelector = {
         x: p.x,
         y: p.y,
@@ -1208,7 +1208,7 @@ export class Canvas extends SelectableCanvas {
 
     // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
-      const pointer = this.getPointer(e);
+      const pointer = this.getPointer(e, true);
 
       groupSelector.deltaX = pointer.x - groupSelector.x;
       groupSelector.deltaY = pointer.y - groupSelector.y;

@@ -313,7 +313,10 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      */
     collectObjects(
       { left, top, width, height }: TBBox,
-      { includeIntersecting = true }: { includeIntersecting?: boolean } = {}
+      {
+        includeIntersecting = true,
+        inViewport = true,
+      }: { includeIntersecting?: boolean; inViewport?: boolean } = {}
     ) {
       const objects: BaseFabricObject[] = [],
         tl = new Point(left, top),
@@ -325,11 +328,11 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         if (
           object.selectable &&
           object.visible &&
-          (object.isContainedWithinRect(tl, br, true) ||
+          (object.isContainedWithinRect(tl, br, !inViewport) ||
             (includeIntersecting &&
-              (object.intersectsWithRect(tl, br, true) ||
-                object.containsPoint(tl, true) ||
-                object.containsPoint(br, true))))
+              (object.intersectsWithRect(tl, br, !inViewport) ||
+                object.containsPoint(tl, !inViewport) ||
+                object.containsPoint(br, !inViewport))))
         ) {
           objects.push(object);
         }

@@ -825,10 +825,8 @@ export class SelectableCanvas<
    */
   _drawSelection(ctx: CanvasRenderingContext2D): void {
     const { x, y, deltaX, deltaY } = this._groupSelector!,
-      start = new Point(x, y).transform(this.viewportTransform),
-      extent = new Point(x + deltaX, y + deltaY).transform(
-        this.viewportTransform
-      ),
+      start = new Point(x, y),
+      extent = new Point(x + deltaX, y + deltaY),
       strokeOffset = this.selectionLineWidth / 2;
     let minX = Math.min(start.x, extent.x),
       minY = Math.min(start.y, extent.y),
