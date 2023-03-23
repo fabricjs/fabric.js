@@ -14,6 +14,7 @@ import { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
@@ -1159,7 +1160,11 @@ export class Canvas extends SelectableCanvas {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
     this._pointer = this.getPointer(e, true);
-    this._absolutePointer = sendPointToPlane(this._pointer, undefined, this.viewportTransform);
+    this._absolutePointer = sendPointToPlane(
+      this._pointer,
+      undefined,
+      this.viewportTransform
+    );
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
