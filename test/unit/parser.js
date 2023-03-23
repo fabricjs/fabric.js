@@ -141,10 +141,11 @@
       return el;
     }
 
-    function getOptions(options) {
-      return fabric.util.object.extend(fabric.util.object.clone({
-        left: 10, top: 20, width: 30, height: 40
-      }), options || { });
+    function getOptions(options = {}) {
+      return {
+        left: 10, top: 20, width: 30, height: 40,
+        ...options,
+      }
     }
 
     var elements = [
@@ -784,8 +785,8 @@
                   '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].clipPath.type, 'polygon');
-      assert.equal(objects[0].clipPath.clipPath.type, 'rect');
+      assert.equal(objects[0].clipPath.constructor.name, 'Polygon');
+      assert.equal(objects[0].clipPath.clipPath.constructor.name, 'Rect');
       done();
     });
   });
@@ -812,7 +813,7 @@
                  '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -826,7 +827,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -843,7 +844,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'image');
+      assert.equal(objects[0].constructor.name, 'Image');
       done();
     });
   });

@@ -24,7 +24,7 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = fabric.getEnv().isLikelyNode
+  var IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -125,11 +125,6 @@
     assert.ok(!areAllTheSame);
   });
 
-  QUnit.test('String.prototype.trim', function(assert) {
-    assert.ok(typeof String.prototype.trim === 'function');
-    assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
@@ -169,92 +164,6 @@
     assert.equal(capitalize('FOO'), 'Foo');
     assert.equal(capitalize('FoobaR'), 'Foobar');
     assert.equal(capitalize('2foo'), '2foo');
-  });
-
-  QUnit.test('fabric.util.object.extend', function(assert) {
-    var extend = fabric.util.object.extend;
-
-    assert.ok(typeof extend === 'function');
-
-    var destination = { x: 1 },
-        source = { y: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 1);
-    assert.equal(destination.y, 2);
-    assert.equal(source.x, undefined);
-    assert.equal(source.y, 2);
-
-    destination = { x: 1 };
-    source = { x: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 2);
-    assert.equal(source.x, 2);
-  });
-
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
-    var extend = fabric.util.object.extend;
-    var d = function() { };
-    var destination = { x: 1 },
-        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
-
-    extend(destination, source, true);
-
-    assert.equal(destination.x, 1, 'x is still in destination');
-    assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
-  });
-
-  QUnit.test('fabric.util.object.clone', function(assert) {
-    var clone = fabric.util.object.clone;
-
-    assert.ok(typeof clone === 'function');
-
-    var obj = { x: 1, y: [1, 2, 3] },
-        _clone = clone(obj);
-
-    assert.equal(_clone.x, 1);
-    assert.notEqual(obj, _clone);
-    assert.equal(_clone.y, obj.y);
-  });
-
-  QUnit.test('Function.prototype.bind', function(assert) {
-    assert.ok(typeof Function.prototype.bind === 'function');
-
-    var obj = { };
-    function fn() {
-      return [this, arguments[0], arguments[1]];
-    }
-
-    var bound = fn.bind(obj);
-    assert.deepEqual([obj, undefined, undefined], bound());
-    assert.deepEqual([obj, 1, undefined], bound(1));
-    assert.deepEqual([obj, 1, null], bound(1, null));
-
-    bound = fn.bind(obj, 1);
-    assert.deepEqual([obj, 1, undefined], bound());
-    assert.deepEqual([obj, 1, 2], bound(2));
-
-    function Point(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    obj = { };
-    var YAxisPoint = Point.bind(obj, 0);
-    var axisPoint = new YAxisPoint(5);
-
-    assert.deepEqual(0, axisPoint.x);
-    assert.deepEqual(5, axisPoint.y);
-
-    assert.ok(axisPoint instanceof Point);
-    // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
   });
 
   QUnit.test('fabric.util.wrapElement', function(assert) {
@@ -475,7 +384,7 @@
   });
 
   // element doesn't seem to have style on node
-  if (!fabric.getEnv().isLikelyNode) {
+  if (!isNode()) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
@@ -619,6 +528,11 @@
     assert.equal(transform.flipX, true);
     assert.equal(transform.flipY, true);
     assert.equal(transform.angle, 30);
+  });
+
+  QUnit.test('isIdentityMatrix', function(assert) {
+    assert.equal(fabric.util.isIdentityMatrix([1, 0, 0, 1, 0, 0]), true, 'is identity');
+    assert.equal(fabric.util.isIdentityMatrix([1, 2, 3, 4, 5, 6]), false, 'is not identity');
   });
 
   QUnit.test('invertTransform', function(assert) {

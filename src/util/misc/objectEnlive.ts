@@ -1,10 +1,10 @@
 import { noop } from '../../constants';
-import type { Gradient } from '../../gradient/gradient.class';
-import type { Pattern } from '../../pattern.class';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
-import { classRegistry } from '../class_registry';
+import { classRegistry } from '../../ClassRegistry';
 
 export type LoadImageOptions = {
   /**

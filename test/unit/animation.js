@@ -40,24 +40,14 @@
     let called = false;
     fabric.util.animateColor({
       startValue: 'red',
-      endValue: 'magenta',
+      endValue: 'blue',
       duration: 96,
       onChange: function (val, changePerc) {
         called && assert.ok(changePerc !== 0, 'change percentage');
         called = true;
       },
-      onComplete: done,
-    });
-  });
-  
-  QUnit.test('animateColor byValue', function (assert) {
-    var done = assert.async();
-    fabric.util.animateColor({
-      startValue: 'red',
-      byValue: 'blue',
-      duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(val, 'rgba(0,0,255,1)', 'color is blue');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -65,14 +55,14 @@
     });
   });
 
-  QUnit.test('animateColor byValue with ignored opacity', function (assert) {
+  QUnit.test('animateColor with opacity', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
-      startValue: 'rgba(255,0,0,0.5)',
-      byValue: 'rgba(0,0,255,0.5)',
+      startValue: 'rgba(255, 0, 0, 0.9)',
+      endValue: 'rgba(0, 0, 255, 0.7)',
       duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
+        assert.equal(val, 'rgba(0,0,255,0.7)', 'color is animated on all 4 values');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -80,32 +70,17 @@
     });
   });
 
-  QUnit.test('animateColor byValue with opacity', function (assert) {
+  QUnit.test('animateColor, opacity out of bounds value are ignored', function (assert) {
     var done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
-      byValue: [0, 0, 255, -0.5],
-      duration: 16,
-      onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,0,255,0.5)', 'color is magenta');
-        assert.equal(changePerc, 1, 'change percentage is 100%');
-        assert.equal(timePerc, 1, 'time percentage is 100%');
-        done();
-      }
-    });
-  });
-
-  QUnit.test('animateColor byValue with wrong opacity is ignored', function (assert) {
-    var done = assert.async();
-    fabric.util.animateColor({
-      startValue: 'red',
-      byValue: [0, 0, 255, 0.5],
+      endValue: [255, 255, 255, 3],
       duration: 16,
       onChange: val => {
         assert.equal(new fabric.Color(val).getAlpha(), 1, 'alpha diff should be ignored')
       },
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 'rgba(255,0,255,1)', 'color is magenta');
+        assert.equal(val, 'rgba(255,255,255,1)', 'color is normalized to max values');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -113,15 +88,36 @@
     });
   });
 
-  QUnit.test('byValue', function (assert) {
+  QUnit.test('animateColor opacity only', function (assert) {
+    var done = assert.async();
+    let called = false;
+    fabric.util.animateColor({
+      startValue: 'rgba(255, 0, 0, 0.9)',
+      endValue: 'rgba(255, 0, 0, 0.7)',
+      duration: 96,
+      onChange: function (val, changePerc) {
+        const alpha = new fabric.Color(val).getAlpha();
+        assert.equal(changePerc, (0.9 - alpha) / (0.9 - 0.7), 'valueProgress should match');
+        called = true;
+      },
+      onComplete: function (val, changePerc, timePerc) {
+        assert.equal(val, 'rgba(255,0,0,0.7)', 'color is animated on all 4 values');
+        assert.equal(changePerc, 1, 'change percentage is 100%');
+        assert.equal(timePerc, 1, 'time percentage is 100%');
+        assert.ok(called);
+        done();
+      }
+    });
+  });
+
+  QUnit.test('endValue', function (assert) {
     var done = assert.async();
     fabric.util.animate({
-      startValue: 0,
-      byValue: 10,
+      startValue: 2,
       endValue: 5,
       duration: 16,
       onComplete: function (val, changePerc, timePerc) {
-        assert.equal(val, 10, 'endValue is ignored');
+        assert.equal(val, 5, 'endValue is respected');
         assert.equal(changePerc, 1, 'change percentage is 100%');
         assert.equal(timePerc, 1, 'time percentage is 100%');
         done();
@@ -273,8 +269,9 @@
 
     assert.ok(typeof object.animate === 'function');
 
-    object.animate('left', 40);
-    assert.ok(true, 'animate without options does not crash');
+    const context = object.animate({ left: 40 });
+    assert.deepEqual(Object.keys(context), ['left'], 'should return a map of animation classes');
+    assert.equal(context.left.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
     assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
     assert.equal(fabric.runningAnimations[0].target, object, 'animation.target should be set');
 
@@ -290,7 +287,7 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    object.animate('left', '+=40');
+    object.animate({ left: object.left + 40 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
@@ -304,7 +301,7 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43, shadow: { offsetX: 20 } });
 
-    object.animate('shadow.offsetX', 100);
+    object.animate({ 'shadow.offsetX': 100 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
@@ -314,12 +311,13 @@
   });
 
   QUnit.test('animate with color', function(assert) {
-    var done = assert.async(), properties = fabric.Object.prototype.colorProperties,
-        object = new fabric.Object();
+    var done = assert.async(),
+        object = new fabric.Object(),
+        properties = fabric.Object.getDefaults().colorProperties;
 
     properties.forEach(function (prop, index) {
       object.set(prop, 'red');
-      object.animate(prop, 'blue');
+      object.animate({ [prop]: 'blue' });
       assert.ok(true, 'animate without options does not crash');
       assert.equal(fabric.runningAnimations.length, index + 1, 'should have 1 registered animation');
       assert.equal(findAnimationsByTarget(object).length, index + 1, 'animation.target should be set');
@@ -338,7 +336,7 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
 
-    object.animate('left', '-=40');
+    object.animate({ left: object.left - 40 });
     assert.ok(true, 'animate without options does not crash');
 
     setTimeout(function() {
@@ -348,27 +346,13 @@
     }, 1000);
   });
 
-  QUnit.test('animate with object', function(assert) {
-    var done = assert.async();
-    var object = new fabric.Object({ left: 20, top: 30, width: 40, height: 50, angle: 43 });
-
-    assert.ok(typeof object.animate === 'function');
-
-    object.animate({ left: 40});
-    assert.ok(true, 'animate without options does not crash');
-    assert.equal(fabric.runningAnimations.length, 1, 'should have 1 registered animation');
-    assert.equal(findAnimationsByTarget(object).length, 1, 'animation.target should be set');
-
-    setTimeout(function() {
-      assert.equal(40, Math.round(object.left));
-      done();
-    }, 1000);
-  });
-
   QUnit.test('animate multiple properties', function(assert) {
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
-    object.animate({ left: 223, top: 224 });
+    const context = object.animate({ left: 223, top: 224 });
+    assert.deepEqual(Object.keys(context), ['left', 'top'], 'should return a map of animation classes');
+    assert.equal(context.left.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
+    assert.equal(context.top.constructor.name, 'ValueAnimation', 'should be instance of ValueAnimation');
     setTimeout(function() {
       assert.equal(223, Math.round(object.get('left')));
       assert.equal(224, Math.round(object.get('top')));
@@ -399,7 +383,7 @@
       assert.equal(Math.round(object.get('top')), 1);
 
       assert.ok(changedInvocations > 0);
-      assert.equal(completeInvocations, 1);
+      assert.equal(completeInvocations, 2, 'the callbacks get call for each animation');
 
       done();
 
@@ -413,23 +397,24 @@
     fabric.util.animate({
       startValue: [1, 2, 3],
       endValue: [2, 4, 6],
-      byValue: [1, 2, 3],
       duration: 96,
-      onChange: function(currentValue) {
+      onChange: function(currentValue, valueProgress) {
         assert.equal(fabric.runningAnimations.length, 1, 'runningAnimations should not be empty');
         assert.ok(Array.isArray(currentValue), 'should be array');
-        assert.ok(fabric.runningAnimations[0].value !== currentValue, 'should not share array');
+        assert.ok(Object.isFrozen(fabric.runningAnimations[0].value), 'should be frozen');
         assert.deepEqual(fabric.runningAnimations[0].value, currentValue);
         assert.equal(currentValue.length, 3);
         currentValue.forEach(function(v) {
           assert.ok(v > 0, 'confirm values are not invalid numbers');
         })
+        assert.equal(valueProgress, currentValue[0] - 1, 'should match');
         // Make sure mutations are not kept
         assert.ok(currentValue[0] <= 2, 'mutating callback values must not persist');
         currentValue[0] = 200;
         run = true;
       },
-      onComplete: function(endValue) {
+      onComplete: function (endValue) {
+        assert.ok(Object.isFrozen(endValue), 'should be frozen');
         assert.equal(endValue.length, 3);
         assert.deepEqual(endValue, [2, 4, 6]);
         assert.equal(run, true, 'something run');
@@ -442,14 +427,14 @@
     var done = assert.async();
     var object = new fabric.Object({ left: 123, top: 124 });
 
-    var context; 
+    var context;
     object.animate({ left: 223, top: 224 }, {
       abort: function() {
         context = this;
         return true;
       }
     });
-    
+
     setTimeout(function() {
       assert.equal(123, Math.round(object.get('left')));
       assert.equal(124, Math.round(object.get('top')));

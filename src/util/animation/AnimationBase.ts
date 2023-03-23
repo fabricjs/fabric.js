@@ -5,9 +5,7 @@ import { defaultEasing } from './easing';
 import {
   AnimationState,
   TAbortCallback,
-  TAnimationBaseOptions,
-  TAnimationCallbacks,
-  TAnimationValues,
+  TBaseAnimationOptions,
   TEasingFunction,
   TOnAnimationChangeCallback,
 } from './types';
@@ -17,49 +15,44 @@ const defaultAbort = () => false;
 export abstract class AnimationBase<
   T extends number | number[] = number | number[]
 > {
-  readonly startValue: T;
-  readonly byValue: T;
-  readonly endValue: T;
-  readonly duration: number;
-  readonly delay: number;
-  protected readonly easing: TEasingFunction<T>;
+  declare readonly startValue: T;
+  declare readonly endValue: T;
+  declare readonly duration: number;
+  declare readonly delay: number;
 
-  private readonly _onStart: VoidFunction;
-  private readonly _onChange: TOnAnimationChangeCallback<T, void>;
-  private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
-  private readonly _abort: TAbortCallback<T>;
+  protected declare readonly byValue: T;
+  protected declare readonly easing: TEasingFunction<T>;
+
+  private declare readonly _onStart: VoidFunction;
+  private declare readonly _onChange: TOnAnimationChangeCallback<T, void>;
+  private declare readonly _onComplete: TOnAnimationChangeCallback<T, void>;
+  private declare readonly _abort: TAbortCallback<T>;
 
   /**
    * Used to register the animation to a target object
    * so that it can be cancelled within the object context
    */
-  readonly target?: unknown;
+  declare readonly target?: unknown;
 
   private _state: AnimationState = 'pending';
   /**
    * Time %, or the ratio of `timeElapsed / duration`
    * @see tick
    */
-  durationRatio = 0;
+  durationProgress = 0;
   /**
    * Value %, or the ratio of `(currentValue - startValue) / (endValue - startValue)`
    */
-  valueRatio = 0;
+  valueProgress = 0;
   /**
    * Current value
    */
-  value: T;
+  declare value: T;
   /**
    * Animation start time ms
    */
-  private startTime!: number;
+  private declare startTime: number;
 
-  /**
-   * Constructor
-   * Since both `byValue` and `endValue` are accepted in subclass options
-   * and are populated with defaults if missing, we defer to `byValue` and
-   * ignore `endValue` to avoid conflict
-   */
   constructor({
     startValue,
     byValue,
@@ -71,8 +64,7 @@ export abstract class AnimationBase<
     onComplete = noop,
     abort = defaultAbort,
     target,
-  }: Partial<TAnimationBaseOptions<T> & TAnimationCallbacks<T>> &
-    Required<Omit<TAnimationValues<T>, 'endValue'>>) {
+  }: TBaseAnimationOptions<T>) {
     this.tick = this.tick.bind(this);
 
     this.duration = duration;
@@ -87,11 +79,15 @@ export abstract class AnimationBase<
     this.startValue = startValue;
     this.byValue = byValue;
     this.value = this.startValue;
-    this.endValue = this.calculate(this.duration).value;
+    this.endValue = Object.freeze(this.calculate(this.duration).value);
   }
 
   get state() {
     return this._state;
+  }
+
+  isDone() {
+    return this._state === 'aborted' || this._state === 'completed';
   }
 
   /**
@@ -101,7 +97,7 @@ export abstract class AnimationBase<
    */
   protected abstract calculate(timeElapsed: number): {
     value: T;
-    changeRatio: number;
+    valueProgress: number;
   };
 
   start() {
@@ -127,29 +123,30 @@ export abstract class AnimationBase<
   private tick(t: number) {
     const durationMs = (t || +new Date()) - this.startTime;
     const boundDurationMs = Math.min(durationMs, this.duration);
-    this.durationRatio = boundDurationMs / this.duration;
-    const { value, changeRatio } = this.calculate(boundDurationMs);
-    this.value = Array.isArray(value) ? (value.slice() as T) : value;
-    this.valueRatio = changeRatio;
+    this.durationProgress = boundDurationMs / this.duration;
+    const { value, valueProgress } = this.calculate(boundDurationMs);
+    this.value = Object.freeze(value);
+    this.valueProgress = valueProgress;
 
     if (this._state === 'aborted') {
       return;
-    } else if (this._abort(value, this.valueRatio, this.durationRatio)) {
+    } else if (
+      this._abort(this.value, this.valueProgress, this.durationProgress)
+    ) {
       this._state = 'aborted';
       this.unregister();
     } else if (durationMs >= this.duration) {
-      const endValue = this.endValue;
-      this.durationRatio = this.valueRatio = 1;
-      this._onChange(
-        (Array.isArray(endValue) ? endValue.slice() : endValue) as T,
-        this.valueRatio,
-        this.durationRatio
-      );
+      this.durationProgress = this.valueProgress = 1;
+      this._onChange(this.endValue, this.valueProgress, this.durationProgress);
       this._state = 'completed';
-      this._onComplete(endValue, this.valueRatio, this.durationRatio);
+      this._onComplete(
+        this.endValue,
+        this.valueProgress,
+        this.durationProgress
+      );
       this.unregister();
     } else {
-      this._onChange(value, this.valueRatio, this.durationRatio);
+      this._onChange(this.value, this.valueProgress, this.durationProgress);
       requestAnimFrame(this.tick);
     }
   }
