@@ -13,7 +13,6 @@ import {
 import {
   addTransformToObject,
   resetObjectTransform,
-  saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { isCollection } from '../util/types';
@@ -739,7 +738,7 @@ export class SelectableCanvas<
 
   /**
    * This method will take in consideration a modifier key pressed and the control we are
-   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
+   * about to drag, and try to guess the anchor point ( origin ) of the transformation.
    * This should be really in the realm of controls, and we should remove specific code for legacy
    * embedded actions.
    * @TODO this probably deserve discussion/rediscovery and change/refactor
@@ -778,7 +777,7 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
@@ -790,55 +789,36 @@ export class SelectableCanvas<
     }
     const pointer = this.getPointer(e, true);
     const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
+      control = corner ? target.controls[corner] : undefined,
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = (
-        control ? new Point(-control.x, -control.y) : new Point()
-      ).scalarAdd(0.5),
       altKey = e[this.centeredKey as ModifierKey],
-      offset = pointer.subtract(target.getXY('left', 'top')),
-      /**
-       * relative to viewport
-       **/
-      transform: Transform = {
-        target: target,
-        action: action,
-        actionHandler,
-        actionPerformed: false,
-        corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: offset.x,
-        offsetY: offset.x,
-        originX: origin.x,
-        originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: target.getTotalAngle(),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey: altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
+      origin = (
+        control && !this._shouldCenterTransform(target, action, altKey)
+          ? new Point(-control.x, -control.y)
+          : new Point()
+      ).scalarAdd(0.5);
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
-    }
-    this._currentTransform = transform;
+    this._currentTransform = {
+      target,
+      action,
+      actionHandler,
+      actionPerformed: false,
+      corner,
+      control,
+      originX: origin.x,
+      originY: origin.y,
+      ex: pointer.x,
+      ey: pointer.y,
+      lastX: pointer.x,
+      lastY: pointer.y,
+      theta: target.getTotalAngle(),
+      shiftKey: e.shiftKey,
+      altKey,
+    };
     // @ts-ignore
     this._beforeTransform(e);
   }
