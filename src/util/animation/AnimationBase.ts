@@ -18,6 +18,7 @@ export abstract class AnimationBase<
   declare readonly startValue: T;
   declare readonly endValue: T;
   declare readonly duration: number;
+  declare readonly startOffset: number;
   declare readonly delay: number;
 
   protected declare readonly byValue: T;
@@ -58,6 +59,7 @@ export abstract class AnimationBase<
     byValue,
     duration = 500,
     delay = 0,
+    startOffset = 0,
     easing = defaultEasing,
     onStart = noop,
     onChange = noop,
@@ -69,6 +71,7 @@ export abstract class AnimationBase<
 
     this.duration = duration;
     this.delay = delay;
+    this.startOffset = startOffset;
     this.easing = easing;
     this._onStart = onStart;
     this._onChange = onChange;
@@ -121,7 +124,7 @@ export abstract class AnimationBase<
   }
 
   private tick(t: number) {
-    const durationMs = (t || +new Date()) - this.startTime;
+    const durationMs = (t || +new Date()) - this.startTime + this.startOffset;
     const boundDurationMs = Math.min(durationMs, this.duration);
     this.durationProgress = boundDurationMs / this.duration;
     const { value, valueProgress } = this.calculate(boundDurationMs);
