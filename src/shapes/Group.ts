@@ -20,6 +20,7 @@ import { classRegistry } from '../ClassRegistry';
 
 export type LayoutContextType =
   | 'initialization'
+  | 'viewport'
   | 'object_modified'
   | 'added'
   | 'removed'
@@ -296,6 +297,11 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       this.forEachObject((object) => {
         object._set(key, value);
       });
+      // layout in case children need viewport coords
+      value &&
+        this._applyLayoutStrategy({
+          type: 'viewport',
+        });
     }
     if (key === 'layout' && prev !== value) {
       this._applyLayoutStrategy({
@@ -674,7 +680,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       layoutDirective === 'fit-content' ||
       layoutDirective === 'fit-content-lazy' ||
       (layoutDirective === 'fixed' &&
-        (context.type === 'initialization' || context.type === 'imperative'))
+        (context.type === 'initialization' ||
+          context.type === 'viewport' ||
+          context.type === 'imperative'))
     ) {
       return this.prepareBoundingBox(layoutDirective, objects, context);
     } else if (layoutDirective === 'clip-path' && this.clipPath) {
@@ -682,7 +690,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       const clipPathSizeAfter = clipPath.getDimensionsVectorForLayout();
       if (
         clipPath.absolutePositioned &&
-        (context.type === 'initialization' || context.type === 'layout_change')
+        (context.type === 'initialization' ||
+          context.type === 'viewport' ||
+          context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
         let clipPathCenter = clipPath.getRelativeCenterPoint();
@@ -708,6 +718,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
           );
         if (
           context.type === 'initialization' ||
+          context.type === 'viewport' ||
           context.type === 'layout_change'
         ) {
           const bbox =
@@ -731,7 +742,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
           };
         }
       }
-    } else if (layoutDirective === 'svg' && context.type === 'initialization') {
+    } else if (
+      layoutDirective === 'svg' &&
+      (context.type === 'initialization' || context.type === 'viewport')
+    ) {
       const bbox = this.getObjectsBoundingBox(objects, true) || {};
       return Object.assign(bbox, {
         correctionX: -bbox.offsetX || 0,
