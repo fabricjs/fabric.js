@@ -926,17 +926,7 @@ export class SelectableCanvas<
    * @private
    */
   _checkTarget(obj: FabricObject, globalPointer: Point): boolean {
-    if (
-      obj &&
-      obj.visible &&
-      obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(
-        sendPointToPlane(globalPointer, undefined, this.viewportTransform),
-        true
-      )
-    ) {
+    if (obj && obj.visible && obj.evented && obj.containsPoint(globalPointer)) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
