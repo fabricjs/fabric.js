@@ -1,4 +1,4 @@
-import { changeWidth } from './changeWidth';
+import { changeWidth } from './resize';
 import { Control } from './Control';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
 import { scaleCursorStyleHandler, scalingEqually } from './scale';
