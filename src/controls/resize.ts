@@ -1,3 +1,4 @@
+import { BBox } from '../BBox/BBox';
 import { TPointerEvent, Transform } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { TAxis } from '../typedefs';
@@ -34,12 +35,14 @@ export const resize = (
   x: number,
   y: number
 ) => {
+  // offset is measured relative to the control bbox
   const offset = target.bbox
     .pointToOrigin(new Point(x, y))
     .subtract(resolveOriginPoint(originX, originY));
   const sideVector = UNIT_VECTOR[axis];
   const factor = dotProduct(offset, sideVector);
-  const viewportSide = target.bbox.vectorFromOrigin(
+  // sides are measured using the transformed bbox
+  const viewportSide = BBox.transformed(target).vectorFromOrigin(
     sideVector.scalarMultiply(Math.abs(factor))
   );
   const origin = resolveOrigin({ originX, originY }[AXIS_KEYS[axis].origin]);
