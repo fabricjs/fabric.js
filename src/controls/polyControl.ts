@@ -69,23 +69,18 @@ const anchorWrapper = (
   ) {
     const poly = transform.target as Polyline,
       anchorIndex = (pointIndex > 0 ? pointIndex : poly.points.length) - 1,
-      pointInCanvasPlane = new Point(
-        poly.points[anchorIndex].x - poly.pathOffset.x,
-        poly.points[anchorIndex].y - poly.pathOffset.y
-      ).transform(poly.calcTransformMatrix()),
-      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
-      polygonBaseSize = getSize(poly),
-      adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+      originBefore = new Point(poly.points[anchorIndex])
+        .subtract(poly.pathOffset)
+        .transform(poly.calcTransformMatrix());
 
-    const newPosition = new Point(
-      poly.points[anchorIndex].x,
-      poly.points[anchorIndex].y
-    )
+    const actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y);
+
+    const offset = new Point(poly.points[anchorIndex])
       .subtract(poly.pathOffset)
-      .divide(polygonBaseSize)
-      .multiply(adjustFlip);
+      .transform(poly.calcTransformMatrix())
+      .subtract(originBefore);
+    poly.translate(-offset.x, -offset.y, false);
 
-    poly.setXY(pointInCanvasPlane, newPosition.x + 0.5, newPosition.y + 0.5);
     return actionPerformed;
   };
 };
