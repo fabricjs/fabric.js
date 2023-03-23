@@ -11,10 +11,6 @@ import { sendPointToPlane } from '../util';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
-const getSize = (poly: Polyline) => {
-  return new Point(poly.width, poly.height);
-};
-
 /**
  * This function locates the controls.
  * It'll be used both for drawing and for interaction.
