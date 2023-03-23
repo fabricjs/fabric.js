@@ -23,7 +23,14 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   declare strokeUniform: boolean;
   declare padding: number;
 
-  declare bbox: BBox;
+  private _bbox?: BBox;
+
+  get bbox() {
+    if (!this._bbox) {
+      this._bbox = BBox.rotated(this);
+    }
+    return this._bbox;
+  }
 
   /**
    * A Reference of the Canvas where the object is actually added
@@ -175,7 +182,7 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
   setCoords(): void {
-    this.bbox = BBox.rotated(this);
+    this._bbox = BBox.rotated(this);
 
     // // debug code
     // setTimeout(() => {
