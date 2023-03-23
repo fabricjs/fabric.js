@@ -40,7 +40,7 @@ export const resize = (
   const sideVector = UNIT_VECTOR[axis];
   const factor = dotProduct(offset, sideVector);
   const viewportSide = target.bbox.vectorFromOrigin(
-    sideVector.scalarMultiply(factor)
+    sideVector.scalarMultiply(Math.abs(factor))
   );
   const origin = resolveOrigin({ originX, originY }[AXIS_KEYS[axis].origin]);
 
@@ -59,9 +59,7 @@ export const resize = (
       ),
       undefined,
       target.calcTransformMatrixInViewport()
-    )
-      .scalarSubtract(!target.strokeUniform ? target.strokeWidth : 0)
-      .max(new Point());
+    ).scalarSubtract(!target.strokeUniform ? target.strokeWidth : 0);
     const sizeKey = AXIS_KEYS[axis].size;
     const valueBefore = target[sizeKey];
     target.set(sizeKey, size[axis]);
