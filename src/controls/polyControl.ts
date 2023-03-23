@@ -1,15 +1,13 @@
 import { Point } from '../Point';
 import { Control } from './Control';
 import { TMat2D } from '../typedefs';
-import { iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
-import { multiplyTransformMatrices } from '../util/misc/matrix';
 import {
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { getLocalPoint } from './util';
+import { sendPointToPlane } from '../util';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
@@ -23,14 +21,9 @@ const getSize = (poly: Polyline) => {
  */
 const factoryPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
-    const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
-      y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
-    return new Point(x, y).transform(
-      multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? iMatrix,
-        polyObject.calcTransformMatrix()
-      )
-    );
+    return new Point(polyObject.points[pointIndex])
+      .subtract(polyObject.pathOffset)
+      .transform(polyObject.calcTransformMatrixInViewport());
   };
 };
 
@@ -49,18 +42,13 @@ const polyActionHandler = (
 ) => {
   const poly = transform.target as Polyline,
     pointIndex = transform.pointIndex,
-    mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
-    polygonBaseSize = getSize(poly),
-    size = poly.bbox.sendToParent().getBBoxVector(),
-    sizeFactor = polygonBaseSize.divide(size),
-    adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+    positionInPlane = sendPointToPlane(
+      new Point(x, y),
+      undefined,
+      poly.calcTransformMatrixInViewport()
+    );
 
-  const finalPointPosition = mouseLocalPosition
-    .multiply(adjustFlip)
-    .multiply(sizeFactor)
-    .add(poly.pathOffset);
-
-  poly.points[pointIndex] = finalPointPosition;
+  poly.points[pointIndex] = positionInPlane.add(poly.pathOffset);
   poly.setDimensions();
 
   return true;
