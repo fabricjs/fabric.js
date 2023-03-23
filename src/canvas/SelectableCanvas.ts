@@ -16,7 +16,7 @@ import {
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { isCollection } from '../util/types';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { invertTransform } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TSize } from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
@@ -636,18 +636,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the pointer in object coordinates
-   * @private
-   */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
-    );
-  }
-
-  /**
    * Set the canvas tolerance value for pixel taret find.
    * Use only integer numbers.
    * @private
@@ -1041,7 +1029,7 @@ export class SelectableCanvas<
    * ignoreVpt false, default = fabric space coordinates, the same used for shape position
    * To interact with your shapes top and left you want to use ignoreVpt true
    * most of the time, while ignoreVpt false will give you coordinates
-   * compatible with the object.oCoords system.
+   * compatible with the object BBox system.
    * of the time.
    * @param {Event} e
    * @param {Boolean} ignoreVpt

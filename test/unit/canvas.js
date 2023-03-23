@@ -1568,30 +1568,6 @@
     });
   });
 
-
-  QUnit.test('normalize pointer', function(assert) {
-    assert.ok(typeof canvas._normalizePointer === 'function');
-    var pointer = new fabric.Point({ x: 10, y: 20 }),
-        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
-        normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
-    assert.equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
-    object.angle = 90;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -15, 'should consider angle');
-    assert.equal(normalizedPointer.y, -25, 'should consider angle');
-    object.angle = 0;
-    object.scaleX = 2;
-    object.scaleY = 2;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should consider scale');
-    assert.equal(normalizedPointer.y, -20, 'should consider scale');
-    object.skewX = 60;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
-    assert.equal(normalizedPointer.y, -20, 'should not change');
-  });
-
   QUnit.test('restorePointerVpt', function(assert) {
     assert.ok(typeof canvas.restorePointerVpt === 'function');
     var pointer = new fabric.Point({ x: 10, y: 20 }),
