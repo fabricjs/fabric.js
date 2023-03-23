@@ -364,7 +364,7 @@
         canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.width,
-      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+      clientY: canvasOffset.top + text.controlCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
     };
     var originalWidth = text.width;
@@ -389,7 +389,7 @@
         canvasOffset = fabric.util.getElementOffset(canvasEl);
     var eventStub = {
       clientX: canvasOffset.left + text.left,
-      clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
+      clientY: canvasOffset.top + text.controlCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
     };
     var originalWidth = text.width;

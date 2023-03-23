@@ -418,7 +418,7 @@
     });
   });
 
-  QUnit.test.skip('fromObject restores oCoords', function(assert) {
+  QUnit.test.skip('fromObject restores controlCoords', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
 
@@ -741,9 +741,9 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1]);
 
-    var coords = group.oCoords;
+    var coords = group.controlCoords;
     group.add(rect2);
-    var newCoords = group.oCoords;
+    var newCoords = group.controlCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
   });
 
@@ -781,9 +781,9 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1, rect2]);
 
-    var coords = group.oCoords;
+    var coords = group.controlCoords;
     group.remove(rect2);
-    var newCoords = group.oCoords;
+    var newCoords = group.controlCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
 

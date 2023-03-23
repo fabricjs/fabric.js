@@ -253,59 +253,59 @@
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
     cObj.setCoords();
-    assert.equal(cObj.oCoords.tl.position.x, 150);
-    assert.equal(cObj.oCoords.tl.position.y, 150);
-    assert.equal(cObj.oCoords.tr.position.x, 250);
-    assert.equal(cObj.oCoords.tr.position.y, 150);
-    assert.equal(cObj.oCoords.bl.position.x, 150);
-    assert.equal(cObj.oCoords.bl.position.y, 250);
-    assert.equal(cObj.oCoords.br.position.x, 250);
-    assert.equal(cObj.oCoords.br.position.y, 250);
-    assert.equal(cObj.oCoords.mtr.position.x, 200);
-    assert.equal(cObj.oCoords.mtr.position.y, 110);
+    assert.equal(cObj.controlCoords.tl.position.x, 150);
+    assert.equal(cObj.controlCoords.tl.position.y, 150);
+    assert.equal(cObj.controlCoords.tr.position.x, 250);
+    assert.equal(cObj.controlCoords.tr.position.y, 150);
+    assert.equal(cObj.controlCoords.bl.position.x, 150);
+    assert.equal(cObj.controlCoords.bl.position.y, 250);
+    assert.equal(cObj.controlCoords.br.position.x, 250);
+    assert.equal(cObj.controlCoords.br.position.y, 250);
+    assert.equal(cObj.controlCoords.mtr.position.x, 200);
+    assert.equal(cObj.controlCoords.mtr.position.y, 110);
 
     cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.position.x, 150);
-    assert.equal(cObj.oCoords.tl.position.y, 150);
-    assert.equal(cObj.oCoords.tr.position.x, 250);
-    assert.equal(cObj.oCoords.tr.position.y, 150);
-    assert.equal(cObj.oCoords.bl.position.x, 150);
-    assert.equal(cObj.oCoords.bl.position.y, 250);
-    assert.equal(cObj.oCoords.br.position.x, 250);
-    assert.equal(cObj.oCoords.br.position.y, 250);
-    assert.equal(cObj.oCoords.mtr.position.x, 200);
-    assert.equal(cObj.oCoords.mtr.position.y, 110);
+    assert.equal(cObj.controlCoords.tl.position.x, 150);
+    assert.equal(cObj.controlCoords.tl.position.y, 150);
+    assert.equal(cObj.controlCoords.tr.position.x, 250);
+    assert.equal(cObj.controlCoords.tr.position.y, 150);
+    assert.equal(cObj.controlCoords.bl.position.x, 150);
+    assert.equal(cObj.controlCoords.bl.position.y, 250);
+    assert.equal(cObj.controlCoords.br.position.x, 250);
+    assert.equal(cObj.controlCoords.br.position.y, 250);
+    assert.equal(cObj.controlCoords.mtr.position.x, 200);
+    assert.equal(cObj.controlCoords.mtr.position.y, 110);
 
     // recalculate coords
     cObj.setCoords();
 
     // check that coords are now updated
-    assert.equal(cObj.oCoords.tl.position.x, 250);
-    assert.equal(cObj.oCoords.tl.position.y, 250);
-    assert.equal(cObj.oCoords.tr.position.x, 350);
-    assert.equal(cObj.oCoords.tr.position.y, 250);
-    assert.equal(cObj.oCoords.bl.position.x, 250);
-    assert.equal(cObj.oCoords.bl.position.y, 350);
-    assert.equal(cObj.oCoords.br.position.x, 350);
-    assert.equal(cObj.oCoords.br.position.y, 350);
-    assert.equal(cObj.oCoords.mtr.position.x, 300);
-    assert.equal(cObj.oCoords.mtr.position.y, 210);
+    assert.equal(cObj.controlCoords.tl.position.x, 250);
+    assert.equal(cObj.controlCoords.tl.position.y, 250);
+    assert.equal(cObj.controlCoords.tr.position.x, 350);
+    assert.equal(cObj.controlCoords.tr.position.y, 250);
+    assert.equal(cObj.controlCoords.bl.position.x, 250);
+    assert.equal(cObj.controlCoords.bl.position.y, 350);
+    assert.equal(cObj.controlCoords.br.position.x, 350);
+    assert.equal(cObj.controlCoords.br.position.y, 350);
+    assert.equal(cObj.controlCoords.mtr.position.x, 300);
+    assert.equal(cObj.controlCoords.mtr.position.y, 210);
 
     cObj.set('padding', 25);
     cObj.setCoords();
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.position.x, 225, 'setCoords tl.position.x padding');
-    assert.equal(cObj.oCoords.tl.position.y, 225, 'setCoords tl.position.y padding');
-    assert.equal(cObj.oCoords.tr.position.x, 375, 'setCoords tr.position.x padding');
-    assert.equal(cObj.oCoords.tr.position.y, 225, 'setCoords tr.position.y padding');
-    assert.equal(cObj.oCoords.bl.position.x, 225, 'setCoords bl.position.x padding');
-    assert.equal(cObj.oCoords.bl.position.y, 375, 'setCoords bl.position.y padding');
-    assert.equal(cObj.oCoords.br.position.x, 375, 'setCoords br.position.x padding');
-    assert.equal(cObj.oCoords.br.position.y, 375, 'setCoords br.position.y padding');
-    assert.equal(cObj.oCoords.mtr.position.x, 300, 'setCoords mtr.position.x padding');
-    assert.equal(cObj.oCoords.mtr.position.y, 185, 'setCoords mtr.position.y padding');
+    assert.equal(cObj.controlCoords.tl.position.x, 225, 'setCoords tl.position.x padding');
+    assert.equal(cObj.controlCoords.tl.position.y, 225, 'setCoords tl.position.y padding');
+    assert.equal(cObj.controlCoords.tr.position.x, 375, 'setCoords tr.position.x padding');
+    assert.equal(cObj.controlCoords.tr.position.y, 225, 'setCoords tr.position.y padding');
+    assert.equal(cObj.controlCoords.bl.position.x, 225, 'setCoords bl.position.x padding');
+    assert.equal(cObj.controlCoords.bl.position.y, 375, 'setCoords bl.position.y padding');
+    assert.equal(cObj.controlCoords.br.position.x, 375, 'setCoords br.position.x padding');
+    assert.equal(cObj.controlCoords.br.position.y, 375, 'setCoords br.position.y padding');
+    assert.equal(cObj.controlCoords.mtr.position.x, 300, 'setCoords mtr.position.x padding');
+    assert.equal(cObj.controlCoords.mtr.position.y, 185, 'setCoords mtr.position.y padding');
   });
 
   QUnit.test.skip('setCoords and aCoords', function(assert) {
@@ -315,16 +315,16 @@
     };
     cObj.setCoords();
 
-    assert.equal(cObj.oCoords.tl.position.x, 300, 'oCoords are modified by viewportTransform tl.position.x');
-    assert.equal(cObj.oCoords.tl.position.y, 300, 'oCoords are modified by viewportTransform tl.position.y');
-    assert.equal(cObj.oCoords.tr.position.x, 500, 'oCoords are modified by viewportTransform tr.position.x');
-    assert.equal(cObj.oCoords.tr.position.y, 300, 'oCoords are modified by viewportTransform tr.position.y');
-    assert.equal(cObj.oCoords.bl.position.x, 300, 'oCoords are modified by viewportTransform bl.position.x');
-    assert.equal(cObj.oCoords.bl.position.y, 500, 'oCoords are modified by viewportTransform bl.position.y');
-    assert.equal(cObj.oCoords.br.position.x, 500, 'oCoords are modified by viewportTransform br.position.x');
-    assert.equal(cObj.oCoords.br.position.y, 500, 'oCoords are modified by viewportTransform br.position.y');
-    assert.equal(cObj.oCoords.mtr.position.x, 400, 'oCoords are modified by viewportTransform mtr.position.x');
-    assert.equal(cObj.oCoords.mtr.position.y, 260, 'oCoords are modified by viewportTransform mtr.position.y');
+    assert.equal(cObj.controlCoords.tl.position.x, 300, 'controlCoords are modified by viewportTransform tl.position.x');
+    assert.equal(cObj.controlCoords.tl.position.y, 300, 'controlCoords are modified by viewportTransform tl.position.y');
+    assert.equal(cObj.controlCoords.tr.position.x, 500, 'controlCoords are modified by viewportTransform tr.position.x');
+    assert.equal(cObj.controlCoords.tr.position.y, 300, 'controlCoords are modified by viewportTransform tr.position.y');
+    assert.equal(cObj.controlCoords.bl.position.x, 300, 'controlCoords are modified by viewportTransform bl.position.x');
+    assert.equal(cObj.controlCoords.bl.position.y, 500, 'controlCoords are modified by viewportTransform bl.position.y');
+    assert.equal(cObj.controlCoords.br.position.x, 500, 'controlCoords are modified by viewportTransform br.position.x');
+    assert.equal(cObj.controlCoords.br.position.y, 500, 'controlCoords are modified by viewportTransform br.position.y');
+    assert.equal(cObj.controlCoords.mtr.position.x, 400, 'controlCoords are modified by viewportTransform mtr.position.x');
+    assert.equal(cObj.controlCoords.mtr.position.y, 260, 'controlCoords are modified by viewportTransform mtr.position.y');
 
     assert.equal(cObj.aCoords.tl.x, 150, 'aCoords do not interfere with viewportTransform');
     assert.equal(cObj.aCoords.tl.y, 150, 'aCoords do not interfere with viewportTransform');
@@ -591,10 +591,10 @@
 
     cObj.left += 5;
     coords = cObj.getCoords();
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached controlCoords');
+    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached controlCoords');
+    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached controlCoords');
+    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached controlCoords');
 
     coords = cObj.getCoords(false, true);
     assert.deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');
@@ -621,10 +621,10 @@
       viewportTransform: [2, 0, 0, 2, 35, 35]
     };
     var coords = cObj.getCoords(true);
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached controlCoords');
+    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached controlCoords');
+    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached controlCoords');
+    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached controlCoords');
   });
 
   QUnit.test('getCoords absolute with angle', function(assert) {
