@@ -1159,7 +1159,7 @@ export class Canvas extends SelectableCanvas {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
     this._pointer = this.getPointer(e, true);
-    this._absolutePointer = this.restorePointerVpt(this._pointer);
+    this._absolutePointer = sendPointToPlane(this._pointer, undefined, this.viewportTransform);
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);

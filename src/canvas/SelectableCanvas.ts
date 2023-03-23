@@ -16,7 +16,6 @@ import {
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { isCollection } from '../util/types';
-import { invertTransform } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TSize } from '../typedefs';
 import { getPointer, isTouchEvent } from '../util/dom_event';
@@ -1009,39 +1008,19 @@ export class SelectableCanvas<
   }
 
   /**
-   * Returns pointer coordinates without the effect of the viewport
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
-   */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
-  }
-
-  /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
-   * compatible with the object BBox system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
+   * Returns pointer relative to canvas.
+   * @param {TPointerEvent} e
+   * @param {Boolean} inViewport `true` returns pointer in the viewport, (0,0) being the top left corner of the `HTMLCanvasElement`, offsets affected by the viewport\
+   * `false` returns the pointer as measured by instance as if no `viewportTransform` exists.
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
+  getPointer(e: TPointerEvent, inViewport = false): Point {
     // return cached values if we are in the event processing chain
     // safeguard from mutation by cloning
-    if (this._absolutePointer && !ignoreVpt) {
+    if (this._absolutePointer && !inViewport) {
       return this._absolutePointer.clone();
     }
-    if (this._pointer && ignoreVpt) {
+    if (this._pointer && inViewport) {
       return this._pointer.clone();
     }
 
@@ -1063,8 +1042,8 @@ export class SelectableCanvas<
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
+    if (!inViewport) {
+      pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
     const retinaScaling = this.getRetinaScaling();

@@ -1568,19 +1568,6 @@
     });
   });
 
-  QUnit.test('restorePointerVpt', function(assert) {
-    assert.ok(typeof canvas.restorePointerVpt === 'function');
-    var pointer = new fabric.Point({ x: 10, y: 20 }),
-        restoredPointer = canvas.restorePointerVpt(pointer);
-    assert.equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
-    assert.equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
-    canvas.viewportTransform = [2, 0, 0, 2, 50, -60];
-    restoredPointer = canvas.restorePointerVpt(pointer);
-    assert.equal(restoredPointer.x, -20, 'vpt changes restored');
-    assert.equal(restoredPointer.y, 40, 'vpt changes restored');
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-  });
-
   // QUnit.test('loadFromJSON with backgroundImage', function(assert) {
   //   var done = assert.async();
   //   canvas.setBackgroundImage('../../assets/pug.jpg');
