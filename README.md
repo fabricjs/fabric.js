@@ -191,6 +191,8 @@ http
 
 </details>
 
+See our ready to use [templates](./.codesandbox/templates/)
+
 ---
 
 ## Other Solutions
