@@ -186,24 +186,35 @@ If you need to change test config ask for guidance.
 
 ## 🚧🎢 Developing 💡✨
 
-### Setting Up Locally
+### Getting Started
 
-1. 🍴 Fork the repository
-1. 💾 Clone your 🍴 to your 💻
+1. 🍴 Fork and clone 💾 the repository
 1. Install dependencies 🕹️ `npm i --include=dev`
-1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
-#### Online
+### Start an App
+
+```bash
+npm start <template>
+```
+
+Templates are available in [`.codesandbox/templates`](.codesandbox/templates), refer to the cli help (`npm start -- -h`) and to [`.codesandbox/README.md`](.codesandbox/README.md).
+
+You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
+
+```bash
+npm run sandbox deploy <path/to/app>
+npm run sandbox build <template> <path/to/app>
+npm run sandbox -- --help
+```
+
+### Online
 
 You can actively develop fabric online using [Github Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530), [Gitpod](https://gitpod.io/from-referrer/) or CodeSandbox:
 
-- After the Github Codespace has started run `npm start <template>` to start a [prototyping](#-prototyping) app.
-- Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints available on forwarded ports.
+- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
   `A service is available on port ...` popups will show up.
-
-### 🧭 Prototyping
-
-[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping [**👍 Try it out**](.codesandbox/README.md)
+- Codesandbox: _available soon_.
 
 ### 🔮 Symlinking
 
@@ -211,6 +222,7 @@ Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
+1. Consider flagging `--save` to avoid misunderstanding what version of fabric is being used by the project.
 
 See [npm link][npm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
