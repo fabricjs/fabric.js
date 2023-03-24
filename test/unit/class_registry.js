@@ -70,12 +70,13 @@
     classRegistry.setClass(SVGClass);
     classRegistry.setClass(ExportableClass, 'Y');
     assert.equal(classRegistry.getJSONClass(JSONClass.name), JSONClass, 'resolved class');
-    assert.throws(() => classRegistry.getSVGClass(JSONClass.name), 'should not have registered class');
-    assert.equal(classRegistry.getSVGClass(SVGClass.name), SVGClass, 'resolved class');
+    assert.throws(() => classRegistry.getSVGClass(JSONClass.name.toLowerCase()), 'should not have registered class');
+    assert.equal(classRegistry.getSVGClass(SVGClass.name.toLowerCase()), SVGClass, 'resolved class');
     assert.throws(() => classRegistry.getJSONClass(SVGClass.name), 'should not have registered class');
     assert.equal(classRegistry.getJSONClass('Y'), ExportableClass, 'resolved class');
     assert.equal(classRegistry.getSVGClass('Y'), ExportableClass, 'resolved class');
     assert.throws(() => classRegistry.getJSONClass('X'), 'should not have registered class');
     assert.throws(() => classRegistry.getSVGClass('X'), 'should not have registered class');
+    assert.throws(() => classRegistry.getSVGClass('x'), 'should not have registered class');
   });
 })()
