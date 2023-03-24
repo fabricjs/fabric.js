@@ -9,13 +9,13 @@ Creating a clear, easy to use reproduction in very **IMPORTANT**.
 Keep it simple and concise.
 Don't add stuff that is out of scope.
 
-Provide a **detailed description** including steps to reproduce in the `REPRODUCE.md` file.
+Provide a **detailed description** including steps to reproduce in the [`REPRODUCE.md`](./REPRODUCE.md) file.
 
 ## Browser Reproduction
 
-Naviagate to `pages/index` and start editing.
+Navigate to [`pages/index`](./pages/index.tsx) and start editing.
 
 ## Node Reproduction
 
-Naviagate to `pages/api/fabric` to see how to expose a server endpoint.
+Navigate to [`pages/api/fabric`](./pages/api/fabric.ts) to see how to expose a server endpoint.
 All `Next.js` endpoints are available to the app at `/api/XXX`, `XXX` being the endpoint file name.
