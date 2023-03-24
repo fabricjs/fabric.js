@@ -191,7 +191,7 @@ If you need to change test config ask for guidance.
 1. 🍴 Fork and clone 💾 the repository
 1. Install dependencies 🕹️ `npm i --include=dev`
 
-### Start an App
+### Starting an App
 
 ```bash
 npm start <template>
