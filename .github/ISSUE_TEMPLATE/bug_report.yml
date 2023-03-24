@@ -229,20 +229,13 @@ body:
         Take the time and put effort into making your reproduction accurate and
         minimal.
 
-        Use the following reproduction templates for **v6 and above**:
+        Use the following reproduction templates:
 
-        - [Next reproduction template](https://codesandbox.io/p/sandbox/fabric-nextjs-sandbox-forked-h6qdh3?file=%2FREADME.md) for browser/node
+        - [Next template >= `v6`](https://codesandbox.io/p/sandbox/fabric-nextjs-sandbox-forked-h6qdh3?file=%2FREADME.md) for browser and node reproductions, **preferred**
 
-        - [Node reproduction
-        template](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md)
+        - [Vanilla template >= `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-e5r48u?file=%2FREADME.md), [Vanilla template < `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-v92h26?file=%2FREADME.md) for browser reproductions
 
-        Use the following reproduction templates for **v5 and below**:
-
-        - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
-
-        - [Node reproduction
-        template](https://codesandbox.io/s/exciting-browser-ytb701)
-
+        - [Node template >= `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md), [Node template < `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
 
         ⛔ No reproduction === closed issue ⛔
     validations:

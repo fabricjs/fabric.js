@@ -13,7 +13,8 @@
   "devDependencies": {
     "@parcel/transformer-typescript-tsc": "^2.7.0",
     "open-cli": "^7.0.1",
-    "parcel": "^2.7.0"
+    "parcel": "^2.7.0",
+    "typescript": "^5.0.2"
   },
   "keywords": [
     "vanilla",
