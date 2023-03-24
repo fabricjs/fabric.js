@@ -223,7 +223,7 @@ Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
-1. Consider flagging `--save` to avoid misunderstanding what version of fabric is being used by the project.
+1. Consider flagging `--save` to avoid confusion regarding what version of fabric is being used by the project.
 
 See [npm link][npm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
