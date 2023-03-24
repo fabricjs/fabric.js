@@ -17,5 +17,5 @@ Naviagate to `pages/index` and start editing.
 
 ## Node Reproduction
 
-Naviagate to `api/fabric` to see how to expose a server endpoint.
+Naviagate to `pages/api/fabric` to see how to expose a server endpoint.
 All `Next.js` endpoints are available to the app at `/api/XXX`, `XXX` being the endpoint file name.
