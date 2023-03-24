@@ -221,11 +221,10 @@ body:
 
         Use the following reproduction templates.
 
-
-        - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
+        - [Next reproduction template](https://codesandbox.io/p/sandbox/heuristic-perlman-qevk3r?file=%2FREADME.md) for browser/node
 
         - [Node reproduction
-        template](https://codesandbox.io/s/exciting-browser-ytb701)
+        template](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-9pi085?file=%2FREADME.md)
 
 
         ⛔ No reproduction === closed issue ⛔
