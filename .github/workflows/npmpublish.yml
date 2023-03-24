@@ -6,26 +6,29 @@ on:
       - master
       - 5.x
     types: [published]
+  push:
+    branches:
+      - ci-sandbox-templates
 
 jobs:
-  publish-npm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 18.x
-          registry-url: https://registry.npmjs.org/
-      - run: npm install
-      - run: npm run build
-      - run: node publish.js
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-          PRE_RELEASE: ${{github.event.release.prerelease}}
+  # publish-npm:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 18.x
+  #         registry-url: https://registry.npmjs.org/
+  #     - run: npm install
+  #     - run: npm run build
+  #     - run: node publish.js
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+  #         PRE_RELEASE: ${{github.event.release.prerelease}}
   update-bug-report:
     runs-on: ubuntu-latest
     # wait for publishing to complete
-    needs: publish-npm
+    # needs: publish-npm
     if: always()
     steps:
       - uses: actions/checkout@v3
