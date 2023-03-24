@@ -31,9 +31,10 @@ export type TEndPathInfo = TPathSegmentInfoCommon<'Z'> & {
 };
 
 /**
- * Info about various paths
+ * Relevant info to calculate path length/points on path
+ * for each command type in a simplified parsed path
  */
-export type TPathSegmentInfo = {
+export type TPathSegmentCommandInfo = {
   M: TPathSegmentInfoCommon<'M'>;
   L: TPathSegmentInfoCommon<'L'>;
   C: TCurveInfo<'C'>;
@@ -41,7 +42,8 @@ export type TPathSegmentInfo = {
   Z: TEndPathInfo;
 };
 
-export type TPathSegmentsInfo = TPathSegmentInfo[keyof TPathSegmentInfo];
+export type TPathSegmentInfo =
+  TPathSegmentCommandInfo[keyof TPathSegmentCommandInfo];
 
 /**
  * A parsed command of any length (even impossible ones)

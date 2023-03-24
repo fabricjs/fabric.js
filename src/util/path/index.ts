@@ -11,11 +11,11 @@ import {
   TComplexPathData,
   TParsedAbsoluteCubicCurveCommand,
   TParsedCubicCurveCommand,
-  TPathSegmentsInfo,
+  TPathSegmentInfo,
   TPointAngle,
   TSimpleParsedCommand,
   TSimplePathData,
-  TPathSegmentInfo,
+  TPathSegmentCommandInfo,
   TComplexParsedCommand,
   TPathSegmentInfoCommon,
   TEndPathInfo,
@@ -672,11 +672,11 @@ const findPercentageForDistance = (
 /**
  * Run over a parsed and simplified path and extract some information (length of each command and starting point)
  * @param {TSimplePathData} path parsed path commands
- * @return {TPathSegmentsInfo[]} path commands information
+ * @return {TPathSegmentInfo[]} path commands information
  */
 export const getPathSegmentsInfo = (
   path: TSimplePathData
-): TPathSegmentsInfo[] => {
+): TPathSegmentInfo[] => {
   let totalLength = 0,
     //x2 and y2 are the coords of segment start
     //x1 and y1 are the coords of the current point
@@ -685,10 +685,10 @@ export const getPathSegmentsInfo = (
     x2 = 0,
     y2 = 0,
     iterator,
-    tempInfo: TPathSegmentsInfo;
-  const info: TPathSegmentsInfo[] = [];
+    tempInfo: TPathSegmentInfo;
+  const info: TPathSegmentInfo[] = [];
   for (const current of path) {
-    const basicInfo: TPathSegmentInfoCommon<keyof TPathSegmentInfo> = {
+    const basicInfo: TPathSegmentInfoCommon<keyof TPathSegmentCommandInfo> = {
       x: x1,
       y: y1,
       command: current[0],
@@ -785,7 +785,7 @@ export const getPathSegmentsInfo = (
 export const getPointOnPath = (
   path: TSimplePathData,
   distance: number,
-  infos: TPathSegmentsInfo[] = getPathSegmentsInfo(path)
+  infos: TPathSegmentInfo[] = getPathSegmentsInfo(path)
 ): TPointAngle | undefined => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {

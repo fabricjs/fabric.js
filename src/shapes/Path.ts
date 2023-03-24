@@ -10,11 +10,10 @@ import {
   joinPath,
   makePathSimpler,
   parsePath,
-  type TPathSegmentsInfo,
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TSimplePathData } from '../util/path/typedefs';
+import { TPathSegmentInfo, TSimplePathData } from '../util/path/typedefs';
 
 export class Path extends FabricObject {
   /**
@@ -30,7 +29,7 @@ export class Path extends FabricObject {
 
   declare sourcePath?: string;
 
-  declare segmentsInfo?: TPathSegmentsInfo[];
+  declare segmentsInfo?: TPathSegmentInfo[];
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
