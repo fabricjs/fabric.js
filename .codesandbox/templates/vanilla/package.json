@@ -8,7 +8,7 @@
     "build": "parcel build index.html"
   },
   "dependencies": {
-    "fabric": "file:../../../"
+    "fabric": "file:../../.."
   },
   "devDependencies": {
     "open-cli": "^7.0.1",
