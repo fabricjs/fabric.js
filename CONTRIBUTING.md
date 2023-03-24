@@ -177,8 +177,8 @@ Backing a PR with tests that cover the changes that were made is a **MUST**. Aim
 
 Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
 
-- [`unit` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237)
-- [`visual` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67)
+- [`unit` test example][unit_test]
+- [`visual` test example][visual_test]
 
 If you need to change test config ask for guidance.
 
@@ -210,7 +210,7 @@ Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information
 
 ### Online
 
-You can actively develop fabric online using [Github Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530), [Gitpod](https://gitpod.io/from-referrer/) or CodeSandbox:
+You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
 
 - After the Github Codespace has started run `npm start <template>` to start a prototyping app.
 - Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
@@ -249,5 +249,9 @@ Don't forget to unlink the package once you're done.
 [jsdoc]: https://jsdoc.app/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
+[unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
+[visual_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67
+[github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
+[gitpod]: https://gitpod.io/from-referrer/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
 [yarn_link]: https://yarnpkg.com/cli/link
