@@ -195,9 +195,8 @@ If you need to change test config ask for guidance.
 
 ```bash
 npm start <template>
+npm start -- --help
 ```
-
-Templates are available in [`.codesandbox/templates`](.codesandbox/templates), refer to the cli help (`npm start -- -h`) and to [`.codesandbox/README.md`](.codesandbox/README.md).
 
 You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
 
@@ -206,6 +205,8 @@ npm run sandbox deploy <path/to/app>
 npm run sandbox build <template> <path/to/app>
 npm run sandbox -- --help
 ```
+
+Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information.
 
 ### Online
 
