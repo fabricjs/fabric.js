@@ -34,7 +34,7 @@
   QUnit.module('fabric.Group', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -61,19 +61,6 @@
     assert.ok(Array.isArray(group.getObjects()), 'should be an array');
     assert.equal(group.getObjects().length, 2, 'should have 2 items');
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'should return deepEqual objects as those passed to constructor');
-  });
-
-  QUnit.test('getObjects with type', function(assert) {
-    var rect = new fabric.Rect({ width: 10, height: 20 }),
-        circle = new fabric.Circle({ radius: 30 });
-
-    var group = new fabric.Group([rect, circle]);
-
-    assert.equal(group.size(), 2, 'should have length=2 initially');
-
-    assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
-    assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
-    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are');
   });
 
   QUnit.test('add', function(assert) {
@@ -174,7 +161,7 @@
 
     var expectedObject = {
       version: fabric.version,
-      type:                     'group',
+      type:                     'Group',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -223,7 +210,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -231,7 +218,7 @@
       strokeWidth: 0,
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -240,7 +227,7 @@
     }];
     var expectedObject = {
       version: fabric.version,
-      type: 'group',
+      type: 'Group',
       left: 50,
       top: 100,
       width: 80,
@@ -560,42 +547,42 @@
     group.bringObjectToFront(textBg);
     assert.deepEqual(group.getObjects(), [text, obj, textBg], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectToBack(textBg);
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectToBack(textBg);
     assert.deepEqual(group.getObjects(), [textBg, text, obj], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.sendObjectBackwards(obj);
     assert.deepEqual(group.getObjects(), [textBg, obj, text]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(text);
     assert.deepEqual(group.getObjects(), [textBg, obj, text], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(obj);
     assert.deepEqual(group.getObjects(), [textBg, text, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.bringObjectForward(textBg);
     assert.deepEqual(group.getObjects(), [text, textBg, obj]);
     assert.ok(group.dirty, 'should invalidate group');
-    
+
     group.dirty = false;
     group.moveObjectTo(obj, 2);
     assert.deepEqual(group.getObjects(), [text, textBg, obj], 'has no effect');
     assert.ok(group.dirty === false, 'should not invalidate group');
-    
+
     group.dirty = false;
     group.moveObjectTo(obj, 0);
     assert.deepEqual(group.getObjects(), [obj, text, textBg]);

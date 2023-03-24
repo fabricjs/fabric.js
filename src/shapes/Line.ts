@@ -13,31 +13,31 @@ const coordProps = ['x1', 'x2', 'y1', 'y2'];
 export class Line extends FabricObject {
   /**
    * x value or first line edge
-   * @type Number
+   * @type number
    * @default
    */
-  declare x1: number;
+  x1 = 0;
 
   /**
    * y value or first line edge
-   * @type Number
+   * @type number
    * @default
    */
-  declare y1: number;
+  y1 = 0;
 
   /**
    * x value or second line edge
-   * @type Number
+   * @type number
    * @default
    */
-  declare x2: number;
+  x2 = 0;
 
   /**
    * y value or second line edge
-   * @type Number
+   * @type number
    * @default
    */
-  declare y2: number;
+  y2 = 0;
 
   static cacheProperties = [...cacheProperties, 'x1', 'x2', 'y1', 'y2'];
   /**
@@ -312,17 +312,5 @@ export class Line extends FabricObject {
     });
   }
 }
-
-export const lineDefaultValues: Partial<TClassProperties<Line>> = {
-  type: 'line',
-  x1: 0,
-  y1: 0,
-  x2: 0,
-  y2: 0,
-};
-
-Object.assign(Line.prototype, {
-  ...lineDefaultValues,
-});
 
 classRegistry.setClass(Line);

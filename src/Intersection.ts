@@ -1,24 +1,9 @@
 import { Point } from './Point';
+import { createVector } from './util/misc/vectors';
 
 /* Adaptation of work of Kevin Lindsey (kevin@kevlindev.com) */
 
 export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
-
-/**
- * **Assuming `T`, `A`, `B` are points on the same line**,
- * check if `T` is contained in `[A, B]` by comparing the direction of the vectors from `T` to `A` and `B`
- * @param T
- * @param A
- * @param B
- * @returns true if `T` is contained
- */
-const isContainedInInterval = (T: Point, A: Point, B: Point) => {
-  const TA = new Point(T).subtract(A);
-  const TB = new Point(T).subtract(B);
-  return (
-    Math.sign(TA.x) !== Math.sign(TB.x) || Math.sign(TA.y) !== Math.sign(TB.y)
-  );
-};
 
 export class Intersection {
   declare points: Point[];
@@ -55,7 +40,51 @@ export class Intersection {
   }
 
   /**
+   * check if point T is on the segment or line defined between A and B
+   *
+   * @param {Point} T the point we are checking for
+   * @param {Point} A one extremity of the segment
+   * @param {Point} B the other extremity of the segment
+   * @param [infinite] if true checks if `T` is on the line defined by `A` and `B`
+   * @returns true if `T` is contained
+   */
+  static isPointContained(T: Point, A: Point, B: Point, infinite = false) {
+    if (A.eq(B)) {
+      // Edge case: the segment is a point, we check for coincidence,
+      // infinite param has no meaning because there are infinite lines to consider
+      return T.eq(A);
+    } else if (A.x === B.x) {
+      // Edge case: horizontal line.
+      // we first check if T.x has the same value, and then if T.y is contained between A.y and B.y
+      return (
+        T.x === A.x &&
+        (infinite || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
+      );
+    } else if (A.y === B.y) {
+      // Edge case: vertical line.
+      // we first check if T.y has the same value, and then if T.x is contained between A.x and B.x
+      return (
+        T.y === A.y &&
+        (infinite || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
+      );
+    } else {
+      // Generic case: sloped line.
+      // we check that AT has the same slope as AB
+      // for the segment case we need both the vectors to have the same direction and for AT to be lte AB in size
+      // for the infinite case we check the absolute value of the slope, since direction is meaningless
+      const AB = createVector(A, B);
+      const AT = createVector(A, T);
+      const s = AT.divide(AB);
+      return infinite
+        ? Math.abs(s.x) === Math.abs(s.y)
+        : s.x === s.y && s.x >= 0 && s.x <= 1;
+    }
+  }
+
+  /**
    * Checks if a line intersects another
+   * @see {@link https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection line intersection}
+   * @see {@link https://en.wikipedia.org/wiki/Cramer%27s_rule Cramer's rule}
    * @static
    * @param {Point} a1
    * @param {Point} a2
@@ -73,12 +102,12 @@ export class Intersection {
     aInfinite = true,
     bInfinite = true
   ): Intersection {
-    const b2xb1x = b2.x - b1.x,
-      a1yb1y = a1.y - b1.y,
+    const a2xa1x = a2.x - a1.x,
+      a2ya1y = a2.y - a1.y,
+      b2xb1x = b2.x - b1.x,
       b2yb1y = b2.y - b1.y,
       a1xb1x = a1.x - b1.x,
-      a2ya1y = a2.y - a1.y,
-      a2xa1x = a2.x - a1.x,
+      a1yb1y = a1.y - b1.y,
       uaT = b2xb1x * a1yb1y - b2yb1y * a1xb1x,
       ubT = a2xa1x * a1yb1y - a2ya1y * a1xb1x,
       uB = b2yb1y * a2xa1x - b2xb1x * a2ya1y;
@@ -100,10 +129,10 @@ export class Intersection {
         const segmentsCoincide =
           aInfinite ||
           bInfinite ||
-          isContainedInInterval(a1, b1, b2) ||
-          isContainedInInterval(a2, b1, b2) ||
-          isContainedInInterval(b1, a1, a2) ||
-          isContainedInInterval(b2, a1, a2);
+          Intersection.isPointContained(a1, b1, b2) ||
+          Intersection.isPointContained(a2, b1, b2) ||
+          Intersection.isPointContained(b1, a1, a2) ||
+          Intersection.isPointContained(b2, a1, a2);
         return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
         return new Intersection('Parallel');

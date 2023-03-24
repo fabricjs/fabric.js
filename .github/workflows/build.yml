@@ -12,7 +12,7 @@ jobs:
       - name: Uglified build
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run build
   stats:
@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - name: build stats
         run: npm run build
@@ -75,7 +75,7 @@ jobs:
       - name: Linting
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run lint
   prettier:
@@ -85,7 +85,7 @@ jobs:
       - name: Prettier check
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run prettier:check
   coverage:
@@ -96,7 +96,7 @@ jobs:
       - name: Code Coverage Report Updater
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run build -- -f
       - run: npm run test:coverage && npm run test:visual:coverage
