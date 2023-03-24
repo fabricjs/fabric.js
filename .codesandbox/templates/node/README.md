@@ -4,7 +4,7 @@ A node app for reproducing `fabric` server side issues and creating examples.
 
 ## Reproducing
 
-Creating a clear, easy to use reproduction in very **IMPORTANT**.
+Creating a clear, easy to use reproduction is very **IMPORTANT**.
 Keep it simple and concise.
 Don't add stuff that is out of scope.
 

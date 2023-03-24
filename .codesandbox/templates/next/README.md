@@ -5,7 +5,7 @@ A [`Next.js`](https://nextjs.org/) app for reproducing `fabric` issues and creat
 
 ## Reproducing
 
-Creating a clear, easy to use reproduction in very **IMPORTANT**.
+Creating a clear, easy to use reproduction is very **IMPORTANT**.
 Keep it simple and concise.
 Don't add stuff that is out of scope.
 
