@@ -9,7 +9,7 @@
     class TestClass {
 
     }
-    classRegistry.setClass(TestClass);
+    classRegistry.setJSONClass(TestClass);
     assert.equal(classRegistry.getClass('TestClass'), TestClass, 'resolves class correctly');
     assert.equal(classRegistry.getClass('testclass'), TestClass, 'resolves class correctly to lower case');
   });
@@ -17,7 +17,7 @@
     class TestClass2 {
 
     }
-    classRegistry.setClass(TestClass2, 'myCustomType');
+    classRegistry.setJSONClass(TestClass2, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');
     assert.equal(resolved, TestClass2, 'resolves class correctly with custom type');
   });
@@ -28,7 +28,7 @@
     class TestClass4 {
 
     }
-    classRegistry.setClass(TestClass3, 'myCustomType');
+    classRegistry.setJSONClass(TestClass3, 'myCustomType');
     classRegistry.setSVGClass(TestClass4, 'myCustomType');
     const resolved = classRegistry.getClass('myCustomType');
     const resolvedSvg = classRegistry.getSVGClass('myCustomType');
@@ -39,5 +39,43 @@
     assert.equal(fabric.classRegistry.getClass('i-text'), fabric.IText, 'resolves class correctly');
     assert.equal(fabric.classRegistry.getClass('activeSelection'), fabric.ActiveSelection, 'resolves class correctly');
     assert.equal(fabric.classRegistry.getClass('object'), fabric.Object, 'resolves class correctly');
+    assert.equal(fabric.classRegistry.getJSONClass({
+      blur: 1,
+      offsetY: 2
+    }), fabric.Shadow, 'found shadow');
+    assert.equal(fabric.classRegistry.getJSONClass({
+      colorStops: []
+    }), fabric.Gradient, 'found gradient');
+  });
+    QUnit.test('can set both SVG and JSON', function (assert) {
+    class JSONClass {
+      static fromObject() {
+        return new this();
+      }
+    }
+    class SVGClass {
+      static fromElement() {
+        return new this();
+      }
+    }
+    class ExportableClass {
+      static fromObject() {
+        return new this();
+      }
+      static fromElement() {
+        return new this();
+      }
+    }
+    classRegistry.setClass(JSONClass);
+    classRegistry.setClass(SVGClass);
+    classRegistry.setClass(ExportableClass, 'Y');
+    assert.equal(classRegistry.getJSONClass('json'), JSONClass, 'resolved class');
+    assert.throws(() => classRegistry.getSVGClass('json'), 'should not have registered class');
+    assert.equal(classRegistry.getSVGClass('svg'), SVGClass, 'resolved class');
+    assert.throws(() => classRegistry.getJSONClass('svg'), 'should not have registered class');
+    assert.equal(classRegistry.getJSONClass('Y'), ExportableClass, 'resolved class');
+    assert.equal(classRegistry.getSVGClass('Y'), ExportableClass, 'resolved class');
+    assert.throws(() => classRegistry.getJSONClass('X'), 'should not have registered class');
+    assert.throws(() => classRegistry.getSVGClass('X'), 'should not have registered class');
   });
 })()
