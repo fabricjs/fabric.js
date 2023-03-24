@@ -209,7 +209,7 @@ export class Shadow {
   }
 
   static fromObject(options: Partial<TClassProperties<Shadow>>) {
-    return new Shadow(options);
+    return new this(options);
   }
 
   /**

@@ -326,7 +326,7 @@ export class Gradient<
   static fromObject(
     options: GradientOptions<'linear'> | GradientOptions<'radial'>
   ) {
-    return new Gradient(options);
+    return new this(options);
   }
 
   /* _FROM_SVG_START_ */
