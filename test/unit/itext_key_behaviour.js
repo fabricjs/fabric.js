@@ -25,25 +25,40 @@
 
   QUnit.module('selection changes', function (hooks) {
     let iText, selection = 0, _assertCursorAnimation, _setSelection;
-    hooks.before(() => {
+    hooks.beforeEach(() => {
       iText = new fabric.IText('test need some word\nsecond line');
       iText.ctx = ctx;
       iText.on('selection:changed', () => selection++);
       _assertCursorAnimation = assertCursorAnimation.bind(null, QUnit.assert, iText);
       _setSelection = setSelection.bind(null, QUnit.assert, iText);
+      selection = 0;
     });
     hooks.after(() => {
       // needed or test hangs
       iText.dispose();
     });
-    hooks.beforeEach(() => {
-      selection = 0;
-    });
-
     QUnit.test('enterEditing', async function (assert) {
       iText.enterEditing();
       await _assertCursorAnimation(true);
       assert.equal(selection, 1, 'will fire on enter edit since the cursor is changing for the first time');
+    });
+
+    QUnit.test('enterEditing and onInput', function (assert) {
+      iText.enterEditing();
+      assert.equal(iText.text.includes('__UNIQUE_TEXT_'), false, 'does not contain __UNIQUE_TEXT_');
+      const event = new (fabric.getWindow().InputEvent)("input", { inputType: "insertText", data: '__UNIQUE_TEXT_', composed: true });
+      // manually crafted events have `isTrusted` as false so they won't interact with the html element
+      iText.hiddenTextarea.value = `__UNIQUE_TEXT_${iText.hiddenTextarea.value}`;
+      iText.hiddenTextarea.dispatchEvent(event);
+      assert.equal(iText.text.includes('__UNIQUE_TEXT_'), true, 'does contain __UNIQUE_TEXT_');
+    });
+
+    QUnit.test('updateFromTextArea calls setDimensions', function (assert) {
+      iText.enterEditing();
+      assert.equal(iText.width < 400, true, 'iText is less than 400px')
+      iText.hiddenTextarea.value = `more more more more text ${iText.hiddenTextarea.value}`;
+      iText.updateFromTextArea();
+      assert.equal(iText.width > 700, true, 'iText is now more than 700px')
     });
 
     QUnit.test('selectAll', async function (assert) {
