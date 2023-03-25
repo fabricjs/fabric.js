@@ -578,7 +578,7 @@ export class SelectableCanvas<
     const activeObject = this._activeObject;
     return !this.preserveObjectStacking && activeObject
       ? this._objects
-          .filter((object) => !object.group && object !== activeObject)
+          .filter((object) => object !== activeObject)
           .concat(activeObject)
       : this._objects;
   }
