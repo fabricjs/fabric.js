@@ -497,7 +497,9 @@ export class FabricObject<
     const needFullTransform =
       (this.group && !this.group._transformDone) ||
       (this.group && this.canvas && ctx === (this.canvas as Canvas).contextTop);
-    const m = this.calcTransformMatrix(!needFullTransform);
+    const m = needFullTransform
+      ? this.calcTransformMatrix()
+      : this.calcOwnMatrix();
     ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
   }
 
