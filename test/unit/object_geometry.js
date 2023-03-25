@@ -472,15 +472,13 @@
   QUnit.test('getBoundingRect with absolute coords', function(assert) {
     var cObj = new fabric.Object({ strokeWidth: 0, width: 10, height: 10, top: 6, left: 5 }),
         boundingRect;
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 5, 'gives the bounding rect left with zoom 1');
     assert.equal(boundingRect.width, 10, 'gives the bounding rect width with zoom 1');
     assert.equal(boundingRect.height, 10, 'gives the bounding rect height with zoom 1');
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
+    canvas.setViewportTransform([2, 0, 0, 2, 0, 0])
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 10, 'gives the bounding rect left with zoom 2');
@@ -496,7 +494,7 @@
     var cObj = new fabric.Object({ strokeWidth: 0 }),
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
@@ -531,7 +529,7 @@
     var cObj = new fabric.Object(),
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
@@ -583,6 +581,7 @@
 
   QUnit.test('getCoords return coordinate of object in canvas coordinate.', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+    canvas.add(cObj);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner');
     assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner');
@@ -605,9 +604,8 @@
 
   QUnit.test('getCoords return coordinate of object in zoomed canvas coordinate.', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 35]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(115, 95), 'return top left corner is influenced by canvas zoom');
     assert.deepEqual(coords[1], new fabric.Point(139, 95), 'return top right corner is influenced by canvas zoom');
@@ -617,9 +615,8 @@
 
   QUnit.test('getCoords return coordinate of object in absolute coordinates and ignore canvas zoom', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 35]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached controlCoords');
     assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached controlCoords');
@@ -629,9 +626,8 @@
 
   QUnit.test('getCoords absolute with angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, angle: 20 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with angle X');
     assert.deepEqual(coords[1].x, 51.2763114494309, 'return top right absolute with angle X');
@@ -645,9 +641,8 @@
 
   QUnit.test('getCoords with angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, angle: 20 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with angle X');
     assert.deepEqual(coords[1].x, 137.55262289886178, 'return top right with angle X');
@@ -661,9 +656,8 @@
 
   QUnit.test('getCoords absolute with skewX', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewX: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewX X');
     assert.deepEqual(coords[1].x, 69, 'return top right absolute with skewX X');
@@ -677,9 +671,8 @@
 
   QUnit.test('getCoords with skewX', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewX: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewX X');
     assert.deepEqual(coords[1].x, 173, 'return top right with skewX X');
@@ -693,9 +686,8 @@
 
   QUnit.test('getCoords absolute with skewY', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewY X');
     assert.deepEqual(coords[1].x, 52, 'return top right absolute with skewY X');
@@ -709,9 +701,8 @@
 
   QUnit.test('getCoords with skewY', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewY X');
     assert.deepEqual(coords[1].x, 139, 'return top right with skewY X');
@@ -725,9 +716,8 @@
 
   QUnit.test('getCoords absolute with skewY skewX angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45, skewX: 30, angle: 90 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewY skewX angle X');
     assert.deepEqual(coords[1].x, 40, 'return top right absolute with skewY skewX angle X');
@@ -741,9 +731,8 @@
 
   QUnit.test('getCoords with skewY skewX angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45, skewX: 30, angle: 90 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewY skewX angle X');
     assert.deepEqual(coords[1].x, 115, 'return top right with skewY skewX angle X');
