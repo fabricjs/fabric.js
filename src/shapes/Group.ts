@@ -523,16 +523,18 @@ export class Group extends createCollectionMixin(
    */
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
+    const preserve = this.canvas?.preserveObjectStacking;
     this._objects.forEach((object) => {
       // TODO: handle rendering edge case somehow
-      if (this.canvas?.preserveObjectStacking && object.group !== this) {
+      if (preserve && object.group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
         object.render(ctx);
         ctx.restore();
       } else if (
         object.group === this &&
-        (!object.skipOffscreen || object.isOverlapping(this))
+        (preserve || !this._activeObjects.includes(object))
+        // && (!object.skipOffscreen || object.isOverlapping(this))
       ) {
         object.render(ctx);
       }
