@@ -224,7 +224,7 @@ export class InteractiveFabricObject<
     const legacyBBox = BBox.legacy(this);
     const coords = mapValues(this.controls, (control, key) => {
       const position = control.positionHandler(
-        legacyBBox.getDimensionsVector(),
+        legacyBBox.getBBoxVector(),
         legacyBBox.getTransformation(),
         this,
         control[key]
@@ -376,7 +376,7 @@ export class InteractiveFabricObject<
     ctx.save();
     const legacy = BBox.legacy(this);
     legacy.transform(ctx);
-    this.strokeBordersLegacy(ctx, legacy.getDimensionsVector());
+    this.strokeBordersLegacy(ctx, legacy.getBBoxVector());
     ctx.restore();
     this.strokeBorders(ctx);
     ctx.restore();

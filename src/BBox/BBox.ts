@@ -159,7 +159,7 @@ export class BBox extends ViewportBBox {
       getBBox() {
         return legacyBBox;
       },
-      getDimensionsVector() {
+      getBBoxVector() {
         return new Point(legacyBBox.width, legacyBBox.height);
       },
       transform(ctx: CanvasRenderingContext2D) {
