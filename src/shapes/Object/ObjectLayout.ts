@@ -52,7 +52,7 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
    */
   declare matrixCache?: TMatrixCache;
 
-  protected getDimensionsVectorForLayout(origin = new Point(1, 1)) {
+  getDimensionsVectorForLayout(origin = new Point(1, 1)) {
     return sizeAfterTransform(this.width, this.height, this)
       .rotate(degreesToRadians(this.angle))
       .multiply(origin);
