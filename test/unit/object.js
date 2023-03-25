@@ -318,7 +318,7 @@
     assert.ok(typeof cObj.scale === 'function');
     assert.equal(cObj.get('scaleX'), 1);
     assert.equal(cObj.get('scaleY'), 1);
-    cObj.scale(1.5);
+    cObj.scale(1.5, 1.5);
     assert.equal(cObj.get('scaleX'), 1.5);
     assert.equal(cObj.get('scaleY'), 1.5);
   });

@@ -332,12 +332,12 @@
 
     assert.ok(!group.containsPoint({ x: 0, y: 0 }));
 
-    group.scale(2);
+    group.scale(2, 2);
     assert.ok(group.containsPoint({ x: 50, y: 120 }));
     assert.ok(group.containsPoint({ x: 100, y: 160 }));
     assert.ok(!group.containsPoint({ x: 0, y: 0 }));
 
-    group.scale(1);
+    group.scale(1, 1);
     group.padding = 30;
     group.setCoords();
     assert.ok(group.containsPoint({ x: 50, y: 120 }));

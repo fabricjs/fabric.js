@@ -629,7 +629,7 @@
     text.selectAll();
     canvas.renderAll();
     text.rotate(90);
-    text.scale(0.8);
+    text.scale(0.8, 0.8);
     canvas.centerObject(text);
     canvas.renderAll();
     assert.equal(text.__calledInitDimensions, 0, 'initDimensions was not called');

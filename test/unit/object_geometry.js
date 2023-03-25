@@ -518,7 +518,7 @@
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 167);
 
-    cObj.scale(2)
+    cObj.scale(2, 2)
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
@@ -555,7 +555,7 @@
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 168);
 
-    cObj.scale(2)
+    cObj.scale(2, 2)
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
