@@ -402,6 +402,18 @@ export class Group extends createCollectionMixin(
       object.group.remove(object);
     }
     this._enterGroup(object, removeParentTransform);
+    this.interactive && this._watchObject(true, object);
+    const activeObject =
+      this.canvas &&
+      this.canvas.getActiveObject &&
+      this.canvas.getActiveObject();
+    // if we are adding the activeObject in a group
+    if (
+      activeObject &&
+      (activeObject === object || object.isDescendantOf(activeObject))
+    ) {
+      this._activeObjects.push(object);
+    }
     return true;
   }
 
@@ -424,18 +436,6 @@ export class Group extends createCollectionMixin(
     this._shouldSetNestedCoords() && object.setCoords();
     object._set('group', this);
     object._set('canvas', this.canvas);
-    this.interactive && this._watchObject(true, object);
-    const activeObject =
-      this.canvas &&
-      this.canvas.getActiveObject &&
-      this.canvas.getActiveObject();
-    // if we are adding the activeObject in a group
-    if (
-      activeObject &&
-      (activeObject === object || object.isDescendantOf(activeObject))
-    ) {
-      this._activeObjects.push(object);
-    }
   }
 
   /**
@@ -445,6 +445,12 @@ export class Group extends createCollectionMixin(
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    this._watchObject(false, object);
+    const index =
+      this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
+    if (index > -1) {
+      this._activeObjects.splice(index, 1);
+    }
     object._set('canvas', undefined);
   }
 
@@ -464,12 +470,6 @@ export class Group extends createCollectionMixin(
         )
       );
       object.setCoords();
-    }
-    this._watchObject(false, object);
-    const index =
-      this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
-    if (index > -1) {
-      this._activeObjects.splice(index, 1);
     }
   }
 

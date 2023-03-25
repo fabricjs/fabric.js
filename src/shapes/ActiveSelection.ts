@@ -131,6 +131,12 @@ export class ActiveSelection extends Group {
     return false;
   }
 
+  drawObject(ctx: CanvasRenderingContext2D) {
+    this._renderBackground(ctx);
+    this._objects.forEach((object) => object.render(ctx));
+    this._drawClipPath(ctx, this.clipPath);
+  }
+
   /**
    * Returns string representation of a group
    * @return {String}
