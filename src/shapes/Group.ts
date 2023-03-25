@@ -1,10 +1,9 @@
-// @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
-import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
+import type { TSVGReviver } from '../typedefs';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -20,6 +19,8 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
+import { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import { makeBoundingBoxFromPoints } from '../util';
 
 export type LayoutContextType =
   | 'initialization'
@@ -77,7 +78,18 @@ export type LayoutResult = {
   height: number;
 };
 
-export const groupDefaultValues: Partial<TClassProperties<Group>> = {
+export interface GroupOwnProps {
+  layout: LayoutStrategy;
+  subTargetCheck: boolean;
+  interactive: boolean;
+}
+
+export interface SerializedGroupProps
+  extends SerializedObjectProps,
+    GroupOwnProps {}
+export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
+
+export const groupDefaultValues = {
   layout: 'fit-content',
   strokeWidth: 0,
   subTargetCheck: false,
@@ -89,12 +101,13 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
+export class Group extends createCollectionMixin(
+  FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
+) {
   /**
    * Specifies the **layout strategy** for instance
    * Used by `getLayoutStrategyResult` to calculate layout
    * `fit-content`, `fit-content-lazy`, `fixed`, `clip-path` are supported out of the box
-   * @type LayoutStrategy
    * @default
    */
   declare layout: LayoutStrategy;
@@ -130,6 +143,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   ];
 
   static ownDefaults: Record<string, any> = groupDefaultValues;
+  private __objectSelectionTracker: (ev: ObjectEvents['selected']) => void;
+  private __objectSelectionDisposer: (ev: ObjectEvents['deselected']) => void;
+  private _firstLayoutDone = false;
 
   static getDefaults(): Record<string, any> {
     return {
@@ -161,7 +177,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       this,
       false
     );
-    this._firstLayoutDone = false;
     // setting angle, skewX, skewY must occur after initial layout
     this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
@@ -333,8 +348,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * invalidates layout on object modified
    * @private
    */
-  __objectMonitor(opt) {
-    this._applyLayoutStrategy({ ...opt, type: 'object_modified' });
+  __objectMonitor(ev: ObjectEvents['modified']) {
+    this._applyLayoutStrategy({ ...ev, type: 'object_modified' });
     this._set('dirty', true);
   }
 
@@ -342,8 +357,10 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * keeps track of the selected objects
    * @private
    */
-  __objectSelectionMonitor(selected: boolean, opt) {
-    const object = opt.target;
+  __objectSelectionMonitor<T extends boolean>(
+    selected: T,
+    { target: object }: ObjectEvents[T extends true ? 'selected' : 'deselected']
+  ) {
     if (selected) {
       this._activeObjects.push(object);
       this._set('dirty', true);
@@ -544,7 +561,9 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @public
    * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
    */
-  triggerLayout(context) {
+  triggerLayout<T extends this['layout']>(
+    context?: Partial<LayoutResult> & { layout?: T }
+  ) {
     if (context && context.layout) {
       context.prevLayout = this.layout;
       this.layout = context.layout;
@@ -572,7 +591,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @private
    * @param {LayoutContext} context
    */
-  _applyLayoutStrategy(context) {
+  _applyLayoutStrategy(context: LayoutContext) {
     const isFirstLayout = context.type === 'initialization';
     if (!isFirstLayout && !this._firstLayoutDone) {
       //  reject layout requests before initialization layout
@@ -587,7 +606,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     const center = this.getRelativeCenterPoint();
     let result = this.getLayoutStrategyResult(
       this.layout,
-      this._objects.concat(),
+      [...this._objects],
       context
     );
     let diff: Point;
@@ -626,6 +645,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
         height: this.height,
       };
       initialTransform && this.set(initialTransform);
+      diff = new Point();
     } else {
       //  no `result` so we return
       return;
@@ -660,8 +680,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  getLayoutStrategyResult(
-    layoutDirective: LayoutStrategy,
+  getLayoutStrategyResult<T extends this['layout']>(
+    layoutDirective: T,
     objects: FabricObject[],
     context: LayoutContext
   ) {
@@ -734,12 +754,6 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
           };
         }
       }
-    } else if (layoutDirective === 'svg' && context.type === 'initialization') {
-      const bbox = this.getObjectsBoundingBox(objects, true) || {};
-      return Object.assign(bbox, {
-        correctionX: -bbox.offsetX || 0,
-        correctionY: -bbox.offsetY || 0,
-      });
     }
   }
 
@@ -752,18 +766,18 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  prepareBoundingBox(
-    layoutDirective: LayoutStrategy,
+  prepareBoundingBox<T extends this['layout']>(
+    layoutDirective: T,
     objects: FabricObject[],
     context: LayoutContext
   ) {
     if (context.type === 'initialization') {
       return this.prepareInitialBoundingBox(layoutDirective, objects, context);
     } else if (context.type === 'imperative' && context.context) {
-      return Object.assign(
-        this.getObjectsBoundingBox(objects) || {},
-        context.context
-      );
+      return {
+        ...(this.getObjectsBoundingBox(objects) || {}),
+        ...context.context,
+      };
     } else {
       return this.getObjectsBoundingBox(objects);
     }
@@ -777,8 +791,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @param {LayoutContext} context
    * @returns {LayoutResult | undefined}
    */
-  prepareInitialBoundingBox(
-    layoutDirective: LayoutStrategy,
+  prepareInitialBoundingBox<T extends this['layout']>(
+    layoutDirective: T,
     objects: FabricObject[],
     context: LayoutContext
   ) {
@@ -802,29 +816,23 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
       return;
     }
 
-    const bbox = this.getObjectsBoundingBox(objects) || {};
-    const width = hasWidth ? this.width : bbox.width || 0,
-      height = hasHeight ? this.height : bbox.height || 0,
-      calculatedCenter = new Point(bbox.centerX || 0, bbox.centerY || 0),
+    const {
+      centerX = 0,
+      centerY = 0,
+      width: w = 0,
+      height: h = 0,
+    } = this.getObjectsBoundingBox(objects) || {};
+    const width = hasWidth ? this.width : w,
+      height = hasHeight ? this.height : h,
+      calculatedCenter = new Point(centerX, centerY),
       origin = new Point(
         resolveOrigin(this.originX),
         resolveOrigin(this.originY)
       ),
       size = new Point(width, height),
-      strokeWidthVector = this._getTransformedDimensions({
-        width: 0,
-        height: 0,
-      }),
-      sizeAfter = this._getTransformedDimensions({
-        width: width,
-        height: height,
-        strokeWidth: 0,
-      }),
-      bboxSizeAfter = this._getTransformedDimensions({
-        width: bbox.width,
-        height: bbox.height,
-        strokeWidth: 0,
-      }),
+      strokeWidthVector = new Point(),
+      sizeAfter = new Point(width, height),
+      bboxSizeAfter = new Point(w, h),
       rotationCorrection = new Point(0, 0);
 
     //  calculate center and correction
@@ -884,8 +892,8 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
     if (objects.length === 0) {
       return null;
     }
-    let min: Point, max: Point;
-    objects.forEach((object, i) => {
+    const objectBounds: Point[] = [];
+    objects.forEach((object) => {
       const objCenter = object.getRelativeCenterPoint();
       let sizeVector = object._getTransformedDimensions().scalarDivide(2);
       if (object.angle) {
@@ -896,28 +904,22 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
           ry = sizeVector.x * sine + sizeVector.y * cosine;
         sizeVector = new Point(rx, ry);
       }
-      const a = objCenter.subtract(sizeVector);
-      const b = objCenter.add(sizeVector);
-      if (i === 0) {
-        min = new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-        max = new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
-      } else {
-        min.setXY(Math.min(min.x, a.x, b.x), Math.min(min.y, a.y, b.y));
-        max.setXY(Math.max(max.x, a.x, b.x), Math.max(max.y, a.y, b.y));
-      }
+      objectBounds.push(
+        objCenter.subtract(sizeVector),
+        objCenter.add(sizeVector)
+      );
     });
+    const { left, top, width, height } =
+      makeBoundingBoxFromPoints(objectBounds);
 
-    const size = max.subtract(min),
-      relativeCenter = ignoreOffset
-        ? size.scalarDivide(2)
-        : min.midPointFrom(max),
+    const size = new Point(width, height),
+      relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
+        size.scalarDivide(2)
+      ),
       //  we send `relativeCenter` up to group's containing plane
-      offset = min.transform(this.calcOwnMatrix()),
       center = relativeCenter.transform(this.calcOwnMatrix());
 
     return {
-      offsetX: offset.x,
-      offsetY: offset.y,
       centerX: center.x,
       centerY: center.y,
       width: size.x,
@@ -968,14 +970,15 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @return {Object} object representation of an instance
    */
   toObject(propertiesToInclude: (keyof this)[] = []) {
-    const obj = super.toObject([
-      'layout',
-      'subTargetCheck',
-      'interactive',
-      ...propertiesToInclude,
-    ]);
-    obj.objects = this.__serializeObjects('toObject', propertiesToInclude);
-    return obj;
+    return {
+      ...super.toObject([
+        'layout',
+        'subTargetCheck',
+        'interactive',
+        ...propertiesToInclude,
+      ]),
+      objects: this.__serializeObjects('toObject', propertiesToInclude),
+    };
   }
 
   toString() {
@@ -994,22 +997,23 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
   /**
    * @private
    */
-  _createSVGBgRect(reviver?: (markup: string) => any) {
+  _createSVGBgRect(reviver?: TSVGReviver) {
     if (!this.backgroundColor) {
       return '';
     }
-    const fillStroke = Rect.prototype._toSVG.call(this, reviver);
+    const fillStroke = Rect.prototype._toSVG.call(this);
     const commons = fillStroke.indexOf('COMMON_PARTS');
     fillStroke[commons] = 'for="group" ';
-    return fillStroke.join('');
+    const markup = fillStroke.join('');
+    return reviver ? reviver(markup) : markup;
   }
 
   /**
    * Returns svg representation of an instance
-   * @param {Function} [reviver] Method for further parsing of svg representation.
+   * @param {TSVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  _toSVG(reviver?: (markup: string) => any) {
+  _toSVG(reviver?: TSVGReviver) {
     const svgString = ['<g ', 'COMMON_PARTS', ' >\n'];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t\t', bg);
@@ -1038,7 +1042,7 @@ export class Group extends createCollectionMixin(FabricObject<GroupEvents>) {
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: (markup: string) => any) {
+  toClipPathSVG(reviver?: TSVGReviver) {
     const svgString = [];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t', bg);
