@@ -5,13 +5,19 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { TDegree, TMat2D, TRadian } from '../../typedefs';
 import { mapValues } from '../../util/internals';
-import { multiplyTransformMatrices, qrDecompose } from '../../util/misc/matrix';
-import { getUnitVector, rotateVector } from '../../util/misc/vectors';
+import {
+  composeMatrix,
+  multiplyTransformMatrices,
+} from '../../util/misc/matrix';
+import {
+  calcVectorRotation,
+  getUnitVector,
+  rotateVector,
+} from '../../util/misc/vectors';
 import { BBox } from '../../BBox/BBox';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 
 export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
   extends ObjectLayout<EventSpec>
@@ -76,20 +82,27 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {TDegree}
    */
   getTotalAngle(inViewport = true): TRadian {
-    const { flipX, flipY } = this;
-    this.flipX = false;
-    this.flipY = false;
-    const { angle } = qrDecompose(
-      inViewport
-        ? multiplyTransformMatrices(
-            this.getViewportTransform(),
-            this.calcTransformMatrix()
-          )
-        : this.calcTransformMatrix()
-    );
-    this.flipX = flipX;
-    this.flipY = flipY;
-    return degreesToRadians(angle);
+    const center = this.getRelativeCenterPoint();
+    const own = composeMatrix({
+      angle: this.angle,
+      translateX: center.x,
+      translateY: center.y,
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      skewX: this.skewX,
+      // TODO: should we pass 0 here?
+      skewY: this.skewY,
+      // flipping should not be taken into account in the angle, it is taken into account in the bbox transformation
+      flipX: false,
+      flipY: false,
+    });
+    const t = this.group
+      ? multiplyTransformMatrices(this.group.calcTransformMatrix(), own)
+      : own;
+    const [a, b] = inViewport
+      ? multiplyTransformMatrices(this.getViewportTransform(), t)
+      : t;
+    return calcVectorRotation({ x: a, y: b });
   }
 
   protected calcDimensionsVector(

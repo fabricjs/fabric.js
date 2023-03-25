@@ -1,8 +1,6 @@
 import { IPoint, Point } from '../../Point';
 import { TRadian } from '../../typedefs';
 
-const unitVectorX = new Point(1, 0);
-
 /**
  * Rotates `vector` with `radians`
  * @param {Point} vector The vector to rotate (x and y)
@@ -47,8 +45,8 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
  * @param {Point} v
  * @returns the angle in radians of `v`
  */
-export const calcVectorRotation = (v: Point) =>
-  calcAngleBetweenVectors(unitVectorX, v);
+export const calcVectorRotation = (v: IPoint) =>
+  Math.atan2(v.y, v.x) as TRadian;
 
 /**
  * @param {Point} v
