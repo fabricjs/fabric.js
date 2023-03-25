@@ -123,8 +123,6 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
           sep +
           this.height +
           sep +
-          // TODO: why is this here?
-          // this.strokeWidth +
           this.flipX +
           this.flipY;
   }
