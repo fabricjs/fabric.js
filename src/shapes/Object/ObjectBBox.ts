@@ -1,3 +1,4 @@
+import { BBox } from '../../BBox/BBox';
 import { Canvas } from '../../canvas/Canvas';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { iMatrix } from '../../constants';
@@ -9,12 +10,7 @@ import {
   composeMatrix,
   multiplyTransformMatrices,
 } from '../../util/misc/matrix';
-import {
-  calcVectorRotation,
-  getUnitVector,
-  rotateVector,
-} from '../../util/misc/vectors';
-import { BBox } from '../../BBox/BBox';
+import { calcVectorRotation, magnitude } from '../../util/misc/vectors';
 import { ObjectLayout } from './ObjectLayout';
 import { ControlProps } from './types/ControlProps';
 import { FillStrokeProps } from './types/FillStrokeProps';
@@ -110,9 +106,11 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
     {
       applyViewportTransform = this.needsViewportCoords(),
       transform = this.calcTransformMatrix(),
+      padding = this.padding,
     }: {
       applyViewportTransform?: boolean;
       transform?: TMat2D;
+      padding?: number;
     } = {}
   ) {
     const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
@@ -120,33 +118,27 @@ export class ObjectBBox<EventSpec extends ObjectEvents = ObjectEvents>
       .multiply(new Point(this.width, this.height))
       .add(origin.scalarMultiply(!this.strokeUniform ? this.strokeWidth : 0))
       .transform(multiplyTransformMatrices(vpt, transform), true);
-    const strokeUniformVector = getUnitVector(dimVector).scalarMultiply(
-      this.strokeUniform ? this.strokeWidth : 0
+    return dimVector.scalarMultiply(
+      1 +
+        (2 * padding + (this.strokeUniform ? this.strokeWidth : 0)) /
+          magnitude(dimVector)
     );
-    return dimVector.add(strokeUniformVector);
   }
 
   protected calcCoord(
     origin: Point,
     {
-      offset = new Point(),
       applyViewportTransform = this.needsViewportCoords(),
-      padding = 0,
     }: {
-      offset?: Point;
       applyViewportTransform?: boolean;
-      padding?: number;
     } = {}
   ) {
-    const vpt = applyViewportTransform ? this.getViewportTransform() : iMatrix;
-    const offsetVector = rotateVector(
-      offset.add(origin.scalarMultiply(padding * 2)),
-      this.getTotalAngle(applyViewportTransform)
+    const realCenter = this.getCenterPoint().transform(
+      applyViewportTransform ? this.getViewportTransform() : iMatrix
     );
-    const realCenter = this.getCenterPoint().transform(vpt);
-    return realCenter
-      .add(this.calcDimensionsVector(origin, { applyViewportTransform }))
-      .add(offsetVector);
+    return realCenter.add(
+      this.calcDimensionsVector(origin, { applyViewportTransform })
+    );
   }
 
   /**
