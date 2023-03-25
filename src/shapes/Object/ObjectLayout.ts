@@ -150,10 +150,10 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
         matrix
       );
     }
-    this.matrixCache = {
-      key,
-      value: matrix,
-    };
+    // this.matrixCache = {
+    //   key,
+    //   value: matrix,
+    // };
     return matrix;
   }
 
@@ -180,10 +180,10 @@ export class ObjectLayout<EventSpec extends ObjectEvents = ObjectEvents>
         flipX: this.flipX,
         flipY: this.flipY,
       });
-    this.ownMatrixCache = {
-      key,
-      value,
-    };
+    // this.ownMatrixCache = {
+    //   key,
+    //   value,
+    // };
     return value;
   }
 }
