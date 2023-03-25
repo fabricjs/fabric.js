@@ -97,6 +97,8 @@ export class ObjectTransformations<
 
     if (!isMatrixEqual(ownTransformAfter, ownTransformBefore)) {
       // TODO: stop using decomposed values in favor of a matrix
+      delete this.ownMatrixCache;
+      delete this.matrixCache;
       applyTransformToObject(this, ownTransformAfter);
       this.setCoords();
       if (this.group) {
