@@ -3,6 +3,7 @@ import { createCollectionMixin } from '../Collection';
 import { resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { TSVGReviver } from '../typedefs';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -17,7 +18,6 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 
 export type LayoutContextType =
   | 'initialization'
@@ -161,7 +161,7 @@ export class Group extends createCollectionMixin(
    */
   constructor(
     objects: FabricObject[] = [],
-    options: any = {},
+    options: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
     super();
