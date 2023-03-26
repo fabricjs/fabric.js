@@ -4,6 +4,7 @@ import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
 import type { TSVGReviver } from '../typedefs';
+import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -20,7 +21,6 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import { makeBoundingBoxFromPoints } from '../util';
 
 export type LayoutContextType =
   | 'initialization'
