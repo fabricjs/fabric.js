@@ -13,7 +13,6 @@ import { createVector } from '../util/misc/vectors';
 import { ViewportBBox, ViewportBBoxPlanes } from './ViewportBBox';
 
 export interface BBoxPlanes extends ViewportBBoxPlanes {
-  retina(): TMat2D;
   parent(): TMat2D;
   self(): TMat2D;
 }
@@ -71,7 +70,6 @@ export class BBox extends ViewportBBox {
     const self = target.calcTransformMatrix();
     const parent = target.group?.calcTransformMatrix() || iMatrix;
     const viewport = target.getViewportTransform();
-    const retina = target.canvas?.getRetinaScaling() || 1;
     return {
       self() {
         return self;
@@ -81,9 +79,6 @@ export class BBox extends ViewportBBox {
       },
       viewport() {
         return viewport;
-      },
-      retina() {
-        return [retina, 0, 0, retina, 0, 0] as TMat2D;
       },
     };
   }

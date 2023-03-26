@@ -35,10 +35,6 @@ export class OwnBBox extends BBox {
       viewport() {
         return target.getViewportTransform();
       },
-      retina() {
-        const retina = target.canvas?.getRetinaScaling() || 1;
-        return [retina, 0, 0, retina, 0, 0] as TMat2D;
-      },
     };
   }
 }
