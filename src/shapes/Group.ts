@@ -830,9 +830,20 @@ export class Group extends createCollectionMixin(
         resolveOrigin(this.originY)
       ),
       size = new Point(width, height),
-      strokeWidthVector = new Point(),
-      sizeAfter = new Point(width, height),
-      bboxSizeAfter = new Point(w, h),
+      strokeWidthVector = this._getTransformedDimensions({
+        width: 0,
+        height: 0,
+      }),
+      sizeAfter = this._getTransformedDimensions({
+        width: width,
+        height: height,
+        strokeWidth: 0,
+      }),
+      bboxSizeAfter = this._getTransformedDimensions({
+        width: w,
+        height: h,
+        strokeWidth: 0,
+      }),
       rotationCorrection = new Point(0, 0);
 
     //  calculate center and correction
