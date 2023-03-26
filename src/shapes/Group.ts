@@ -163,7 +163,7 @@ export class Group extends createCollectionMixin(
    */
   constructor(
     objects: FabricObject[] = [],
-    options: any = {},
+    options: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
     super();
