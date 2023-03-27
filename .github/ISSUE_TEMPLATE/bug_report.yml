@@ -47,6 +47,7 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.0.0-beta1
         - 5.3.0
         - 5.2.4
         - 5.2.2
@@ -85,6 +86,10 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 19.8.1
+        - 19.8.0
+        - 19.7.0
+        - 19.6.1
         - 19.6.0
         - 19.5.0
         - 19.4.0
@@ -93,6 +98,9 @@ body:
         - 19.1.0
         - 19.0.1
         - 19.0.0
+        - 18.15.0
+        - 18.14.2
+        - 18.14.1
         - 18.14.0
         - 18.13.0
         - 18.12.1
@@ -123,6 +131,7 @@ body:
         - 17.1.0
         - 17.0.1
         - 17.0.0
+        - 16.19.1
         - 16.19.0
         - 16.18.1
         - 16.18.0
@@ -166,6 +175,7 @@ body:
         - 15.1.0
         - 15.0.1
         - 15.0.0
+        - 14.21.3
         - 14.21.2
         - 14.21.0
         - 14.20.1
@@ -219,14 +229,13 @@ body:
         Take the time and put effort into making your reproduction accurate and
         minimal.
 
-        Use the following reproduction templates.
+        Use the following reproduction templates:
 
+        - [Next template >= `v6`](https://codesandbox.io/p/sandbox/fabric-nextjs-sandbox-forked-h6qdh3?file=%2FREADME.md) for browser and node reproductions, **preferred**
 
-        - [Browser reproduction template](https://jsfiddle.net/Lcp2h3nv/)
+        - [Vanilla template >= `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-e5r48u?file=%2FREADME.md), [Vanilla template < `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-v92h26?file=%2FREADME.md) for browser reproductions
 
-        - [Node reproduction
-        template](https://codesandbox.io/s/exciting-browser-ytb701)
-
+        - [Node template >= `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md), [Node template < `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
 
         ⛔ No reproduction === closed issue ⛔
     validations:

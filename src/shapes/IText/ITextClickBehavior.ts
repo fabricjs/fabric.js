@@ -1,5 +1,5 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
-import { IPoint, Point } from '../../Point';
+import { XY, Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';
@@ -23,7 +23,7 @@ export abstract class ITextClickBehavior<
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
-  private declare __lastPointer: IPoint | Record<string, never>;
+  private declare __lastPointer: XY | Record<string, never>;
   private declare __newClickTime: number;
 
   protected draggableTextDelegate: DraggableTextDelegate;
@@ -88,7 +88,7 @@ export abstract class ITextClickBehavior<
     this.__lastSelected = this.selected;
   }
 
-  isTripleClick(newPointer: IPoint) {
+  isTripleClick(newPointer: XY) {
     return (
       this.__newClickTime - this.__lastClickTime < 500 &&
       this.__lastClickTime - this.__lastLastClickTime < 500 &&
@@ -293,7 +293,7 @@ export abstract class ITextClickBehavior<
    * @private
    */
   _getNewSelectionStartFromOffset(
-    mouseOffset: IPoint,
+    mouseOffset: XY,
     prevWidth: number,
     width: number,
     index: number,

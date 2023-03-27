@@ -1,5 +1,5 @@
 import { iMatrix } from '../../constants';
-import { IPoint, Point } from '../../Point';
+import { XY, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
@@ -36,13 +36,13 @@ export const isIdentityMatrix = (mat: TMat2D) =>
 
 /**
  * Apply transform t to point p
- * @param  {Point | IPoint} p The point to transform
+ * @param  {Point | XY} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
 export const transformPoint = (
-  p: IPoint,
+  p: XY,
   t: TMat2D,
   ignoreOffset?: boolean
 ): Point => new Point(p).transform(t, ignoreOffset);
