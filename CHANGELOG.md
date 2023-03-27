@@ -2,6 +2,7 @@
 
 ## [next]
 
+- rename(): `IPoint` => `XY` [#8806](https://github.com/fabricjs/fabric.js/pull/8806)
 - ci(): use sandbox apps in issue template, use the current branch when deploying an app, minors [#8803](https://github.com/fabricjs/fabric.js/pull/8803)
 - perf(): optimize `perPixelTargetFind` [#8770](https://github.com/fabricjs/fabric.js/pull/8770)
 - BREAKING fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
