@@ -2,7 +2,7 @@
 import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
-import type { Point } from './Point';
+import type { IPoint, Point } from './Point';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -10,8 +10,8 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type TNonFunctionPropertyNames<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -67,11 +67,6 @@ export const enum SupportedSVGUnit {
 export type TMat2D = [number, number, number, number, number, number];
 
 /**
- * SVG path commands
- */
-export type PathData = (string | number)[][];
-
-/**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
  * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
  */
@@ -99,6 +94,8 @@ export type TCacheCanvasDimensions = {
   x: number;
   y: number;
 };
+
+export type TRectBounds = [min: IPoint, max: IPoint];
 
 export type TToCanvasElementOptions = {
   left?: number;

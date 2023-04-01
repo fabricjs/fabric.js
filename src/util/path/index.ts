@@ -1,96 +1,108 @@
-//@ts-nocheck
+import { cache } from '../../cache';
+import { config } from '../../config';
+import { halfPI, PiBy180 } from '../../constants';
+import type { TMat2D, TRadian, TRectBounds } from '../../typedefs';
+import { cos } from '../misc/cos';
+import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
+import { sin } from '../misc/sin';
+import { toFixed } from '../misc/toFixed';
+import {
+  TCurveInfo,
+  TComplexPathData,
+  TParsedAbsoluteCubicCurveCommand,
+  TParsedCubicCurveCommand,
+  TPathSegmentInfo,
+  TPointAngle,
+  TSimpleParsedCommand,
+  TSimplePathData,
+  TPathSegmentCommandInfo,
+  TComplexParsedCommand,
+  TPathSegmentInfoCommon,
+  TEndPathInfo,
+  TParsedArcCommand,
+} from './typedefs';
+import { XY, Point } from '../../Point';
+import { numberRegExStr, rePathCommand } from './regex';
 
-import { cache } from '../cache';
-import { config } from '../config';
-import { halfPI, PiBy180 } from '../constants';
-import { commaWsp, rePathCommand } from '../parser/constants';
-import { Point } from '../Point';
-import type { PathData, TMat2D } from '../typedefs';
-import { cos } from './misc/cos';
-import { multiplyTransformMatrices, transformPoint } from './misc/matrix';
-import { sin } from './misc/sin';
-import { toFixed } from './misc/toFixed';
-
-type PathSegmentInfoCommon = {
-  x: number;
-  y: number;
-  command: string;
-  length: number;
-};
-
-type CurveInfo = PathSegmentInfoCommon & {
-  iterator: (pct: number) => Point;
-  angleFinder: (pct: number) => number;
-  length: number;
-};
-
-export type PathSegmentInfo = {
-  M: PathSegmentInfoCommon;
-  L: PathSegmentInfoCommon;
-  C: CurveInfo;
-  Q: CurveInfo;
-  Z: PathSegmentInfoCommon & { destX: number; destY: number };
-};
-
-export type TPathSegmentsInfo = PathSegmentInfo[keyof PathSegmentInfo];
-
-const commandLengths = {
-  m: 2,
-  l: 2,
-  h: 1,
-  v: 1,
-  c: 6,
-  s: 4,
-  q: 4,
-  t: 2,
-  a: 7,
-};
-const repeatedCommands = {
+/**
+ * Commands that may be repeated
+ */
+const repeatedCommands: Record<string, string | undefined> = {
   m: 'l',
   M: 'L',
 };
 
+/**
+ * Convert an arc of a rotated ellipse to a Bezier Curve
+ * @param {TRadian} theta1 start of the arc
+ * @param {TRadian} theta2 end of the arc
+ * @param cosTh cosine of the angle of rotation
+ * @param sinTh sine of the angle of rotation
+ * @param rx x-axis radius (before rotation)
+ * @param ry y-axis radius (before rotation)
+ * @param cx1 center x of the ellipse
+ * @param cy1 center y of the ellipse
+ * @param mT
+ * @param fromX starting point of arc x
+ * @param fromY starting point of arc y
+ */
 const segmentToBezier = (
-  th2,
-  th3,
-  cosTh,
-  sinTh,
-  rx,
-  ry,
-  cx1,
-  cy1,
-  mT,
-  fromX,
-  fromY
-) => {
-  const costh2 = cos(th2),
-    sinth2 = sin(th2),
-    costh3 = cos(th3),
-    sinth3 = sin(th3),
-    toX = cosTh * rx * costh3 - sinTh * ry * sinth3 + cx1,
-    toY = sinTh * rx * costh3 + cosTh * ry * sinth3 + cy1,
-    cp1X = fromX + mT * (-cosTh * rx * sinth2 - sinTh * ry * costh2),
-    cp1Y = fromY + mT * (-sinTh * rx * sinth2 + cosTh * ry * costh2),
-    cp2X = toX + mT * (cosTh * rx * sinth3 + sinTh * ry * costh3),
-    cp2Y = toY + mT * (sinTh * rx * sinth3 - cosTh * ry * costh3);
+  theta1: TRadian,
+  theta2: TRadian,
+  cosTh: number,
+  sinTh: number,
+  rx: number,
+  ry: number,
+  cx1: number,
+  cy1: number,
+  mT: number,
+  fromX: number,
+  fromY: number
+): TParsedCubicCurveCommand => {
+  const costh1 = cos(theta1),
+    sinth1 = sin(theta1),
+    costh2 = cos(theta2),
+    sinth2 = sin(theta2),
+    toX = cosTh * rx * costh2 - sinTh * ry * sinth2 + cx1,
+    toY = sinTh * rx * costh2 + cosTh * ry * sinth2 + cy1,
+    cp1X = fromX + mT * (-cosTh * rx * sinth1 - sinTh * ry * costh1),
+    cp1Y = fromY + mT * (-sinTh * rx * sinth1 + cosTh * ry * costh1),
+    cp2X = toX + mT * (cosTh * rx * sinth2 + sinTh * ry * costh2),
+    cp2Y = toY + mT * (sinTh * rx * sinth2 - cosTh * ry * costh2);
 
   return ['C', cp1X, cp1Y, cp2X, cp2Y, toX, toY];
 };
 
-/* Adapted from http://dxr.mozilla.org/mozilla-central/source/content/svg/content/src/nsSVGPathDataParser.cpp
+/**
+ * Adapted from {@link http://dxr.mozilla.org/mozilla-central/source/dom/svg/SVGPathDataParser.cpp}
  * by Andrea Bogazzi code is under MPL. if you don't have a copy of the license you can take it here
  * http://mozilla.org/MPL/2.0/
+ * @param toX
+ * @param toY
+ * @param rx
+ * @param ry
+ * @param {number} large 0 or 1 flag
+ * @param {number} sweep 0 or 1 flag
+ * @param rotateX
  */
-const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
+const arcToSegments = (
+  toX: number,
+  toY: number,
+  rx: number,
+  ry: number,
+  large: number,
+  sweep: number,
+  rotateX: TRadian
+): TParsedAbsoluteCubicCurveCommand[] => {
   let fromX = 0,
     fromY = 0,
     root = 0;
   const PI = Math.PI,
-    th = rotateX * PiBy180,
-    sinTh = sin(th),
-    cosTh = cos(th),
-    px = 0.5 * (-cosTh * toX - sinTh * toY),
-    py = 0.5 * (-cosTh * toY + sinTh * toX),
+    theta = rotateX * PiBy180,
+    sinTheta = sin(theta),
+    cosTh = cos(theta),
+    px = 0.5 * (-cosTh * toX - sinTheta * toY),
+    py = 0.5 * (-cosTh * toY + sinTheta * toX),
     rx2 = rx ** 2,
     ry2 = ry ** 2,
     py2 = py ** 2,
@@ -110,8 +122,8 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
 
   const cx = (root * _rx * py) / _ry,
     cy = (-root * _ry * px) / _rx,
-    cx1 = cosTh * cx - sinTh * cy + toX * 0.5,
-    cy1 = sinTh * cx + cosTh * cy + toY * 0.5;
+    cx1 = cosTh * cx - sinTheta * cy + toX * 0.5,
+    cy1 = sinTheta * cx + cosTh * cy + toY * 0.5;
   let mTheta = calcVectorAngle(1, 0, (px - cx) / _rx, (py - cy) / _ry);
   let dtheta = calcVectorAngle(
     (px - cx) / _rx,
@@ -140,7 +152,7 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
       mTheta,
       th3,
       cosTh,
-      sinTh,
+      sinTheta,
       _rx,
       _ry,
       cx1,
@@ -157,10 +169,20 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
   return result;
 };
 
-/*
- * Private
+/**
+ * @private
+ * Calculate the angle between two vectors
+ * @param ux u endpoint x
+ * @param uy u endpoint y
+ * @param vx v endpoint x
+ * @param vy v endpoint y
  */
-const calcVectorAngle = (ux, uy, vx, vy) => {
+const calcVectorAngle = (
+  ux: number,
+  uy: number,
+  vx: number,
+  vy: number
+): TRadian => {
   const ta = Math.atan2(uy, ux),
     tb = Math.atan2(vy, vx);
   if (tb >= ta) {
@@ -172,26 +194,36 @@ const calcVectorAngle = (ux, uy, vx, vy) => {
 
 // functions for the Cubic beizer
 // taken from: https://github.com/konvajs/konva/blob/7.0.5/src/shapes/Path.ts#L350
-const CB1 = (t) => t ** 3;
-const CB2 = (t) => 3 * t ** 2 * (1 - t);
-const CB3 = (t) => 3 * t * (1 - t) ** 2;
-const CB4 = (t) => (1 - t) ** 3;
+const CB1 = (t: number) => t ** 3;
+const CB2 = (t: number) => 3 * t ** 2 * (1 - t);
+const CB3 = (t: number) => 3 * t * (1 - t) ** 2;
+const CB4 = (t: number) => (1 - t) ** 3;
 
 /**
- * Calculate bounding box of a beziercurve
- * @param {Number} x0 starting point
- * @param {Number} y0
- * @param {Number} x1 first control point
- * @param {Number} y1
- * @param {Number} x2 secondo control point
- * @param {Number} y2
- * @param {Number} x3 end of bezier
- * @param {Number} y3
+ * Calculate bounding box of a cubic Bezier curve
+ * Taken from http://jsbin.com/ivomiq/56/edit (no credits available)
+ * TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
+ * @param {number} begx starting point
+ * @param {number} begy
+ * @param {number} cp1x first control point
+ * @param {number} cp1y
+ * @param {number} cp2x second control point
+ * @param {number} cp2y
+ * @param {number} endx end of bezier
+ * @param {number} endy
+ * @return {TRectBounds} the rectangular bounds
  */
-// taken from http://jsbin.com/ivomiq/56/edit  no credits available for that.
-// TODO: can we normalize this with the starting points set at 0 and then translated the bbox?
-export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
-  let argsString;
+export function getBoundsOfCurve(
+  begx: number,
+  begy: number,
+  cp1x: number,
+  cp1y: number,
+  cp2x: number,
+  cp2y: number,
+  endx: number,
+  endy: number
+): TRectBounds {
+  let argsString: string;
   if (config.cachesBoundsOfCurve) {
     // eslint-disable-next-line
     argsString = [...arguments].join();
@@ -203,17 +235,20 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   const sqrt = Math.sqrt,
     abs = Math.abs,
     tvalues = [],
-    bounds = [[], []];
+    bounds: [[x: number, y: number], [x: number, y: number]] = [
+      [0, 0],
+      [0, 0],
+    ];
 
-  let b = 6 * x0 - 12 * x1 + 6 * x2;
-  let a = -3 * x0 + 9 * x1 - 9 * x2 + 3 * x3;
-  let c = 3 * x1 - 3 * x0;
+  let b = 6 * begx - 12 * cp1x + 6 * cp2x;
+  let a = -3 * begx + 9 * cp1x - 9 * cp2x + 3 * endx;
+  let c = 3 * cp1x - 3 * begx;
 
   for (let i = 0; i < 2; ++i) {
     if (i > 0) {
-      b = 6 * y0 - 12 * y1 + 6 * y2;
-      a = -3 * y0 + 9 * y1 - 9 * y2 + 3 * y3;
-      c = 3 * y1 - 3 * y0;
+      b = 6 * begy - 12 * cp1y + 6 * cp2y;
+      a = -3 * begy + 9 * cp1y - 9 * cp2y + 3 * endy;
+      c = 3 * cp1y - 3 * begy;
     }
 
     if (abs(a) < 1e-12) {
@@ -244,14 +279,14 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
   let j = tvalues.length;
   const jlen = j;
   const iterator = getPointOnCubicBezierIterator(
-    x0,
-    y0,
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3
+    begx,
+    begy,
+    cp1x,
+    cp1y,
+    cp2x,
+    cp2y,
+    endx,
+    endy
   );
   while (j--) {
     const { x, y } = iterator(tvalues[j]);
@@ -259,31 +294,31 @@ export function getBoundsOfCurve(x0, y0, x1, y1, x2, y2, x3, y3) {
     bounds[1][j] = y;
   }
 
-  bounds[0][jlen] = x0;
-  bounds[1][jlen] = y0;
-  bounds[0][jlen + 1] = x3;
-  bounds[1][jlen + 1] = y3;
-  const result = [
+  bounds[0][jlen] = begx;
+  bounds[1][jlen] = begy;
+  bounds[0][jlen + 1] = endx;
+  bounds[1][jlen + 1] = endy;
+  const result: TRectBounds = [
     new Point(Math.min(...bounds[0]), Math.min(...bounds[1])),
     new Point(Math.max(...bounds[0]), Math.max(...bounds[1])),
   ];
   if (config.cachesBoundsOfCurve) {
-    cache.boundsOfCurveCache[argsString] = result;
+    cache.boundsOfCurveCache[argsString!] = result;
   }
   return result;
 }
 
 /**
- * Converts arc to a bunch of bezier curves
- * @param {Number} fx starting point x
- * @param {Number} fy starting point y
- * @param {Array} coords Arc command
+ * Converts arc to a bunch of cubic Bezier curves
+ * @param {number} fx starting point x
+ * @param {number} fy starting point y
+ * @param {TParsedArcCommand} coords Arc command
  */
 export const fromArcToBeziers = (
-  fx,
-  fy,
-  [_, rx, ry, rot, large, sweep, tx, ty] = []
-) => {
+  fx: number,
+  fy: number,
+  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedArcCommand
+): TParsedAbsoluteCubicCurveCommand[] => {
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
   for (let i = 0, len = segsNorm.length; i < len; i++) {
@@ -298,19 +333,22 @@ export const fromArcToBeziers = (
 };
 
 /**
- * This function take a parsed SVG path and make it simpler for fabricJS logic.
- * simplification consist of: only UPPERCASE absolute commands ( relative converted to absolute )
- * S converted in C, T converted in Q, A converted in C.
- * @param {PathData} path the array of commands of a parsed svg path for `Path`
- * @return {PathData} the simplified array of commands of a parsed svg path for `Path`
+ * This function takes a parsed SVG path and makes it simpler for fabricJS logic.
+ * Simplification consist of:
+ * - All commands converted to absolute (lowercase to uppercase)
+ * - S converted to C
+ * - T converted to Q
+ * - A converted to C
+ * @param {TComplexPathData} path the array of commands of a parsed SVG path for `Path`
+ * @return {TSimplePathData} the simplified array of commands of a parsed SVG path for `Path`
+ * TODO: figure out how to remove the type assertions in a nice way
  */
-export const makePathSimpler = (path: PathData): PathData => {
-  // x and y represent the last point of the path. the previous command point.
+export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
+  // x and y represent the last point of the path, AKA the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
   let x = 0,
     y = 0;
-  const len = path.length;
   // x1 and y1 represent the last point of the subpath. the subpath is started with
   // m or M command. When a z or Z command is drawn, x and y need to be resetted to
   // the last x1 and y1.
@@ -318,44 +356,41 @@ export const makePathSimpler = (path: PathData): PathData => {
     y1 = 0;
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
-  let destinationPath: PathData = [],
-    previous,
-    controlX,
-    controlY;
-  for (let i = 0; i < len; ++i) {
-    let converted = false;
-    const current = path[i].slice(0);
+  const destinationPath: TSimplePathData = [];
+  let previous,
+    // placeholders
+    controlX = 0,
+    controlY = 0;
+  for (const parsedCommand of path) {
+    const current: TComplexParsedCommand = [...parsedCommand];
+    let converted: TSimpleParsedCommand | undefined;
     switch (
       current[0] // first letter
     ) {
       case 'l': // lineto, relative
-        current[0] = 'L';
         current[1] += x;
         current[2] += y;
       // falls through
       case 'L':
         x = current[1];
         y = current[2];
+        converted = ['L', x, y];
         break;
       case 'h': // horizontal lineto, relative
         current[1] += x;
       // falls through
       case 'H':
-        current[0] = 'L';
-        current[2] = y;
         x = current[1];
+        converted = ['L', x, y];
         break;
       case 'v': // vertical lineto, relative
         current[1] += y;
       // falls through
       case 'V':
-        current[0] = 'L';
         y = current[1];
-        current[1] = x;
-        current[2] = y;
+        converted = ['L', x, y];
         break;
       case 'm': // moveTo, relative
-        current[0] = 'M';
         current[1] += x;
         current[2] += y;
       // falls through
@@ -364,9 +399,9 @@ export const makePathSimpler = (path: PathData): PathData => {
         y = current[2];
         x1 = current[1];
         y1 = current[2];
+        converted = ['M', x, y];
         break;
       case 'c': // bezierCurveTo, relative
-        current[0] = 'C';
         current[1] += x;
         current[2] += y;
         current[3] += x;
@@ -379,9 +414,9 @@ export const makePathSimpler = (path: PathData): PathData => {
         controlY = current[4];
         x = current[5];
         y = current[6];
+        converted = ['C', current[1], current[2], controlX, controlY, x, y];
         break;
       case 's': // shorthand cubic bezierCurveTo, relative
-        current[0] = 'S';
         current[1] += x;
         current[2] += y;
         current[3] += x;
@@ -401,20 +436,13 @@ export const makePathSimpler = (path: PathData): PathData => {
         }
         x = current[3];
         y = current[4];
-        current[0] = 'C';
-        current[5] = current[3];
-        current[6] = current[4];
-        current[3] = current[1];
-        current[4] = current[2];
-        current[1] = controlX;
-        current[2] = controlY;
-        // current[3] and current[4] are NOW the second control point.
+        converted = ['C', controlX, controlY, current[1], current[2], x, y];
+        // converted[3] and converted[4] are NOW the second control point.
         // we keep it for the next reflection.
-        controlX = current[3];
-        controlY = current[4];
+        controlX = converted[3];
+        controlY = converted[4];
         break;
       case 'q': // quadraticCurveTo, relative
-        current[0] = 'Q';
         current[1] += x;
         current[2] += y;
         current[3] += x;
@@ -425,9 +453,9 @@ export const makePathSimpler = (path: PathData): PathData => {
         controlY = current[2];
         x = current[3];
         y = current[4];
+        converted = ['Q', controlX, controlY, x, y];
         break;
       case 't': // shorthand quadraticCurveTo, relative
-        current[0] = 'T';
         current[1] += x;
         current[2] += y;
       // falls through
@@ -442,24 +470,16 @@ export const makePathSimpler = (path: PathData): PathData => {
           controlX = x;
           controlY = y;
         }
-        current[0] = 'Q';
         x = current[1];
         y = current[2];
-        current[1] = controlX;
-        current[2] = controlY;
-        current[3] = x;
-        current[4] = y;
+        converted = ['Q', controlX, controlY, x, y];
         break;
       case 'a':
-        current[0] = 'A';
         current[6] += x;
         current[7] += y;
       // falls through
       case 'A':
-        converted = true;
-        destinationPath = destinationPath.concat(
-          fromArcToBeziers(x, y, current)
-        );
+        fromArcToBeziers(x, y, current).forEach((b) => destinationPath.push(b));
         x = current[6];
         y = current[7];
         break;
@@ -467,13 +487,16 @@ export const makePathSimpler = (path: PathData): PathData => {
       case 'Z':
         x = x1;
         y = y1;
+        converted = ['Z'];
         break;
       default:
     }
-    if (!converted) {
-      destinationPath.push(current);
+    if (converted) {
+      destinationPath.push(converted);
+      previous = converted[0];
+    } else {
+      previous = '';
     }
-    previous = current[0];
   }
   return destinationPath;
 };
@@ -481,24 +504,49 @@ export const makePathSimpler = (path: PathData): PathData => {
 // todo verify if we can just use the point class here
 /**
  * Calc length from point x1,y1 to x2,y2
- * @param {Number} x1 starting point x
- * @param {Number} y1 starting point y
- * @param {Number} x2 starting point x
- * @param {Number} y2 starting point y
- * @return {Number} length of segment
+ * @param {number} x1 starting point x
+ * @param {number} y1 starting point y
+ * @param {number} x2 starting point x
+ * @param {number} y2 starting point y
+ * @return {number} length of segment
  */
-const calcLineLength = (x1, y1, x2, y2) =>
-  Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+const calcLineLength = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+): number => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
+/**
+ * Get an iterator that takes a percentage and returns a point
+ * @param {number} begx
+ * @param {number} begy
+ * @param {number} cp1x
+ * @param {number} cp1y
+ * @param {number} cp2x
+ * @param {number} cp2y
+ * @param {number} endx
+ * @param {number} endy
+ */
 const getPointOnCubicBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
+  (
+    begx: number,
+    begy: number,
+    cp1x: number,
+    cp1y: number,
+    cp2x: number,
+    cp2y: number,
+    endx: number,
+    endy: number
+  ) =>
+  (pct: number) => {
     const c1 = CB1(pct),
       c2 = CB2(pct),
       c3 = CB3(pct),
       c4 = CB4(pct);
     return new Point(
-      p4x * c1 + p3x * c2 + p2x * c3 + p1x * c4,
-      p4y * c1 + p3y * c2 + p2y * c3 + p1y * c4
+      endx * c1 + cp2x * c2 + cp1x * c3 + begx * c4,
+      endy * c1 + cp2y * c2 + cp1y * c3 + begy * c4
     );
   };
 
@@ -507,7 +555,17 @@ const QB2 = (t: number) => 2 * t * (1 - t);
 const QB3 = (t: number) => (1 - t) ** 2;
 
 const getTangentCubicIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y, p4x, p4y) => (pct: number) => {
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number,
+    p4x: number,
+    p4y: number
+  ) =>
+  (pct: number) => {
     const qb1 = QB1(pct),
       qb2 = QB2(pct),
       qb3 = QB3(pct),
@@ -519,7 +577,15 @@ const getTangentCubicIterator =
   };
 
 const getPointOnQuadraticBezierIterator =
-  (p1x, p1y, p2x, p2y, p3x, p3y) => (pct: number) => {
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number
+  ) =>
+  (pct: number) => {
     const c1 = QB1(pct),
       c2 = QB2(pct),
       c3 = QB3(pct);
@@ -529,12 +595,21 @@ const getPointOnQuadraticBezierIterator =
     );
   };
 
-const getTangentQuadraticIterator = (p1x, p1y, p2x, p2y, p3x, p3y) => (pct) => {
-  const invT = 1 - pct,
-    tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
-    tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
-  return Math.atan2(tangentY, tangentX);
-};
+const getTangentQuadraticIterator =
+  (
+    p1x: number,
+    p1y: number,
+    p2x: number,
+    p2y: number,
+    p3x: number,
+    p3y: number
+  ) =>
+  (pct: number) => {
+    const invT = 1 - pct,
+      tangentX = 2 * (invT * (p2x - p1x) + pct * (p3x - p2x)),
+      tangentY = 2 * (invT * (p2y - p1y) + pct * (p3y - p2y));
+    return Math.atan2(tangentY, tangentX);
+  };
 
 // this will run over a path segment (a cubic or quadratic segment) and approximate it
 // with 100 segments. This will good enough to calculate the length of the curve
@@ -558,17 +633,20 @@ const pathIterator = (
  * that correspond to that pixels run over the path.
  * The percentage will be then used to find the correct point on the canvas for the path.
  * @param {Array} segInfo fabricJS collection of information on a parsed path
- * @param {Number} distance from starting point, in pixels.
- * @return {Object} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
+ * @param {number} distance from starting point, in pixels.
+ * @return {TPointAngle} info object with x and y ( the point on canvas ) and angle, the tangent on that point;
  */
-const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
+const findPercentageForDistance = (
+  segInfo: TCurveInfo<'Q' | 'C'>,
+  distance: number
+): TPointAngle => {
   let perc = 0,
     tmpLen = 0,
-    tempP = { x: segInfo.x, y: segInfo.y },
-    p,
-    nextLen,
+    tempP: XY = { x: segInfo.x, y: segInfo.y },
+    p: XY = { ...tempP },
+    nextLen: number,
     nextStep = 0.01,
-    lastPerc;
+    lastPerc = 0;
   // nextStep > 0.0001 covers 0.00015625 that 1/64th of 1/100
   // the path
   const iterator = segInfo.iterator,
@@ -588,18 +666,18 @@ const findPercentageForDistance = (segInfo: CurveInfo, distance: number) => {
       tmpLen += nextLen;
     }
   }
-  p.angle = angleFinder(lastPerc);
-  return p;
+  return { ...p, angle: angleFinder(lastPerc) };
 };
 
 /**
  * Run over a parsed and simplified path and extract some information (length of each command and starting point)
- * @param {PathData} path parsed path commands
- * @return {Array} path commands information
+ * @param {TSimplePathData} path parsed path commands
+ * @return {TPathSegmentInfo[]} path commands information
  */
-export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
+export const getPathSegmentsInfo = (
+  path: TSimplePathData
+): TPathSegmentInfo[] => {
   let totalLength = 0,
-    current,
     //x2 and y2 are the coords of segment start
     //x1 and y1 are the coords of the current point
     x1 = 0,
@@ -607,26 +685,25 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
     x2 = 0,
     y2 = 0,
     iterator,
-    tempInfo,
-    angleFinder;
-  const len = path.length,
-    info = [];
-  for (let i = 0; i < len; i++) {
-    current = path[i];
-    tempInfo = {
+    tempInfo: TPathSegmentInfo;
+  const info: TPathSegmentInfo[] = [];
+  for (const current of path) {
+    const basicInfo: TPathSegmentInfoCommon<keyof TPathSegmentCommandInfo> = {
       x: x1,
       y: y1,
-      command: current[0] as string,
+      command: current[0],
+      length: 0,
     };
     switch (
       current[0] //first letter
     ) {
       case 'M':
-        tempInfo.length = 0;
+        tempInfo = <TPathSegmentInfoCommon<'M'>>basicInfo;
         x2 = x1 = current[1];
         y2 = y1 = current[2];
         break;
       case 'L':
+        tempInfo = <TPathSegmentInfoCommon<'L'>>basicInfo;
         tempInfo.length = calcLineLength(x1, y1, current[1], current[2]);
         x1 = current[1];
         y1 = current[2];
@@ -642,7 +719,9 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[5],
           current[6]
         );
-        angleFinder = getTangentCubicIterator(
+        tempInfo = <TCurveInfo<'C'>>basicInfo;
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = getTangentCubicIterator(
           x1,
           y1,
           current[1],
@@ -652,9 +731,8 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[5],
           current[6]
         );
-        tempInfo.iterator = iterator;
-        tempInfo.angleFinder = angleFinder;
         tempInfo.length = pathIterator(iterator, x1, y1);
+
         x1 = current[5];
         y1 = current[6];
         break;
@@ -667,7 +745,9 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[3],
           current[4]
         );
-        angleFinder = getTangentQuadraticIterator(
+        tempInfo = <TCurveInfo<'Q'>>basicInfo;
+        tempInfo.iterator = iterator;
+        tempInfo.angleFinder = getTangentQuadraticIterator(
           x1,
           y1,
           current[1],
@@ -675,15 +755,13 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
           current[3],
           current[4]
         );
-        tempInfo.iterator = iterator;
-        tempInfo.angleFinder = angleFinder;
         tempInfo.length = pathIterator(iterator, x1, y1);
         x1 = current[3];
         y1 = current[4];
         break;
       case 'Z':
-      case 'z':
         // we add those in order to ease calculations later
+        tempInfo = <TEndPathInfo>basicInfo;
         tempInfo.destX = x2;
         tempInfo.destY = y2;
         tempInfo.length = calcLineLength(x1, y1, x2, y2);
@@ -698,55 +776,58 @@ export const getPathSegmentsInfo = (path: PathData): TPathSegmentsInfo[] => {
   return info;
 };
 
+/**
+ * Get the point on the path that is distance along the path
+ * @param path
+ * @param distance
+ * @param infos
+ */
 export const getPointOnPath = (
-  path: PathData,
+  path: TSimplePathData,
   distance: number,
-  infos: ReturnType<typeof getPathSegmentsInfo> = getPathSegmentsInfo(path)
-) => {
+  infos: TPathSegmentInfo[] = getPathSegmentsInfo(path)
+): TPointAngle | undefined => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
     distance -= infos[i].length;
     i++;
   }
-  // var distance = infos[infos.length - 1] * perc;
   const segInfo = infos[i],
     segPercent = distance / segInfo.length,
-    command = segInfo.command,
     segment = path[i];
-  let info;
 
-  switch (command) {
+  switch (segInfo.command) {
     case 'M':
       return { x: segInfo.x, y: segInfo.y, angle: 0 };
     case 'Z':
-    case 'z':
-      info = new Point(segInfo.x, segInfo.y).lerp(
-        new Point(segInfo.destX, segInfo.destY),
-        segPercent
-      );
-      info.angle = Math.atan2(
-        segInfo.destY - segInfo.y,
-        segInfo.destX - segInfo.x
-      );
-      return info;
+      return {
+        ...new Point(segInfo.x, segInfo.y).lerp(
+          new Point(segInfo.destX, segInfo.destY),
+          segPercent
+        ),
+        angle: Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x),
+      };
     case 'L':
-      info = new Point(segInfo.x, segInfo.y).lerp(
-        new Point(segment[1], segment[2]),
-        segPercent
-      );
-      info.angle = Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x);
-      return info;
+      return {
+        ...new Point(segInfo.x, segInfo.y).lerp(
+          new Point(segment[1]!, segment[2]!),
+          segPercent
+        ),
+        angle: Math.atan2(segment[2]! - segInfo.y, segment[1]! - segInfo.x),
+      };
     case 'C':
       return findPercentageForDistance(segInfo, distance);
     case 'Q':
       return findPercentageForDistance(segInfo, distance);
+    default:
+    // throw Error('Invalid command');
   }
 };
 
 /**
  *
  * @param {string} pathString
- * @return {(string|number)[][]} An array of SVG path commands
+ * @return {TComplexPathData} An array of SVG path commands
  * @example <caption>Usage</caption>
  * parsePath('M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0') === [
  *   ['M', 3, 4],
@@ -755,81 +836,80 @@ export const getPointOnPath = (
  * ];
  *
  */
-export const parsePath = (pathString) => {
-  // one of commands (m,M,l,L,q,Q,c,C,etc.) followed by non-command characters (i.e. command values)
-  const re = rePathCommand,
-    rNumber = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?\\s*',
-    rNumberCommaWsp = `(${rNumber})${commaWsp}`,
-    rFlagCommaWsp = `([01])${commaWsp}?`,
-    rArcSeq = `${rNumberCommaWsp}?${rNumberCommaWsp}?${rNumberCommaWsp}${rFlagCommaWsp}${rFlagCommaWsp}${rNumberCommaWsp}?(${rNumber})`,
-    regArcArgumentSequence = new RegExp(rArcSeq, 'g'),
-    result = [];
+export const parsePath = (pathString: string): TComplexPathData => {
+  // clean the string
+  // add spaces around the numbers
+  pathString = pathString
+    .replace(new RegExp(`(${numberRegExStr})`, 'gi'), ' $1 ')
+    // replace annoying commas and arbitrary whitespace with single spaces
+    .replace(/,/gi, ' ')
+    .replace(/\s+/gi, ' ');
 
-  if (!pathString || !pathString.match) {
-    return result;
-  }
-  const path = pathString.match(/[mzlhvcsqta][^mzlhvcsqta]*/gi);
-
-  for (let i = 0, len = path.length; i < len; i++) {
-    const currentPath = path[i];
-    const coordsStr = currentPath.slice(1).trim();
-    const coords = [];
-    let command = currentPath.charAt(0);
-    const coordsParsed = [command];
-
-    if (command.toLowerCase() === 'a') {
-      // arcs have special flags that apparently don't require spaces so handle special
-      for (let args; (args = regArcArgumentSequence.exec(coordsStr)); ) {
-        for (let j = 1; j < args.length; j++) {
-          coords.push(args[j]);
+  const res: TComplexPathData = [];
+  for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
+    let matchStr = match[0];
+    const chain: TComplexPathData = [];
+    let paramArr: RegExpExecArray | null;
+    do {
+      paramArr = new RegExp(rePathCommand, 'i').exec(matchStr);
+      if (!paramArr) {
+        break;
+      }
+      // ignore undefined match groups
+      const filteredGroups = paramArr.filter((g) => g);
+      // remove the first element from the match array since it's just the whole command
+      filteredGroups.shift();
+      // if we can't parse the number, just interpret it as a string
+      // (since it's probably the path command)
+      const command = filteredGroups.map((g) => {
+        const numParse = Number.parseFloat(g);
+        if (Number.isNaN(numParse)) {
+          return g;
+        } else {
+          return numParse;
         }
+      });
+      chain.push(command as any);
+      // stop now if it's a z command
+      if (filteredGroups.length <= 1) {
+        break;
       }
-    } else {
-      let match;
-      while ((match = re.exec(coordsStr))) {
-        coords.push(match[0]);
+      // remove the last part of the chained command
+      filteredGroups.shift();
+      // ` ?` is to support commands with optional spaces between flags
+      matchStr = matchStr.replace(
+        new RegExp(`${filteredGroups.join(' ?')} ?$`),
+        ''
+      );
+    } while (paramArr);
+    // add the chain, convert multiple m's to l's in the process
+    chain.reverse().forEach((c, idx) => {
+      const transformed = repeatedCommands[c[0]];
+      if (idx > 0 && (transformed == 'l' || transformed == 'L')) {
+        c[0] = transformed;
       }
-    }
-
-    for (let j = 0, jlen = coords.length; j < jlen; j++) {
-      const parsed = parseFloat(coords[j]);
-      if (!isNaN(parsed)) {
-        coordsParsed.push(parsed);
-      }
-    }
-
-    const commandLength = commandLengths[command.toLowerCase()],
-      repeatedCommand = repeatedCommands[command] || command;
-
-    if (coordsParsed.length - 1 > commandLength) {
-      for (
-        let k = 1, klen = coordsParsed.length;
-        k < klen;
-        k += commandLength
-      ) {
-        result.push([command].concat(coordsParsed.slice(k, k + commandLength)));
-        command = repeatedCommand;
-      }
-    } else {
-      result.push(coordsParsed);
-    }
+      res.push(c);
+    });
   }
-  return result;
+  return res;
 };
 
 /**
  *
  * Converts points to a smooth SVG path
- * @param {{ x: number,y: number }[]} points Array of points
+ * @param {XY[]} points Array of points
  * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
  * @return {(string|number)[][]} An array of SVG path commands
  */
-export const getSmoothPathFromPoints = (points, correction = 0) => {
+export const getSmoothPathFromPoints = (
+  points: Point[],
+  correction = 0
+): TSimplePathData => {
   let p1 = new Point(points[0]),
     p2 = new Point(points[1]),
     multSignX = 1,
     multSignY = 0;
-  const path = [],
+  const path: TSimplePathData = [],
     len = points.length,
     manyPoints = len > 2;
 
@@ -872,16 +952,16 @@ export const getSmoothPathFromPoints = (points, correction = 0) => {
  * Transform a path by transforming each segment.
  * it has to be a simplified path or it won't work.
  * WARNING: this depends from pathOffset for correct operation
- * @param {PathData} path fabricJS parsed and simplified path commands
+ * @param {TSimplePathData} path fabricJS parsed and simplified path commands
  * @param {TMat2D} transform matrix that represent the transformation
  * @param {Point} [pathOffset] `Path.pathOffset`
- * @returns {Array} the transformed path
+ * @returns {TSimplePathData} the transformed path
  */
 export const transformPath = (
-  path: PathData,
+  path: TSimplePathData,
   transform: TMat2D,
   pathOffset: Point
-) => {
+): TSimplePathData => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
       1,
@@ -893,12 +973,13 @@ export const transformPath = (
     ]);
   }
   return path.map((pathSegment) => {
-    const newSegment = pathSegment.slice(0);
+    const newSegment: TSimpleParsedCommand = [...pathSegment];
     for (let i = 1; i < pathSegment.length - 1; i += 2) {
+      // TODO: is there a way to get around casting to any?
       const { x, y } = transformPoint(
         {
-          x: pathSegment[i],
-          y: pathSegment[i + 1],
+          x: pathSegment[i] as number,
+          y: pathSegment[i + 1] as number,
         },
         transform
       );
@@ -911,11 +992,14 @@ export const transformPath = (
 
 /**
  * Returns an array of path commands to create a regular polygon
- * @param {number} radius
  * @param {number} numVertexes
- * @returns {(string|number)[][]} An array of SVG path commands
+ * @param {number} radius
+ * @returns {TSimplePathData} An array of SVG path commands
  */
-export const getRegularPolygonPath = (numVertexes, radius) => {
+export const getRegularPolygonPath = (
+  numVertexes: number,
+  radius: number
+): TSimplePathData => {
   const interiorAngle = (Math.PI * 2) / numVertexes;
   // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom
   // This isn't strictly necessary, but it's how we tend to think of and expect polygons to be drawn
@@ -935,11 +1019,11 @@ export const getRegularPolygonPath = (numVertexes, radius) => {
 
 /**
  * Join path commands to go back to svg format
- * @param {Array} pathData fabricJS parsed path commands
+ * @param {TSimplePathData} pathData fabricJS parsed path commands
  * @param {number} fractionDigits number of fraction digits to "leave"
  * @return {String} joined path 'M 0 0 L 20 30'
  */
-export const joinPath = (pathData: PathData, fractionDigits?: number) =>
+export const joinPath = (pathData: TSimplePathData, fractionDigits?: number) =>
   pathData
     .map((segment) => {
       return segment
