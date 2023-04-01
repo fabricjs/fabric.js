@@ -816,12 +816,8 @@ export class Group extends createCollectionMixin(
       return;
     }
 
-    const {
-      centerX = 0,
-      centerY = 0,
-      width: w = 0,
-      height: h = 0,
-    } = this.getObjectsBoundingBox(objects) || {};
+    const bbox = this.getObjectsBoundingBox(objects) || ({} as LayoutResult);
+    const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
     const width = hasWidth ? this.width : w,
       height = hasHeight ? this.height : h,
       calculatedCenter = new Point(centerX, centerY),
@@ -840,8 +836,8 @@ export class Group extends createCollectionMixin(
         strokeWidth: 0,
       }),
       bboxSizeAfter = this._getTransformedDimensions({
-        width: w,
-        height: h,
+        width: bbox.width,
+        height: bbox.height,
         strokeWidth: 0,
       }),
       rotationCorrection = new Point(0, 0);
