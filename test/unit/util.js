@@ -923,15 +923,15 @@
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [2, 0, 0, 2, 0, 0]);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 Z');
   });
   QUnit.test('fabric.util.transformPath can apply a generic transform', function(assert) {
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 Z');
   });
 
   QUnit.test('fabric.util.calcDimensionsMatrix', function(assert) {

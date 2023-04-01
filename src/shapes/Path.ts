@@ -3,7 +3,6 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { Point } from '../Point';
-import { PathData } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -11,10 +10,10 @@ import {
   joinPath,
   makePathSimpler,
   parsePath,
-  type TPathSegmentsInfo,
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import { TPathSegmentInfo, TSimplePathData } from '../util/path/typedefs';
 
 export class Path extends FabricObject {
   /**
@@ -22,7 +21,7 @@ export class Path extends FabricObject {
    * @type Array
    * @default
    */
-  declare path: PathData;
+  declare path: TSimplePathData;
 
   declare pathOffset: Point;
 
@@ -30,18 +29,18 @@ export class Path extends FabricObject {
 
   declare sourcePath?: string;
 
-  declare segmentsInfo?: TPathSegmentsInfo[];
+  declare segmentsInfo?: TPathSegmentInfo[];
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
   /**
    * Constructor
-   * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TSimplePathData} path Path data (sequence of coordinates and corresponding "command" tokens)
    * @param {Object} [options] Options object
    * @return {Path} thisArg
    */
   constructor(
-    path: PathData | string,
+    path: TSimplePathData | string,
     { path: _, left, top, ...options }: any = {}
   ) {
     super(options);
@@ -58,11 +57,11 @@ export class Path extends FabricObject {
 
   /**
    * @private
-   * @param {PathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TSimplePathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
    * @param {boolean} [adjustPosition] pass true to reposition the object according to the bounding box
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  _setPath(path: PathData | string, adjustPosition?: boolean) {
+  _setPath(path: TSimplePathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
     return this.setDimensions();
   }
@@ -153,7 +152,7 @@ export class Path extends FabricObject {
 
   /**
    * Returns string representation of an instance
-   * @return {String} string representation of an instance
+   * @return {string} string representation of an instance
    */
   toString() {
     return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${
@@ -194,7 +193,7 @@ export class Path extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path);
+    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
     return [
       '<path ',
       'COMMON_PARTS',
@@ -213,7 +212,7 @@ export class Path extends FabricObject {
   /**
    * Returns svg clipPath representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
   toClipPathSVG(reviver) {
     const additionalTransform = this._getOffsetTransform();
@@ -229,7 +228,7 @@ export class Path extends FabricObject {
   /**
    * Returns svg representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
   toSVG(reviver) {
     const additionalTransform = this._getOffsetTransform();
@@ -241,7 +240,7 @@ export class Path extends FabricObject {
 
   /**
    * Returns number representation of an instance complexity
-   * @return {Number} complexity of this instance
+   * @return {number} complexity of this instance
    */
   complexity() {
     return this.path.length;

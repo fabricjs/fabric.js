@@ -177,8 +177,8 @@ Backing a PR with tests that cover the changes that were made is a **MUST**. Aim
 
 Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
 
-- [`unit` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237)
-- [`visual` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67)
+- [`unit` test example][unit_test]
+- [`visual` test example][visual_test]
 
 If you need to change test config ask for guidance.
 
@@ -186,54 +186,36 @@ If you need to change test config ask for guidance.
 
 ## 🚧🎢 Developing 💡✨
 
-### Setting Up Locally
+### Getting Started
 
-1. 🍴 Fork the repository
-1. 💾 Clone your 🍴 to your 💻
+1. 🍴 Fork and clone 💾 the repository
 1. Install dependencies 🕹️ `npm i --include=dev`
-1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
-#### Online
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
-
-Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
-`A service is available on port ...` popups will show up.
-
-### 🧭 Prototyping
-
-[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out**
+### Starting an App
 
 ```bash
-
-npm run sandbox build next [/path/to/sandbox]
-> building next app at /path/to/sandbox
-
-npm run sandbox start </path/to/sandbox>
-> starting dev server
-
-npm run sandbox deploy </path/to/sandbox>
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox deploy -- --template node
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox -- --help
-
-> Usage: fabric.js sandbox [options] [command]
-
-> sandbox commands
-
-Options:
-  -h, --help                      display help for command
-
-Commands:
-  deploy [options] [path]         deploy a sandbox to codesandbox
-  build <template> [destination]  build and start a sandbox
-  start <path>                    start a sandbox
-  help [command]                  display help for command
-
+npm start <template>
+npm start -- --help
 ```
+
+You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
+
+```bash
+npm run sandbox deploy <path/to/app>
+npm run sandbox build <template> <path/to/app>
+npm run sandbox -- --help
+```
+
+Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information.
+
+### Online
+
+You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
+
+- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
+  `A service is available on port ...` popups will show up.
+- Codesandbox: _available soon_.
 
 ### 🔮 Symlinking
 
@@ -241,6 +223,7 @@ Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
+1. Consider flagging `--save` to avoid confusion regarding what version of fabric is being used by the project.
 
 See [npm link][npm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
@@ -266,5 +249,9 @@ Don't forget to unlink the package once you're done.
 [jsdoc]: https://jsdoc.app/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
+[unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
+[visual_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67
+[github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
+[gitpod]: https://gitpod.io/from-referrer/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
 [yarn_link]: https://yarnpkg.com/cli/link
