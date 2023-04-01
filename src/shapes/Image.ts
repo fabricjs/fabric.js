@@ -23,7 +23,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { WebGLFilterBackend } from '../filters';
+import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -43,24 +43,24 @@ interface UniqueImageProps {
   resizeFilter?: BaseFilter;
 }
 
-export const imageDefaultValues: UniqueImageProps & Partial<FabricObjectProps> = {
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
-export interface SerializedImageProps
-  extends SerializedObjectProps {
-    src: string;
-    crossOrigin: string | null;
-    filters: any[];
-    resizeFilter?: any;
-    cropX: number;
-    cropY: number;
+export const imageDefaultValues: UniqueImageProps & Partial<FabricObjectProps> =
+  {
+    strokeWidth: 0,
+    srcFromAttribute: false,
+    minimumScaleTrigger: 0.5,
+    cropX: 0,
+    cropY: 0,
+    imageSmoothing: true,
   };
+
+export interface SerializedImageProps extends SerializedObjectProps {
+  src: string;
+  crossOrigin: string | null;
+  filters: any[];
+  resizeFilter?: any;
+  cropX: number;
+  cropY: number;
+}
 
 export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
 
@@ -75,7 +75,8 @@ export class Image<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqueImageProps {
+  implements UniqueImageProps
+{
   /**
    * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
@@ -192,7 +193,9 @@ export class Image<
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
-      typeof arg0 === 'string' ? (getDocument().getElementById(arg0) as ImageSource) : arg0,
+      typeof arg0 === 'string'
+        ? (getDocument().getElementById(arg0) as ImageSource)
+        : arg0,
       options
     );
   }
