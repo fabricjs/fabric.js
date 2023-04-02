@@ -38,7 +38,11 @@ export const getEnv = (): TFabricEnv => {
     window: JSDOMWindow,
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
-    createCanvasElement(width = 0, height = 0, type?: 'image' | 'pdf' | 'svg') {
+    createCanvasElement(
+      width = 300,
+      height = 150,
+      type?: 'image' | 'pdf' | 'svg'
+    ) {
       return new NodeCanvas(width, height, type);
     },
     createImageElement() {

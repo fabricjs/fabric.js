@@ -33,7 +33,7 @@ let measuringContext: CanvasRenderingContext2D | null;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    measuringContext = getEnv().createCanvasElement().getContext('2d');
+    measuringContext = getEnv().createCanvasElement(1, 1).getContext('2d');
   }
   return measuringContext;
 }

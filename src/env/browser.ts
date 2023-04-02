@@ -24,7 +24,7 @@ export const getEnv = (): TFabricEnv => {
     window,
     isTouchSupported,
     WebGLProbe: new WebGLProbe(),
-    createCanvasElement(width = 0, height = 0) {
+    createCanvasElement(width = 300, height = 150) {
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
