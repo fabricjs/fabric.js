@@ -23,7 +23,7 @@ interface UniqueEllipseProps {
 
 export interface SerializedEllipseProps
   extends SerializedObjectProps,
-    UniqueEllipseProps {};
+    UniqueEllipseProps {}
 
 export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 
@@ -35,7 +35,8 @@ export class Ellipse<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqueEllipseProps {
+  implements EllipseProps
+{
   /**
    * Horizontal radius
    * @type Number
@@ -104,12 +105,11 @@ export class Ellipse<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  // @ts-expect-error
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-expect-error
+    // @ts-expect-error toObject typing does not really work
     return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 

@@ -43,15 +43,15 @@ interface UniqueImageProps {
   resizeFilter?: BaseFilter;
 }
 
-export const imageDefaultValues: UniqueImageProps & Partial<FabricObjectProps> =
-  {
-    strokeWidth: 0,
-    srcFromAttribute: false,
-    minimumScaleTrigger: 0.5,
-    cropX: 0,
-    cropY: 0,
-    imageSmoothing: true,
-  };
+export const imageDefaultValues: Partial<UniqueImageProps> &
+  Partial<FabricObjectProps> = {
+  strokeWidth: 0,
+  srcFromAttribute: false,
+  minimumScaleTrigger: 0.5,
+  cropX: 0,
+  cropY: 0,
+  imageSmoothing: true,
+};
 
 export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
@@ -75,7 +75,7 @@ export class Image<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqueImageProps
+  implements ImageProps
 {
   /**
    * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
@@ -311,7 +311,6 @@ export class Image<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  // @ts-expect-error
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
@@ -320,8 +319,9 @@ export class Image<
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
     });
+    // @ts-expect-error toObject typing does not really work
     return {
-      // @ts-expect-error
+      // @ts-expect-error toObject typing does not really work
       ...super.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
