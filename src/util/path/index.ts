@@ -21,7 +21,7 @@ import {
   TEndPathInfo,
   TParsedArcCommand,
 } from './typedefs';
-import { IPoint, Point } from '../../Point';
+import { XY, Point } from '../../Point';
 import { numberRegExStr, rePathCommand } from './regex';
 
 /**
@@ -357,7 +357,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
   // previous will host the letter of the previous command, to handle S and T.
   // controlX and controlY will host the previous reflected control point
   const destinationPath: TSimplePathData = [];
-  let previous: string | undefined,
+  let previous,
     // placeholders
     controlX = 0,
     controlY = 0;
@@ -414,7 +414,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         controlY = current[4];
         x = current[5];
         y = current[6];
-        converted = ['C', current[1], current[2], current[3], current[4], x, y];
+        converted = ['C', current[1], current[2], controlX, controlY, x, y];
         break;
       case 's': // shorthand cubic bezierCurveTo, relative
         current[1] += x;
@@ -472,9 +472,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
         }
         x = current[1];
         y = current[2];
-        current[1] = controlX;
-        current[2] = controlY;
-        converted = ['Q', current[1], current[2], x, y];
+        converted = ['Q', controlX, controlY, x, y];
         break;
       case 'a':
         current[6] += x;
@@ -495,8 +493,10 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
     }
     if (converted) {
       destinationPath.push(converted);
+      previous = converted[0];
+    } else {
+      previous = '';
     }
-    previous = converted?.[0];
   }
   return destinationPath;
 };
@@ -642,8 +642,8 @@ const findPercentageForDistance = (
 ): TPointAngle => {
   let perc = 0,
     tmpLen = 0,
-    tempP: IPoint = { x: segInfo.x, y: segInfo.y },
-    p: IPoint = { ...tempP },
+    tempP: XY = { x: segInfo.x, y: segInfo.y },
+    p: XY = { ...tempP },
     nextLen: number,
     nextStep = 0.01,
     lastPerc = 0;
@@ -897,7 +897,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
 /**
  *
  * Converts points to a smooth SVG path
- * @param {IPoint[]} points Array of points
+ * @param {XY[]} points Array of points
  * @param {number} [correction] Apply a correction to the path (usually we use `width / 1000`). If value is undefined 0 is used as the correction value.
  * @return {(string|number)[][]} An array of SVG path commands
  */

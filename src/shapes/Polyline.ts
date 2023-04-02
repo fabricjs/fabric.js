@@ -2,7 +2,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import { IPoint, Point } from '../Point';
+import { XY, Point } from '../Point';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
@@ -21,7 +21,7 @@ export class Polyline extends FabricObject {
    * @type Array
    * @default
    */
-  declare points: IPoint[];
+  declare points: XY[];
 
   /**
    * WARNING: Feature in progress
@@ -86,7 +86,7 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
+  constructor(points: XY[] = [], { left, top, ...options }: any = {}) {
     super({ points, ...options });
     this.initialized = true;
     this.setBoundingBox(true);

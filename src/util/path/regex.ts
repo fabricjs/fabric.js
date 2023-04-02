@@ -8,25 +8,25 @@ export const numberRegExStr = `[-+]?${absNumberRegExStr}`;
  */
 const p = `(${numberRegExStr})`;
 
-export const reMoveToCommand = `(M) (?:${p} ${p} ?)+`;
+const reMoveToCommand = `(M) (?:${p} ${p} ?)+`;
 
-export const reLineCommand = `(L) (?:${p} ${p} ?)+`;
+const reLineCommand = `(L) (?:${p} ${p} ?)+`;
 
-export const reHorizontalLineCommand = `(H) (?:${p} ?)+`;
+const reHorizontalLineCommand = `(H) (?:${p} ?)+`;
 
-export const reVerticalLineCommand = `(V) (?:${p} ?)+`;
+const reVerticalLineCommand = `(V) (?:${p} ?)+`;
 
-export const reClosePathCommand = String.raw`(Z)\s*`;
+const reClosePathCommand = String.raw`(Z)\s*`;
 
-export const reCubicCurveCommand = `(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`;
+const reCubicCurveCommand = `(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`;
 
-export const reCubicCurveShortcutCommand = `(S) (?:${p} ${p} ${p} ${p} ?)+`;
+const reCubicCurveShortcutCommand = `(S) (?:${p} ${p} ${p} ${p} ?)+`;
 
-export const reQuadraticCurveCommand = `(Q) (?:${p} ${p} ${p} ${p} ?)+`;
+const reQuadraticCurveCommand = `(Q) (?:${p} ${p} ${p} ${p} ?)+`;
 
-export const reQuadraticCurveShortcutCommand = `(T) (?:${p} ${p} ?)+`;
+const reQuadraticCurveShortcutCommand = `(T) (?:${p} ${p} ?)+`;
 
-export const reArcCommand = `(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`;
+const reArcCommand = `(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`;
 
 export const rePathCommand =
   `(?:(?:${reMoveToCommand})` +
