@@ -48,17 +48,6 @@ export const getEnv = (): TFabricEnv => {
     createImageElement() {
       return new Image();
     },
-    dispose(element) {
-      const impl = jsdomImplForWrapper(element);
-      if (impl) {
-        impl._image = null;
-        impl._canvas = null;
-        // unsure if necessary
-        impl._currentSrc = null;
-        impl._attributes = null;
-        impl._classList = null;
-      }
-    },
     copyPasteData,
   };
 };

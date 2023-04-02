@@ -1944,15 +1944,12 @@
       var canvas = new fabric.Canvas(el, { enableRetinaScaling, renderOnAddRemove: false });
 
       canvas.setDimensions({ width: 500, height: 500 });
-      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
       assert.equal(el.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(el.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
       assert.equal(canvas.upperCanvasEl.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(canvas.upperCanvasEl.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
 
       await canvas.dispose();
-      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
       assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
       assert.equal(el.width, 500, 'restored width');
       assert.equal(el.height, 500, 'restored height');

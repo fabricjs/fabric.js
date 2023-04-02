@@ -273,13 +273,6 @@ export class StaticCanvas<
    */
   declare disposed?: boolean;
 
-  /**
-   * Keeps a copy of the canvas style before setting retina scaling and other potions
-   * in order to return it to original state on dispose
-   * @type string
-   */
-  declare _originalCanvasStyle?: string;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
@@ -314,7 +307,6 @@ export class StaticCanvas<
 
   protected initElements(el: string | HTMLCanvasElement) {
     this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
   }
 
   add(...objects: FabricObject[]) {
@@ -1657,18 +1649,8 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl;
     // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
   }
 
   /**

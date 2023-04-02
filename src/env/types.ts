@@ -26,6 +26,5 @@ export type TFabricEnv = {
   WebGLProbe: GLProbe;
   createCanvasElement(width?: number, height?: number): AbstractCanvasElement;
   createImageElement(): AbstractImageElement;
-  dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
 };

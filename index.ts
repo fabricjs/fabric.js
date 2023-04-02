@@ -4,6 +4,7 @@ import {
   Image as ImageBase,
   classRegistry,
 } from './fabric';
+import { TDestroyedCanvas } from './src/canvas/SelectableCanvas';
 import { ImageSource } from './src/shapes/Image';
 
 export * from './fabric';
@@ -32,6 +33,22 @@ function markCanvasElement(el: HTMLCanvasElement) {
   }
   el.classList.add('lower-canvas');
   el.setAttribute('data-fabric', 'main');
+  el.setAttribute('data-style', el.style.cssText);
+}
+
+function cleanupCanvasElement(
+  el: HTMLCanvasElement,
+  width: number,
+  height: number
+) {
+  // restore canvas style and attributes
+  el.classList.remove('lower-canvas');
+  el.removeAttribute('data-fabric');
+  // restore canvas size to original size in case retina scaling was applied
+  el.setAttribute('width', `${width}`);
+  el.setAttribute('height', `${height}`);
+  el.style.cssText = el.getAttribute('data-style') || '';
+  el.removeAttribute('data-style');
 }
 
 export class StaticCanvas extends StaticCanvasBase {
@@ -44,6 +61,12 @@ export class StaticCanvas extends StaticCanvasBase {
     );
     markCanvasElement(this.lowerCanvasEl);
   }
+
+  destroy(): void {
+    const el = this.lowerCanvasEl;
+    super.destroy();
+    cleanupCanvasElement(el, this.width, this.height);
+  }
 }
 
 export class Canvas extends CanvasBase {
@@ -55,5 +78,11 @@ export class Canvas extends CanvasBase {
         : canvasEl
     );
     markCanvasElement(this.lowerCanvasEl);
+  }
+
+  destroy(this: TDestroyedCanvas<this>): void {
+    const el = this.lowerCanvasEl!;
+    super.destroy();
+    cleanupCanvasElement(el, this.width, this.height);
   }
 }

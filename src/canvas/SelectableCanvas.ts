@@ -1519,10 +1519,7 @@ export class SelectableCanvas<
     wrapperEl.removeChild(lowerCanvasEl);
     this.pixelFindContext = null;
     this.contextTop = null;
-    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    getEnv().dispose(upperCanvasEl);
     this.upperCanvasEl = undefined;
-    getEnv().dispose(this.pixelFindCanvasEl!);
     this.pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);

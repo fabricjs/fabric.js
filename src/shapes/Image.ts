@@ -201,7 +201,6 @@ export class Image extends FabricObject {
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
       (element) => {
-        getEnv().dispose(this[element as keyof this]);
         // @ts-expect-error disposing
         this[element] = undefined;
       }

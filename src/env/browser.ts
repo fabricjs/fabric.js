@@ -33,9 +33,6 @@ export const getEnv = (): TFabricEnv => {
     createImageElement() {
       return document.createElement('img');
     },
-    dispose() {
-      // noop
-    },
     copyPasteData,
   };
 };
