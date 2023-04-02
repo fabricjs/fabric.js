@@ -1,5 +1,5 @@
-import { TRadian } from '../../typedefs';
-import { IPoint, Point } from '../../Point';
+import type { TRadian } from '../../typedefs';
+import type { XY, Point } from '../../Point';
 
 export type TPathSegmentInfoCommon<C extends string> = {
   x: number;
@@ -302,4 +302,4 @@ export type TSimplePathData = TSimpleParsedCommand[];
 /**
  * A point (vector) and angle between the vector and x-axis
  */
-export type TPointAngle = IPoint & { angle: TRadian };
+export type TPointAngle = XY & { angle: TRadian };
