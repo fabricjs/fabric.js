@@ -21,11 +21,11 @@ interface UniqueLineProps {
   x2: number;
   y1: number;
   y2: number;
-};
+}
 
 export interface SerializedLineProps
   extends SerializedObjectProps,
-    UniqueLineProps {};
+    UniqueLineProps {}
 
 export class Line<
     Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
@@ -33,7 +33,8 @@ export class Line<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqueLineProps {
+  implements UniqueLineProps
+{
   /**
    * x value or first line edge
    * @type number
@@ -69,10 +70,7 @@ export class Line<
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor(
-    points = [0, 0, 0, 0],
-    options: Props = {} as Props
-  ) {
+  constructor(points = [0, 0, 0, 0], options: Props = {} as Props) {
     super(options);
     this.x1 = points[0];
     this.y1 = points[1];
@@ -147,12 +145,10 @@ export class Line<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  // @ts-expect-error
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-expect-error
     return { ...super.toObject(propertiesToInclude), ...this.calcLinePoints() };
   }
 

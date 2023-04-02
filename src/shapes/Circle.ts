@@ -52,13 +52,14 @@ export const circleDefaultValues: UniqCircleProps = {
   endAngle: 360,
 };
 
+// @ts-expect-error toObject typing does not really work
 export class Circle<
     Props extends TProps<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqCircleProps
+  implements CircleProps
 {
   declare radius: number;
   declare startAngle: number;
@@ -140,7 +141,7 @@ export class Circle<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-expect-error toObject typing does not really work\
+    // @ts-expect-error toObject typing does not really work
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 

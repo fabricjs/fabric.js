@@ -35,7 +35,7 @@ export class Rect<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements FabricObjectProps
+  implements RectProps
 {
   /**
    * Horizontal border radius
