@@ -1163,7 +1163,7 @@ export class SelectableCanvas<
    * @protected
    */
   protected _setDimensionsImpl(
-    dimensions: TSize,
+    dimensions: Partial<TSize>,
     options?: TCanvasSizeOptions
   ) {
     // @ts-ignore

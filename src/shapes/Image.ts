@@ -168,7 +168,6 @@ export class Image extends FabricObject {
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(Image.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -686,14 +685,6 @@ export class Image extends FabricObject {
       cropY,
     };
   }
-
-  /**
-   * Default CSS class name for canvas
-   * @static
-   * @type String
-   * @default
-   */
-  static CSS_CANVAS = 'canvas-img';
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})

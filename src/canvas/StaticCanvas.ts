@@ -378,8 +378,8 @@ export class StaticCanvas<
     context: CanvasRenderingContext2D
   ) {
     const scaleRatio = config.devicePixelRatio;
-    canvas.setAttribute('width', (this.width * scaleRatio).toString());
-    canvas.setAttribute('height', (this.height * scaleRatio).toString());
+    canvas.width = this.width * scaleRatio;
+    canvas.height = this.height * scaleRatio;
     context.scale(scaleRatio, scaleRatio);
   }
 
