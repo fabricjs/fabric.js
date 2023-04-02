@@ -11,6 +11,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   TClassProperties,
+  KeyOf,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -492,7 +493,7 @@ export class FabricObject<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends KeyOf<T> = never
   >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =

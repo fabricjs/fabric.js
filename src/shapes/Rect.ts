@@ -1,7 +1,7 @@
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import { TClassProperties, KeyOf } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -27,6 +27,8 @@ export interface SerializedRectProps
 
 export interface RectProps extends FabricObjectProps, UniqueRectProps {}
 
+const RECT_PROPS = ['rx', 'ry'] as const;
+
 export class Rect<
     Props extends TProps<RectProps> = Partial<RectProps>,
     SProps extends SerializedRectProps = SerializedRectProps,
@@ -49,7 +51,7 @@ export class Rect<
    */
   declare ry: number;
 
-  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+  static cacheProperties = [...cacheProperties, ...RECT_PROPS];
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
 
@@ -146,11 +148,10 @@ export class Rect<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    return super.toObject(['rx', 'ry', ...propertiesToInclude]);
+  toObject<T extends Props & TClassProperties<this>, K extends KeyOf<T>>(
+    propertiesToInclude: K[] = []
+  ): { [R in K]: T[K] } & SProps {
+    return super.toObject<T, K>([...RECT_PROPS, ...propertiesToInclude]);
   }
 
   /**

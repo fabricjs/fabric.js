@@ -2,7 +2,7 @@
 import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
-import type { IPoint, Point } from './Point';
+import type { XY, Point } from './Point';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -15,6 +15,8 @@ type TNonFunctionPropertyNames<T> = {
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
+
+export type KeyOf<T> = Extract<keyof T, string>;
 
 // https://github.com/microsoft/TypeScript/issues/32080
 export type Constructor<T = object> = new (...args: any[]) => T;
@@ -95,7 +97,7 @@ export type TCacheCanvasDimensions = {
   y: number;
 };
 
-export type TRectBounds = [min: IPoint, max: IPoint];
+export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions = {
   left?: number;
