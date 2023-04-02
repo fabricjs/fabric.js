@@ -16,16 +16,25 @@ export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
   ry: 0,
 };
 
+interface UniqueRectProps {
+  rx: number;
+  ry: number;
+}
+
 export interface SerializedRectProps
-  extends SerializedObjectProps {};
+  extends SerializedObjectProps,
+    UniqueRectProps {}
+
+export interface RectProps extends FabricObjectProps, UniqueRectProps {}
 
 export class Rect<
-    Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
+    Props extends TProps<RectProps> = Partial<RectProps>,
+    SProps extends SerializedRectProps = SerializedRectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements FabricObjectProps {
+  implements FabricObjectProps
+{
   /**
    * Horizontal border radius
    * @type Number
@@ -56,7 +65,7 @@ export class Rect<
    * @param {Object} [options] Options object
    * @return {Object} thisArg
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options: Props) {
     super(options);
     this._initRxRy();
   }
@@ -140,7 +149,7 @@ export class Rect<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     return super.toObject(['rx', 'ry', ...propertiesToInclude]);
   }
 
