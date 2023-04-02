@@ -28,7 +28,6 @@ export {
   stylesToArray,
   hasStyleChanged,
 } from './misc/textStyles';
-export { copyCanvasElement } from './misc/dom';
 export { toFixed } from './misc/toFixed';
 export {
   matrixToSVG,
