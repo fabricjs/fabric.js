@@ -486,18 +486,18 @@ export class FabricObject<
     ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
   }
 
-  /**
-   * Returns an object representation of an instance
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of an instance
-   */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-ignore toObject typing does not really work
-    return this.toObjectImpl(propertiesToInclude);
-  }
+  // /**
+  //  * Returns an object representation of an instance
+  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+  //  * @return {Object} Object representation of an instance
+  //  */
+  // toObject<
+  //   T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+  //   K extends keyof T = never
+  // >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+  //   // @ts-ignore toObject typing does not really work
+  //   return this.toObjectImpl(propertiesToInclude);
+  // }
 
   /**
    * Returns an object representation of an instance
