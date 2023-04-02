@@ -153,7 +153,7 @@ export class Rect<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     // @ts-ignore toObject typing does not really work
-    return this.toObjectImpl([...RECT_PROPS, ...propertiesToInclude]);
+    return this.toObject([...RECT_PROPS, ...propertiesToInclude]);
   }
 
   /**

@@ -178,9 +178,8 @@ export class Path<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-ignore toObject typing does not really work
     return {
-      ...this.toObjectImpl(propertiesToInclude as string[]),
+      ...this.toObject(propertiesToInclude),
       path: this.path.map((item) => {
         return item.slice();
       }),
@@ -193,7 +192,7 @@ export class Path<
    * @return {Object} object representation of an instance
    */
   toDatalessObject(propertiesToInclude: string[]) {
-    const o = this.toObjectImpl([
+    const o = this.toObject([
       'sourcePath',
       ...(propertiesToInclude as string[]),
     ]);

@@ -141,7 +141,7 @@ export class Circle<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     // @ts-ignore toObject typing does not really work
-    return this.toObjectImpl([...CIRCLE_PROPS, ...propertiesToInclude]);
+    return this.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
   /* _TO_SVG_START_ */

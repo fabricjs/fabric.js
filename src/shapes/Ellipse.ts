@@ -110,7 +110,7 @@ export class Ellipse<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     // @ts-ignore toObject typing does not really work
-    return this.toObjectImpl([...ELLIPSE_PROPS, ...propertiesToInclude]);
+    return this.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 
   /**

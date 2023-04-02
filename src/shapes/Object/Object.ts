@@ -85,10 +85,8 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps> &
-      Record<string, any>,
-    SProps extends SerializedObjectProps = SerializedObjectProps &
-      Record<string, any>,
+    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends AnimatableObject<EventSpec>
@@ -486,27 +484,12 @@ export class FabricObject<
     ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
   }
 
-  // /**
-  //  * Returns an object representation of an instance
-  //  * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-  //  * @return {Object} Object representation of an instance
-  //  */
-  // toObject<
-  //   T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-  //   K extends keyof T = never
-  // >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-  //   // @ts-ignore toObject typing does not really work
-  //   return this.toObjectImpl(propertiesToInclude);
-  // }
-
   /**
    * Returns an object representation of an instance
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObjectImpl(
-    propertiesToInclude: string[] = []
-  ): Record<string, any> {
+  protected toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -517,7 +500,7 @@ export class FabricObject<
             }
           : null,
       object = {
-        ...pick(this, propertiesToInclude),
+        ...pick(this, propertiesToInclude as (keyof this)[]),
         type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
@@ -573,7 +556,7 @@ export class FabricObject<
    */
   toDatalessObject(propertiesToInclude?: string[]) {
     // will be overwritten by subclasses
-    return this.toObjectImpl(propertiesToInclude);
+    return this.toObject(propertiesToInclude);
   }
 
   /**

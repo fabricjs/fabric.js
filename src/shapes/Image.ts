@@ -322,7 +322,7 @@ export class Image<
     // @ts-ignore toObject typing does not really work
     return {
       // @ts-ignore toObject typing does not really work
-      ...this.toObjectImpl([...IMAGE_PROPS, ...propertiesToInclude]),
+      ...this.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
       filters,

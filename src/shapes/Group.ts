@@ -980,7 +980,7 @@ export class Group extends createCollectionMixin(
    */
   toObject(propertiesToInclude: (keyof this)[] = []) {
     return {
-      ...this.toObjectImpl([
+      ...this.toObject([
         'layout',
         'subTargetCheck',
         'interactive',

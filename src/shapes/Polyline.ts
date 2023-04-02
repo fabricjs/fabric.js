@@ -232,9 +232,8 @@ export class Polyline<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-ignore toObject typing does not really work
     return {
-      ...this.toObjectImpl(propertiesToInclude as string[]),
+      ...this.toObject(propertiesToInclude),
       points: this.points.concat(),
     };
   }
