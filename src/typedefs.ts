@@ -16,8 +16,6 @@ type TNonFunctionPropertyNames<T> = {
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
 
-export type KeyOf<T> = Extract<keyof T, string>;
-
 // https://github.com/microsoft/TypeScript/issues/32080
 export type Constructor<T = object> = new (...args: any[]) => T;
 

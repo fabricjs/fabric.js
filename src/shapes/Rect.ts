@@ -1,7 +1,7 @@
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties, KeyOf } from '../typedefs';
+import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -148,10 +148,12 @@ export class Rect<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<T extends Props & TClassProperties<this>, K extends KeyOf<T>>(
-    propertiesToInclude: K[] = []
-  ): { [R in K]: T[K] } & SProps {
-    return super.toObject<T, K>([...RECT_PROPS, ...propertiesToInclude]);
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    // @ts-expect-error toObject typing does not really work
+    return super.toObject([...RECT_PROPS, ...propertiesToInclude]);
   }
 
   /**
