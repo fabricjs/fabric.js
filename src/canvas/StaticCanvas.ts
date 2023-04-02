@@ -38,6 +38,7 @@ import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
+import { AbstractCanvasElement } from '../env/types';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -241,7 +242,7 @@ export class StaticCanvas<
    * Can be use to read the raw pixels, but never write or manipulate
    * @type HTMLCanvasElement
    */
-  declare lowerCanvasEl: HTMLCanvasElement;
+  declare lowerCanvasEl: AbstractCanvasElement;
 
   declare contextContainer: CanvasRenderingContext2D;
 

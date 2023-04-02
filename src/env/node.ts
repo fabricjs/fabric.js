@@ -1,14 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import { Canvas as NodeCanvas, Image } from 'canvas';
 import { JSDOM } from 'jsdom';
-// @ts-ignore
-import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
 import { setEnv } from './index';
 import { TCopyPasteData, TFabricEnv } from './types';
-
-const { implForWrapper: jsdomImplForWrapper } = utils;
 
 const copyPasteData: TCopyPasteData = {};
 
@@ -26,11 +22,6 @@ const { window: JSDOMWindow } = new JSDOM(
 config.configure({
   devicePixelRatio: JSDOMWindow.devicePixelRatio || 1,
 });
-
-export const getNodeCanvas = (canvasEl: HTMLCanvasElement) => {
-  const impl = jsdomImplForWrapper(canvasEl);
-  return (impl._canvas || impl._image) as NodeCanvas;
-};
 
 export const getEnv = (): TFabricEnv => {
   return {
