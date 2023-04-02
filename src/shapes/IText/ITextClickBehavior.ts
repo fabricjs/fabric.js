@@ -15,9 +15,11 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
+    Props,
+    SProps,
     EventSpec extends ITextEvents = ITextEvents
   >
-  extends ITextKeyBehavior<EventSpec>
+  extends ITextKeyBehavior<Props, SProps, EventSpec>
   implements DragMethods
 {
   private declare __lastSelected: boolean;

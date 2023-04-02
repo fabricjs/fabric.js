@@ -215,11 +215,12 @@ export class BlendImage extends BaseFilter {
    * @returns {Promise<BlendImage>}
    */
   static fromObject(
-    object: Record<string, any>,
+    { type, image, ...filterOptions }: Record<string, any>,
     options: { signal: AbortSignal }
   ) {
-    return Image.fromObject(object.image, options).then(
-      (image) => new BlendImage({ ...object, image })
+    return Image.fromObject(image, options).then(
+      (enlivedImage) =>
+        new this({ ...filterOptions, image: enlivedImage }) as BaseFilter
     );
   }
 }

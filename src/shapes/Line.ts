@@ -83,7 +83,7 @@ export class Line<
    * @private
    * @param {Object} [options] Options
    */
-  _setWidthHeight({ left, top }: Partial<TClassProperties<Line>> = {}) {
+  _setWidthHeight({ left, top }: Partial<Props> = {}) {
     this.width = Math.abs(this.x2 - this.x1);
     this.height = Math.abs(this.y2 - this.y1);
     this.left = left ?? this._getLeftToOriginX();
@@ -150,7 +150,7 @@ export class Line<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     return {
-      ...this.toObject(propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       ...this.calcLinePoints(),
     };
   }

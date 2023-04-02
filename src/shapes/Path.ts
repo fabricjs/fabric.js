@@ -21,9 +21,18 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { TClassProperties, TSVGReviver } from '../typedefs';
 
+interface UniquePathProps {
+  sourcePath?: string;
+  path?: TSimplePathData;
+}
+
+export interface PathSerializedProps
+  extends SerializedObjectProps,
+    UniquePathProps {}
+
 export class Path<
   Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-  SProps extends SerializedObjectProps = SerializedObjectProps,
+  SProps extends PathSerializedProps = PathSerializedProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
   /**
@@ -179,7 +188,7 @@ export class Path<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     return {
-      ...this.toObject(propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       path: this.path.map((item) => {
         return item.slice();
       }),
@@ -191,13 +200,14 @@ export class Path<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject(propertiesToInclude: string[]) {
-    const o = this.toObject([
-      'sourcePath',
-      ...(propertiesToInclude as string[]),
-    ]);
-    if (o.sourcePath) {
+  toDatalessObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    const o = this.toObject<T, K>(propertiesToInclude);
+    if (this.sourcePath) {
       delete o.path;
+      o.sourcePath = this.sourcePath;
     }
     return o;
   }

@@ -19,8 +19,9 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
-import { SelectableCanvas, TDestroyedCanvas } from './SelectableCanvas';
+import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
+import type { TDestroyedCanvas } from './StaticCanvas';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 

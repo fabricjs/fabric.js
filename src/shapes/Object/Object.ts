@@ -554,7 +554,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude?: string[]) {
+  toDatalessObject(propertiesToInclude?: any[]): any {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
@@ -572,19 +572,21 @@ export class FabricObject<
       ? defaults
       : Object.getPrototypeOf(this);
 
-    Object.keys(object).forEach(function (prop) {
+    (Object.keys(object) as (keyof T)[]).forEach((prop) => {
       if (prop === 'left' || prop === 'top' || prop === 'type') {
         return;
       }
-      if (object[prop] === baseValues[prop]) {
+      const exportedValue = object[prop];
+      const baseValue = baseValues[prop];
+      if (exportedValue === baseValue) {
         delete object[prop];
       }
       // basically a check for [] === []
       if (
-        Array.isArray(object[prop]) &&
-        Array.isArray(baseValues[prop]) &&
-        object[prop].length === 0 &&
-        baseValues[prop].length === 0
+        Array.isArray(exportedValue) &&
+        Array.isArray(baseValue) &&
+        exportedValue.length === 0 &&
+        baseValue.length === 0
       ) {
         delete object[prop];
       }

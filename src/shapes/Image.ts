@@ -319,10 +319,8 @@ export class Image<
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
     });
-    // @ts-ignore toObject typing does not really work
     return {
-      // @ts-ignore toObject typing does not really work
-      ...this.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
+      ...super.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
       filters,

@@ -233,7 +233,7 @@ export class Polyline<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
     return {
-      ...this.toObject(propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       points: this.points.concat(),
     };
   }

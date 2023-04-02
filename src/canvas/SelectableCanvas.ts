@@ -30,22 +30,7 @@ import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
-};
-
-export type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'pixelFindContext'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'pixelFindCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
+import type { TDestroyedCanvas } from './StaticCanvas';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,

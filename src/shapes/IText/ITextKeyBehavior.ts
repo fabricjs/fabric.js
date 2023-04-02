@@ -8,8 +8,10 @@ import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
 
 export abstract class ITextKeyBehavior<
+  Props,
+  SProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends ITextBehavior<EventSpec> {
+> extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype

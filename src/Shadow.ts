@@ -18,6 +18,15 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   nonScaling: false,
 };
 
+type TShadowSerializedProps = {
+  color?: string;
+  blur?: number;
+  offsetX?: number;
+  offsetY?: number;
+  affectStroke?: boolean;
+  nonScaling?: boolean;
+};
+
 export class Shadow {
   /**
    * Shadow color
@@ -181,7 +190,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data = {
+    const data: TShadowSerializedProps = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
@@ -195,15 +204,14 @@ export class Shadow {
     }
 
     const defaults = Shadow.ownDefaults;
-    const out: Partial<typeof data> = {};
-    for (const key in data) {
-      if (
-        data[key as keyof typeof data] !== defaults[key as keyof typeof data]
-      ) {
-        out[key] = data[key as keyof typeof data];
+    return (
+      Object.keys(data) as (keyof TShadowSerializedProps)[]
+    ).reduce<TShadowSerializedProps>((acc, key) => {
+      if (data[key] !== defaults[key]) {
+        acc[key] = data[key];
       }
-    }
-    return out;
+      return acc;
+    }, {} as TShadowSerializedProps);
   }
 
   /**

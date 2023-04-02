@@ -10,7 +10,8 @@ import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
-import { TextStyleDeclaration } from '../Text/StyledText';
+import type { TextStyleDeclaration } from '../Text/StyledText';
+import type { SerializedTextProps, TextProps } from '../Text/Text';
 
 /**
  *  extend this regex to support non english languages
@@ -36,8 +37,10 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
+  Props extends TextProps = TextProps,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<EventSpec> {
+> extends Text<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;
