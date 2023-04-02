@@ -11,12 +11,12 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   TClassProperties,
+  ImageFormat,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capValue } from '../../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
@@ -41,6 +41,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
 import { TProps } from './types';
+import { getEnv } from '../../env';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -294,7 +295,7 @@ export class FabricObject<
    * @private
    */
   _createCacheCanvas() {
-    this._cacheCanvas = createCanvasElement();
+    this._cacheCanvas = getEnv().createCanvasElement();
     this._cacheContext = this._cacheCanvas.getContext('2d');
     this._updateCacheCanvas();
     // if canvas gets created, is empty, so dirty.
@@ -1240,13 +1241,11 @@ export class FabricObject<
     filler: TFiller
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
-      width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    pCanvas.width = width;
-    pCanvas.height = height;
-    const pCtx = pCanvas.getContext('2d');
+      width = Math.ceil(dims.x / this.scaleX / retinaScaling),
+      height = Math.ceil(dims.y / this.scaleY / retinaScaling),
+      pCanvas = getEnv().createCanvasElement(width, height),
+      pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
     }
@@ -1357,9 +1356,8 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
-    const el = createCanvasElement(),
-      // skip canvas zoom and calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true, true),
+    // skip canvas zoom and calculate with setCoords now.
+    const boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow,
       shadowOffset = new Point();
 
@@ -1374,12 +1372,12 @@ export class FabricObject<
       shadowOffset.y =
         2 * Math.round(abs(shadow.offsetY) + shadowBlur) * abs(scaling.y);
     }
-    const width = boundingRect.width + shadowOffset.x,
-      height = boundingRect.height + shadowOffset.y;
     // if the current width/height is not an integer
     // we need to make it so.
-    el.width = Math.ceil(width);
-    el.height = Math.ceil(height);
+    const el = getEnv().createCanvasElement(
+      Math.ceil(boundingRect.width + shadowOffset.x),
+      Math.ceil(boundingRect.height + shadowOffset.y)
+    );
     const canvas = new StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
@@ -1431,12 +1429,8 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options: any = {}) {
-    return toDataURL(
-      this.toCanvasElement(options),
-      options.format || 'png',
-      options.quality || 1
-    );
+  toDataURL({ format = ImageFormat.png, quality = 1, ...options }: any = {}) {
+    return this.toCanvasElement(options).toDataURL(`image/${format}`, quality);
   }
 
   /**

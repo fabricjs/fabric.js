@@ -1,6 +1,5 @@
-import { getWindow } from '../env';
+import { getEnv, getWindow } from '../env';
 import { config } from '../config';
-import { createCanvasElement } from '../util/misc/dom';
 import {
   TWebGLPipelineState,
   TProgramCache,
@@ -76,7 +75,7 @@ export class WebGLFilterBackend {
    * putImageData is faster than drawImage for that specific operation.
    */
   chooseFastestCopyGLTo2DMethod(width: number, height: number): void {
-    const targetCanvas = createCanvasElement();
+    const targetCanvas = getEnv().createCanvasElement(width, height);
     // eslint-disable-next-line no-undef
     const imageBuffer = new ArrayBuffer(width * height * 4);
     if (config.forceGLPutImageData) {
@@ -91,13 +90,9 @@ export class WebGLFilterBackend {
     const testPipelineState = {
       destinationWidth: width,
       destinationHeight: height,
-      targetCanvas: targetCanvas,
+      targetCanvas,
     } as unknown as TWebGLPipelineState;
-    let startTime;
-    targetCanvas.width = width;
-    targetCanvas.height = height;
-
-    startTime = getWindow().performance.now();
+    let startTime = getWindow().performance.now();
     this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
     const drawImageTime = getWindow().performance.now() - startTime;
 
@@ -116,9 +111,10 @@ export class WebGLFilterBackend {
    * class properties to the GLFilterBackend class.
    */
   createWebGLCanvas(width: number, height: number): void {
-    const canvas = createCanvasElement();
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = getEnv().createCanvasElement(
+      width,
+      height
+    ) as HTMLCanvasElement;
     const glOptions = {
         alpha: true,
         premultipliedAlpha: false,

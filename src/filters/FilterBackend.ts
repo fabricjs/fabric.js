@@ -1,6 +1,5 @@
 import { config } from '../config';
 import { getEnv } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
 import { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 
@@ -12,8 +11,8 @@ let filterBackend: FilterBackend;
  * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
  */
 export function initFilterBackend(): FilterBackend {
-  const { WebGLProbe } = getEnv();
-  WebGLProbe.queryWebGL(createCanvasElement());
+  const { WebGLProbe, createCanvasElement } = getEnv();
+  WebGLProbe.queryWebGL(createCanvasElement() as HTMLCanvasElement);
   if (config.enableGLFiltering && WebGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({ tileSize: config.textureSize });
   } else {

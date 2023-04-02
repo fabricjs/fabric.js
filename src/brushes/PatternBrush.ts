@@ -1,5 +1,5 @@
 import { Pattern } from '../Pattern';
-import { createCanvasElement } from '../util/misc/dom';
+import { getEnv } from '../env';
 import type { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';
 import { TSimplePathData } from '../util/path/typedefs';
@@ -14,10 +14,9 @@ export class PatternBrush extends PencilBrush {
   getPatternSrc() {
     const dotWidth = 20,
       dotDistance = 5,
-      patternCanvas = createCanvasElement(),
+      size = dotWidth + dotDistance,
+      patternCanvas = getEnv().createCanvasElement(size, size),
       patternCtx = patternCanvas.getContext('2d');
-
-    patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
     if (patternCtx) {
       patternCtx.fillStyle = this.color;
       patternCtx.beginPath();

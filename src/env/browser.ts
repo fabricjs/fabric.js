@@ -24,6 +24,15 @@ export const getEnv = (): TFabricEnv => {
     window,
     isTouchSupported,
     WebGLProbe: new WebGLProbe(),
+    createCanvasElement(width = 0, height = 0) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      return canvas;
+    },
+    createImageElement() {
+      return document.createElement('img');
+    },
     dispose() {
       // noop
     },

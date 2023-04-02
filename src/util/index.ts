@@ -28,12 +28,7 @@ export {
   stylesToArray,
   hasStyleChanged,
 } from './misc/textStyles';
-export {
-  createCanvasElement,
-  createImage,
-  copyCanvasElement,
-  toDataURL,
-} from './misc/dom';
+export { copyCanvasElement } from './misc/dom';
 export { toFixed } from './misc/toFixed';
 export {
   matrixToSVG,

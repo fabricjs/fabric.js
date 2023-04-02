@@ -1,5 +1,4 @@
 import type { TClassProperties } from '../typedefs';
-import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
   TWebGLPipelineState,
@@ -9,6 +8,7 @@ import type {
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blur';
+import { getEnv } from '../env';
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
   blur: 0,
@@ -73,8 +73,8 @@ export class Blur extends BaseFilter {
   }: T2DPipelineState) {
     const { width, height } = imageData;
     if (!resources.blurLayer1) {
-      resources.blurLayer1 = createCanvasElement();
-      resources.blurLayer2 = createCanvasElement();
+      resources.blurLayer1 = getEnv().createCanvasElement();
+      resources.blurLayer2 = getEnv().createCanvasElement();
     }
     const canvas1 = resources.blurLayer1!;
     const canvas2 = resources.blurLayer2!;

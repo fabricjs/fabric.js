@@ -1,4 +1,4 @@
-import { getDocument, getEnv } from '../env';
+import { getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -28,7 +28,6 @@ import {
 } from '../util/animation/AnimationFrameProvider';
 import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import {
   enlivenObjectEnlivables,
@@ -39,8 +38,6 @@ import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
-
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -402,42 +399,12 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
    */
-  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
-    // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
-    if (isHTMLCanvas(canvasEl)) {
-      this.lowerCanvasEl = canvasEl;
-    } else {
-      this.lowerCanvasEl =
-        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
-    }
-    if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
-      /* _DEV_MODE_START_ */
-      throw new Error(
-        'fabric.js: trying to initialize a canvas that has already been initialized'
-      );
-      /* _DEV_MODE_END_ */
-    }
-    this.lowerCanvasEl.classList.add('lower-canvas');
-    this.lowerCanvasEl.setAttribute('data-fabric', 'main');
+  protected _createLowerCanvas(canvasEl?: HTMLCanvasElement) {
+    this.lowerCanvasEl = canvasEl || getEnv().createCanvasElement();
     this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
   }
 
@@ -1529,9 +1496,7 @@ export class StaticCanvas<
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    */
   cloneWithoutData() {
-    const el = createCanvasElement();
-    el.width = this.width;
-    el.height = this.height;
+    const el = getEnv().createCanvasElement(this.width, this.height);
     return new (this.constructor as Constructor<this>)(el);
   }
 
@@ -1573,21 +1538,19 @@ export class StaticCanvas<
    *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
    * });
    */
-  toDataURL(options = {} as TDataUrlOptions): string {
-    const {
+  toDataURL(
+    {
       format = ImageFormat.png,
       quality = 1,
       multiplier = 1,
       enableRetinaScaling = false,
-    } = options;
-    const finalMultiplier =
-      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
-
-    return toDataURL(
-      this.toCanvasElement(finalMultiplier, options),
-      format,
-      quality
-    );
+      ...options
+    } = {} as TDataUrlOptions
+  ): string {
+    return this.toCanvasElement(
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1),
+      options
+    ).toDataURL(`image/${format}`, quality);
   }
 
   /**
@@ -1619,12 +1582,13 @@ export class StaticCanvas<
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElement(),
+      canvasEl = getEnv().createCanvasElement(
+        Math.ceil(scaledWidth),
+        Math.ceil(scaledHeight)
+      ),
       objectsToRender = filter
         ? this._objects.filter((obj) => filter(obj))
         : this._objects;
-    canvasEl.width = scaledWidth;
-    canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;

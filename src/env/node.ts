@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import type { Canvas as NodeCanvas } from 'canvas';
+import { Canvas as NodeCanvas, Image } from 'canvas';
 import { JSDOM } from 'jsdom';
 // @ts-ignore
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
@@ -38,6 +38,12 @@ export const getEnv = (): TFabricEnv => {
     window: JSDOMWindow,
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
+    createCanvasElement(width = 0, height = 0, type?: 'image' | 'pdf' | 'svg') {
+      return new NodeCanvas(width, height, type);
+    },
+    createImageElement() {
+      return new Image();
+    },
     dispose(element) {
       const impl = jsdomImplForWrapper(element);
       if (impl) {

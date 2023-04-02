@@ -1,10 +1,9 @@
 import { noop } from '../../constants';
-import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TCrossOrigin, TFiller } from '../../typedefs';
-import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
+import { getEnv } from '../../env';
 
 export type LoadImageOptions = {
   /**
@@ -31,7 +30,7 @@ export const loadImage = (
     if (signal && signal.aborted) {
       return reject(new Error('`options.signal` is in `aborted` state'));
     }
-    const img = createImage();
+    const img = getEnv().createImageElement();
     let abort: EventListenerOrEventListenerObject;
     if (signal) {
       abort = function (err: Event) {

@@ -13,7 +13,6 @@ import type {
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
-import { createCanvasElement } from '../../util/misc/dom';
 import {
   hasStyleChanged,
   stylesFromArray,
@@ -24,6 +23,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import { getEnv } from '../../env';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -33,7 +33,7 @@ let measuringContext: CanvasRenderingContext2D | null;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    measuringContext = createCanvasElement().getContext('2d');
+    measuringContext = getEnv().createCanvasElement().getContext('2d');
   }
   return measuringContext;
 }
@@ -1278,13 +1278,11 @@ export class Text<
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler: TFiller) {
-    const pCanvas = createCanvasElement(),
-      // TODO: verify compatibility with strokeUniform
-      width = this.width + this.strokeWidth,
+    // TODO: verify compatibility with strokeUniform
+    const width = this.width + this.strokeWidth,
       height = this.height + this.strokeWidth,
+      pCanvas = getEnv().createCanvasElement(width, height),
       pCtx = pCanvas.getContext('2d')!;
-    pCanvas.width = width;
-    pCanvas.height = height;
     pCtx.beginPath();
     pCtx.moveTo(0, 0);
     pCtx.lineTo(width, 0);

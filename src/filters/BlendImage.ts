@@ -1,6 +1,5 @@
 import { Image } from '../shapes/Image';
 import type { TClassProperties } from '../typedefs';
-import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
   T2DPipelineState,
@@ -10,6 +9,7 @@ import type {
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blendImage';
+import { getEnv } from '../env';
 
 export type TBlendImageMode = 'multiply' | 'mask';
 
@@ -117,7 +117,7 @@ export class BlendImage extends BaseFilter {
   }: T2DPipelineState) {
     const image = this.image;
     if (!resources.blendImage) {
-      resources.blendImage = createCanvasElement();
+      resources.blendImage = getEnv().createCanvasElement();
     }
     const canvas1 = resources.blendImage;
     const context = canvas1.getContext('2d')!;

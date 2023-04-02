@@ -1207,7 +1207,7 @@ export class SelectableCanvas<
 
     // if there is no upperCanvas (most common case) we create one.
     if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
+      this.upperCanvasEl = getEnv().createCanvasElement();
     }
     const upperCanvasEl = this.upperCanvasEl;
     // we assign the same classname of the lowerCanvas
@@ -1225,7 +1225,7 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.pixelFindCanvasEl = this._createCanvasElement();
+    this.pixelFindCanvasEl = getEnv().createCanvasElement();
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;

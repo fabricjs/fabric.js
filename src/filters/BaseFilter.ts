@@ -1,5 +1,4 @@
 import { getEnv } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
   TWebGLAttributeLocationMap,
@@ -366,10 +365,10 @@ export class BaseFilter {
    */
   createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
-      const helpLayer = createCanvasElement();
-      helpLayer.width = options.sourceWidth;
-      helpLayer.height = options.sourceHeight;
-      options.helpLayer = helpLayer;
+      options.helpLayer = getEnv().createCanvasElement(
+        options.sourceWidth,
+        options.sourceHeight
+      );
     }
   }
 

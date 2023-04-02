@@ -1,12 +1,11 @@
 //@ts-nocheck
-import { getDocument, getEnv } from '../env';
+import { getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties, TSize } from '../typedefs';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import {
   enlivenObjectEnlivables,
@@ -138,23 +137,16 @@ export class Image extends FabricObject {
     };
   }
   /**
-   * Constructor
-   * Image can be initialized with any canvas drawable or a string.
-   * The string should be a url and will be loaded as an image.
    * Canvas and Image element work out of the box, while videos require extra code to work.
    * Please check video element events for seeking.
-   * @param {ImageSource | string} element Image element
+   * @param {ImageSource} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: any = {});
-  constructor(element: ImageSource, options: any = {});
+  constructor(element: ImageSource, options?: any);
   constructor(arg0: ImageSource | string, options: any = {}) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
-    this.setElement(
-      (typeof arg0 === 'string' && getDocument().getElementById(arg0)) || arg0,
-      options
-    );
+    this.setElement(arg0, options);
   }
 
   /**
@@ -453,11 +445,9 @@ export class Image extends FabricObject {
       this._lastScaleY = scaleY;
       return;
     }
-    const canvasEl = createCanvasElement(),
-      sourceWidth = elementToFilter.width,
-      sourceHeight = elementToFilter.height;
-    canvasEl.width = sourceWidth;
-    canvasEl.height = sourceHeight;
+    const sourceWidth = elementToFilter.width,
+      sourceHeight = elementToFilter.height,
+      canvasEl = getEnv().createCanvasElement(sourceWidth, sourceHeight);
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
@@ -499,9 +489,7 @@ export class Image extends FabricObject {
 
     if (this._element === this._originalElement) {
       // if the element is the same we need to create a new element
-      const canvasEl = createCanvasElement();
-      canvasEl.width = sourceWidth;
-      canvasEl.height = sourceHeight;
+      const canvasEl = getEnv().createCanvasElement(sourceWidth, sourceHeight);
       this._element = canvasEl;
       this._filteredEl = canvasEl;
     } else {

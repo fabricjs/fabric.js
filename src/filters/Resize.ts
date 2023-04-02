@@ -4,7 +4,7 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { createCanvasElement } from '../util/misc/dom';
+import { getEnv } from '../env';
 
 export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
   resizeType: 'hermite',
@@ -257,7 +257,7 @@ export class Resize extends BaseFilter {
     const dX = oW;
     let dY = 0;
     if (!resources.sliceByTwo) {
-      resources.sliceByTwo = createCanvasElement();
+      resources.sliceByTwo = getEnv().createCanvasElement();
     }
     const tmpCanvas = resources.sliceByTwo;
     if (tmpCanvas.width < oW * 1.5 || tmpCanvas.height < oH) {
