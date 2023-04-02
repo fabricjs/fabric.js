@@ -2,6 +2,7 @@ import {
   Canvas as CanvasBase,
   StaticCanvas as StaticCanvasBase,
   Image as ImageBase,
+  classRegistry,
 } from './fabric';
 import { ImageSource } from './src/shapes/Image';
 
@@ -18,6 +19,8 @@ export class Image extends ImageBase {
     );
   }
 }
+
+classRegistry.setClass(Image);
 
 function markCanvasElement(el: HTMLCanvasElement) {
   if (el.hasAttribute('data-fabric')) {

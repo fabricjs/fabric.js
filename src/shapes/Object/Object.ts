@@ -5,7 +5,7 @@ import { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
-import type {
+import {
   TDegree,
   TFiller,
   TSize,
