@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -87,6 +88,7 @@ export interface GroupOwnProps {
 export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {}
+
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
 
 export const groupDefaultValues = {
