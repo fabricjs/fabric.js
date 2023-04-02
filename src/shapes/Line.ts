@@ -149,7 +149,11 @@ export class Line<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    return { ...super.toObject(propertiesToInclude), ...this.calcLinePoints() };
+    // @ts-ignore toObject typing does not really work
+    return {
+      ...this.toObjectImpl(propertiesToInclude as string[]),
+      ...this.calcLinePoints(),
+    };
   }
 
   /*

@@ -10,7 +10,6 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
-  TClassProperties,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -86,8 +85,10 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
+    Props extends TProps<ObjectProps> = Partial<ObjectProps> &
+      Record<string, any>,
+    SProps extends SerializedObjectProps = SerializedObjectProps &
+      Record<string, any>,
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends AnimatableObject<EventSpec>
@@ -493,7 +494,19 @@ export class FabricObject<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    // @ts-ignore toObject typing does not really work
+    return this.toObjectImpl(propertiesToInclude);
+  }
+
+  /**
+   * Returns an object representation of an instance
+   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} Object representation of an instance
+   */
+  protected toObjectImpl(
+    propertiesToInclude: string[] = []
+  ): Record<string, any> {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -560,7 +573,7 @@ export class FabricObject<
    */
   toDatalessObject(propertiesToInclude?: string[]) {
     // will be overwritten by subclasses
-    return this.toObject(propertiesToInclude);
+    return this.toObjectImpl(propertiesToInclude);
   }
 
   /**

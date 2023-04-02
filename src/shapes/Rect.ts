@@ -152,8 +152,8 @@ export class Rect<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-expect-error toObject typing does not really work
-    return super.toObject([...RECT_PROPS, ...propertiesToInclude]);
+    // @ts-ignore toObject typing does not really work
+    return this.toObjectImpl([...RECT_PROPS, ...propertiesToInclude]);
   }
 
   /**

@@ -10,12 +10,26 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
 };
 
-export class Polyline extends FabricObject {
+export interface SerializedPolylineProps extends SerializedObjectProps {
+  points: XY[];
+}
+
+export class Polyline<
+  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedPolylineProps = SerializedPolylineProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Points array
    * @type Array
@@ -86,8 +100,9 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: XY[] = [], { left, top, ...options }: any = {}) {
+  constructor(points: XY[] = [], options: Props) {
     super({ points, ...options });
+    const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
     typeof left === 'number' && this.set('left', left);
@@ -213,9 +228,13 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): object {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+    // @ts-ignore toObject typing does not really work
     return {
-      ...super.toObject(propertiesToInclude),
+      ...this.toObjectImpl(propertiesToInclude as string[]),
       points: this.points.concat(),
     };
   }

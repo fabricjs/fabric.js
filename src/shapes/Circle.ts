@@ -52,7 +52,6 @@ export const circleDefaultValues: UniqCircleProps = {
   endAngle: 360,
 };
 
-// @ts-expect-error toObject typing does not really work
 export class Circle<
     Props extends TProps<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
@@ -141,8 +140,8 @@ export class Circle<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
-    // @ts-expect-error toObject typing does not really work
-    return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
+    // @ts-ignore toObject typing does not really work
+    return this.toObjectImpl([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
   /* _TO_SVG_START_ */
