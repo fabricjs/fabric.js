@@ -348,7 +348,7 @@
   function toDataURLWithOddPixels(fabricCanvas, callback) {
     var imgsrc =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
-    var imageEl = fabric.util.createImage();
+    var imageEl = fabric.getEnv().createImageElement();
     imageEl.onload = function() {
       var fimg = new fabric.Image(imageEl);
       callback(fimg.toDataURL());
@@ -369,7 +369,7 @@
   function toDataURLWithEvenPixels(fabricCanvas, callback) {
     var imgsrc =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAQMAAABKLAcXAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwAfqy43KjcqNyo3KjcoBAEFzhKc6XssoAAAAAElFTkSuQmCC';
-    var imageEl = fabric.util.createImage();
+    var imageEl = fabric.getEnv().createImageElement();
     imageEl.onload = function() {
       var fimg = new fabric.Image(imageEl);
       callback(fimg.toDataURL());
@@ -390,7 +390,7 @@
   function toDataURLWithOddPixelsStrokeWidth(fabricCanvas, callback) {
     var imgsrc =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
-    var imageEl = fabric.util.createImage();
+    var imageEl = fabric.getEnv().createImageElement();
     imageEl.onload = function() {
       var fimg = new fabric.Image(imageEl, { strokeWidth: 1, stroke: 'orange' });
       callback(fimg.toDataURL());
@@ -412,7 +412,7 @@
   function toDataURLWithOddPixelsStrokeWidthEven(fabricCanvas, callback) {
     var imgsrc =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGMAAABjAQMAAAC19SzWAAAABlBMVEUAAAD///+l2Z/dAAAAG0lEQVR4XmNABf+RwANqyI3KjcqNyo3KjcoBACFidLMGY3BLAAAAAElFTkSuQmCC';
-    var imageEl = fabric.util.createImage();
+    var imageEl = fabric.getEnv().createImageElement();
     imageEl.onload = function() {
       var fimg = new fabric.Image(imageEl, { strokeWidth: 2, stroke: 'orange' });
       callback(fimg.toDataURL());

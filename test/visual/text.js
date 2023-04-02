@@ -271,9 +271,7 @@
   });
 
   function text9(canvas, callback) {
-    var canvasP = fabric.util.createCanvasElement();
-    canvasP.width = 10;
-    canvasP.height = 10;
+    var canvasP = fabric.getEnv().createCanvasElement(10, 10);
     var ctx = canvasP.getContext('2d');
     ctx.fillStyle = 'blue';
     ctx.fillRect(0, 0, 5, 5);

@@ -46,8 +46,7 @@ const size = {
  * source https://github.com/mdn/content/blob/main/files/en-us/web/api/canvas_api/tutorial/compositing/example/index.md#utility-functions
  */
 const colorSphere = (r) => {
-    const c = fabric.util.createCanvasElement()
-    c.width = c.height = r * 2;
+    const c = fabric.getEnv().createCanvasElement(r * 2, r * 2);
     const ctx = c.getContext('2d');
     const rotate = (1 / 360) * Math.PI * 2; // per degree
     const oleft = 0;

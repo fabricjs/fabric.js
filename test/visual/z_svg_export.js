@@ -25,9 +25,7 @@
     var dataUrl = svgToDataURL(svg);
     var image = fabric.getDocument().createElement('img');
     image.onload = function() {
-      var newCanvas = fabric.util.createCanvasElement();
-      newCanvas.width = canvas.width;
-      newCanvas.height = canvas.height;
+      var newCanvas = fabric.getEnv().createCanvasElement(canvas.width, canvas.height);
       newCanvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
       callback(newCanvas);
     };
