@@ -1,4 +1,5 @@
 import { getDocument } from '../env';
+import { setStyle } from './dom_style';
 
 /**
  * Wraps element with another element
@@ -103,7 +104,7 @@ export function makeElementUnselectable(element: HTMLElement) {
   if (typeof element.onselectstart !== 'undefined') {
     element.onselectstart = () => false;
   }
-  element.style.userSelect = 'none';
+  setStyle(element, { userSelect: 'none' });
   return element;
 }
 

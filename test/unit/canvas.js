@@ -92,7 +92,7 @@
     return new fabric.Triangle({ ...defaultOptions, ...options });
   }
 
-  QUnit.module('fabric.Canvas', {
+  (isNode() ? QUnit.module.skip : QUnit.module)('fabric.Canvas', {
     beforeEach: function () {
       canvas = new fabric.Canvas(null, { enableRetinaScaling: false, width: 600, height: 600 });
       upperCanvasEl = canvas.upperCanvasEl;

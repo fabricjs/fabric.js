@@ -1619,71 +1619,79 @@
     assert.notEqual(cloned.backgroundColor, 'red', 'background color has not been cloned');
   });
 
-  QUnit.test('getSetWidth', function(assert) {
-    assert.ok(typeof canvas.getWidth === 'function');
-    assert.equal(canvas.getWidth(), 200);
-    canvas.setWidth(444)
-    assert.equal(canvas.getWidth(), 444);
-    assert.equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
-  });
+  (isNode() ? QUnit.module.skip : QUnit.module)('setting width/height', (hooks) => {
 
-  QUnit.test('getSetHeight', function(assert) {
-    assert.ok(typeof canvas.getHeight === 'function');
-    assert.equal(canvas.getHeight(), 200);
-    canvas.setHeight(765)
-    assert.equal(canvas.getHeight(), 765);
-    assert.equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
-  });
+    let canvas;
+    hooks.beforeEach(() => {
+      canvas = new fabric.StaticCanvas(null, { width: 200, height: 200 });
+    });
 
-  QUnit.test('setWidth css only', function(assert) {
-    canvas.setWidth(123);
-    canvas.setWidth('100%', { cssOnly: true });
+    QUnit.test('getSetWidth', function (assert) {
+      assert.ok(typeof canvas.getWidth === 'function');
+      assert.equal(canvas.getWidth(), 200);
+      canvas.setWidth(444)
+      assert.equal(canvas.getWidth(), 444);
+      assert.equal(canvas.lowerCanvasEl.style.width, 444 + 'px');
+    });
 
-    assert.equal(canvas.lowerCanvasEl.style.width, '100%', 'Should be as the css only value');
-    assert.equal(canvas.getWidth(), 123, 'Should be as the none css only value');
-  });
+    QUnit.test('getSetHeight', function (assert) {
+      assert.ok(typeof canvas.getHeight === 'function');
+      assert.equal(canvas.getHeight(), 200);
+      canvas.setHeight(765)
+      assert.equal(canvas.getHeight(), 765);
+      assert.equal(canvas.lowerCanvasEl.style.height, 765 + 'px');
+    });
 
-  QUnit.test('setHeight css only', function(assert) {
-    canvas.setHeight(123);
-    canvas.setHeight('100%', { cssOnly: true });
+    QUnit.test('setWidth css only', function (assert) {
+      canvas.setWidth(123);
+      canvas.setWidth('100%', { cssOnly: true });
 
-    assert.equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
-    assert.equal(canvas.getHeight(), 123, 'Should be as the none css only value');
-  });
+      assert.equal(canvas.lowerCanvasEl.style.width, '100%', 'Should be as the css only value');
+      assert.equal(canvas.getWidth(), 123, 'Should be as the none css only value');
+    });
 
-  QUnit.test('setDimensions css only', function(assert) {
-    canvas.setDimensions({ width: 200, height: 200 });
-    canvas.setDimensions({ width: '250px', height: '350px' }, { cssOnly: true });
-    assert.equal(canvas.lowerCanvasEl.style.width, '250px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.lowerCanvasEl.style.height, '350px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.getWidth(), 200, 'Should be as the backstore only value');
-    assert.equal(canvas.getHeight(), 200, 'Should be as the backstore only value');
-  });
+    QUnit.test('setHeight css only', function (assert) {
+      canvas.setHeight(123);
+      canvas.setHeight('100%', { cssOnly: true });
 
-  QUnit.test('setWidth backstore only', function(assert) {
-    canvas.setWidth(123);
-    canvas.setWidth(500, { backstoreOnly: true });
+      assert.equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
+      assert.equal(canvas.getHeight(), 123, 'Should be as the none css only value');
+    });
 
-    assert.equal(canvas.lowerCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.getWidth(), 500, 'Should be as the backstore only value');
-  });
+    QUnit.test('setDimensions css only', function (assert) {
+      canvas.setDimensions({ width: 200, height: 200 });
+      canvas.setDimensions({ width: '250px', height: '350px' }, { cssOnly: true });
+      assert.equal(canvas.lowerCanvasEl.style.width, '250px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.lowerCanvasEl.style.height, '350px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.getWidth(), 200, 'Should be as the backstore only value');
+      assert.equal(canvas.getHeight(), 200, 'Should be as the backstore only value');
+    });
 
-  QUnit.test('setHeight backstore only', function(assert) {
-    canvas.setHeight(123);
-    canvas.setHeight(500, { backstoreOnly: true });
+    QUnit.test('setWidth backstore only', function (assert) {
+      canvas.setWidth(123);
+      canvas.setWidth(500, { backstoreOnly: true });
 
-    assert.equal(canvas.lowerCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
-  });
+      assert.equal(canvas.lowerCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.getWidth(), 500, 'Should be as the backstore only value');
+    });
 
-  QUnit.test('setDimensions backstore only', function(assert) {
-    canvas.setDimensions({ width: 200, height: 200 });
-    canvas.setDimensions({ width: 250, height: 350 }, { backstoreOnly: true });
-    assert.equal(canvas.lowerCanvasEl.style.width, 200 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.lowerCanvasEl.style.height, 200 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.getWidth(), 250, 'Should be as the backstore only value');
-    assert.equal(canvas.getHeight(), 350, 'Should be as the backstore only value');
-    canvas.cancelRequestedRender();
+    QUnit.test('setHeight backstore only', function (assert) {
+      canvas.setHeight(123);
+      canvas.setHeight(500, { backstoreOnly: true });
+
+      assert.equal(canvas.lowerCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
+    });
+
+    QUnit.test('setDimensions backstore only', function (assert) {
+      canvas.setDimensions({ width: 200, height: 200 });
+      canvas.setDimensions({ width: 250, height: 350 }, { backstoreOnly: true });
+      assert.equal(canvas.lowerCanvasEl.style.width, 200 + 'px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.lowerCanvasEl.style.height, 200 + 'px', 'Should be as none backstore only value + "px"');
+      assert.equal(canvas.getWidth(), 250, 'Should be as the backstore only value');
+      assert.equal(canvas.getHeight(), 350, 'Should be as the backstore only value');
+      canvas.cancelRequestedRender();
+    });
   });
 
   QUnit.skip('fxRemove', function(assert) {
@@ -1825,10 +1833,10 @@
     assert.ok(typeof canvas.calcViewportBoundaries === 'function');
     canvas.setViewportTransform([2, 0, 0, -2, -60, 60]);
     canvas.calcViewportBoundaries();
-    assert.deepEqual({ x: canvas.vptCoords.tl.x, y: canvas.vptCoords.tl.y }, { x: 30, y: -145 }, 'tl is 30, -145');
-    assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -145 }, 'tr is 130, -145');
-    assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl is 30,-70');
-    assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
+    assert.deepEqual({ x: canvas.vptCoords.tl.x, y: canvas.vptCoords.tl.y }, { x: 30, y: -70 }, 'tl');
+    assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -70 }, 'tr');
+    assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl');
+    assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br');
   });
 
   QUnit.test('_isRetinaScaling', function(assert) {

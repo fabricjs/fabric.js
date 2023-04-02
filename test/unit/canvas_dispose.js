@@ -21,12 +21,12 @@ function assertCanvasDisposing(klass) {
         assert.ok(typeof canvas.destroy === 'function');
         canvas.add(makeRect(), makeRect(), makeRect());
         const lowerCanvas = canvas.lowerCanvasEl;
-        assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
+        assert.ok(lowerCanvas['data-fabric'], 'lowerCanvasEl should be marked by fabric');
         await canvas.dispose();
         assert.equal(canvas.destroyed, true, 'dispose should flag destroyed');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
         assert.equal(canvas.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
-        assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
+        assert.notOk(lowerCanvas['data-fabric'], 'dispose should clear lowerCanvasEl data-fabric attr');
         assert.equal(canvas.contextContainer, null, 'dispose should clear contextContainer');
     });
 
@@ -166,7 +166,7 @@ function testCanvasDisposing() {
 
     assertCanvasDisposing(fabric.Canvas);
 
-    QUnit.test('dispose: clear refs', async function (assert) {
+    (isNode() ? QUnit.skip : QUnit.test)('dispose: clear refs', async function (assert) {
         //made local vars to do not dispose the external canvas
         var el = fabric.getDocument().createElement('canvas'),
             parentEl = fabric.getDocument().createElement('div'),

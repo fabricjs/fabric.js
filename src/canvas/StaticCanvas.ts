@@ -398,6 +398,17 @@ export class StaticCanvas<
    */
   protected _createLowerCanvas(canvasEl?: HTMLCanvasElement) {
     this.lowerCanvasEl = canvasEl || getEnv().createCanvasElement();
+    if (this.lowerCanvasEl['data-fabric']) {
+      throw new Error(
+        'fabric.js: trying to initialize a canvas that has already been initialized'
+      );
+    }
+    Object.defineProperty(this.lowerCanvasEl, 'data-fabric', {
+      value: true,
+      configurable: true,
+      enumerable: false,
+      writable: true,
+    });
     this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
   }
 
@@ -1650,6 +1661,7 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
+    delete this.lowerCanvasEl['data-fabric'];
     // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
   }
