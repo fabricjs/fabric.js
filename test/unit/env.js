@@ -40,4 +40,19 @@ QUnit.module('env', (hooks) => {
             assert.equal(fabric.getDocument(), document, 'window should be set');
         })
     });
+
+    QUnit.test('createCanvasElement', function (assert) {
+        assert.ok(typeof fabric.getEnv().createCanvasElement === 'function');
+        var element = fabric.getEnv().createCanvasElement();
+        assert.ok(element.getContext);
+        assert.equal(element.width, 300, 'default width');
+        assert.equal(element.height, 150, 'default height');
+    });
+
+    QUnit.test('createImageElement', function (assert) {
+        assert.ok(typeof fabric.getEnv().createImageElement === 'function');
+        var element = fabric.getEnv().createImageElement();
+        assert.equal(element.naturalHeight, 0);
+        assert.equal(element.naturalWidth, 0);
+    });
 });

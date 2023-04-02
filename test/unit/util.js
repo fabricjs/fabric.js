@@ -752,19 +752,6 @@
     assert.equal(Math.round(fabric.util.parseUnit('30pc'), 0), 480, '30mm is pixels');
   });
 
-  QUnit.test('createCanvasElement', function(assert) {
-    assert.ok(typeof fabric.util.createCanvasElement === 'function');
-    var element = fabric.util.createCanvasElement();
-    assert.ok(element.getContext);
-  });
-
-  QUnit.test('createImage', function(assert) {
-    assert.ok(typeof fabric.util.createImage === 'function');
-    var element = fabric.util.createImage();
-    assert.equal(element.naturalHeight, 0);
-    assert.equal(element.naturalWidth, 0);
-  });
-
   QUnit.test('qrDecompose with identity matrix', function(assert) {
     assert.ok(typeof fabric.util.qrDecompose === 'function');
     var options = fabric.util.qrDecompose(fabric.iMatrix);
@@ -849,23 +836,6 @@
     assert.deepEqual(fabric.util.getSvgAttributes('stop'),
       ['instantiated_by_use', 'style', 'id', 'class', 'offset', 'stop-color', 'stop-opacity'],
       'stop attribs');
-  });
-
-  QUnit.test('fabric.util.copyCanvasElement', function(assert) {
-    assert.ok(typeof fabric.util.copyCanvasElement === 'function');
-    var c = fabric.util.createCanvasElement();
-    c.width = 10;
-    c.height = 20;
-    c.getContext('2d').fillStyle = 'red';
-    c.getContext('2d').fillRect(0, 0, 10, 10);
-    var b = fabric.util.copyCanvasElement(c);
-    assert.equal(b.width, 10, 'width has been copied');
-    assert.equal(b.height, 20, 'height has been copied');
-    var data = b.getContext('2d').getImageData(1,1,1,1).data;
-    assert.equal(data[0], 255, 'red color has been copied');
-    assert.equal(data[1], 0, 'red color has been copied');
-    assert.equal(data[2], 0, 'red color has been copied');
-    assert.equal(data[3], 255, 'red color has been copied');
   });
 
   QUnit.test('fabric.util.findScaleToCover', function(assert) {
