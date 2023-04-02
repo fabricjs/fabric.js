@@ -142,8 +142,7 @@ export class Image extends FabricObject {
    * @param {ImageSource} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(element: ImageSource, options?: any);
-  constructor(arg0: ImageSource | string, options: any = {}) {
+  constructor(arg0: ImageSource, options: any = {}) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(arg0, options);
