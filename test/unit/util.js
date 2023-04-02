@@ -580,7 +580,7 @@
    * @param {*} actual
    * @param {*} expected
    * @param {*} [message]
-   * @param {number} [error] floating point percision, defaults to 10
+   * @param {number} [error] floating point precision, defaults to 10
    */
   QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
     var error = Math.pow(10, error ? -error : -10);
