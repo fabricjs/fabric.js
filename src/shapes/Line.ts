@@ -323,8 +323,14 @@ export class Line<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
-  static fromObject({ x1, y1, x2, y2, ...object }: Record<string, any>) {
-    return this._fromObject(
+  static fromObject<T extends TProps<SerializedLineProps>>({
+    x1,
+    y1,
+    x2,
+    y2,
+    ...object
+  }: T) {
+    return this._fromObject<Line>(
       {
         ...object,
         points: [x1, y1, x2, y2],
@@ -332,9 +338,7 @@ export class Line<
       {
         extraParam: 'points',
       }
-    ).then((fabricLine) => {
-      return fabricLine;
-    });
+    );
   }
 }
 

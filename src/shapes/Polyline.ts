@@ -21,12 +21,18 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
 };
 
-export interface SerializedPolylineProps extends SerializedObjectProps {
+export interface UniquePolylineProps {
   points: XY[];
 }
 
+export interface SerializedPolylineProps
+  extends SerializedObjectProps,
+    UniquePolylineProps {}
+
+export interface PolylineProps extends FabricObjectProps, UniquePolylineProps {}
+
 export class Polyline<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TProps<PolylineProps> = Partial<PolylineProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -347,8 +353,8 @@ export class Polyline<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: Record<string, unknown>) {
-    return this._fromObject(object, {
+  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
+    return this._fromObject<Polyline>(object, {
       extraParam: 'points',
     });
   }

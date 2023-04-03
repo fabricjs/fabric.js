@@ -1859,8 +1859,8 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject(object: Record<string, any>): Promise<Text> {
-    return this._fromObject(
+  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
+    return this._fromObject<Text>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),

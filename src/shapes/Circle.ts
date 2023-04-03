@@ -13,7 +13,7 @@ import {
   TProps,
 } from './Object/types';
 
-interface UniqeCircleProps {
+interface UniqueCircleProps {
   /**
    * Radius of this circle
    * @type Number
@@ -40,13 +40,13 @@ interface UniqeCircleProps {
 
 export interface SerializedCircleProps
   extends SerializedObjectProps,
-    UniqeCircleProps {}
+    UniqueCircleProps {}
 
-export interface CircleProps extends FabricObjectProps, UniqeCircleProps {}
+export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
 const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
 
-export const circleDefaultValues: UniqeCircleProps = {
+export const circleDefaultValues: UniqueCircleProps = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
@@ -58,7 +58,7 @@ export class Circle<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqeCircleProps
+  implements UniqueCircleProps
 {
   declare radius: number;
   declare startAngle: number;
@@ -233,10 +233,8 @@ export class Circle<
   /**
    * @todo how do we declare this??
    */
-  static fromObject<T extends TProps<SerializedCircleProps>>(
-    object: T
-  ): Promise<Circle> {
-    return super.fromObject(object) as unknown as Promise<Circle>;
+  static fromObject<T extends TProps<SerializedCircleProps>>(object: T) {
+    return super._fromObject<Circle>(object);
   }
 }
 

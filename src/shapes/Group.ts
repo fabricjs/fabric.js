@@ -21,7 +21,11 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
-import { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
 
 export type LayoutContextType =
   | 'initialization'
@@ -87,9 +91,13 @@ export interface GroupOwnProps {
 
 export interface SerializedGroupProps
   extends SerializedObjectProps,
-    GroupOwnProps {}
+    GroupOwnProps {
+  objects: SerializedObjectProps[];
+}
 
-export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
+export interface GroupProps extends FabricObjectProps, GroupOwnProps {
+  objects: FabricObject[];
+}
 
 export const groupDefaultValues = {
   layout: 'fit-content',
@@ -1071,7 +1079,10 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject({ objects = [], ...options }) {
+  static fromObject<T extends TProps<SerializedGroupProps>>({
+    objects = [],
+    ...options
+  }: T) {
     return Promise.all([
       enlivenObjects(objects),
       enlivenObjectEnlivables(options),

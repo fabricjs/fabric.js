@@ -1557,7 +1557,7 @@ export class FabricObject<
   static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
     options?: { signal?: AbortSignal }
-  ): Promise<FabricObject> {
+  ) {
     return this._fromObject(object, options);
   }
 }

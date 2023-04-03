@@ -26,13 +26,15 @@ interface UniquePathProps {
   path?: TSimplePathData;
 }
 
-export interface PathSerializedProps
+export interface SerializedPathProps
   extends SerializedObjectProps,
     UniquePathProps {}
 
+export interface PathProps extends FabricObjectProps, UniquePathProps {}
+
 export class Path<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-  SProps extends PathSerializedProps = PathSerializedProps,
+  Props extends TProps<PathProps> = Partial<PathProps>,
+  SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
   /**
@@ -375,8 +377,8 @@ export class Path<
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject(object: Record<string, any>) {
-    return this._fromObject(object, {
+  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+    return this._fromObject<Path>(object, {
       extraParam: 'path',
     });
   }

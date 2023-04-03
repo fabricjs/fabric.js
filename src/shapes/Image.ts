@@ -780,13 +780,14 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject(
-    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: any,
+  static fromObject<T extends TProps<SerializedImageProps>>(
+    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
     options: { signal: AbortSignal }
-  ): Promise<Image> {
+  ) {
     return Promise.all([
       loadImage(src, { ...options, crossOrigin }),
       f && enlivenObjects(f, options),
+      // TODO: redundant - handled by enlivenObjectEnlivables
       rf && enlivenObjects([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
@@ -808,7 +809,10 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
+  static fromURL<T extends TProps<SerializedImageProps>>(
+    url: string,
+    options: T & LoadImageOptions = {}
+  ): Promise<Image> {
     return loadImage(url, options).then((img) => new this(img, options));
   }
 
