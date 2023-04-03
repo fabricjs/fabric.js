@@ -20,6 +20,7 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { TClassProperties, TSVGReviver } from '../typedefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -191,9 +192,7 @@ export class Path<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: this.path.map((item) => {
-        return item.slice();
-      }),
+      path: cloneDeep(this.path),
     };
   }
 

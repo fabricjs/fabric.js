@@ -16,6 +16,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -240,7 +241,7 @@ export class Polyline<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      points: this.points.concat(),
+      points: cloneDeep(this.points),
     };
   }
 
