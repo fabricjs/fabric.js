@@ -6,10 +6,12 @@ import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
+import { TProps } from '../Object/types';
+import { TextProps, SerializedTextProps } from '../Text/Text';
 
 export abstract class ITextKeyBehavior<
-  Props,
-  SProps,
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextBehavior<Props, SProps, EventSpec> {
   /**

@@ -12,6 +12,7 @@ import { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
+import { TProps } from '../Object/types';
 
 /**
  *  extend this regex to support non english languages
@@ -37,7 +38,7 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
-  Props extends TextProps = TextProps,
+  Props extends TProps<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends Text<Props, SProps, EventSpec> {
