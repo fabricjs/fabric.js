@@ -121,6 +121,7 @@ export class FabricObject<
   declare clipPath?: FabricObject;
   declare inverted: boolean;
   declare absolutePositioned: boolean;
+  declare centeredRotation: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.

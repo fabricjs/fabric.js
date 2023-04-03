@@ -1694,7 +1694,7 @@ export class StaticCanvas<
    *
    * @private
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     this.destroyed = true;
     this.cancelRequestedRender();
     this.forEachObject((object) => object.dispose());
@@ -1710,7 +1710,7 @@ export class StaticCanvas<
     // @ts-expect-error disposing
     this.contextContainer = null;
     const canvasElement = this.lowerCanvasEl!;
-    this.lowerCanvasEl = undefined;
+    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');

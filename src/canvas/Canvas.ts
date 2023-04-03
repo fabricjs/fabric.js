@@ -21,7 +21,6 @@ import {
 } from '../util/types';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
-import type { TDestroyedCanvas } from './StaticCanvas';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
@@ -1599,7 +1598,7 @@ export class Canvas extends SelectableCanvas {
   /**
    * @override clear {@link textEditingManager}
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     this.removeListeners();
     super.destroy();
     this.textEditingManager.dispose();

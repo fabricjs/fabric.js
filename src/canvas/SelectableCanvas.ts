@@ -1490,29 +1490,29 @@ export class SelectableCanvas<
    *
    * @private
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
       activeSelection = this._activeSelection!;
     // dispose of active selection
     activeSelection.removeAll();
-    this._activeSelection = undefined;
+    (this as TDestroyedCanvas<this>)._activeSelection = undefined;
     activeSelection.dispose();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this.pixelFindContext = null;
-    this.contextTop = null;
+    (this as TDestroyedCanvas<this>).pixelFindContext = null;
+    (this as TDestroyedCanvas<this>).contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
     getEnv().dispose(upperCanvasEl);
-    this.upperCanvasEl = undefined;
+    (this as TDestroyedCanvas<this>).upperCanvasEl = undefined;
     getEnv().dispose(this.pixelFindCanvasEl!);
-    this.pixelFindCanvasEl = undefined;
+    (this as TDestroyedCanvas<this>).pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
-    this.wrapperEl = undefined;
+    (this as TDestroyedCanvas<this>).wrapperEl = undefined;
   }
 
   /**
