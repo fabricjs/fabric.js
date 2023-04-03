@@ -6,7 +6,11 @@ import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
-import type { TCacheCanvasDimensions, TFiller } from '../../typedefs';
+import type {
+  TCacheCanvasDimensions,
+  TClassProperties,
+  TFiller,
+} from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
@@ -1681,7 +1685,10 @@ export class Text<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject([...additionalProps, ...propertiesToInclude]),
       styles: stylesToArray(this.styles, this.text),

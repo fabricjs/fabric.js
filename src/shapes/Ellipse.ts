@@ -108,7 +108,7 @@ export class Ellipse<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 

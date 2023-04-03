@@ -314,7 +314,7 @@ export class Image<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());

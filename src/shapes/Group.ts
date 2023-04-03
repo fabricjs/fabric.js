@@ -4,7 +4,7 @@ import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
-import type { TSVGReviver } from '../typedefs';
+import type { TClassProperties, TSVGReviver } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -986,7 +986,13 @@ export class Group extends createCollectionMixin(
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<
+      GroupProps & TClassProperties<this>,
+      keyof SerializedGroupProps
+    >,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
     return {
       ...super.toObject([
         'layout',
