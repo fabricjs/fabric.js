@@ -200,9 +200,9 @@ export class Shadow {
       nonScaling: this.nonScaling,
     };
     const defaults = Shadow.ownDefaults;
-    return this.includeDefaultValues
-      ? data
-      : pickBy(data, (value, key) => value !== defaults[key]);
+    return !this.includeDefaultValues
+      ? pickBy(data, (value, key) => value !== defaults[key])
+      : data;
   }
 
   /**
