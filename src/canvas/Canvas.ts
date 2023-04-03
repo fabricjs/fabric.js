@@ -1103,7 +1103,7 @@ export class Canvas extends SelectableCanvas {
       this.selection &&
       (!target ||
         (!target.selectable &&
-          !target.isEditing &&
+          (!isInteractiveTextObject(target) || !target.isEditing) &&
           target !== this._activeObject))
     ) {
       const p = this.getPointer(e);
