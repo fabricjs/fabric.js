@@ -22,18 +22,12 @@ export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
 };
 
-export interface UniquePolylineProps {
+export interface SerializedPolylineProps extends SerializedObjectProps {
   points: XY[];
 }
 
-export interface SerializedPolylineProps
-  extends SerializedObjectProps,
-    UniquePolylineProps {}
-
-export interface PolylineProps extends FabricObjectProps, UniquePolylineProps {}
-
 export class Polyline<
-  Props extends TProps<PolylineProps> = Partial<PolylineProps>,
+  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {

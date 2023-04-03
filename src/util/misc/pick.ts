@@ -20,10 +20,10 @@ export const pickBy = <T extends Record<string, any>>(
   source: T,
   predicate: <K extends keyof T>(value: T[K], key: K, collection: T) => boolean
 ) => {
-  return (Object.keys(source) as (keyof T)[])
-    .filter((key) => predicate(source[key], key, source))
-    .reduce((o, key) => {
+  return (Object.keys(source) as (keyof T)[]).reduce((o, key) => {
+    if (predicate(source[key], key, source)) {
       o[key] = source[key];
-      return o;
-    }, {} as Partial<T>);
+    }
+    return o;
+  }, {} as Partial<T>);
 };

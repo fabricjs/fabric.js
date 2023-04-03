@@ -95,9 +95,7 @@ export interface SerializedGroupProps
   objects: SerializedObjectProps[];
 }
 
-export interface GroupProps extends FabricObjectProps, GroupOwnProps {
-  objects: FabricObject[];
-}
+export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
 
 export const groupDefaultValues = {
   layout: 'fit-content',
