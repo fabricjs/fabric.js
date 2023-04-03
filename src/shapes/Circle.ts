@@ -13,7 +13,7 @@ import {
   TProps,
 } from './Object/types';
 
-interface UniqCircleProps {
+interface UniqeCircleProps {
   /**
    * Radius of this circle
    * @type Number
@@ -40,13 +40,13 @@ interface UniqCircleProps {
 
 export interface SerializedCircleProps
   extends SerializedObjectProps,
-    UniqCircleProps {}
+    UniqeCircleProps {}
 
-export interface CircleProps extends FabricObjectProps, UniqCircleProps {}
+export interface CircleProps extends FabricObjectProps, UniqeCircleProps {}
 
 const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
 
-export const circleDefaultValues: UniqCircleProps = {
+export const circleDefaultValues: UniqeCircleProps = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
@@ -58,7 +58,7 @@ export class Circle<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements CircleProps
+  implements UniqCircleProps
 {
   declare radius: number;
   declare startAngle: number;
