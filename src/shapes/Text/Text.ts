@@ -266,7 +266,7 @@ export class Text<
    * });
    * @default
    */
-  declare path: Path;
+  declare path: Path | null;
 
   /**
    * Offset amount for text path starting position

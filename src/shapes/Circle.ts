@@ -58,7 +58,7 @@ export class Circle<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqCircleProps
+  implements UniqeCircleProps
 {
   declare radius: number;
   declare startAngle: number;
