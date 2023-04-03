@@ -23,7 +23,7 @@ import {
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
 import { sendObjectToPlane } from '../../util/misc/planeChange';
-import { pick } from '../../util/misc/pick';
+import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
@@ -573,27 +573,22 @@ export class FabricObject<
       ? defaults
       : Object.getPrototypeOf(this);
 
-    (Object.keys(object) as (keyof T)[]).forEach((prop) => {
-      if (prop === 'left' || prop === 'top' || prop === 'type') {
-        return;
+    return pickBy(object, (value, key) => {
+      if (key === 'left' || key === 'top' || key === 'type') {
+        return true;
       }
-      const exportedValue = object[prop];
-      const baseValue = baseValues[prop];
-      if (exportedValue === baseValue) {
-        delete object[prop];
-      }
-      // basically a check for [] === []
-      if (
-        Array.isArray(exportedValue) &&
-        Array.isArray(baseValue) &&
-        exportedValue.length === 0 &&
-        baseValue.length === 0
-      ) {
-        delete object[prop];
-      }
+      const baseValue = baseValues[key];
+      return (
+        value !== baseValue &&
+        // basically a check for [] === []
+        !(
+          Array.isArray(value) &&
+          Array.isArray(baseValue) &&
+          value.length === 0 &&
+          baseValue.length === 0
+        )
+      );
     });
-
-    return object;
   }
 
   /**

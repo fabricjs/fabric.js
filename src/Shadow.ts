@@ -4,6 +4,7 @@ import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';
+import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
 import { rotateVector } from './util/misc/vectors';
@@ -19,12 +20,12 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 type TShadowSerializedProps = {
-  color?: string;
-  blur?: number;
-  offsetX?: number;
-  offsetY?: number;
-  affectStroke?: boolean;
-  nonScaling?: boolean;
+  color: string;
+  blur: number;
+  offsetX: number;
+  offsetY: number;
+  affectStroke: boolean;
+  nonScaling: boolean;
 };
 
 export class Shadow {
@@ -198,20 +199,10 @@ export class Shadow {
       affectStroke: this.affectStroke,
       nonScaling: this.nonScaling,
     };
-
-    if (this.includeDefaultValues) {
-      return data;
-    }
-
     const defaults = Shadow.ownDefaults;
-    return (
-      Object.keys(data) as (keyof TShadowSerializedProps)[]
-    ).reduce<TShadowSerializedProps>((acc, key) => {
-      if (data[key] !== defaults[key]) {
-        acc[key] = data[key];
-      }
-      return acc;
-    }, {} as TShadowSerializedProps);
+    return this.includeDefaultValues
+      ? data
+      : pickBy(data, (value, key) => value !== defaults[key]);
   }
 
   /**
