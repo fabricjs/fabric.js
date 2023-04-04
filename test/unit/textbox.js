@@ -131,6 +131,37 @@
     assert.deepEqual(obj.styles[1].style, TEXTBOX_OBJECT.styles[1].style, 'style properties match at second index');
   });
 
+  QUnit.test('stylesToArray edge case', function (assert) {
+    var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
+      width: 120,
+      styles: {
+        "0": {
+          "5": { fill: "red" },
+          "6": { fill: "red" },
+          "7": { fill: "red" },
+          "8": { fill: "red" },
+          "9": { fill: "red" },
+          "10": { fill: "red" },
+        },
+        "2": {
+          "0": { fill: "red" },
+        }
+      }
+    });
+    assert.deepEqual(textbox.toObject().styles, [
+      {
+        start: 5,
+        end: 10,
+        style: { fill: "red" }
+      },
+      {
+        start: 16,
+        end: 17,
+        style: { fill: "red" }
+      }
+    ], 'stylesToArray output matches');
+  });
+
   QUnit.test('fromObject', function(assert) {
     var done = assert.async();
     fabric.Textbox.fromObject(TEXTBOX_OBJECT).then(function(textbox) {
