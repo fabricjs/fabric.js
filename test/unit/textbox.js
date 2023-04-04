@@ -101,7 +101,7 @@
     assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });
 
-  QUnit.test('toObject', function(assert) {
+  QUnit.test('toObject with styles', function(assert) {
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
       width: 120,
       styles: {
