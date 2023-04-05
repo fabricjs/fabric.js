@@ -1335,9 +1335,11 @@ export class SelectableCanvas<
     const objects = this.getActiveObjects(),
       added: FabricObject[] = [],
       removed: FabricObject[] = [];
+    const objectsSet = new Set(objects);
+    const oldObjectsSet = new Set(oldObjects);
 
     oldObjects.forEach((target) => {
-      if (!objects.includes(target)) {
+      if (!objectsSet.has(target)) {
         somethingChanged = true;
         target.fire('deselected', {
           e,
@@ -1348,7 +1350,7 @@ export class SelectableCanvas<
     });
 
     objects.forEach((target) => {
-      if (!oldObjects.includes(target)) {
+      if (!oldObjectsSet.has(target)) {
         somethingChanged = true;
         target.fire('selected', {
           e,
