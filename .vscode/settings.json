@@ -1,0 +1,18 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "markdown.validate.enabled": true,
+  "markdown.validate.fileLinks.enabled": "warning",
+  "markdown.validate.fragmentLinks.enabled": "warning",
+  "markdown.validate.fileLinks.markdownFragmentLinks": "warning",
+  "markdown.validate.referenceLinks.enabled": "warning",
+  "markdown.validate.ignoredLinks": [
+    // github links
+    "../../**"
+  ],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": false,
+    "source.removeUnusedImports": true
+  }
+}

@@ -1,7 +1,5 @@
 /**
  * Returns random number between 2 specified ones.
- * @static
- * @memberOf fabric.util
  * @param {Number} min lower limit
  * @param {Number} max upper limit
  * @return {Number} random value (between min and max)

@@ -2,7 +2,7 @@
 
   var LINE_OBJECT = {
     version:                  fabric.version,
-    type:                     'line',
+    type:                     'Line',
     originX:                  'left',
     originY:                  'top',
     left:                     11,
@@ -47,7 +47,7 @@
     assert.ok(line instanceof fabric.Line);
     assert.ok(line instanceof fabric.Object);
 
-    assert.equal(line.type, 'line');
+    assert.equal(line.constructor.name, 'Line');
 
     assert.equal(line.get('x1'), 10);
     assert.equal(line.get('y1'), 11);
@@ -93,7 +93,7 @@
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var lineEl           = fabric.document.createElementNS(namespace, 'line'),
+    var lineEl           = fabric.getDocument().createElementNS(namespace, 'line'),
         x1               = 11,
         y1               = 23,
         x2               = 34,
@@ -130,7 +130,7 @@
       assert.equal(oLine.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var lineElWithMissingAttributes = fabric.document.createElementNS(namespace, 'line');
+      var lineElWithMissingAttributes = fabric.getDocument().createElementNS(namespace, 'line');
       lineElWithMissingAttributes.setAttributeNS(namespace, 'x1', 10);
       lineElWithMissingAttributes.setAttributeNS(namespace, 'y1', 20);
 
@@ -162,7 +162,7 @@
 
   QUnit.test('stroke-width in a style', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var lineEl = fabric.document.createElementNS(namespace, 'line');
+    var lineEl = fabric.getDocument().createElementNS(namespace, 'line');
     lineEl.setAttribute('style', 'stroke-width:4');
     fabric.Line.fromElement(lineEl, function(oLine) {
       assert.ok(4, oLine.strokeWidth);

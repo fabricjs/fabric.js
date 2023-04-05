@@ -33,9 +33,8 @@
 
   QUnit.module('fabric.Group', {
     afterEach: function() {
-      fabric.Object.__uid = 0;
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -49,7 +48,7 @@
 
   QUnit.test('toString', function(assert) {
     var group = makeGroupWith2Objects();
-    assert.equal(group.toString(), '#<fabric.Group: (2)>', 'should return proper representation');
+    assert.equal(group.toString(), '#<Group: (2)>', 'should return proper representation');
   });
 
   QUnit.test('getObjects', function(assert) {
@@ -62,19 +61,6 @@
     assert.ok(Array.isArray(group.getObjects()), 'should be an array');
     assert.equal(group.getObjects().length, 2, 'should have 2 items');
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'should return deepEqual objects as those passed to constructor');
-  });
-
-  QUnit.test('getObjects with type', function(assert) {
-    var rect = new fabric.Rect({ width: 10, height: 20 }),
-        circle = new fabric.Circle({ radius: 30 });
-
-    var group = new fabric.Group([rect, circle]);
-
-    assert.equal(group.size(), 2, 'should have length=2 initially');
-
-    assert.deepEqual(group.getObjects('rect'), [rect], 'should return rect only');
-    assert.deepEqual(group.getObjects('circle'), [circle], 'should return circle only');
-    assert.deepEqual(group.getObjects('circle', 'rect'), [rect, circle], 'should return circle and rect, in the same order they are');
   });
 
   QUnit.test('add', function(assert) {
@@ -175,7 +161,7 @@
 
     var expectedObject = {
       version: fabric.version,
-      type:                     'group',
+      type:                     'Group',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -224,7 +210,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -232,7 +218,7 @@
       strokeWidth: 0,
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -241,7 +227,7 @@
     }];
     var expectedObject = {
       version: fabric.version,
-      type: 'group',
+      type: 'Group',
       left: 50,
       top: 100,
       width: 80,
@@ -277,14 +263,12 @@
     assert.equal(group.item(9999), undefined);
   });
 
-  QUnit.test('moveTo', function(assert) {
+  QUnit.test('moveObjectTo', function(assert) {
     var group = makeGroupWith4Objects(),
         groupEl1 = group.getObjects()[0],
         groupEl2 = group.getObjects()[1],
         groupEl3 = group.getObjects()[2],
         groupEl4 = group.getObjects()[3];
-
-    assert.ok(typeof group.item(0).moveTo === 'function');
 
     // [ 1, 2, 3, 4 ]
     assert.equal(group.item(0), groupEl1);
@@ -293,7 +277,7 @@
     assert.equal(group.item(3), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(3);
+    group.moveObjectTo(group.item(0), 3);
 
     // moved 1 to level 3 — [2, 3, 4, 1]
     assert.equal(group.item(3), groupEl1);
@@ -302,7 +286,7 @@
     assert.equal(group.item(2), groupEl4);
     assert.equal(group.item(9999), undefined);
 
-    group.item(0).moveTo(2);
+    group.moveObjectTo(group.item(0), 2);
 
     // moved 2 to level 2 — [3, 4, 2, 1]
     assert.equal(group.item(3), groupEl1);
@@ -464,14 +448,14 @@
     var group = makeGroupWith2Objects();
     assert.ok(typeof group.toSVG === 'function');
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath', function(assert) {
     var group = makeGroupWith2Objects();
     group.clipPath = new fabric.Rect({ width: 100, height: 100 });
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a clipPath absolutePositioned', function(assert) {
@@ -479,14 +463,14 @@
     group.clipPath = new fabric.Rect({ width: 100, height: 100 });
     group.clipPath.absolutePositioned = true;
     var expectedSVG = '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 90 130)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<rect transform=\"matrix(1 0 0 1 50.5 50.5)\" x=\"-50\" y=\"-50\" rx=\"0\" ry=\"0\" width=\"100\" height=\"100\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('toSVG with a group as a clipPath', function(assert) {
     var group = makeGroupWith2Objects();
     group.clipPath = makeGroupWith2Objects();
     var expectedSVG = '<g transform=\"matrix(1 0 0 1 90 130)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t\t<rect transform=\"matrix(1 0 0 1 115 105)\" x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n\t\t<rect transform=\"matrix(1 0 0 1 55 140)\" x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</clipPath>\n<g style=\"\"   >\n\t\t<g transform=\"matrix(1 0 0 1 25 -25)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-15\" y=\"-5\" rx=\"0\" ry=\"0\" width=\"30\" height=\"10\" />\n</g>\n\t\t<g transform=\"matrix(1 0 0 1 -35 10)\"  >\n<rect style=\"stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x=\"-5\" y=\"-20\" rx=\"0\" ry=\"0\" width=\"10\" height=\"40\" />\n</g>\n</g>\n</g>\n';
-    assert.equal(group.toSVG(), expectedSVG);
+    assert.equalSVG(group.toSVG(), expectedSVG);
   });
 
   QUnit.test('cloning group with 2 objects', function(assert) {
@@ -522,7 +506,7 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('z-index methods with group objects', function(assert) {
+  QUnit.test('object stacking methods with group objects', function (assert) {
 
     var textBg = new fabric.Rect({
       fill: '#abc',
@@ -531,22 +515,77 @@
     });
 
     var text = new fabric.Text('text');
-    var group = new fabric.Group([textBg, text]);
+    var obj = new fabric.Object();
+    var group = new fabric.Group([textBg, text, obj]);
+
+    assert.ok(typeof group.sendObjectToBack === 'function');
+    assert.ok(typeof group.bringObjectToFront === 'function');
+    assert.ok(typeof group.sendObjectBackwards === 'function');
+    assert.ok(typeof group.bringObjectForward === 'function');
+    assert.ok(typeof group.moveObjectTo === 'function');
 
     canvas.add(group);
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
 
-    textBg.bringToFront();
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === text);
-    assert.ok(group.getObjects()[1] === textBg);
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    textBg.sendToBack();
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg]);
+    assert.ok(group.dirty, 'should invalidate group');
 
-    assert.ok(group.getObjects()[0] === textBg);
-    assert.ok(group.getObjects()[1] === text);
+    group.dirty = false;
+    group.bringObjectToFront(textBg);
+    assert.deepEqual(group.getObjects(), [text, obj, textBg], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+
+    group.dirty = false;
+    group.sendObjectToBack(textBg);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+
+    group.dirty = false;
+    group.sendObjectBackwards(obj);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text]);
+    assert.ok(group.dirty, 'should invalidate group');
+
+    group.dirty = false;
+    group.bringObjectForward(text);
+    assert.deepEqual(group.getObjects(), [textBg, obj, text], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+
+    group.dirty = false;
+    group.bringObjectForward(obj);
+    assert.deepEqual(group.getObjects(), [textBg, text, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+
+    group.dirty = false;
+    group.bringObjectForward(textBg);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj]);
+    assert.ok(group.dirty, 'should invalidate group');
+
+    group.dirty = false;
+    group.moveObjectTo(obj, 2);
+    assert.deepEqual(group.getObjects(), [text, textBg, obj], 'has no effect');
+    assert.ok(group.dirty === false, 'should not invalidate group');
+
+    group.dirty = false;
+    group.moveObjectTo(obj, 0);
+    assert.deepEqual(group.getObjects(), [obj, text, textBg]);
   });
 
   QUnit.test('group reference on an object', function(assert) {
@@ -595,23 +634,23 @@
       });
     });
 
-    group.insertAt(rect3, 1);
+    group.insertAt(1, rect3);
     control.splice(1, 0, rect3);
     firingControl.push(rect3);
     equalsControl('rect3');
-    group.insertAt(rect4, 0);
+    group.insertAt(0, rect4);
     control.splice(0, 0, rect4);
     firingControl.push(rect4);
     equalsControl('rect4');
-    group.insertAt(rect5, 2);
+    group.insertAt(2, rect5);
     control.splice(2, 0, rect5);
     firingControl.push(rect5);
     equalsControl('rect5');
-    group.insertAt([rect6], 2);
+    group.insertAt(2, rect6);
     control.splice(2, 0, rect6);
     firingControl.push(rect6);
     equalsControl('rect6');
-    group.insertAt([rect7, rect8], 3);
+    group.insertAt(3, rect7, rect8);
     control.splice(3, 0, rect7, rect8);
     firingControl.push(rect7, rect8);
     equalsControl('rect7');
@@ -723,7 +762,7 @@
     assert.deepEqual(group.getObjects(), [rect1, rect2], '`rect2` should have entered once');
     //  adding self
     assert.notOk(group.canEnterGroup(group));
-    group.insertAt(group, 0);
+    group.insertAt(0, group);
     assert.deepEqual(group.getObjects(), [rect1, rect2], 'objects should not have changed');
     //  nested object should be removed from group
     var nestedGroup = new fabric.Group([rect1]);

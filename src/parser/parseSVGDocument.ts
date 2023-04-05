@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { fabric } from '../../HEADER';
+import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
   clipPaths,
@@ -41,25 +41,12 @@ export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
   }
   parseUseDirectives(doc);
 
-  let svgUid = fabric.Object.__uid++,
-    i,
-    len,
+  const svgUid = uid(),
     options = applyViewboxTransform(doc),
     descendants = Array.from(doc.getElementsByTagName('*'));
   options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
   options.svgUid = svgUid;
   options.signal = parsingOptions && parsingOptions.signal;
-
-  if (descendants.length === 0 && isLikelyNode) {
-    // we're likely in node, where "o3-xml" library fails to gEBTN("*")
-    // https://github.com/ajaxorg/node-o3-xml/issues/21
-    descendants = doc.selectNodes('//*[name(.)!="svg"]');
-    const arr = [];
-    for (i = 0, len = descendants.length; i < len; i++) {
-      arr[i] = descendants[i];
-    }
-    descendants = arr;
-  }
 
   const elements = descendants.filter(function (el) {
     applyViewboxTransform(el);

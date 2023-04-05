@@ -5,14 +5,17 @@ export const cssRules = {};
 export const gradientDefs = {};
 export const clipPaths = {};
 
+export const storage = {
+  cssRules,
+  gradientDefs,
+  clipPaths,
+};
+
 export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
 
 export const svgNS = 'http://www.w3.org/2000/svg';
 
-export const commaWsp = '(?:\\s+,?\\s*|,\\s*)';
-
-export const rePathCommand =
-  /([-+]?((\d+\.\d+)|((\d+)|(\.\d+)))(?:[eE][-+]?\d+)?)/gi;
+export const commaWsp = String.raw`(?:\s+,?\s*|,\s*|$)`;
 
 export const reFontDeclaration = new RegExp(
   '(normal|italic)?\\s*(normal|small-caps)?\\s*' +

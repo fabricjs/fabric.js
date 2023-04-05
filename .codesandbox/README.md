@@ -1,16 +1,16 @@
 # CodeSandbox CI
 
-Configuration, scripts and templates used by [CodeSandbox CI](https://codesandbox.io/docs/ci)
+Configuration files, scripts and templates used by [CodeSandbox CI](https://codesandbox.io/docs/ci), [Github Codespaces](https://docs.github.com/en/codespaces) and [Gitpod](https://gitpod.io/from-referrer/)
 
 ## Contents
 
-- `ci.json`: configuration for ci
+- `ci.json`: configuration for codesandbox ci
 - `.mjs`: script files used by our cli
 - `templates`: ready to start fabric templates (`next`, `node`, `vanilla`)
 
-## Running Locally
+## Running a Template
 
-To run a template locally use the cli.
+To run a template use the cli.
 
 ```bash
 npm run sandbox

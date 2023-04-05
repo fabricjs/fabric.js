@@ -13,15 +13,21 @@ import { wd } from '../scripts/dirname.mjs';
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} destination
  */
-export function startSandbox(destination, buildAndWatch) {
+export function startSandbox(destination, buildAndWatch, installDeps = false) {
   console.log(chalk.blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
-  cp.execSync('npm link fabric --save', {
+  cp.execSync('npm link fabric --include=dev --save', {
     cwd: destination,
     stdio: 'inherit',
   });
-  console.log(chalk.blue('\n> installing dependencies'));
-  cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
+
+  if (
+    installDeps ||
+    !fs.existsSync(path.resolve(destination, 'node_modules'))
+  ) {
+    console.log(chalk.blue('\n> installing dependencies'));
+    cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
+  }
 
   if (buildAndWatch) {
     console.log(chalk.blue('\n> building and watching for changes'));
@@ -30,18 +36,18 @@ export function startSandbox(destination, buildAndWatch) {
 
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
-    !locked &&
-      fs.writeFileSync(
+    if (!locked) {
+      const packageJSON = fs.readJsonSync(pathToTrigger);
+      fs.writeJSONSync(
         pathToTrigger,
-        JSON.stringify(
-          {
-            ...JSON.parse(fs.readFileSync(pathToTrigger)),
-            trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
-          },
-          null,
-          '  '
-        )
+        {
+          ...packageJSON,
+          trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
+        },
+        { spaces: 2 }
       );
+      fs.writeJSONSync(pathToTrigger, packageJSON, { spaces: 2 });
+    }
   }, 500);
 
   console.log(
@@ -51,6 +57,12 @@ export function startSandbox(destination, buildAndWatch) {
       )}`
     )
   );
+
+  try {
+    cp.exec('code .', { cwd: destination });
+  } catch (error) {
+    console.log('> failed to open VSCode');
+  }
 
   return cp.spawn('npm run dev', {
     cwd: destination,

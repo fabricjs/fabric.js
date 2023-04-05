@@ -10,11 +10,18 @@
 <script src="/node_modules/source-map-support/browser-source-map-support.js"></script>
 <script>sourceMapSupport.install();</script>
 
+<script>
+const isNode = () => false;
+</script>
+
 <script src="/testem.js"></script>
 {{#serve_files}}<script src="{{{src}}}"{{#attrs}} {{&.}}{{/attrs}}></script>{{/serve_files}}
 
 <script>
 QUnit.config.reorder = false;
+QUnit.config.noglobals = true;
+QUnit.config.hidepassed = true;
+QUnit.config.testTimeout = 15000;
 </script>
 
 {{#visual}}

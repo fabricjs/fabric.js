@@ -1,56 +1,16 @@
-/* eslint-disable no-unused-vars, no-unused-expressions */
-(function() {
-  if (fabric.isLikelyNode) {
-    if (process.env.launcher === 'Firefox') {
-      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
-    }
-    if (process.env.launcher === 'Node') {
-      fabric.config.configure({ browserShadowBlurConstant: 1 });
-    }
-    if (process.env.launcher === 'Chrome') {
-      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
-    }
-    if (process.env.launcher === 'Edge') {
-      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
-    }
-  }
-  else {
-    if (navigator.userAgent.indexOf('Firefox') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 0.9 });
-    }
-    if (navigator.userAgent.indexOf('Chrome') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 1.5 });
-    }
-    if (navigator.userAgent.indexOf('Edge') !== -1) {
-      fabric.config.configure({ browserShadowBlurConstant: 1.75 });
-    }
-  }
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
-  fabric.Object.prototype.objectCaching = true;
-  // eslint-disable-next-line
-  var visualTestLoop, compareGoldensTest;
-  if (fabric.isLikelyNode) {
-    visualTestLoop = global.visualTestLoop;
-    compareGoldensTest = global.compareGoldensTest;
-  }
-  else {
-    visualTestLoop = window.visualTestLoop;
-    compareGoldensTest = window.compareGoldensTest;
-  }
   function setBrush(canvas, brush) {
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
   }
   var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false) {
+  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
     setBrush(brush.canvas, brush);
     brush.onMouseDown(points[0], options);
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
       brush.onMouseMove(points[i], options);
+      onMove && onMove(points[i], i, points);
     }
     if (fireUp) {
       brush.onMouseUp(options);
@@ -2056,9 +2016,43 @@
     }
   ].map(p => new fabric.Point(p));;
 
-  var tests = [];
 
-  var freeDrawingTestDefaults = {
+
+QUnit.module('Free Drawing', hooks => {
+  const visualTester = visualTestLoop(QUnit);
+  let objectCachingDefault;
+  const BROWSER_SHADOW_BLUR = {
+    firefox: 0.9,
+    chrome: 1.5,
+    edge: 1.75,
+    node: 1
+  };
+  function getBrowserAgent() {
+    return ['chrome', 'firefox', 'edge'].find(name => navigator.userAgent.toLowerCase().indexOf(name) > -1);
+  }
+  hooks.before(() => {
+    objectCachingDefault = fabric.Object.ownDefaults.objectCaching;
+    if (isNode()) {
+      fabric.config.configure({
+        browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
+      });
+    }
+    else {
+      fabric.config.configure({ browserShadowBlurConstant: BROWSER_SHADOW_BLUR[getBrowserAgent()] });
+    }
+    fabric.config.configure({
+      enableGLFiltering: false
+    });
+    fabric.Object.ownDefaults.objectCaching = true;
+  });
+  hooks.after(() => {
+    // fabric.config.restoreDefaults();
+    fabric.Object.ownDefaults.objectCaching = objectCachingDefault;
+  });
+
+  const tests = [];
+
+  const freeDrawingTestDefaults = {
     /**
      * render top context before mouseup
      */
@@ -2083,7 +2077,7 @@
 
   function freedrawing(canvas) {
     // eslint-disable-next-line
-    var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":20.076},{"x":14.940,"y":22.068},{"x":14.940,"y":25.056},{"x":14.940,"y":27.048},{"x":14.940,"y":29.040},{"x":14.940,"y":31.032},{"x":14.940,"y":33.024},{"x":14.940,"y":35.016},{"x":15.936,"y":36.012},{"x":17.928,"y":35.016},{"x":18.924,"y":34.020},{"x":19.920,"y":32.028},{"x":21.912,"y":31.032},{"x":22.908,"y":29.040},{"x":23.904,"y":27.048},{"x":24.900,"y":25.056},{"x":25.896,"y":24.060},{"x":26.892,"y":22.068},{"x":28.884,"y":23.064},{"x":29.880,"y":24.060},{"x":30.876,"y":25.056},{"x":32.869,"y":25.056},{"x":34.861,"y":25.056},{"x":36.853,"y":25.056},{"x":38.845,"y":25.056},{"x":40.837,"y":24.060},{"x":41.833,"y":23.064},{"x":42.829,"y":22.068},{"x":43.825,"y":21.072},{"x":44.821,"y":20.076},{"x":43.825,"y":24.060},{"x":43.825,"y":26.052},{"x":43.825,"y":30.036},{"x":43.825,"y":33.024},{"x":43.825,"y":35.016},{"x":43.825,"y":38.004},{"x":43.825,"y":40.992},{"x":43.825,"y":42.984},{"x":43.825,"y":44.976},{"x":44.821,"y":45.972},{"x":45.817,"y":46.968},{"x":47.809,"y":46.968},{"x":48.805,"y":45.972},{"x":50.797,"y":43.980},{"x":51.793,"y":41.988},{"x":52.789,"y":38.004},{"x":53.785,"y":37.008},{"x":53.785,"y":35.016},{"x":54.781,"y":33.024},{"x":54.781,"y":31.032},{"x":54.781,"y":33.024},{"x":56.773,"y":33.024},{"x":58.765,"y":34.020},{"x":60.757,"y":34.020},{"x":62.749,"y":34.020},{"x":63.745,"y":33.024}]
+    var points = [{ "x": 14.940, "y": 18.084 }, { "x": 14.940, "y": 20.076 }, { "x": 14.940, "y": 22.068 }, { "x": 14.940, "y": 25.056 }, { "x": 14.940, "y": 27.048 }, { "x": 14.940, "y": 29.040 }, { "x": 14.940, "y": 31.032 }, { "x": 14.940, "y": 33.024 }, { "x": 14.940, "y": 35.016 }, { "x": 15.936, "y": 36.012 }, { "x": 17.928, "y": 35.016 }, { "x": 18.924, "y": 34.020 }, { "x": 19.920, "y": 32.028 }, { "x": 21.912, "y": 31.032 }, { "x": 22.908, "y": 29.040 }, { "x": 23.904, "y": 27.048 }, { "x": 24.900, "y": 25.056 }, { "x": 25.896, "y": 24.060 }, { "x": 26.892, "y": 22.068 }, { "x": 28.884, "y": 23.064 }, { "x": 29.880, "y": 24.060 }, { "x": 30.876, "y": 25.056 }, { "x": 32.869, "y": 25.056 }, { "x": 34.861, "y": 25.056 }, { "x": 36.853, "y": 25.056 }, { "x": 38.845, "y": 25.056 }, { "x": 40.837, "y": 24.060 }, { "x": 41.833, "y": 23.064 }, { "x": 42.829, "y": 22.068 }, { "x": 43.825, "y": 21.072 }, { "x": 44.821, "y": 20.076 }, { "x": 43.825, "y": 24.060 }, { "x": 43.825, "y": 26.052 }, { "x": 43.825, "y": 30.036 }, { "x": 43.825, "y": 33.024 }, { "x": 43.825, "y": 35.016 }, { "x": 43.825, "y": 38.004 }, { "x": 43.825, "y": 40.992 }, { "x": 43.825, "y": 42.984 }, { "x": 43.825, "y": 44.976 }, { "x": 44.821, "y": 45.972 }, { "x": 45.817, "y": 46.968 }, { "x": 47.809, "y": 46.968 }, { "x": 48.805, "y": 45.972 }, { "x": 50.797, "y": 43.980 }, { "x": 51.793, "y": 41.988 }, { "x": 52.789, "y": 38.004 }, { "x": 53.785, "y": 37.008 }, { "x": 53.785, "y": 35.016 }, { "x": 54.781, "y": 33.024 }, { "x": 54.781, "y": 31.032 }, { "x": 54.781, "y": 33.024 }, { "x": 56.773, "y": 33.024 }, { "x": 58.765, "y": 34.020 }, { "x": 60.757, "y": 34.020 }, { "x": 62.749, "y": 34.020 }, { "x": 63.745, "y": 33.024 }]
       .map(p => new fabric.Point(p));
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
@@ -2165,7 +2159,7 @@
 
   function freedrawingWithDecimateToPoint(canvas) {
     // eslint-disable-next-line
-    var points = [{"x":14.940,"y":18.084},{"x":14.940,"y":18.084},{"x":14.940,"y":18.084}]
+    var points = [{ "x": 14.940, "y": 18.084 }, { "x": 14.940, "y": 18.084 }, { "x": 14.940, "y": 18.084 }]
       .map(p => new fabric.Point(p));
     var brush = new fabric.PencilBrush(canvas);
     brush.color = 'red';
@@ -2212,47 +2206,119 @@
     }
   });
 
-  var visualTester = visualTestLoop(QUnit);
-  //var compareGoldens = compareGoldensTest(QUnit);
-  tests[0].newModule = 'Free Drawing';
+  function pattern(canvas) {
+    var brush = new fabric.PatternBrush(canvas);
+    brush.color = 'red';
+    brush.width = 20;
+    pointDrawer(points, brush, true);
+    brush.color = 'blue';
+    brush.width = 15;
+    brush.decimate = 7;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Pattern src from `getPatternSrc`',
+    build: pattern,
+    golden: 'freedrawingPattern.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      main: true,
+      compare: false
+    }
+  });
+
+  async function patternFromSource(canvas) {
+    var brush = new fabric.PatternBrush(canvas);
+    brush.source = await new Promise(resolve => getFixture('greyfloral.png', false, resolve));
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, true);
+    brush.source = await new Promise(resolve => getFixture('parrot.png', false, resolve));
+    brush.width = 7;
+    pointDrawer(points, brush);
+  }
+
+  tests.push({
+    test: 'Pattern src from `source`',
+    build: patternFromSource,
+    golden: 'freedrawingPatternSource.png',
+    percentage: 0.09,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      main: true,
+      compare: false
+    }
+  });
+
+  function withText(canvas) {
+    canvas.add(new fabric.IText('This textbox should NOT\nclear the brush during rendering'));
+    const brush = new fabric.PencilBrush(canvas);
+    brush.color = 'red';
+    brush.width = 25;
+    pointDrawer(points, brush, false, (point, index, points) => index === points.length - 1 && canvas.renderAll());
+  }
+
+  tests.push({
+    test: 'textbox should not clear brush',
+    build: withText,
+    golden: 'withText.png',
+    percentage: 0.02,
+    width: 200,
+    height: 250,
+    fabricClass: 'Canvas',
+    targets: {
+      top: true,
+      main: false,
+      mesh: true,
+      result: false,
+      compare: false
+    }
+  });
+
   tests.forEach(function (test) {
     var options = Object.assign({}, freeDrawingTestDefaults, test.targets);
     if (options.top) {
       visualTester(Object.assign({}, test, {
         test: `${test.test} (top context)`,
         golden: `top_ctx_${test.golden}`,
-        code: function (canvas, callback) {
-          test.build(canvas);
+        code: async function (canvas, callback) {
+          await test.build(canvas);
           callback(canvas.upperCanvasEl);
         },
-        disabled: fabric.isLikelyNode
+        disabled: isNode()
       }));
     }
     options.main && visualTester(Object.assign({}, test, {
       test: `${test.test} (main context)`,
       golden: `main_ctx_${test.golden}`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: isNode()
     }));
     options.mesh && visualTester(Object.assign({}, test, {
       test: `${test.test} (context mesh)`,
       golden: `mesh_${test.golden}`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         canvas.renderAll();
         canvas.contextContainer.drawImage(canvas.upperCanvasEl, 0, 0);
         callback(canvas.lowerCanvasEl);
       },
-      disabled: fabric.isLikelyNode
+      disabled: isNode()
     }));
     options.result && visualTester(Object.assign({}, test, {
       test: `${test.test} (result)`,
-      code: function (canvas, callback) {
-        test.build(canvas);
+      code: async function (canvas, callback) {
+        await test.build(canvas);
         fireMouseUp(canvas.freeDrawingBrush);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
@@ -2260,4 +2326,5 @@
     }));
     //options.compare && compareGoldens(`${test.test} (mesh <> result)`, test.golden, `mesh_${test.golden}`, test.percentage);
   });
-})();
+
+});

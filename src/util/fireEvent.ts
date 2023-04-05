@@ -1,7 +1,15 @@
-import { TransformEvent } from '../typedefs';
+import { BasicTransformEvent, TModificationEvents } from '../EventTypeDefs';
 
-export const fireEvent = <T>(eventName: string, options: TransformEvent<T>) => {
-  const target = options.transform.target;
-  target.canvas?.fire('object:' + eventName, { ...options, target });
+export const fireEvent = (
+  eventName: TModificationEvents,
+  options: BasicTransformEvent
+) => {
+  const {
+    transform: { target },
+  } = options;
+  target.canvas?.fire(`object:${eventName}`, {
+    ...options,
+    target,
+  });
   target.fire(eventName, options);
 };

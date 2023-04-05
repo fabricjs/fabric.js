@@ -98,8 +98,8 @@ const number = reNum,
  */
 export function parseTransformAttribute(attributeValue) {
   // start with identity matrix
-  let matrix = iMatrix.concat(),
-    matrices = [];
+  let matrix = iMatrix.concat();
+  const matrices = [];
 
   // return if no argument was given or
   // an argument does not match transform attribute regexp

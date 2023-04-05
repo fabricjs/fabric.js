@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -24,7 +24,7 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = fabric.isLikelyNode
+  var IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -125,27 +125,6 @@
     assert.ok(!areAllTheSame);
   });
 
-  QUnit.test('String.prototype.trim', function(assert) {
-    assert.ok(typeof String.prototype.trim === 'function');
-    assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
-  });
-
-  QUnit.test('fabric.util.string.camelize', function(assert) {
-    var camelize = fabric.util.string.camelize;
-
-    assert.ok(typeof camelize === 'function');
-
-    assert.equal(camelize('foo'), 'foo');
-    assert.equal(camelize('foo-bar'), 'fooBar');
-    assert.equal(camelize('Foo-bar-Baz'), 'FooBarBaz');
-    assert.equal(camelize('FooBarBaz'), 'FooBarBaz');
-    assert.equal(camelize('-bar'), 'Bar');
-    assert.equal(camelize(''), '');
-    assert.equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
-    assert.equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
-    assert.equal(camelize('--double'), 'Double');
-  });
-
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
     var gSplit = fabric.util.string.graphemeSplit;
 
@@ -187,108 +166,22 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  QUnit.test('fabric.util.object.extend', function(assert) {
-    var extend = fabric.util.object.extend;
-
-    assert.ok(typeof extend === 'function');
-
-    var destination = { x: 1 },
-        source = { y: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 1);
-    assert.equal(destination.y, 2);
-    assert.equal(source.x, undefined);
-    assert.equal(source.y, 2);
-
-    destination = { x: 1 };
-    source = { x: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 2);
-    assert.equal(source.x, 2);
-  });
-
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
-    var extend = fabric.util.object.extend;
-    var d = function() { };
-    var destination = { x: 1 },
-        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
-
-    extend(destination, source, true);
-
-    assert.equal(destination.x, 1, 'x is still in destination');
-    assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
-  });
-
-  QUnit.test('fabric.util.object.clone', function(assert) {
-    var clone = fabric.util.object.clone;
-
-    assert.ok(typeof clone === 'function');
-
-    var obj = { x: 1, y: [1, 2, 3] },
-        _clone = clone(obj);
-
-    assert.equal(_clone.x, 1);
-    assert.notEqual(obj, _clone);
-    assert.equal(_clone.y, obj.y);
-  });
-
-  QUnit.test('Function.prototype.bind', function(assert) {
-    assert.ok(typeof Function.prototype.bind === 'function');
-
-    var obj = { };
-    function fn() {
-      return [this, arguments[0], arguments[1]];
-    }
-
-    var bound = fn.bind(obj);
-    assert.deepEqual([obj, undefined, undefined], bound());
-    assert.deepEqual([obj, 1, undefined], bound(1));
-    assert.deepEqual([obj, 1, null], bound(1, null));
-
-    bound = fn.bind(obj, 1);
-    assert.deepEqual([obj, 1, undefined], bound());
-    assert.deepEqual([obj, 1, 2], bound(2));
-
-    function Point(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    obj = { };
-    var YAxisPoint = Point.bind(obj, 0);
-    var axisPoint = new YAxisPoint(5);
-
-    assert.deepEqual(0, axisPoint.x);
-    assert.deepEqual(5, axisPoint.y);
-
-    assert.ok(axisPoint instanceof Point);
-    // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
-  });
-
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-    var wrapper = fabric.document.createElement('div');
-    var el = fabric.document.createElement('p');
+    var wrapper = fabric.getDocument().createElement('div');
+    var el = fabric.getDocument().createElement('p');
     var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-    var childEl = fabric.document.createElement('span');
-    var parentEl = fabric.document.createElement('p');
+    var childEl = fabric.getDocument().createElement('span');
+    var parentEl = fabric.getDocument().createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, fabric.document.createElement('strong'));
+    wrapper = wrapElement(childEl, fabric.getDocument().createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -300,8 +193,8 @@
 
     assert.ok(typeof makeElementUnselectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
 
@@ -325,8 +218,8 @@
 
     assert.ok(typeof makeElementSelectable === 'function');
 
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     makeElementUnselectable(el);
     makeElementSelectable(el);
@@ -490,62 +383,13 @@
     });
   });
 
-  QUnit.test('fabric.util.createClass', function(assert) {
-    var Klass = fabric.util.createClass();
-
-    assert.ok(typeof Klass === 'function');
-    assert.ok(typeof new Klass() === 'object');
-
-    var Person = fabric.util.createClass({
-      initialize: function(firstName, lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-      },
-      toString: function() {
-        return 'My name is ' + this.firstName + ' ' + this.lastName;
-      }
-    });
-
-    assert.ok(typeof Person === 'function');
-    assert.ok(typeof new Person() === 'object');
-
-    var john = new Person('John', 'Meadows');
-    assert.ok(john instanceof Person);
-
-    assert.equal(john.firstName, 'John');
-    assert.equal(john.lastName, 'Meadows');
-    assert.equal(john + '', 'My name is John Meadows');
-
-
-    var WebDeveloper = fabric.util.createClass(Person, {
-      initialize: function(firstName, lastName, skills) {
-        this.callSuper('initialize', firstName, lastName);
-        this.skills = skills;
-      },
-      toString: function() {
-        return this.callSuper('toString') + ' and my skills are ' + this.skills.join(', ');
-      }
-    });
-
-    assert.ok(typeof WebDeveloper === 'function');
-    var dan = new WebDeveloper('Dan', 'Trink', ['HTML', 'CSS', 'Javascript']);
-    assert.ok(dan instanceof Person);
-    assert.ok(dan instanceof WebDeveloper);
-
-    assert.equal(dan.firstName, 'Dan');
-    assert.equal(dan.lastName, 'Trink');
-    assert.deepEqual(dan.skills, ['HTML', 'CSS', 'Javascript']);
-
-    assert.equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
-  });
-
   // element doesn't seem to have style on node
-  if (!fabric.isLikelyNode) {
+  if (!isNode()) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.document.createElement('div');
+      var el = fabric.getDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
@@ -557,18 +401,6 @@
       assert.equal(el.style.width, '45px');
     });
   }
-
-  QUnit.test('fabric.util.addListener', function(assert) {
-    assert.ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
-    fabric.util.addListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element addListener');
-  });
-
-  QUnit.test('fabric.util.removeListener', function(assert) {
-    assert.ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
-    fabric.util.removeListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element removeListener');
-  });
 
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
@@ -594,14 +426,6 @@
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');
     assert.ok(typeof destination.ffffffffff === 'undefined');
-  });
-
-  QUnit.test('getKlass', function(assert) {
-    assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
-    assert.equal(fabric.util.getKlass('i-text'), fabric.IText);
-    assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
-    assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
-    assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
   QUnit.test('clearFontCache', function(assert) {
@@ -706,6 +530,11 @@
     assert.equal(transform.angle, 30);
   });
 
+  QUnit.test('isIdentityMatrix', function(assert) {
+    assert.equal(fabric.util.isIdentityMatrix([1, 0, 0, 1, 0, 0]), true, 'is identity');
+    assert.equal(fabric.util.isIdentityMatrix([1, 2, 3, 4, 5, 6]), false, 'is not identity');
+  });
+
   QUnit.test('invertTransform', function(assert) {
     assert.ok(typeof fabric.util.invertTransform === 'function');
     var m1 = [1, 2, 3, 4, 5, 6], m3;
@@ -751,7 +580,7 @@
    * @param {*} actual
    * @param {*} expected
    * @param {*} [message]
-   * @param {number} [error] floating point percision, defaults to 10
+   * @param {number} [error] floating point precision, defaults to 10
    */
   QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
     var error = Math.pow(10, error ? -error : -10);
@@ -936,10 +765,6 @@
     assert.equal(element.naturalWidth, 0);
   });
 
-  // QUnit.test('createAccessors', function(assert) {
-  //   assert.ok(typeof fabric.util.createAccessors === 'function');
-  // });
-
   QUnit.test('qrDecompose with identity matrix', function(assert) {
     assert.ok(typeof fabric.util.qrDecompose === 'function');
     var options = fabric.util.qrDecompose(fabric.iMatrix);
@@ -1098,15 +923,15 @@
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [2, 0, 0, 2, 0, 0]);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 Z');
   });
   QUnit.test('fabric.util.transformPath can apply a generic transform', function(assert) {
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 Z');
   });
 
   QUnit.test('fabric.util.calcDimensionsMatrix', function(assert) {

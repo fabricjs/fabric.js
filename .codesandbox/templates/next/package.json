@@ -2,17 +2,17 @@
   "name": "fabric-nextjs-sandbox",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npx open-cli http://localhost:3000/ && node dev.js 3000",
+    "dev": "open-cli http://localhost:3000/ && node dev.mjs 3000",
     "build": "next build",
     "start": "next start",
     "type-check": "tsc"
   },
   "dependencies": {
-    "bootstrap": "5.2.0",
-    "fabric": "*",
-    "next": "^12.2.5",
+    "bootstrap": "^5.2.3",
+    "fabric": "file:../../..",
+    "next": "^13.1.6",
     "react": "^18.2.0",
-    "react-bootstrap": "2.5.0",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
@@ -20,6 +20,7 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "nodemon": "^2.0.19",
+    "open-cli": "^7.0.1",
     "typescript": "^4.7.4"
   },
   "license": "ISC",

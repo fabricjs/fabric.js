@@ -24,46 +24,16 @@ import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
-import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
-import { startSandbox } from '../.codesandbox/start.mjs';
 import { build } from './build.mjs';
 import { awaitBuild } from './buildLock.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
-import { listFiles, transform as transformFiles } from './transform_files.mjs';
 
-const program = new commander.Command();
+const program = new commander.Command()
+  .showHelpAfterError()
+  .allowUnknownOption(false)
+  .allowExcessArguments(false);
 
 const websiteDir = path.resolve(wd, '../fabricjs.com');
-
-function execGitCommand(cmd) {
-  return cp
-    .execSync(cmd, { cwd: wd })
-    .toString()
-    .replace(/\n/g, ',')
-    .split(',')
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-}
-
-function getGitInfo(branchRef) {
-  const branch = execGitCommand('git branch --show-current')[0];
-  const tag = execGitCommand('git describe --tags')[0];
-  const uncommittedChanges = execGitCommand('git status --porcelain').map(
-    (value) => {
-      const [type, path] = value.split(' ');
-      return { type, path };
-    }
-  );
-  const changes = execGitCommand(`git diff ${branchRef} --name-only`);
-  const userName = execGitCommand('git config user.name')[0];
-  return {
-    branch,
-    tag,
-    uncommittedChanges,
-    changes,
-    user: userName,
-  };
-}
 
 class ICheckbox extends Checkbox {
   constructor(questions, rl, answers) {
@@ -163,7 +133,7 @@ function copy(from, to) {
   }
 }
 
-const BUILD_SOURCE = ['src', 'lib', 'HEADER.js'];
+const BUILD_SOURCE = ['src', 'lib'];
 
 function exportBuildToWebsite(options = {}) {
   _.defaultsDeep(options, { gestures: true });
@@ -392,42 +362,6 @@ function createChoiceData(type, file) {
   };
 }
 
-async function selectFileToTransform() {
-  const files = _.map(listFiles(), ({ dir, file }) =>
-    createChoiceData(
-      path.relative(path.resolve(wd, 'src'), dir).replaceAll('\\', '/'),
-      file
-    )
-  );
-  const { tests: filteredTests } = await inquirer.prompt([
-    {
-      type: 'test-selection',
-      name: 'tests',
-      message: 'Select files to transform to es6',
-      highlight: true,
-      searchable: true,
-      default: [],
-      pageSize: 10,
-      source(answersSoFar, input = '') {
-        return new Promise((resolve) => {
-          const value = _.map(this.getCurrentValue(), (value) =>
-            createChoiceData(value.type, value.file)
-          );
-          const res = fuzzy
-            .filter(input, files, {
-              extract: (item) => item.name,
-            })
-            .map((element) => element.original);
-          resolve(value.concat(_.differenceBy(res, value, 'name')));
-        });
-      },
-    },
-  ]);
-  return filteredTests.map(({ type, file }) =>
-    path.resolve(wd, 'src', type, file)
-  );
-}
-
 async function selectTestFile() {
   const selected = readCLIFile();
   const unitTests = listTestFiles('unit').map((file) =>
@@ -540,6 +474,7 @@ program
   .option('-o, --output <path>', 'specify the build output path')
   .option('-x, --exclude <exclude...>')
   .option('-m, --modules <modules...>')
+  .option('-s, --stats', 'inspect build statistics', false)
   .action((options) => {
     build(options);
   });
@@ -625,164 +560,5 @@ website
   )
   .option('-w, --watch')
   .action(exportToWebsite);
-
-program
-  .command('transform')
-  .description('transforms files into es6')
-  .option('-o, --overwrite', 'overwrite existing files', false)
-  .option('-x, --no-exports', 'do not use exports')
-  .option('-i, --index', 'create index files', false)
-  .option('-ts, --typescript', 'transform into typescript', false)
-  .option('-v, --verbose', 'verbose logging', true)
-  .option('-a, --all', 'transform all files', false)
-  .option(
-    '-d, --diff <branch>',
-    'compare against given branch (default: master) and transform all files with diff'
-  )
-  .action(
-    async ({
-      overwrite,
-      exports,
-      index,
-      typescript,
-      verbose,
-      all,
-      diff: gitRef,
-    } = {}) => {
-      let files = [];
-      if (gitRef) {
-        gitRef = gitRef === true ? 'master' : gitRef;
-        const { changes } = getGitInfo(gitRef);
-        files = changes.map((change) => path.resolve(wd, change));
-      } else if (!all) {
-        files = await selectFileToTransform();
-      }
-      transformFiles({
-        overwriteExistingFiles: overwrite,
-        useExports: exports,
-        createIndex: index,
-        ext: typescript ? 'ts' : 'js',
-        verbose,
-        files,
-      });
-    }
-  );
-
-const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
-
-const sandbox = program.command('sandbox').description('sandbox commands');
-
-const templates = fs.readdirSync(codesandboxTemplatesDir);
-
-program
-  .command('start')
-  .description('start a sandbox app')
-  .addArgument(
-    new commander.Argument('[template]', 'template to use').choices(templates)
-  )
-  .option('-w, --watch', 'build and watch fabric', true)
-  .option(
-    '--no-watch',
-    'use this option if you have another process watching fabric'
-  )
-  .action(async (template, { watch }) => {
-    const run = template
-      ? [template]
-      : (
-          await inquirer.prompt([
-            {
-              name: 'templates',
-              type: 'checkbox',
-              message: 'Select the templates you wish to start',
-              choices: templates,
-            },
-          ])
-        ).templates;
-    if (watch) {
-      console.log(chalk.blue('\n> building and watching for changes'));
-      build({ watch: true, fast: true });
-    }
-    run.forEach((template) => {
-      const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
-      startSandbox(pathToSandbox, false);
-    });
-  });
-
-sandbox
-  .command('deploy')
-  .argument('[path]', 'directory to upload')
-  .description('deploy a sandbox to codesandbox')
-  .addOption(
-    new commander.Option(
-      '-t, --template <template>',
-      'template to use instead of a "path"'
-    ).choices(templates)
-  )
-  .action(async (deploy, { template }, context) => {
-    if (!deploy && !template) {
-      console.log(chalk.red(`Provide "path" or "--template"`));
-      context.help({ error: true });
-      return;
-    } else if (
-      !template &&
-      !fs.existsSync(deploy) &&
-      templates.includes(deploy)
-    ) {
-      template = deploy;
-      deploy = undefined;
-      const { confirm } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirm',
-          message: `Did you mean to run ${chalk.blue(
-            `npm run sandbox deploy -- -t ${template}\n`
-          )}?`,
-          default: true,
-        },
-      ]);
-      if (!confirm) {
-        context.help({ error: true });
-        return;
-      }
-    }
-    const uri = await createCodeSandbox(
-      deploy || path.resolve(codesandboxTemplatesDir, template)
-    );
-    console.log(chalk.yellow(`> created codesandbox ${uri}`));
-  });
-
-sandbox
-  .command('build')
-  .description('build and start a sandbox')
-  .addArgument(
-    new commander.Argument('<template>', 'template to use').choices(templates)
-  )
-  .argument('<destination>', 'build destination')
-  .option('-w, --watch', 'build and watch fabric', true)
-  .option(
-    '--no-watch',
-    'use this option if you have another process watching fabric'
-  )
-  .action((template, destination, { watch }) => {
-    fs.copySync(path.resolve(codesandboxTemplatesDir, template), destination);
-    console.log(
-      `${chalk.blue(
-        `> building ${chalk.bold(template)} sandbox`
-      )} at ${chalk.cyanBright(destination)}`
-    );
-    startSandbox(destination, watch);
-  });
-
-sandbox
-  .command('start <path>')
-  .description('start a sandbox')
-  .option('-w, --watch', 'build and watch fabric', true)
-  .option(
-    '--no-watch',
-    'use this option if you have another process watching fabric'
-  )
-  .action((pathToSandbox, { watch }) => {
-    startSandbox(pathToSandbox, watch);
-  });
 
 program.parse(process.argv);

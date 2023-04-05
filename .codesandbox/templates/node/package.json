@@ -4,14 +4,15 @@
   "description": "fabric.js on node",
   "main": "src/index.js",
   "scripts": {
-    "dev": "npx open-cli http://localhost:8080/ && nodemon --config nodemon.config.json src/index.js 8080",
+    "dev": "open-cli http://localhost:8080/ && nodemon --config nodemon.config.json src/index.mjs 8080",
     "start": "node src/index.js"
   },
   "dependencies": {
-    "fabric": "*"
+    "fabric": "file:../../.."
   },
   "devDependencies": {
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.19",
+    "open-cli": "^7.0.1"
   },
   "keywords": []
 }

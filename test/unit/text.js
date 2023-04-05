@@ -1,6 +1,13 @@
 (function() {
 
-  QUnit.module('fabric.Text');
+  QUnit.module('fabric.Text', {
+    before() {
+      fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
+    },
+    after() {
+      fabric.config.restoreDefaults();
+    }
+  });
 
   function createTextObject(text) {
     return new fabric.Text(text || 'x');
@@ -10,7 +17,7 @@
 
   var REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
-    type:                      'text',
+    type:                      'Text',
     originX:                   'left',
     originY:                   'top',
     left:                      0,
@@ -68,14 +75,14 @@
     assert.ok(text instanceof fabric.Text);
     assert.ok(text instanceof fabric.Object);
 
-    assert.equal(text.get('type'), 'text');
+    assert.equal(text.constructor.name, 'Text');
     assert.equal(text.get('text'), 'x');
   });
 
   QUnit.test('toString', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
-    assert.equal(text.toString(), '#<fabric.Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
+    assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
@@ -196,26 +203,27 @@
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.document.createElement('text');
+    var elText = fabric.getDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
       assert.ok(text instanceof fabric.Text);
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         left: 0,
         top: -14.05,
         width: 8,
         height: 18.08,
         fontSize: 16,
         originX: 'left'
-      });
+      };
       assert.deepEqual(text.toObject(), expectedObject, 'parsed object is what expected');
     });
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.document.createElementNS(namespace, 'text');
+    var elTextWithAttrs = fabric.getDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
@@ -242,7 +250,8 @@
 
       assert.ok(textWithAttrs instanceof fabric.Text);
 
-      var expectedObject = fabric.util.object.extend(fabric.util.object.clone(REFERENCE_TEXT_OBJECT), {
+      var expectedObject = {
+        ...REFERENCE_TEXT_OBJECT,
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
         top:              -88.03,
@@ -263,7 +272,7 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
-      });
+      };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
     });
   });
@@ -345,9 +354,9 @@
     var text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
     text.cleanStyle('any');
-    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there were no usefull informations');
-    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there were no usefull informations');
+    assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[2], undefined, 'the style has been cleaned since there was no useful information');
+    assert.equal(text.styles[3], undefined, 'the style has been cleaned since there was no useful information');
   });
 
   QUnit.test('text cleanStyle with full style', function(assert) {
@@ -385,6 +394,24 @@
     text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
     text.removeStyle('fill');
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
+  });
+
+  QUnit.test('text toObject removes empty style object', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: {} } };
+    var obj = text.toObject();
+    assert.deepEqual(obj.styles, [], 'empty style object has been removed');
+  });
+
+  QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function(assert) {
+    var text = new fabric.Text('xxx');
+    text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
+    var obj = text.toObject();
+    assert.deepEqual(
+      obj.styles,
+      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
+      'styles with only a textBackgroundColor property do not throw an error'
+    );
   });
 
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
@@ -697,7 +724,8 @@
     var schema = text.superscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2).setSuperscript(2, 3);
+    text.setSuperscript(1, 2);
+    text.setSuperscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -719,7 +747,8 @@
     var schema = text.subscript;
     var styleFontSize = text.styles[0][2].fontSize;
     var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1,2).setSubscript(2,3);
+    text.setSubscript(1, 2);
+    text.setSubscript(2, 3);
 
     assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
     assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
@@ -860,7 +889,7 @@
     });
     var toObject = text.toObject();
     fabric.Text.fromObject(toObject).then(function(text) {
-      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.equal(text.path.constructor.name, 'Path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');
       done();
@@ -869,7 +898,7 @@
 
   QUnit.test('cacheProperties for text', function(assert) {
     var text = new fabric.Text('a');
-    assert.equal(text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-direction-path-pathStartOffset-pathSide-pathAlign');
+    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-direction-path-pathStartOffset-pathSide-pathAlign');
   });
 
   QUnit.test('_getLineLeftOffset', function(assert) {

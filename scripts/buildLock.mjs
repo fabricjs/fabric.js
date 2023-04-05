@@ -110,6 +110,6 @@ export function report(type, data) {
       );
       break;
     case 'end':
-      !readLockFile().error && unlock();
+      isLocked() && !readLockFile().error && unlock();
   }
 }

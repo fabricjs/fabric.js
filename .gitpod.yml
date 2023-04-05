@@ -1,21 +1,21 @@
 # https://www.gitpod.io/docs/config-gitpod-file
 
 tasks:
-  - name: Sandbox
+  - name: Build & Watch
     init: npm install
-    command: npm start
+    command: npm run build -- -w -f
 
   - name: Node
     init: npm install
-    command: npm start node
+    command: npm start node -- --no-watch
 
   - name: Next.js
     init: npm install
-    command: npm start next
+    command: npm start next -- --no-watch
 
   - name: Vanilla
     init: npm install
-    command: npm start vanilla
+    command: npm start vanilla -- --no-watch
 
   - name: Kitchensink
     init: npm install

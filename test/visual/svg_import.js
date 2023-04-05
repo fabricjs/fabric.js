@@ -2,10 +2,10 @@
   fabric.config.configure({
     enableGLFiltering: false
   });
-  fabric.Object.prototype.objectCaching = true;
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
   var getAsset;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAsset = global.getAsset;
   }
@@ -94,7 +94,9 @@
     'cs',
     'qt',
     'generic-path',
-    '177'
+    '177',
+    'polygons',
+    'polygons-rounded',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

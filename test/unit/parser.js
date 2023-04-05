@@ -1,7 +1,7 @@
 (function(){
 
   function makeElement() {
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     var attributes = {
       'cx':           101,
       'x':            102,
@@ -41,7 +41,7 @@
 
   QUnit.test('parseAttributesNoneValues', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'fill', 'none');
     element.setAttributeNS(namespace, 'stroke', 'none');
 
@@ -50,7 +50,7 @@
 
   QUnit.test('parseAttributesFillRule', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'fill-rule', 'evenodd');
 
     assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
@@ -58,7 +58,7 @@
 
   QUnit.test('parseAttributesFillRuleWithoutTransformation', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace,  'path');
+    var element = fabric.getDocument().createElementNS(namespace,  'path');
     element.setAttributeNS(namespace, 'fill-rule', 'inherit');
 
     assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'inherit' });
@@ -66,16 +66,16 @@
 
   QUnit.test('parseAttributesTransform', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace,  'path');
+    var element = fabric.getDocument().createElementNS(namespace,  'path');
     element.setAttributeNS(namespace, 'transform', 'translate(5, 10)');
     assert.deepEqual(fabric.parseAttributes(element, ['transform']), { transformMatrix: [1, 0, 0, 1, 5, 10] });
   });
 
   QUnit.test('parseAttributesWithParent', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
-    var parent = fabric.document.createElementNS(namespace, 'g');
-    var grandParent = fabric.document.createElementNS(namespace, 'g');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
+    var parent = fabric.getDocument().createElementNS(namespace, 'g');
+    var grandParent = fabric.getDocument().createElementNS(namespace, 'g');
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
@@ -90,9 +90,9 @@
 
   QUnit.test('parseAttributesWithGrandParentSvg', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path'),
-        parent = fabric.document.createElementNS(namespace, 'g'),
-        grandParent = fabric.document.createElementNS(namespace, 'svg');
+    var element = fabric.getDocument().createElementNS(namespace, 'path'),
+        parent = fabric.getDocument().createElementNS(namespace, 'g'),
+        grandParent = fabric.getDocument().createElementNS(namespace, 'svg');
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
@@ -107,7 +107,7 @@
   });
 
   QUnit.test('parseAttributeFontValueStartWithFontSize', function(assert) {
-    var element = fabric.document.createElementNS(
+    var element = fabric.getDocument().createElementNS(
       'http://www.w3.org/2000/svg',
       'path'
     );
@@ -126,7 +126,7 @@
     assert.ok(typeof fabric.parseElements === 'function');
 
     function makeElement(tagName, attributes) {
-      var el = fabric.document.createElement(tagName);
+      var el = fabric.getDocument().createElement(tagName);
       for (var prop in attributes) {
         if (prop === 'class') {
           el.className = attributes[prop];
@@ -141,10 +141,11 @@
       return el;
     }
 
-    function getOptions(options) {
-      return fabric.util.object.extend(fabric.util.object.clone({
-        left: 10, top: 20, width: 30, height: 40
-      }), options || { });
+    function getOptions(options = {}) {
+      return {
+        left: 10, top: 20, width: 30, height: 40,
+        ...options,
+      }
     }
 
     var elements = [
@@ -165,7 +166,7 @@
   QUnit.test('parseStyleAttribute', function(assert) {
     assert.ok(fabric.parseStyleAttribute);
 
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'left:10px;top:22.3em;width:103.45pt;height:20%;');
     var styleObj = fabric.parseStyleAttribute(element);
     // TODO: looks like this still fails with % values
@@ -179,7 +180,7 @@
   });
 
   QUnit.test('parseStyleAttribute with one pair', function(assert) {
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'left:10px');
 
     var expectedObject = {
@@ -189,7 +190,7 @@
   });
 
   QUnit.test('parseStyleAttribute with trailing spaces', function(assert) {
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'left:10px;  top:5px;  ');
 
     var expectedObject = {
@@ -200,7 +201,7 @@
   });
 
   QUnit.test('parseStyleAttribute with value normalization', function(assert) {
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
 
     var expectedObject = {
@@ -211,7 +212,7 @@
   });
 
   QUnit.test('parseStyleAttribute with short font declaration', function(assert) {
-    var element = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var element = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
     element.setAttribute('style', 'font: italic 12px Arial,Helvetica,sans-serif');
     var styleObj = fabric.parseStyleAttribute(element);
     if (styleObj.font) {
@@ -244,7 +245,7 @@
 
   QUnit.test('parseAttributes (style to have higher priority than attribute)', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
     element.setAttribute('style', 'fill:red');
     element.setAttributeNS(namespace, 'fill', 'green');
 
@@ -256,7 +257,7 @@
 
   QUnit.test('parseAttributes stroke-opacity and fill-opacity', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'style', 'fill:rgb(100,200,50);fill-opacity:0.2;');
     element.setAttributeNS(namespace, 'stroke', 'green');
     element.setAttributeNS(namespace, 'stroke-opacity', '0.5');
@@ -273,7 +274,7 @@
 
   QUnit.test('parse 0 attribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'opacity', 0);
 
     var expectedObject = {
@@ -286,7 +287,7 @@
     assert.ok(fabric.parsePointsAttribute);
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'polygon');
+    var element = fabric.getDocument().createElementNS(namespace, 'polygon');
     element.setAttributeNS(namespace, 'points', '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3E-2, 10,-1     ');
 
     var actualPoints = fabric.parsePointsAttribute(element.getAttribute('points'));
@@ -312,7 +313,7 @@
 
     assert.ok(fabric.parseTransformAttribute);
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
 
     //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
 
@@ -362,8 +363,8 @@
 
   QUnit.test('parseNestedTransformAttribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.document.createElementNS(namespace, 'path');
-    var parent = fabric.document.createElementNS(namespace, 'g');
+    var element = fabric.getDocument().createElementNS(namespace, 'path');
+    var parent = fabric.getDocument().createElementNS(namespace, 'g');
     parent.appendChild(element);
 
     parent.setAttributeNS(namespace, 'transform', 'translate(50)');
@@ -599,7 +600,7 @@
     var namespace = 'http://www.w3.org/2000/svg';
 
     for (var i = tagNames.length; i--; ) {
-      var el = fabric.document.createElementNS(namespace, tagNames[i]);
+      var el = fabric.getDocument().createElementNS(namespace, tagNames[i]);
       var opacityValue = Math.random().toFixed(2);
 
       el.setAttributeNS(namespace, 'opacity', opacityValue);
@@ -613,7 +614,7 @@
 
   QUnit.test('fill-opacity attribute with fill attribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
@@ -626,7 +627,7 @@
 
   QUnit.test('fill-opacity attribute without fill attribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
@@ -638,7 +639,7 @@
 
   QUnit.test('fill-opacity attribute with fill none', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
@@ -650,7 +651,7 @@
 
   QUnit.test('stroke-opacity attribute with stroke attribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
@@ -663,7 +664,7 @@
 
   QUnit.test('stroke-opacity attribute without stroke attribute', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
@@ -674,7 +675,7 @@
 
   QUnit.test('stroke-opacity attribute with stroke none', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'rect');
+    var el = fabric.getDocument().createElementNS(namespace, 'rect');
     var opacityValue = Math.random().toFixed(2);
 
     el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
@@ -687,8 +688,8 @@
   QUnit.test('getCssRule', function(assert) {
 
     assert.ok(fabric.getCSSRules);
-
-    var doc = fabric.document,
+    var rules = {};
+    var doc = fabric.getDocument(),
         svgUid = 'uniqueId',
         styleElement = doc.createElement('style');
 
@@ -714,11 +715,11 @@
       }
     };
 
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
+    rules[svgUid] = fabric.getCSSRules(doc);
+    assert.deepEqual(rules[svgUid], expectedObject);
 
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygon = fabric.document.createElementNS(namespace, 'polygon'),
+    var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon'),
         expectedStyle = {
           'fill': '',
           'stroke': '#0000FF'
@@ -728,21 +729,20 @@
     elPolygon.setAttributeNS(namespace, 'class', 'cls');
     elPolygon.setAttributeNS(namespace, 'svgUid', svgUid);
 
-    var style = fabric.parseAttributes(elPolygon, []);
-    assert.deepEqual(style, expectedStyle);
+    var style = fabric.parseAttributes(elPolygon, ['fill', 'stroke']);
+    assert.deepEqual(style, {}, 'those are not attributes of the polygon');
 
     styleElement.textContent = '\t\n';
-    expectedStyle = { };
-    svgUid =  'uniqueId2';
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedStyle);
+    svgUid = 'uniqueId2';
+    const reparse = fabric.getCSSRules(doc);
+    assert.deepEqual(reparse, {});
   });
 
   QUnit.test('getCssRule with same selectors', function(assert) {
 
     assert.ok(fabric.getCSSRules);
-
-    var doc = fabric.document,
+    const rules = {};
+    var doc = fabric.getDocument(),
         svgUid = 'uniqueId',
         styleElement = doc.createElement('style');
 
@@ -764,8 +764,8 @@
       }
     };
 
-    fabric.cssRules[svgUid] = fabric.getCSSRules(doc);
-    assert.deepEqual(fabric.cssRules[svgUid], expectedObject);
+    rules[svgUid] = fabric.getCSSRules(doc);
+    assert.deepEqual(rules[svgUid], expectedObject);
   });
 
   QUnit.test('parseSVGFromString with nested clippath', function(assert) {
@@ -785,8 +785,8 @@
                   '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].clipPath.type, 'polygon');
-      assert.equal(objects[0].clipPath.clipPath.type, 'rect');
+      assert.equal(objects[0].clipPath.constructor.name, 'Polygon');
+      assert.equal(objects[0].clipPath.clipPath.constructor.name, 'Rect');
       done();
     });
   });
@@ -813,7 +813,7 @@
                  '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -827,7 +827,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'rect');
+      assert.equal(objects[0].constructor.name, 'Rect');
       done();
     });
   });
@@ -844,7 +844,7 @@
       '</svg>';
 
     fabric.loadSVGFromString(string, function(objects) {
-      assert.equal(objects[0].type, 'image');
+      assert.equal(objects[0].constructor.name, 'Image');
       done();
     });
   });

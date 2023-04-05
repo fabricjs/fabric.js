@@ -1,12 +1,15 @@
 //@ts-nocheck
-
-import { fabric } from '../../HEADER';
-import { capitalize } from '../util/lang_string';
+import { Gradient } from '../gradient/Gradient';
+import { Group } from '../shapes/Group';
+import { Image } from '../shapes/Image';
+import { classRegistry } from '../ClassRegistry';
 import {
   invertTransform,
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
+import { storage } from './constants';
+import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 
 const ElementsParser = function (
   elements,
@@ -41,7 +44,9 @@ const ElementsParser = function (
   };
 
   proto.findTag = function (el) {
-    return fabric[capitalize(el.tagName.replace('svg:', ''))];
+    return classRegistry.getSVGClass(
+      el.tagName.toLowerCase().replace('svg:', '')
+    );
   };
 
   proto.createObject = function (el, index) {
@@ -58,23 +63,22 @@ const ElementsParser = function (
   };
 
   proto.createCallback = function (index, el) {
-    const _this = this;
-    return function (obj) {
+    return (obj) => {
       let _options;
-      _this.resolveGradient(obj, el, 'fill');
-      _this.resolveGradient(obj, el, 'stroke');
-      if (obj instanceof fabric.Image && obj._originalElement) {
+      this.resolveGradient(obj, el, 'fill');
+      this.resolveGradient(obj, el, 'stroke');
+      if (obj instanceof Image && obj._originalElement) {
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
-      obj._removeTransformMatrix(_options);
-      _this.resolveClipPath(obj, el);
-      _this.reviver && _this.reviver(el, obj);
-      _this.instances[index] = obj;
-      _this.checkIfDone();
+      removeTransformMatrixForSvgParsing(obj, _options);
+      this.resolveClipPath(obj, el);
+      this.reviver && this.reviver(el, obj);
+      this.instances[index] = obj;
+      this.checkIfDone();
     };
   };
 
-  proto.extractPropertyDefinition = function (obj, property, storage) {
+  proto.extractPropertyDefinition = function (obj, property, storageType) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -83,7 +87,8 @@ const ElementsParser = function (
     regex.lastIndex = 0;
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
-    return fabric[storage][this.svgUid][id];
+    // @todo fix this
+    return storage[storageType][this.svgUid][id];
   };
 
   proto.resolveGradient = function (obj, el, property) {
@@ -94,7 +99,7 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = fabric.Gradient.fromElement(gradientDef, obj, {
+      const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
       });
@@ -104,14 +109,14 @@ const ElementsParser = function (
 
   proto.createClipPathCallback = function (obj, container) {
     return function (_newObj) {
-      _newObj._removeTransformMatrix();
+      removeTransformMatrixForSvgParsing(_newObj);
       _newObj.fillRule = _newObj.clipRule;
       container.push(_newObj);
     };
   };
 
   proto.resolveClipPath = function (obj, usingElement) {
-    var clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
+    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
       element,
       klass,
       objTransformInv,
@@ -143,7 +148,7 @@ const ElementsParser = function (
       if (container.length === 1) {
         clipPath = container[0];
       } else {
-        clipPath = new fabric.Group(container);
+        clipPath = new Group(container);
       }
       gTransform = multiplyTransformMatrices(
         objTransformInv,

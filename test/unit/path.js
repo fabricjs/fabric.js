@@ -2,7 +2,7 @@
 
   var REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
-    type:                     'path',
+    type:                     'Path',
     originX:                  'left',
     originY:                  'top',
     left:                     100,
@@ -23,7 +23,7 @@
     flipX:                    false,
     flipY:                    false,
     opacity:                  1,
-    path:                     [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['z']],
+    path:                     [['M', 100, 100], ['L', 300, 100], ['L', 200, 300], ['Z']],
     shadow:                   null,
     visible:                  true,
     backgroundColor:          '',
@@ -37,7 +37,7 @@
 
   function getPathElement(path) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.document.createElementNS(namespace, 'path');
+    var el = fabric.getDocument().createElementNS(namespace, 'path');
     el.setAttributeNS(namespace, 'd', path);
     el.setAttributeNS(namespace, 'fill', 'red');
     el.setAttributeNS(namespace, 'stroke', 'blue');
@@ -65,9 +65,7 @@
   }
 
   QUnit.module('fabric.Path', {
-    beforeEach: function() {
-      fabric.Object.__uid = 0;
-    }
+
   });
 
   QUnit.test('constructor', function(assert) {
@@ -78,7 +76,7 @@
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
 
-      assert.equal(path.get('type'), 'path');
+      assert.equal(path.constructor.name, 'Path');
 
       var error;
       try {
@@ -129,12 +127,7 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var left = path.left;
-    var top = path.top;
-    path.center();
-    assert.equal(left, path.left);
-    assert.equal(top, path.top);
-    var opts = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+    var opts = { ...REFERENCE_PATH_OBJECT };
     delete opts.path;
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -148,7 +141,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toString === 'function');
-      assert.equal(path.toString(), '#<fabric.Path (4): { "top": 100, "left": 100 }>');
+      assert.equal(path.toString(), '#<Path (4): { "top": 100, "left": 100 }>');
       done();
     });
   });
@@ -165,12 +158,12 @@
   QUnit.test('toObject', function(assert) {
     var done = assert.async();
     makePathObject(function(path) {
-      path.top = fabric.Object.prototype.top;
-      path.left = fabric.Object.prototype.left;
+      path.top = fabric.Path.getDefaults().top;
+      path.left = fabric.Path.getDefaults().left;
       path.includeDefaultValues = false;
       var obj = path.toObject();
-      assert.equal(obj.top, fabric.Object.prototype.top, 'top is available also when equal to prototype');
-      assert.equal(obj.left, fabric.Object.prototype.left, 'left is available also when equal to prototype');
+      assert.equal(obj.top, fabric.Path.getDefaults().top, 'top is available also when equal to prototype');
+      assert.equal(obj.left, fabric.Path.getDefaults().left, 'left is available also when equal to prototype');
       done();
     });
   });
@@ -179,7 +172,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.deepEqual(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n');
+      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
       done();
     });
   });
@@ -189,7 +182,7 @@
     makePathObject(function(path) {
       makePathObject(function(path2) {
         path.clipPath = path2;
-        assert.deepEqual(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
+        assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
         done();
       });
     });
@@ -202,7 +195,7 @@
       makePathObject(function(path2) {
         path.clipPath = path2;
         path.clipPath.absolutePositioned = true;
-        assert.deepEqual(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
+        assert.equalSVG(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
         done();
       });
     });
@@ -233,7 +226,7 @@
     makePathObject(function(path) {
       var src = 'http://example.com/';
       path.sourcePath = src;
-      var clonedRef = fabric.util.object.clone(REFERENCE_PATH_OBJECT);
+      var clonedRef = { ...REFERENCE_PATH_OBJECT };
       clonedRef.sourcePath = src;
       delete clonedRef.path;
       assert.deepEqual(path.toDatalessObject(), clonedRef, 'if sourcePath the object looses path');
@@ -273,7 +266,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'fill', 'red');
@@ -292,12 +285,13 @@
     fabric.Path.fromElement(elPath, function(path) {
       assert.ok(path instanceof fabric.Path);
 
-      assert.deepEqual(path.toObject(), fabric.util.object.extend(REFERENCE_PATH_OBJECT, {
+      assert.deepEqual(path.toObject(), {
+        ...REFERENCE_PATH_OBJECT,
         strokeDashArray:  [5, 2],
         strokeLineCap:    'round',
         strokeLineJoin:   'bevel',
         strokeMiterLimit: 5
-      }));
+      });
 
       var ANGLE_DEG = 90;
       elPath.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');
@@ -315,7 +309,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Path.fromElement === 'function');
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPath = fabric.document.createElementNS(namespace, 'path');
+    var elPath = fabric.getDocument().createElementNS(namespace, 'path');
 
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'transform', 'scale(.2)');
@@ -384,7 +378,7 @@
       assert.deepEqual(obj.path[0], ['M', 56.224, 84.12]);
       assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
       assert.deepEqual(obj.path[2], ['C', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
-      assert.deepEqual(obj.path[3], ['z']);
+      assert.deepEqual(obj.path[3], ['Z']);
       done();
     });
   });
@@ -398,7 +392,7 @@
       assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
       assert.deepEqual(obj.path[2], ['C', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
       assert.deepEqual(obj.path[3], ['M', 0.272, -20.315]);
-      assert.deepEqual(obj.path[4], ['z']);
+      assert.deepEqual(obj.path[4], ['Z']);
       done();
     });
   });
