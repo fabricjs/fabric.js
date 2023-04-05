@@ -1335,30 +1335,28 @@ export class SelectableCanvas<
     const objects = this.getActiveObjects(),
       added: FabricObject[] = [],
       removed: FabricObject[] = [];
-    const objectsSet = new Set(objects);
-    const oldObjectsSet = new Set(oldObjects);
 
-    oldObjects.forEach((target) => {
-      if (!objectsSet.has(target)) {
+    for (let i = 0; i < Math.max(oldObjects.length, objects.length); i++) {
+      const oldObject = oldObjects[i];
+      if (oldObject && !objects.includes(oldObject)) {
         somethingChanged = true;
-        target.fire('deselected', {
+        oldObject.fire('deselected', {
           e,
-          target,
+          target: oldObject,
         });
-        removed.push(target);
+        removed.push(oldObject);
       }
-    });
 
-    objects.forEach((target) => {
-      if (!oldObjectsSet.has(target)) {
+      const newObject = objects[i];
+      if (newObject && !oldObjects.includes(newObject)) {
         somethingChanged = true;
-        target.fire('selected', {
+        newObject.fire('selected', {
           e,
-          target,
+          target: newObject,
         });
-        added.push(target);
+        added.push(newObject);
       }
-    });
+    }
 
     if (oldObjects.length > 0 && objects.length > 0) {
       invalidate = true;
