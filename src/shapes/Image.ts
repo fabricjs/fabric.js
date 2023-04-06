@@ -70,6 +70,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 export class Image<
+    Source extends ImageSource = ImageSource,
     Props extends TProps<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
@@ -164,9 +165,9 @@ export class Image<
   declare filters: BaseFilter[];
   declare resizeFilter: BaseFilter;
 
-  protected declare _element: ImageSource;
-  protected declare _originalElement: ImageSource;
-  protected declare _filteredEl: ImageSource;
+  protected declare _element: Source;
+  protected declare _originalElement: Source;
+  protected declare _filteredEl: Source;
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
@@ -188,13 +189,14 @@ export class Image<
    * @param {Object} [options] Options object
    */
   constructor(elementId: string, options?: Props);
-  constructor(element: ImageSource, options?: Props);
-  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
+  constructor(element: Source, options?: Props);
+  constructor(element: Source | string, options?: Props);
+  constructor(arg0: Source | string, options: Props = {} as Props) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       typeof arg0 === 'string'
-        ? (getDocument().getElementById(arg0) as ImageSource)
+        ? (getDocument().getElementById(arg0) as Source)
         : arg0,
       options
     );
@@ -214,7 +216,7 @@ export class Image<
    * @param {HTMLImageElement} element
    * @param {Partial<TSize>} [size] Options object
    */
-  setElement(element: ImageSource, size: Partial<TSize> = {}) {
+  setElement(element: Source, size: Partial<TSize> = {}) {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
@@ -273,8 +275,7 @@ export class Image<
   /**
    * Returns original size of an image
    */
-  getOriginalSize() {
-    const element = this.getElement() as any;
+  getOriginalSize(element = this.getElement()) {
     if (!element) {
       return {
         width: 0,
@@ -540,8 +541,8 @@ export class Image<
     }
 
     const imgElement = this._originalElement,
-      sourceWidth = imgElement.naturalWidth || imgElement.width,
-      sourceHeight = imgElement.naturalHeight || imgElement.height;
+      { width: sourceWidth, height: sourceHeight } =
+        this.getOriginalSize(imgElement);
 
     if (this._element === this._originalElement) {
       // if the element is the same we need to create a new element
@@ -628,8 +629,7 @@ export class Image<
       // crop values cannot be lesser than 0.
       cropX = Math.max(this.cropX, 0),
       cropY = Math.max(this.cropY, 0),
-      elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-      elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+      { width: elWidth, height: elHeight } = this.getOriginalSize(),
       sX = cropX * scaleX,
       sY = cropY * scaleY,
       // the width height cannot exceed element width/height, starting from the crop offset.
@@ -772,6 +772,10 @@ export class Image<
     'image-rendering',
   ];
 
+  static load(url: string, options: LoadImageOptions) {
+    return loadImage(url, options);
+  }
+
   /**
    * Creates an instance of Image from its object representation
    * @static
@@ -780,12 +784,15 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject<T extends TProps<SerializedImageProps>>(
+  static fromObject<
+    T extends TProps<SerializedImageProps>,
+    S extends HTMLImageElement | HTMLVideoElement = HTMLImageElement
+  >(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
-    options: { signal: AbortSignal }
+    options: Omit<LoadImageOptions<S>, 'crossOrigin'>
   ) {
     return Promise.all([
-      loadImage(src, { ...options, crossOrigin }),
+      this.load(src, { ...options, crossOrigin }),
       f && enlivenObjects(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
       rf && enlivenObjects([rf], options),
@@ -809,11 +816,11 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL<T extends TProps<SerializedImageProps>>(
+  static async fromURL<T extends TProps<SerializedImageProps>>(
     url: string,
     options: T & LoadImageOptions = {}
-  ): Promise<Image> {
-    return loadImage(url, options).then((img) => new this(img, options));
+  ) {
+    return new this(await this.load(url, options), options);
   }
 
   /**

@@ -310,6 +310,7 @@ export class StaticCanvas<
     (): void;
     kill: (reason?: any) => void;
   };
+  protected _renderLoopDisposer?: VoidFunction;
 
   static getDefaults(): Record<string, any> {
     return StaticCanvas.ownDefaults;
@@ -724,6 +725,20 @@ export class StaticCanvas<
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
       this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
+  }
+
+  startRenderAllLoop() {
+    this.stopRenderAllLoop();
+    this._renderLoopDisposer = this.on(
+      'after:render',
+      ({ ctx }) => ctx === this.contextContainer && this.requestRenderAll()
+    );
+    this.requestRenderAll();
+    return this._renderLoopDisposer;
+  }
+
+  stopRenderAllLoop() {
+    this._renderLoopDisposer?.();
   }
 
   /**
