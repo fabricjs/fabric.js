@@ -8,6 +8,10 @@ export interface VideoProps extends ImageProps {
   loop?: boolean;
 }
 
+/**
+ * ## IMPORTANT
+ * Calling {@link HTMLVideoElement#play} before the user interacts with the window will throw an error
+ */
 export class Video<
   Props extends TProps<VideoProps> = Partial<VideoProps>,
   SProps extends SerializedImageProps = SerializedImageProps,
