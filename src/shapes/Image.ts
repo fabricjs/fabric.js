@@ -812,6 +812,7 @@ export class Image<
   /**
    * Creates an instance of Image from an URL string
    * @static
+   * @deprecated use {@link fromObject}
    * @param {String} url URL to create an image from
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
@@ -837,9 +838,10 @@ export class Image<
     options: { signal?: AbortSignal } = {}
   ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    this.fromURL(parsedAttributes['xlink:href'], {
+    this.fromObject({
       ...options,
       ...parsedAttributes,
+      src: parsedAttributes['xlink:href'],
     }).then(callback);
   }
 }
