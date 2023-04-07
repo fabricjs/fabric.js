@@ -26,6 +26,7 @@ export class Video<
    */
   private _renderLoopDisposer?: VoidFunction;
   private __disposer?: () => void;
+  private started = false;
 
   constructor(elementId: string, options?: Props);
   constructor(element: HTMLVideoElement, options?: Props);
@@ -33,6 +34,7 @@ export class Video<
     super(arg0, options);
     const el = this.getElement();
     const start = () => {
+      this.started = true;
       this._renderLoopDisposer = this.canvas?.startRenderAllLoop();
     };
     const stop = () => this._renderLoopDisposer?.();
@@ -92,7 +94,16 @@ export class Video<
     };
   }
 
-  dispose(): void {
+  protected renderPlaceHolder(ctx: CanvasRenderingContext2D) {
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+  }
+
+  _renderFill(ctx: CanvasRenderingContext2D) {
+    !this.started && this.renderPlaceHolder(ctx);
+    super._renderFill(ctx);
+  }
+
+  dispose() {
     this.__disposer?.();
     super.dispose();
   }
