@@ -14,11 +14,16 @@ const VIDEO_EVENTS /*: (keyof HTMLVideoElementEventMap)[] */ = [
   'loadedmetadata',
   'loadeddata',
   'play',
-  'playing',
   'pause',
   'ended',
   'seeking',
   'seeked',
+  'ratechange',
+  'volumechange',
+  'timeupdate',
+  'error',
+  'progress',
+  'waiting',
 ] as const;
 
 type UniqueVideoEvents = typeof VIDEO_EVENTS[number];
@@ -98,7 +103,7 @@ export class Video<
 
   static load(url: string, { crossOrigin = null }: LoadImageOptions = {}) {
     const el = getDocument().createElement('video');
-    el.crossOrigin = crossOrigin;
+    crossOrigin && (el.crossOrigin = crossOrigin);
     el.src = url;
     return el;
   }
