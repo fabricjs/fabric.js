@@ -21,6 +21,8 @@ const VIDEO_EVENTS /*: (keyof HTMLVideoElementEventMap)[] */ = [
   'ratechange',
   'volumechange',
   'timeupdate',
+  'enterpictureinpicture',
+  'leavepictureinpicture',
   'error',
   'progress',
   'waiting',

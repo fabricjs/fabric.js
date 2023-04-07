@@ -784,7 +784,7 @@ export class ImageSource<
       resizeFilter: rf,
       ...object
     }: T & { imageSource: S },
-    options: Omit<LoadImageOptions, 'crossOrigin'> = {}
+    options: { signal?: AbortSignal } = {}
   ) {
     return Promise.all([
       f && enlivenObjects(f, options),
@@ -794,8 +794,6 @@ export class ImageSource<
     ]).then(([filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(imageSource, {
         ...object,
-        src,
-        crossOrigin,
         filters,
         resizeFilter,
         ...hydratedProps,
