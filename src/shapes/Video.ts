@@ -3,7 +3,7 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { Canvas } from '../canvas/Canvas';
 import { getDocument } from '../env';
 import { LoadImageOptions } from '../util/misc/objectEnlive';
-import { Image, ImageProps, SerializedImageProps } from './Image';
+import { ImageProps, ImageSource, SerializedImageProps } from './Image';
 import { TProps } from './Object/types';
 
 export interface VideoProps extends ImageProps {
@@ -39,7 +39,7 @@ export class Video<
   Props extends TProps<VideoProps> = Partial<VideoProps>,
   SProps extends SerializedImageProps = SerializedImageProps,
   EventSpec extends VideoEvents = VideoEvents
-> extends Image<HTMLVideoElement, Props, SProps, EventSpec> {
+> extends ImageSource<HTMLVideoElement, Props, SProps, EventSpec> {
   private started = false;
 
   constructor(elementId: string, options?: Props);
@@ -101,11 +101,26 @@ export class Video<
     super._renderFill(ctx);
   }
 
-  static load(url: string, { crossOrigin = null }: LoadImageOptions = {}) {
+  toString() {
+    return `#<Video: { src: "${this.getSrc()}" }>`;
+  }
+
+  static async fromObject<T extends TProps<SerializedImageProps>>(
+    { src = '', crossOrigin: x = null, ...object }: T,
+    { crossOrigin = x, ...options }: LoadImageOptions = {}
+  ) {
     const el = getDocument().createElement('video');
     crossOrigin && (el.crossOrigin = crossOrigin);
-    el.src = url;
-    return el;
+    el.src = src;
+    return this._fromObject<Video>(
+      {
+        ...object,
+        src,
+        crossOrigin,
+        imageSource: el,
+      },
+      options
+    );
   }
 }
 

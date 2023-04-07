@@ -27,7 +27,7 @@ import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 
 // @todo Would be nice to have filtering code not imported directly.
 
-export type ImageSource =
+export type ImageSourceElement =
   | HTMLImageElement
   | HTMLVideoElement
   | HTMLCanvasElement;
@@ -69,8 +69,8 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image<
-    Source extends ImageSource = ImageSource,
+export class ImageSource<
+    Source extends ImageSourceElement = ImageSourceElement,
     Props extends TProps<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
@@ -79,7 +79,7 @@ export class Image<
   implements ImageProps
 {
   /**
-   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link ImageSource.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -177,7 +177,7 @@ export class Image<
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      ...Image.ownDefaults,
+      ...ImageSource.ownDefaults,
     };
   }
   /**
@@ -186,7 +186,7 @@ export class Image<
    * The string should be a url and will be loaded as an image.
    * Canvas and Image element work out of the box, while videos require extra code to work.
    * Please check video element events for seeking.
-   * @param {ImageSource | string} element Image element
+   * @param {ImageSourceElement | string} element Image element
    * @param {Object} [options] Options object
    */
   constructor(elementId: string, options?: Props);
@@ -223,7 +223,7 @@ export class Image<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(Image.CSS_CANVAS);
+    element.classList.add(ImageSource.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -757,7 +757,7 @@ export class Image<
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link ImageSource.fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
@@ -773,10 +773,38 @@ export class Image<
     'image-rendering',
   ];
 
-  static load(url: string, options: LoadImageOptions) {
-    return loadImage(url, options);
+  static _fromObject<
+    R extends ImageSource,
+    T extends TProps<SerializedImageProps> = TProps<SerializedImageProps>,
+    S extends HTMLImageElement | HTMLVideoElement = ReturnType<R['getElement']>
+  >(
+    {
+      imageSource,
+      filters: f,
+      resizeFilter: rf,
+      ...object
+    }: T & { imageSource: S },
+    options: Omit<LoadImageOptions, 'crossOrigin'> = {}
+  ) {
+    return Promise.all([
+      f && enlivenObjects(f, options),
+      // TODO: redundant - handled by enlivenObjectEnlivables
+      rf && enlivenObjects([rf], options),
+      enlivenObjectEnlivables(object, options),
+    ]).then(([filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
+      return new this(imageSource, {
+        ...object,
+        src,
+        crossOrigin,
+        filters,
+        resizeFilter,
+        ...hydratedProps,
+      }) as R;
+    });
   }
+}
 
+export class Image extends ImageSource {
   /**
    * Creates an instance of Image from its object representation
    * @static
@@ -785,29 +813,19 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject<
-    T extends TProps<SerializedImageProps>,
-    S extends HTMLImageElement | HTMLVideoElement = HTMLImageElement
-  >(
-    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
-    options: Omit<LoadImageOptions, 'crossOrigin'> = {}
+  static async fromObject<T extends TProps<SerializedImageProps>>(
+    { src, crossOrigin: x = null, ...object }: T,
+    { crossOrigin = x, ...options }: LoadImageOptions = {}
   ) {
-    return Promise.all([
-      this.load(src, { ...options, crossOrigin }),
-      f && enlivenObjects(f, options),
-      // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects([rf], options),
-      enlivenObjectEnlivables(object, options),
-    ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
-      return new this(el, {
+    return this._fromObject<Image>(
+      {
         ...object,
         src,
         crossOrigin,
-        filters,
-        resizeFilter,
-        ...hydratedProps,
-      });
-    });
+        imageSource: await loadImage(src, { ...options, crossOrigin }),
+      },
+      options
+    );
   }
 
   /**
