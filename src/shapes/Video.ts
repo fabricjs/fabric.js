@@ -8,6 +8,10 @@ export interface VideoProps extends ImageProps {
   loop?: boolean;
 }
 
+export type VideoEvents = ObjectEvents & {
+  loaded: never;
+};
+
 /**
  * ## IMPORTANT
  * Calling {@link HTMLVideoElement#play} before the user interacts with the window will throw an error
@@ -15,7 +19,7 @@ export interface VideoProps extends ImageProps {
 export class Video<
   Props extends TProps<VideoProps> = Partial<VideoProps>,
   SProps extends SerializedImageProps = SerializedImageProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends VideoEvents = VideoEvents
 > extends Image<HTMLVideoElement, Props, SProps, EventSpec> {
   /**
    * keep a ref to the disposer in case the canvas ref is voided during video playing
@@ -46,6 +50,18 @@ export class Video<
         once: true,
       }
     );
+    el.addEventListener(
+      'loadeddata',
+      () => {
+        this.fire('loaded');
+        this.canvas?.requestRenderAll();
+      },
+      {
+        once: true,
+      }
+    );
+    el.addEventListener('seeking', () => this.canvas?.requestRenderAll());
+    el.addEventListener('seeked', () => this.canvas?.requestRenderAll());
     this.__disposer = () => {
       stop();
       el.removeEventListener('play', start);

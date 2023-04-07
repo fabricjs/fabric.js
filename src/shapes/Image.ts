@@ -789,7 +789,7 @@ export class Image<
     S extends HTMLImageElement | HTMLVideoElement = HTMLImageElement
   >(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
-    options: Omit<LoadImageOptions<S>, 'crossOrigin'>
+    options: Omit<LoadImageOptions<S>, 'crossOrigin'> = {}
   ) {
     return Promise.all([
       this.load(src, { ...options, crossOrigin }),
