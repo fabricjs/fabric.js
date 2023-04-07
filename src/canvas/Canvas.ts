@@ -22,6 +22,7 @@ import {
 } from '../util/types';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
+import { VideoPlayerManager } from './VideoPlayerManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
@@ -117,6 +118,7 @@ export class Canvas extends SelectableCanvas {
   private _isClick: boolean;
 
   textEditingManager = new TextEditingManager();
+  videoPlayerManager = new VideoPlayerManager(this);
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
@@ -1603,5 +1605,6 @@ export class Canvas extends SelectableCanvas {
     this.removeListeners();
     super.destroy();
     this.textEditingManager.dispose();
+    this.videoPlayerManager.dispose();
   }
 }

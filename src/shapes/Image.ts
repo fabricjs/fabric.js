@@ -820,7 +820,7 @@ export class Image<
     url: string,
     options: T & LoadImageOptions = {}
   ) {
-    return new this(await this.load(url, options), options);
+    return this.fromObject({ ...options, src: url }, options);
   }
 
   /**

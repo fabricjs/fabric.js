@@ -739,6 +739,7 @@ export class StaticCanvas<
 
   stopRenderAllLoop() {
     this._renderLoopDisposer?.();
+    delete this._renderLoopDisposer;
   }
 
   /**

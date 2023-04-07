@@ -1,4 +1,6 @@
+import { classRegistry } from '../ClassRegistry';
 import { ObjectEvents } from '../EventTypeDefs';
+import { Canvas } from '../canvas/Canvas';
 import { getDocument } from '../env';
 import { LoadImageOptions } from '../util/misc/objectEnlive';
 import { Image, ImageProps, SerializedImageProps } from './Image';
@@ -8,9 +10,21 @@ export interface VideoProps extends ImageProps {
   loop?: boolean;
 }
 
-export type VideoEvents = ObjectEvents & {
-  loaded: never;
-};
+const VIDEO_EVENTS /*: (keyof HTMLVideoElementEventMap)[] */ = [
+  'loadedmetadata',
+  'loadeddata',
+  'play',
+  'playing',
+  'pause',
+  'ended',
+  'seeking',
+  'seeked',
+] as const;
+
+type UniqueVideoEvents = typeof VIDEO_EVENTS[number];
+
+export type VideoEvents = ObjectEvents &
+  Record<UniqueVideoEvents, { e: Event }>;
 
 /**
  * ## IMPORTANT
@@ -21,11 +35,6 @@ export class Video<
   SProps extends SerializedImageProps = SerializedImageProps,
   EventSpec extends VideoEvents = VideoEvents
 > extends Image<HTMLVideoElement, Props, SProps, EventSpec> {
-  /**
-   * keep a ref to the disposer in case the canvas ref is voided during video playing
-   */
-  private _renderLoopDisposer?: VoidFunction;
-  private __disposer?: () => void;
   private started = false;
 
   constructor(elementId: string, options?: Props);
@@ -33,44 +42,28 @@ export class Video<
   constructor(arg0: HTMLVideoElement | string, options: Props = {} as Props) {
     super(arg0, options);
     const el = this.getElement();
-    const start = () => {
+    const fire = (e: Event) => this.fire(e.type as UniqueVideoEvents, { e });
+    VIDEO_EVENTS.forEach((eventType) => {
+      el.addEventListener(eventType, fire);
+    });
+    // set dimensions in case metadata wasn't loaded yet
+    this.once('loadedmetadata', () => {
+      this._setWidthHeight(options);
+      this.setCoords();
+    });
+    this.once('play', () => {
       this.started = true;
-      this._renderLoopDisposer = this.canvas?.startRenderAllLoop();
-    };
-    const stop = () => this._renderLoopDisposer?.();
-    el.addEventListener('play', start);
-    el.addEventListener('pause', stop);
-    el.addEventListener('ended', stop);
-    this._setWidthHeight(options);
-    el.addEventListener(
-      'loadedmetadata',
-      () => {
-        this._setWidthHeight(options);
-        this.setCoords();
-      },
-      {
-        once: true,
-      }
-    );
-    el.addEventListener(
-      'loadeddata',
-      () => {
-        this.fire('loaded');
-        this.canvas?.requestRenderAll();
-      },
-      {
-        once: true,
-      }
-    );
-    el.addEventListener('seeking', () => this.canvas?.requestRenderAll());
-    el.addEventListener('seeked', () => this.canvas?.requestRenderAll());
-    this.__disposer = () => {
-      stop();
-      el.removeEventListener('play', start);
-      el.removeEventListener('pause', stop);
-      el.removeEventListener('ended', stop);
-      delete this.__disposer;
-    };
+    });
+  }
+
+  _set(key: string, value: any) {
+    if (key === 'canvas') {
+      this.canvas instanceof Canvas &&
+        this.canvas.videoPlayerManager.remove(this);
+      value instanceof Canvas && value.videoPlayerManager.add(this);
+    }
+
+    return super._set(key, value);
   }
 
   set loop(value: boolean) {
@@ -103,11 +96,6 @@ export class Video<
     super._renderFill(ctx);
   }
 
-  dispose() {
-    this.__disposer?.();
-    super.dispose();
-  }
-
   static load(url: string, { crossOrigin = null }: LoadImageOptions = {}) {
     const el = getDocument().createElement('video');
     el.crossOrigin = crossOrigin;
@@ -115,3 +103,5 @@ export class Video<
     return el;
   }
 }
+
+classRegistry.setClass(Video);
