@@ -4,7 +4,7 @@ import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties, TSize } from '../typedefs';
+import { TClassProperties, TCrossOrigin, TSize } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
@@ -38,7 +38,7 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  crossOrigin: string | null;
+  crossOrigin: TCrossOrigin;
   filters: BaseFilter[];
   resizeFilter?: BaseFilter;
 }
@@ -55,7 +55,7 @@ export const imageDefaultValues: Partial<UniqueImageProps> &
 
 export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
-  crossOrigin: string | null;
+  crossOrigin: TCrossOrigin;
   filters: any[];
   resizeFilter?: any;
   cropX: number;
@@ -161,6 +161,7 @@ export class Image<
   declare preserveAspectRatio: string;
 
   protected declare src: string;
+  declare crossOrigin: TCrossOrigin;
 
   declare filters: BaseFilter[];
   declare resizeFilter: BaseFilter;
@@ -789,7 +790,7 @@ export class Image<
     S extends HTMLImageElement | HTMLVideoElement = HTMLImageElement
   >(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
-    options: Omit<LoadImageOptions<S>, 'crossOrigin'> = {}
+    options: Omit<LoadImageOptions, 'crossOrigin'> = {}
   ) {
     return Promise.all([
       this.load(src, { ...options, crossOrigin }),
@@ -819,7 +820,7 @@ export class Image<
    */
   static async fromURL<T extends TProps<SerializedImageProps>>(
     url: string,
-    options: T & LoadImageOptions = {}
+    options: Partial<T & LoadImageOptions> = {}
   ) {
     return this.fromObject({ ...options, src: url }, options);
   }
