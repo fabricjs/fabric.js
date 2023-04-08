@@ -168,7 +168,7 @@ export class ImageSource<
 
   protected declare _element: Source;
   protected declare _originalElement: Source;
-  protected declare _filteredEl: Source;
+  protected declare _filteredEl: HTMLImageElement;
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
@@ -203,10 +203,14 @@ export class ImageSource<
     );
   }
 
-  /**
-   * Returns image element which this instance if based on
-   */
   getElement() {
+    return this.getImageSource();
+  }
+
+  /**
+   * @returns image source element which is used for rendering
+   */
+  getImageSource() {
     return this._element;
   }
 
@@ -266,26 +270,51 @@ export class ImageSource<
   /**
    * Get the crossOrigin value (of the corresponding image element)
    */
-  getCrossOrigin(): string | null {
-    return (
-      this._originalElement &&
-      ((this._originalElement as any).crossOrigin || null)
-    );
+  getCrossOrigin(): TCrossOrigin | null {
+    return this._originalElement?.crossOrigin || null;
+  }
+
+  static getElementOriginalSize(element: ImageSourceElement) {
+    return {
+      width:
+        (element as HTMLImageElement).naturalWidth ||
+        (element as HTMLVideoElement).videoWidth ||
+        element.width,
+      height:
+        (element as HTMLImageElement).naturalHeight ||
+        (element as HTMLVideoElement).videoHeight ||
+        element.height,
+    };
   }
 
   /**
    * Returns original size of an image
    */
-  getOriginalSize(element = this.getElement()) {
+  getOriginalSize(element = this.getImageSource()) {
     if (!element) {
       return {
         width: 0,
         height: 0,
       };
     }
+    return (this.constructor as typeof ImageSource).getElementOriginalSize(
+      element
+    );
+  }
+
+  getFinalSize(element = this.getImageSource()) {
+    if (!element) {
+      return {
+        width: 0,
+        height: 0,
+      };
+    }
+    const original = (
+      this.constructor as typeof ImageSource
+    ).getElementOriginalSize(element);
     return {
-      width: element.naturalWidth || element.width,
-      height: element.naturalHeight || element.height,
+      width: element.width || original.width,
+      height: element.height || original.height,
     };
   }
 
@@ -516,8 +545,9 @@ export class ImageSource<
       sourceHeight,
       this._element
     );
-    this._filterScalingX = canvasEl.width / this._originalElement.width;
-    this._filterScalingY = canvasEl.height / this._originalElement.height;
+    const sourceSize = this.getFinalSize(this._originalElement);
+    this._filterScalingX = canvasEl.width / sourceSize.width;
+    this._filterScalingY = canvasEl.height / sourceSize.height;
   }
 
   /**
@@ -570,13 +600,14 @@ export class ImageSource<
       sourceHeight,
       this._element
     );
+    const sourceSize = this.getFinalSize(this._originalElement);
+    const targetSize = this.getFinalSize(this._element);
     if (
-      this._originalElement.width !== this._element.width ||
-      this._originalElement.height !== this._element.height
+      sourceSize.width !== targetSize.width ||
+      sourceSize.height !== targetSize.height
     ) {
-      this._filterScalingX = this._element.width / this._originalElement.width;
-      this._filterScalingY =
-        this._element.height / this._originalElement.height;
+      this._filterScalingX = targetSize.width / sourceSize.width;
+      this._filterScalingY = targetSize.height / sourceSize.height;
     }
   }
 
@@ -626,7 +657,7 @@ export class ImageSource<
     this.renderImage(ctx, elementToDraw);
   }
 
-  renderImage(ctx: CanvasRenderingContext2D, img: ImageSourceElement) {
+  renderImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
     const scaleX = this._filterScalingX,
       scaleY = this._filterScalingY,
       w = this.width,

@@ -80,7 +80,7 @@ export class BlendImage extends BaseFilter {
   }
 
   createTexture(backend: WebGLFilterBackend, image: Image) {
-    return backend.getCachedTexture(image.cacheKey, image.getElement());
+    return backend.getCachedTexture(image.cacheKey, image.getImageSource());
   }
 
   /**
@@ -91,7 +91,7 @@ export class BlendImage extends BaseFilter {
    */
   calculateMatrix() {
     const image = this.image,
-      { width, height } = image.getElement();
+      { width, height } = image.getFinalSize();
     return [
       1 / image.scaleX,
       0,
@@ -135,7 +135,7 @@ export class BlendImage extends BaseFilter {
       image.left,
       image.top
     );
-    context.drawImage(image.getElement(), 0, 0, width, height);
+    context.drawImage(image.getImageSource(), 0, 0, width, height);
     const blendData = context.getImageData(0, 0, width, height).data;
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];

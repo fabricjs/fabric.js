@@ -3,7 +3,7 @@ import { ObjectEvents } from '../EventTypeDefs';
 import { Canvas } from '../canvas/Canvas';
 import { getDocument, getEnv } from '../env';
 import { TSize } from '../typedefs';
-import { loadImage } from '../util/misc/objectEnlive';
+import { LoadImageOptions, loadImage } from '../util/misc/objectEnlive';
 import { ImageProps, ImageSource, SerializedImageProps } from './Image';
 import { TProps } from './Object/types';
 
@@ -79,6 +79,10 @@ export class Video<
     });
   }
 
+  getElement(): HTMLVideoElement {
+    return this._originalElement;
+  }
+
   setElement(element: HTMLVideoElement, size?: Partial<TSize>): void {
     super.setElement(element, size);
     if (element.poster) {
@@ -133,19 +137,6 @@ export class Video<
 
   set loop(value: boolean) {
     this.getElement().loop = value;
-  }
-
-  getOriginalSize(element = this.getElement()) {
-    if (!element) {
-      return {
-        width: 0,
-        height: 0,
-      };
-    }
-    return {
-      width: element.videoWidth || element.width,
-      height: element.videoHeight || element.height,
-    };
   }
 
   isCacheDirty(): boolean {
