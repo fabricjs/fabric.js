@@ -42,6 +42,17 @@ export class Video<
   SProps extends SerializedImageProps = SerializedImageProps,
   EventSpec extends VideoEvents = VideoEvents
 > extends ImageSource<HTMLVideoElement, Props, SProps, EventSpec> {
+  static ownDefaults: Record<string, any> = {
+    objectCaching: false,
+  };
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...this.ownDefaults,
+    };
+  }
+
   private started = false;
 
   constructor(elementId: string, options?: Props);
@@ -77,10 +88,6 @@ export class Video<
     this.getElement().loop = value;
   }
 
-  shouldCache(): boolean {
-    return false;
-  }
-
   getOriginalSize(element = this.getElement()) {
     if (!element) {
       return {
@@ -92,6 +99,10 @@ export class Video<
       width: element.videoWidth || element.width,
       height: element.videoHeight || element.height,
     };
+  }
+
+  isCacheDirty(): boolean {
+    return true;
   }
 
   protected renderPlaceHolder(ctx: CanvasRenderingContext2D) {
