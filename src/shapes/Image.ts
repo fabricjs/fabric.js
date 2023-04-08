@@ -623,6 +623,10 @@ export class ImageSource<
     if (!elementToDraw) {
       return;
     }
+    this.renderImage(ctx, elementToDraw);
+  }
+
+  renderImage(ctx: CanvasRenderingContext2D, img: ImageSourceElement) {
     const scaleX = this._filterScalingX,
       scaleY = this._filterScalingY,
       w = this.width,
@@ -641,8 +645,7 @@ export class ImageSource<
       maxDestW = Math.min(w, elWidth / scaleX - cropX),
       maxDestH = Math.min(h, elHeight / scaleY - cropY);
 
-    elementToDraw &&
-      ctx.drawImage(elementToDraw, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
+    ctx.drawImage(img, sX, sY, sW, sH, x, y, maxDestW, maxDestH);
   }
 
   /**

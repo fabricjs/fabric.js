@@ -1,8 +1,9 @@
 import { classRegistry } from '../ClassRegistry';
 import { ObjectEvents } from '../EventTypeDefs';
 import { Canvas } from '../canvas/Canvas';
-import { getDocument } from '../env';
-import { LoadImageOptions } from '../util/misc/objectEnlive';
+import { getDocument, getEnv } from '../env';
+import { TSize } from '../typedefs';
+import { loadImage } from '../util/misc/objectEnlive';
 import { ImageProps, ImageSource, SerializedImageProps } from './Image';
 import { TProps } from './Object/types';
 
@@ -31,7 +32,9 @@ const VIDEO_EVENTS /*: (keyof HTMLVideoElementEventMap)[] */ = [
 type UniqueVideoEvents = typeof VIDEO_EVENTS[number];
 
 export type VideoEvents = ObjectEvents &
-  Record<UniqueVideoEvents, { e: Event }>;
+  Record<UniqueVideoEvents, { e: Event }> & {
+    posterloaded: { poster: HTMLImageElement };
+  };
 
 /**
  * ## IMPORTANT
@@ -53,13 +56,15 @@ export class Video<
     };
   }
 
-  private started = false;
+  private _started = false;
+  private _posterElement?: HTMLImageElement;
+  private _posterAbortController?: AbortController;
 
   constructor(elementId: string, options?: Props);
   constructor(element: HTMLVideoElement, options?: Props);
   constructor(arg0: HTMLVideoElement | string, options: Props = {} as Props) {
     super(arg0, options);
-    const el = this.getElement();
+    const el = this._originalElement;
     const fire = (e: Event) => this.fire(e.type as UniqueVideoEvents, { e });
     VIDEO_EVENTS.forEach((eventType) => {
       el.addEventListener(eventType, fire);
@@ -70,7 +75,49 @@ export class Video<
       this.setCoords();
     });
     this.once('play', () => {
-      this.started = true;
+      this._started = true;
+    });
+  }
+
+  setElement(element: HTMLVideoElement, size?: Partial<TSize>): void {
+    super.setElement(element, size);
+    if (element.poster) {
+      this.setPoster(element.poster).then(
+        (done) =>
+          done && this.fire('posterloaded', { poster: this._posterElement! })
+      );
+    }
+  }
+
+  setPoster(url: string): Promise<boolean>;
+  setPoster(el: HTMLImageElement): Promise<boolean>;
+  setPoster(arg0: string | HTMLImageElement) {
+    const prevController = this._posterAbortController;
+    prevController && !prevController.signal.aborted && prevController.abort();
+    return Promise.resolve().then(async () => {
+      if (!this._started) {
+        const controller = (this._posterAbortController =
+          new AbortController());
+        const disposer = this.once('play', () => {
+          controller.abort();
+          if (this._posterElement) {
+            getEnv().dispose(this._posterElement);
+            this._posterElement = undefined;
+          }
+        });
+        controller.signal.addEventListener('abort', () => disposer());
+        this._posterElement =
+          typeof arg0 === 'string'
+            ? await loadImage(arg0, controller).catch((err) => {
+                disposer();
+                console.error(err);
+                return undefined;
+              })
+            : arg0;
+        this.canvas?.requestRenderAll();
+        return true;
+      }
+      return false;
     });
   }
 
@@ -106,16 +153,37 @@ export class Video<
   }
 
   protected renderPlaceHolder(ctx: CanvasRenderingContext2D) {
-    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    this._posterElement
+      ? this.renderImage(ctx, this._posterElement)
+      : ctx.fillRect(
+          -this.width / 2,
+          -this.height / 2,
+          this.width,
+          this.height
+        );
   }
 
   _renderFill(ctx: CanvasRenderingContext2D) {
-    !this.started && this.renderPlaceHolder(ctx);
+    !this._started && this.renderPlaceHolder(ctx);
     super._renderFill(ctx);
+  }
+
+  _render(ctx: CanvasRenderingContext2D): void {
+    this.filters.length > 0 && this._started && this.applyFilters();
+    super._render(ctx);
   }
 
   toString() {
     return `#<Video: { src: "${this.getSrc()}" }>`;
+  }
+
+  dispose(): void {
+    super.dispose();
+    this._posterAbortController?.abort();
+    if (this._posterElement) {
+      getEnv().dispose(this._posterElement);
+      this._posterElement = undefined;
+    }
   }
 
   static async fromObject<T extends TProps<SerializedImageProps>>(
