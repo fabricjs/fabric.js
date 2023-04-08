@@ -2,12 +2,20 @@ import { classRegistry } from '../ClassRegistry';
 import { ObjectEvents } from '../EventTypeDefs';
 import { Canvas } from '../canvas/Canvas';
 import { getDocument, getEnv } from '../env';
-import { TSize } from '../typedefs';
+import { TClassProperties, TSize } from '../typedefs';
 import { LoadImageOptions, loadImage } from '../util/misc/objectEnlive';
 import { ImageProps, ImageSource, SerializedImageProps } from './Image';
 import { TProps } from './Object/types';
 
-export interface VideoProps extends ImageProps {
+interface UniqueVideoProps {
+  poster: string;
+}
+
+export interface SerializedVideoProps
+  extends SerializedImageProps,
+    UniqueVideoProps {}
+
+export interface VideoProps extends ImageProps, Partial<UniqueVideoProps> {
   loop?: boolean;
 }
 
@@ -42,7 +50,7 @@ export type VideoEvents = ObjectEvents &
  */
 export class Video<
   Props extends TProps<VideoProps> = Partial<VideoProps>,
-  SProps extends SerializedImageProps = SerializedImageProps,
+  SProps extends SerializedVideoProps = SerializedVideoProps,
   EventSpec extends VideoEvents = VideoEvents
 > extends ImageSource<HTMLVideoElement, Props, SProps, EventSpec> {
   static ownDefaults: Record<string, any> = {
@@ -93,11 +101,22 @@ export class Video<
     }
   }
 
+  setSrc(src: string, { crossOrigin }: LoadImageOptions = {}) {
+    const el = this.getElement() || getDocument().createElement('video');
+    if (crossOrigin) {
+      el.crossOrigin = crossOrigin;
+      this.set({ crossOrigin });
+    }
+    el.src = src;
+    this.setElement(el);
+  }
+
   setPoster(url: string): Promise<boolean>;
   setPoster(el: HTMLImageElement): Promise<boolean>;
   setPoster(arg0: string | HTMLImageElement) {
     const prevController = this._posterAbortController;
     prevController && !prevController.signal.aborted && prevController.abort();
+    this.getElement().poster = typeof arg0 === 'string' ? arg0 : arg0.src;
     return Promise.resolve().then(async () => {
       if (!this._started) {
         const controller = (this._posterAbortController =
@@ -177,13 +196,25 @@ export class Video<
     }
   }
 
-  static async fromObject<T extends TProps<SerializedImageProps>>(
-    { src = '', crossOrigin: x = null, ...object }: T,
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude?: K[]): Pick<T, K> & SProps {
+    const { poster } = this.getElement();
+    return {
+      ...super.toObject(propertiesToInclude),
+      ...(poster ? { poster } : {}),
+    };
+  }
+
+  static async fromObject<T extends TProps<SerializedVideoProps>>(
+    { src = '', poster = '', crossOrigin: x = null, ...object }: T,
     { crossOrigin = x, ...options }: LoadImageOptions = {}
   ) {
     const el = getDocument().createElement('video');
     crossOrigin && (el.crossOrigin = crossOrigin);
     el.src = src;
+    el.poster = poster;
     return this._fromObject<Video>(
       {
         ...object,
