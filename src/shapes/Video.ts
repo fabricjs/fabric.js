@@ -4,7 +4,7 @@ import { Canvas } from '../canvas/Canvas';
 import { getDocument, getEnv } from '../env';
 import { TClassProperties, TSize } from '../typedefs';
 import { LoadImageOptions, loadImage } from '../util/misc/objectEnlive';
-import { ImageProps, ImageSource, SerializedImageProps } from './Image';
+import { ImageProps, ImageSource, SerializedImageProps } from './ImageSource';
 import { TProps } from './Object/types';
 
 interface UniqueVideoProps {
