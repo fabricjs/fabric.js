@@ -158,8 +158,6 @@ export class ImageSource<
    */
   declare imageSmoothing: boolean;
 
-  declare preserveAspectRatio: string;
-
   protected declare src: string;
   declare crossOrigin: TCrossOrigin;
 
@@ -203,15 +201,15 @@ export class ImageSource<
     );
   }
 
-  getElement() {
-    return this.getImageSource();
-  }
-
   /**
    * @returns image source element which is used for rendering
    */
   getImageSource() {
     return this._element;
+  }
+
+  getElement() {
+    return this.getImageSource();
   }
 
   /**
@@ -227,7 +225,6 @@ export class ImageSource<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(ImageSource.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -375,92 +372,6 @@ export class ImageSource<
   }
 
   /**
-   * Returns svg representation of an instance
-   * @return {string[]} an array of strings with the specific svg representation
-   * of the instance
-   */
-  _toSVG() {
-    const imageMarkup = [],
-      element = this._element,
-      x = -this.width / 2,
-      y = -this.height / 2;
-    let svgString = [],
-      strokeSvg,
-      clipPath = '',
-      imageRendering = '';
-    if (!element) {
-      return [];
-    }
-    if (this.hasCrop()) {
-      const clipPathId = uid();
-      svgString.push(
-        '<clipPath id="imageCrop_' + clipPathId + '">\n',
-        '\t<rect x="' +
-          x +
-          '" y="' +
-          y +
-          '" width="' +
-          this.width +
-          '" height="' +
-          this.height +
-          '" />\n',
-        '</clipPath>\n'
-      );
-      clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
-    }
-    if (!this.imageSmoothing) {
-      imageRendering = '" image-rendering="optimizeSpeed';
-    }
-    imageMarkup.push(
-      '\t<image ',
-      'COMMON_PARTS',
-      'xlink:href="',
-      this.getSvgSrc(true),
-      '" x="',
-      x - this.cropX,
-      '" y="',
-      y - this.cropY,
-      // we're essentially moving origin of transformation from top/left corner to the center of the shape
-      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-      // so that object's center aligns with container's left/top
-      '" width="',
-      element.width || element.naturalWidth,
-      '" height="',
-      element.height || element.naturalHeight,
-      imageRendering,
-      '"',
-      clipPath,
-      '></image>\n'
-    );
-
-    if (this.stroke || this.strokeDashArray) {
-      const origFill = this.fill;
-      this.fill = null;
-      strokeSvg = [
-        '\t<rect ',
-        'x="',
-        x,
-        '" y="',
-        y,
-        '" width="',
-        this.width,
-        '" height="',
-        this.height,
-        '" style="',
-        this.getSvgStyles(),
-        '"/>\n',
-      ];
-      this.fill = origFill;
-    }
-    if (this.paintFirst !== 'fill') {
-      svgString = svgString.concat(strokeSvg, imageMarkup);
-    } else {
-      svgString = svgString.concat(imageMarkup, strokeSvg);
-    }
-    return svgString;
-  }
-
-  /**
    * Returns source of an image
    * @param {Boolean} filtered indicates if the src is needed for svg
    * @return {String} Source of an image
@@ -480,36 +391,6 @@ export class ImageSource<
     } else {
       return this.src || '';
     }
-  }
-
-  /**
-   * Alias for getSrc
-   * @param filtered
-   * @deprecated
-   */
-  getSvgSrc(filtered?: boolean) {
-    return this.getSrc(filtered);
-  }
-
-  /**
-   * Loads and sets source of an image\
-   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
-   * @param {String} src Source string (URL)
-   * @param {LoadImageOptions} [options] Options object
-   */
-  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions = {}) {
-    return loadImage(src, { crossOrigin, signal }).then((img) => {
-      typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
-      this.setElement(img);
-    });
-  }
-
-  /**
-   * Returns string representation of an instance
-   * @return {String} String representation of an instance
-   */
-  toString() {
-    return `#<Image: { src: "${this.getSrc()}" }>`;
   }
 
   applyResizeFilters() {
@@ -707,6 +588,223 @@ export class ImageSource<
     this.height = height || size.height;
   }
 
+  static _fromObject<
+    R extends ImageSource,
+    T extends TProps<SerializedImageProps> = TProps<SerializedImageProps>,
+    S extends HTMLImageElement | HTMLVideoElement = ReturnType<R['getElement']>
+  >(
+    {
+      imageSource,
+      filters: f,
+      resizeFilter: rf,
+      ...object
+    }: T & { imageSource: S },
+    options: { signal?: AbortSignal } = {}
+  ) {
+    return Promise.all([
+      f && enlivenObjects(f, options),
+      // TODO: redundant - handled by enlivenObjectEnlivables
+      rf && enlivenObjects([rf], options),
+      enlivenObjectEnlivables(object, options),
+    ]).then(([filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
+      return new this(imageSource, {
+        ...object,
+        filters,
+        resizeFilter,
+        ...hydratedProps,
+      }) as R;
+    });
+  }
+}
+
+export class Image extends ImageSource {
+  declare preserveAspectRatio: string;
+
+  setElement(element: ImageSourceElement, size?: Partial<TSize>): void {
+    super.setElement(element, size);
+    // TODO: change to data attribute
+    element.classList.add(ImageSource.CSS_CANVAS);
+  }
+
+  /**
+   * Alias for getSrc
+   * @param filtered
+   * @deprecated
+   */
+  getSvgSrc(filtered?: boolean) {
+    return this.getSrc(filtered);
+  }
+
+  /**
+   * Loads and sets source of an image\
+   * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
+   * @param {String} src Source string (URL)
+   * @param {LoadImageOptions} [options] Options object
+   */
+  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions = {}) {
+    return loadImage(src, { crossOrigin, signal }).then((img) => {
+      typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
+      this.setElement(img);
+    });
+  }
+
+  /**
+   * Returns string representation of an instance
+   * @return {String} String representation of an instance
+   */
+  toString() {
+    return `#<Image: { src: "${this.getSrc()}" }>`;
+  }
+
+  /**
+   * Returns svg representation of an instance
+   * @return {string[]} an array of strings with the specific svg representation
+   * of the instance
+   */
+  _toSVG() {
+    const imageMarkup = [],
+      element = this._element,
+      x = -this.width / 2,
+      y = -this.height / 2;
+    let svgString = [],
+      strokeSvg,
+      clipPath = '',
+      imageRendering = '';
+    if (!element) {
+      return [];
+    }
+    if (this.hasCrop()) {
+      const clipPathId = uid();
+      svgString.push(
+        '<clipPath id="imageCrop_' + clipPathId + '">\n',
+        '\t<rect x="' +
+          x +
+          '" y="' +
+          y +
+          '" width="' +
+          this.width +
+          '" height="' +
+          this.height +
+          '" />\n',
+        '</clipPath>\n'
+      );
+      clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
+    }
+    if (!this.imageSmoothing) {
+      imageRendering = '" image-rendering="optimizeSpeed';
+    }
+    imageMarkup.push(
+      '\t<image ',
+      'COMMON_PARTS',
+      'xlink:href="',
+      this.getSvgSrc(true),
+      '" x="',
+      x - this.cropX,
+      '" y="',
+      y - this.cropY,
+      // we're essentially moving origin of transformation from top/left corner to the center of the shape
+      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+      // so that object's center aligns with container's left/top
+      '" width="',
+      element.width || element.naturalWidth,
+      '" height="',
+      element.height || element.naturalHeight,
+      imageRendering,
+      '"',
+      clipPath,
+      '></image>\n'
+    );
+
+    if (this.stroke || this.strokeDashArray) {
+      const origFill = this.fill;
+      this.fill = null;
+      strokeSvg = [
+        '\t<rect ',
+        'x="',
+        x,
+        '" y="',
+        y,
+        '" width="',
+        this.width,
+        '" height="',
+        this.height,
+        '" style="',
+        this.getSvgStyles(),
+        '"/>\n',
+      ];
+      this.fill = origFill;
+    }
+    if (this.paintFirst !== 'fill') {
+      svgString = svgString.concat(strokeSvg, imageMarkup);
+    } else {
+      svgString = svgString.concat(imageMarkup, strokeSvg);
+    }
+    return svgString;
+  }
+
+  /**
+   * Default CSS class name for canvas
+   * @static
+   * @type String
+   * @default
+   */
+  static CSS_CANVAS = 'canvas-img';
+
+  /**
+   * Creates an instance of Image from its object representation
+   * @static
+   * @param {Object} object Object to create an instance from
+   * @param {object} [options] Options object
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @returns {Promise<Image>}
+   */
+  static async fromObject<T extends TProps<SerializedImageProps>>(
+    { src, crossOrigin: x = null, ...object }: T,
+    { crossOrigin = x, ...options }: LoadImageOptions = {}
+  ) {
+    return this._fromObject<Image>(
+      {
+        ...object,
+        src,
+        crossOrigin,
+        imageSource: await loadImage(src, { ...options, crossOrigin }),
+      },
+      options
+    );
+  }
+
+  /**
+   * Creates an instance of Image from an URL string
+   * @static
+   * @deprecated use {@link fromObject}
+   * @param {String} url URL to create an image from
+   * @param {LoadImageOptions} [options] Options object
+   * @returns {Promise<Image>}
+   */
+  static async fromURL<T extends TProps<SerializedImageProps>>(
+    url: string,
+    options: Partial<T & LoadImageOptions> = {}
+  ) {
+    return this.fromObject({ ...options, src: url }, options);
+  }
+
+  /**
+   * List of attribute names to account for when parsing SVG element (used by {@link ImageSource.fromElement})
+   * @static
+   * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
+   */
+  static ATTRIBUTE_NAMES = [
+    ...SHARED_ATTRIBUTES,
+    'x',
+    'y',
+    'width',
+    'height',
+    'preserveAspectRatio',
+    'xlink:href',
+    'crossOrigin',
+    'image-rendering',
+  ];
+
   /**
    * Calculate offset for center and scale factor for the image in order to respect
    * the preserveAspectRatio attribute
@@ -780,99 +878,6 @@ export class ImageSource<
       cropX,
       cropY,
     };
-  }
-
-  /**
-   * Default CSS class name for canvas
-   * @static
-   * @type String
-   * @default
-   */
-  static CSS_CANVAS = 'canvas-img';
-
-  /**
-   * List of attribute names to account for when parsing SVG element (used by {@link ImageSource.fromElement})
-   * @static
-   * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
-   */
-  static ATTRIBUTE_NAMES = [
-    ...SHARED_ATTRIBUTES,
-    'x',
-    'y',
-    'width',
-    'height',
-    'preserveAspectRatio',
-    'xlink:href',
-    'crossOrigin',
-    'image-rendering',
-  ];
-
-  static _fromObject<
-    R extends ImageSource,
-    T extends TProps<SerializedImageProps> = TProps<SerializedImageProps>,
-    S extends HTMLImageElement | HTMLVideoElement = ReturnType<R['getElement']>
-  >(
-    {
-      imageSource,
-      filters: f,
-      resizeFilter: rf,
-      ...object
-    }: T & { imageSource: S },
-    options: { signal?: AbortSignal } = {}
-  ) {
-    return Promise.all([
-      f && enlivenObjects(f, options),
-      // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects([rf], options),
-      enlivenObjectEnlivables(object, options),
-    ]).then(([filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
-      return new this(imageSource, {
-        ...object,
-        filters,
-        resizeFilter,
-        ...hydratedProps,
-      }) as R;
-    });
-  }
-}
-
-export class Image extends ImageSource {
-  /**
-   * Creates an instance of Image from its object representation
-   * @static
-   * @param {Object} object Object to create an instance from
-   * @param {object} [options] Options object
-   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<Image>}
-   */
-  static async fromObject<T extends TProps<SerializedImageProps>>(
-    { src, crossOrigin: x = null, ...object }: T,
-    { crossOrigin = x, ...options }: LoadImageOptions = {}
-  ) {
-    return this._fromObject<Image>(
-      {
-        ...object,
-        src,
-        crossOrigin,
-        imageSource: await loadImage(src, { ...options, crossOrigin }),
-      },
-      options
-    );
-  }
-
-  /**
-   * Creates an instance of Image from an URL string
-   * @static
-   * @deprecated use {@link fromObject}
-   * @param {String} url URL to create an image from
-   * @param {LoadImageOptions} [options] Options object
-   * @returns {Promise<Image>}
-   */
-  static async fromURL<T extends TProps<SerializedImageProps>>(
-    url: string,
-    options: Partial<T & LoadImageOptions> = {}
-  ) {
-    return this.fromObject({ ...options, src: url }, options);
   }
 
   /**
