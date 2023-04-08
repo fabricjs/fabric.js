@@ -56,11 +56,12 @@ export interface SerializedImageProps extends SerializedObjectProps {
 }
 
 export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
+
 const IMAGE_PROPS = ['cropX', 'cropY'] as const;
+
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-
 export class ImageSource<
     Source extends ImageSourceElement = ImageSourceElement,
     Props extends TProps<ImageProps> = Partial<ImageProps>,
