@@ -39,7 +39,7 @@ export class BaseFilter {
    * mainParameter
    * @private
    */
-  declare mainParameter?: keyof this;
+  declare mainParameter?: keyof this | undefined;
 
   /**
    * Constructor
@@ -394,7 +394,10 @@ export class BaseFilter {
     return this.toObject();
   }
 
-  static async fromObject({ type, ...options }: any) {
-    return new this(options);
+  static async fromObject(
+    { type, ...filterOptions }: Record<string, any>,
+    options: { signal: AbortSignal }
+  ) {
+    return new this(filterOptions);
   }
 }

@@ -4,13 +4,39 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
   rx: 0,
   ry: 0,
 };
 
-export class Rect extends FabricObject {
+interface UniqueRectProps {
+  rx: number;
+  ry: number;
+}
+
+export interface SerializedRectProps
+  extends SerializedObjectProps,
+    UniqueRectProps {}
+
+export interface RectProps extends FabricObjectProps, UniqueRectProps {}
+
+const RECT_PROPS = ['rx', 'ry'] as const;
+
+export class Rect<
+    Props extends TProps<RectProps> = Partial<RectProps>,
+    SProps extends SerializedRectProps = SerializedRectProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements RectProps
+{
   /**
    * Horizontal border radius
    * @type Number
@@ -25,7 +51,7 @@ export class Rect extends FabricObject {
    */
   declare ry: number;
 
-  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+  static cacheProperties = [...cacheProperties, ...RECT_PROPS];
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
 
@@ -41,7 +67,7 @@ export class Rect extends FabricObject {
    * @param {Object} [options] Options object
    * @return {Object} thisArg
    */
-  constructor(options: Record<string, unknown>) {
+  constructor(options: Props) {
     super(options);
     this._initRxRy();
   }
@@ -122,8 +148,11 @@ export class Rect extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(['rx', 'ry', ...propertiesToInclude]);
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return super.toObject([...RECT_PROPS, ...propertiesToInclude]);
   }
 
   /**

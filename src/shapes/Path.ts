@@ -1,8 +1,7 @@
-//@ts-nocheck
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point } from '../Point';
+import { Point, XY } from '../Point';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -14,8 +13,31 @@ import {
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { TPathSegmentInfo, TSimplePathData } from '../util/path/typedefs';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { TClassProperties, TSVGReviver } from '../typedefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
-export class Path extends FabricObject {
+interface UniquePathProps {
+  sourcePath?: string;
+  path?: TSimplePathData;
+}
+
+export interface SerializedPathProps
+  extends SerializedObjectProps,
+    UniquePathProps {}
+
+export interface PathProps extends FabricObjectProps, UniquePathProps {}
+
+export class Path<
+  Props extends TProps<PathProps> = Partial<PathProps>,
+  SProps extends SerializedPathProps = SerializedPathProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Array of path points
    * @type Array
@@ -41,9 +63,9 @@ export class Path extends FabricObject {
    */
   constructor(
     path: TSimplePathData | string,
-    { path: _, left, top, ...options }: any = {}
+    { path: _, left, top, ...options }: Props = {} as Props
   ) {
-    super(options);
+    super(options as Props);
     const pathTL = this._setPath(path || []);
     const origin = this.translateToGivenOrigin(
       new Point(left ?? pathTL.x, top ?? pathTL.y),
@@ -131,7 +153,6 @@ export class Path extends FabricObject {
           controlY = current[2];
           break;
 
-        case 'z':
         case 'Z':
           x = subpathStartX;
           y = subpathStartY;
@@ -165,12 +186,13 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: this.path.map((item) => {
-        return item.slice();
-      }),
+      path: cloneDeep(this.path),
     };
   }
 
@@ -179,10 +201,14 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject(propertiesToInclude: (keyof this)[] = []) {
-    const o = this.toObject(['sourcePath', ...propertiesToInclude]);
-    if (o.sourcePath) {
+  toDatalessObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    const o = this.toObject<T, K>(propertiesToInclude);
+    if (this.sourcePath) {
       delete o.path;
+      o.sourcePath = this.sourcePath;
     }
     return o;
   }
@@ -214,7 +240,7 @@ export class Path extends FabricObject {
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver) {
+  toClipPathSVG(reviver: TSVGReviver) {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
@@ -230,7 +256,7 @@ export class Path extends FabricObject {
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toSVG(reviver) {
+  toSVG(reviver: TSVGReviver) {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver: reviver,
@@ -256,7 +282,7 @@ export class Path extends FabricObject {
    * @private
    */
   _calcDimensions() {
-    const bounds: Point[] = [];
+    const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
       x = 0, // current x
@@ -314,7 +340,6 @@ export class Path extends FabricObject {
           y = current[4];
           break;
 
-        case 'z':
         case 'Z':
           x = subpathStartX;
           y = subpathStartY;
@@ -351,8 +376,8 @@ export class Path extends FabricObject {
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject(object) {
-    return this._fromObject(object, {
+  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+    return this._fromObject<Path>(object, {
       extraParam: 'path',
     });
   }
@@ -366,7 +391,11 @@ export class Path extends FabricObject {
    * @param {Object} [options] Options object
    * @param {Function} [callback] Options callback invoked after parsing is finished
    */
-  static fromElement(element, callback, options) {
+  static fromElement(
+    element: SVGElement,
+    callback: (path: Path) => void,
+    options: any
+  ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
     callback(
       new this(parsedAttributes.d, {

@@ -39,6 +39,7 @@ export { Textbox } from './src/shapes/Textbox';
 export { Group } from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
+export { Video } from './src/shapes/Video';
 export { createCollectionMixin } from './src/Collection';
 
 export * as util from './src/util';

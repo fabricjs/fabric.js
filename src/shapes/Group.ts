@@ -1,9 +1,10 @@
+// @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
-import type { TSVGReviver } from '../typedefs';
+import type { TClassProperties, TSVGReviver } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -20,7 +21,11 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
-import { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
 
 export type LayoutContextType =
   | 'initialization'
@@ -86,7 +91,10 @@ export interface GroupOwnProps {
 
 export interface SerializedGroupProps
   extends SerializedObjectProps,
-    GroupOwnProps {}
+    GroupOwnProps {
+  objects: SerializedObjectProps[];
+}
+
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
 
 export const groupDefaultValues = {
@@ -976,7 +984,13 @@ export class Group extends createCollectionMixin(
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<
+      GroupProps & TClassProperties<this>,
+      keyof SerializedGroupProps
+    >,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
     return {
       ...super.toObject([
         'layout',
@@ -1069,7 +1083,10 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject({ objects = [], ...options }) {
+  static fromObject<T extends TProps<SerializedGroupProps>>({
+    objects = [],
+    ...options
+  }: T) {
     return Promise.all([
       enlivenObjects(objects),
       enlivenObjectEnlivables(options),

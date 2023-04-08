@@ -6,6 +6,8 @@ import { invertTransform, transformPoint } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
+import { TProps } from '../Object/types';
+import { TextProps, SerializedTextProps } from '../Text/Text';
 
 // TODO: this code seems wrong.
 // e.button for a left click is `0` and so different than `1` is more
@@ -15,9 +17,11 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
+    Props extends TProps<TextProps> = Partial<TextProps>,
+    SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
-  extends ITextKeyBehavior<EventSpec>
+  extends ITextKeyBehavior<Props, SProps, EventSpec>
   implements DragMethods
 {
   private declare __lastSelected: boolean;

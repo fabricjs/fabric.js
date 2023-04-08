@@ -9,7 +9,7 @@ import {
 } from './constants';
 import { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Text } from '../Text/Text';
+import type { SerializedTextProps, TextProps } from '../Text/Text';
 
 type CursorBoundaries = {
   left: number;
@@ -39,6 +39,18 @@ export const iTextDefaultValues = {
   ctrlKeysMapDown,
   ctrlKeysMapUp,
 };
+
+// @TODO this is not complete
+interface UniqueITextProps {
+  selectionStart: number;
+  selectionEnd: number;
+}
+
+export interface SerializedITextProps
+  extends SerializedTextProps,
+    UniqueITextProps {}
+
+export interface ITextProps extends TextProps, UniqueITextProps {}
 
 /**
  * @fires changed
@@ -84,8 +96,13 @@ export const iTextDefaultValues = {
  * ```
  */
 export class IText<
-  EventSpec extends ITextEvents = ITextEvents
-> extends ITextClickBehavior<EventSpec> {
+    Props extends ITextProps = ITextProps,
+    SProps extends SerializedITextProps = SerializedITextProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends ITextClickBehavior<Props, SProps, EventSpec>
+  implements UniqueITextProps
+{
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number

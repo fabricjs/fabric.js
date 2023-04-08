@@ -67,7 +67,9 @@ export class Composed extends BaseFilter {
       ((object.subFilters || []) as BaseFilter[]).map((filter) =>
         classRegistry.getClass(filter.type).fromObject(filter, options)
       )
-    ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
+    ).then(
+      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as BaseFilter
+    );
   }
 }
 

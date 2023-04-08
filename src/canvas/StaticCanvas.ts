@@ -40,6 +40,22 @@ import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
 
+type TDestroyed<T, K extends keyof any> = {
+  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
+  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
+};
+
+export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
+  T,
+  | 'contextTop'
+  | 'pixelFindContext'
+  | 'lowerCanvasEl'
+  | 'upperCanvasEl'
+  | 'pixelFindCanvasEl'
+  | 'wrapperEl'
+  | '_activeSelection'
+>;
+
 const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
 export type TCanvasSizeOptions = {
@@ -294,6 +310,7 @@ export class StaticCanvas<
     (): void;
     kill: (reason?: any) => void;
   };
+  protected _renderLoopDisposer?: VoidFunction;
 
   static getDefaults(): Record<string, any> {
     return StaticCanvas.ownDefaults;
@@ -708,6 +725,21 @@ export class StaticCanvas<
     if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
       this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
+  }
+
+  startRenderAllLoop() {
+    this.stopRenderAllLoop();
+    this._renderLoopDisposer = this.on(
+      'after:render',
+      ({ ctx }) => ctx === this.contextContainer && this.requestRenderAll()
+    );
+    this.requestRenderAll();
+    return this._renderLoopDisposer;
+  }
+
+  stopRenderAllLoop() {
+    this._renderLoopDisposer?.();
+    delete this._renderLoopDisposer;
   }
 
   /**
@@ -1693,9 +1725,8 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl;
-    // @ts-expect-error disposing
-    this.lowerCanvasEl = undefined;
+    const canvasElement = this.lowerCanvasEl!;
+    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
