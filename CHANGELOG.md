@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
+- fix(): text styles edge case [#8820](https://github.com/fabricjs/fabric.js/pull/8820)
 - chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
 - chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
 - rename(): `IPoint` => `XY` [#8806](https://github.com/fabricjs/fabric.js/pull/8806)
