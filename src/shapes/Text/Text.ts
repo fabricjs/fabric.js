@@ -24,6 +24,16 @@ import { cacheProperties } from '../Object/FabricObject';
 import { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from '../Object/types';
+import {
+  additionalProps,
+  textDefaultValues,
+  textLayoutProperties,
+} from './constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -37,6 +47,10 @@ function getMeasuringContext() {
   }
   return measuringContext;
 }
+
+type TPathSide = 'left' | 'right';
+
+type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
 
 /**
  * Measure and return the info of a single grapheme.
@@ -58,111 +72,42 @@ export type GraphemeBBox<onPath = false> = {
     }
   : Record<string, never>);
 
-const additionalProps = [
-  'fontFamily',
-  'fontWeight',
-  'fontSize',
-  'text',
-  'underline',
-  'overline',
-  'linethrough',
-  'textAlign',
-  'fontStyle',
-  'lineHeight',
-  'textBackgroundColor',
-  'charSpacing',
-  'styles',
-  'direction',
-  'path',
-  'pathStartOffset',
-  'pathSide',
-  'pathAlign',
-] as const;
+// @TODO this is not complete
+interface UniqueTextProps {
+  charSpacing: number;
+  lineHeight: number;
+  fontSize: number;
+  fontWeight: string;
+  fontFamily: string;
+  fontStyle: string;
+  pathSide: TPathSide;
+  pathAlign: TPathAlign;
+  underline: boolean;
+  overline: boolean;
+  linethrough: boolean;
+  textAlign: string;
+  direction: CanvasDirection;
+  path?: Path;
+}
 
-const textLayoutProperties: string[] = [
-  'fontSize',
-  'fontWeight',
-  'fontFamily',
-  'fontStyle',
-  'lineHeight',
-  'text',
-  'charSpacing',
-  'textAlign',
-  'styles',
-  'path',
-  'pathStartOffset',
-  'pathSide',
-  'pathAlign',
-];
+export interface SerializedTextProps
+  extends SerializedObjectProps,
+    UniqueTextProps {}
 
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _styleProperties: [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ],
-  _reNewline: /\r?\n/,
-  _reSpacesAndTabs: /[ \t\r]/g,
-  _reSpaceAndTab: /[ \t\r]/,
-  _reWords: /\S+/g,
-  fontSize: 40,
-  fontWeight: 'normal',
-  fontFamily: 'Times New Roman',
-  underline: false,
-  overline: false,
-  linethrough: false,
-  textAlign: 'left',
-  fontStyle: 'normal',
-  lineHeight: 1.16,
-  superscript: {
-    size: 0.6, // fontSize factor
-    baseline: -0.35, // baseline-shift factor (upwards)
-  },
-  subscript: {
-    size: 0.6, // fontSize factor
-    baseline: 0.11, // baseline-shift factor (downwards)
-  },
-  textBackgroundColor: '',
-  stroke: null,
-  shadow: null,
-  path: null,
-  pathStartOffset: 0,
-  pathSide: 'left',
-  pathAlign: 'baseline',
-  _fontSizeFraction: 0.222,
-  offsets: {
-    underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88,
-  },
-  _fontSizeMult: 1.13,
-  charSpacing: 0,
-  styles: null,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2,
-};
+export interface TextProps extends FabricObjectProps, UniqueTextProps {}
 
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends StyledText<EventSpec> {
+    Props extends TProps<TextProps> = Partial<TextProps>,
+    SProps extends SerializedTextProps = SerializedTextProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends StyledText<Props, SProps, EventSpec>
+  implements UniqueTextProps
+{
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
@@ -301,8 +246,6 @@ export class Text<
    */
   declare textBackgroundColor: string;
 
-  protected declare _styleProperties: string[];
-
   declare styles: TextStyle;
 
   /**
@@ -327,7 +270,7 @@ export class Text<
    * });
    * @default
    */
-  declare path: Path;
+  declare path: Path | null;
 
   /**
    * Offset amount for text path starting position
@@ -340,20 +283,20 @@ export class Text<
   /**
    * Which side of the path the text should be drawn on.
    * Only used when text has a path
-   * @type {String} 'left|right'
+   * @type {TPathSide} 'left|right'
    * @default
    */
-  declare pathSide: string;
+  declare pathSide: TPathSide;
 
   /**
    * How text is aligned to the path. This property determines
    * the perpendicular position of each character relative to the path.
    * (one of "baseline", "center", "ascender", "descender")
    * This feature is in BETA, and its behavior may change
-   * @type String
+   * @type TPathAlign
    * @default
    */
-  declare pathAlign: string;
+  declare pathAlign: TPathAlign;
 
   /**
    * @private
@@ -395,10 +338,10 @@ export class Text<
    * some interesting link for the future
    * https://www.w3.org/International/questions/qa-bidi-unicode-controls
    * @since 4.5.0
-   * @type {String} 'ltr|rtl'
+   * @type {CanvasDirection} 'ltr|rtl'
    * @default
    */
-  declare direction: string;
+  declare direction: CanvasDirection;
 
   /**
    * contains characters bounding boxes
@@ -845,7 +788,7 @@ export class Text<
     }
     if (stylesAreEqual && fontCache[couple] !== undefined) {
       coupleWidth = fontCache[couple];
-      kernedWidth = coupleWidth - previousWidth;
+      kernedWidth = coupleWidth - previousWidth!;
     }
     if (
       width === undefined ||
@@ -1742,7 +1685,10 @@ export class Text<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject([...additionalProps, ...propertiesToInclude]),
       styles: stylesToArray(this.styles, this.text),
@@ -1920,8 +1866,8 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject(object: Record<string, any>): Promise<Text> {
-    return this._fromObject(
+  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
+    return this._fromObject<Text>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),

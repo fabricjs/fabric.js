@@ -169,14 +169,25 @@ function assertDragEventStream(name, a, b) {
 
             QUnit.test('drag start', function (assert) {
                 const e = startDragging(eventData);
-                const charStyle = { "stroke": null, "strokeWidth": 1, "fill": "rgb(0,0,0)", "fontFamily": "Times New Roman", "fontSize": 40, "fontWeight": "normal", "fontStyle": "normal", "underline": false, "overline": false, "linethrough": false, "deltaY": 0, "textBackgroundColor": "" };
-                assert.deepEqual(e.dataTransfer.data, {
-                    'application/fabric': JSON.stringify({
-                        value: 'test',
-                        styles: [charStyle, charStyle, charStyle, charStyle]
-                    }),
-                    'text/plain': "test"
-                }, 'should set dataTransfer');
+                const charStyle = {
+                    "stroke": null,
+                    "strokeWidth": 1,
+                    "fill": "rgb(0,0,0)",
+                    "fontFamily": "Times New Roman",
+                    "fontSize": 40,
+                    "fontWeight": "normal",
+                    "fontStyle": "normal",
+                    "underline": false,
+                    "overline": false,
+                    "linethrough": false,
+                    "deltaY": 0,
+                    "textBackgroundColor": ""
+                };
+                assert.equal(e.dataTransfer.data['text/plain'], 'test', 'should set text/plain');
+                assert.deepEqual(JSON.parse(e.dataTransfer.data['application/fabric']), {
+                    value: 'test',
+                    styles: [charStyle, charStyle, charStyle, charStyle]
+                }, 'should set application/fabric');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');
                 assert.ok(e.dataTransfer.dragImageData.img instanceof HTMLCanvasElement, 'drag image was set');
                 assert.equal(e.dataTransfer.dragImageData.x, 30, 'drag image position');

@@ -10,12 +10,27 @@ import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
 };
 
-export class Polyline extends FabricObject {
+export interface SerializedPolylineProps extends SerializedObjectProps {
+  points: XY[];
+}
+
+export class Polyline<
+  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedPolylineProps = SerializedPolylineProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Points array
    * @type Array
@@ -86,8 +101,9 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: XY[] = [], { left, top, ...options }: any = {}) {
+  constructor(points: XY[] = [], options: Props = {} as Props) {
     super({ points, ...options });
+    const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
     typeof left === 'number' && this.set('left', left);
@@ -213,10 +229,13 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): object {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      points: this.points.concat(),
+      points: cloneDeep(this.points),
     };
   }
 
@@ -329,8 +348,8 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: Record<string, unknown>) {
-    return this._fromObject(object, {
+  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
+    return this._fromObject<Polyline>(object, {
       extraParam: 'points',
     });
   }

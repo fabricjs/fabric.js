@@ -11,6 +11,7 @@ import {
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
+import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
@@ -19,7 +20,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/types';
-import { SelectableCanvas, TDestroyedCanvas } from './SelectableCanvas';
+import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
@@ -1095,7 +1096,7 @@ export class Canvas extends SelectableCanvas {
     }
     // we start a group selector rectangle if
     // selection is enabled
-    // and there is no target, or the following 3 condition both apply
+    // and there is no target, or the following 3 conditions are satisfied:
     // target is not selectable ( otherwise we selected it )
     // target is not editing
     // target is not already selected ( otherwise we drag )
@@ -1103,7 +1104,7 @@ export class Canvas extends SelectableCanvas {
       this.selection &&
       (!target ||
         (!target.selectable &&
-          !target.isEditing &&
+          !(target as IText).isEditing &&
           target !== this._activeObject))
     ) {
       const p = this.getPointer(e);
@@ -1598,7 +1599,7 @@ export class Canvas extends SelectableCanvas {
   /**
    * @override clear {@link textEditingManager}
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     this.removeListeners();
     super.destroy();
     this.textEditingManager.dispose();

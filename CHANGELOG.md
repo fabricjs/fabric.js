@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)
 - fix(): text styles edge case [#8820](https://github.com/fabricjs/fabric.js/pull/8820)
 - chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
 - chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
