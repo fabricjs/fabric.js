@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)
 - chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
 - chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
 - rename(): `IPoint` => `XY` [#8806](https://github.com/fabricjs/fabric.js/pull/8806)
