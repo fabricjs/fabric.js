@@ -170,6 +170,8 @@ function assertDragEventStream(name, a, b) {
             QUnit.test('drag start', function (assert) {
                 const e = startDragging(eventData);
                 const charStyle = { "stroke": null, "strokeWidth": 1, "fill": "rgb(0,0,0)", "fontFamily": "Times New Roman", "fontSize": 40, "fontWeight": "normal", "fontStyle": "normal", "underline": false, "overline": false, "linethrough": false, "deltaY": 0, "textBackgroundColor": "" };
+                console.log(e.dataTransfer.data)
+                console.log(e.dataTransfer.data['application/fabric']);
                 assert.deepEqual(e.dataTransfer.data, {
                     'application/fabric': JSON.stringify({
                         value: 'test',
