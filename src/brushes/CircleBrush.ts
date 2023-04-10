@@ -97,7 +97,7 @@ export class CircleBrush extends BaseBrush {
     const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    const circles = [];
+    const circles: Circle[] = [];
 
     for (let i = 0; i < this.points.length; i++) {
       const point = this.points[i],
