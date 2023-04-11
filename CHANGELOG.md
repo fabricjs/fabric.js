@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(TS): add types to some untyped empty arrays [#8830](https://github.com/fabricjs/fabric.js/pull/8830)
 - chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)
 - fix(): text styles edge case [#8820](https://github.com/fabricjs/fabric.js/pull/8820)
 - chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
