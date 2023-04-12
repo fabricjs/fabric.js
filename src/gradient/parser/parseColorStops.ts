@@ -1,6 +1,7 @@
 import { Color } from '../../color/Color';
 import { parsePercent } from '../../parser/percent';
 import { ifNaN } from '../../util/internals';
+import { ColorStop } from '../typedefs';
 
 const RE_KEY_VALUE_PAIRS = /\s*;\s*/;
 const RE_KEY_VALUE = /\s*:\s*/;
@@ -45,7 +46,7 @@ export function parseColorStops(
   el: SVGGradientElement,
   opacityAttr: string | null
 ) {
-  const colorStops = [],
+  const colorStops: ColorStop[] = [],
     colorStopEls = el.getElementsByTagName('stop'),
     multiplier = parsePercent(opacityAttr, 1);
   for (let i = colorStopEls.length; i--; ) {
