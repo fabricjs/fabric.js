@@ -131,6 +131,7 @@ body:
         - 17.1.0
         - 17.0.1
         - 17.0.0
+        - 16.20.0
         - 16.19.1
         - 16.19.0
         - 16.18.1
@@ -231,11 +232,20 @@ body:
 
         Use the following reproduction templates:
 
-        - [Next template >= `v6`](https://codesandbox.io/p/sandbox/fabric-nextjs-sandbox-forked-h6qdh3?file=%2FREADME.md) for browser and node reproductions, **preferred**
+        - [Next template >=
+        `v6`](https://codesandbox.io/p/sandbox/fabric-nextjs-sandbox-forked-h6qdh3?file=%2FREADME.md)
+        for browser and node reproductions, **preferred**
 
-        - [Vanilla template >= `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-e5r48u?file=%2FREADME.md), [Vanilla template < `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-v92h26?file=%2FREADME.md) for browser reproductions
+        - [Vanilla template >=
+        `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-e5r48u?file=%2FREADME.md),
+        [Vanilla template <
+        `v6`](https://codesandbox.io/p/sandbox/fabric-vanillajs-sandbox-forked-v92h26?file=%2FREADME.md)
+        for browser reproductions
 
-        - [Node template >= `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md), [Node template < `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
+        - [Node template >=
+        `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md),
+        [Node template <
+        `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
 
         ⛔ No reproduction === closed issue ⛔
     validations:
