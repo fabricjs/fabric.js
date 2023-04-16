@@ -1,4 +1,6 @@
 import type { Shadow } from '../../../Shadow';
+import type { Canvas } from '../../../canvas/Canvas';
+import type { StaticCanvas } from '../../../canvas/StaticCanvas';
 import { TFiller } from '../../../typedefs';
 import type { FabricObject } from '../Object';
 import { ClipPathProps, SerializedObjectProps } from './SerializedObjectProps';
@@ -8,6 +10,7 @@ export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
   fill: TFiller | string | null;
   stroke: TFiller | string | null;
   shadow: Shadow | null;
+  canvas?: StaticCanvas | Canvas;
 
   /**
    * Minimum allowed scale value of an object

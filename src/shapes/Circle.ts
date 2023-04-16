@@ -1,4 +1,4 @@
-import { ObjectEvents } from '../EventTypeDefs';
+import type { ObjectEvents } from '../EventTypeDefs';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { cos } from '../util/misc/cos';
@@ -13,7 +13,7 @@ import {
   TProps,
 } from './Object/types';
 
-interface UniqCircleProps {
+interface UniqueCircleProps {
   /**
    * Radius of this circle
    * @type Number
@@ -40,13 +40,13 @@ interface UniqCircleProps {
 
 export interface SerializedCircleProps
   extends SerializedObjectProps,
-    UniqCircleProps {}
+    UniqueCircleProps {}
 
-export interface CircleProps extends FabricObjectProps, UniqCircleProps {}
+export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
 const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
 
-export const circleDefaultValues: UniqCircleProps = {
+export const circleDefaultValues: UniqueCircleProps = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
@@ -58,7 +58,7 @@ export class Circle<
     EventSpec extends ObjectEvents = ObjectEvents
   >
   extends FabricObject<Props, SProps, EventSpec>
-  implements UniqCircleProps
+  implements UniqueCircleProps
 {
   declare radius: number;
   declare startAngle: number;
@@ -139,7 +139,7 @@ export class Circle<
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never
-  >(propertiesToInclude: K[] = []): { [R in K]: T[K] } & SProps {
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
@@ -233,10 +233,8 @@ export class Circle<
   /**
    * @todo how do we declare this??
    */
-  static fromObject<T extends TProps<SerializedCircleProps>>(
-    object: T
-  ): Promise<Circle> {
-    return super.fromObject(object) as unknown as Promise<Circle>;
+  static fromObject<T extends TProps<SerializedCircleProps>>(object: T) {
+    return super._fromObject<Circle>(object);
   }
 }
 
