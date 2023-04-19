@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Path type fixes [#8842](https://github.com/fabricjs/fabric.js/pull/8842)
 - fix(TS): add types to some untyped empty arrays [#8830](https://github.com/fabricjs/fabric.js/pull/8830)
 - chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)
 - fix(): text styles edge case [#8820](https://github.com/fabricjs/fabric.js/pull/8820)

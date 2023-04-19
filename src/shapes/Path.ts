@@ -12,14 +12,18 @@ import {
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TPathSegmentInfo, TSimplePathData } from '../util/path/typedefs';
+import {
+  TComplexPathData,
+  TPathSegmentInfo,
+  TSimplePathData,
+} from '../util/path/typedefs';
 import type {
   FabricObjectProps,
   SerializedObjectProps,
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { TClassProperties, TSVGReviver } from '../typedefs';
+import { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 
 interface UniquePathProps {
@@ -32,6 +36,12 @@ export interface SerializedPathProps
     UniquePathProps {}
 
 export interface PathProps extends FabricObjectProps, UniquePathProps {}
+
+export interface IPathBBox extends TBBox {
+  left: number;
+  top: number;
+  pathOffset: Point;
+}
 
 export class Path<
   Props extends TProps<PathProps> = Partial<PathProps>,
@@ -57,13 +67,13 @@ export class Path<
 
   /**
    * Constructor
-   * @param {TSimplePathData} path Path data (sequence of coordinates and corresponding "command" tokens)
-   * @param {Object} [options] Options object
+   * @param {TComplexPathData} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {Partial<PathProps>} [options] Options object
    * @return {Path} thisArg
    */
   constructor(
-    path: TSimplePathData | string,
-    { path: _, left, top, ...options }: Props = {} as Props
+    path: TComplexPathData | string,
+    { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
     const pathTL = this._setPath(path || []);
@@ -79,11 +89,11 @@ export class Path<
 
   /**
    * @private
-   * @param {TSimplePathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TComplexPathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
    * @param {boolean} [adjustPosition] pass true to reposition the object according to the bounding box
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  _setPath(path: TSimplePathData | string, adjustPosition?: boolean) {
+  _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
     return this.setDimensions();
   }
@@ -93,8 +103,7 @@ export class Path<
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
   _renderPathCommands(ctx: CanvasRenderingContext2D) {
-    let current, // current instruction
-      subpathStartX = 0,
+    let subpathStartX = 0,
       subpathStartY = 0,
       x = 0, // current x
       y = 0, // current y
@@ -105,34 +114,32 @@ export class Path<
 
     ctx.beginPath();
 
-    for (let i = 0, len = this.path.length; i < len; ++i) {
-      current = this.path[i];
-
+    for (const command of this.path) {
       switch (
-        current[0] // first letter
+        command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           ctx.lineTo(x + l, y + t);
           break;
 
         case 'M': // moveTo, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           subpathStartX = x;
           subpathStartY = y;
           ctx.moveTo(x + l, y + t);
           break;
 
         case 'C': // bezierCurveTo, absolute
-          x = current[5];
-          y = current[6];
-          controlX = current[3];
-          controlY = current[4];
+          x = command[5];
+          y = command[6];
+          controlX = command[3];
+          controlY = command[4];
           ctx.bezierCurveTo(
-            current[1] + l,
-            current[2] + t,
+            command[1] + l,
+            command[2] + t,
             controlX + l,
             controlY + t,
             x + l,
@@ -142,15 +149,15 @@ export class Path<
 
         case 'Q': // quadraticCurveTo, absolute
           ctx.quadraticCurveTo(
-            current[1] + l,
-            current[2] + t,
-            current[3] + l,
-            current[4] + t
+            command[1] + l,
+            command[2] + t,
+            command[3] + l,
+            command[4] + t
           );
-          x = current[3];
-          y = current[4];
-          controlX = current[1];
-          controlY = current[2];
+          x = command[3];
+          y = command[4];
+          controlX = command[1];
+          controlY = command[2];
           break;
 
         case 'Z':
@@ -227,6 +234,10 @@ export class Path<
     ];
   }
 
+  /**
+   * @private
+   * @return the path command's translate transform attribute
+   */
   _getOffsetTransform() {
     const digits = config.NUM_FRACTION_DIGITS;
     return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(
@@ -272,7 +283,11 @@ export class Path<
     return this.path.length;
   }
 
-  setDimensions() {
+  /**
+   * Recalculates and sets the dimensions
+   * @returns the calculated top-left
+   */
+  setDimensions(): Point {
     const { left, top, width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
     return new Point(left, top);
@@ -281,27 +296,27 @@ export class Path<
   /**
    * @private
    */
-  _calcDimensions() {
+  _calcDimensions(): IPathBBox {
     const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
       x = 0, // current x
       y = 0; // current y
 
-    for (let i = 0; i < this.path.length; ++i) {
-      const current = this.path[i]; // current instruction
+    for (const command of this.path) {
+      // current instruction
       switch (
-        current[0] // first letter
+        command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           bounds.push(new Point(subpathStartX, subpathStartY), new Point(x, y));
           break;
 
         case 'M': // moveTo, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           subpathStartX = x;
           subpathStartY = y;
           break;
@@ -311,16 +326,16 @@ export class Path<
             ...getBoundsOfCurve(
               x,
               y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6]
+              command[1],
+              command[2],
+              command[3],
+              command[4],
+              command[5],
+              command[6]
             )
           );
-          x = current[5];
-          y = current[6];
+          x = command[5];
+          y = command[6];
           break;
 
         case 'Q': // quadraticCurveTo, absolute
@@ -328,16 +343,16 @@ export class Path<
             ...getBoundsOfCurve(
               x,
               y,
-              current[1],
-              current[2],
-              current[1],
-              current[2],
-              current[3],
-              current[4]
+              command[1],
+              command[2],
+              command[1],
+              command[2],
+              command[3],
+              command[4]
             )
           );
-          x = current[3];
-          y = current[4];
+          x = command[3];
+          y = command[4];
           break;
 
         case 'Z':
@@ -387,14 +402,13 @@ export class Path<
    * @static
    * @memberOf Path
    * @param {SVGElement} element to parse
-   * @param {Function} callback Callback to invoke when an Path instance is created
-   * @param {Object} [options] Options object
-   * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {(path: Path) => void} callback Callback to invoke after the element has been parsed
+   * @param {Partial<PathProps>} [options] Options object
    */
   static fromElement(
     element: SVGElement,
     callback: (path: Path) => void,
-    options: any
+    options: Partial<PathProps>
   ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
     callback(
