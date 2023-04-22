@@ -1266,9 +1266,6 @@ export class FabricObject<
       (retinaScaling * this.scaleX) / dims.zoomX,
       (retinaScaling * this.scaleY) / dims.zoomY
     );
-    if (pCanvas.width === 0 || pCanvas.height === 0) {
-      console.log(this);
-    }
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
 
