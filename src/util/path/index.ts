@@ -94,6 +94,9 @@ const arcToSegments = (
   sweep: number,
   rotateX: TRadian
 ): TParsedAbsoluteCubicCurveCommand[] => {
+  if (rx === 0 || ry === 0) {
+    return [];
+  }
   let fromX = 0,
     fromY = 0,
     root = 0;
@@ -139,8 +142,8 @@ const arcToSegments = (
   }
 
   // Convert into cubic bezier segments <= 90deg
-  const segments = Math.ceil(Math.abs((dtheta / PI) * 2)),
-    result = new Array(segments),
+  const segments = Math.ceil(Math.abs((dtheta / PI) * 2));
+  const result = new Array(segments),
     mDelta = dtheta / segments,
     mT =
       ((8 / 3) * Math.sin(mDelta / 4) * Math.sin(mDelta / 4)) /
