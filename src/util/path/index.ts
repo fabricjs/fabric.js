@@ -142,8 +142,8 @@ const arcToSegments = (
   }
 
   // Convert into cubic bezier segments <= 90deg
-  const segments = Math.ceil(Math.abs((dtheta / PI) * 2));
-  const result = new Array(segments),
+  const segments = Math.ceil(Math.abs((dtheta / PI) * 2)),
+    result = new Array(segments),
     mDelta = dtheta / segments,
     mT =
       ((8 / 3) * Math.sin(mDelta / 4) * Math.sin(mDelta / 4)) /
