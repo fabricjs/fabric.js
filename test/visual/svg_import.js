@@ -97,6 +97,7 @@
     '177',
     'polygons',
     'polygons-rounded',
+    'light-bulb',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
