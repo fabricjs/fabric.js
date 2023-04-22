@@ -1238,6 +1238,8 @@ export class FabricObject<
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
+    // in case width and height are less than 1px, we have to cap the at 1
+    // since the pattern is no-repeat, this is fine
     pCanvas.width = Math.max(width, 1);
     pCanvas.height = Math.max(height, 1);
     const pCtx = pCanvas.getContext('2d');
