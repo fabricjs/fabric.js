@@ -1,8 +1,0 @@
-
-> fabric@6.0.0-beta1 build
-> npm run cli -- build
-
-
-> fabric@6.0.0-beta1 cli
-> node ./scripts/index.mjs build
-
