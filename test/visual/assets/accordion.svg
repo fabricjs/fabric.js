@@ -1,11 +1,4 @@
-import * as fabric from 'fabric';
-import './styles.css';
-
-const el = document.getElementById('canvas');
-const canvas = new fabric.Canvas(el);
-
-const svgString = `
-<svg width="3096" height="3096" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="512" height="512" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_i_18_18515)">
 <path d="M23.098 4.89597C18.298 2.67097 13.2282 4.31262 11.3324 5.39596L16.8324 25.4897C19.0074 25.1647 20.572 25.2293 21.0824 25.3022L23.098 4.89597Z" fill="url(#paint0_linear_18_18515)"/>
 <path d="M23.098 4.89597C18.298 2.67097 13.2282 4.31262 11.3324 5.39596L16.8324 25.4897C19.0074 25.1647 20.572 25.2293 21.0824 25.3022L23.098 4.89597Z" fill="url(#paint1_radial_18_18515)"/>
@@ -805,9 +798,3 @@ const svgString = `
 </linearGradient>
 </defs>
 </svg>
-`;
-
-fabric.loadSVGFromString(svgString, (objects) => {
-  canvas.setDimensions({ width: 3096, height: 3096 });
-  canvas.add(...objects);
-});

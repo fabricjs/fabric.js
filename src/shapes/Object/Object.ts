@@ -1238,8 +1238,8 @@ export class FabricObject<
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
-    pCanvas.width = width;
-    pCanvas.height = height;
+    pCanvas.width = Math.max(width, 1);
+    pCanvas.height = Math.max(height, 1);
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
@@ -1266,6 +1266,9 @@ export class FabricObject<
       (retinaScaling * this.scaleX) / dims.zoomX,
       (retinaScaling * this.scaleY) / dims.zoomY
     );
+    if (pCanvas.width === 0 || pCanvas.height === 0) {
+      console.log(this);
+    }
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
 

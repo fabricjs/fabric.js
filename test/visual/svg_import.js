@@ -98,6 +98,7 @@
     'polygons',
     'polygons-rounded',
     'light-bulb',
+    'accordion',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
