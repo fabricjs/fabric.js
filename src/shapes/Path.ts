@@ -73,11 +73,11 @@ export class Path<
    */
   constructor(
     path: TComplexPathData | string,
-    { path: _, left, top, fromSVG, ...options }: Partial<Props> = {}
+    { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
     const pathTL = this._setPath(path || []);
-    if (fromSVG) {
+    if (this.fromSVG) {
       // if coming from SVG just assign top and left, those will be fixed
       // later by remove removeTransformMatrixForSvgParsing using the weird
       // _findCenterFromElement.
