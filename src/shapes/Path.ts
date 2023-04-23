@@ -73,18 +73,35 @@ export class Path<
    */
   constructor(
     path: TComplexPathData | string,
-    { path: _, left, top, ...options }: Partial<Props> = {}
+    { path: _, left, top, fromSVG, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
     const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
-      new Point(left ?? pathTL.x, top ?? pathTL.y),
-      typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    if (fromSVG) {
+      // if coming from SVG just assign top and left, those will be fixed
+      // later by remove removeTransformMatrixForSvgParsing using the weird
+      // _findCenterFromElement.
+      // This is not clear and is probably wrong, but as of now it works in conjuction
+      // with that other parsing function
+      this.set({ left: pathTL.x, top: pathTL.y });
+    } else {
+      // here is confusing and far from the actual issue.
+      // if i pass a path that says m0,0 l10,0, so a line from 0 to 10,
+      // i want it to see from 0 to 10 regardless of origin.
+      // the path wins over the origin setting and left top gets ajusted
+      // to respect both.
+      // if i pass left and top, those gets simply applied.
+      const origin = this.translateToGivenOrigin(
+        new Point(left ?? pathTL.x, top ?? pathTL.y),
+        // to explain this: if left or top exist, assign them as they are.
+        // if you are using the calculated one assign them as LEFT/TOP origin
+        typeof left === 'number' ? this.originX : 'left',
+        typeof top === 'number' ? this.originY : 'top',
+        this.originX,
+        this.originY
+      );
+      this.setPositionByOrigin(origin, this.originX, this.originY);
+    }
   }
 
   /**

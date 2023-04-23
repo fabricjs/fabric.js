@@ -41,9 +41,6 @@ export class Polyline<
   /**
    * WARNING: Feature in progress
    * Calculate the exact bounding box taking in account strokeWidth on acute angles
-   * this will be turned to true by default on fabric 6.0
-   * maybe will be left in as an optimization since calculations may be slow
-   * @deprecated
    * @type Boolean
    * @default false
    */
@@ -103,11 +100,36 @@ export class Polyline<
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
     super({ points, ...options });
-    const { left, top } = options;
+    const { left, top, fromSVG } = options;
     this.initialized = true;
-    this.setBoundingBox(true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    const {
+      left: calculatedLeft,
+      top: calculatedTop,
+      width,
+      height,
+      pathOffset,
+      strokeOffset,
+    } = this._calcDimensions();
+    this.set({ width, height, pathOffset, strokeOffset });
+    if (fromSVG) {
+      // if coming from SVG just assign top and left, those will be fixed
+      // later by remove removeTransformMatrixForSvgParsing using the weird
+      // _findCenterFromElement.
+      // This is not clear and is probably wrong, but as of now it works in conjuction
+      // with that other parsing function
+      this.set({
+        left: calculatedLeft,
+        top: calculatedTop,
+      });
+    } else {
+      // looking at out path behaves this is not correct.
+      // This should behave the same as path
+      this.setPositionByOrigin(
+        new Point(left ?? calculatedLeft, top ?? calculatedTop),
+        'left',
+        'top'
+      );
+    }
   }
 
   protected isOpen() {
