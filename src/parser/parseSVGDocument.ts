@@ -1,5 +1,4 @@
 //@ts-nocheck
-
 import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
@@ -21,7 +20,7 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
  * @static
  * @function
  * @memberOf fabric
- * @param {SVGElement} doc SVG document to parse
+ * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible of with the list of parsed objects.
  * TSvgParsedCallback receive also `allElements` array as last argument. This is the full array from the list of svg nodes available in the document.
  * You may want to use it if you are trying to regroup the objects as they were originally grouped in the SVG. ( This was the reason why it was added )
@@ -32,29 +31,27 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function parseSVGDocument(
-  doc: SVGElement,
+  doc: HTMLElement,
   callback: TSvgParsedCallback,
   reviver?: TSvgReviverCallback,
-  parsingOptions?: LoadImageOptions
+  { crossOrigin, signal }: LoadImageOptions = {}
 ) {
   if (!doc) {
     return;
   }
-  if (
-    parsingOptions &&
-    parsingOptions.signal &&
-    parsingOptions.signal.aborted
-  ) {
+  if (signal && signal.aborted) {
     throw new Error('`options.signal` is in `aborted` state');
   }
   parseUseDirectives(doc);
 
   const svgUid = uid(),
-    options = applyViewboxTransform(doc),
-    descendants = Array.from(doc.getElementsByTagName('*'));
-  options.crossOrigin = parsingOptions && parsingOptions.crossOrigin;
-  options.svgUid = svgUid;
-  options.signal = parsingOptions && parsingOptions.signal;
+    descendants = Array.from(doc.getElementsByTagName('*')),
+    options = {
+      ...applyViewboxTransform(doc),
+      crossOrigin,
+      svgUid,
+      signal,
+    };
 
   const elements = descendants.filter(function (el) {
     applyViewboxTransform(el);
@@ -64,20 +61,16 @@ export function parseSVGDocument(
     ); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
   if (!elements || (elements && !elements.length)) {
-    callback && callback([], {});
+    callback && callback([], {}, [], descendants);
     return;
   }
   const localClipPaths = {};
   descendants
-    .filter(function (el) {
-      return el.nodeName.replace('svg:', '') === 'clipPath';
-    })
-    .forEach(function (el) {
+    .filter((el) => el.nodeName.replace('svg:', '') === 'clipPath')
+    .forEach((el) => {
       const id = el.getAttribute('id');
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
-        function (el) {
-          return svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
-        }
+        (el) => svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''))
       );
     });
   gradientDefs[svgUid] = getGradientDefs(doc);
@@ -96,6 +89,6 @@ export function parseSVGDocument(
     },
     Object.assign({}, options),
     reviver,
-    parsingOptions
+    { crossOrigin, signal }
   );
 }

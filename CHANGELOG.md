@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(TS) add types for loadSVGFromURl and parseSVGDocument [#8869](https://github.com/fabricjs/fabric.js/pull/8869)
+- chore(TS) add types for loadSVGFromURl, parseSVGDocument, loadSVGFromString [#8869](https://github.com/fabricjs/fabric.js/pull/8869)
 - fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
 
 ## [6.0.0-beta3]

@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import { request } from '../util/dom_request';
 import { parseSVGDocument } from './parseSVGDocument';
 import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
@@ -23,28 +21,21 @@ export function loadSVGFromURL(
   url: string,
   callback: TSvgParsedCallback,
   reviver?: TSvgReviverCallback,
-  options?: LoadImageOptions
+  options: LoadImageOptions = {}
 ) {
-  new request(url.replace(/^\n\s*/, '').trim(), {
-    method: 'get',
-    onComplete: onComplete,
-    signal: options && options.signal,
-  });
-
-  function onComplete(r) {
+  const onComplete = (r: XMLHttpRequest) => {
     const xml = r.responseXML;
     if (!xml || !xml.documentElement) {
       callback && callback(null);
       return false;
     }
 
-    parseSVGDocument(
-      xml.documentElement,
-      function (results, _options, elements, allElements) {
-        callback && callback(results, _options, elements, allElements);
-      },
-      reviver,
-      options
-    );
-  }
+    parseSVGDocument(xml.documentElement, callback, reviver, options);
+  };
+
+  request(url.replace(/^\n\s*/, '').trim(), {
+    method: 'get',
+    onComplete,
+    signal: options.signal,
+  });
 }
