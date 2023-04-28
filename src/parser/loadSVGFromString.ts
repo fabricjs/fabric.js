@@ -24,6 +24,6 @@ export function loadSVGFromString(
 ) {
   const parser = new (getWindow() as any).DOMParser(),
     // should we use `image/svg+xml` here?
-    doc = parser.parseFromString(string.trim(), 'text/html');
+    doc = parser.parseFromString(string.trim(), 'text/xml');
   parseSVGDocument(doc.documentElement, callback, reviver, options);
 }
