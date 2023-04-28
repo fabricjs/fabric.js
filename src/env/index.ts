@@ -23,4 +23,4 @@ export const getDocument = (): Document => getEnv().document;
 
 export const getWindow = (): Window | DOMWindow => getEnv().window;
 
-export const getParser = () => getEnv().parser;
+export const getDOMParser = () => getEnv().DOMParser;

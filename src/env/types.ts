@@ -12,5 +12,5 @@ export type TFabricEnv = {
   WebGLProbe: GLProbe;
   dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
-  parser: DOMParser;
+  DOMParser: DOMParser;
 };
