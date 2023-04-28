@@ -1,7 +1,9 @@
 import { TMat2D } from './typedefs';
+// use this syntax so babel plugin see this import here
+import { version } from '../package.json';
 
-// TODO: consider using https://github.com/swiing/rollup-plugin-import-assertions so we can import json in node and have rollup build pass
-export { version as VERSION } from '../package.json';
+export const VERSION = version;
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export function noop() {}
 export const halfPI = Math.PI / 2;
 export const twoMathPi = Math.PI * 2;
@@ -12,3 +14,7 @@ export const ALIASING_LIMIT = 2;
 
 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 export const kRect = 1 - 0.5522847498;
+
+export const LEFT_CLICK = 1;
+export const MIDDLE_CLICK = 2;
+export const RIGHT_CLICK = 3;

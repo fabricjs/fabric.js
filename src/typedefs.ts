@@ -1,7 +1,8 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import type { Gradient } from './gradient/gradient.class';
-import type { Pattern } from './pattern.class';
-import type { Point } from './point.class';
+import { BaseFabricObject } from './EventTypeDefs';
+import type { Gradient } from './gradient/Gradient';
+import type { Pattern } from './Pattern';
+import type { XY, Point } from './Point';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -9,8 +10,8 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type TNonFunctionPropertyNames<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -66,11 +67,6 @@ export const enum SupportedSVGUnit {
 export type TMat2D = [number, number, number, number, number, number];
 
 /**
- * SVG path commands
- */
-export type PathData = (string | number)[][];
-
-/**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
  * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
  */
@@ -86,6 +82,8 @@ export type TCornerPoint = {
   br: Point;
 };
 
+export type TSVGReviver = (markup: string) => string;
+
 export type TValidToObjectMethod = 'toDatalessObject' | 'toObject';
 
 export type TCacheCanvasDimensions = {
@@ -96,3 +94,22 @@ export type TCacheCanvasDimensions = {
   x: number;
   y: number;
 };
+
+export type TRectBounds = [min: XY, max: XY];
+
+export type TToCanvasElementOptions = {
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+  filter?: (object: BaseFabricObject) => boolean;
+};
+
+export type TDataUrlOptions = TToCanvasElementOptions & {
+  multiplier: number;
+  format?: ImageFormat;
+  quality?: number;
+  enableRetinaScaling?: boolean;
+};
+
+export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;

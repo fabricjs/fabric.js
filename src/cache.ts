@@ -1,4 +1,5 @@
 import { config } from './config';
+import { TRectBounds } from './typedefs';
 
 export class Cache {
   /**
@@ -76,12 +77,6 @@ export class Cache {
   }
 
   /**
-   * This object contains the result of arc to bezier conversion for faster retrieving if the same arc needs to be converted again.
-   * It was an internal variable, is accessible since version 2.3.4
-   */
-  arcToSegmentsCache = {};
-
-  /**
    * This object keeps the results of the boundsOfCurve calculation mapped by the joined arguments necessary to calculate it.
    * It does speed up calculation, if you parse and add always the same paths, but in case of heavy usage of freedrawing
    * you do not get any speed benefit and you get a big object in memory.
@@ -89,7 +84,7 @@ export class Cache {
    * can eventually clear it.
    * It was an internal variable, is accessible since version 2.3.4
    */
-  boundsOfCurveCache = {};
+  boundsOfCurveCache: Record<string, TRectBounds> = {};
 }
 
 export const cache = new Cache();

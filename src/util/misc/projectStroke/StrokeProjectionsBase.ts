@@ -1,5 +1,5 @@
 import { halfPI } from '../../../constants';
-import { IPoint, Point } from '../../../point.class';
+import { XY, Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
@@ -12,10 +12,10 @@ import { TProjectStrokeOnPointsOptions, TProjection } from './types';
  * @see https://github.com/fabricjs/fabric.js/pull/8344
  */
 export abstract class StrokeProjectionsBase {
-  options: TProjectStrokeOnPointsOptions;
-  scale: Point;
-  strokeUniformScalar: Point;
-  strokeProjectionMagnitude: number;
+  declare options: TProjectStrokeOnPointsOptions;
+  declare scale: Point;
+  declare strokeUniformScalar: Point;
+  declare strokeProjectionMagnitude: number;
 
   static getAcuteAngleFactor(vector1: Point, vector2?: Point) {
     const angle = vector2
@@ -36,7 +36,7 @@ export abstract class StrokeProjectionsBase {
   /**
    * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
    */
-  protected createSideVector(from: IPoint, to: IPoint) {
+  protected createSideVector(from: XY, to: XY) {
     const v = createVector(from, to);
     return this.options.strokeUniform ? v.multiply(this.scale) : v;
   }

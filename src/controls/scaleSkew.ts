@@ -4,14 +4,13 @@ import {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/object.class';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TAxisKey } from '../typedefs';
-import { Canvas } from '../__types__';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 
 function isAltAction(eventData: TPointerEvent, target: FabricObject) {
-  return eventData[(target.canvas as Canvas)?.altActionKey];
+  return eventData[target.canvas!.altActionKey!];
 }
 
 /**
@@ -22,7 +21,7 @@ function isAltAction(eventData: TPointerEvent, target: FabricObject) {
  * @return {String} an action name
  */
 export const scaleOrSkewActionName: ControlCallback<
-  TAxisKey<'skew' | 'scale'> | undefined
+  TAxisKey<'skew' | 'scale'> | ''
 > = (eventData, control, fabricObject) => {
   const isAlternative = isAltAction(eventData, fabricObject);
   if (control.x === 0) {
@@ -33,6 +32,7 @@ export const scaleOrSkewActionName: ControlCallback<
     // then is scaleY or skewX
     return isAlternative ? 'skewY' : 'scaleX';
   }
+  return '';
 };
 
 /**

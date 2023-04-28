@@ -1,4 +1,4 @@
-import { IPoint, Point } from '../../../point.class';
+import { XY, Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
@@ -20,26 +20,21 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   /**
    * The point being projected (the angle ∠BAC)
    */
-  A: Point;
+  declare A: Point;
   /**
    * The point before A
    */
-  B: Point;
+  declare B: Point;
   /**
    * The point after A
    */
-  C: Point;
+  declare C: Point;
   /**
    * The bisector of A (∠BAC)
    */
-  bisector: ReturnType<typeof getBisector>;
+  declare bisector: ReturnType<typeof getBisector>;
 
-  constructor(
-    A: IPoint,
-    B: IPoint,
-    C: IPoint,
-    options: TProjectStrokeOnPointsOptions
-  ) {
+  constructor(A: XY, B: XY, C: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.B = new Point(B);

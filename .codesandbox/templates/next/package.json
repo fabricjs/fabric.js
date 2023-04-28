@@ -1,0 +1,32 @@
+{
+  "name": "fabric-nextjs-sandbox",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "open-cli http://localhost:3000/ && node dev.mjs 3000",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "fabric": "file:../../..",
+    "next": "^13.1.6",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.7.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.8",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "nodemon": "^2.0.19",
+    "open-cli": "^7.0.1",
+    "typescript": "^4.7.4"
+  },
+  "license": "ISC",
+  "keywords": [
+    "fabric",
+    "next.js"
+  ],
+  "description": "fabric.js on next.js"
+}

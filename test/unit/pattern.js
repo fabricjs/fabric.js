@@ -1,5 +1,5 @@
 (function() {
-  var IMG_SRC = fabric.isLikelyNode ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
+  var IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function setSrc(img, src, callback) {
     img.onload = callback;
@@ -8,7 +8,7 @@
 
   QUnit.module('fabric.Pattern');
 
-  var img = fabric.document.createElement('img');
+  var img = fabric.getDocument().createElement('img');
   setSrc(img, IMG_SRC);
 
   function createPattern() {
@@ -78,7 +78,7 @@
     fabric.Pattern.fromObject({
       source: IMG_SRC,
       crossOrigin: 'anonymous',
-      type: 'pattern',
+      type: 'Pattern',
     }).then(function(patternEnlived) {
       var object = patternEnlived.toObject();
       fabric.Pattern.fromObject(object).then(function(patternAgain) {
@@ -160,7 +160,7 @@
     var done = assert.async();
     var rectObj = {
       fill: {
-        type: 'pattern',
+        type: 'Pattern',
         source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==',
       },
     };
