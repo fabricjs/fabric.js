@@ -28,5 +28,6 @@ export const getEnv = (): TFabricEnv => {
       // noop
     },
     copyPasteData,
+    parser: new window.DOMParser(),
   };
 };
