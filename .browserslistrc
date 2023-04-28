@@ -3,3 +3,5 @@
 chrome >= 64
 safari >= 11
 firefox >= 58
+edge >= 14
+opera >= 51
