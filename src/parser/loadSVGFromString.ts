@@ -1,4 +1,3 @@
-import { DOMWindow } from 'jsdom';
 import { getWindow } from '../env';
 import { LoadImageOptions } from '../util/misc/objectEnlive';
 import { parseSVGDocument } from './parseSVGDocument';
@@ -23,15 +22,8 @@ export function loadSVGFromString(
   reviver: TSvgReviverCallback,
   options: LoadImageOptions
 ) {
-  const parser = new (getWindow() as DOMWindow).DOMParser(),
+  const parser = new (getWindow() as any).DOMParser(),
     // should we use `image/svg+xml` here?
     doc = parser.parseFromString(string.trim(), 'text/html');
-  parseSVGDocument(
-    doc.documentElement,
-    function (results, _options, elements, allElements) {
-      callback(results, _options, elements, allElements);
-    },
-    reviver,
-    options
-  );
+  parseSVGDocument(doc.documentElement, callback, reviver, options);
 }
