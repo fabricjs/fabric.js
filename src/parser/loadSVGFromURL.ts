@@ -2,7 +2,8 @@
 
 import { request } from '../util/dom_request';
 import { parseSVGDocument } from './parseSVGDocument';
-
+import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
  * Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
@@ -14,7 +15,12 @@ import { parseSVGDocument } from './parseSVGDocument';
  * @param {String} [options.crossOrigin] crossOrigin crossOrigin setting to use for external resources
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
-export function loadSVGFromURL(url, callback, reviver, options) {
+export function loadSVGFromURL(
+  url: string,
+  callback: TSvgParsedCallback,
+  reviver?: TSvgReviverCallback,
+  options?: LoadImageOptions
+) {
   new request(url.replace(/^\n\s*/, '').trim(), {
     method: 'get',
     onComplete: onComplete,

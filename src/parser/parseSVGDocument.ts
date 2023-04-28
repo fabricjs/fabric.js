@@ -14,7 +14,8 @@ import { getGradientDefs } from './getGradientDefs';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
 import { parseElements } from './parseElements';
 import { parseUseDirectives } from './parseUseDirectives';
-
+import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
  * @static
@@ -28,7 +29,12 @@ import { parseUseDirectives } from './parseUseDirectives';
  * @param {String} [parsingOptions.crossOrigin] crossOrigin settings
  * @param {AbortSignal} [parsingOptions.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
-export function parseSVGDocument(doc, callback, reviver, parsingOptions) {
+export function parseSVGDocument(
+  doc: SVGElement,
+  callback: TSvgParsedCallback,
+  reviver?: TSvgReviverCallback,
+  parsingOptions?: LoadImageOptions
+) {
   if (!doc) {
     return;
   }
