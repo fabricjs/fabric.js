@@ -1,8 +1,4 @@
 (function() {
-  fabric.config.configure({
-    enableGLFiltering: false
-  });
-  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
   var getAsset;
   if (isNode()) {
@@ -23,10 +19,11 @@
         fabric.loadSVGFromString(string, function(objects, options) {
           // something is disabling objectCaching and i cannot find where it is.
           var group = fabric.util.groupSVGElements(objects, options);
-          canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
+          canvas.setDimensions({ width: group.width, height: group.height });
           group.includeDefaultValues = false;
           canvas.includeDefaultValues = false;
           canvas.add(group);
+          canvas.centerObject(group);
           canvas.renderAll();
           callback(canvas.lowerCanvasEl);
         });
@@ -40,7 +37,21 @@
     };
   }
 
-  QUnit.module('Simple svg import test');
+  QUnit.module('Simple svg import test', hooks => {
+
+    hooks.before(() => {
+      fabric.config.configure({
+        enableGLFiltering: false
+      });
+      fabric.Object.ownDefaults.objectCaching = true;
+      fabric.Object.ownDefaults.originX = 'center';
+      fabric.Object.ownDefaults.originY = 'center';
+    });
+    hooks.after(() => {
+      fabric.config.restoreDefaults();
+      fabric.Object.ownDefaults.originX = 'left';
+      fabric.Object.ownDefaults.originY = 'top';
+    })
 
   var tests = [
     'svg_stroke_1',
@@ -103,4 +114,7 @@
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
+    
+        
+  });
 })();
