@@ -79,7 +79,7 @@ export function parseSVGDocument(
   // Precedence of rules:   style > class > attribute
   parseElements(
     elements,
-    function (instances, elements) {
+    (instances, elements) => {
       if (callback) {
         callback(instances, options, elements, descendants);
         delete gradientDefs[svgUid];
@@ -87,7 +87,7 @@ export function parseSVGDocument(
         delete clipPaths[svgUid];
       }
     },
-    Object.assign({}, options),
+    { ...options },
     reviver,
     { crossOrigin, signal }
   );
