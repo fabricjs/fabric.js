@@ -6,7 +6,7 @@ import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { classRegistry } from '../ClassRegistry';
-import { TPatternRepeat, PatternProps, SerializedPatternProps } from './types';
+import { PatternRepeat, PatternProps, SerializedPatternProps } from './types';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -30,10 +30,10 @@ export class Pattern {
   }
 
   /**
-   * @type TPatternRepeat
+   * @type PatternRepeat
    * @defaults
    */
-  repeat: TPatternRepeat = 'repeat';
+  repeat: PatternRepeat = 'repeat';
 
   /**
    * Pattern horizontal offset from object's left/top corner

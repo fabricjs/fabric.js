@@ -1,6 +1,6 @@
 import { Pattern } from './Pattern';
 
-export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
+export type PatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
 type ExportedKeys =
   | 'crossOrigin'
