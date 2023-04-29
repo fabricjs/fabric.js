@@ -11,6 +11,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import { makeBoundingBoxFromPoints } from '../util';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
@@ -70,24 +71,28 @@ export class Line<
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor(points = [0, 0, 0, 0], options: Props = {} as Props) {
-    super(options);
-    this.x1 = points[0];
-    this.y1 = points[1];
-    this.x2 = points[2];
-    this.y2 = points[3];
-    this._setWidthHeight(options);
+  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Props = {} as Props) {
+    super({ ...options, x1, y1, x2, y2 });
+    this._setWidthHeight();
+    const { left, top } = options;
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
    * @private
    * @param {Object} [options] Options
    */
-  _setWidthHeight({ left, top }: Partial<Props> = {}) {
-    this.width = Math.abs(this.x2 - this.x1);
-    this.height = Math.abs(this.y2 - this.y1);
-    this.left = left ?? this._getLeftToOriginX();
-    this.top = top ?? this._getTopToOriginY();
+  _setWidthHeight() {
+    const { x1, y1, x2, y2 } = this;
+    this.width = Math.abs(x2 - x1);
+    this.height = Math.abs(y2 - y1);
+    const { left, top, width, height } = makeBoundingBoxFromPoints([
+      { x: x1, y: y1 },
+      { x: x2, y: y2 },
+    ]);
+    const position = new Point(left + width / 2, top + height / 2);
+    this.setPositionByOrigin(position, 'center', 'center');
   }
 
   /**
@@ -98,6 +103,9 @@ export class Line<
   _set(key: string, value: any) {
     super._set(key, value);
     if (coordProps.includes(key as keyof UniqueLineProps)) {
+      // this doesn't make sense anymore, since setting x1 when top or left
+      // are already set, is just going to show a strange result since the
+      // line will move way more than the developer expect
       this._setWidthHeight();
     }
     return this;
@@ -192,77 +200,6 @@ export class Line<
     };
   }
 
-  private makeEdgeToOriginGetter(
-    propertyNames: any,
-    originValues: any
-  ): number {
-    const origin = propertyNames.origin,
-      axis1 = propertyNames.axis1,
-      axis2 = propertyNames.axis2,
-      dimension = propertyNames.dimension,
-      nearest = originValues.nearest,
-      center = originValues.center,
-      farthest = originValues.farthest;
-
-    switch (this.get(origin)) {
-      case nearest:
-        return Math.min(this.get(axis1), this.get(axis2));
-      case center:
-        return (
-          Math.min(this.get(axis1), this.get(axis2)) + 0.5 * this.get(dimension)
-        );
-      case farthest:
-        return Math.max(this.get(axis1), this.get(axis2));
-      // this should never occurr, since origin is always either one of the 3 above
-      default:
-        return 0;
-    }
-  }
-
-  /**
-   * @private
-   * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
-   */
-  _getLeftToOriginX(): number {
-    return this.makeEdgeToOriginGetter(
-      {
-        // property names
-        origin: 'originX',
-        axis1: 'x1',
-        axis2: 'x2',
-        dimension: 'width',
-      },
-      {
-        // possible values of origin
-        nearest: 'left',
-        center: 'center',
-        farthest: 'right',
-      }
-    );
-  }
-
-  /**
-   * @private
-   * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
-   */
-  _getTopToOriginY(): number {
-    return this.makeEdgeToOriginGetter(
-      {
-        // property names
-        origin: 'originY',
-        axis1: 'y1',
-        axis2: 'y2',
-        dimension: 'height',
-      },
-      {
-        // possible values of origin
-        nearest: 'top',
-        center: 'center',
-        farthest: 'bottom',
-      }
-    );
-  }
-
   /**
    * Returns svg representation of an instance
    * @return {Array} an array of strings with the specific svg representation
@@ -305,7 +242,7 @@ export class Line<
    */
   static fromElement(element: SVGElement, callback: (line: Line) => any) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
-      points = [
+      points: [number, number, number, number] = [
         parsedAttributes.x1 || 0,
         parsedAttributes.y1 || 0,
         parsedAttributes.x2 || 0,
