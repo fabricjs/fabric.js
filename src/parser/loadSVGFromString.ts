@@ -19,8 +19,8 @@ import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
 export function loadSVGFromString(
   string: string,
   callback: TSvgParsedCallback,
-  reviver: TSvgReviverCallback,
-  options: LoadImageOptions
+  reviver?: TSvgReviverCallback,
+  options?: LoadImageOptions
 ) {
   const parser = new (getWindow() as any).DOMParser(),
     // should we use `image/svg+xml` here?
