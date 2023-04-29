@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Enable strictPropertyInitialization [#8876](https://github.com/fabricjs/fabric.js/pull/8876)
 - fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
 
 ## [6.0.0-beta3]
