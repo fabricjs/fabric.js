@@ -114,7 +114,7 @@ export class Canvas extends SelectableCanvas {
 
   declare currentSubTargets?: FabricObject[];
 
-  private _isClick: boolean;
+  private _isClick = false;
 
   textEditingManager = new TextEditingManager();
 
