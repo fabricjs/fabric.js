@@ -50,7 +50,7 @@ export const getEnv = (): TFabricEnv => {
       }
     },
     copyPasteData,
-    DOMParser: new JSDOMWindow.DOMParser(),
+    DOMParser: JSDOMWindow.DOMParser,
   };
 };
 
