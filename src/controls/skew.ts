@@ -4,8 +4,8 @@ import {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { Point } from '../Point';
 import { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,

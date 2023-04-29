@@ -1,12 +1,10 @@
-import { IPoint, Point } from '../../point.class';
+import { XY, Point } from '../../Point';
 import { TRadian } from '../../typedefs';
 
 const unitVectorX = new Point(1, 0);
 
 /**
  * Rotates `vector` with `radians`
- * @static
- * @memberOf fabric.util
  * @param {Point} vector The vector to rotate (x and y)
  * @param {Number} radians The radians of the angle for the rotation
  * @return {Point} The new rotated point
@@ -16,14 +14,12 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
 
 /**
  * Creates a vector from points represented as a point
- * @static
- * @memberOf fabric.util
  *
  * @param {Point} from
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: IPoint, to: IPoint): Point =>
+export const createVector = (from: XY, to: XY): Point =>
   new Point(to).subtract(from);
 
 /**

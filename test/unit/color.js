@@ -381,15 +381,34 @@
     assert.deepEqual(fabric.Color.sourceFromHex('fff'), [255,255,255,1]);
   });
 
-  QUnit.test('fromSource', function(assert) {
-    assert.ok(typeof fabric.Color.fromSource === 'function');
-    var oColor = fabric.Color.fromSource([255,255,255,0.37]);
+  QUnit.test('from rgba', function(assert) {
+    var oColor = new fabric.Color([255,255,255,0.37]);
 
     assert.ok(oColor);
     assert.ok(oColor instanceof fabric.Color);
     assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.37)');
     assert.equal(oColor.toHex(), 'FFFFFF');
     assert.equal(oColor.getAlpha(), 0.37);
+  });
+
+  QUnit.test('from rgb', function(assert) {
+    var oColor = new fabric.Color([255,255,255]);
+
+    assert.ok(oColor);
+    assert.ok(oColor instanceof fabric.Color);
+    assert.equal(oColor.toRgba(), 'rgba(255,255,255,1)');
+    assert.equal(oColor.toHex(), 'FFFFFF');
+    assert.equal(oColor.getAlpha(), 1);
+  });
+
+  QUnit.test('from Color instance', function(assert) {
+    var oColor = new fabric.Color(new fabric.Color([255,255,255]));
+
+    assert.ok(oColor);
+    assert.ok(oColor instanceof fabric.Color);
+    assert.equal(oColor.toRgba(), 'rgba(255,255,255,1)');
+    assert.equal(oColor.toHex(), 'FFFFFF');
+    assert.equal(oColor.getAlpha(), 1);
   });
 
   QUnit.test('overlayWith', function(assert) {

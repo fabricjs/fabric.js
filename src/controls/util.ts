@@ -4,15 +4,15 @@ import {
   TransformAction,
   BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../mixins/object_origin.mixin';
-import { Point } from '../point.class';
-import type { FabricObject } from '../shapes/fabricObject.class';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { Point } from '../Point';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
-import type { Control } from './control.class';
+import type { Control } from './Control';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 

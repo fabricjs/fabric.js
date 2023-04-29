@@ -1,5 +1,5 @@
 import { iMatrix } from '../../constants';
-import { IPoint, Point } from '../../point.class';
+import { XY, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
@@ -30,25 +30,25 @@ export type TComposeMatrixArgs = TTranslateMatrixArgs &
 export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
+
+export const isIdentityMatrix = (mat: TMat2D) =>
+  mat.every((value, index) => value === iMatrix[index]);
+
 /**
  * Apply transform t to point p
- * @static
- * @memberOf fabric.util
- * @param  {Point | IPoint} p The point to transform
+ * @param  {Point | XY} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
 export const transformPoint = (
-  p: Point | IPoint,
+  p: XY,
   t: TMat2D,
   ignoreOffset?: boolean
 ): Point => new Point(p).transform(t, ignoreOffset);
 
 /**
  * Invert transformation t
- * @static
- * @memberOf fabric.util
  * @param {Array} t The transform
  * @return {Array} The inverted transform
  */
@@ -63,8 +63,6 @@ export const invertTransform = (t: TMat2D): TMat2D => {
 
 /**
  * Multiply matrix A by matrix B to nest transformations
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a First transformMatrix
  * @param  {TMat2D} b Second transformMatrix
  * @param  {Boolean} is2x2 flag to multiply matrices as 2x2 matrices
@@ -86,8 +84,6 @@ export const multiplyTransformMatrices = (
 
 /**
  * Decomposes standard 2x3 matrix into transform components
- * @static
- * @memberOf fabric.util
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
@@ -112,13 +108,10 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle] angle in degrees
  * @return {TMat2D} transform matrix
  */
-
 export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
   if (!angle) {
     return iMatrix;
@@ -135,8 +128,6 @@ export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
  * transformations from an object that is not enlived yet.
  * is called DimensionsTransformMatrix because those properties are the one that influence
  * the size of the resulting box of the object.
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.scaleX]
  * @param  {Number} [options.scaleY]
@@ -186,8 +177,6 @@ export const calcDimensionsMatrix = ({
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
- * @static
- * @memberOf fabric.util
  * @param  {Object} options
  * @param  {Number} [options.angle]
  * @param  {Number} [options.scaleX]
@@ -200,7 +189,6 @@ export const calcDimensionsMatrix = ({
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-
 export const composeMatrix = ({
   translateX = 0,
   translateY = 0,

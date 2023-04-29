@@ -36,7 +36,7 @@
         oEvent,
         eventType;
 
-    element = typeof element === 'string' ? fabric.document.getElementById(element) : element;
+    element = typeof element === 'string' ? fabric.getDocument().getElementById(element) : element;
 
     for (var name in eventMatchers) {
       if (eventMatchers[name].test(eventName)) {
@@ -49,14 +49,14 @@
       throw new SyntaxError('This event is not supported');
     }
 
-    if (fabric.document.createEvent) {
+    if (fabric.getDocument().createEvent) {
       try {
         // Opera doesn't support event types like "KeyboardEvent",
         // but allows to create event of type "HTMLEvents", then fire key event on it
-        oEvent = fabric.document.createEvent(eventType);
+        oEvent = fabric.getDocument().createEvent(eventType);
       }
       catch (err) {
-        oEvent = fabric.document.createEvent('HTMLEvents');
+        oEvent = fabric.getDocument().createEvent('HTMLEvents');
       }
 
       if (eventType === 'HTMLEvents') {
@@ -65,7 +65,7 @@
       else if (eventType === 'KeyboardEvent') {
         // TODO (kangax): this needs to be tested
         if (oEvent.initKeyEvent) {
-          oEvent.initKeyEvent(eventName, options.bubbles, options.cancelable, fabric.document.defaultView,
+          oEvent.initKeyEvent(eventName, options.bubbles, options.cancelable, fabric.getDocument().defaultView,
             options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.keyCode,
             options.charCode);
         }
@@ -74,7 +74,7 @@
         }
       }
       else {
-        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, fabric.document.defaultView,
+        oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, fabric.getDocument().defaultView,
           options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
           options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
       }
@@ -83,7 +83,7 @@
     else {
       options.clientX = options.pointerX;
       options.clientY = options.pointerY;
-      oEvent = extendObject(fabric.document.createEventObject(), options);
+      oEvent = extendObject(fabric.getDocument().createEventObject(), options);
       element.fireEvent('on' + eventName, oEvent);
     }
     return element;
