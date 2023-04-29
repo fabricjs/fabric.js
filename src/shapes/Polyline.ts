@@ -41,6 +41,9 @@ export class Polyline<
   /**
    * WARNING: Feature in progress
    * Calculate the exact bounding box taking in account strokeWidth on acute angles
+   * this will be turned to true by default on fabric 6.0
+   * maybe will be left in as an optimization since calculations may be slow
+   * @deprecated
    * @type Boolean
    * @default false
    */
@@ -71,8 +74,6 @@ export class Polyline<
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
 
   declare strokeOffset: Point;
@@ -100,36 +101,11 @@ export class Polyline<
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
     super({ points, ...options });
-    const { left, top, fromSVG } = options;
+    const { left, top } = options;
     this.initialized = true;
-    const {
-      left: calculatedLeft,
-      top: calculatedTop,
-      width,
-      height,
-      pathOffset,
-      strokeOffset,
-    } = this._calcDimensions();
-    this.set({ width, height, pathOffset, strokeOffset });
-    if (fromSVG) {
-      // if coming from SVG just assign top and left, those will be fixed
-      // later by remove removeTransformMatrixForSvgParsing using the weird
-      // _findCenterFromElement.
-      // This is not clear and is probably wrong, but as of now it works in conjuction
-      // with that other parsing function
-      this.set({
-        left: calculatedLeft,
-        top: calculatedTop,
-      });
-    } else {
-      // looking at out path behaves this is not correct.
-      // This should behave the same as path
-      this.setPositionByOrigin(
-        new Point(left ?? calculatedLeft, top ?? calculatedTop),
-        'left',
-        'top'
-      );
-    }
+    this.setBoundingBox(true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   protected isOpen() {
@@ -169,8 +145,7 @@ export class Polyline<
     const pathOffsetY =
       offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
     // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
+    const legacyCorrection = !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
       left: bbox.left - legacyCorrection,
@@ -180,6 +155,17 @@ export class Polyline<
         new Point(bbox.left, bbox.top)
       ),
     };
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = makeBoundingBoxFromPoints(this.points);
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   setDimensions() {
@@ -356,7 +342,6 @@ export class Polyline<
       new this(points || [], {
         ...parsedAttributes,
         ...options,
-        fromSVG: true,
       })
     );
   }

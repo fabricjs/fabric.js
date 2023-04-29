@@ -57,8 +57,6 @@ export class Path<
 
   declare pathOffset: Point;
 
-  declare fromSVG?: boolean;
-
   declare sourcePath?: string;
 
   declare segmentsInfo?: TPathSegmentInfo[];
@@ -77,31 +75,14 @@ export class Path<
   ) {
     super(options as Props);
     const pathTL = this._setPath(path || []);
-    if (this.fromSVG) {
-      // if coming from SVG just assign top and left, those will be fixed
-      // later by remove removeTransformMatrixForSvgParsing using the weird
-      // _findCenterFromElement.
-      // This is not clear and is probably wrong, but as of now it works in conjuction
-      // with that other parsing function
-      this.set({ left: pathTL.x, top: pathTL.y });
-    } else {
-      // here is confusing and far from the actual issue.
-      // if i pass a path that says m0,0 l10,0, so a line from 0 to 10,
-      // i want it to see from 0 to 10 regardless of origin.
-      // the path wins over the origin setting and left top gets ajusted
-      // to respect both.
-      // if i pass left and top, those gets simply applied.
-      const origin = this.translateToGivenOrigin(
-        new Point(left ?? pathTL.x, top ?? pathTL.y),
-        // to explain this: if left or top exist, assign them as they are.
-        // if you are using the calculated one assign them as LEFT/TOP origin
-        typeof left === 'number' ? this.originX : 'left',
-        typeof top === 'number' ? this.originY : 'top',
-        this.originX,
-        this.originY
-      );
-      this.setPositionByOrigin(origin, this.originX, this.originY);
-    }
+    const origin = this.translateToGivenOrigin(
+      new Point(left ?? pathTL.x, top ?? pathTL.y),
+      typeof left === 'number' ? this.originX : 'left',
+      typeof top === 'number' ? this.originY : 'top',
+      this.originX,
+      this.originY
+    );
+    this.setPositionByOrigin(origin, this.originX, this.originY);
   }
 
   /**
@@ -113,6 +94,17 @@ export class Path<
   _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
     return this.setDimensions();
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = this._calcBoundsFromPath();
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   /**
@@ -310,10 +302,7 @@ export class Path<
     return new Point(left, top);
   }
 
-  /**
-   * @private
-   */
-  _calcDimensions(): IPathBBox {
+  _calcBoundsFromPath(): TBBox {
     const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
@@ -378,9 +367,15 @@ export class Path<
           break;
       }
     }
+    return makeBoundingBoxFromPoints(bounds);
+  }
 
-    const bbox = makeBoundingBoxFromPoints(bounds);
-    const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
+  /**
+   * @private
+   */
+  _calcDimensions(): IPathBBox {
+    const bbox = this._calcBoundsFromPath();
+    const strokeCorrection = this.strokeWidth / 2;
 
     return {
       ...bbox,
@@ -435,7 +430,6 @@ export class Path<
         // we pass undefined to instruct the constructor to position the object using the bbox
         left: undefined,
         top: undefined,
-        fromSVG: true,
       })
     );
   }
