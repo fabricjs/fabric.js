@@ -76,15 +76,9 @@ export class Path<
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
-    const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
-      new Point(left ?? pathTL.x, top ?? pathTL.y),
-      typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    this._setPath(path || [], true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
@@ -95,7 +89,7 @@ export class Path<
    */
   _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    return this.setDimensions();
+    this.setBoundingBox(adjustPosition);
   }
 
   /**
@@ -283,14 +277,15 @@ export class Path<
     return this.path.length;
   }
 
-  /**
-   * Recalculates and sets the dimensions
-   * @returns the calculated top-left
-   */
-  setDimensions(): Point {
+  setDimensions() {
+    this.setBoundingBox();
+  }
+
+  setBoundingBox(adjustPosition?: boolean) {
     const { left, top, width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    return new Point(left, top);
+    adjustPosition &&
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
   /**
