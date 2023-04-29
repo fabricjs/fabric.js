@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { getDOMParserFactory } from '../env';
+import { getDOMParser } from '../env';
 import { parseSVGDocument } from './parseSVGDocument';
 
 /**
@@ -13,7 +13,7 @@ import { parseSVGDocument } from './parseSVGDocument';
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
 export function loadSVGFromString(string, callback, reviver, options) {
-  const parser = new (getDOMParserFactory())(),
+  const parser = getDOMParser(),
     doc = parser.parseFromString(string.trim(), 'text/xml');
   parseSVGDocument(
     doc.documentElement,
