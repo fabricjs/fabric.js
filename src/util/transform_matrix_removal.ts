@@ -40,10 +40,6 @@ export const removeTransformMatrixForSvgParsing = (
   object: FabricObjectWithTransformMatrix,
   preserveAspectRatioOptions?: any
 ) => {
-  // findCenterFromElement is the issue why we need to assigne
-  // left and top as they are in the constructor for SVG
-  // if findCenterFromElement would respect origin, maybe setup would
-  // be more straight forward
   let center = object._findCenterFromElement();
   if (object.transformMatrix) {
     _assignTransformMatrixProps(object);
