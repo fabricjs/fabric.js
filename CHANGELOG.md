@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(TS): Add getDOMParserFactory to env [#8871](https://github.com/fabricjs/fabric.js/pull/8871)
+- chore(TS): Add getDOMParser to env [#8871](https://github.com/fabricjs/fabric.js/pull/8871)
 - fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
 
 ## [6.0.0-beta3]
