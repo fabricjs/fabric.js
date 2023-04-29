@@ -15,6 +15,6 @@ export function skewMatrix(
   matrix: TMat2D,
   args: TMatSkew | number[],
   pos: 2 | 1
-) {
+): void {
   matrix[pos] = Math.tan(degreesToRadians(args[0]));
 }

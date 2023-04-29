@@ -7,7 +7,6 @@ import { scaleMatrix } from './scaleMatrix';
 import { skewMatrix } from './skewMatrix';
 import { translateMatrix } from './translateMatrix';
 import { TMat2D } from '../typedefs';
-import { numberRegExStr } from '../util/path/regex';
 
 // == begin transform regexp
 const p = String.raw`(${reNum})`;
@@ -36,7 +35,7 @@ const reTransform = new RegExp(transform, 'g');
 export function parseTransformAttribute(attributeValue: string): TMat2D {
   // first we clean the string
   attributeValue = attributeValue
-    .replace(new RegExp(`(${numberRegExStr})`, 'gi'), ' $1 ')
+    .replace(new RegExp(`(${reNum})`, 'gi'), ' $1 ')
     // replace annoying commas and arbitrary whitespace with single spaces
     .replace(/,/gi, ' ')
     .replace(/\s+/gi, ' ')
@@ -56,12 +55,12 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     return matrix;
   }
 
-  for(const match in attributeValue.matchAll(reTransform)) {
+  for (const match in attributeValue.matchAll(reTransform)) {
     const transformMatch = new RegExp(transform).exec(match);
-    if(!transformMatch) {
+    if (!transformMatch) {
       continue;
     }
-    const matchedParams = transformMatch.filter(m => !!m);
+    const matchedParams = transformMatch.filter((m) => !!m);
     const operation = matchedParams[1];
     const args = matchedParams.slice(2).map(parseFloat);
 

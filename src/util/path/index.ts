@@ -22,7 +22,8 @@ import {
   TParsedArcCommand,
 } from './typedefs';
 import { XY, Point } from '../../Point';
-import { numberRegExStr, rePathCommand } from './regex';
+import { rePathCommand } from './regex';
+import { reNum } from '../../parser/constants';
 
 /**
  * Commands that may be repeated
@@ -843,7 +844,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
   // add spaces around the numbers
   pathString = pathString
-    .replace(new RegExp(`(${numberRegExStr})`, 'gi'), ' $1 ')
+    .replace(new RegExp(`(${reNum})`, 'gi'), ' $1 ')
     // replace annoying commas and arbitrary whitespace with single spaces
     .replace(/,/gi, ' ')
     .replace(/\s+/gi, ' ');

@@ -1,6 +1,4 @@
-
-import {TMat2D} from "../typedefs";
-
+import { TMat2D } from '../typedefs';
 
 /**
  * A translation matrix in the form of
