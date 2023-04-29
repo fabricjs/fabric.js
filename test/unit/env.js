@@ -22,13 +22,17 @@ QUnit.module('env', (hooks) => {
             const required = require('../../dist/index.js');
             assert.notOk(global.window, 'no window');
             assert.notOk(global.document, 'no document');
-            const win = { devicePixelRatio: 1.25 };
+            class DOMParserStub {
+
+            }
+            const win = { devicePixelRatio: 1.25, DOMParser:DOMParserStub  };
             const doc = { foo: 'bar' };
             global.window = win;
             global.document = doc;
             [imported, required].forEach(fabric => {
                 assert.equal(fabric.getEnv().window, win, 'window should match');
                 assert.equal(fabric.getEnv().document, doc, 'document should match');
+                assert.equal(fabric.getEnv().DOMParser, DOMParserStub, 'DOMParser should match');
             });
             done();
         });
