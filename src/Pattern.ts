@@ -17,9 +17,9 @@ type TExportedKeys =
   | 'repeat'
   | 'source';
 
-export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
+export type PatternProps = Partial<Pick<Pattern, TExportedKeys>>;
 
-export type TPatternSerialized = TPatternOptions & {
+export type SerializedPatternProps = PatternProps & {
   source: string;
 };
 
@@ -111,7 +111,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: TPatternOptions = {}) {
+  constructor(options: PatternProps = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -211,7 +211,7 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: TPatternSerialized,
+    { source, ...serialized }: SerializedPatternProps,
     options: TPatternHydrationOptions
   ): Promise<Pattern> {
     const img = await loadImage(source, {
