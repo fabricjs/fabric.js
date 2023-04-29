@@ -59,8 +59,6 @@ export class Polyline extends FabricObject {
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
 
   declare strokeOffset: Point;
@@ -130,13 +128,8 @@ export class Polyline extends FabricObject {
       offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
     const pathOffsetY =
       offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-    // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
-      left: bbox.left - legacyCorrection,
-      top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
         new Point(bbox.left, bbox.top)
@@ -286,7 +279,6 @@ export class Polyline extends FabricObject {
       new this(points || [], {
         ...parsedAttributes,
         ...options,
-        fromSVG: true,
       })
     );
   }
