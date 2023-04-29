@@ -61,7 +61,7 @@ export function parseSVGDocument(
     ); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
   if (!elements || (elements && !elements.length)) {
-    callback && callback([], {}, [], descendants);
+    callback([], {}, [], descendants);
     return;
   }
   const localClipPaths = {};
