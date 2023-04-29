@@ -35,7 +35,7 @@ import {
   stateProperties,
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
-import type { Pattern } from '../../Pattern';
+import type { Pattern } from '../../Pattern/Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
