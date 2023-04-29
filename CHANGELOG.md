@@ -2,6 +2,11 @@
 
 ## [next]
 
+- chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
+- fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
+
+## [6.0.0-beta3]
+
 - chore(TS): Path type fixes [#8842](https://github.com/fabricjs/fabric.js/pull/8842)
 - fix(TS): add types to some untyped empty arrays [#8830](https://github.com/fabricjs/fabric.js/pull/8830)
 - chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)

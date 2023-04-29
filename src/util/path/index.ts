@@ -94,6 +94,9 @@ const arcToSegments = (
   sweep: number,
   rotateX: TRadian
 ): TParsedAbsoluteCubicCurveCommand[] => {
+  if (rx === 0 || ry === 0) {
+    return [];
+  }
   let fromX = 0,
     fromY = 0,
     root = 0;

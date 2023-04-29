@@ -396,4 +396,9 @@
       done();
     });
   });
+
+  QUnit.test('can parse arcs with rx and ry set to 0', function(assert) {
+    var path = new fabric.Path('M62.87543,168.19448H78.75166a0,0,0,0,1,0,0v1.9884a6.394,6.394,0,0,1-6.394,6.394H69.26939a6.394,6.394,0,0,1-6.394-6.394v-1.9884A0,0,0,0,1,62.87543,168.19448Z');
+    assert.equal(path.path.length, 9);
+  });
 })();
