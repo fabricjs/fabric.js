@@ -1,12 +1,12 @@
 import { config } from '../config';
-import { TCrossOrigin, TMat2D } from '../typedefs';
+import { Abortable, TCrossOrigin, TMat2D } from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { classRegistry } from '../ClassRegistry';
-import { TPatternRepeat, PatternProps } from './types';
+import { TPatternRepeat, PatternProps, SerializedPatternProps } from './types';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -186,7 +186,7 @@ export class Pattern {
 
   static async fromObject(
     { source, ...serialized }: SerializedPatternProps,
-    options: TPatternHydrationOptions
+    options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

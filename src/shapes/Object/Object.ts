@@ -10,6 +10,7 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  Abortable,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -1518,15 +1519,11 @@ export class FabricObject<
    * @param {object} object
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
-   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
-    {
-      extraParam,
-      ...options
-    }: { extraParam?: string; signal?: AbortSignal } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1548,12 +1545,11 @@ export class FabricObject<
    *
    * @param {object} object
    * @param {object} [options]
-   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
   static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
-    options?: { signal?: AbortSignal }
+    options?: Abortable
   ) {
     return this._fromObject(object, options);
   }
