@@ -554,7 +554,7 @@
     var path1 = new fabric.Path(path, {
       strokeWidth: 2,
       opacity: 0.5,
-      stroke: 'pink',
+      stroke: 'blue',
       originX: 'right',
       originY: 'top',
       fill: '',
@@ -568,12 +568,29 @@
       fill: '',
       objectCaching: false,
     });
+    var line1 = new fabric.Line([6, 22, 24, 22], {
+      strokeWidth: 2,
+      stroke: 'green',
+      originX: 'right',
+      originY: 'top',
+      opacity: 0.5,
+      objectCaching: false,
+    });
+    var line2 = new fabric.Line([6, 22, 24, 22], {
+      strokeWidth: 0.2,
+      stroke: 'black',
+      objectCaching: false,
+      originX: 'left',
+      originY: 'bottom',
+    });
     canvas.setZoom(10);
     canvas.add(
       polygon,
       polygon2,
       path1,
-      path2
+      path2,
+      line1,
+      line2
     );
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
@@ -583,7 +600,7 @@
     test: 'polygon and paths',
     code: polygonAndPaths,
     golden: 'polygonAndPaths.png',
-    newModule: 'Text gradient fill',
+    newModule: 'Polygon and paths positioning',
     percentage: 0.04,
     width: 300,
     height: 300,
