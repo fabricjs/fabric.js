@@ -23,7 +23,6 @@ export function loadSVGFromString(
   reviver?: TSvgReviverCallback,
   options?: LoadImageOptions
 ) {
-
   const parser = new (getWindow().DOMParser)(),
     // should we use `image/svg+xml` here?
     doc = parser.parseFromString(string.trim(), 'text/xml');
