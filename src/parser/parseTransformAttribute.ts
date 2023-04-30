@@ -10,11 +10,11 @@ import { TMat2D } from '../typedefs';
 
 // == begin transform regexp
 const p = String.raw`(${reNum})`;
-const skewX = String.raw`(skewX)\(${p})`;
-const skewY = String.raw`(skewY)\(${p})`;
+const skewX = String.raw`(skewX)\(${p}\)`;
+const skewY = String.raw`(skewY)\(${p}\)`;
 const rotate = String.raw`(rotate)\(${p}(?: ${p} ${p})?\)`;
-const scale = String.raw`(scale)\(${p}(?: ${p})\)`;
-const translate = String.raw`(translate)\(${p}(?: ${p})\)`;
+const scale = String.raw`(scale)\(${p}(?: ${p})?\)`;
+const translate = String.raw`(translate)\(${p}(?: ${p})?\)`;
 const matrix = String.raw`(matrix)\(${p} ${p} ${p} ${p} ${p} ${p}\)`;
 const transform = String.raw`(?:${matrix}|${translate}|${rotate}|${scale}|${skewX}|${skewY})`;
 const transforms = String.raw`(?:${transform}*)`;
@@ -39,8 +39,8 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     // replace annoying commas and arbitrary whitespace with single spaces
     .replace(/,/gi, ' ')
     .replace(/\s+/gi, ' ')
-    // remove spaces around parentheses
-    .replace(/\s*([()])\s*/gi, '$1');
+    // remove spaces around front parentheses
+    .replace(/\s*([()])\s*/gi, '$1')
 
   // start with identity matrix
   let matrix: TMat2D = [...iMatrix];
@@ -55,8 +55,8 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     return matrix;
   }
 
-  for (const match in attributeValue.matchAll(reTransform)) {
-    const transformMatch = new RegExp(transform).exec(match);
+  for (const match of attributeValue.matchAll(reTransform)) {
+    const transformMatch = new RegExp(transform).exec(match[0]);
     if (!transformMatch) {
       continue;
     }
