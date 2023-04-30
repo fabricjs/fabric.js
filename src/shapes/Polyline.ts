@@ -74,9 +74,9 @@ export class Polyline<
     'points',
   ];
 
-  declare pathOffset: Point;
-
   declare fromSVG: boolean;
+
+  declare pathOffset: Point;
 
   declare strokeOffset: Point;
 
@@ -180,11 +180,7 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
     adjustPosition &&
-      this.setPositionByOrigin(
-        new Point(left + width / 2, top + height / 2),
-        'center',
-        'center'
-      );
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
   /**
