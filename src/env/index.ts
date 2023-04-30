@@ -21,4 +21,5 @@ export const getEnv = () => env || getBrowserEnv();
 
 export const getDocument = (): Document => getEnv().document;
 
-export const getWindow = (): (Window & typeof globalThis) | DOMWindow => getEnv().window;
+export const getWindow = (): (Window & typeof globalThis) | DOMWindow =>
+  getEnv().window;
