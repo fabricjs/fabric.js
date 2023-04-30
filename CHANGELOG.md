@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Parse transform attribute typing [#8878](https://github.com/fabricjs/fabric.js/pull/8878)
 - chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
 - fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
 
