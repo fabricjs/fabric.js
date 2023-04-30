@@ -93,6 +93,17 @@ export class Path<
   }
 
   /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = this._calcBoundsFromPath();
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
+  }
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
@@ -288,10 +299,7 @@ export class Path<
       this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
-  /**
-   * @private
-   */
-  _calcDimensions(): IPathBBox {
+  _calcBoundsFromPath(): TBBox {
     const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
@@ -356,8 +364,14 @@ export class Path<
           break;
       }
     }
+    return makeBoundingBoxFromPoints(bounds);
+  }
 
-    const bbox = makeBoundingBoxFromPoints(bounds);
+  /**
+   * @private
+   */
+  _calcDimensions(): IPathBBox {
+    const bbox = this._calcBoundsFromPath();
     const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
     return {

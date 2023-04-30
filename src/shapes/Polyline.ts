@@ -74,9 +74,9 @@ export class Polyline<
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
+
+  declare fromSVG: boolean;
 
   declare strokeOffset: Point;
 
@@ -160,6 +160,17 @@ export class Polyline<
     };
   }
 
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = makeBoundingBoxFromPoints(this.points);
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
+  }
+
   setDimensions() {
     this.setBoundingBox();
   }
@@ -169,7 +180,11 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
     adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+      this.setPositionByOrigin(
+        new Point(left + width / 2, top + height / 2),
+        'center',
+        'center'
+      );
   }
 
   /**
