@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Fix typing for DOMParser [#8871](https://github.com/fabricjs/fabric.js/pull/8871)
 - fix(Path, polyline): fix for SVG import [#8879](https://github.com/fabricjs/fabric.js/pull/8879)
 - chore(TS) add types for loadSVGFromURl, parseSVGDocument, loadSVGFromString [#8869](https://github.com/fabricjs/fabric.js/pull/8869)
 - chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
