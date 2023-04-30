@@ -9,15 +9,15 @@ import { translateMatrix } from './translateMatrix';
 import { TMat2D } from '../typedefs';
 
 // == begin transform regexp
-const p = String.raw`(${reNum})`;
+const p = `(${reNum})`;
 const skewX = String.raw`(skewX)\(${p}\)`;
 const skewY = String.raw`(skewY)\(${p}\)`;
 const rotate = String.raw`(rotate)\(${p}(?: ${p} ${p})?\)`;
 const scale = String.raw`(scale)\(${p}(?: ${p})?\)`;
 const translate = String.raw`(translate)\(${p}(?: ${p})?\)`;
 const matrix = String.raw`(matrix)\(${p} ${p} ${p} ${p} ${p} ${p}\)`;
-const transform = String.raw`(?:${matrix}|${translate}|${rotate}|${scale}|${skewX}|${skewY})`;
-const transforms = String.raw`(?:${transform}*)`;
+const transform = `(?:${matrix}|${translate}|${rotate}|${scale}|${skewX}|${skewY})`;
+const transforms = `(?:${transform}*)`;
 const transformList = String.raw`^\s*(?:${transforms}?)\s*$`;
 // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
 const reTransformList = new RegExp(transformList);
