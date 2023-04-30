@@ -40,7 +40,7 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     .replace(/,/gi, ' ')
     .replace(/\s+/gi, ' ')
     // remove spaces around front parentheses
-    .replace(/\s*([()])\s*/gi, '$1')
+    .replace(/\s*([()])\s*/gi, '$1');
 
   // start with identity matrix
   let matrix: TMat2D = [...iMatrix];

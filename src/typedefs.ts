@@ -64,7 +64,6 @@ export const enum SupportedSVGUnit {
   em = 'em',
 }
 
-
 /**
  * A transform matrix.
  * Basically a matrix in the form
@@ -73,7 +72,14 @@ export const enum SupportedSVGUnit {
  * [ 0 0 1 ]
  * For more details, see @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix
  */
-export type TMat2D = [a: number, b: number, c: number, d: number, e: number, f: number];
+export type TMat2D = [
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  e: number,
+  f: number
+];
 
 /**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
