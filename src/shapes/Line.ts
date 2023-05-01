@@ -105,7 +105,10 @@ export class Line<
     if (coordProps.includes(key as keyof UniqueLineProps)) {
       // this doesn't make sense very much, since setting x1 when top or left
       // are already set, is just going to show a strange result since the
-      // line will move way more than the developer expect
+      // line will move way more than the developer expect.
+      // in fabric5 it worked only when the line didn't have extra transformations,
+      // in fabric6 too. With extra transform they behave bad in different ways.
+      // This needs probably a good rework or a tutorial if you have to create a dynamic line
       this._setWidthHeight();
     }
     return this;
@@ -182,6 +185,9 @@ export class Line<
 
   /**
    * Recalculates line points given width and height
+   * Those points are simply placed around the center,
+   * This is not useful outside internal render functions and svg output
+   * Is not meant to be for the developer.
    * @private
    */
   calcLinePoints(): UniqueLineProps {

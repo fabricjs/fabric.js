@@ -173,16 +173,19 @@
     ['top', 'center', 'bottom'].forEach((originY) => {
       [0, 7].forEach((strokeWidth) => {
         [0, 33, 90].forEach((angle) => {
-          QUnit.test(`Regardless of strokeWidth or origin, a line is always positioned on its center when left/top are not specified (${originX}/${originY} stroke:${strokeWidth} angle:${angle})`, function(assert) {
-            const line = new fabric.Line([1, 1, 15, 7], {
-              strokeWidth,
-              originX,
-              originY,
-              angle,
+          ['butt', 'round', 'square'].forEach((strokeLineCap) => {
+            QUnit.test(`Regardless of strokeWidth or origin, a line is always positioned on its center when left/top are not specified (${originX}/${originY} stroke:${strokeWidth} angle:${angle} cap:${strokeLineCap})`, function(assert) {
+              const line = new fabric.Line([1, 1, 15, 7], {
+                strokeWidth,
+                originX,
+                originY,
+                angle,
+                strokeLineCap,
+              });
+              const center = line.getCenterPoint();
+              assert.equal(Math.round(center.x), 8);
+              assert.equal(Math.round(center.y), 4);
             });
-            const center = line.getCenterPoint();
-            assert.equal(Math.round(center.x), 8);
-            assert.equal(Math.round(center.y), 4);
           });
         });
       });
