@@ -103,7 +103,7 @@ export class Line<
   _set(key: string, value: any) {
     super._set(key, value);
     if (coordProps.includes(key as keyof UniqueLineProps)) {
-      // this doesn't make sense anymore, since setting x1 when top or left
+      // this doesn't make sense very much, since setting x1 when top or left
       // are already set, is just going to show a strange result since the
       // line will move way more than the developer expect
       this._setWidthHeight();
@@ -185,20 +185,23 @@ export class Line<
    * @private
    */
   calcLinePoints(): UniqueLineProps {
-    const xMult = this.x1 <= this.x2 ? -1 : 1,
-      yMult = this.y1 <= this.y2 ? -1 : 1,
-      x1 = xMult * this.width * 0.5,
-      y1 = yMult * this.height * 0.5,
-      x2 = xMult * this.width * -0.5,
-      y2 = yMult * this.height * -0.5;
+    const { x1: _x1, x2: _x2, y1: _y1, y2: _y2, width, height } = this;
+    const xMult = _x1 <= _x2 ? -1 : 1,
+      yMult = _y1 <= _y2 ? -1 : 1,
+      x1 = (xMult * width) / 2,
+      y1 = (yMult * height) / 2,
+      x2 = (xMult * -width) / 2,
+      y2 = (yMult * -height) / 2;
 
     return {
-      x1: x1,
-      x2: x2,
-      y1: y1,
-      y2: y2,
+      x1,
+      x2,
+      y1,
+      y2,
     };
   }
+
+  /* _FROM_SVG_START_ */
 
   /**
    * Returns svg representation of an instance
@@ -206,23 +209,13 @@ export class Line<
    * of the instance
    */
   _toSVG() {
-    const p = this.calcLinePoints();
+    const { x1, x2, y1, y2 } = this.calcLinePoints();
     return [
       '<line ',
       'COMMON_PARTS',
-      'x1="',
-      p.x1,
-      '" y1="',
-      p.y1,
-      '" x2="',
-      p.x2,
-      '" y2="',
-      p.y2,
-      '" />\n',
+      `x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />\n`,
     ];
   }
-
-  /* _FROM_SVG_START_ */
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
@@ -241,13 +234,14 @@ export class Line<
    * @param {Function} [callback] callback function invoked after parsing
    */
   static fromElement(element: SVGElement, callback: (line: Line) => any) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
-      points: [number, number, number, number] = [
-        parsedAttributes.x1 || 0,
-        parsedAttributes.y1 || 0,
-        parsedAttributes.x2 || 0,
-        parsedAttributes.y2 || 0,
-      ];
+    const {
+        x1 = 0,
+        y1 = 0,
+        x2 = 0,
+        y2 = 0,
+        ...parsedAttributes
+      } = parseAttributes(element, this.ATTRIBUTE_NAMES),
+      points: [number, number, number, number] = [x1, y1, x2, y2];
     callback(new this(points, parsedAttributes));
   }
 
