@@ -5,8 +5,8 @@
     type:                     'Line',
     originX:                  'left',
     originY:                  'top',
-    left:                     11,
-    top:                      12,
+    left:                     10.5,
+    top:                      11.5,
     width:                    2,
     height:                   2,
     fill:                     'rgb(0,0,0)',
@@ -69,7 +69,7 @@
 
   QUnit.test('toSVG', function(assert) {
     var line = new fabric.Line([11, 12, 13, 14]);
-    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 12.5 13.5)\"  >\n<line style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x1=\"-1\" y1=\"-1\" x2=\"1\" y2=\"1\" />\n</g>\n';
+    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 12 13)\"  >\n<line style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x1=\"-1\" y1=\"-1\" x2=\"1\" y2=\"1\" />\n</g>\n';
     assert.equal(line.toSVG(), EXPECTED_SVG);
   });
 
@@ -169,304 +169,23 @@
     });
   });
 
-  // this isn't implemented yet, so disabling for now
-
-  // QUnit.test('x1,y1 less than x2,y2 should work', function(assert) {
-  //   var line = new fabric.Line([ 400, 200, 300, 400]);
-
-  //   assert.equal(100, line.width);
-  //   assert.equal(200, line.height);
-  // });
-
-  var lineCoordsCases = [
-    { description: 'default to 0 left and 0 top',
-      givenLineArgs: {
-        options: {
-          strokeWidth: 0,
-        }
-      },
-      expectedCoords: {
-        left: 0,
-        top: 0,
-      }
-    },
-    { description: 'default to 0 left and 0 top and default strokeWidth of 1',
-      givenLineArgs: {
-      },
-      expectedCoords: {
-        left: -0.5,
-        top: -0.5,
-      }
-    },
-    { description: 'origin defaults to left-top',
-      givenLineArgs: {
-        points: [0, 0, 11, 22],
-      },
-      expectedCoords: {
-        left: 0,
-        top: 0,
-      }
-    },
-    { description: 'equal smallest points when origin is left-top and line not offset',
-      givenLineArgs: {
-        points: [0, 0, 12.3, 34.5],
-        options: {
-          originX: 'left',
-          originY: 'top',
-        },
-      },
-      expectedCoords: {
-        left: 0,
-        top: 0,
-      }
-    },
-    { description: 'include offsets for left-top origin',
-      givenLineArgs: {
-        points: [33, 44, 44, 66],
-        options: {
-          originX: 'left',
-          originY: 'top',
-        },
-      },
-      expectedCoords: {
-        left: 33,
-        top: 44,
-      }
-    },
-    { description: 'equal half-dimensions when origin is center and line not offset',
-      givenLineArgs: {
-        points: [0, 0, 12.3, 34.5],
-        options: {
-          originX: 'center',
-          originY: 'center',
-        },
-      },
-      expectedCoords: {
-        left: 0.5 * 12.3,
-        top: 0.5 * 34.5,
-      }
-    },
-    { description: 'include offsets for center-center origin',
-      givenLineArgs: {
-        points: [0 + 9.87, 0 - 4.32, 12.3 + 9.87, 34.5 - 4.32],
-        options: {
-          originX: 'center',
-          originY: 'center',
-        },
-      },
-      expectedCoords: {
-        left: (0.5 * 12.3) + 9.87,
-        top: (0.5 * 34.5) - 4.32,
-      }
-    },
-    { description: 'equal full dimensions when origin is right-bottom and line not offset',
-      givenLineArgs: {
-        points: [0, 0, 55, 18],
-        options: {
-          originX: 'right',
-          originY: 'bottom',
-          strokeWidth: 0,
-        },
-      },
-      expectedCoords: {
-        left: 55,
-        top: 18,
-      }
-    },
-    { description: 'include offsets for right-bottom origin',
-      givenLineArgs: {
-        points: [0 - 3.14, 0 - 1.41, 55 - 3.14, 18 - 1.41],
-        options: {
-          strokeWidth: 0,
-          originX: 'right',
-          originY: 'bottom',
-        },
-      },
-      expectedCoords: {
-        left: 55 - 3.14,
-        top: 18 - 1.41,
-      }
-    },
-    { description: 'arent changed by rotation for left-top origin',
-      givenLineArgs: {
-        points: [1, 2, 30, 40],
-        options: {
-          originX: 'left',
-          originY: 'top',
-          angle: 67,
-        }
-      },
-      expectedCoords: {
-        left: 1,
-        top: 2,
-      }
-    },
-    { description: 'arent changed by rotation for right-bottom origin',
-      givenLineArgs: {
-        points: [1, 2, 30, 40],
-        options: {
-          originX: 'right',
-          originY: 'bottom',
-          angle: 67,
-        }
-      },
-      expectedCoords: {
-        left: 30,
-        top: 40,
-      }
-    },
-    { description: 'arent changed by scaling for left-top origin',
-      givenLineArgs: {
-        points: [1, 2, 30, 40],
-        options: {
-          originX: 'left',
-          originY: 'top',
-          scale: 2.1,
-        }
-      },
-      expectedCoords: {
-        left: 1,
-        top: 2,
-      }
-    },
-    { description: 'arent changed by scaling for right-bottom origin',
-      givenLineArgs: {
-        points: [1, 2, 30, 40],
-        options: {
-          originX: 'right',
-          originY: 'bottom',
-          scale: 1.2,
-        }
-      },
-      expectedCoords: {
-        left: 30,
-        top: 40,
-      }
-    },
-    { description: 'arent changed by strokeWidth for left-top origin',
-      givenLineArgs: {
-        points: [31, 41, 59, 26],
-        options: {
-          originX: 'left',
-          originY: 'top',
-          stroke: 'black',
-          strokeWidth: '53'
-        }
-      },
-      expectedCoords: {
-        left: 31,
-        top: 26,
-      }
-    },
-    { description: 'arent changed by strokeWidth for center-center origin',
-      givenLineArgs: {
-        points: [0 + 31, 15 + 26, 28 + 31, 0 + 26],
-        options: {
-          originX: 'center',
-          originY: 'center',
-          stroke: 'black',
-          strokeWidth: '53'
-        }
-      },
-      expectedCoords: {
-        left: (0.5 * 28) + 31,
-        top: (0.5 * 15) + 26,
-      }
-    },
-    { description: 'arent changed by strokeWidth for right-bottom origin',
-      givenLineArgs: {
-        points: [1, 2, 30, 40],
-        options: {
-          originX: 'right',
-          originY: 'bottom',
-          stroke: 'black',
-          strokeWidth: '53'
-        }
-      },
-      expectedCoords: {
-        left: 30,
-        top: 40,
-      }
-    },
-    { description: 'left and top options override points',
-      givenLineArgs: {
-        points: [12, 34, 56, 78],
-        options: {
-          left: 98,
-          top: 76,
-        }
-      },
-      expectedCoords: {
-        left: 98,
-        top: 76,
-      }
-    },
-    { description: '0 left and 0 top options override points',
-      givenLineArgs: {
-        points: [12, 34, 56, 78],
-        options: {
-          left: 0,
-          top: 0,
-        }
-      },
-      expectedCoords: {
-        left: 0,
-        top: 0,
-      }
-    },
-    { description: 'equal x2 and y2 for left-top origin when x1 and y1 are largest and line not offset',
-      givenLineArgs: {
-        points: [100, 200, 30, 40],
-        options: {
-          originX: 'left',
-          originY: 'top',
-        }
-      },
-      expectedCoords: {
-        left: 30,
-        top: 40,
-      }
-    },
-    { description: 'equal half-dimensions for center-center origin when x1 and y1 are largest and line not offset',
-      givenLineArgs: {
-        points: [100, 200, 0, 0],
-        options: {
-          originX: 'center',
-          originY: 'center',
-        }
-      },
-      expectedCoords: {
-        left: 0.5 * 100,
-        top: 0.5 * 200,
-      }
-    },
-    { description: 'equal x1 and y1 for right-bottom origin when x1 and y1 are largest and line not offset',
-      givenLineArgs: {
-        points: [100, 200, 0, 0],
-        options: {
-          originX: 'right',
-          originY: 'bottom',
-        }
-      },
-      expectedCoords: {
-        left: 100,
-        top: 200,
-      }
-    },
-  ];
-
-  lineCoordsCases.forEach(function (c_) {
-    QUnit.test('stroke-less line coords ' + c_.description, function(assert) {
-      var points = c_.givenLineArgs.points;
-      var options = c_.givenLineArgs.options;
-
-      var givenLine = new fabric.Line(
-        points,
-        options
-      );
-
-      assert.equal(givenLine.left, c_.expectedCoords.left);
-      assert.equal(givenLine.top, c_.expectedCoords.top);
+  ['left', 'center', 'right'].forEach((originX) => {
+    ['top', 'center', 'bottom'].forEach((originY) => {
+      [0, 7].forEach((strokeWidth) => {
+        [0, 33, 90].forEach((angle) => {
+          QUnit.test(`Regardless of strokeWidth or origin, a line is always positioned on its center when left/top are not specified (${originX}/${originY} stroke:${strokeWidth} angle:${angle})`, function(assert) {
+            const line = new fabric.Line([1, 1, 15, 7], {
+              strokeWidth,
+              originX,
+              originY,
+              angle,
+            });
+            const center = line.getCenterPoint();
+            assert.equal(Math.round(center.x), 8);
+            assert.equal(Math.round(center.y), 4);
+          });
+        });
+      });
     });
   });
 
