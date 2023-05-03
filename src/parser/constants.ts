@@ -11,7 +11,7 @@ export const storage = {
   clipPaths,
 };
 
-export const reNum = '(?:[-+]?(?:\\d+|\\d*\\.\\d+)(?:[eE][-+]?\\d+)?)';
+export const reNum = String.raw`(?:[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?)`;
 
 export const svgNS = 'http://www.w3.org/2000/svg';
 

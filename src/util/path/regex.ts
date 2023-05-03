@@ -1,12 +1,10 @@
-// absolute value number
-const absNumberRegExStr = String.raw`(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
-export const numberRegExStr = `[-+]?${absNumberRegExStr}`;
+import { reNum } from '../../parser/constants';
 
 /**
  * p for param
  * using "bad naming" here because it makes the regex much easier to read
  */
-const p = `(${numberRegExStr})`;
+const p = `(${reNum})`;
 
 const reMoveToCommand = `(M) (?:${p} ${p} ?)+`;
 

@@ -1,92 +1,28 @@
-//@ts-nocheck
 import { iMatrix } from '../constants';
-import { commaWsp, reNum } from './constants';
+import { reNum } from './constants';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';
 import { skewMatrix } from './skewMatrix';
 import { translateMatrix } from './translateMatrix';
+import { TMat2D } from '../typedefs';
 
 // == begin transform regexp
-const number = reNum,
-  skewX = '(?:(skewX)\\s*\\(\\s*(' + number + ')\\s*\\))',
-  skewY = '(?:(skewY)\\s*\\(\\s*(' + number + ')\\s*\\))',
-  rotate =
-    '(?:(rotate)\\s*\\(\\s*(' +
-    number +
-    ')(?:' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    '))?\\s*\\))',
-  scale =
-    '(?:(scale)\\s*\\(\\s*(' +
-    number +
-    ')(?:' +
-    commaWsp +
-    '(' +
-    number +
-    '))?\\s*\\))',
-  translate =
-    '(?:(translate)\\s*\\(\\s*(' +
-    number +
-    ')(?:' +
-    commaWsp +
-    '(' +
-    number +
-    '))?\\s*\\))',
-  matrix =
-    '(?:(matrix)\\s*\\(\\s*' +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    commaWsp +
-    '(' +
-    number +
-    ')' +
-    '\\s*\\))',
-  transform =
-    '(?:' +
-    matrix +
-    '|' +
-    translate +
-    '|' +
-    scale +
-    '|' +
-    rotate +
-    '|' +
-    skewX +
-    '|' +
-    skewY +
-    ')',
-  transforms =
-    '(?:' + transform + '(?:' + commaWsp + '*' + transform + ')*' + ')',
-  transformList = '^\\s*(?:' + transforms + '?)\\s*$',
-  // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-  reTransformList = new RegExp(transformList),
-  // == end transform regexp
-  reTransform = new RegExp(transform, 'g');
+const p = `(${reNum})`;
+const skewX = String.raw`(skewX)\(${p}\)`;
+const skewY = String.raw`(skewY)\(${p}\)`;
+const rotate = String.raw`(rotate)\(${p}(?: ${p} ${p})?\)`;
+const scale = String.raw`(scale)\(${p}(?: ${p})?\)`;
+const translate = String.raw`(translate)\(${p}(?: ${p})?\)`;
+const matrix = String.raw`(matrix)\(${p} ${p} ${p} ${p} ${p} ${p}\)`;
+const transform = `(?:${matrix}|${translate}|${rotate}|${scale}|${skewX}|${skewY})`;
+const transforms = `(?:${transform}*)`;
+const transformList = String.raw`^\s*(?:${transforms}?)\s*$`;
+// http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+const reTransformList = new RegExp(transformList);
+// == end transform regexp
+const reTransform = new RegExp(transform, 'g');
 
 /**
  * Parses "transform" attribute, returning an array of values
@@ -94,12 +30,21 @@ const number = reNum,
  * @function
  * @memberOf fabric
  * @param {String} attributeValue String containing attribute value
- * @return {Array} Array of 6 elements representing transformation matrix
+ * @return {TTransformMatrix} Array of 6 elements representing transformation matrix
  */
-export function parseTransformAttribute(attributeValue) {
+export function parseTransformAttribute(attributeValue: string): TMat2D {
+  // first we clean the string
+  attributeValue = attributeValue
+    .replace(new RegExp(`(${reNum})`, 'gi'), ' $1 ')
+    // replace annoying commas and arbitrary whitespace with single spaces
+    .replace(/,/gi, ' ')
+    .replace(/\s+/gi, ' ')
+    // remove spaces around front parentheses
+    .replace(/\s*([()])\s*/gi, '$1');
+
   // start with identity matrix
-  let matrix = iMatrix.concat();
-  const matrices = [];
+  let matrix: TMat2D = [...iMatrix];
+  const matrices: TMat2D[] = [];
 
   // return if no argument was given or
   // an argument does not match transform attribute regexp
@@ -110,13 +55,14 @@ export function parseTransformAttribute(attributeValue) {
     return matrix;
   }
 
-  attributeValue.replace(reTransform, function (match) {
-    const m = new RegExp(transform).exec(match).filter(function (match) {
-        // match !== '' && match != null
-        return !!match;
-      }),
-      operation = m[1],
-      args = m.slice(2).map(parseFloat);
+  for (const match of attributeValue.matchAll(reTransform)) {
+    const transformMatch = new RegExp(transform).exec(match[0]);
+    if (!transformMatch) {
+      continue;
+    }
+    const matchedParams = transformMatch.filter((m) => !!m);
+    const operation = matchedParams[1];
+    const args = matchedParams.slice(2).map(parseFloat);
 
     switch (operation) {
       case 'translate':
@@ -136,15 +82,15 @@ export function parseTransformAttribute(attributeValue) {
         skewMatrix(matrix, args, 1);
         break;
       case 'matrix':
-        matrix = args;
+        matrix = args as TMat2D;
         break;
     }
 
     // snapshot current matrix into matrices array
-    matrices.push(matrix.concat());
+    matrices.push([...matrix]);
     // reset
-    matrix = iMatrix.concat();
-  });
+    matrix = [...iMatrix];
+  }
 
   let combinedMatrix = matrices[0];
   while (matrices.length > 1) {

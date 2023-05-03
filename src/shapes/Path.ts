@@ -76,15 +76,9 @@ export class Path<
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
-    const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
-      new Point(left ?? pathTL.x, top ?? pathTL.y),
-      typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    this._setPath(path || [], true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
@@ -95,7 +89,18 @@ export class Path<
    */
   _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    return this.setDimensions();
+    this.setBoundingBox(adjustPosition);
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = this._calcBoundsFromPath();
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   /**
@@ -283,20 +288,18 @@ export class Path<
     return this.path.length;
   }
 
-  /**
-   * Recalculates and sets the dimensions
-   * @returns the calculated top-left
-   */
-  setDimensions(): Point {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
-    this.set({ width, height, pathOffset });
-    return new Point(left, top);
+  setDimensions() {
+    this.setBoundingBox();
   }
 
-  /**
-   * @private
-   */
-  _calcDimensions(): IPathBBox {
+  setBoundingBox(adjustPosition?: boolean) {
+    const { left, top, width, height, pathOffset } = this._calcDimensions();
+    this.set({ width, height, pathOffset });
+    adjustPosition &&
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+  }
+
+  _calcBoundsFromPath(): TBBox {
     const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
@@ -361,8 +364,14 @@ export class Path<
           break;
       }
     }
+    return makeBoundingBoxFromPoints(bounds);
+  }
 
-    const bbox = makeBoundingBoxFromPoints(bounds);
+  /**
+   * @private
+   */
+  _calcDimensions(): IPathBBox {
+    const bbox = this._calcBoundsFromPath();
     const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
     return {
