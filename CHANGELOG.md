@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): BREAKING canvas e jsdom move to peerDependencies [#8502](https://github.com/fabricjs/fabric.js/pull/8502)
 - chore(TS): Parse transform attribute typing [#8878](https://github.com/fabricjs/fabric.js/pull/8878)
 - chore(TS): Fix typing for DOMParser [#8871](https://github.com/fabricjs/fabric.js/pull/8871)
 - fix(Path, polyline): fix for SVG import [#8879](https://github.com/fabricjs/fabric.js/pull/8879)
