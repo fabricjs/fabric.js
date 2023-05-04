@@ -9,8 +9,9 @@ import { TMat2D } from '../typedefs';
  */
 
 /**
- * Force the translation to be this
- * @param matrix
- * @param args
+ * Generate a translation matrix
+ * @param {number} x translation on X axis
+ * @param {number} [y] translation on Y axis
+ * @returns {TMat2D} matrix
  */
 export const translateMatrix = (x: number, y = 0): TMat2D => [1, 0, 0, 1, x, y];

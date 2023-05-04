@@ -11,6 +11,13 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
  * [0       0      1                 ]
  */
 
+/**
+ * Generate a rotation matrix around the center or around a point x,y
+ * @param {TDegree} angle rotation in degrees
+ * @param {number} [x] translation on X axis for the pivot point
+ * @param {number} [y] translation on Y axis for the pivot point
+ * @returns {TMat2D} matrix
+ */
 export function rotateMatrix(angle: TDegree, x = 0, y = 0): TMat2D {
   const angleRadiant = degreesToRadians(angle),
     cosValue = cos(angleRadiant),
