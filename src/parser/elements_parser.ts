@@ -10,6 +10,10 @@ import {
 } from '../util/misc/matrix';
 import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
+import { FabricObject } from '../shapes/Object/FabricObject';
+
+const findTag = (el) =>
+  classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
 
 const ElementsParser = function (
   elements,
@@ -30,52 +34,38 @@ const ElementsParser = function (
 };
 
 (function (proto) {
-  proto.parse = function () {
-    this.instances = new Array(this.elements.length);
-    this.numElements = this.elements.length;
-    this.createObjects();
+  proto.parse = (): Promise<any> => {
+    return this.createObjects();
   };
 
-  proto.createObjects = function () {
-    this.elements.forEach((element, i) => {
-      element.setAttribute('svgUid', this.svgUid);
-      this.createObject(element, i);
-    });
-  };
-
-  proto.findTag = function (el) {
-    return classRegistry.getSVGClass(
-      el.tagName.toLowerCase().replace('svg:', '')
+  proto.createObjects = (): Promise<any>[] => {
+    return Promise.all(
+      this.elements.map((element, i) => {
+        element.setAttribute('svgUid', this.svgUid);
+        return this.createObject(element, i);
+      })
     );
   };
 
-  proto.createObject = function (el, index) {
-    const klass = this.findTag(el);
+  proto.createObject = function (el): Promise<FabricObject> {
+    const klass = findTag(el);
     if (klass && klass.fromElement) {
-      try {
-        klass.fromElement(el, this.createCallback(index, el), this.options);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      this.checkIfDone();
+      return klass
+        .fromElement(el, this.options)
+        .then((obj) => {
+          let _options;
+          this.resolveGradient(obj, el, 'fill');
+          this.resolveGradient(obj, el, 'stroke');
+          if (obj instanceof Image && obj._originalElement) {
+            _options = obj.parsePreserveAspectRatioAttribute(el);
+          }
+          removeTransformMatrixForSvgParsing(obj, _options);
+          this.resolveClipPath(obj, el);
+          this.reviver && this.reviver(el, obj);
+          return obj;
+        })
+        .catch((err) => console.log(err));
     }
-  };
-
-  proto.createCallback = function (index, el) {
-    return (obj) => {
-      let _options;
-      this.resolveGradient(obj, el, 'fill');
-      this.resolveGradient(obj, el, 'stroke');
-      if (obj instanceof Image && obj._originalElement) {
-        _options = obj.parsePreserveAspectRatioAttribute(el);
-      }
-      removeTransformMatrixForSvgParsing(obj, _options);
-      this.resolveClipPath(obj, el);
-      this.reviver && this.reviver(el, obj);
-      this.instances[index] = obj;
-      this.checkIfDone();
-    };
   };
 
   proto.extractPropertyDefinition = function (obj, property, storageType) {
@@ -174,16 +164,6 @@ const ElementsParser = function (
     } else {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
-    }
-  };
-
-  proto.checkIfDone = function () {
-    if (--this.numElements === 0) {
-      this.instances = this.instances.filter(function (el) {
-        // eslint-disable-next-line no-eq-null, eqeqeq
-        return el != null;
-      });
-      this.callback(this.instances, this.elements);
     }
   };
 })(ElementsParser.prototype);

@@ -203,7 +203,7 @@ export class Circle<
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static fromElement(element: SVGElement, callback: (circle: Circle) => any) {
+  static fromElement(element: SVGElement): Promise<Circle> {
     const {
       left = 0,
       top = 0,
@@ -218,7 +218,7 @@ export class Circle<
     }
 
     // this probably requires to be fixed for default origins not being top/left.
-    callback(
+    return Promise.resolve(
       new this({
         ...otherParsedAttributes,
         radius,
