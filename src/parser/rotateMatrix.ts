@@ -1,7 +1,7 @@
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { TDegree, TMat2D } from '../typedefs';
-import { degreesToRadians } from '../util';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 
 /**
  * A rotation matrix
