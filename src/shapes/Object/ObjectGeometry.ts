@@ -664,7 +664,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   calcACoords(): TCornerPoint {
     const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
       { x, y } = this.getRelativeCenterPoint(),
-      tMatrix = translateMatrix([x, y]),
+      tMatrix = translateMatrix(x, y),
       finalMatrix = multiplyTransformMatrices(tMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
