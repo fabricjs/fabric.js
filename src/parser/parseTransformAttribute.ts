@@ -1,12 +1,12 @@
 import { iMatrix } from '../constants';
 import { reNum } from './constants';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';
-import { skewMatrix } from './skewMatrix';
 import { translateMatrix } from './translateMatrix';
 import { TMat2D } from '../typedefs';
+import { cleanupSvgAttribute } from '../util/internals/cleanupSvAttribute';
+import { skewXMatrix, skewYMatrix } from './skewMatrix';
 
 // == begin transform regexp
 const p = `(${reNum})`;
@@ -34,16 +34,11 @@ const reTransform = new RegExp(transform, 'g');
  */
 export function parseTransformAttribute(attributeValue: string): TMat2D {
   // first we clean the string
-  attributeValue = attributeValue
-    .replace(new RegExp(`(${reNum})`, 'gi'), ' $1 ')
-    // replace annoying commas and arbitrary whitespace with single spaces
-    .replace(/,/gi, ' ')
-    .replace(/\s+/gi, ' ')
+  attributeValue = cleanupSvgAttribute(attributeValue)
     // remove spaces around front parentheses
     .replace(/\s*([()])\s*/gi, '$1');
 
   // start with identity matrix
-  let matrix: TMat2D = [...iMatrix];
   const matrices: TMat2D[] = [];
 
   // return if no argument was given or
@@ -52,7 +47,7 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     !attributeValue ||
     (attributeValue && !reTransformList.test(attributeValue))
   ) {
-    return matrix;
+    return [...iMatrix];
   }
 
   for (const match of attributeValue.matchAll(reTransform)) {
@@ -60,42 +55,40 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     if (!transformMatch) {
       continue;
     }
+    let matrix: TMat2D = iMatrix;
     const matchedParams = transformMatch.filter((m) => !!m);
-    const operation = matchedParams[1];
-    const args = matchedParams.slice(2).map(parseFloat);
+    const [, operation, ...rawArgs] = matchedParams;
+    const [arg0, arg1, arg2, arg3, arg4, arg5] = rawArgs.map((arg) =>
+      parseFloat(arg)
+    );
 
     switch (operation) {
       case 'translate':
-        translateMatrix(matrix, args);
+        matrix = translateMatrix(arg0, arg1);
         break;
       case 'rotate':
-        args[0] = degreesToRadians(args[0]);
-        rotateMatrix(matrix, args);
+        matrix = rotateMatrix(arg0, arg1, arg2);
         break;
       case 'scale':
-        scaleMatrix(matrix, args);
+        matrix = scaleMatrix(arg0, arg1);
         break;
       case 'skewX':
-        skewMatrix(matrix, args, 2);
+        matrix = skewXMatrix(arg0);
         break;
       case 'skewY':
-        skewMatrix(matrix, args, 1);
+        matrix = skewYMatrix(arg0);
         break;
       case 'matrix':
-        matrix = args as TMat2D;
+        matrix = [arg0, arg1, arg2, arg3, arg4, arg5];
         break;
     }
 
     // snapshot current matrix into matrices array
-    matrices.push([...matrix]);
-    // reset
-    matrix = [...iMatrix];
+    matrices.push(matrix);
   }
 
-  let combinedMatrix = matrices[0];
-  while (matrices.length > 1) {
-    matrices.shift();
-    combinedMatrix = multiplyTransformMatrices(combinedMatrix, matrices[0]);
-  }
-  return combinedMatrix;
+  return matrices.reduce(
+    (acc, matrix) => multiplyTransformMatrices(acc, matrix),
+    iMatrix
+  );
 }
