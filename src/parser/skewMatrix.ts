@@ -10,7 +10,7 @@ import { TDegree, TMat2D } from '../typedefs';
  * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
  */
 
-const fromAngleToSkew = (angle: TDegree) => Math.tan(degreesToRadians(angle));,
+const fromAngleToSkew = (angle: TDegree) => Math.tan(degreesToRadians(angle));
 
 export const skewXMatrix = (skewValue: TDegree): TMat2D => [
   1,
