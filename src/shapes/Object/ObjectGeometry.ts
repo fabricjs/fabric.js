@@ -26,6 +26,7 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { ControlProps } from './types/ControlProps';
+import { translateMatrix } from '../../parser/translateMatrix';
 
 type TLineDescriptor = {
   o: Point;
@@ -662,9 +663,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    */
   calcACoords(): TCornerPoint {
     const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
-      center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+      { x, y } = this.getRelativeCenterPoint(),
+      tMatrix = translateMatrix([x, y]),
+      finalMatrix = multiplyTransformMatrices(tMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;

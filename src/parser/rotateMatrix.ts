@@ -1,6 +1,7 @@
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
-import { TMat2D } from '../typedefs';
+import { TDegree, TMat2D } from '../typedefs';
+import { degreesToRadians } from '../util';
 
 /**
  * A rotation matrix
@@ -9,25 +10,17 @@ import { TMat2D } from '../typedefs';
  * [sin(a)  cos(a) -xsin(a)-ycos(a)+y]
  * [0       0      1                 ]
  */
-type TMatRotate = [a: number] | [a: number, x: number, y: number];
 
-export function rotateMatrix(
-  matrix: TMat2D,
-  args: TMatRotate | number[]
-): void {
-  const cosValue = cos(args[0]),
-    sinValue = sin(args[0]);
-  let x = 0,
-    y = 0;
-  if (args.length === 3) {
-    x = args[1];
-    y = args[2];
-  }
-
-  matrix[0] = cosValue;
-  matrix[1] = sinValue;
-  matrix[2] = -sinValue;
-  matrix[3] = cosValue;
-  matrix[4] = x - (cosValue * x - sinValue * y);
-  matrix[5] = y - (sinValue * x + cosValue * y);
+export function rotateMatrix(angle: TDegree, x = 0, y = 0): TMat2D {
+  const angleRadiant = degreesToRadians(angle),
+    cosValue = cos(angleRadiant),
+    sinValue = sin(angleRadiant);
+  return [
+    cosValue,
+    sinValue,
+    -sinValue,
+    cosValue,
+    x - (cosValue * x - sinValue * y),
+    y - (sinValue * x + cosValue * y),
+  ];
 }

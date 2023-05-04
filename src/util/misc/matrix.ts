@@ -1,4 +1,6 @@
 import { iMatrix } from '../../constants';
+import { scaleMatrix } from '../../parser/scaleMatrix';
+import { skewXMatrix, skewYMatrix } from '../../parser/skewMatrix';
 import { XY, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
 import { cos } from './cos';
@@ -145,32 +147,17 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMatrix = iMatrix;
-  if (scaleX !== 1 || scaleY !== 1 || flipX || flipY) {
-    scaleMatrix = [
-      flipX ? -scaleX : scaleX,
-      0,
-      0,
-      flipY ? -scaleY : scaleY,
-      0,
-      0,
-    ] as TMat2D;
-  }
+  let scaleMat = scaleMatrix(
+    flipX ? -scaleX : scaleX,
+    flipY ? -scaleY : scaleY
+  );
   if (skewX) {
-    scaleMatrix = multiplyTransformMatrices(
-      scaleMatrix,
-      [1, 0, Math.tan(degreesToRadians(skewX)), 1] as unknown as TMat2D,
-      true
-    );
+    scaleMat = multiplyTransformMatrices(scaleMat, skewXMatrix(skewX), true);
   }
   if (skewY) {
-    scaleMatrix = multiplyTransformMatrices(
-      scaleMatrix,
-      [1, Math.tan(degreesToRadians(skewY)), 0, 1] as unknown as TMat2D,
-      true
-    );
+    scaleMat = multiplyTransformMatrices(scaleMat, skewYMatrix(skewY), true);
   }
-  return scaleMatrix;
+  return scaleMat;
 };
 
 /**

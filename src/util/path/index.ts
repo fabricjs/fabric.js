@@ -23,7 +23,7 @@ import {
 } from './typedefs';
 import { XY, Point } from '../../Point';
 import { rePathCommand } from './regex';
-import { reNum } from '../../parser/constants';
+import { cleanupSvgAttribute } from '../internals/cleanupSvAttribute';
 
 /**
  * Commands that may be repeated
@@ -843,11 +843,7 @@ export const getPointOnPath = (
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
   // add spaces around the numbers
-  pathString = pathString
-    .replace(new RegExp(`(${reNum})`, 'gi'), ' $1 ')
-    // replace annoying commas and arbitrary whitespace with single spaces
-    .replace(/,/gi, ' ')
-    .replace(/\s+/gi, ' ');
+  pathString = cleanupSvgAttribute(pathString);
 
   const res: TComplexPathData = [];
   for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
