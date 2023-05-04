@@ -13,11 +13,4 @@ import { TMat2D } from '../typedefs';
  * @param matrix
  * @param args
  */
-export const translateMatrix = (x: number, y: number): TMat2D => [
-  1,
-  0,
-  0,
-  1,
-  x,
-  y ?? 0,
-];
+export const translateMatrix = (x: number, y = 0): TMat2D => [1, 0, 0, 1, x, y];
