@@ -206,11 +206,12 @@ export class Circle<
     const {
       left = 0,
       top = 0,
-      radius = 1,
+      radius = 0,
       ...otherParsedAttributes
     } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.
+
     return new this({
       ...otherParsedAttributes,
       radius,
