@@ -1766,16 +1766,11 @@ export class Text<
    * @static
    * @memberOf Text
    * @param {SVGElement} element Element to parse
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (text: Text | null) => any,
-    options: object
-  ) {
+  static fromElement(element: SVGElement, options: object) {
     if (!element) {
-      return callback(null);
+      return null;
     }
 
     const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
@@ -1856,7 +1851,7 @@ export class Text<
       strokeWidth:
         typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
     });
-    callback(text);
+    return text;
   }
 
   /* _FROM_SVG_END_ */

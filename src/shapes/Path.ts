@@ -411,25 +411,18 @@ export class Path<
    * @static
    * @memberOf Path
    * @param {SVGElement} element to parse
-   * @param {(path: Path) => void} callback Callback to invoke after the element has been parsed
    * @param {Partial<PathProps>} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (path: Path) => void,
-    options: Partial<PathProps>
-  ) {
+  static async fromElement(element: SVGElement, options: Partial<PathProps>) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    callback(
-      new this(parsedAttributes.d, {
-        ...parsedAttributes,
-        ...options,
-        // we pass undefined to instruct the constructor to position the object using the bbox
-        left: undefined,
-        top: undefined,
-        fromSVG: true,
-      })
-    );
+    return new this(parsedAttributes.d, {
+      ...parsedAttributes,
+      ...options,
+      // we pass undefined to instruct the constructor to position the object using the bbox
+      left: undefined,
+      top: undefined,
+      fromSVG: true,
+    });
   }
 }
 
