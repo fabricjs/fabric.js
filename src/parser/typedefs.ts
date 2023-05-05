@@ -1,13 +1,13 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
 
-export type TSvgParsedCallback = (
-  results: FabricObject[] | null,
-  options: Record<string, any>,
-  elements: SVGElement[],
-  allElements: SVGElement[]
-) => void;
+export type SVGParsingOutput = {
+  results: FabricObject[];
+  options: Record<string, any>;
+  elements: Element[];
+  allElements: Element[];
+};
 
 export type TSvgReviverCallback = (
-  element: SVGElement,
+  element: Element,
   fabricObject: FabricObject
 ) => void;

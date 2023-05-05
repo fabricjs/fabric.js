@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
@@ -32,11 +32,11 @@ const ElementsParser = function (
 };
 
 (function (proto) {
-  proto.parse = (): Promise<any> => {
+  proto.parse = function (): Promise<FabricObject[]> {
     return this.createObjects();
   };
 
-  proto.createObjects = (): Promise<any>[] => {
+  proto.createObjects = function (): Promise<FabricObject[]> {
     return Promise.all(
       this.elements.map((element, i) => {
         element.setAttribute('svgUid', this.svgUid);
@@ -112,8 +112,7 @@ const ElementsParser = function (
       clipPathOwner.parentNode.appendChild(clipPathTag);
       const container = await Promise.all(
         clipPathElements.map((clipPathElement) => {
-          const klass = this.findTag(clipPathElement);
-          return klass
+          return findTag(clipPathElement)
             .fromElement(clipPathElement, this.options)
             .then((_newObj) => {
               removeTransformMatrixForSvgParsing(_newObj);
