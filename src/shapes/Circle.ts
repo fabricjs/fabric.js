@@ -206,15 +206,9 @@ export class Circle<
     const {
       left = 0,
       top = 0,
-      radius,
+      radius = 1,
       ...otherParsedAttributes
     } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
-
-    if (!radius || radius < 0) {
-      throw new Error(
-        'value of `r` attribute is required and can not be negative'
-      );
-    }
 
     // this probably requires to be fixed for default origins not being top/left.
     return new this({

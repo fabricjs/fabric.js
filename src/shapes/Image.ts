@@ -832,6 +832,9 @@ export class Image<
     return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
+    }).catch((err) => {
+      console.log(err);
+      return null;
     });
   }
 }

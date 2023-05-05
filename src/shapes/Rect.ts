@@ -201,9 +201,6 @@ export class Rect<
     callback: (rect: Rect | null) => void,
     options = {}
   ) {
-    if (!element) {
-      return null;
-    }
     const {
       left = 0,
       top = 0,

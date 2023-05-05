@@ -17,14 +17,12 @@ const findTag = (el) =>
 
 const ElementsParser = function (
   elements,
-  callback,
   options,
   reviver,
   parsingOptions,
   doc
 ) {
   this.elements = elements;
-  this.callback = callback;
   this.options = options;
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
@@ -47,25 +45,22 @@ const ElementsParser = function (
     );
   };
 
-  proto.createObject = function (el): Promise<FabricObject> {
+  proto.createObject = async function (el): Promise<FabricObject> {
     const klass = findTag(el);
-    if (klass && klass.fromElement) {
-      return klass
-        .fromElement(el, this.options)
-        .then((obj) => {
-          let _options;
-          this.resolveGradient(obj, el, 'fill');
-          this.resolveGradient(obj, el, 'stroke');
-          if (obj instanceof Image && obj._originalElement) {
-            _options = obj.parsePreserveAspectRatioAttribute(el);
-          }
-          removeTransformMatrixForSvgParsing(obj, _options);
-          this.resolveClipPath(obj, el);
-          this.reviver && this.reviver(el, obj);
-          return obj;
-        })
-        .catch((err) => console.log(err));
+    if (klass && klass.fromElement && el) {
+      const obj = await klass.fromElement(el, this.options);
+      let _options;
+      this.resolveGradient(obj, el, 'fill');
+      this.resolveGradient(obj, el, 'stroke');
+      if (obj instanceof Image && obj._originalElement) {
+        _options = obj.parsePreserveAspectRatioAttribute(el);
+      }
+      removeTransformMatrixForSvgParsing(obj, _options);
+      await this.resolveClipPath(obj, el);
+      this.reviver && this.reviver(el, obj);
+      return obj;
     }
+    return null;
   };
 
   proto.extractPropertyDefinition = function (obj, property, storageType) {
@@ -97,25 +92,14 @@ const ElementsParser = function (
     }
   };
 
-  proto.createClipPathCallback = function (obj, container) {
-    return function (_newObj) {
-      removeTransformMatrixForSvgParsing(_newObj);
-      _newObj.fillRule = _newObj.clipRule;
-      container.push(_newObj);
-    };
-  };
-
-  proto.resolveClipPath = function (obj, usingElement) {
-    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element,
-      klass,
-      objTransformInv,
-      container,
-      gTransform,
-      options;
-    if (clipPath) {
-      container = [];
-      objTransformInv = invertTransform(obj.calcTransformMatrix());
+  proto.resolveClipPath = async function (obj, usingElement) {
+    const clipPathElements = this.extractPropertyDefinition(
+      obj,
+      'clipPath',
+      'clipPaths'
+    );
+    if (clipPathElements) {
+      const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
       const clipPathTag = clipPath[0].parentNode;
       let clipPathOwner = usingElement;
@@ -126,37 +110,42 @@ const ElementsParser = function (
         clipPathOwner = clipPathOwner.parentNode;
       }
       clipPathOwner.parentNode.appendChild(clipPathTag);
-      for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
-        );
-      }
-      if (container.length === 1) {
-        clipPath = container[0];
-      } else {
-        clipPath = new Group(container);
-      }
-      gTransform = multiplyTransformMatrices(
+      const container = await Promise.all(
+        clipPathElements.map((clipPathElement) => {
+          const klass = this.findTag(clipPathElement);
+          return klass
+            .fromElement(clipPathElement, this.options)
+            .then((_newObj) => {
+              removeTransformMatrixForSvgParsing(_newObj);
+              _newObj.fillRule = _newObj.clipRule;
+              return _newObj;
+            });
+        })
+      );
+      const clipPath =
+        container.length === 1 ? container[0] : new Group(container);
+      const gTransform = multiplyTransformMatrices(
         objTransformInv,
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
+        await this.resolveClipPath(clipPath, clipPathOwner);
       }
-      const options = qrDecompose(gTransform);
-      clipPath.flipX = false;
-      clipPath.flipY = false;
-      clipPath.set('scaleX', options.scaleX);
-      clipPath.set('scaleY', options.scaleY);
-      clipPath.angle = options.angle;
-      clipPath.skewX = options.skewX;
-      clipPath.skewY = 0;
+      const { scaleX, scaleY, angle, skewX, translateX, translateY } =
+        qrDecompose(gTransform);
+      clipPath.set({
+        flipX: false,
+        flipY: false,
+      });
+      clipPath.set({
+        scaleX,
+        scaleY,
+        angle,
+        skewX,
+        skewY: 0,
+      });
       clipPath.setPositionByOrigin(
-        { x: options.translateX, y: options.translateY },
+        { x: translateX, y: translateY },
         'center',
         'center'
       );

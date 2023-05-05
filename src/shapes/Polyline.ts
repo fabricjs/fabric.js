@@ -326,9 +326,6 @@ export class Polyline<
    * @param {Object} [options] Options object
    */
   static async fromElement(element: SVGElement, options?: any) {
-    if (!element) {
-      return null;
-    }
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

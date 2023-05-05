@@ -1768,11 +1768,7 @@ export class Text<
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    */
-  static fromElement(element: SVGElement, options: object) {
-    if (!element) {
-      return null;
-    }
-
+  static async fromElement(element: SVGElement, options: object) {
     const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
       parsedAnchor = parsedAttributes.textAnchor || 'left';
     options = Object.assign({}, options, parsedAttributes);
