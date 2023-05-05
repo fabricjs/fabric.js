@@ -1,6 +1,6 @@
 import { request } from '../util/dom_request';
-import { parseSVGDocument } from './parseSVGDocument';
-import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
+import { parseSVGDocument, emptyResponse } from './parseSVGDocument';
+import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 
 /**
@@ -20,23 +20,27 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
  */
 export function loadSVGFromURL(
   url: string,
-  callback: TSvgParsedCallback,
   reviver?: TSvgReviverCallback,
   options: LoadImageOptions = {}
-) {
-  const onComplete = (r: XMLHttpRequest) => {
-    const xml = r.responseXML;
-    if (!xml || !xml.documentElement) {
-      callback(null, {}, [], []);
-      return false;
-    }
+): Promise<SVGParsingOutput> {
+  // need to handle error properly
+  return new Promise<HTMLElement>((resolve, reject) => {
+    const onComplete = (r: XMLHttpRequest) => {
+      const xml = r.responseXML;
+      if (xml && xml.documentElement) {
+        resolve(xml.documentElement);
+      }
+      reject();
+    };
 
-    parseSVGDocument(xml.documentElement, callback, reviver, options);
-  };
-
-  request(url.replace(/^\n\s*/, '').trim(), {
-    method: 'get',
-    onComplete,
-    signal: options.signal,
-  });
+    request(url.replace(/^\n\s*/, '').trim(), {
+      method: 'get',
+      onComplete,
+      signal: options.signal,
+    });
+  })
+    .then((parsedDoc) => parseSVGDocument(parsedDoc, reviver, options))
+    .catch(() => {
+      return emptyResponse;
+    });
 }

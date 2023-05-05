@@ -35,7 +35,7 @@ import { ElementsParser } from './elements_parser';
 
  */
 
-const emptyResponse: SVGParsingOutput = {
+export const emptyResponse: SVGParsingOutput = {
   results: [],
   elements: [],
   options: {},
@@ -47,7 +47,7 @@ export async function parseSVGDocument(
   reviver?: TSvgReviverCallback,
   { crossOrigin, signal }: LoadImageOptions = {}
 ): Promise<SVGParsingOutput> {
-  if (!doc || (signal && signal.aborted)) {
+  if (signal && signal.aborted) {
     console.log('`options.signal` is in `aborted` state');
     return emptyResponse;
   }
