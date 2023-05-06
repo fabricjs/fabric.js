@@ -583,6 +583,24 @@
       originX: 'left',
       originY: 'bottom',
     });
+
+    var line3 = new fabric.Line([6, 26, 24, 26], {
+      strokeWidth: 2,
+      stroke: 'blue',
+      originX: 'right',
+      originY: 'top',
+      opacity: 0.5,
+      strokeLineCap: 'round'
+    });
+
+    var line4 = new fabric.Line([6, 26, 24, 26], {
+      strokeWidth: 0.2,
+      stroke: 'black',
+      objectCaching: false,
+      originX: 'left',
+      originY: 'bottom',
+    });
+
     canvas.setZoom(10);
     canvas.add(
       polygon,
@@ -590,7 +608,9 @@
       path1,
       path2,
       line1,
-      line2
+      line2,
+      line3,
+      line4,
     );
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
