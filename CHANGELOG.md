@@ -4,6 +4,10 @@
 
 - chore(Path, Polyline): Clean up old SVG import code [#8857](https://github.com/fabricjs/fabric.js/pull/8857)
 
+## [6.0.0-beta5]
+
+- bundle(): export `setEnv` for JEST interoperability [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
+
 ## [6.0.0-beta4]
 
 - chore(): Code cleanup and reuse of code in svg-parsing code [#8881](https://github.com/fabricjs/fabric.js/pull/8881)
