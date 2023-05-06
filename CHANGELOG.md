@@ -4,6 +4,7 @@
 
 ## [6.0.0-beta5]
 
+- refactor(): SVG loading and parsing functionality are now promises or async. Callback have been removed [#8884](https://github.com/fabricjs/fabric.js/pull/8884)
 - bundle(): export `setEnv` for JEST interoperability [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
 
 ## [6.0.0-beta4]
