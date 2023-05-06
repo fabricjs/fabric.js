@@ -402,7 +402,7 @@
   });
 
   function multipleGradients(canvas, callback) {
-    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
+    fabric.loadSVGFromURL(getAssetName('svg_linear_9')).then(({ objects }) => {
       var group = fabric.util.groupSVGElements(objects);
       canvas.add(group);
       toSVGCanvas(canvas, callback);
