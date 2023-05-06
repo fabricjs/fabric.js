@@ -303,7 +303,7 @@ export class Line<
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
-  static async(element: SVGElement) {
+  static async fromElement(element: SVGElement) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
       points = [
         parsedAttributes.x1 || 0,
