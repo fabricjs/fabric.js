@@ -97,38 +97,45 @@
   });
 
   QUnit.test('fromElement without points', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
     var elPolylineWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
-    fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
+    fabric.Polyline.fromElement(elPolylineWithoutPoints).then((polyline) => {
       assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+      done();
     });
   });
 
   QUnit.test('fromElement with empty points', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolylineWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
-    fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
+    fabric.Polyline.fromElement(elPolylineWithEmptyPoints).then((polyline) => {
       assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+      done();
     });
   });
 
   QUnit.test('fromElement', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolyline = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
     elPolyline.setAttributeNS(namespace, 'stroke-width', 1);
-    fabric.Polyline.fromElement(elPolyline, function(polyline) {
+    fabric.Polyline.fromElement(elPolyline).then((polyline) => {
       assert.ok(polyline instanceof fabric.Polyline);
       assert.deepEqual(polyline.toObject(), {
         ...REFERENCE_OBJECT,
         left: 10,
         top: 12
       });
+      done();
     });
   });
 
   QUnit.test('fromElement with custom attr', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolylineWithAttrs = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolylineWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
@@ -142,7 +149,7 @@
     elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
 
-    fabric.Polyline.fromElement(elPolylineWithAttrs, function(polylineWithAttrs) {
+    fabric.Polyline.fromElement(elPolylineWithAttrs).then((polylineWithAttrs) => {
       var expectedPoints = [{x: 10, y: 10}, {x: 20, y: 20}, {x: 30, y: 30}, {x: 10, y: 10}];
       assert.deepEqual(polylineWithAttrs.toObject(), {
         ...REFERENCE_OBJECT,
@@ -160,12 +167,7 @@
         left: 10,
         top: 10,
       });
-    });
-  });
-
-  QUnit.test('fromElement with nothing', function(assert) {
-    fabric.Polyline.fromElement(null, function(polyline) {
-      assert.equal(polyline, null);
+      done();
     });
   });
 })();

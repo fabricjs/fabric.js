@@ -173,29 +173,34 @@
   });
 
   QUnit.test('fromElement without points', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromElement === 'function');
 
     var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
 
-    fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
+    fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+      done();
     });
   });
 
   QUnit.test('fromElement with empty points', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygonWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
-    fabric.Polygon.fromElement(elPolygonWithEmptyPoints, function(polygon) {
+    fabric.Polygon.fromElement(elPolygonWithEmptyPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+      done();
     });
   });
 
   QUnit.test('fromElement with points', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
-    fabric.Polygon.fromElement(elPolygon, function(polygon) {
+    fabric.Polygon.fromElement(elPolygon).then((polygon) => {
       assert.ok(polygon instanceof fabric.Polygon);
       assert.deepEqual(polygon.toObject(), {
         ...REFERENCE_OBJECT,
@@ -203,10 +208,12 @@
         left: 10,
         top: 12
       });
+      done();
     });
   });
 
   QUnit.test('fromElement with points and custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygonWithAttrs = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
@@ -219,7 +226,7 @@
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
-    fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
+    fabric.Polygon.fromElement(elPolygonWithAttrs).then((polygonWithAttrs) => {
       var expectedPoints = [
         { x: 10, y: 10 },
         { x: 20, y: 20 },
@@ -242,11 +249,7 @@
         top:              10,
         left:             10,
       });
-    });
-  });
-  QUnit.test('fromElement with null', function(assert) {
-    fabric.Polygon.fromElement(null, function(polygon) {
-      assert.equal(polygon, null);
+      done();
     });
   });
 })();
