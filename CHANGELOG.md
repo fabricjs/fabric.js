@@ -2,7 +2,7 @@
 
 ## [next]
 
-- bundle(): export `setEnv` [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
+- bundle(): export `setEnv` for JEST interoperability [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
 
 ## [6.0.0-beta4]
 
