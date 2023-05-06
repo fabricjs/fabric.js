@@ -13,6 +13,19 @@ import type { DOMWindow } from 'jsdom';
 
 let env: TFabricEnv;
 
+/**
+ * Sets the environment variables used by fabric.\
+ * This is exposed for special cases, such as configuring a test environment, and should be used with care.
+ *
+ * **CAUTION**: Must be called before using the package.
+ *
+ * @example Testing with jest
+ * // jest is commonjs (https://jestjs.io/docs/ecmascript-modules), so by default it imports the node entry point.
+ * import { getEnv, setEnv } from 'fabric';
+ * // we want fabric to use the `window` and `document` objects exposed by jest.
+ * setEnv({ ...getEnv(), window, document });
+ * // done with setup, now run tests
+ */
 export const setEnv = (value: TFabricEnv) => {
   env = value;
 };
