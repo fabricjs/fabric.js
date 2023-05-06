@@ -1,7 +1,7 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
 
 export type SVGParsingOutput = {
-  results: FabricObject[];
+  objects: FabricObject[];
   options: Record<string, any>;
   elements: Element[];
   allElements: Element[];

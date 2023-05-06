@@ -101,7 +101,7 @@ const ElementsParser = function (
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPath[0].parentNode;
+      const clipPathTag = clipPathElements[0].parentNode;
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentNode &&

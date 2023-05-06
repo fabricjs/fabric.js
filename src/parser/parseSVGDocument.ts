@@ -36,7 +36,7 @@ import { ElementsParser } from './elements_parser';
  */
 
 export const emptyResponse: SVGParsingOutput = {
-  results: [],
+  objects: [],
   elements: [],
   options: {},
   allElements: [],
@@ -109,7 +109,7 @@ export async function parseSVGDocument(
   delete clipPaths[svgUid];
 
   return {
-    results: instances,
+    objects: instances,
     elements,
     options,
     allElements: descendants,
