@@ -11,7 +11,7 @@
     height:                   200,
     fill:                     'red',
     stroke:                   'blue',
-    strokeWidth:              1,
+    strokeWidth:              0,
     strokeDashArray:          null,
     strokeLineCap:            'butt',
     strokeDashOffset:         0,
@@ -48,12 +48,16 @@
     return el;
   }
 
-  function getPathObject(path, callback) {
-    fabric.Path.fromElement(getPathElement(path), callback);
-  }
-
   function makePathObject(callback) {
-    getPathObject('M 100 100 L 300 100 L 200 300 z', callback);
+    const path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
+      fill: 'red',
+      stroke: 'blue',
+      strokeLineCap: 'butt',
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      strokeWidth: 0,
+    });
+    callback(path);
   }
 
   function updatePath(pathObject, value, preservePosition) {
@@ -172,7 +176,7 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
+      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200 200)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
       done();
     });
   });
@@ -182,7 +186,7 @@
     makePathObject(function(path) {
       makePathObject(function(path2) {
         path.clipPath = path2;
-        assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
+        assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200 200)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200 200) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
         done();
       });
     });
@@ -195,7 +199,7 @@
       makePathObject(function(path2) {
         path.clipPath = path2;
         path.clipPath.absolutePositioned = true;
-        assert.equalSVG(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
+        assert.equalSVG(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200 200)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200 200) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
         done();
       });
     });
@@ -272,7 +276,7 @@
     elPath.setAttributeNS(namespace, 'fill', 'red');
     elPath.setAttributeNS(namespace, 'opacity', '1');
     elPath.setAttributeNS(namespace, 'stroke', 'blue');
-    elPath.setAttributeNS(namespace, 'stroke-width', '1');
+    elPath.setAttributeNS(namespace, 'stroke-width', '0');
     elPath.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elPath.setAttributeNS(namespace, 'stroke-linecap', 'round');
     elPath.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
@@ -282,7 +286,7 @@
     //elPath.setAttribute('transform', 'scale(2) translate(10, -20)');
     elPath.setAttributeNS(namespace, 'transform', 'scale(2)');
 
-    fabric.Path.fromElement(elPath, function(path) {
+    fabric.Path.fromElement(elPath).then((path) => {
       assert.ok(path instanceof fabric.Path);
 
       assert.deepEqual(path.toObject(), {
@@ -295,7 +299,7 @@
 
       var ANGLE_DEG = 90;
       elPath.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');
-      fabric.Path.fromElement(elPath, function(path) {
+      fabric.Path.fromElement(elPath).then((path) => {
         assert.deepEqual(
           path.get('transformMatrix'),
           [0, 1, -1, 0, 0, 0]
@@ -314,7 +318,7 @@
     elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
     elPath.setAttributeNS(namespace, 'transform', 'scale(.2)');
 
-    fabric.Path.fromElement(elPath, function(path) {
+    fabric.Path.fromElement(elPath).then((path) => {
       assert.ok(path instanceof fabric.Path);
       assert.deepEqual(path.transformMatrix, [0.2, 0, 0, 0.2, 0, 0], 'transform has been parsed');
       done();
@@ -324,7 +328,7 @@
   QUnit.test('multiple sequences in path commands', function(assert) {
     var done = assert.async();
     var el = getPathElement('M100 100 l 200 200 300 300 400 -50 z');
-    fabric.Path.fromElement(el, function(obj) {
+    fabric.Path.fromElement(el).then((obj) => {
 
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
       assert.deepEqual(obj.path[1], ['L', 300, 300]);
@@ -332,7 +336,7 @@
       assert.deepEqual(obj.path[3], ['L', 1000, 550]);
 
       el = getPathElement('c 0,-53.25604 43.17254,-96.42858 96.42857,-96.42857 53.25603,0 96.42857,43.17254 96.42857,96.42857');
-      fabric.Path.fromElement(el, function(obj) {
+      fabric.Path.fromElement(el).then((obj) => {
         assert.deepEqual(obj.path[0], ['C', 0, -53.25604, 43.17254, -96.42858, 96.42857, -96.42857]);
         assert.deepEqual(obj.path[1], ['C', 149.6846, -96.42857, 192.85714, -53.256029999999996, 192.85714, 0]);
         done();
@@ -343,7 +347,7 @@
   QUnit.test('multiple M/m coordinates converted all L', function(assert) {
     var done = assert.async();
     var el = getPathElement('M100 100 200 200 150 50 m 300 300 400 -50 50 100');
-    fabric.Path.fromElement(el, function(obj) {
+    fabric.Path.fromElement(el).then((obj) => {
 
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
       assert.deepEqual(obj.path[1], ['L', 200, 200]);
@@ -358,7 +362,7 @@
   QUnit.test('multiple M/m commands converted all as M commands', function(assert) {
     var done = assert.async();
     var el = getPathElement('M100 100 M 200 200 M150 50 m 300 300 m 400 -50 m 50 100');
-    fabric.Path.fromElement(el, function(obj) {
+    fabric.Path.fromElement(el).then((obj) => {
 
       assert.deepEqual(obj.path[0], ['M', 100, 100]);
       assert.deepEqual(obj.path[1], ['M', 200, 200]);
@@ -373,8 +377,7 @@
   QUnit.test('compressed path commands', function(assert) {
     var done = assert.async();
     var el = getPathElement('M56.224 84.12C-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215z');
-    fabric.Path.fromElement(el, function(obj) {
-
+    fabric.Path.fromElement(el).then((obj) => {
       assert.deepEqual(obj.path[0], ['M', 56.224, 84.12]);
       assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
       assert.deepEqual(obj.path[2], ['C', 0.046, -0.131, 0.137, -0.221, 0.322, -0.215]);
@@ -386,7 +389,7 @@
   QUnit.test('compressed path commands with e^x', function(assert) {
     var done = assert.async();
     var el = getPathElement('M56.224e2 84.12E-2C-.047.132-.138.221-.322.215.046-.131.137-.221.322-.215m-.050 -20.100z');
-    fabric.Path.fromElement(el, function(obj) {
+    fabric.Path.fromElement(el).then((obj) => {
 
       assert.deepEqual(obj.path[0], ['M', 5622.4, 0.8412]);
       assert.deepEqual(obj.path[1], ['C', -0.047, 0.132, -0.138, 0.221, -0.322, 0.215]);
