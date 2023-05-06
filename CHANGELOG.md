@@ -2,11 +2,11 @@
 
 ## [next]
 
+- refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
 - chore(Path, Polyline): Clean up old SVG import code [#8857](https://github.com/fabricjs/fabric.js/pull/8857)
 
 ## [6.0.0-beta5]
 
-- refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
 - bundle(): export `setEnv` for JEST interoperability [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
 
 ## [6.0.0-beta4]
