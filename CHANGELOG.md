@@ -2,6 +2,8 @@
 
 ## [next]
 
+- bundle(): export `setEnv` [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
+
 ## [6.0.0-beta4]
 
 - chore(): Code cleanup and reuse of code in svg-parsing code [#8881](https://github.com/fabricjs/fabric.js/pull/8881)
