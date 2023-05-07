@@ -94,9 +94,9 @@
     assert.deepEqual(fabric.util.radiansToDegrees(), NaN);
   });
 
-  QUnit.test('calcRotateMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcRotateMatrix === 'function', 'calcRotateMatrix should exist');
-    var matrix = fabric.util.calcRotateMatrix({ angle: 90 });
+  QUnit.test('createRotateMatrix', function (assert) {
+    assert.ok(typeof fabric.util.createRotateMatrix === 'function', 'createRotateMatrix should exist');
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 });
     var expected = [
       0,
       1,
@@ -108,8 +108,8 @@
     assert.deepEqual(matrix, expected, 'rotate matrix is equal');
   });
 
-  QUnit.test('calcRotateMatrix with origin', function (assert) {
-    var matrix = fabric.util.calcRotateMatrix({ angle: 90 }, 100, 200);
+  QUnit.test('createRotateMatrix with origin', function (assert) {
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 }, 100, 200);
     var expected = [
       0,
       1,

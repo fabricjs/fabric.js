@@ -118,7 +118,7 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
  * @param {number} [y] translation on Y axis
  * @returns {TMat2D} matrix
  */
-export const calcTranslateMatrix = (x: number, y = 0): TMat2D => [
+export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
   1,
   0,
   0,
@@ -141,7 +141,7 @@ export const calcTranslateMatrix = (x: number, y = 0): TMat2D => [
  * @param {number} [y] translation on Y axis for the pivot point
  * @returns {TMat2D} matrix
  */
-export function calcRotateMatrix(
+export function createRotateMatrix(
   { angle = 0 }: TRotateMatrixArgs = {},
   x = 0,
   y = 0
@@ -173,7 +173,7 @@ export function calcRotateMatrix(
  * @param {number} [y] scale on Y axis
  * @returns {TMat2D} matrix
  */
-export const calcScaleMatrix = (x: number, y: number = x): TMat2D => [
+export const createScaleMatrix = (x: number, y: number = x): TMat2D => [
   x,
   0,
   0,
@@ -201,7 +201,7 @@ export const skewToAngle = (value: TRadian) =>
  * @param {TDegree} skewValue translation on X axis
  * @returns {TMat2D} matrix
  */
-export const calcSkewXMatrix = (skewValue: TDegree): TMat2D => [
+export const createSkewXMatrix = (skewValue: TDegree): TMat2D => [
   1,
   0,
   angleToSkew(skewValue),
@@ -223,7 +223,7 @@ export const calcSkewXMatrix = (skewValue: TDegree): TMat2D => [
  * @param {TDegree} skewValue translation on Y axis
  * @returns {TMat2D} matrix
  */
-export const calcSkewYMatrix = (skewValue: TDegree): TMat2D => [
+export const createSkewYMatrix = (skewValue: TDegree): TMat2D => [
   1,
   angleToSkew(skewValue),
   0,
@@ -255,21 +255,21 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMat = calcScaleMatrix(
+  let scaleMat = createScaleMatrix(
     flipX ? -scaleX : scaleX,
     flipY ? -scaleY : scaleY
   );
   if (skewX) {
     scaleMat = multiplyTransformMatrices(
       scaleMat,
-      calcSkewXMatrix(skewX),
+      createSkewXMatrix(skewX),
       true
     );
   }
   if (skewY) {
     scaleMat = multiplyTransformMatrices(
       scaleMat,
-      calcSkewYMatrix(skewY),
+      createSkewYMatrix(skewY),
       true
     );
   }
@@ -298,9 +298,9 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  let matrix = calcTranslateMatrix(translateX, translateY);
+  let matrix = createTranslateMatrix(translateX, translateY);
   if (angle) {
-    matrix = multiplyTransformMatrices(matrix, calcRotateMatrix({ angle }));
+    matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));
   }
   const dimMatrix = calcDimensionsMatrix(otherOptions);
   if (!isIdentityMatrix(dimMatrix)) {

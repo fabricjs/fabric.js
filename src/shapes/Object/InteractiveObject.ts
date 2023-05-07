@@ -3,8 +3,8 @@ import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
-  calcRotateMatrix,
-  calcTranslateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
   TQrDecomposeOut,
@@ -236,8 +236,8 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = calcTranslateMatrix(center.x, center.y),
-      rMatrix = calcRotateMatrix({
+      tMatrix = createTranslateMatrix(center.x, center.y),
+      rMatrix = createRotateMatrix({
         angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),

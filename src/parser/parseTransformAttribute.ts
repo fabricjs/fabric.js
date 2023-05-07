@@ -3,11 +3,11 @@ import { reNum } from './constants';
 import { TMat2D } from '../typedefs';
 import { cleanupSvgAttribute } from '../util/internals/cleanupSvAttribute';
 import {
-  calcRotateMatrix,
-  calcScaleMatrix,
-  calcSkewXMatrix,
-  calcSkewYMatrix,
-  calcTranslateMatrix,
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
+  createTranslateMatrix,
   multiplyTransformMatrices,
 } from '../util/misc/matrix';
 
@@ -67,19 +67,19 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
 
     switch (operation) {
       case 'translate':
-        matrix = calcTranslateMatrix(arg0, arg1);
+        matrix = createTranslateMatrix(arg0, arg1);
         break;
       case 'rotate':
-        matrix = calcRotateMatrix({ angle: arg0 }, arg1, arg2);
+        matrix = createRotateMatrix({ angle: arg0 }, arg1, arg2);
         break;
       case 'scale':
-        matrix = calcScaleMatrix(arg0, arg1);
+        matrix = createScaleMatrix(arg0, arg1);
         break;
       case 'skewX':
-        matrix = calcSkewXMatrix(arg0);
+        matrix = createSkewXMatrix(arg0);
         break;
       case 'skewY':
-        matrix = calcSkewYMatrix(arg0);
+        matrix = createSkewYMatrix(arg0);
         break;
       case 'matrix':
         matrix = [arg0, arg1, arg2, arg3, arg4, arg5];
