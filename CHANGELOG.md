@@ -1,5 +1,25 @@
 # Changelog
 
+## [5.4.0]
+
+- fix() fix an issue with offScreen detection and background/overlay Vpt setting [`#8896`](https://github.com/fabricjs/fabric.js/pull/8896)
+
+## [5.2.1]
+
+- fix(): add `eraser` to Object state/cache props [`#7720`](https://github.com/fabricjs/fabric.js/pull/7720)
+
+## [5.2.0]
+
+- feat(fabric.Object): isType accepts multiple `type` [`#7715`](https://github.com/fabricjs/fabric.js/pull/7715)
+- chore(): Replace deprecated String.prototype.substr() with Array.prototype.slice() [`#7696`](https://github.com/fabricjs/fabric.js/pull/7696)
+- chore(): use Array.isArray instead of ie6+ workarounds [`#7718`](https://github.com/fabricjs/fabric.js/pull/7718)
+- MINOR: feat(fabric.Canvas): add `getTopContext` method to expose the internal contextTop [`#7697`](https://github.com/fabricjs/fabric.js/pull/7697)
+- fix(fabric.Object) Add cacheContext checks before trying to render on cache [`#7694`](https://github.com/fabricjs/fabric.js/pull/7694)
+- tests(): node test suite enhancement [`#7691`](https://github.com/fabricjs/fabric.js/pull/7691)
+- feat(Canvas#getCenter): migrate to `getCenterPoint` [`#7699`](https://github.com/fabricjs/fabric.js/pull/7699)
+- updated package.json [`803ce95`](https://github.com/fabricjs/fabric.js/commit/803ce95878150fba9e4195804bccae9bcfe45c6d)
+- tests(fabric.animation): fix test reliability [`4be0fb9`](https://github.com/fabricjs/fabric.js/commit/4be0fb9903e15db294b89030feb645e5da766740)
+
 ## [5.1.0]
 
 - build(deps): bump node-fetch from 2.6.6 to 2.6.7 [`#7684`](https://github.com/fabricjs/fabric.js/pull/7684)
