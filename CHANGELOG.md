@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): Disable offscreen check for bg and overlay when not needed [#8898](https://github.com/fabricjs/fabric.js/pull/8898)
+
 ## [6.0.0-beta5]
 
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
