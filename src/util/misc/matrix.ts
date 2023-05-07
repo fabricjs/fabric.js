@@ -129,9 +129,9 @@ export const calcTranslateMatrix = (x: number, y = 0): TMat2D => [
 ];
 
 /**
- * Generate a rotation matrix around the center or around a point x,y
+ * Generate a rotation matrix around around a point (x,y), defaulting to (0,0)
  *
- * A rotation matrix in the form of
+ * A matrix in the form of
  * [cos(a) -sin(a) -x*cos(a)+y*sin(a)+x]
  * [sin(a)  cos(a) -x*sin(a)-y*cos(a)+y]
  * [0       0      1                 ]
@@ -161,9 +161,9 @@ export function calcRotateMatrix(
 }
 
 /**
- * Generate a scale matrix around the point 0,0
+ * Generate a scale matrix around the point (0,0)
  *
- * A scale matrix of the form of
+ * A matrix in the form of
  * [x 0 0]
  * [0 y 0]
  * [0 0 1]
