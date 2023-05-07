@@ -19,12 +19,12 @@ let env: TFabricEnv;
  *
  * **CAUTION**: Must be called before using the package.
  *
- * @example Testing with jest
- * // jest is commonjs (https://jestjs.io/docs/ecmascript-modules), so by default it imports the node entry point.
+ * @example
+ * <caption>Passing `window` and `document` objects to fabric (in case they are mocked or something)</caption>
  * import { getEnv, setEnv } from 'fabric';
- * // we want fabric to use the `window` and `document` objects exposed by jest.
+ * // we want fabric to use the `window` and `document` objects exposed by the environment we are running in.
  * setEnv({ ...getEnv(), window, document });
- * // done with setup, now run tests
+ * // done with setup, using fabric is now safe
  */
 export const setEnv = (value: TFabricEnv) => {
   env = value;
