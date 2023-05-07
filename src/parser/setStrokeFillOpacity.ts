@@ -17,12 +17,12 @@ export function setStrokeFillOpacity(attributes) {
     ) {
       continue;
     }
-
+    const defaults = FabricObject.getDefaults();
     if (typeof attributes[attr] === 'undefined') {
-      if (!FabricObject.ownDefaults[attr]) {
+      if (!defaults[attr]) {
         continue;
       }
-      attributes[attr] = FabricObject.ownDefaults[attr];
+      attributes[attr] = defaults[attr];
     }
 
     if (attributes[attr].indexOf('url(') === 0) {

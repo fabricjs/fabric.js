@@ -7,7 +7,7 @@ export type TCopyPasteData = {
 };
 export type TFabricEnv = {
   document: Document;
-  window: Window | DOMWindow;
+  window: (Window & typeof globalThis) | DOMWindow;
   isTouchSupported: boolean;
   WebGLProbe: GLProbe;
   dispose(element: Element): void;

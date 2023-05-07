@@ -1,0 +1,10 @@
+{
+  "buildCommand": "build",
+  "sandboxes": [
+    "new",
+    "/.codesandbox/templates/node",
+    "/.codesandbox/templates/next",
+    "/.codesandbox/templates/vanilla"
+  ],
+  "node": "16"
+}

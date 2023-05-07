@@ -6,10 +6,14 @@ import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
+import { TProps } from '../Object/types';
+import { TextProps, SerializedTextProps } from '../Text/Text';
 
 export abstract class ITextKeyBehavior<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends ITextBehavior<EventSpec> {
+> extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
@@ -174,6 +178,19 @@ export abstract class ITextKeyBehavior<
     if (!this.isEditing) {
       return;
     }
+    const updateAndFire = () => {
+      this.updateFromTextArea();
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
+      }
+    };
+    if (this.hiddenTextarea.value === '') {
+      this.styles = {};
+      updateAndFire();
+      return;
+    }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
         this.hiddenTextarea.value
@@ -188,16 +205,6 @@ export abstract class ITextKeyBehavior<
       charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-      return;
-    }
 
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
@@ -265,12 +272,7 @@ export abstract class ITextKeyBehavior<
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
-    this.updateFromTextArea();
-    this.fire('changed');
-    if (this.canvas) {
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+    updateAndFire();
   }
 
   /**

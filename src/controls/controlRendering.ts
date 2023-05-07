@@ -1,11 +1,11 @@
 import { twoMathPi } from '../constants';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 
 export type ControlRenderingStyleOverride = Partial<
   Pick<
-    FabricObject,
+    InteractiveFabricObject,
     | 'cornerStyle'
     | 'cornerSize'
     | 'cornerColor'
@@ -20,7 +20,7 @@ export type ControlRenderer = (
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: FabricObject
+  fabricObject: InteractiveFabricObject
 ) => void;
 
 /**
@@ -40,7 +40,7 @@ export function renderCircleControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: FabricObject
+  fabricObject: InteractiveFabricObject
 ) {
   styleOverride = styleOverride || {};
   const xSize =
@@ -101,7 +101,7 @@ export function renderSquareControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: FabricObject
+  fabricObject: InteractiveFabricObject
 ) {
   styleOverride = styleOverride || {};
   const xSize =

@@ -2,7 +2,7 @@ import { TMat2D, TRadian } from './typedefs';
 import { cos } from './util/misc/cos';
 import { sin } from './util/misc/sin';
 
-export interface IPoint {
+export interface XY {
   x: number;
   y: number;
 }
@@ -10,15 +10,15 @@ export interface IPoint {
 /**
  * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
  */
-export class Point implements IPoint {
+export class Point implements XY {
   declare x: number;
 
   declare y: number;
 
   constructor();
   constructor(x: number, y: number);
-  constructor(point: IPoint);
-  constructor(arg0: number | IPoint = 0, y = 0) {
+  constructor(point: XY);
+  constructor(arg0: number | XY = 0, y = 0) {
     if (typeof arg0 === 'object') {
       this.x = arg0.x;
       this.y = arg0.y;
@@ -30,21 +30,21 @@ export class Point implements IPoint {
 
   /**
    * Adds another point to this one and returns another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point} new Point instance with added values
    */
-  add(that: IPoint): Point {
+  add(that: XY): Point {
     return new Point(this.x + that.x, this.y + that.y);
   }
 
   /**
    * Adds another point to this one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point} thisArg
    * @chainable
    * @deprecated
    */
-  addEquals(that: IPoint): Point {
+  addEquals(that: XY): Point {
     this.x += that.x;
     this.y += that.y;
     return this;
@@ -74,21 +74,21 @@ export class Point implements IPoint {
 
   /**
    * Subtracts another point from this point and returns a new one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point} new Point object with subtracted values
    */
-  subtract(that: IPoint): Point {
+  subtract(that: XY): Point {
     return new Point(this.x - that.x, this.y - that.y);
   }
 
   /**
    * Subtracts another point from this point
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point} thisArg
    * @chainable
    * @deprecated
    */
-  subtractEquals(that: IPoint): Point {
+  subtractEquals(that: XY): Point {
     this.x -= that.x;
     this.y -= that.y;
     return this;
@@ -118,10 +118,10 @@ export class Point implements IPoint {
 
   /**
    * Multiplies this point by another value and returns a new one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point}
    */
-  multiply(that: IPoint): Point {
+  multiply(that: XY): Point {
     return new Point(this.x * that.x, this.y * that.y);
   }
 
@@ -149,10 +149,10 @@ export class Point implements IPoint {
 
   /**
    * Divides this point by another and returns a new one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point}
    */
-  divide(that: IPoint): Point {
+  divide(that: XY): Point {
     return new Point(this.x / that.x, this.y / that.y);
   }
 
@@ -180,57 +180,57 @@ export class Point implements IPoint {
 
   /**
    * Returns true if this point is equal to another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Boolean}
    */
-  eq(that: IPoint): boolean {
+  eq(that: XY): boolean {
     return this.x === that.x && this.y === that.y;
   }
 
   /**
    * Returns true if this point is less than another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Boolean}
    */
-  lt(that: IPoint): boolean {
+  lt(that: XY): boolean {
     return this.x < that.x && this.y < that.y;
   }
 
   /**
    * Returns true if this point is less than or equal to another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Boolean}
    */
-  lte(that: IPoint): boolean {
+  lte(that: XY): boolean {
     return this.x <= that.x && this.y <= that.y;
   }
 
   /**
 
    * Returns true if this point is greater another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Boolean}
    */
-  gt(that: IPoint): boolean {
+  gt(that: XY): boolean {
     return this.x > that.x && this.y > that.y;
   }
 
   /**
    * Returns true if this point is greater than or equal to another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Boolean}
    */
-  gte(that: IPoint): boolean {
+  gte(that: XY): boolean {
     return this.x >= that.x && this.y >= that.y;
   }
 
   /**
    * Returns new point which is the result of linear interpolation with this one and another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @param {Number} t , position of interpolation, between 0 and 1 default 0.5
    * @return {Point}
    */
-  lerp(that: IPoint, t = 0.5): Point {
+  lerp(that: XY, t = 0.5): Point {
     t = Math.max(Math.min(1, t), 0);
     return new Point(
       this.x + (that.x - this.x) * t,
@@ -240,10 +240,10 @@ export class Point implements IPoint {
 
   /**
    * Returns distance from this point and another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Number}
    */
-  distanceFrom(that: IPoint): number {
+  distanceFrom(that: XY): number {
     const dx = this.x - that.x,
       dy = this.y - that.y;
     return Math.sqrt(dx * dx + dy * dy);
@@ -251,28 +251,28 @@ export class Point implements IPoint {
 
   /**
    * Returns the point between this point and another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point}
    */
-  midPointFrom(that: IPoint): Point {
+  midPointFrom(that: XY): Point {
     return this.lerp(that);
   }
 
   /**
    * Returns a new point which is the min of this and another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point}
    */
-  min(that: IPoint): Point {
+  min(that: XY): Point {
     return new Point(Math.min(this.x, that.x), Math.min(this.y, that.y));
   }
 
   /**
    * Returns a new point which is the max of this and another one
-   * @param {IPoint} that
+   * @param {XY} that
    * @return {Point}
    */
-  max(that: IPoint): Point {
+  max(that: XY): Point {
     return new Point(Math.max(this.x, that.x), Math.max(this.y, that.y));
   }
 
@@ -318,10 +318,10 @@ export class Point implements IPoint {
 
   /**
    * Sets x/y of this point from another point
-   * @param {IPoint} that
+   * @param {XY} that
    * @chainable
    */
-  setFromPoint(that: IPoint) {
+  setFromPoint(that: XY) {
     this.x = that.x;
     this.y = that.y;
     return this;
@@ -329,9 +329,9 @@ export class Point implements IPoint {
 
   /**
    * Swaps x/y of this point and another point
-   * @param {IPoint} that
+   * @param {XY} that
    */
-  swap(that: IPoint) {
+  swap(that: XY) {
     const x = this.x,
       y = this.y;
     this.x = that.x;
@@ -352,11 +352,11 @@ export class Point implements IPoint {
    * Rotates `point` around `origin` with `radians`
    * @static
    * @memberOf fabric.util
-   * @param {IPoint} origin The origin of the rotation
+   * @param {XY} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(radians: TRadian, origin: IPoint = originZero): Point {
+  rotate(radians: TRadian, origin: XY = originZero): Point {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
     const sinus = sin(radians),

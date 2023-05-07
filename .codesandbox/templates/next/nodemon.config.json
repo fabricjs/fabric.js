@@ -1,0 +1,4 @@
+{
+  "ignore": [".next"],
+  "ext": "js mjs cjs json ts jsx tsx"
+}

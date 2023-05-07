@@ -5,70 +5,94 @@ import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
 import { isFiller } from '../util/types';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { makeBoundingBoxFromPoints } from '../util';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
-const coordProps = ['x1', 'x2', 'y1', 'y2'];
+const coordProps = ['x1', 'x2', 'y1', 'y2'] as const;
 
-export class Line extends FabricObject {
+interface UniqueLineProps {
+  x1: number;
+  x2: number;
+  y1: number;
+  y2: number;
+}
+
+export interface SerializedLineProps
+  extends SerializedObjectProps,
+    UniqueLineProps {}
+
+export class Line<
+    Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+    SProps extends SerializedLineProps = SerializedLineProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements UniqueLineProps
+{
   /**
    * x value or first line edge
    * @type number
    * @default
    */
-  x1 = 0;
+  declare x1: number;
 
   /**
    * y value or first line edge
    * @type number
    * @default
    */
-  y1 = 0;
+  declare y1: number;
 
   /**
    * x value or second line edge
    * @type number
    * @default
    */
-  x2 = 0;
+  declare x2: number;
 
   /**
    * y value or second line edge
    * @type number
    * @default
    */
-  y2 = 0;
+  declare y2: number;
 
-  static cacheProperties = [...cacheProperties, 'x1', 'x2', 'y1', 'y2'];
+  static cacheProperties = [...cacheProperties, ...coordProps];
   /**
    * Constructor
    * @param {Array} [points] Array of points
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor(
-    points = [0, 0, 0, 0],
-    options: Partial<TClassProperties<Line>> = {}
-  ) {
-    super(options);
-
-    this.set('x1', points[0]);
-    this.set('y1', points[1]);
-    this.set('x2', points[2]);
-    this.set('y2', points[3]);
-
-    this._setWidthHeight(options);
+  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Props = {} as Props) {
+    super({ ...options, x1, y1, x2, y2 });
+    this._setWidthHeight();
+    const { left, top } = options;
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
    * @private
    * @param {Object} [options] Options
    */
-  _setWidthHeight({ left, top }: Partial<TClassProperties<Line>> = {}) {
-    this.width = Math.abs(this.x2 - this.x1);
-    this.height = Math.abs(this.y2 - this.y1);
-    this.left = left ?? this._getLeftToOriginX();
-    this.top = top ?? this._getTopToOriginY();
+  _setWidthHeight() {
+    const { x1, y1, x2, y2 } = this;
+    this.width = Math.abs(x2 - x1);
+    this.height = Math.abs(y2 - y1);
+    const { left, top, width, height } = makeBoundingBoxFromPoints([
+      { x: x1, y: y1 },
+      { x: x2, y: y2 },
+    ]);
+    const position = new Point(left + width / 2, top + height / 2);
+    this.setPositionByOrigin(position, 'center', 'center');
   }
 
   /**
@@ -78,7 +102,13 @@ export class Line extends FabricObject {
    */
   _set(key: string, value: any) {
     super._set(key, value);
-    if (coordProps.includes(key)) {
+    if (coordProps.includes(key as keyof UniqueLineProps)) {
+      // this doesn't make sense very much, since setting x1 when top or left
+      // are already set, is just going to show a strange result since the
+      // line will move way more than the developer expect.
+      // in fabric5 it worked only when the line didn't have extra transformations,
+      // in fabric6 too. With extra transform they behave bad in different ways.
+      // This needs probably a good rework or a tutorial if you have to create a dynamic line
       this._setWidthHeight();
     }
     return this;
@@ -126,8 +156,14 @@ export class Line extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[]) {
-    return { ...super.toObject(propertiesToInclude), ...this.calcLinePoints() };
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return {
+      ...super.toObject(propertiesToInclude),
+      ...this.calcLinePoints(),
+    };
   }
 
   /*
@@ -149,94 +185,29 @@ export class Line extends FabricObject {
 
   /**
    * Recalculates line points given width and height
+   * Those points are simply placed around the center,
+   * This is not useful outside internal render functions and svg output
+   * Is not meant to be for the developer.
    * @private
    */
-  calcLinePoints(): Record<string, number> {
-    const xMult = this.x1 <= this.x2 ? -1 : 1,
-      yMult = this.y1 <= this.y2 ? -1 : 1,
-      x1 = xMult * this.width * 0.5,
-      y1 = yMult * this.height * 0.5,
-      x2 = xMult * this.width * -0.5,
-      y2 = yMult * this.height * -0.5;
+  calcLinePoints(): UniqueLineProps {
+    const { x1: _x1, x2: _x2, y1: _y1, y2: _y2, width, height } = this;
+    const xMult = _x1 <= _x2 ? -1 : 1,
+      yMult = _y1 <= _y2 ? -1 : 1,
+      x1 = (xMult * width) / 2,
+      y1 = (yMult * height) / 2,
+      x2 = (xMult * -width) / 2,
+      y2 = (yMult * -height) / 2;
 
     return {
-      x1: x1,
-      x2: x2,
-      y1: y1,
-      y2: y2,
+      x1,
+      x2,
+      y1,
+      y2,
     };
   }
 
-  private makeEdgeToOriginGetter(
-    propertyNames: any,
-    originValues: any
-  ): number {
-    const origin = propertyNames.origin,
-      axis1 = propertyNames.axis1,
-      axis2 = propertyNames.axis2,
-      dimension = propertyNames.dimension,
-      nearest = originValues.nearest,
-      center = originValues.center,
-      farthest = originValues.farthest;
-
-    switch (this.get(origin)) {
-      case nearest:
-        return Math.min(this.get(axis1), this.get(axis2));
-      case center:
-        return (
-          Math.min(this.get(axis1), this.get(axis2)) + 0.5 * this.get(dimension)
-        );
-      case farthest:
-        return Math.max(this.get(axis1), this.get(axis2));
-      // this should never occurr, since origin is always either one of the 3 above
-      default:
-        return 0;
-    }
-  }
-
-  /**
-   * @private
-   * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
-   */
-  _getLeftToOriginX(): number {
-    return this.makeEdgeToOriginGetter(
-      {
-        // property names
-        origin: 'originX',
-        axis1: 'x1',
-        axis2: 'x2',
-        dimension: 'width',
-      },
-      {
-        // possible values of origin
-        nearest: 'left',
-        center: 'center',
-        farthest: 'right',
-      }
-    );
-  }
-
-  /**
-   * @private
-   * @return {Number} leftToOriginX Distance from left edge of canvas to originX of Line.
-   */
-  _getTopToOriginY(): number {
-    return this.makeEdgeToOriginGetter(
-      {
-        // property names
-        origin: 'originY',
-        axis1: 'y1',
-        axis2: 'y2',
-        dimension: 'height',
-      },
-      {
-        // possible values of origin
-        nearest: 'top',
-        center: 'center',
-        farthest: 'bottom',
-      }
-    );
-  }
+  /* _FROM_SVG_START_ */
 
   /**
    * Returns svg representation of an instance
@@ -244,23 +215,13 @@ export class Line extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const p = this.calcLinePoints();
+    const { x1, x2, y1, y2 } = this.calcLinePoints();
     return [
       '<line ',
       'COMMON_PARTS',
-      'x1="',
-      p.x1,
-      '" y1="',
-      p.y1,
-      '" x2="',
-      p.x2,
-      '" y2="',
-      p.y2,
-      '" />\n',
+      `x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />\n`,
     ];
   }
-
-  /* _FROM_SVG_START_ */
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
@@ -268,7 +229,7 @@ export class Line extends FabricObject {
    * @memberOf Line
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
-  static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat('x1 y1 x2 y2'.split(' '));
+  static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat(coordProps);
 
   /**
    * Returns Line instance from an SVG element
@@ -279,13 +240,14 @@ export class Line extends FabricObject {
    * @param {Function} [callback] callback function invoked after parsing
    */
   static fromElement(element: SVGElement, callback: (line: Line) => any) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES),
-      points = [
-        parsedAttributes.x1 || 0,
-        parsedAttributes.y1 || 0,
-        parsedAttributes.x2 || 0,
-        parsedAttributes.y2 || 0,
-      ];
+    const {
+        x1 = 0,
+        y1 = 0,
+        x2 = 0,
+        y2 = 0,
+        ...parsedAttributes
+      } = parseAttributes(element, this.ATTRIBUTE_NAMES),
+      points: [number, number, number, number] = [x1, y1, x2, y2];
     callback(new this(points, parsedAttributes));
   }
 
@@ -298,8 +260,14 @@ export class Line extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
-  static fromObject({ x1, y1, x2, y2, ...object }: Record<string, any>) {
-    return this._fromObject(
+  static fromObject<T extends TProps<SerializedLineProps>>({
+    x1,
+    y1,
+    x2,
+    y2,
+    ...object
+  }: T) {
+    return this._fromObject<Line>(
       {
         ...object,
         points: [x1, y1, x2, y2],
@@ -307,9 +275,7 @@ export class Line extends FabricObject {
       {
         extraParam: 'points',
       }
-    ).then((fabricLine) => {
-      return fabricLine;
-    });
+    );
   }
 }
 

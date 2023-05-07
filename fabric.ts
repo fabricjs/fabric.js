@@ -1,4 +1,4 @@
-export { getEnv, getDocument, getWindow } from './src/env';
+export { getEnv, getDocument, getWindow, setEnv } from './src/env';
 export { cache } from './src/cache';
 export { VERSION as version, iMatrix } from './src/constants';
 export { config } from './src/config';
@@ -47,6 +47,5 @@ export * from './src/parser';
 
 export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
-import './src/controls/defaultControls';
 
 export * from './src/filters';
