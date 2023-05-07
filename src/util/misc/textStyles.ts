@@ -57,8 +57,9 @@ export const stylesToArray = (
   //loop through each textLine
   for (let i = 0; i < textLines.length; i++) {
     if (!styles[i]) {
-      //no styles exist for this line, so add the line's length to the charIndex total
+      //no styles exist for this line, so add the line's length to the charIndex total and reset prevStyle
       charIndex += textLines[i].length;
+      prevStyle = {};
       continue;
     }
     //loop through each character of the current line

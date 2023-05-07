@@ -6,10 +6,14 @@ import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
+import { TProps } from '../Object/types';
+import { TextProps, SerializedTextProps } from '../Text/Text';
 
 export abstract class ITextKeyBehavior<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends ITextBehavior<EventSpec> {
+> extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype

@@ -1,5 +1,7 @@
 import { iMatrix } from '../../constants';
-import { IPoint, Point } from '../../Point';
+import { scaleMatrix } from '../../parser/scaleMatrix';
+import { skewXMatrix, skewYMatrix } from '../../parser/skewMatrix';
+import { XY, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
@@ -36,13 +38,13 @@ export const isIdentityMatrix = (mat: TMat2D) =>
 
 /**
  * Apply transform t to point p
- * @param  {Point | IPoint} p The point to transform
+ * @param  {Point | XY} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
  * @return {Point} The transformed point
  */
 export const transformPoint = (
-  p: IPoint,
+  p: XY,
   t: TMat2D,
   ignoreOffset?: boolean
 ): Point => new Point(p).transform(t, ignoreOffset);
@@ -145,32 +147,17 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMatrix = iMatrix;
-  if (scaleX !== 1 || scaleY !== 1 || flipX || flipY) {
-    scaleMatrix = [
-      flipX ? -scaleX : scaleX,
-      0,
-      0,
-      flipY ? -scaleY : scaleY,
-      0,
-      0,
-    ] as TMat2D;
-  }
+  let scaleMat = scaleMatrix(
+    flipX ? -scaleX : scaleX,
+    flipY ? -scaleY : scaleY
+  );
   if (skewX) {
-    scaleMatrix = multiplyTransformMatrices(
-      scaleMatrix,
-      [1, 0, Math.tan(degreesToRadians(skewX)), 1] as unknown as TMat2D,
-      true
-    );
+    scaleMat = multiplyTransformMatrices(scaleMat, skewXMatrix(skewX), true);
   }
   if (skewY) {
-    scaleMatrix = multiplyTransformMatrices(
-      scaleMatrix,
-      [1, Math.tan(degreesToRadians(skewY)), 0, 1] as unknown as TMat2D,
-      true
-    );
+    scaleMat = multiplyTransformMatrices(scaleMat, skewYMatrix(skewY), true);
   }
-  return scaleMatrix;
+  return scaleMat;
 };
 
 /**

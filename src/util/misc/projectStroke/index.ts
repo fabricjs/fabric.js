@@ -1,4 +1,4 @@
-import { IPoint } from '../../../Point';
+import { XY } from '../../../Point';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -11,7 +11,7 @@ import { TProjection, TProjectStrokeOnPointsOptions } from './types';
  *
  */
 export const projectStrokeOnPoints = (
-  points: IPoint[],
+  points: XY[],
   options: TProjectStrokeOnPointsOptions,
   openPath = false
 ): TProjection[] => {
@@ -22,7 +22,7 @@ export const projectStrokeOnPoints = (
   }
 
   points.forEach((A, index) => {
-    let B: IPoint, C: IPoint;
+    let B: XY, C: XY;
     if (index === 0) {
       C = points[1];
       B = openPath ? A : points[points.length - 1];

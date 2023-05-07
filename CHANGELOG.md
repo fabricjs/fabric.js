@@ -2,6 +2,34 @@
 
 ## [next]
 
+## [6.0.0-beta5]
+
+- refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
+- bundle(): export `setEnv` for JEST interoperability [#8888](https://github.com/fabricjs/fabric.js/pull/8888)
+
+## [6.0.0-beta4]
+
+- chore(): Code cleanup and reuse of code in svg-parsing code [#8881](https://github.com/fabricjs/fabric.js/pull/8881)
+- chore(TS): Parse transform attribute typing [#8878](https://github.com/fabricjs/fabric.js/pull/8878)
+- chore(TS): Fix typing for DOMParser [#8871](https://github.com/fabricjs/fabric.js/pull/8871)
+- fix(Path, polyline): fix for SVG import [#8879](https://github.com/fabricjs/fabric.js/pull/8879)
+- chore(TS) add types for loadSVGFromURl, parseSVGDocument, loadSVGFromString [#8869](https://github.com/fabricjs/fabric.js/pull/8869)
+- chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
+- fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
+
+## [6.0.0-beta3]
+
+- chore(TS): Path type fixes [#8842](https://github.com/fabricjs/fabric.js/pull/8842)
+- fix(TS): add types to some untyped empty arrays [#8830](https://github.com/fabricjs/fabric.js/pull/8830)
+- chore(TS): Complete typings for toObject/fromObject [#8756](https://github.com/fabricjs/fabric.js/pull/8756)
+- fix(): text styles edge case [#8820](https://github.com/fabricjs/fabric.js/pull/8820)
+- chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
+- chore(TS): Path util typings and refactoring [#8787](https://github.com/fabricjs/fabric.js/pull/8787)
+- rename(): `IPoint` => `XY` [#8806](https://github.com/fabricjs/fabric.js/pull/8806)
+- ci(): use sandbox apps in issue template, use the current branch when deploying an app, minors [#8803](https://github.com/fabricjs/fabric.js/pull/8803)
+- perf(): optimize `perPixelTargetFind` [#8770](https://github.com/fabricjs/fabric.js/pull/8770)
+- BREAKING fix(): reflect NUM_FRACTION_DIGITS to SVG path data [#8782] (https://github.com/fabricjs/fabric.js/pull/8782)
+- fix(IText): layout change regression caused by #8663 (`text` was changed but layout was skipped) [#8711](https://github.com/fabricjs/fabric.js/pull/8711)
 - fix(IText, Textbox): fix broken text input [#8775](https://github.com/fabricjs/fabric.js/pull/8775)
 - ci(): `.codesandbox` [#8135](https://github.com/fabricjs/fabric.js/pull/8135)
 - ci(): disallow circular deps [#8759](https://github.com/fabricjs/fabric.js/pull/8759)

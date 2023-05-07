@@ -16,7 +16,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import { isCollection } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
@@ -30,22 +30,7 @@ import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
-};
-
-export type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'contextCache'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'cacheCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
+import type { TDestroyedCanvas } from './StaticCanvas';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -473,15 +458,6 @@ export class SelectableCanvas<
   contextTopDirty = false;
 
   /**
-   * a reference to the context of an additional canvas that is used for scratch operations
-   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
-   * and is a memory waste. We should either have one that gets added/deleted
-   * @type CanvasRenderingContext2D
-   * @private
-   */
-  declare contextCache: CanvasRenderingContext2D;
-
-  /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
    * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
@@ -516,7 +492,9 @@ export class SelectableCanvas<
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  declare cacheCanvasEl: HTMLCanvasElement;
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
+
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
@@ -638,7 +616,7 @@ export class SelectableCanvas<
 
   /**
    * Given a pointer on the canvas with a viewport applied,
-   * find out the opinter in
+   * find out the pointer in object coordinates
    * @private
    */
   _normalizePointer(object: FabricObject, pointer: Point): Point {
@@ -646,6 +624,20 @@ export class SelectableCanvas<
       this.restorePointerVpt(pointer),
       invertTransform(object.calcTransformMatrix())
     );
+  }
+
+  /**
+   * Set the canvas tolerance value for pixel taret find.
+   * Use only integer numbers.
+   * @private
+   */
+  setTargetFindTolerance(value: number) {
+    value = Math.round(value);
+    this.targetFindTolerance = value;
+    const retina = this.getRetinaScaling();
+    const size = Math.ceil((value * 2 + 1) * retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    this.pixelFindContext.scale(retina, retina);
   }
 
   /**
@@ -659,44 +651,26 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimizatio: we can reuse the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-
-      return isTransparent(
-        target._cacheContext,
-        Math.round(targetRelativeX),
-        Math.round(targetRelativeY),
-        this.targetFindTolerance
-      );
-    }
-
-    const ctx = this.contextCache,
-      originalColor = target.selectionBackgroundColor,
-      v = this.viewportTransform;
-
-    target.selectionBackgroundColor = '';
-
+    const tolerance = this.targetFindTolerance;
+    const ctx = this.pixelFindContext;
     this.clearContext(ctx);
-
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    ctx.translate(-x + tolerance, -y + tolerance);
+    ctx.transform(...this.viewportTransform);
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
     target.render(ctx);
+    target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
-
-    target.selectionBackgroundColor = originalColor;
-
-    return isTransparent(ctx, x, y, this.targetFindTolerance);
+    // our canvas is square, and made around tolerance.
+    // so tolerance in this case also represent the center of the canvas.
+    const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
+    return isTransparent(
+      ctx,
+      enhancedTolerance,
+      enhancedTolerance,
+      enhancedTolerance
+    );
   }
 
   /**
@@ -1044,7 +1018,6 @@ export class SelectableCanvas<
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     super._setBackstoreDimension(prop, value);
     this.upperCanvasEl[prop] = value;
-    this.cacheCanvasEl[prop] = value;
   }
 
   /**
@@ -1086,8 +1059,11 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
+    this.pixelFindCanvasEl = this._createCanvasElement();
+    this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
+      willReadFrequently: true,
+    })!;
+    this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
   protected _initWrapperElement() {
@@ -1364,30 +1340,29 @@ export class SelectableCanvas<
    *
    * @private
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!,
       activeSelection = this._activeSelection!;
     // dispose of active selection
     activeSelection.removeAll();
-    this._activeSelection = undefined;
+    (this as TDestroyedCanvas<this>)._activeSelection = undefined;
     activeSelection.dispose();
     super.destroy();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this.contextCache = null;
-    this.contextTop = null;
+    (this as TDestroyedCanvas<this>).pixelFindContext = null;
+    (this as TDestroyedCanvas<this>).contextTop = null;
     // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
     getEnv().dispose(upperCanvasEl);
-    this.upperCanvasEl = undefined;
-    getEnv().dispose(cacheCanvasEl);
-    this.cacheCanvasEl = undefined;
+    (this as TDestroyedCanvas<this>).upperCanvasEl = undefined;
+    getEnv().dispose(this.pixelFindCanvasEl!);
+    (this as TDestroyedCanvas<this>).pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
-    this.wrapperEl = undefined;
+    (this as TDestroyedCanvas<this>).wrapperEl = undefined;
   }
 
   /**

@@ -225,9 +225,9 @@ function testCanvasDisposing() {
         assert.equal(canvas.wrapperEl, null, 'wrapperEl should be deleted');
         assert.equal(canvas.upperCanvasEl, null, 'upperCanvas should be deleted');
         assert.equal(canvas.lowerCanvasEl, null, 'lowerCanvasEl should be deleted');
-        assert.equal(canvas.cacheCanvasEl, null, 'cacheCanvasEl should be deleted');
+        assert.equal(canvas.pixelFindCanvasEl, null, 'pixelFindCanvasEl should be deleted');
         assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
-        assert.equal(canvas.contextCache, null, 'contextCache should be deleted');
+        assert.equal(canvas.pixelFindContext, null, 'pixelFindContext should be deleted');
         assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
         assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
         assert.equal(el.width, 200, 'restored width');

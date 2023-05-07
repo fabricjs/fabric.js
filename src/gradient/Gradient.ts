@@ -377,6 +377,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
+    const center = instance._findCenterFromElement();
     return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
@@ -391,8 +392,8 @@ export class Gradient<
       ),
       ...(gradientUnits === 'pixels'
         ? {
-            offsetX: -instance.left,
-            offsetY: -instance.top,
+            offsetX: instance.width / 2 - center.x,
+            offsetY: instance.height / 2 - center.y,
           }
         : {
             offsetX: 0,

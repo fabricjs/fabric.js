@@ -15,6 +15,11 @@ const IndexPage: NextPage = () => {
     });
     canvas.add(text);
     canvas.centerObjectH(text);
+    console.log(
+      fabric.util.parsePath(
+        'M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0'
+      )
+    );
   }, []);
 
   return (

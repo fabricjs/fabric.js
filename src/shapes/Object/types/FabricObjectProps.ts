@@ -38,7 +38,7 @@ export interface FabricObjectProps
    * @type Boolean
    * @default
    */
-  centeredRotation: true;
+  centeredRotation: boolean;
 
   /**
    * The angle that an object will lock to while rotating.

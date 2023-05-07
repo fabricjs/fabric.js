@@ -1,11 +1,13 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
-import { IPoint, Point } from '../../Point';
+import { XY, Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
+import { TProps } from '../Object/types';
+import { TextProps, SerializedTextProps } from '../Text/Text';
 
 // TODO: this code seems wrong.
 // e.button for a left click is `0` and so different than `1` is more
@@ -15,15 +17,17 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
+    Props extends TProps<TextProps> = Partial<TextProps>,
+    SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
-  extends ITextKeyBehavior<EventSpec>
+  extends ITextKeyBehavior<Props, SProps, EventSpec>
   implements DragMethods
 {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
-  private declare __lastPointer: IPoint | Record<string, never>;
+  private declare __lastPointer: XY | Record<string, never>;
   private declare __newClickTime: number;
 
   protected draggableTextDelegate: DraggableTextDelegate;
@@ -88,7 +92,7 @@ export abstract class ITextClickBehavior<
     this.__lastSelected = this.selected;
   }
 
-  isTripleClick(newPointer: IPoint) {
+  isTripleClick(newPointer: XY) {
     return (
       this.__newClickTime - this.__lastClickTime < 500 &&
       this.__lastClickTime - this.__lastLastClickTime < 500 &&
@@ -293,7 +297,7 @@ export abstract class ITextClickBehavior<
    * @private
    */
   _getNewSelectionStartFromOffset(
-    mouseOffset: IPoint,
+    mouseOffset: XY,
     prevWidth: number,
     width: number,
     index: number,

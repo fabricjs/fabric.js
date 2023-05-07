@@ -123,7 +123,7 @@ export class SprayBrush extends BaseBrush {
     const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    const rects = [];
+    const rects: Rect[] = [];
 
     for (let i = 0; i < this.sprayChunks.length; i++) {
       const sprayChunk = this.sprayChunks[i];
