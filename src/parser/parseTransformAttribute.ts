@@ -8,7 +8,7 @@ import {
   createSkewXMatrix,
   createSkewYMatrix,
   createTranslateMatrix,
-  multiplyTransformMatrices,
+  multiplyTransformMatricesFromEnd,
 } from '../util/misc/matrix';
 
 // == begin transform regexp
@@ -90,8 +90,5 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     matrices.push(matrix);
   }
 
-  return matrices.reduce(
-    (acc, matrix) => multiplyTransformMatrices(acc, matrix),
-    iMatrix
-  );
+  return multiplyTransformMatricesFromEnd(matrices);
 }

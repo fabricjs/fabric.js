@@ -83,6 +83,46 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
+ * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
+ *
+ * `multiplyTransformMatrixChain([A, B, C, D])` is equivalent to `A(B(C(D)))`
+ *
+ * @param matrices an array of matrices
+ * @param [is2x2] flag to multiply matrices as 2x2 matrices
+ * @returns the multiplication product
+ */
+export const multiplyTransformMatricesFromEnd = (
+  matrices: (TMat2D | undefined | null | false)[],
+  is2x2?: boolean
+) =>
+  matrices.reduceRight(
+    (product: TMat2D, curr) =>
+      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
+    iMatrix
+  );
+
+/**
+ * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **before** it
+ *
+ * `multiplyTransformMatrixChain([A, B, C, D])` is equivalent to `D(C(B(A)))`
+ *
+ * **Note**: this form of multiplication is considered as reversed mathematically
+ *
+ * @param matrices an array of matrices
+ * @param [is2x2] flag to multiply matrices as 2x2 matrices
+ * @returns the multiplication product
+ */
+export const multiplyTransformMatricesFromStart = (
+  matrices: (TMat2D | undefined | null | false)[],
+  is2x2?: boolean
+) =>
+  matrices.reduce(
+    (product: TMat2D, curr) =>
+      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
+    iMatrix
+  );
+
+/**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
@@ -255,25 +295,14 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMat = createScaleMatrix(
-    flipX ? -scaleX : scaleX,
-    flipY ? -scaleY : scaleY
+  return multiplyTransformMatricesFromEnd(
+    [
+      createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
+      skewX && createSkewXMatrix(skewX),
+      skewY && createSkewYMatrix(skewY),
+    ],
+    true
   );
-  if (skewX) {
-    scaleMat = multiplyTransformMatrices(
-      scaleMat,
-      createSkewXMatrix(skewX),
-      true
-    );
-  }
-  if (skewY) {
-    scaleMat = multiplyTransformMatrices(
-      scaleMat,
-      createSkewYMatrix(skewY),
-      true
-    );
-  }
-  return scaleMat;
 };
 
 /**
@@ -298,13 +327,9 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  let matrix = createTranslateMatrix(translateX, translateY);
-  if (angle) {
-    matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));
-  }
-  const dimMatrix = calcDimensionsMatrix(otherOptions);
-  if (!isIdentityMatrix(dimMatrix)) {
-    matrix = multiplyTransformMatrices(matrix, dimMatrix);
-  }
-  return matrix;
+  return multiplyTransformMatricesFromEnd([
+    createTranslateMatrix(translateX, translateY),
+    angle && createRotateMatrix({ angle }),
+    calcDimensionsMatrix(otherOptions),
+  ]);
 };
