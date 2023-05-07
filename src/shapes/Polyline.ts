@@ -74,8 +74,6 @@ export class Polyline<
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
 
   declare strokeOffset: Point;
@@ -146,13 +144,8 @@ export class Polyline<
       offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
     const pathOffsetY =
       offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-    // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
-      left: bbox.left - legacyCorrection,
-      top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
         new Point(bbox.left, bbox.top)
@@ -180,7 +173,11 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
     adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+      this.setPositionByOrigin(
+        new Point(left + width / 2, top + height / 2),
+        'center',
+        'center'
+      );
   }
 
   /**
@@ -345,7 +342,6 @@ export class Polyline<
       new this(points || [], {
         ...parsedAttributes,
         ...options,
-        fromSVG: true,
       })
     );
   }
