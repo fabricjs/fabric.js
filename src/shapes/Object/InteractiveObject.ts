@@ -1,9 +1,10 @@
 import { Point } from '../../Point';
-import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import {
   calcRotateMatrix,
+  calcTranslateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
   TQrDecomposeOut,
@@ -235,7 +236,7 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
+      tMatrix = calcTranslateMatrix(center.x, center.y),
       rMatrix = calcRotateMatrix({
         angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),

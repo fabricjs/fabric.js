@@ -56,7 +56,7 @@ export const transformPoint = (
 export const invertTransform = (t: TMat2D): TMat2D => {
   const a = 1 / (t[0] * t[3] - t[1] * t[2]),
     r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0] as TMat2D,
-    { x, y } = transformPoint(new Point(t[4], t[5]), r, true);
+    { x, y } = new Point(t[4], t[5]).transform(r, true);
   r[4] = -x;
   r[5] = -y;
   return r;
