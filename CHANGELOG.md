@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): Matrix util cleanup [#8894](https://github.com/fabricjs/fabric.js/pull/8894)
+
 ## [6.0.0-beta5]
 
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
