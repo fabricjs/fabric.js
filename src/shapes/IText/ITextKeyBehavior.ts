@@ -8,6 +8,7 @@ import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
 import { TProps } from '../Object/types';
 import { TextProps, SerializedTextProps } from '../Text/Text';
+import { getElementDocument } from '../../util/dom_misc';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
