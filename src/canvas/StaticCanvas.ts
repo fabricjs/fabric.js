@@ -418,20 +418,6 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
@@ -443,7 +429,7 @@ export class StaticCanvas<
     } else {
       this.lowerCanvasEl =
         (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
+        createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */

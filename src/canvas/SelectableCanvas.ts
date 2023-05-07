@@ -1,4 +1,4 @@
-import { getDocument, getEnv } from '../env';
+import { getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -31,6 +31,7 @@ import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TDestroyedCanvas } from './StaticCanvas';
+import { createCanvasElement } from '../util';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -1192,7 +1193,7 @@ export class SelectableCanvas<
 
     // if there is no upperCanvas (most common case) we create one.
     if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
+      this.upperCanvasEl = createCanvasElement();
     }
     const upperCanvasEl = this.upperCanvasEl;
     // we assign the same classname of the lowerCanvas
@@ -1210,7 +1211,7 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.pixelFindCanvasEl = this._createCanvasElement();
+    this.pixelFindCanvasEl = createCanvasElement();
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
