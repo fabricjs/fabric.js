@@ -1,7 +1,6 @@
 import { iMatrix } from '../../constants';
-import { XY, Point } from '../../Point';
-import { TDegree, TMat2D } from '../../typedefs';
-import { angleToSkew } from './angleSkewConversion';
+import { Point, XY } from '../../Point';
+import { TDegree, TRadian, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
@@ -182,6 +181,12 @@ export const calcScaleMatrix = (x: number, y: number = x): TMat2D => [
   0,
   0,
 ];
+
+export const angleToSkew = (angle: TDegree) =>
+  Math.tan(degreesToRadians(angle));
+
+export const skewToAngle = (value: TRadian) =>
+  radiansToDegrees(Math.atan(value));
 
 /**
  * Generate a skew matrix for the X axis
