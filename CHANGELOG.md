@@ -2,6 +2,8 @@
 
 ## [next]
 
+- feat(env): relative window/document, support iframe [#8897](https://github.com/fabricjs/fabric.js/pull/8897)
+
 ## [6.0.0-beta5]
 
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
