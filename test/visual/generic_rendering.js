@@ -361,6 +361,39 @@
     height: 100,
   });
 
+  function bgOverlayVpt(canvas, callback) {
+    var rectbg = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(255,0,0,0.5)'
+    });
+    var rectoverlay = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(0,0,255,0.5)'
+    });
+    canvas.overlayVpt = false;
+    canvas.backgroundVpt = false;
+    canvas.setViewportTransform([0.1,0,0,0.1,7000,7000]);
+    canvas.backgroundImage = rectbg;
+    canvas.overlayImage = rectoverlay;
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'bg-overlay and vpts',
+    code: bgOverlayVpt,
+    golden: 'bgOverlayVpt.png',
+    percentage: 0.04,
+    width: 300,
+    height: 300,
+  });
+
   function gradientStroke(canvas, callback) {
     var line = new fabric.Line([10, 10, 200, 200], {
       stroke: new fabric.Gradient({
@@ -456,40 +489,6 @@
     percentage: 0.04,
     width: 300,
     height: 100,
-  });
-
-  function bgOverlayVpt(canvas, callback) {
-    var rectbg = new fabric.Rect({
-      width: 300,
-      height: 300,
-      top: 0,
-      left: 0,
-      fill: 'rgba(255,0,0,0.5)'
-    });
-    var rectoverlay = new fabric.Rect({
-      width: 300,
-      height: 300,
-      top: 0,
-      left: 0,
-      fill: 'rgba(0,0,255,0.5)'
-    });
-    canvas.overlayVpt = false;
-    canvas.backgroundVpt = false;
-    canvas.setViewportTransform([0.1,0,0,0.1,7000,7000]);
-    canvas.backgroundImage = rectbg;
-    canvas.overlayImage = rectoverlay;
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
-  }
-
-  tests.push({
-    test: 'bg-overlay and vpts',
-    code: bgOverlayVpt,
-    golden: 'bgOverlayVpt.png',
-    newModule: 'Bg and overlay',
-    percentage: 0.04,
-    width: 300,
-    height: 300,
   });
 
   tests.forEach(visualTestLoop(QUnit));
