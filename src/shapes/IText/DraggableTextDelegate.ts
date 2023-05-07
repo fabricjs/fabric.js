@@ -159,7 +159,9 @@ export class DraggableTextDelegate {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    getElementDocument(this.target.hiddenTextarea)!.body.appendChild(dragImage);
+    getElementDocument(
+      (e.target || this.target.hiddenTextarea)! as HTMLElement
+    ).body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
