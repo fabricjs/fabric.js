@@ -1,4 +1,4 @@
-import { getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
