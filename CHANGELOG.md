@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(MultiSelection): add target from behind active selection [#8744](https://github.com/fabricjs/fabric.js/issues/8744)
+
 ## [6.0.0-beta5]
 
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
