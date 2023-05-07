@@ -205,8 +205,9 @@
 
     var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
     elPolygonWithoutPoints.setAttributeNS('http://www.w3.org/2000/svg', 'stroke-width', 0)
-    fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
+    fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, strokeWidth: 0 });
+      done();
     });
   });
 
@@ -243,15 +244,17 @@
         left: 9.5,
         top: 11.5
       });
+      done();
     });
   });
 
-    QUnit.test('fromElement with points no strokewidth', function(assert) {
+  QUnit.test('fromElement with points no strokewidth', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
     elPolygon.setAttributeNS(namespace, 'stroke-width', 0)
-    fabric.Polygon.fromElement(elPolygon, function(polygon) {
+    fabric.Polygon.fromElement(elPolygon).then((polygon) => {
       assert.ok(polygon instanceof fabric.Polygon);
       assert.deepEqual(polygon.toObject(), {
         ...REFERENCE_OBJECT,
