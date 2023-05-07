@@ -1,5 +1,3 @@
-import { getDocument } from '../env';
-
 /**
  * Wraps element with another element
  * @param {HTMLElement} element Element to wrap
@@ -23,9 +21,9 @@ export function wrapElement(element: HTMLElement, wrapper: HTMLDivElement) {
 export function getScrollLeftTop(element: HTMLElement) {
   let left = 0,
     top = 0;
-
-  const docElement = getDocument().documentElement,
-    body = getDocument().body || {
+  const doc = getElementDocument(element);
+  const docElement = doc.documentElement,
+    body = doc.body || {
       scrollLeft: 0,
       scrollTop: 0,
     };
@@ -33,13 +31,12 @@ export function getScrollLeftTop(element: HTMLElement) {
   //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
   //  but the .parentNode of a root ShadowDOM node will always be null, instead
   //  it should be accessed through .host. See http://stackoverflow.com/a/24765528/4383938
-  // @ts-ignore
+  // @ts-expect-error Set element to element parent, or 'host' in case of ShadowDOM
   while (element && (element.parentNode || element.host)) {
-    // Set element to element parent, or 'host' in case of ShadowDOM
-    // @ts-ignore
+    // @ts-expect-error Set element to element parent, or 'host' in case of ShadowDOM
     element = element.parentNode || element.host;
     // @ts-expect-error because element is typed as HTMLElement but it can go up to document
-    if (element === getDocument()) {
+    if (element === doc) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
@@ -62,7 +59,7 @@ export function getScrollLeftTop(element: HTMLElement) {
  */
 export function getElementOffset(element: HTMLElement) {
   let box = { left: 0, top: 0 };
-  const doc = element && element.ownerDocument,
+  const doc = element && getElementDocument(element),
     offset = { left: 0, top: 0 },
     offsetAttributes = {
       borderLeftWidth: 'left',
@@ -74,7 +71,8 @@ export function getElementOffset(element: HTMLElement) {
   if (!doc) {
     return offset;
   }
-  const elemStyle = getDocument().defaultView!.getComputedStyle(element, null);
+  const elemStyle =
+    getElementWindow(element)?.getComputedStyle(element, null) || {};
   for (const attr in offsetAttributes) {
     // @ts-expect-error TS learn to iterate!
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
@@ -119,3 +117,8 @@ export function makeElementSelectable(element: HTMLElement) {
   element.style.userSelect = '';
   return element;
 }
+
+export const getElementDocument = (el: HTMLElement) => el.ownerDocument || null;
+
+export const getElementWindow = (el: HTMLElement) =>
+  el.ownerDocument?.defaultView || null;

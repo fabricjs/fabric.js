@@ -59,7 +59,10 @@ export abstract class ITextKeyBehavior<
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = getDocument().createElement('textarea');
+    const doc =
+      (this.canvas && getElementDocument(this.canvas.getElement())) ||
+      getDocument();
+    this.hiddenTextarea = doc.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -74,7 +77,7 @@ export abstract class ITextKeyBehavior<
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      getDocument().body.appendChild(this.hiddenTextarea);
+      doc.body.appendChild(this.hiddenTextarea);
     }
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));

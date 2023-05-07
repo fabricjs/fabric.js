@@ -194,7 +194,10 @@ export class Image<
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       typeof arg0 === 'string'
-        ? (getDocument().getElementById(arg0) as ImageSource)
+        ? ((
+            (this.canvas && getElementDocument(this.canvas.getElement())) ||
+            getDocument()
+          ).getElementById(arg0) as ImageSource)
         : arg0,
       options
     );

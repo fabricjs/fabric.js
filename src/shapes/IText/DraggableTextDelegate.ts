@@ -10,6 +10,7 @@ import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { TextStyleDeclaration } from '../Text/StyledText';
+import { getElementDocument } from '../../util/dom_misc';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -159,7 +160,11 @@ export class DraggableTextDelegate {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    getDocument().body.appendChild(dragImage);
+    (
+      (this.target.hiddenTextarea &&
+        getElementDocument(this.target.hiddenTextarea)) ||
+      getDocument()
+    ).body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
