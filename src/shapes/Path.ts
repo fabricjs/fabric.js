@@ -57,8 +57,6 @@ export class Path<
 
   declare pathOffset: Point;
 
-  declare fromSVG?: boolean;
-
   declare sourcePath?: string;
 
   declare segmentsInfo?: TPathSegmentInfo[];
@@ -293,10 +291,11 @@ export class Path<
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
+    const { width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    // using pathOffset because it match the use case.
+    // if pathOffset change here we need to use left + width/2 , top + height/2
+    adjustPosition && this.setPositionByOrigin(pathOffset, 'center', 'center');
   }
 
   _calcBoundsFromPath(): TBBox {
@@ -372,12 +371,9 @@ export class Path<
    */
   _calcDimensions(): IPathBBox {
     const bbox = this._calcBoundsFromPath();
-    const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
     return {
       ...bbox,
-      left: bbox.left - strokeCorrection,
-      top: bbox.top - strokeCorrection,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
         bbox.top + bbox.height / 2
@@ -427,7 +423,6 @@ export class Path<
         // we pass undefined to instruct the constructor to position the object using the bbox
         left: undefined,
         top: undefined,
-        fromSVG: true,
       })
     );
   }

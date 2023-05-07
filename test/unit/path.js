@@ -11,7 +11,7 @@
     height:                   200,
     fill:                     'red',
     stroke:                   'blue',
-    strokeWidth:              1,
+    strokeWidth:              0,
     strokeDashArray:          null,
     strokeLineCap:            'butt',
     strokeDashOffset:         0,
@@ -48,12 +48,20 @@
     return el;
   }
 
-  function getPathObject(path, callback) {
+  function getPathObjectFromElement(path, callback) {
     fabric.Path.fromElement(getPathElement(path), callback);
   }
 
   function makePathObject(callback) {
-    getPathObject('M 100 100 L 300 100 L 200 300 z', callback);
+    const path = new fabric.Path('M 100 100 L 300 100 L 200 300 z', {
+      fill: 'red',
+      stroke: 'blue',
+      strokeLineCap: 'butt',
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      strokeWidth: 0,
+    });
+    callback(path);
   }
 
   function updatePath(pathObject, value, preservePosition) {
@@ -109,11 +117,11 @@
     done();
   });
 
-  QUnit.test('initialize with strokeWidth with originX and originY', function(assert) {
+  QUnit.test('initialize with strokeWidth with originX and originY center/center', function(assert) {
     var done = assert.async();
     var path = new fabric.Path(
       'M 100 100 L 200 100 L 170 200 z',
-      { strokeWidth: 0, originX: 'center', originY: 'center' }
+      { strokeWidth: 4, originX: 'center', originY: 'center' }
     );
 
     assert.equal(path.left, 150);
@@ -121,7 +129,47 @@
     done();
   });
 
+  QUnit.test('initialize with strokeWidth with originX and originY top/left', function(assert) {
+    var done = assert.async();
+    var path = new fabric.Path(
+      'M 100 100 L 200 100 L 170 200 z',
+      { strokeWidth: 4, originX: 'left', originY: 'top' }
+    );
+
+    assert.equal(path.left, 98);
+    assert.equal(path.top, 98);
+    done();
+  });
+
+    QUnit.test('initialize with strokeWidth with originX and originY bottom/right', function(assert) {
+    var done = assert.async();
+    var path = new fabric.Path(
+      'M 100 100 L 200 100 L 170 200 z',
+      { strokeWidth: 4, originX: 'right', originY: 'bottom' }
+    );
+
+    assert.equal(path.left, 202);
+    assert.equal(path.top, 202);
+    done();
+  });
+
   QUnit.test('set path after initialization', function (assert) {
+    var done = assert.async();
+    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
+    updatePath(path, REFERENCE_PATH_OBJECT.path, true);
+    assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
+    updatePath(path, REFERENCE_PATH_OBJECT.path, false);
+    var opts = { ...REFERENCE_PATH_OBJECT };
+    delete opts.path;
+    path.set(opts);
+    updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
+    makePathObject(function (cleanPath) {
+      assert.deepEqual(path.toObject(), cleanPath.toObject());
+      done();
+    });
+  });
+
+  QUnit.test('Path initialized with strokeWidth takes that in account for positioning', function (assert) {
     var done = assert.async();
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
@@ -172,7 +220,16 @@
     var done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toSVG === 'function');
-      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
+      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200 200)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
+      done();
+    });
+  });
+
+  QUnit.test('toSVG of path with a strokeWidth', function(assert) {
+    var done = assert.async();
+    makePathObject(function(path) {
+      path.strokeWidth = 2;
+      assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 201 201)\"  >\n<path style=\"stroke: rgb(0,0,255); stroke-width: 2; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n');
       done();
     });
   });
@@ -182,7 +239,7 @@
     makePathObject(function(path) {
       makePathObject(function(path2) {
         path.clipPath = path2;
-        assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200.5 200.5)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
+        assert.equalSVG(path.toSVG(), '<g transform=\"matrix(1 0 0 1 200 200)\" clip-path=\"url(#CLIPPATH_0)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200 200) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n', 'path clipPath toSVG should match');
         done();
       });
     });
@@ -195,7 +252,7 @@
       makePathObject(function(path2) {
         path.clipPath = path2;
         path.clipPath.absolutePositioned = true;
-        assert.equalSVG(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200.5 200.5)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200.5 200.5) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
+        assert.equalSVG(path.toSVG(), '<g clip-path=\"url(#CLIPPATH_0)\"  >\n<g transform=\"matrix(1 0 0 1 200 200)\"  >\n<clipPath id=\"CLIPPATH_0\" >\n\t<path transform=\"matrix(1 0 0 1 200 200) translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</clipPath>\n<path style=\"stroke: rgb(0,0,255); stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  transform=\" translate(-200, -200)\" d=\"M 100 100 L 300 100 L 200 300 Z\" stroke-linecap=\"round\" />\n</g>\n</g>\n', 'path clipPath toSVG absolute should match');
         done();
       });
     });
@@ -272,7 +329,7 @@
     elPath.setAttributeNS(namespace, 'fill', 'red');
     elPath.setAttributeNS(namespace, 'opacity', '1');
     elPath.setAttributeNS(namespace, 'stroke', 'blue');
-    elPath.setAttributeNS(namespace, 'stroke-width', '1');
+    elPath.setAttributeNS(namespace, 'stroke-width', '0');
     elPath.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
     elPath.setAttributeNS(namespace, 'stroke-linecap', 'round');
     elPath.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
