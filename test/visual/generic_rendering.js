@@ -322,6 +322,72 @@
     });
   }
 
+  function bgOverlayVpt(canvas, callback) {
+    var rectbg = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(255,0,0,0.5)'
+    });
+    var rectoverlay = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(0,0,255,0.5)'
+    });
+    canvas.overlayVpt = false;
+    canvas.backgroundVpt = false;
+    canvas.setViewportTransform([0.1,0,0,0.1,7000,7000]);
+    canvas.backgroundImage = rectbg;
+    canvas.overlayImage = rectoverlay;
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'bg-overlay and vpts',
+    code: bgOverlayVpt,
+    golden: 'bgOverlayVpt.png',
+    percentage: 0.04,
+    width: 300,
+    height: 300,
+  });
+
+  function bgOverlayRespectingVpt(canvas, callback) {
+    var rectbg = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(255,0,0,0.5)'
+    });
+    var rectoverlay = new fabric.Rect({
+      width: 300,
+      height: 300,
+      top: 0,
+      left: 0,
+      fill: 'rgba(0,0,255,0.5)'
+    });
+    canvas.overlayVpt = true;
+    canvas.backgroundVpt = true;
+    canvas.setViewportTransform([0.9,0,0,0.9,150,150]);
+    canvas.backgroundImage = rectbg;
+    canvas.overlayImage = rectoverlay;
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'bg-overlay and vpts',
+    code: bgOverlayRespectingVpt,
+    golden: 'bgOverlayRespectVpt.png',
+    percentage: 0.04,
+    width: 300,
+    height: 300,
+  });
+
   tests.push({
     test: 'canvas with background pattern and export',
     code: canvasPattern,
