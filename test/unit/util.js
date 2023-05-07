@@ -261,7 +261,7 @@
     var done = assert.async();
     fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ').then(({ objects }) => {
       assert.ok(objects[0] instanceof fabric.Polygon);
-      assert.equal('red', objects[0] && objects[0].fill);
+      assert.equal(objects[0].fill, 'red');
       done();
     });
   });
