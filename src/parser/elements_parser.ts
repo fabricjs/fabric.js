@@ -11,6 +11,7 @@ import {
 import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { Point } from '../Point';
 
 const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
