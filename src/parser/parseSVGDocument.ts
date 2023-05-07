@@ -49,7 +49,8 @@ export async function parseSVGDocument(
 ): Promise<SVGParsingOutput> {
   if (signal && signal.aborted) {
     console.log('`options.signal` is in `aborted` state');
-    return emptyResponse;
+    // this is an unhappy path, we dont care about speed
+    return cloneDeep(emptyResponse);
   }
   parseUseDirectives(doc);
 
@@ -71,7 +72,7 @@ export async function parseSVGDocument(
   });
   if (!elements || (elements && !elements.length)) {
     return {
-      ...emptyResponse,
+      ...cloneDeep(emptyResponse),
       options,
       allElements: descendants,
     };

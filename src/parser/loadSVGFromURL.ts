@@ -2,6 +2,7 @@ import { request } from '../util/dom_request';
 import { parseSVGDocument, emptyResponse } from './parseSVGDocument';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
+import { cloneDeep } from '../util/internals/cloneDeep';
 
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
@@ -41,6 +42,7 @@ export function loadSVGFromURL(
   })
     .then((parsedDoc) => parseSVGDocument(parsedDoc, reviver, options))
     .catch(() => {
-      return emptyResponse;
+      // this is an unhappy path, we dont care about speed
+      return cloneDeep(emptyResponse);
     });
 }
