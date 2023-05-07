@@ -380,7 +380,7 @@
   }
 
   tests.push({
-    test: 'bg-overlay and vpts',
+    test: 'bg-overlay and vpts applied',
     code: bgOverlayRespectingVpt,
     golden: 'bgOverlayRespectVpt.png',
     percentage: 0.04,
