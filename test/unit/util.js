@@ -108,6 +108,20 @@
     assert.deepEqual(matrix, expected, 'rotate matrix is equal');
   });
 
+  QUnit.test('calcRotateMatrix with origin', function (assert) {
+    var matrix = fabric.util.calcRotateMatrix({ angle: 90 }, 100, 200);
+    var expected = [
+      0,
+      1,
+      -1,
+      0,
+      300,
+      100
+    ];
+    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+    assert.deepEqual(new fabric.Point().rotate(Math.PI / 2, new fabric.Point(100, 200)), new fabric.Point(300, 100), 'rotating 0,0 around origin should equal the matrix translation');
+  });
+
   QUnit.test('fabric.util.getRandomInt', function(assert) {
     assert.ok(typeof fabric.util.getRandomInt === 'function');
 
