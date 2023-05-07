@@ -998,12 +998,17 @@
         ctx.restore();
       }
       if (object) {
+        var skipOffscreen = this.skipOffscreen;
+        // if the object doesn't move with the viewport,
+        // the offscreen concept does not apply;
+        this.skipOffscreen = needsVpt;
         ctx.save();
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
         object.render(ctx);
         ctx.restore();
+        this.skipOffscreen = skipOffscreen;
       }
     },
 
