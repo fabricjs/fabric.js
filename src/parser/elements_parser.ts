@@ -12,11 +12,11 @@ import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import { FabricObject } from '../shapes/Object/FabricObject';
 
-const findTag = (el) =>
+const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
 
 const ElementsParser = function (
-  elements,
+  elements: HTMLElement[],
   options,
   reviver,
   parsingOptions,
@@ -33,21 +33,17 @@ const ElementsParser = function (
 
 (function (proto) {
   proto.parse = function (): Promise<FabricObject[]> {
-    return this.createObjects();
-  };
-
-  proto.createObjects = function (): Promise<FabricObject[]> {
     return Promise.all(
-      this.elements.map((element, i) => {
+      this.elements.map((element: HTMLElement, i) => {
         element.setAttribute('svgUid', this.svgUid);
-        return this.createObject(element, i);
+        return this.createObject(element);
       })
     );
   };
 
-  proto.createObject = async function (el): Promise<FabricObject> {
+  proto.createObject = async function (el: HTMLElement): Promise<FabricObject> {
     const klass = findTag(el);
-    if (klass && klass.fromElement && el) {
+    if (klass) {
       const obj = await klass.fromElement(el, this.options);
       let _options;
       this.resolveGradient(obj, el, 'fill');
@@ -114,10 +110,10 @@ const ElementsParser = function (
         clipPathElements.map((clipPathElement) => {
           return findTag(clipPathElement)
             .fromElement(clipPathElement, this.options)
-            .then((_newObj) => {
-              removeTransformMatrixForSvgParsing(_newObj);
-              _newObj.fillRule = _newObj.clipRule;
-              return _newObj;
+            .then((enlivedClippath) => {
+              removeTransformMatrixForSvgParsing(enlivedClippath);
+              enlivedClippath.fillRule = enlivedClippath.clipRule;
+              return enlivedClippath;
             });
         })
       );

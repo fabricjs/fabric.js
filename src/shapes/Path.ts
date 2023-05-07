@@ -410,8 +410,11 @@ export class Path<
    * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(element: SVGElement, options: Partial<PathProps>) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    return new this(parsedAttributes.d, {
+    const { d, ...parsedAttributes } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES
+    );
+    return new this(d, {
       ...parsedAttributes,
       ...options,
       // we pass undefined to instruct the constructor to position the object using the bbox
