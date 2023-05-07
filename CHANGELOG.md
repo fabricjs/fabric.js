@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(): cleanup #8888
+- chore(): cleanup #8888 [#8892](https://github.com/fabricjs/fabric.js/pull/8892)
 
 ## [6.0.0-beta5]
 
