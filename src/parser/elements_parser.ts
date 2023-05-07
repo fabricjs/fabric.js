@@ -140,7 +140,7 @@ const ElementsParser = function (
         skewY: 0,
       });
       clipPath.setPositionByOrigin(
-        { x: translateX, y: translateY },
+        new Point(translateX, translateY),
         'center',
         'center'
       );
