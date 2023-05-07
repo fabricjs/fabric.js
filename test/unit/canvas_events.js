@@ -26,9 +26,7 @@
     }
   });
 
-  QUnit.test('_beforeTransform', function (assert) {
-    assert.ok(typeof canvas._beforeTransform === 'function');
-
+  QUnit.test('_setupCurrentTransform triggers `before:transform`', function (assert) {
     var canvasEl = canvas.getElement(),
         canvasOffset = fabric.util.getElementOffset(canvasEl);
 
@@ -43,9 +41,9 @@
     });
 
     var corners = ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr'];
-    for (var i = 0; i < corners.length; i++) {
-      var co = rect.oCoords[corners[i]].corner;
-      var e = {
+    for (let i = 0; i < corners.length; i++) {
+      const co = rect.oCoords[corners[i]].corner;
+      const e = {
         clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
         clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
         which: 1
@@ -59,15 +57,15 @@
 
     t = null;
     counter = 0;
-    for (var i = 0; i < corners.length; i++) {
-      var c = corners[i];
-      var co = rect.oCoords[c].corner;
-      var e = {
+    for (let i = 0; i < corners.length; i++) {
+      const c = corners[i];
+      const co = rect.oCoords[c].corner;
+      const e = {
         clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
         clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
         which: 1
       };
-      canvas._beforeTransform(e, rect);
+      canvas._setupCurrentTransform(e, rect);
     }
     assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
     assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');
@@ -379,6 +377,27 @@
     canvas.__onMouseMove(e2);
     canvas.__onMouseUp(e2);
     assert.equal(count, 1, 'object:modified fired');
+    assert.equal(opt.e, e2, 'options match model - event');
+    assert.equal(opt.target, rect, 'options match model - target');
+    assert.equal(opt.transform.action, 'drag', 'options match model - target');
+  });
+
+  QUnit.test('fires object:modified once', function(assert) {
+    var e = { clientX: 30, clientY: 30, which: 1 };
+    var e2 = { clientX: 31, clientY: 31, which: 1 };
+    var rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
+    canvas.add(rect);
+    var count = 0;
+    var opt;
+    canvas.on('object:modified', function(_opt) {
+      count++;
+      opt = _opt;
+      canvas.remove(rect);
+    });
+    canvas.__onMouseDown(e);
+    canvas.__onMouseMove(e2);
+    canvas.__onMouseUp(e2);
+    assert.equal(count, 1, 'object:modified fired once though `endCurrentTransform` was called twice - a spy would be great here');
     assert.equal(opt.e, e2, 'options match model - event');
     assert.equal(opt.target, rect, 'options match model - target');
     assert.equal(opt.transform.action, 'drag', 'options match model - target');

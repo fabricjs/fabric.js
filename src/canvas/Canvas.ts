@@ -1,8 +1,11 @@
 import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
+import { dragHandler } from '../controls/drag';
+import { getActionFromCorner } from '../controls/util';
 import { getDocument, getWindow } from '../env';
 import {
   CanvasEvents,
   DragEventData,
+  ModifierKey,
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
@@ -13,9 +16,11 @@ import { Point } from '../Point';
 import { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { AssertKeys } from '../typedefs';
+import { AssertKeys, TOriginX, TOriginY } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { saveObjectTransform } from '../util/misc/objectTransforms';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
@@ -66,6 +71,14 @@ type TSyntheticEventContext = {
 };
 
 export class Canvas extends SelectableCanvas {
+  /**
+   * hold a reference to a data structure that contains information
+   * on the current on going transform
+   * @type
+   * @private
+   */
+  _currentTransform: Transform | null = null;
+
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -819,11 +832,7 @@ export class Canvas extends SelectableCanvas {
     if (!this._isMainEvent(e)) {
       return;
     }
-    let shouldRender = false;
-    if (transform) {
-      this._finalizeCurrentTransform(e);
-      shouldRender = transform.actionPerformed;
-    }
+    let shouldRender = this.endCurrentTransform(e);
     if (!isClick) {
       const targetWasActive = target === this._activeObject;
       this.handleSelection(e);
@@ -833,9 +842,8 @@ export class Canvas extends SelectableCanvas {
           (!targetWasActive && target === this._activeObject);
       }
     }
-    let pointer, corner;
     if (target) {
-      corner = target._findTargetCorner(
+      const corner = target._findTargetCorner(
         this.getPointer(e, true),
         isTouchEvent(e)
       );
@@ -846,38 +854,33 @@ export class Canvas extends SelectableCanvas {
       ) {
         this.setActiveObject(target, e);
         shouldRender = true;
-      } else {
-        const control = target.controls[corner as string];
+      } else if (corner) {
+        const control = target.controls[corner];
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
-          pointer = this.getPointer(e);
+          const pointer = this.getPointer(e);
           mouseUpHandler(e, transform!, pointer.x, pointer.y);
         }
       }
-      target.isMoving = false;
     }
     // if we are ending up a transform on a different control or a new object
     // fire the original mouse up from the corner that started the transform
     if (
       transform &&
-      (transform.target !== target || transform.corner !== corner)
+      (transform.target !== target || transform.corner !== target.__corner)
     ) {
-      const originalControl =
-          transform.target && transform.target.controls[transform.corner],
+      const { target: originalTarget, corner } = transform;
+      const originalControl = originalTarget && originalTarget.controls[corner],
         originalMouseUpHandler =
           originalControl &&
-          originalControl.getMouseUpHandler(
-            e,
-            transform.target,
-            originalControl
-          );
-      pointer = pointer || this.getPointer(e);
+          originalControl.getMouseUpHandler(e, originalTarget, originalControl);
+      const pointer = this.getPointer(e);
       originalMouseUpHandler &&
         originalMouseUpHandler(e, transform, pointer.x, pointer.y);
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+    this._handleEvent(e, 'up', LEFT_CLICK, isClick, transform);
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
@@ -924,19 +927,20 @@ export class Canvas extends SelectableCanvas {
     e: TPointerEvent,
     eventType: TPointerEventNames,
     button = LEFT_CLICK,
-    isClick = false
+    isClick = false,
+    transform = this._currentTransform
   ) {
     const target = this._target,
       targets = this.targets || [],
       options: TPointerEventInfo = {
-        e: e,
-        target: target,
+        e,
+        target,
         subTargets: targets,
         button,
         isClick,
         pointer: this.getPointer(e),
         absolutePointer: this.getPointer(e, true),
-        transform: this._currentTransform,
+        transform,
       };
     if (eventType === 'up') {
       options.currentTarget = this.findTarget(e);
@@ -947,48 +951,6 @@ export class Canvas extends SelectableCanvas {
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
       targets[i].fire(`mouse${eventType}`, options);
-    }
-  }
-
-  /**
-   * End the current transform.
-   * You don't usually need to call this method unless you are interrupting a user initiated transform
-   * because of some other event ( a press of key combination, or something that block the user UX )
-   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
-   */
-  endCurrentTransform(e: TPointerEvent) {
-    const transform = this._currentTransform;
-    this._finalizeCurrentTransform(e);
-    if (transform && transform.target) {
-      // this could probably go inside _finalizeCurrentTransform
-      transform.target.isMoving = false;
-    }
-    this._currentTransform = null;
-  }
-
-  /**
-   * @private
-   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
-   */
-  _finalizeCurrentTransform(e: TPointerEvent) {
-    const transform = this._currentTransform!,
-      target = transform.target,
-      options = {
-        e,
-        target,
-        transform,
-        action: transform.action,
-      };
-
-    if (target._scaling) {
-      target._scaling = false;
-    }
-
-    target.setCoords();
-
-    if (transform.actionPerformed) {
-      this.fire('object:modified', options);
-      target.fire('modified', options);
     }
   }
 
@@ -1040,6 +1002,193 @@ export class Canvas extends SelectableCanvas {
       this._isCurrentlyDrawing = false;
     }
     this._handleEvent(e, 'up');
+  }
+
+  /**
+   * This method will take in consideration a modifier key pressed and the control we are
+   * about to drag, and try to guess the anchor point ( origin ) of the transormation.
+   * This should be really in the realm of controls, and we should remove specific code for legacy
+   * embedded actions.
+   * @TODO this probably deserve discussion/rediscovery and change/refactor
+   * @private
+   * @deprecated
+   * @param {FabricObject} target
+   * @param {string} action
+   * @param {boolean} altKey
+   * @returns {boolean} true if the transformation should be centered
+   */
+  private _shouldCenterTransform(
+    target: FabricObject,
+    action: string,
+    modifierKeyPressed: boolean
+  ) {
+    if (!target) {
+      return;
+    }
+
+    let centerTransform;
+
+    if (
+      action === 'scale' ||
+      action === 'scaleX' ||
+      action === 'scaleY' ||
+      action === 'resizing'
+    ) {
+      centerTransform = this.centeredScaling || target.centeredScaling;
+    } else if (action === 'rotate') {
+      centerTransform = this.centeredRotation || target.centeredRotation;
+    }
+
+    return centerTransform ? !modifierKeyPressed : modifierKeyPressed;
+  }
+
+  /**
+   * Given the control clicked, determine the origin of the transform.
+   * This is bad because controls can totally have custom names
+   * should disappear before release 4.0
+   * @private
+   * @deprecated
+   */
+  _getOriginFromCorner(
+    target: FabricObject,
+    controlName: string
+  ): { x: TOriginX; y: TOriginY } {
+    const origin = {
+      x: target.originX,
+      y: target.originY,
+    };
+    // is a left control ?
+    if (['ml', 'tl', 'bl'].includes(controlName)) {
+      origin.x = 'right';
+      // is a right control ?
+    } else if (['mr', 'tr', 'br'].includes(controlName)) {
+      origin.x = 'left';
+    }
+    // is a top control ?
+    if (['tl', 'mt', 'tr'].includes(controlName)) {
+      origin.y = 'bottom';
+      // is a bottom control ?
+    } else if (['bl', 'mb', 'br'].includes(controlName)) {
+      origin.y = 'top';
+    }
+    return origin;
+  }
+
+  /**
+   * @private
+   * @param {Event} e Event object
+   * @param {FaricObject} target
+   */
+  _setupCurrentTransform(
+    e: TPointerEvent,
+    target: FabricObject,
+    alreadySelected: boolean
+  ): void {
+    if (!target) {
+      return;
+    }
+    const pointer = target.group
+      ? // transform pointer to target's containing coordinate plane
+        sendPointToPlane(
+          this.getPointer(e),
+          undefined,
+          target.group.calcTransformMatrix()
+        )
+      : this.getPointer(e);
+    const corner = target.__corner || '',
+      control = !!corner && target.controls[corner],
+      actionHandler =
+        alreadySelected && control
+          ? control.getActionHandler(e, target, control)
+          : dragHandler,
+      action = getActionFromCorner(alreadySelected, corner, e, target),
+      origin = this._getOriginFromCorner(target, corner),
+      altKey = e[this.centeredKey as ModifierKey],
+      /**
+       * relative to target's containing coordinate plane
+       * both agree on every point
+       **/
+      transform: Transform = {
+        target: target,
+        action: action,
+        actionHandler,
+        actionPerformed: false,
+        corner,
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
+        offsetX: pointer.x - target.left,
+        offsetY: pointer.y - target.top,
+        originX: origin.x,
+        originY: origin.y,
+        ex: pointer.x,
+        ey: pointer.y,
+        lastX: pointer.x,
+        lastY: pointer.y,
+        theta: degreesToRadians(target.angle),
+        width: target.width,
+        height: target.height,
+        shiftKey: e.shiftKey,
+        altKey: altKey,
+        original: {
+          ...saveObjectTransform(target),
+          originX: origin.x,
+          originY: origin.y,
+        },
+      };
+
+    if (this._shouldCenterTransform(target, action, altKey)) {
+      transform.originX = 'center';
+      transform.originY = 'center';
+    }
+    this._currentTransform = transform;
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
+  }
+
+  protected onObjectDiscarded(target: FabricObject, e?: TPointerEvent) {
+    super.onObjectDiscarded(target, e);
+    if (this._currentTransform && this._currentTransform.target === target) {
+      this.endCurrentTransform(e);
+    }
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that blocks the user UX )
+   * @param {Event} [e] pass down the mouse event that finalized the transform, so it can be used in the event
+   * @returns {boolean} true if {@link Transform['actionPerformed']}, meaning a modified event was fired
+   */
+  protected endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._currentTransform = null;
+    if (!transform) {
+      return false;
+    }
+    const { target, action, actionPerformed } = transform;
+
+    // reset object transform state
+    target._scaling = false;
+    target.isMoving = false;
+
+    target.setCoords();
+
+    if (actionPerformed) {
+      const options = {
+        e,
+        target,
+        transform,
+        action,
+      };
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -1167,17 +1316,6 @@ export class Canvas extends SelectableCanvas {
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
-  }
-
-  /**
-   * @private
-   */
-  _beforeTransform(e: TPointerEvent) {
-    const t = this._currentTransform!;
-    this.fire('before:transform', {
-      e,
-      transform: t,
-    });
   }
 
   /**
