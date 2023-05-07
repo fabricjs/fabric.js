@@ -152,6 +152,7 @@ const ElementsParser = function (
     } else {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
+      return;
     }
   };
 })(ElementsParser.prototype);
