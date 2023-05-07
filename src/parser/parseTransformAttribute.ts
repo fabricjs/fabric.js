@@ -1,7 +1,7 @@
 import { iMatrix } from '../constants';
 import { reNum } from './constants';
 import { TMat2D } from '../typedefs';
-import { cleanupSvgAttribute } from '../util/internals/cleanupSvAttribute';
+import { cleanupSvgAttribute } from '../util/internals/cleanupSvgAttribute';
 import {
   createRotateMatrix,
   createScaleMatrix,
