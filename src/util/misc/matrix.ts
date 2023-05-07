@@ -1,8 +1,7 @@
 import { iMatrix } from '../../constants';
-import { scaleMatrix } from '../../parser/scaleMatrix';
-import { skewXMatrix, skewYMatrix } from '../../parser/skewMatrix';
 import { XY, Point } from '../../Point';
 import { TDegree, TMat2D } from '../../typedefs';
+import { angleToSkew } from './angleSkewConversion';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
@@ -107,22 +106,126 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
 };
 
 /**
- * Returns a transform matrix starting from an object of the same kind of
- * the one returned from qrDecompose, useful also if you want to calculate some
- * transformations from an object that is not enlived yet
- * @param  {Object} options
- * @param  {Number} [options.angle] angle in degrees
- * @return {TMat2D} transform matrix
+ * Generate a translation matrix
+ *
+ * A translation matrix in the form of
+ * [ 1 0 x ]
+ * [ 0 1 y ]
+ * [ 0 0 1 ]
+ *
+ * See @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate for more details
+ *
+ * @param {number} x translation on X axis
+ * @param {number} [y] translation on Y axis
+ * @returns {TMat2D} matrix
  */
-export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
-  if (!angle) {
-    return iMatrix;
-  }
-  const theta = degreesToRadians(angle),
-    cosin = cos(theta),
-    sinus = sin(theta);
-  return [cosin, sinus, -sinus, cosin, 0, 0];
-};
+export const calcTranslateMatrix = (x: number, y = 0): TMat2D => [
+  1,
+  0,
+  0,
+  1,
+  x,
+  y,
+];
+
+/**
+ * Generate a rotation matrix around the center or around a point x,y
+ *
+ * A rotation matrix in the form of
+ * [cos(a) -sin(a) -x*cos(a)+y*sin(a)+x]
+ * [sin(a)  cos(a) -x*sin(a)-y*cos(a)+y]
+ * [0       0      1                 ]
+ *
+ *
+ * @param {TDegree} angle rotation in degrees
+ * @param {number} [x] translation on X axis for the pivot point
+ * @param {number} [y] translation on Y axis for the pivot point
+ * @returns {TMat2D} matrix
+ */
+export function calcRotateMatrix(
+  { angle = 0 }: TRotateMatrixArgs = {},
+  x = 0,
+  y = 0
+): TMat2D {
+  const angleRadiant = degreesToRadians(angle),
+    cosValue = cos(angleRadiant),
+    sinValue = sin(angleRadiant);
+  return [
+    cosValue,
+    sinValue,
+    -sinValue,
+    cosValue,
+    x - (cosValue * x - sinValue * y),
+    y - (sinValue * x + cosValue * y),
+  ];
+}
+
+/**
+ * Generate a scale matrix around the point 0,0
+ *
+ * A scale matrix of the form of
+ * [x 0 0]
+ * [0 y 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale
+ *
+ * @param {number} x scale on X axis
+ * @param {number} [y] scale on Y axis
+ * @returns {TMat2D} matrix
+ */
+export const calcScaleMatrix = (x: number, y: number = x): TMat2D => [
+  x,
+  0,
+  0,
+  y,
+  0,
+  0,
+];
+
+/**
+ * Generate a skew matrix for the X axis
+ *
+ * A matrix in the form of
+ * [1 x 0]
+ * [0 1 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
+ *
+ * @param {TDegree} skewValue translation on X axis
+ * @returns {TMat2D} matrix
+ */
+export const calcSkewXMatrix = (skewValue: TDegree): TMat2D => [
+  1,
+  0,
+  angleToSkew(skewValue),
+  1,
+  0,
+  0,
+];
+
+/**
+ * Generate a skew matrix for the Y axis
+ *
+ * A matrix in the form of
+ * [1 0 0]
+ * [y 1 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy
+ *
+ * @param {TDegree} skewValue translation on Y axis
+ * @returns {TMat2D} matrix
+ */
+export const calcSkewYMatrix = (skewValue: TDegree): TMat2D => [
+  1,
+  angleToSkew(skewValue),
+  0,
+  1,
+  0,
+  0,
+];
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
@@ -147,15 +250,23 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMat = scaleMatrix(
+  let scaleMat = calcScaleMatrix(
     flipX ? -scaleX : scaleX,
     flipY ? -scaleY : scaleY
   );
   if (skewX) {
-    scaleMat = multiplyTransformMatrices(scaleMat, skewXMatrix(skewX), true);
+    scaleMat = multiplyTransformMatrices(
+      scaleMat,
+      calcSkewXMatrix(skewX),
+      true
+    );
   }
   if (skewY) {
-    scaleMat = multiplyTransformMatrices(scaleMat, skewYMatrix(skewY), true);
+    scaleMat = multiplyTransformMatrices(
+      scaleMat,
+      calcSkewYMatrix(skewY),
+      true
+    );
   }
   return scaleMat;
 };
@@ -182,13 +293,13 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  let matrix = [1, 0, 0, 1, translateX, translateY] as TMat2D;
+  let matrix = calcTranslateMatrix(translateX, translateY);
   if (angle) {
     matrix = multiplyTransformMatrices(matrix, calcRotateMatrix({ angle }));
   }
-  const scaleMatrix = calcDimensionsMatrix(otherOptions);
-  if (scaleMatrix !== iMatrix) {
-    matrix = multiplyTransformMatrices(matrix, scaleMatrix);
+  const dimMatrix = calcDimensionsMatrix(otherOptions);
+  if (!isIdentityMatrix(dimMatrix)) {
+    matrix = multiplyTransformMatrices(matrix, dimMatrix);
   }
   return matrix;
 };
