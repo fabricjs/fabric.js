@@ -1802,6 +1802,9 @@ export class Text<
       .replace(/^\s+|\s+$|\n+/g, '')
       .replace(/\s+/g, ' ');
 
+    // this code here is probably the usual issue for SVG center find
+    // this can later looked at again and probably removed.
+
     const text = new this(textContent, {
         left: left + dx,
         top: top + dy,
