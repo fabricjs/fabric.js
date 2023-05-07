@@ -91,32 +91,11 @@ export const multiplyTransformMatrices = (
  * @param [is2x2] flag to multiply matrices as 2x2 matrices
  * @returns the multiplication product
  */
-export const multiplyTransformMatricesFromEnd = (
+export const multiplyTransformMatrices2 = (
   matrices: (TMat2D | undefined | null | false)[],
   is2x2?: boolean
 ) =>
   matrices.reduceRight(
-    (product: TMat2D, curr) =>
-      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
-    iMatrix
-  );
-
-/**
- * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **before** it
- *
- * `multiplyTransformMatrixChain([A, B, C, D])` is equivalent to `D(C(B(A)))`
- *
- * **Note**: this form of multiplication is considered as reversed mathematically
- *
- * @param matrices an array of matrices
- * @param [is2x2] flag to multiply matrices as 2x2 matrices
- * @returns the multiplication product
- */
-export const multiplyTransformMatricesFromStart = (
-  matrices: (TMat2D | undefined | null | false)[],
-  is2x2?: boolean
-) =>
-  matrices.reduce(
     (product: TMat2D, curr) =>
       curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
     iMatrix
@@ -295,7 +274,7 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  return multiplyTransformMatricesFromEnd(
+  return multiplyTransformMatrices2(
     [
       createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
       skewX && createSkewXMatrix(skewX),
@@ -327,7 +306,7 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  return multiplyTransformMatricesFromEnd([
+  return multiplyTransformMatrices2([
     createTranslateMatrix(translateX, translateY),
     angle && createRotateMatrix({ angle }),
     calcDimensionsMatrix(otherOptions),
