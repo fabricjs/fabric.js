@@ -1,5 +1,5 @@
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { TDegree, TMat2D } from '../typedefs';
+import { angleToSkew } from '../util/misc/angleSkewConversion';
 
 /**
  * A matrix in the form
@@ -16,7 +16,6 @@ import { TDegree, TMat2D } from '../typedefs';
  * For more info, see
  * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
  */
-const fromAngleToSkew = (angle: TDegree) => Math.tan(degreesToRadians(angle));
 
 /**
  * Generate a skew matrix for the X axis
@@ -26,7 +25,7 @@ const fromAngleToSkew = (angle: TDegree) => Math.tan(degreesToRadians(angle));
 export const skewXMatrix = (skewValue: TDegree): TMat2D => [
   1,
   0,
-  fromAngleToSkew(skewValue),
+  angleToSkew(skewValue),
   1,
   0,
   0,
@@ -39,7 +38,7 @@ export const skewXMatrix = (skewValue: TDegree): TMat2D => [
  */
 export const skewYMatrix = (skewValue: TDegree): TMat2D => [
   1,
-  fromAngleToSkew(skewValue),
+  angleToSkew(skewValue),
   0,
   1,
   0,
