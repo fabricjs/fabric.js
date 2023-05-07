@@ -1,5 +1,4 @@
 import type { Canvas } from '../../canvas/Canvas';
-import { getDocument } from '../../env';
 import {
   DragEventData,
   DropEventData,
@@ -160,11 +159,7 @@ export class DraggableTextDelegate {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    (
-      (this.target.hiddenTextarea &&
-        getElementDocument(this.target.hiddenTextarea)) ||
-      getDocument()
-    ).body.appendChild(dragImage);
+    getElementDocument(this.target.hiddenTextarea)!.body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
