@@ -111,7 +111,7 @@
   };
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function _createImageObject(width, height, callback) {
@@ -561,7 +561,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
       assert.equal(img.height, c.height * fabric.config.devicePixelRatio, 'output height is bigger');
@@ -576,7 +576,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 1 });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio, 'output width is bigger');
       assert.equal(img.height, c.height * fabric.config.devicePixelRatio, 'output height is bigger');
@@ -591,7 +591,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: true, multiplier: 3 });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * fabric.config.devicePixelRatio * 3, 'output width is bigger by 6');
       assert.equal(img.height, c.height * fabric.config.devicePixelRatio * 3, 'output height is bigger by 6');
@@ -606,7 +606,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
       assert.equal(img.height, c.height, 'output height is not bigger');
@@ -621,7 +621,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 1 });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is not bigger');
       assert.equal(img.height, c.height, 'output height is not bigger');
@@ -636,7 +636,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false, multiplier: 3 });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width * 3, 'output width is bigger by 3');
       assert.equal(img.height, c.height * 3, 'output height is bigger by 3');
@@ -651,7 +651,7 @@
     var c = new fabric.StaticCanvas(null, { enableRetinaScaling: true, width: 10, height: 10 });
     var dataUrl = c.toDataURL({ enableRetinaScaling: false });
     c.cancelRequestedRender();
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.onload = function() {
       assert.equal(img.width, c.width, 'output width is bigger');
       assert.equal(img.height, c.height, 'output height is bigger');
@@ -1950,7 +1950,7 @@
   QUnit.test('toSVG with background pattern', function(assert) {
     var canvas2 = new fabric.StaticCanvas();
 
-    var img = fabric.getDocument().createElement('img');
+    var img = fabric.getFabricDocument().createElement('img');
     img.src = 'a.jpg';
     canvas2.backgroundColor = new fabric.Pattern({
       repeat: 'repeat',

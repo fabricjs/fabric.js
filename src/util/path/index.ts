@@ -23,7 +23,7 @@ import {
 } from './typedefs';
 import { XY, Point } from '../../Point';
 import { rePathCommand } from './regex';
-import { cleanupSvgAttribute } from '../internals/cleanupSvAttribute';
+import { cleanupSvgAttribute } from '../internals/cleanupSvgAttribute';
 
 /**
  * Commands that may be repeated

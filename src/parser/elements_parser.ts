@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
@@ -10,17 +10,20 @@ import {
 } from '../util/misc/matrix';
 import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import { Point } from '../Point';
+
+const findTag = (el: HTMLElement) =>
+  classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
 
 const ElementsParser = function (
-  elements,
-  callback,
+  elements: HTMLElement[],
   options,
   reviver,
   parsingOptions,
   doc
 ) {
   this.elements = elements;
-  this.callback = callback;
   this.options = options;
   this.reviver = reviver;
   this.svgUid = (options && options.svgUid) || 0;
@@ -30,40 +33,19 @@ const ElementsParser = function (
 };
 
 (function (proto) {
-  proto.parse = function () {
-    this.instances = new Array(this.elements.length);
-    this.numElements = this.elements.length;
-    this.createObjects();
-  };
-
-  proto.createObjects = function () {
-    this.elements.forEach((element, i) => {
-      element.setAttribute('svgUid', this.svgUid);
-      this.createObject(element, i);
-    });
-  };
-
-  proto.findTag = function (el) {
-    return classRegistry.getSVGClass(
-      el.tagName.toLowerCase().replace('svg:', '')
+  proto.parse = function (): Promise<FabricObject[]> {
+    return Promise.all(
+      this.elements.map((element: HTMLElement, i) => {
+        element.setAttribute('svgUid', this.svgUid);
+        return this.createObject(element);
+      })
     );
   };
 
-  proto.createObject = function (el, index) {
-    const klass = this.findTag(el);
-    if (klass && klass.fromElement) {
-      try {
-        klass.fromElement(el, this.createCallback(index, el), this.options);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      this.checkIfDone();
-    }
-  };
-
-  proto.createCallback = function (index, el) {
-    return (obj) => {
+  proto.createObject = async function (el: HTMLElement): Promise<FabricObject> {
+    const klass = findTag(el);
+    if (klass) {
+      const obj = await klass.fromElement(el, this.options);
       let _options;
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
@@ -71,11 +53,11 @@ const ElementsParser = function (
         _options = obj.parsePreserveAspectRatioAttribute(el);
       }
       removeTransformMatrixForSvgParsing(obj, _options);
-      this.resolveClipPath(obj, el);
+      await this.resolveClipPath(obj, el);
       this.reviver && this.reviver(el, obj);
-      this.instances[index] = obj;
-      this.checkIfDone();
-    };
+      return obj;
+    }
+    return null;
   };
 
   proto.extractPropertyDefinition = function (obj, property, storageType) {
@@ -107,27 +89,16 @@ const ElementsParser = function (
     }
   };
 
-  proto.createClipPathCallback = function (obj, container) {
-    return function (_newObj) {
-      removeTransformMatrixForSvgParsing(_newObj);
-      _newObj.fillRule = _newObj.clipRule;
-      container.push(_newObj);
-    };
-  };
-
-  proto.resolveClipPath = function (obj, usingElement) {
-    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element,
-      klass,
-      objTransformInv,
-      container,
-      gTransform,
-      options;
-    if (clipPath) {
-      container = [];
-      objTransformInv = invertTransform(obj.calcTransformMatrix());
+  proto.resolveClipPath = async function (obj, usingElement) {
+    const clipPathElements = this.extractPropertyDefinition(
+      obj,
+      'clipPath',
+      'clipPaths'
+    );
+    if (clipPathElements) {
+      const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPath[0].parentNode;
+      const clipPathTag = clipPathElements[0].parentNode;
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentNode &&
@@ -136,37 +107,41 @@ const ElementsParser = function (
         clipPathOwner = clipPathOwner.parentNode;
       }
       clipPathOwner.parentNode.appendChild(clipPathTag);
-      for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
-        );
-      }
-      if (container.length === 1) {
-        clipPath = container[0];
-      } else {
-        clipPath = new Group(container);
-      }
-      gTransform = multiplyTransformMatrices(
+      const container = await Promise.all(
+        clipPathElements.map((clipPathElement) => {
+          return findTag(clipPathElement)
+            .fromElement(clipPathElement, this.options)
+            .then((enlivedClippath) => {
+              removeTransformMatrixForSvgParsing(enlivedClippath);
+              enlivedClippath.fillRule = enlivedClippath.clipRule;
+              return enlivedClippath;
+            });
+        })
+      );
+      const clipPath =
+        container.length === 1 ? container[0] : new Group(container);
+      const gTransform = multiplyTransformMatrices(
         objTransformInv,
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
+        await this.resolveClipPath(clipPath, clipPathOwner);
       }
-      const options = qrDecompose(gTransform);
-      clipPath.flipX = false;
-      clipPath.flipY = false;
-      clipPath.set('scaleX', options.scaleX);
-      clipPath.set('scaleY', options.scaleY);
-      clipPath.angle = options.angle;
-      clipPath.skewX = options.skewX;
-      clipPath.skewY = 0;
+      const { scaleX, scaleY, angle, skewX, translateX, translateY } =
+        qrDecompose(gTransform);
+      clipPath.set({
+        flipX: false,
+        flipY: false,
+      });
+      clipPath.set({
+        scaleX,
+        scaleY,
+        angle,
+        skewX,
+        skewY: 0,
+      });
       clipPath.setPositionByOrigin(
-        { x: options.translateX, y: options.translateY },
+        new Point(translateX, translateY),
         'center',
         'center'
       );
@@ -174,16 +149,7 @@ const ElementsParser = function (
     } else {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
-    }
-  };
-
-  proto.checkIfDone = function () {
-    if (--this.numElements === 0) {
-      this.instances = this.instances.filter(function (el) {
-        // eslint-disable-next-line no-eq-null, eqeqeq
-        return el != null;
-      });
-      this.callback(this.instances, this.elements);
+      return;
     }
   };
 })(ElementsParser.prototype);

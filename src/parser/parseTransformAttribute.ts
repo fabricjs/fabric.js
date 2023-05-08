@@ -5,7 +5,7 @@ import { rotateMatrix } from './rotateMatrix';
 import { scaleMatrix } from './scaleMatrix';
 import { translateMatrix } from './translateMatrix';
 import { TMat2D } from '../typedefs';
-import { cleanupSvgAttribute } from '../util/internals/cleanupSvAttribute';
+import { cleanupSvgAttribute } from '../util/internals/cleanupSvgAttribute';
 import { skewXMatrix, skewYMatrix } from './skewMatrix';
 
 // == begin transform regexp

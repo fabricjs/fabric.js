@@ -104,18 +104,21 @@
   });
 
   QUnit.test('fabric.Rect.fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Rect.fromElement === 'function');
 
-    var elRect = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
-    fabric.Rect.fromElement(elRect, function(rect) {
+    var elRect = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
+    fabric.Rect.fromElement(elRect).then((rect) => {
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
+      done();
     });
   });
 
   QUnit.test('fabric.Rect.fromElement with custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elRectWithAttrs = fabric.getDocument().createElementNS(namespace, 'rect');
+    var elRectWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'rect');
 
     elRectWithAttrs.setAttributeNS(namespace, 'x', 10);
     elRectWithAttrs.setAttributeNS(namespace, 'y', 20);
@@ -133,7 +136,7 @@
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elRectWithAttrs.setAttributeNS(namespace, 'vector-effect', 'non-scaling-stroke');
     //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
-    fabric.Rect.fromElement(elRectWithAttrs, function(rectWithAttrs) {
+    fabric.Rect.fromElement(elRectWithAttrs).then((rectWithAttrs) => {
       assert.ok(rectWithAttrs instanceof fabric.Rect);
       assert.equal(rectWithAttrs.strokeUniform, true, 'strokeUniform is parsed');
       var expectedObject = {
@@ -155,12 +158,7 @@
         strokeUniform:    true
       };
       assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
-    });
-  });
-
-  QUnit.test('empty fromElement', function(assert) {
-    fabric.Rect.fromElement(null, function(rect) {
-      assert.equal(rect, null);
+      done();
     });
   });
 
@@ -215,8 +213,8 @@
   QUnit.test('paintFirst life cycle', function(assert) {
     var done = assert.async();
     var svg = '<svg><rect x="10" y="10" height="50" width="55" fill="red" stroke="blue" paint-order="stroke" /></svg>';
-    fabric.loadSVGFromString(svg, function(envlivedObjects) {
-      var rect = envlivedObjects[0];
+    fabric.loadSVGFromString(svg).then(({ objects }) => {
+      var rect = objects[0];
       var rectObject = rect.toObject();
       var rectSvg = rect.toSVG();
       assert.equal(rect.paintFirst, 'stroke');
