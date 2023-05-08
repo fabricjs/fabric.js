@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Disable offscreen check for bg and overlay when not needed [#8898](https://github.com/fabricjs/fabric.js/pull/8898)
 - chore(): cleanup #8888 [#8892](https://github.com/fabricjs/fabric.js/pull/8892)
 - feat(env): relative window/document, support iframe [#8897](https://github.com/fabricjs/fabric.js/pull/8897)
 - docs(): add repo repro link to `bug_report.yml` [#8900](https://github.com/fabricjs/fabric.js/pull/8900)
