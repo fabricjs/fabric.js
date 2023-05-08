@@ -1,4 +1,4 @@
-import { Pattern } from '../Pattern';
+import { Pattern } from '../pattern';
 import { createCanvasElement } from '../util/misc/dom';
 import type { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';

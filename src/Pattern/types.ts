@@ -1,4 +1,4 @@
-import { Pattern } from './Pattern';
+import type { Pattern } from './Pattern';
 
 export type PatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
 
