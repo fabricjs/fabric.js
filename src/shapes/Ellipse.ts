@@ -158,18 +158,14 @@ export class Ellipse<
    * @static
    * @memberOf Ellipse
    * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @return {Ellipse}
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (ellipse: Ellipse) => void
-  ) {
+  static async fromElement(element: SVGElement) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    callback(new this(parsedAttributes));
+    return new this(parsedAttributes);
   }
 
   /* _FROM_SVG_END_ */

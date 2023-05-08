@@ -827,16 +827,18 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static fromElement(
+  static async fromElement(
     element: SVGElement,
-    callback: (image: Image) => any,
     options: { signal?: AbortSignal } = {}
   ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    this.fromURL(parsedAttributes['xlink:href'], {
+    return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
-    }).then(callback);
+    }).catch((err) => {
+      console.log(err);
+      return null;
+    });
   }
 }
 

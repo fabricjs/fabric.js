@@ -320,17 +320,9 @@ export class Polyline<
    * @static
    * @memberOf Polyline
    * @param {SVGElement} element Element to parser
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (poly: Polyline | null) => any,
-    options?: any
-  ) {
-    if (!element) {
-      return callback(null);
-    }
+  static async fromElement(element: SVGElement, options?: any) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -338,12 +330,10 @@ export class Polyline<
         element,
         this.ATTRIBUTE_NAMES
       );
-    callback(
-      new this(points || [], {
-        ...parsedAttributes,
-        ...options,
-      })
-    );
+    return new this(points || [], {
+      ...parsedAttributes,
+      ...options,
+    });
   }
 
   /* _FROM_SVG_END_ */
