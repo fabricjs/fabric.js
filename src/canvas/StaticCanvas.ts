@@ -1,4 +1,4 @@
-import { getDocument, getEnv } from '../env';
+import { getFabricDocument, getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -55,8 +55,6 @@ export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
   | 'wrapperEl'
   | '_activeSelection'
 >;
-
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -414,20 +412,6 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
@@ -438,8 +422,8 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
+        (getFabricDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
+        createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */

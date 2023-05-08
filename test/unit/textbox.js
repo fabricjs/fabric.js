@@ -397,15 +397,18 @@
       clientX: canvasOffset.left + text.width,
       clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
+      target: canvas.upperCanvasEl
     };
     var originalWidth = text.width;
     canvas.__onMouseDown(eventStub);
     canvas.__onMouseMove({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
     canvas.__onMouseUp({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mouseup',
@@ -422,15 +425,18 @@
       clientX: canvasOffset.left + text.left,
       clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
+      target: canvas.upperCanvasEl
     };
     var originalWidth = text.width;
     canvas.__onMouseDown(eventStub);
     canvas.__onMouseMove({
+      ...eventStub,
       clientX: eventStub.clientX - 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
     canvas.__onMouseUp({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mouseup',

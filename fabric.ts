@@ -1,4 +1,4 @@
-export { getEnv, getDocument, getWindow, setEnv } from './src/env';
+export { getEnv, getFabricDocument, getFabricWindow, setEnv } from './src/env';
 export { cache } from './src/cache';
 export { VERSION as version, iMatrix } from './src/constants';
 export { config } from './src/config';

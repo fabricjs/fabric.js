@@ -23,7 +23,7 @@
   function toSVGCanvas(canvas, callback) {
     var svg = canvas.toSVG();
     var dataUrl = svgToDataURL(svg);
-    var image = fabric.getDocument().createElement('img');
+    var image = fabric.getFabricDocument().createElement('img');
     image.onload = function() {
       var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
