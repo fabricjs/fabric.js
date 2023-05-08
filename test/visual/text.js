@@ -503,7 +503,8 @@
           canvas.getContext().drawImage(imageSource, 0, 0);
           callback(canvas.lowerCanvasEl);
         }
-      }
+      },
+      target: canvas.upperCanvasEl
     };
     text.draggableTextDelegate.setDragImage(dragEventStub, {
       selectionStart: 3,
@@ -565,10 +566,12 @@
     canvas._onMouseDown({
       clientX: 5,
       clientY: 5,
+      target: canvas.upperCanvasEl
     });
     canvas._onDragStart({
       clientX: 5,
       clientY: 5,
+      target: canvas.upperCanvasEl,
       preventDefault() {
 
       },
@@ -587,6 +590,7 @@
     canvas._onDragOver({
       clientX: 25,
       clientY: 25,
+      target: canvas.upperCanvasEl,
       preventDefault() {
 
       },

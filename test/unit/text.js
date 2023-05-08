@@ -203,7 +203,7 @@
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.getDocument().createElement('text');
+    var elText = fabric.getFabricDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
@@ -224,7 +224,7 @@
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.getDocument().createElementNS(namespace, 'text');
+    var elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
