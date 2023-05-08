@@ -224,7 +224,7 @@ export class StaticCanvas<
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
    * @type Boolean
-   * @default
+   * @default true
    */
   declare skipOffscreen: boolean;
 
@@ -853,10 +853,15 @@ export class StaticCanvas<
     }
     if (object) {
       ctx.save();
+      const { skipOffscreen } = this;
+      // if the object doesn't move with the viewport,
+      // the offscreen concept does not apply;
+      this.skipOffscreen = needsVpt;
       if (needsVpt) {
         ctx.transform(...v);
       }
       object.render(ctx);
+      this.skipOffscreen = skipOffscreen;
       ctx.restore();
     }
   }
