@@ -1,4 +1,4 @@
-import { getFabricDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -30,7 +30,6 @@ import { pick } from '../util/misc/pick';
 import { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TDestroyedCanvas } from './StaticCanvas';
 import { createCanvasElement } from '../util';
 
 export const DefaultCanvasProperties = {
@@ -1479,41 +1478,46 @@ export class SelectableCanvas<
     }
   }
 
-  /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
-   */
-  destroy() {
-    const wrapperEl = this.wrapperEl as HTMLDivElement,
+  protected cleanupDOM(): void {
+    const wrapperEl = this.wrapperEl!,
       lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!,
-      activeSelection = this._activeSelection!;
-    // dispose of active selection
-    activeSelection.removeAll();
-    (this as TDestroyedCanvas<this>)._activeSelection = undefined;
-    activeSelection.dispose();
-    super.destroy();
+      upperCanvasEl = this.upperCanvasEl!;
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    (this as TDestroyedCanvas<this>).pixelFindContext = null;
-    (this as TDestroyedCanvas<this>).contextTop = null;
-    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    getEnv().dispose(upperCanvasEl);
-    (this as TDestroyedCanvas<this>).upperCanvasEl = undefined;
-    getEnv().dispose(this.pixelFindCanvasEl!);
-    (this as TDestroyedCanvas<this>).pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
-    (this as TDestroyedCanvas<this>).wrapperEl = undefined;
+  }
+
+  /**
+   * @override clears active selection ref and interactive canvas elements and contexts
+   */
+  destroy() {
+    // dispose of active selection
+    const activeSelection = this._activeSelection!;
+    activeSelection.removeAll();
+    // @ts-expect-error disposing
+    this._activeSelection = undefined;
+    activeSelection.dispose();
+
+    super.destroy();
+
+    // free resources
+
+    // top canvas
+    // @ts-expect-error disposing
+    this.contextTop = null;
+    // @ts-expect-error disposing
+    this.upperCanvasEl = undefined;
+
+    // pixel find canvas
+    // @ts-expect-error disposing
+    this.pixelFindContext = null;
+    // @ts-expect-error disposing
+    this.pixelFindCanvasEl = undefined;
+
+    // @ts-expect-error disposing
+    this.wrapperEl = undefined;
   }
 
   /**

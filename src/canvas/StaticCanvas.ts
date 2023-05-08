@@ -1,4 +1,4 @@
-import { getFabricDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -39,22 +39,6 @@ import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
-
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
-};
-
-export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'pixelFindContext'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'pixelFindCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1646,6 +1630,7 @@ export class StaticCanvas<
    */
   dispose() {
     this.disposed = true;
+    this.cleanupDOM();
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
         this.destroy();
@@ -1667,7 +1652,24 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources
+   * Invoked as part the **sync** operation of {@link dispose}.
+   */
+  protected cleanupDOM() {
+    const canvasElement = this.lowerCanvasEl!;
+    // restore canvas style and attributes
+    canvasElement.classList.remove('lower-canvas');
+    canvasElement.removeAttribute('data-fabric');
+    // restore canvas size to original size in case retina scaling was applied
+    canvasElement.setAttribute('width', `${this.width}`);
+    canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
+  }
+
+  /**
+   * Clears the canvas element, disposes objects and frees resources.
+   *
+   * Invoked as part the **async** operation of {@link dispose}.
    *
    * **CAUTION**:
    *
@@ -1693,17 +1695,8 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl!;
-    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
+    // @ts-expect-error disposing
+    this.lowerCanvasEl = undefined;
   }
 
   /**

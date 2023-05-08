@@ -10,6 +10,5 @@ export type TFabricEnv = {
   window: (Window & typeof globalThis) | DOMWindow;
   isTouchSupported: boolean;
   WebGLProbe: GLProbe;
-  dispose(element: Element): void;
   copyPasteData: TCopyPasteData;
 };
