@@ -281,7 +281,7 @@ export class StaticCanvas<
   /**
    * Started the process of disposing but not done yet.
    * No more rendering operations will be executed on this canvas.
-   * If a rendering operation is in progress it will throw a silent error, see {@link requestRenderAll}.
+   * If a rendering operation is in progress it will throw a silent error, see {@link renderCanvas}.
    * @type boolean
    */
   protected declare disposed?: boolean;
@@ -773,6 +773,10 @@ export class StaticCanvas<
 
   /**
    * Renders background, objects, overlay and controls.
+   *
+   * **CAUTION**:
+   * Do not call this method directly, call {@link renderCanvas} instead to avoid a disposing race condition.
+   *
    * @param {CanvasRenderingContext2D} ctx
    * @param {Array} objects to render
    */
@@ -1664,7 +1668,7 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources.
+   * Clears the canvas element, disposes of objects and frees resources.
    *
    * If a rendering operation is in progress, requested by {@link requestRenderAll} or by an async {@link toCanvasElement},
    * it will throw a silent error and render nothing (resources will be nullified).
