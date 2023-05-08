@@ -704,21 +704,13 @@ export class StaticCanvas<
    * Append a renderAll request to next animation frame.
    * unless one is already in progress, in that case nothing is done
    *
-   * Since this method is async a race condition may occur when calling {@link dispose} during a requested render.
-   * This is why the render method is wrapped with a try-catch block.
+   * **Note**:
+   * Since this method is async, a race condition might occur when calling {@link dispose} during a requested render.
+   * In such a case rendering will fail silently.
    */
   requestRenderAll() {
     if (!this.nextRenderHandle && !this.disposed) {
-      this.nextRenderHandle = requestAnimFrame(() => {
-        try {
-          this.renderAndReset();
-        } catch (error) {
-          if (!this.disposed) {
-            // throw only if the error is not related to disposing
-            throw error;
-          }
-        }
-      });
+      this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
     }
   }
 
@@ -759,21 +751,41 @@ export class StaticCanvas<
   }
 
   /**
-   * Renders background, objects, overlay and controls.
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {Array} objects to render
+   * Safeguards {@link renderCanvasUnsafe} from a disposing race condition
+   * @param ctx
+   * @param objects
+   * @returns
    */
   renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
     if (this.disposed) {
       return;
     }
+    try {
+      // catch in case of a disposing race condition
+      this.renderCanvasUnsafe(ctx, objects);
+    } catch (error) {
+      if (!this.disposed) {
+        // throw only if the error is not related to disposing
+        throw error;
+      }
+    }
+  }
 
+  /**
+   * Renders background, objects, overlay and controls.
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {Array} objects to render
+   */
+  protected renderCanvasUnsafe(
+    ctx: CanvasRenderingContext2D,
+    objects: FabricObject[]
+  ) {
     const v = this.viewportTransform,
       path = this.clipPath;
     this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    // @ts-ignore node-canvas stuff
+    // @ts-expect-error node-canvas stuff
     ctx.patternQuality = 'best';
     this.fire('before:render', { ctx });
     this._renderBackground(ctx);
@@ -1602,7 +1614,12 @@ export class StaticCanvas<
    * No need to resize the actual one or repaint it.
    * Will transfer object ownership to a new canvas, paint it, and set everything back.
    * This is an intermediary step used to get to a dataUrl but also it is useful to
-   * create quick image copies of a canvas without passing for the dataUrl string
+   * create quick image copies of a canvas without passing for the dataUrl string.
+   *
+   * **Note**:
+   * A race condition might occur when calling {@link dispose} while running this method in an async context.
+   * In such a case rendering will fail silently, returning a blank canvas.
+   *
    * @param {Number} [multiplier] a zoom factor.
    * @param {Object} [options] Cropping informations
    * @param {Number} [options.left] Cropping left offset.
@@ -1637,14 +1654,7 @@ export class StaticCanvas<
     this.width = scaledWidth;
     this.height = scaledHeight;
     this.calcViewportBoundaries();
-    try {
-      this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
-    } catch (error) {
-      if (!this.disposed) {
-        // throw only if the error is not related to disposing
-        throw error;
-      }
-    }
+    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
@@ -1656,7 +1666,7 @@ export class StaticCanvas<
   /**
    * Clears the canvas element, disposes objects and frees resources.
    *
-   * If a rendering operation is in progress, requested by {@link requestRenderAll},
+   * If a rendering operation is in progress, requested by {@link requestRenderAll} or by an async {@link toCanvasElement},
    * it will throw a silent error and render nothing (resources will be nullified).
    */
   dispose() {
