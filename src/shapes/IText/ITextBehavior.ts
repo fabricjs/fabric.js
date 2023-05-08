@@ -12,7 +12,7 @@ import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import { TProps } from '../Object/types';
-import { getElementDocument } from '../../util/dom_misc';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  *  extend this regex to support non english languages
@@ -405,7 +405,7 @@ export abstract class ITextBehavior<
   updateSelectionOnMouseMove(e: TPointerEvent) {
     const el = this.hiddenTextarea!;
     // regain focus
-    getElementDocument(el).activeElement !== el && el.focus();
+    getDocumentFromElement(el).activeElement !== el && el.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,

@@ -1,4 +1,4 @@
-import { getWindow } from '../env';
+import { getFabricWindow } from '../env';
 import { LoadImageOptions } from '../util/misc/objectEnlive';
 import { parseSVGDocument } from './parseSVGDocument';
 import type { TSvgParsedCallback, TSvgReviverCallback } from './typedefs';
@@ -23,7 +23,7 @@ export function loadSVGFromString(
   reviver?: TSvgReviverCallback,
   options?: LoadImageOptions
 ) {
-  const parser = new (getWindow().DOMParser)(),
+  const parser = new (getFabricWindow().DOMParser)(),
     // should we use `image/svg+xml` here?
     doc = parser.parseFromString(string.trim(), 'text/xml');
   parseSVGDocument(doc.documentElement, callback, reviver, options);

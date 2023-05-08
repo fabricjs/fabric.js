@@ -450,8 +450,8 @@
     var actualTest = test.code;
     test.code = function(fabricCanvas, callback) {
       actualTest(fabricCanvas, function(dataURL) {
-        var img = fabric.getDocument().createElement('img');
-        var canvas = fabric.getDocument().createElement('canvas');
+        var img = fabric.getFabricDocument().createElement('img');
+        var canvas = fabric.getFabricDocument().createElement('canvas');
         img.onload = function() {
           canvas.width = img.width;
           canvas.height = img.height;

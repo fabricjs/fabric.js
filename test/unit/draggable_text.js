@@ -164,7 +164,7 @@ function assertDragEventStream(name, a, b) {
                 startDragging(eventData);
                 iText.hiddenTextarea.blur();
                 canvas._onDragEnd(createDragEvent());
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drag start', function (assert) {
@@ -318,7 +318,7 @@ function assertDragEventStream(name, a, b) {
                     ...dragEvents.slice(32, 93).map(e => ({ e, source: iText, target: iText })),
                     ...dragEvents.slice(93).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
             
             QUnit.test('drag over: target', function (assert) {
@@ -390,7 +390,7 @@ function assertDragEventStream(name, a, b) {
                     ...dragEvents.slice(0, 5).map(e => ({ e, source: iText, target: iText2 })),
                     ...dragEvents.slice(5).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drag over: canvas', function (assert) {
@@ -426,7 +426,7 @@ function assertDragEventStream(name, a, b) {
                         didDrop: false,
                     }
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drop on drag source', function (assert) {
@@ -493,7 +493,7 @@ function assertDragEventStream(name, a, b) {
                         didDrop: true,
                     }
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drop', function (assert) {
@@ -550,7 +550,7 @@ function assertDragEventStream(name, a, b) {
                         pointer: new fabric.Point(240, 15),
                     },
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('disable drop', function (assert) {
@@ -593,7 +593,7 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false
                     })),
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
         });
     });

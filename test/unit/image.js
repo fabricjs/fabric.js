@@ -71,7 +71,7 @@
   };
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function _createImageObject(width, height, callback, options, src) {

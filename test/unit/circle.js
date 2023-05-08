@@ -170,7 +170,7 @@
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elCircle         = fabric.getDocument().createElementNS(namespace, 'circle'),
+    var elCircle         = fabric.getFabricDocument().createElementNS(namespace, 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -207,7 +207,7 @@
       assert.equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var elFaultyCircle = fabric.getDocument().createElementNS(namespace, 'circle');
+      var elFaultyCircle = fabric.getFabricDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
 
       var error;
