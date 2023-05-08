@@ -576,7 +576,7 @@ export class SelectableCanvas<
    */
   renderAll() {
     this.cancelRequestedRender();
-    if (this.destroyed) {
+    if (this.disposed) {
       return;
     }
     if (this.contextTopDirty && !this._groupSelector && !this.isDrawingMode) {
@@ -1479,27 +1479,23 @@ export class SelectableCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
+   * @override Clears the canvas elements, disposes of refs and frees resources
    */
-  destroy() {
+  dispose() {
+    if (this.disposed) {
+      return;
+    }
+
     const wrapperEl = this.wrapperEl as HTMLDivElement,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!,
       activeSelection = this._activeSelection!;
+
     // dispose of active selection
     activeSelection.removeAll();
     (this as TDestroyedCanvas<this>)._activeSelection = undefined;
     activeSelection.dispose();
-    super.destroy();
+    super.dispose();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
     (this as TDestroyedCanvas<this>).pixelFindContext = null;

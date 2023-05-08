@@ -1407,8 +1407,7 @@ export class FabricObject<
     // since this canvas is a simple element for the process, we remove references
     // to objects in this way in order to avoid object trashing.
     canvas._objects = [];
-    // since render has settled it is safe to destroy canvas
-    canvas.destroy();
+    canvas.dispose();
     return canvasEl;
   }
 

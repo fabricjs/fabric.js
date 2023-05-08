@@ -279,18 +279,12 @@ export class StaticCanvas<
   declare height: number;
 
   /**
-   * If true the Canvas is in the process or has been disposed/destroyed.
-   * No more rendering operation will be executed on this canvas.
-   * @type boolean
-   */
-  declare destroyed?: boolean;
-
-  /**
    * Started the process of disposing but not done yet.
-   * WIll likely complete the render cycle already scheduled but stopping adding more.
+   * No more rendering operations will be executed on this canvas.
+   * If a rendering operation is in progress it will throw a silent error, see {@link requestRenderAll}.
    * @type boolean
    */
-  declare disposed?: boolean;
+  protected declare disposed?: boolean;
 
   /**
    * Keeps a copy of the canvas style before setting retina scaling and other potions
@@ -304,12 +298,6 @@ export class StaticCanvas<
   protected declare nextRenderHandle: number;
 
   static ownDefaults: Record<string, any> = StaticCanvasDefaults;
-
-  // reference to
-  protected declare __cleanupTask?: {
-    (): void;
-    kill: (reason?: any) => void;
-  };
 
   static getDefaults(): Record<string, any> {
     return StaticCanvas.ownDefaults;
@@ -696,7 +684,7 @@ export class StaticCanvas<
    */
   renderAll() {
     this.cancelRequestedRender();
-    if (this.destroyed) {
+    if (this.disposed) {
       return;
     }
     this.renderCanvas(this.contextContainer, this._objects);
@@ -718,11 +706,22 @@ export class StaticCanvas<
   /**
    * Append a renderAll request to next animation frame.
    * unless one is already in progress, in that case nothing is done
-   * a boolean flag will avoid appending more.
+   *
+   * Since this method is async a race condition may occur when calling {@link dispose} during a requested render.
+   * This is why the render method is wrapped with a try-catch block.
    */
   requestRenderAll() {
-    if (!this.nextRenderHandle && !this.disposed && !this.destroyed) {
-      this.nextRenderHandle = requestAnimFrame(() => this.renderAndReset());
+    if (!this.nextRenderHandle && !this.disposed) {
+      this.nextRenderHandle = requestAnimFrame(() => {
+        try {
+          this.renderAndReset();
+        } catch (error) {
+          if (!this.disposed) {
+            // throw only if the error is not related to disposing
+            throw error;
+          }
+        }
+      });
     }
   }
 
@@ -768,7 +767,7 @@ export class StaticCanvas<
    * @param {Array} objects to render
    */
   renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
-    if (this.destroyed) {
+    if (this.disposed) {
       return;
     }
 
@@ -803,11 +802,6 @@ export class StaticCanvas<
       this.drawControls(ctx);
     }
     this.fire('after:render', { ctx });
-
-    if (this.__cleanupTask) {
-      this.__cleanupTask();
-      this.__cleanupTask = undefined;
-    }
   }
 
   /**
@@ -1656,46 +1650,15 @@ export class StaticCanvas<
   }
 
   /**
-   * Waits until rendering has settled to destroy the canvas
-   * @returns {Promise<boolean>} a promise resolving to `true` once the canvas has been destroyed or to `false` if the canvas has was already destroyed
-   * @throws if aborted by a consequent call
+   * Clears the canvas element, disposes objects and frees resources
+   * If a rendering operation is in progress (requested by {@link requestRenderAll})
+   * it will throw a silent error (resources will be nullified).
    */
   dispose() {
+    if (this.disposed) {
+      return;
+    }
     this.disposed = true;
-    return new Promise<boolean>((resolve, reject) => {
-      const task = () => {
-        this.destroy();
-        resolve(true);
-      };
-      task.kill = reject;
-      if (this.__cleanupTask) {
-        this.__cleanupTask.kill('aborted');
-      }
-
-      if (this.destroyed) {
-        resolve(false);
-      } else if (this.nextRenderHandle) {
-        this.__cleanupTask = task;
-      } else {
-        task();
-      }
-    });
-  }
-
-  /**
-   * Clears the canvas element, disposes objects and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
-   */
-  destroy() {
-    this.destroyed = true;
     this.cancelRequestedRender();
     this.forEachObject((object) => object.dispose());
     this._objects = [];
