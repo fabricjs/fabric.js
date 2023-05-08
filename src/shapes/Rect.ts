@@ -194,17 +194,13 @@ export class Rect<
    * @static
    * @memberOf Rect
    * @param {SVGElement} element Element to parse
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
+  static async fromElement(
     element: SVGElement,
     callback: (rect: Rect | null) => void,
     options = {}
   ) {
-    if (!element) {
-      return callback(null);
-    }
     const {
       left = 0,
       top = 0,
@@ -214,7 +210,7 @@ export class Rect<
       ...restOfparsedAttributes
     } = parseAttributes(element, this.ATTRIBUTE_NAMES);
 
-    const rect = new this({
+    return new this({
       ...options,
       ...restOfparsedAttributes,
       left,
@@ -223,7 +219,6 @@ export class Rect<
       height,
       visible: Boolean(visible && width && height),
     });
-    callback(rect);
   }
 
   /* _FROM_SVG_END_ */

@@ -186,7 +186,7 @@
       iText.abortCursorAnimation = () => aborted++;
       canvas.setActiveObject(iText);
       iText.enterEditing();
-      iText._mouseDownHandler({ e: {} });
+      iText._mouseDownHandler({ e: { target: canvas.upperCanvasEl } });
       assert.equal(animate, 1, 'called from enterEditing');
       assert.equal(aborted, 1, 'called from render');
     });
@@ -238,7 +238,7 @@
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(canvas._target, group, 'group should be found as target');
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();
@@ -252,14 +252,14 @@
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(iText.isEditing, true, 'iText should enter editing');
       assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
       group.interactive = false;
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
     });
     QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function (assert) {
