@@ -32,7 +32,7 @@ export const setEnv = (value: TFabricEnv) => {
 
 export const getEnv = () => env || getBrowserEnv();
 
-export const getFabricDocument = (): Document => getEnv().document;
+export const getDocument = (): Document => getEnv().document;
 
-export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
+export const getWindow = (): (Window & typeof globalThis) | DOMWindow =>
   getEnv().window;

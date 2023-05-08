@@ -1,9 +1,9 @@
-import { getFabricWindow } from '../../env';
+import { getWindow } from '../../env';
 
 export function requestAnimFrame(callback: FrameRequestCallback): number {
-  return getFabricWindow().requestAnimationFrame(callback);
+  return getWindow().requestAnimationFrame(callback);
 }
 
 export function cancelAnimFrame(handle: number): void {
-  return getFabricWindow().cancelAnimationFrame(handle);
+  return getWindow().cancelAnimationFrame(handle);
 }

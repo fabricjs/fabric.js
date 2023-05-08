@@ -57,13 +57,13 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // JSDOM catches errors and throws them to the window
 
-fabric.getFabricWindow().addEventListener('unhandledrejection', (event) => {
+fabric.getWindow().addEventListener('unhandledrejection', (event) => {
   // prevent logging to console
   event.preventDefault();
   QUnit.onUncaughtException(event.reason);
 });
 
-fabric.getFabricWindow().addEventListener('error', (event) => {
+fabric.getWindow().addEventListener('error', (event) => {
   // prevent logging to console
   event.preventDefault();
   QUnit.onUncaughtException(event.error);

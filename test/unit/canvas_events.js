@@ -551,7 +551,7 @@
         fired.push(eventName);
       });
     });
-    var event = fabric.getFabricDocument().createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('drop', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
@@ -574,7 +574,7 @@
           assert.equal(opt.target, rect, eventName + ' on canvas has rect as a target');
           canvasRegistry.push(eventName);
         });
-        var event = fabric.getFabricDocument().createEvent('HTMLEvents');
+        var event = fabric.getDocument().createEvent('HTMLEvents');
         event.initEvent(eventName, true, true);
         event.clientX = 5;
         event.clientY = 5;
@@ -618,7 +618,7 @@
         counter++;
         target = opt.target;
       });
-      var event = fabric.getFabricDocument().createEvent('HTMLEvents');
+      var event = fabric.getDocument().createEvent('HTMLEvents');
       event.initEvent(eventType, true, true);
       event.clientX = 5;
       event.clientY = 5;
@@ -635,7 +635,7 @@
     c.on(eventname, function () {
       counter++;
     });
-    var event = fabric.getFabricDocument().createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent('mouseenter', true, true);
     c.upperCanvasEl.dispatchEvent(event);
     assert.equal(counter, 1, eventname + ' fabric event fired');
@@ -659,7 +659,7 @@
     c.on(canvasEventName, function (ev) {
       control.push(ev);
     });
-    var event = fabric.getFabricDocument().createEvent('HTMLEvents');
+    var event = fabric.getDocument().createEvent('HTMLEvents');
     event.initEvent(eventName, true, true);
 
     //  with targets
@@ -802,7 +802,7 @@
   });
 
   QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
-    var event = fabric.getFabricDocument().createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     c._hoveredTarget = new fabric.Object();
@@ -811,7 +811,7 @@
   });
 
   QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
-    var event = fabric.getFabricDocument().createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();
@@ -822,7 +822,7 @@
   });
 
   QUnit.test('mouseEnter removes __corner', function(assert) {
-    var event = fabric.getFabricDocument().createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object({ top: 100, left: 100 });
@@ -834,7 +834,7 @@
   });
 
   QUnit.test('mouseEnter does not removes __corner if there is a transform', function(assert) {
-    var event = fabric.getFabricDocument().createEvent('MouseEvent');
+    var event = fabric.getDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
     var obj = new fabric.Object();

@@ -168,8 +168,8 @@ function testCanvasDisposing() {
 
     QUnit.test('dispose: clear refs', async function (assert) {
         //made local vars to do not dispose the external canvas
-        var el = fabric.getFabricDocument().createElement('canvas'),
-            parentEl = fabric.getFabricDocument().createElement('div'),
+        var el = fabric.getDocument().createElement('canvas'),
+            parentEl = fabric.getDocument().createElement('div'),
             wrapperEl, lowerCanvasEl, upperCanvasEl;
         el.width = 200; el.height = 200;
         parentEl.className = 'rootNode';

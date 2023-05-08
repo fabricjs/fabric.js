@@ -1,5 +1,5 @@
 (function(){
-  var canvas = fabric.getFabricDocument().createElement('canvas'),
+  var canvas = fabric.getDocument().createElement('canvas'),
     ctx = canvas.getContext('2d');
 
   async function assertCursorAnimation(assert, text, active = false, delay = false) {
@@ -46,7 +46,7 @@
     QUnit.test('enterEditing and onInput', function (assert) {
       iText.enterEditing();
       assert.equal(iText.text.includes('__UNIQUE_TEXT_'), false, 'does not contain __UNIQUE_TEXT_');
-      const event = new (fabric.getFabricWindow().InputEvent)("input", { inputType: "insertText", data: '__UNIQUE_TEXT_', composed: true });
+      const event = new (fabric.getWindow().InputEvent)("input", { inputType: "insertText", data: '__UNIQUE_TEXT_', composed: true });
       // manually crafted events have `isTrusted` as false so they won't interact with the html element
       iText.hiddenTextarea.value = `__UNIQUE_TEXT_${iText.hiddenTextarea.value}`;
       iText.hiddenTextarea.dispatchEvent(event);

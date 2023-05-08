@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getFabricDocument, getEnv } from '../env';
+import { getDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -196,7 +196,7 @@ export class Image<
       typeof arg0 === 'string'
         ? ((
             (this.canvas && getElementDocument(this.canvas.getElement())) ||
-            getFabricDocument()
+            getDocument()
           ).getElementById(arg0) as ImageSource)
         : arg0,
       options

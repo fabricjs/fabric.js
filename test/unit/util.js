@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.getFabricDocument().createElement('img');
+    return fabric.getDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -169,19 +169,19 @@
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-    var wrapper = fabric.getFabricDocument().createElement('div');
-    var el = fabric.getFabricDocument().createElement('p');
+    var wrapper = fabric.getDocument().createElement('div');
+    var el = fabric.getDocument().createElement('p');
     var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-    var childEl = fabric.getFabricDocument().createElement('span');
-    var parentEl = fabric.getFabricDocument().createElement('p');
+    var childEl = fabric.getDocument().createElement('span');
+    var parentEl = fabric.getDocument().createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, fabric.getFabricDocument().createElement('strong'));
+    wrapper = wrapElement(childEl, fabric.getDocument().createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -193,8 +193,8 @@
 
     assert.ok(typeof makeElementUnselectable === 'function');
 
-    var el = fabric.getFabricDocument().createElement('p');
-    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
 
@@ -218,8 +218,8 @@
 
     assert.ok(typeof makeElementSelectable === 'function');
 
-    var el = fabric.getFabricDocument().createElement('p');
-    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
+    var el = fabric.getDocument().createElement('p');
+    el.appendChild(fabric.getDocument().createTextNode('foo'));
 
     makeElementUnselectable(el);
     makeElementSelectable(el);
@@ -389,7 +389,7 @@
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.getFabricDocument().createElement('div');
+      var el = fabric.getDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');

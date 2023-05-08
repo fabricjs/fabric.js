@@ -21,7 +21,7 @@ export function wrapElement(element: HTMLElement, wrapper: HTMLDivElement) {
 export function getScrollLeftTop(element: HTMLElement) {
   let left = 0,
     top = 0;
-  const doc = getDocumentFromElement(element);
+  const doc = getElementDocument(element);
   const docElement = doc.documentElement,
     body = doc.body || {
       scrollLeft: 0,
@@ -59,7 +59,7 @@ export function getScrollLeftTop(element: HTMLElement) {
  */
 export function getElementOffset(element: HTMLElement) {
   let box = { left: 0, top: 0 };
-  const doc = element && getDocumentFromElement(element),
+  const doc = element && getElementDocument(element),
     offset = { left: 0, top: 0 },
     offsetAttributes = {
       borderLeftWidth: 'left',
@@ -72,7 +72,7 @@ export function getElementOffset(element: HTMLElement) {
     return offset;
   }
   const elemStyle =
-    getWindowFromElement(element)?.getComputedStyle(element, null) || {};
+    getElementWindow(element)?.getComputedStyle(element, null) || {};
   for (const attr in offsetAttributes) {
     // @ts-expect-error TS learn to iterate!
     offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
@@ -118,8 +118,7 @@ export function makeElementSelectable(element: HTMLElement) {
   return element;
 }
 
-export const getDocumentFromElement = (el: HTMLElement) =>
-  el.ownerDocument || null;
+export const getElementDocument = (el: HTMLElement) => el.ownerDocument || null;
 
-export const getWindowFromElement = (el: HTMLElement) =>
+export const getElementWindow = (el: HTMLElement) =>
   el.ownerDocument?.defaultView || null;

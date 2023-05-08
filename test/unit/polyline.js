@@ -125,7 +125,7 @@
 
   QUnit.test('fromElement without points', function(assert) {
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
-    var elPolylineWithoutPoints = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    var elPolylineWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
     elPolylineWithoutPoints.setAttribute('stroke-width', 0);
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
       assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, strokeWidth: 0 });
@@ -134,7 +134,7 @@
 
   QUnit.test('fromElement without points but strokewidth takes in account the strokeWidth regardless', function(assert) {
     assert.ok(typeof fabric.Polyline.fromElement === 'function');
-    var elPolylineWithoutPoints = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    var elPolylineWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polyline');
     fabric.Polyline.fromElement(elPolylineWithoutPoints, function(polyline) {
       assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
     });
@@ -142,7 +142,7 @@
 
   QUnit.test('fromElement with empty points', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolylineWithEmptyPoints = fabric.getFabricDocument().createElementNS(namespace, 'polyline');
+    var elPolylineWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     fabric.Polyline.fromElement(elPolylineWithEmptyPoints, function(polyline) {
       assert.deepEqual(polyline.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
@@ -151,7 +151,7 @@
 
   QUnit.test('fromElement without strokeWidth, top left is on top-left point', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolyline = fabric.getFabricDocument().createElementNS(namespace, 'polyline');
+    var elPolyline = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
     elPolyline.setAttributeNS(namespace, 'stroke-width', 0);
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
@@ -167,7 +167,7 @@
 
     QUnit.test('fromElement with strokeWidth, top left is not top-left point, add space for stroke', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolyline = fabric.getFabricDocument().createElementNS(namespace, 'polyline');
+    var elPolyline = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
     fabric.Polyline.fromElement(elPolyline, function(polyline) {
       assert.ok(polyline instanceof fabric.Polyline);
@@ -181,7 +181,7 @@
 
   QUnit.test('fromElement with custom attr', function(assert) {
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolylineWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'polyline');
+    var elPolylineWithAttrs = fabric.getDocument().createElementNS(namespace, 'polyline');
     elPolylineWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
     elPolylineWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
     elPolylineWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');
