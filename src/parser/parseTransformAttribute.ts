@@ -70,7 +70,7 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
         matrix = createTranslateMatrix(arg0, arg1);
         break;
       case 'rotate':
-        matrix = createRotateMatrix({ angle: arg0 }, arg1, arg2);
+        matrix = createRotateMatrix({ angle: arg0 }, { x: arg1, y: arg2 });
         break;
       case 'scale':
         matrix = createScaleMatrix(arg0, arg1);

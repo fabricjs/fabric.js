@@ -156,14 +156,12 @@ export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
  *
  *
  * @param {TDegree} angle rotation in degrees
- * @param {number} [x] translation on X axis for the pivot point
- * @param {number} [y] translation on Y axis for the pivot point
+ * @param {XY} [pivotPoint] pivot point to rotate around
  * @returns {TMat2D} matrix
  */
 export function createRotateMatrix(
   { angle = 0 }: TRotateMatrixArgs = {},
-  x = 0,
-  y = 0
+  { x = 0, y = 0 }: Partial<XY> = {}
 ): TMat2D {
   const angleRadiant = degreesToRadians(angle),
     cosValue = cos(angleRadiant),
@@ -173,8 +171,8 @@ export function createRotateMatrix(
     sinValue,
     -sinValue,
     cosValue,
-    x - (cosValue * x - sinValue * y),
-    y - (sinValue * x + cosValue * y),
+    x ? x - (cosValue * x - sinValue * y) : 0,
+    y ? y - (sinValue * x + cosValue * y) : 0,
   ];
 }
 
