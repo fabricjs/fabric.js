@@ -107,7 +107,7 @@ const ElementsParser = function (
     }
   };
 
-  proto.createClipPathCallback = function (obj, container) {
+  proto.createClipPathCallback = function (container) {
     return function (_newObj) {
       removeTransformMatrixForSvgParsing(_newObj);
       _newObj.fillRule = _newObj.clipRule;
@@ -116,65 +116,61 @@ const ElementsParser = function (
   };
 
   proto.resolveClipPath = function (obj, usingElement) {
-    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element,
-      klass,
-      objTransformInv,
-      container,
-      gTransform,
-      options;
-    if (clipPath) {
-      container = [];
-      objTransformInv = invertTransform(obj.calcTransformMatrix());
-      // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPath[0].parentNode;
-      let clipPathOwner = usingElement;
-      while (
-        clipPathOwner.parentNode &&
-        clipPathOwner.getAttribute('clip-path') !== obj.clipPath
-      ) {
-        clipPathOwner = clipPathOwner.parentNode;
-      }
-      clipPathOwner.parentNode.appendChild(clipPathTag);
-      for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
-        );
-      }
-      if (container.length === 1) {
-        clipPath = container[0];
-      } else {
-        clipPath = new Group(container);
-      }
-      gTransform = multiplyTransformMatrices(
-        objTransformInv,
-        clipPath.calcTransformMatrix()
-      );
-      if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
-      }
-      const options = qrDecompose(gTransform);
-      clipPath.flipX = false;
-      clipPath.flipY = false;
-      clipPath.set('scaleX', options.scaleX);
-      clipPath.set('scaleY', options.scaleY);
-      clipPath.angle = options.angle;
-      clipPath.skewX = options.skewX;
-      clipPath.skewY = 0;
-      clipPath.setPositionByOrigin(
-        { x: options.translateX, y: options.translateY },
-        'center',
-        'center'
-      );
-      obj.clipPath = clipPath;
-    } else {
+    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths');
+    if (!clipPath) {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
+      return;
     }
+    const container = [];
+    const objTransformInv = invertTransform(obj.calcTransformMatrix());
+    // move the clipPath tag as sibling to the real element that is using it
+    const clipPathTag = clipPath[0].parentNode;
+    let clipPathOwner = usingElement;
+    while (
+      clipPathOwner.parentNode &&
+      clipPathOwner.getAttribute('clip-path') !== obj.clipPath
+    ) {
+      clipPathOwner = clipPathOwner.parentNode;
+    }
+    clipPathOwner.parentNode.appendChild(clipPathTag);
+    for (let i = 0; i < clipPath.length; i++) {
+      const element = clipPath[i];
+      this.findTag(element).fromElement(
+        element,
+        this.createClipPathCallback(container),
+        this.options
+      );
+    }
+    if (container.length === 1) {
+      clipPath = container[0];
+    } else {
+      clipPath = new Group(container);
+    }
+    const gTransform = multiplyTransformMatrices(
+      objTransformInv,
+      clipPath.calcTransformMatrix()
+    );
+    if (clipPath.clipPath) {
+      this.resolveClipPath(clipPath, clipPathOwner);
+    }
+    const { scaleX, scaleY, angle, skewX, translateX, translateY } =
+      qrDecompose(gTransform);
+    clipPath.set({
+      flipX: false,
+      flipY: false,
+      scaleX,
+      scaleY,
+      angle,
+      skewX,
+      skewY: 0,
+    });
+    clipPath.setPositionByOrigin(
+      { x: translateX, y: translateY },
+      'center',
+      'center'
+    );
+    obj.clipPath = clipPath;
   };
 
   proto.checkIfDone = function () {
