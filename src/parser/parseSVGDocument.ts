@@ -35,7 +35,7 @@ import { ElementsParser } from './elements_parser';
 
  */
 
-export const createEmptyResponse: SVGParsingOutput = () => ({
+export const createEmptyResponse = (): SVGParsingOutput => ({
   objects: [],
   elements: [],
   options: {},

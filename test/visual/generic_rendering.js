@@ -328,20 +328,22 @@
       height: 300,
       top: 0,
       left: 0,
-      fill: 'rgba(255,0,0,0.5)'
+      fill: 'rgba(255,0,0,0.5)',
+      canvas
     });
     var rectoverlay = new fabric.Rect({
       width: 300,
       height: 300,
       top: 0,
       left: 0,
-      fill: 'rgba(0,0,255,0.5)'
+      fill: 'rgba(0,0,255,0.5)',
+      canvas,
     });
     canvas.overlayVpt = false;
     canvas.backgroundVpt = false;
-    canvas.setViewportTransform([0.1,0,0,0.1,7000,7000]);
     canvas.backgroundImage = rectbg;
     canvas.overlayImage = rectoverlay;
+    canvas.setViewportTransform([0.1,0,0,0.1,7000,7000]);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }
@@ -361,20 +363,22 @@
       height: 300,
       top: 0,
       left: 0,
-      fill: 'rgba(255,0,0,0.5)'
+      fill: 'rgba(255,0,0,0.5)',
+      canvas,
     });
     var rectoverlay = new fabric.Rect({
       width: 300,
       height: 300,
       top: 0,
       left: 0,
-      fill: 'rgba(0,0,255,0.5)'
+      fill: 'rgba(0,0,255,0.5)',
+      canvas,
     });
     canvas.overlayVpt = true;
     canvas.backgroundVpt = true;
-    canvas.setViewportTransform([0.9,0,0,0.9,150,150]);
     canvas.backgroundImage = rectbg;
     canvas.overlayImage = rectoverlay;
+    canvas.setViewportTransform([0.9,0,0,0.9,150,150]);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }

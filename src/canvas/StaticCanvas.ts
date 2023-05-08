@@ -242,7 +242,7 @@ export class StaticCanvas<
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
    * @type Boolean
-   * @default
+   * @default true
    */
   declare skipOffscreen: boolean;
 
