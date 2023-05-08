@@ -107,7 +107,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Rect.fromElement === 'function');
 
-    var elRect = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
+    var elRect = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
     fabric.Rect.fromElement(elRect).then((rect) => {
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
@@ -118,7 +118,7 @@
   QUnit.test('fabric.Rect.fromElement with custom attributes', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elRectWithAttrs = fabric.getDocument().createElementNS(namespace, 'rect');
+    var elRectWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'rect');
 
     elRectWithAttrs.setAttributeNS(namespace, 'x', 10);
     elRectWithAttrs.setAttributeNS(namespace, 'y', 20);

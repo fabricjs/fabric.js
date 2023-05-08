@@ -1,5 +1,4 @@
 import type { Canvas } from '../../canvas/Canvas';
-import { getDocument } from '../../env';
 import {
   DragEventData,
   DropEventData,
@@ -10,6 +9,7 @@ import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { TextStyleDeclaration } from '../Text/StyledText';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -159,7 +159,9 @@ export class DraggableTextDelegate {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    getDocument().body.appendChild(dragImage);
+    getDocumentFromElement(
+      (e.target || this.target.hiddenTextarea)! as HTMLElement
+    ).body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 

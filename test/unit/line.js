@@ -94,7 +94,7 @@
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var lineEl           = fabric.getDocument().createElementNS(namespace, 'line'),
+    var lineEl           = fabric.getFabricDocument().createElementNS(namespace, 'line'),
         x1               = 11,
         y1               = 23,
         x2               = 34,
@@ -131,7 +131,7 @@
       assert.equal(oLine.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oLine.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var lineElWithMissingAttributes = fabric.getDocument().createElementNS(namespace, 'line');
+      var lineElWithMissingAttributes = fabric.getFabricDocument().createElementNS(namespace, 'line');
       lineElWithMissingAttributes.setAttributeNS(namespace, 'x1', 10);
       lineElWithMissingAttributes.setAttributeNS(namespace, 'y1', 20);
 
@@ -165,7 +165,7 @@
   QUnit.test('stroke-width in a style', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var lineEl = fabric.getDocument().createElementNS(namespace, 'line');
+    var lineEl = fabric.getFabricDocument().createElementNS(namespace, 'line');
     lineEl.setAttribute('style', 'stroke-width:4');
     fabric.Line.fromElement(lineEl).then((oLine)=> {
       assert.ok(4, oLine.strokeWidth);
