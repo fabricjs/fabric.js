@@ -10,8 +10,8 @@ type ExportedKeys =
   | 'repeat'
   | 'source';
 
-export type PatternProps = Partial<Pick<Pattern, ExportedKeys>>;
+export type PatternOptions = Partial<Pick<Pattern, ExportedKeys>>;
 
-export type SerializedPatternProps = PatternProps & {
+export type SerializedPatternOptions = PatternOptions & {
   source: string;
 };

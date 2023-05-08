@@ -6,7 +6,11 @@ import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { classRegistry } from '../ClassRegistry';
-import { PatternRepeat, PatternProps, SerializedPatternProps } from './types';
+import {
+  PatternRepeat,
+  PatternOptions,
+  SerializedPatternOptions,
+} from './types';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -85,7 +89,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternProps = {}) {
+  constructor(options: PatternOptions = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -185,7 +189,7 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: SerializedPatternProps,
+    { source, ...serialized }: SerializedPatternOptions,
     options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
