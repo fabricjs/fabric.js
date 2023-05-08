@@ -20,7 +20,7 @@
     }
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
-        fabric.loadSVGFromString(string, function(objects, options) {
+        fabric.loadSVGFromString(string).then(({ objects, options }) => {
           // something is disabling objectCaching and i cannot find where it is.
           var group = fabric.util.groupSVGElements(objects, options);
           canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
@@ -99,6 +99,7 @@
     'polygons-rounded',
     'light-bulb',
     'accordion',
+    'car',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

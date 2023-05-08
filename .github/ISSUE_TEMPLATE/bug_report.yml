@@ -47,6 +47,8 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.0.0-beta5
+        - 6.0.0-beta4
         - 6.0.0-beta3
         - 6.0.0-beta1
         - 5.3.0
@@ -87,6 +89,8 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 20.1.0
+        - 20.0.0
         - 19.8.1
         - 19.8.0
         - 19.7.0
@@ -99,6 +103,7 @@ body:
         - 19.1.0
         - 19.0.1
         - 19.0.0
+        - 18.16.0
         - 18.15.0
         - 18.14.2
         - 18.14.1
@@ -247,6 +252,8 @@ body:
         `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md),
         [Node template <
         `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
+
+        - [Opening a github repository in codesandbox](https://codesandbox.io/docs/learn/getting-started/your-first-sandbox#opening-a-github-repository-as-a-cloud-sandbox)
 
         ⛔ No reproduction === closed issue ⛔
     validations:

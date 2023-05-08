@@ -250,25 +250,20 @@
     var done = assert.async();
     assert.equal('function', typeof fabric.loadSVGFromString);
 
-    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(loadedObjects) {
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING).then(({ objects: loadedObjects }) => {
       assert.ok(loadedObjects[0] instanceof fabric.Polygon);
       assert.equal('red', loadedObjects[0].fill);
-      setTimeout(done, 1000);
+      done();
     });
   });
 
   QUnit.test('fabric.loadSVGFromString with surrounding whitespace', function(assert) {
     var done = assert.async();
-    var loadedObjects = [];
-    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
-      assert.ok(loadedObjects[0] instanceof fabric.Polygon);
-      assert.equal('red', loadedObjects[0] && loadedObjects[0].fill);
+    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ').then(({ objects }) => {
+      assert.ok(objects[0] instanceof fabric.Polygon);
+      assert.equal(objects[0].fill, 'red');
       done();
-    }, 1000);
+    });
   });
 
   QUnit.test('fabric.util.loadImage', function(assert) {
@@ -366,7 +361,7 @@
     assert.ok(typeof fabric.util.groupSVGElements === 'function');
 
     var group1;
-    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT).then(({ objects, options }) => {
       group1 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group1 instanceof fabric.Polygon, 'it returns just the first element in case is just one');
       done();
@@ -376,7 +371,7 @@
   QUnit.test('fabric.util.groupSVGElements #2', function(assert) {
     var done = assert.async();
     var group2;
-    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS).then(({ objects, options }) => {
       group2 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group2 instanceof fabric.Group);
       done();

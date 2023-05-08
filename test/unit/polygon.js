@@ -65,6 +65,33 @@
     assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
+  QUnit.test('constructor, with strokeWidth top-left and origins top-left', function(assert) {
+
+    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
+
+    assert.equal(polygon.left, 9);
+    assert.equal(polygon.top, 11);
+
+  });
+
+  QUnit.test('constructor, with strokeWidth top-left and origins center-center', function(assert) {
+
+    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'center', originY: 'center' });
+
+    assert.equal(polygon.left, 15);
+    assert.equal(polygon.top, 17);
+
+  });
+
+  QUnit.test('constructor, with strokeWidth top-left and origins bottom-right', function(assert) {
+
+    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'right', originY: 'bottom' });
+
+    assert.equal(polygon.left, 21);
+    assert.equal(polygon.top, 23);
+
+  });
+
   QUnit.test('polygon with exactBoundingBox false', function(assert) {
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: false,
@@ -173,40 +200,75 @@
   });
 
   QUnit.test('fromElement without points', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromElement === 'function');
 
     var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    elPolygonWithoutPoints.setAttributeNS('http://www.w3.org/2000/svg', 'stroke-width', 0)
+    fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
+      assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, strokeWidth: 0 });
+      done();
+    });
+  });
 
-    fabric.Polygon.fromElement(elPolygonWithoutPoints, function(polygon) {
-      assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+  QUnit.test('fromElement without points but strokeWidth', function(assert) {
+    var done = assert.async();
+    var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
+      assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
+      done();
     });
   });
 
   QUnit.test('fromElement with empty points', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygonWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
-    fabric.Polygon.fromElement(elPolygonWithEmptyPoints, function(polygon) {
-      assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT });
+    fabric.Polygon.fromElement(elPolygonWithEmptyPoints).then((polygon) => {
+      assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
+      done();
     });
   });
 
   QUnit.test('fromElement with points', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
-    fabric.Polygon.fromElement(elPolygon, function(polygon) {
+    fabric.Polygon.fromElement(elPolygon).then((polygon) => {
       assert.ok(polygon instanceof fabric.Polygon);
       assert.deepEqual(polygon.toObject(), {
         ...REFERENCE_OBJECT,
         points: [{ x: 10, y: 12 }, { x: 20, y: 22 }],
+        left: 9.5,
+        top: 11.5
+      });
+      done();
+    });
+  });
+
+  QUnit.test('fromElement with points no strokewidth', function(assert) {
+    var done = assert.async();
+    var namespace = 'http://www.w3.org/2000/svg';
+    var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
+    elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
+    elPolygon.setAttributeNS(namespace, 'stroke-width', 0)
+    fabric.Polygon.fromElement(elPolygon).then((polygon) => {
+      assert.ok(polygon instanceof fabric.Polygon);
+      assert.deepEqual(polygon.toObject(), {
+        ...REFERENCE_OBJECT,
+        strokeWidth: 0,
+        points: [{ x: 10, y: 12 }, { x: 20, y: 22 }],
         left: 10,
         top: 12
       });
+      done();
     });
   });
 
   QUnit.test('fromElement with points and custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elPolygonWithAttrs = fabric.getDocument().createElementNS(namespace, 'polygon');
     elPolygonWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
@@ -219,7 +281,7 @@
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
     elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
-    fabric.Polygon.fromElement(elPolygonWithAttrs, function(polygonWithAttrs) {
+    fabric.Polygon.fromElement(elPolygonWithAttrs).then((polygonWithAttrs) => {
       var expectedPoints = [
         { x: 10, y: 10 },
         { x: 20, y: 20 },
@@ -239,14 +301,10 @@
         strokeMiterLimit: 5,
         opacity:          0.34,
         points:           expectedPoints,
-        top:              10,
-        left:             10,
+        top:              8.5,
+        left:             8.5,
       });
-    });
-  });
-  QUnit.test('fromElement with null', function(assert) {
-    fabric.Polygon.fromElement(null, function(polygon) {
-      assert.equal(polygon, null);
+      done();
     });
   });
 })();

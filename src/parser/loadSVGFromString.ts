@@ -1,26 +1,29 @@
-//@ts-nocheck
 import { getWindow } from '../env';
+import { LoadImageOptions } from '../util/misc/objectEnlive';
 import { parseSVGDocument } from './parseSVGDocument';
+import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 
 /**
  * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
  * @memberOf fabric
- * @param {String} string
- * @param {Function} callback
- * @param {Function} [reviver] Method for further parsing of SVG elements, called after each fabric object created.
+ * @param {String} string representing the svg
+ * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
+ * {@link TSvgParsedCallback} also receives `allElements` array as the last argument. This is the full list of svg nodes available in the document.
+ * You may want to use it if you are trying to regroup the objects as they were originally grouped in the SVG. ( This was the reason why it was added )
+ * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.
+ * Takes as input the original svg element and the generated `FabricObject` as arguments. Used to inspect extra properties not parsed by fabric,
+ * or extra custom manipulation
  * @param {Object} [options] Object containing options for parsing
- * @param {String} [options.crossOrigin] crossOrigin crossOrigin setting to use for external resources
+ * @param {String} [options.crossOrigin] crossOrigin setting to use for external resources
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  */
-export function loadSVGFromString(string, callback, reviver, options) {
+export function loadSVGFromString(
+  string: string,
+  reviver?: TSvgReviverCallback,
+  options?: LoadImageOptions
+): Promise<SVGParsingOutput> {
   const parser = new (getWindow().DOMParser)(),
+    // should we use `image/svg+xml` here?
     doc = parser.parseFromString(string.trim(), 'text/xml');
-  parseSVGDocument(
-    doc.documentElement,
-    function (results, _options, elements, allElements) {
-      callback(results, _options, elements, allElements);
-    },
-    reviver,
-    options
-  );
+  return parseSVGDocument(doc.documentElement, reviver, options);
 }

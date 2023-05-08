@@ -57,8 +57,6 @@ export class Path<
 
   declare pathOffset: Point;
 
-  declare fromSVG?: boolean;
-
   declare sourcePath?: string;
 
   declare segmentsInfo?: TPathSegmentInfo[];
@@ -76,15 +74,9 @@ export class Path<
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
-    const pathTL = this._setPath(path || []);
-    const origin = this.translateToGivenOrigin(
-      new Point(left ?? pathTL.x, top ?? pathTL.y),
-      typeof left === 'number' ? this.originX : 'left',
-      typeof top === 'number' ? this.originY : 'top',
-      this.originX,
-      this.originY
-    );
-    this.setPositionByOrigin(origin, this.originX, this.originY);
+    this._setPath(path || [], true);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   /**
@@ -95,7 +87,18 @@ export class Path<
    */
   _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    return this.setDimensions();
+    this.setBoundingBox(adjustPosition);
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = this._calcBoundsFromPath();
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   /**
@@ -283,20 +286,19 @@ export class Path<
     return this.path.length;
   }
 
-  /**
-   * Recalculates and sets the dimensions
-   * @returns the calculated top-left
-   */
-  setDimensions(): Point {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
-    this.set({ width, height, pathOffset });
-    return new Point(left, top);
+  setDimensions() {
+    this.setBoundingBox();
   }
 
-  /**
-   * @private
-   */
-  _calcDimensions(): IPathBBox {
+  setBoundingBox(adjustPosition?: boolean) {
+    const { width, height, pathOffset } = this._calcDimensions();
+    this.set({ width, height, pathOffset });
+    // using pathOffset because it match the use case.
+    // if pathOffset change here we need to use left + width/2 , top + height/2
+    adjustPosition && this.setPositionByOrigin(pathOffset, 'center', 'center');
+  }
+
+  _calcBoundsFromPath(): TBBox {
     const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
@@ -361,14 +363,17 @@ export class Path<
           break;
       }
     }
+    return makeBoundingBoxFromPoints(bounds);
+  }
 
-    const bbox = makeBoundingBoxFromPoints(bounds);
-    const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
+  /**
+   * @private
+   */
+  _calcDimensions(): IPathBBox {
+    const bbox = this._calcBoundsFromPath();
 
     return {
       ...bbox,
-      left: bbox.left - strokeCorrection,
-      top: bbox.top - strokeCorrection,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
         bbox.top + bbox.height / 2
@@ -402,25 +407,20 @@ export class Path<
    * @static
    * @memberOf Path
    * @param {SVGElement} element to parse
-   * @param {(path: Path) => void} callback Callback to invoke after the element has been parsed
    * @param {Partial<PathProps>} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (path: Path) => void,
-    options: Partial<PathProps>
-  ) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    callback(
-      new this(parsedAttributes.d, {
-        ...parsedAttributes,
-        ...options,
-        // we pass undefined to instruct the constructor to position the object using the bbox
-        left: undefined,
-        top: undefined,
-        fromSVG: true,
-      })
+  static async fromElement(element: SVGElement, options: Partial<PathProps>) {
+    const { d, ...parsedAttributes } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES
     );
+    return new this(d, {
+      ...parsedAttributes,
+      ...options,
+      // we pass undefined to instruct the constructor to position the object using the bbox
+      left: undefined,
+      top: undefined,
+    });
   }
 }
 

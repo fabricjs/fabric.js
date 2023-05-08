@@ -823,16 +823,18 @@ export class Image<
    * @param {Object} [options] Options object
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static fromElement(
+  static async fromElement(
     element: SVGElement,
-    callback: (image: Image) => any,
-    options: Abortable = {}
+    options: { signal?: AbortSignal } = {}
   ) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    this.fromURL(parsedAttributes['xlink:href'], {
+    return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
-    }).then(callback);
+    }).catch((err) => {
+      console.log(err);
+      return null;
+    });
   }
 }
 

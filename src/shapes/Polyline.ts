@@ -74,8 +74,6 @@ export class Polyline<
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
 
   declare strokeOffset: Point;
@@ -146,18 +144,24 @@ export class Polyline<
       offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
     const pathOffsetY =
       offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-    // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
-      left: bbox.left - legacyCorrection,
-      top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
         new Point(bbox.left, bbox.top)
       ),
     };
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = makeBoundingBoxFromPoints(this.points);
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   setDimensions() {
@@ -169,7 +173,11 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
     adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+      this.setPositionByOrigin(
+        new Point(left + width / 2, top + height / 2),
+        'center',
+        'center'
+      );
   }
 
   /**
@@ -312,17 +320,9 @@ export class Polyline<
    * @static
    * @memberOf Polyline
    * @param {SVGElement} element Element to parser
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (poly: Polyline | null) => any,
-    options?: any
-  ) {
-    if (!element) {
-      return callback(null);
-    }
+  static async fromElement(element: SVGElement, options?: any) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -330,13 +330,10 @@ export class Polyline<
         element,
         this.ATTRIBUTE_NAMES
       );
-    callback(
-      new this(points || [], {
-        ...parsedAttributes,
-        ...options,
-        fromSVG: true,
-      })
-    );
+    return new this(points || [], {
+      ...parsedAttributes,
+      ...options,
+    });
   }
 
   /* _FROM_SVG_END_ */
