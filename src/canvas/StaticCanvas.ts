@@ -684,9 +684,6 @@ export class StaticCanvas<
    */
   renderAll() {
     this.cancelRequestedRender();
-    if (this.disposed) {
-      return;
-    }
     this.renderCanvas(this.contextContainer, this._objects);
   }
 
@@ -1640,7 +1637,14 @@ export class StaticCanvas<
     this.width = scaledWidth;
     this.height = scaledHeight;
     this.calcViewportBoundaries();
-    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
+    try {
+      this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
+    } catch (error) {
+      if (!this.disposed) {
+        // throw only if the error is not related to disposing
+        throw error;
+      }
+    }
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
@@ -1654,9 +1658,6 @@ export class StaticCanvas<
    *
    * If a rendering operation is in progress, requested by {@link requestRenderAll},
    * it will throw a silent error and render nothing (resources will be nullified).
-   * If you are experiencing a related race condition consider wrapping your rendering operation with a try-catch block
-   *
-   * e.g. You might experience a race condition when disposing while {@link StaticCanvas#toCanvasElement} or {@link StaticCanvas#toDataURL} are running in a promise/timeout context.
    */
   dispose() {
     if (this.disposed) {
