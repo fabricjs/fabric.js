@@ -1,38 +1,16 @@
-import { config } from './config';
-import { TCrossOrigin, TMat2D, TSize } from './typedefs';
-import { ifNaN } from './util/internals';
-import { uid } from './util/internals/uid';
-import { loadImage } from './util/misc/objectEnlive';
-import { pick } from './util/misc/pick';
-import { toFixed } from './util/misc/toFixed';
-import { classRegistry } from './ClassRegistry';
-
-export type TPatternRepeat = 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
-
-type TExportedKeys =
-  | 'crossOrigin'
-  | 'offsetX'
-  | 'offsetY'
-  | 'patternTransform'
-  | 'repeat'
-  | 'source';
-
-export type TPatternOptions = Partial<Pick<Pattern, TExportedKeys>>;
-
-export type TPatternSerialized = TPatternOptions & {
-  source: string;
-};
-
-export type TPatternHydrationOptions = {
-  /**
-   * handle aborting
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
-};
-
-type TImageSource = { source: HTMLImageElement };
-type TCanvasSource = { source: HTMLCanvasElement };
+import { config } from '../config';
+import { Abortable, TCrossOrigin, TMat2D } from '../typedefs';
+import { ifNaN } from '../util/internals';
+import { uid } from '../util/internals/uid';
+import { loadImage } from '../util/misc/objectEnlive';
+import { pick } from '../util/misc/pick';
+import { toFixed } from '../util/misc/toFixed';
+import { classRegistry } from '../ClassRegistry';
+import {
+  PatternRepeat,
+  PatternOptions,
+  SerializedPatternOptions,
+} from './types';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -56,10 +34,10 @@ export class Pattern {
   }
 
   /**
-   * @type TPatternRepeat
+   * @type PatternRepeat
    * @defaults
    */
-  repeat: TPatternRepeat = 'repeat';
+  repeat: PatternRepeat = 'repeat';
 
   /**
    * Pattern horizontal offset from object's left/top corner
@@ -111,7 +89,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: TPatternOptions = {}) {
+  constructor(options: PatternOptions = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -119,7 +97,7 @@ export class Pattern {
   /**
    * @returns true if {@link source} is an <img> element
    */
-  isImageSource(): this is TImageSource {
+  isImageSource(): this is { source: HTMLImageElement } {
     return (
       !!this.source && typeof (this.source as HTMLImageElement).src === 'string'
     );
@@ -128,7 +106,7 @@ export class Pattern {
   /**
    * @returns true if {@link source} is a <canvas> element
    */
-  isCanvasSource(): this is TCanvasSource {
+  isCanvasSource(): this is { source: HTMLCanvasElement } {
     return !!this.source && !!(this.source as HTMLCanvasElement).toDataURL;
   }
 
@@ -211,8 +189,8 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: TPatternSerialized,
-    options: TPatternHydrationOptions
+    { source, ...serialized }: SerializedPatternOptions,
+    options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

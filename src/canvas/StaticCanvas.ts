@@ -75,10 +75,6 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-type TCanvasHydrationOption = {
-  signal?: AbortSignal;
-};
-
 export const StaticCanvasDefaults = {
   backgroundColor: '',
   backgroundImage: null,
@@ -1475,7 +1471,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: TCanvasHydrationOption = {}
+    { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));

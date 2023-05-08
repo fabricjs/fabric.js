@@ -128,3 +128,11 @@ export type TDataUrlOptions = TToCanvasElementOptions & {
 };
 
 export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;
+
+export type Abortable = {
+  /**
+   * handle aborting
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal?: AbortSignal;
+};
