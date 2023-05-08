@@ -1652,7 +1652,7 @@ export class StaticCanvas<
   }
 
   /**
-   * Invoked as part the **sync** operation of {@link dispose}.
+   * Invoked as part of the **sync** operation of {@link dispose}.
    */
   protected cleanupDOM() {
     const canvasElement = this.lowerCanvasEl!;
@@ -1669,7 +1669,7 @@ export class StaticCanvas<
   /**
    * Clears the canvas element, disposes objects and frees resources.
    *
-   * Invoked as part the **async** operation of {@link dispose}.
+   * Invoked as part of the **async** operation of {@link dispose}.
    *
    * **CAUTION**:
    *
