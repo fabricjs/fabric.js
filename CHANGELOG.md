@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): pattern cleanup + export types [#8875](https://github.com/fabricjs/fabric.js/pull/8875)
 - feat(env): relative window/document, support iframe [#8897](https://github.com/fabricjs/fabric.js/pull/8897)
 - docs(): add repo repro link to `bug_report.yml` [#8900](https://github.com/fabricjs/fabric.js/pull/8900)
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
