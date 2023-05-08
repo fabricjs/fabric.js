@@ -253,6 +253,8 @@ body:
         [Node template <
         `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
 
+        - [Opening a github repository in codesandbox](https://codesandbox.io/docs/learn/getting-started/your-first-sandbox#opening-a-github-repository-as-a-cloud-sandbox)
+
         ⛔ No reproduction === closed issue ⛔
     validations:
       required: true

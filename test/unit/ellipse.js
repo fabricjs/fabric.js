@@ -128,6 +128,7 @@
   });
 
   QUnit.test('fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
@@ -156,7 +157,7 @@
     elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
     elEllipse.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
-    fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
+    fabric.Ellipse.fromElement(elEllipse).then((oEllipse) => {
       assert.ok(oEllipse instanceof fabric.Ellipse);
       assert.equal(oEllipse.get('rx'), rx);
       assert.equal(oEllipse.get('ry'), ry);
@@ -169,6 +170,7 @@
       assert.equal(oEllipse.get('strokeLineCap'), strokeLineCap);
       assert.equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+      done();
     });
   });
 
