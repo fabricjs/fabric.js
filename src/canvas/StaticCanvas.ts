@@ -1650,9 +1650,13 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources
-   * If a rendering operation is in progress (requested by {@link requestRenderAll})
-   * it will throw a silent error (resources will be nullified).
+   * Clears the canvas element, disposes objects and frees resources.
+   *
+   * If a rendering operation is in progress, requested by {@link requestRenderAll},
+   * it will throw a silent error and render nothing (resources will be nullified).
+   * If you are experiencing a related race condition consider wrapping your rendering operation with a try-catch block
+   *
+   * e.g. You might experience a race condition when disposing while {@link StaticCanvas#toCanvasElement} or {@link StaticCanvas#toDataURL} are running in a promise/timeout context.
    */
   dispose() {
     if (this.disposed) {

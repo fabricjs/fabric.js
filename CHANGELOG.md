@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): make `Canvas#dispose` sync - revert async logic [#8901](https://github.com/fabricjs/fabric.js/pull/8901)
 - refactor(fabric.Line): Line position is calculated from the center between the 2 points now [#8877](https://github.com/fabricjs/fabric.js/pull/8877)
 - chore(Path, Polyline): Clean up old SVG import code [#8857](https://github.com/fabricjs/fabric.js/pull/8857)
 
