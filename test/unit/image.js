@@ -566,7 +566,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -589,7 +589,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('imageSmoothing'), false, 'imageSmoothing set to false');
       done();
@@ -609,7 +609,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.ok(imgObject instanceof fabric.Image);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
@@ -637,7 +637,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -666,7 +666,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -695,7 +695,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -724,7 +724,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -753,7 +753,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
@@ -782,7 +782,7 @@
       'xlink:href': IMAGE_DATA_URL
     });
 
-    fabric.Image.fromElement(imageEl, function(imgObject) {
+    fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
