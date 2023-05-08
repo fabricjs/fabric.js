@@ -4,8 +4,13 @@ import { ImageFormat } from '../../typedefs';
  * Creates canvas element
  * @return {CanvasElement} initialized canvas element
  */
-export const createCanvasElement = (): HTMLCanvasElement =>
-  getDocument().createElement('canvas');
+export const createCanvasElement = (): HTMLCanvasElement => {
+  const element = getDocument().createElement('canvas');
+  if (!element || typeof element.getContext === 'undefined') {
+    throw new Error('Failed to create `canvas` element');
+  }
+  return element;
+};
 
 /**
  * Creates image element (works on client and node)

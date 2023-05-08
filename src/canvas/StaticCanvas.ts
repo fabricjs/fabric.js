@@ -56,8 +56,6 @@ export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
   | '_activeSelection'
 >;
 
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
-
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
   cssOnly?: boolean;
