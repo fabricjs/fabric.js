@@ -824,6 +824,7 @@ export class Image<
    * @static
    * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
   static async fromElement(
