@@ -25,6 +25,7 @@ export {
   createSkewYMatrix,
   calcDimensionsMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
 export {

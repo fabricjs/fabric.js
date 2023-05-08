@@ -85,13 +85,13 @@ export const multiplyTransformMatrices = (
 /**
  * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
  *
- * `multiplyTransformMatrixChain([A, B, C, D])` is equivalent to `A(B(C(D)))`
+ * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
  *
  * @param matrices an array of matrices
  * @param [is2x2] flag to multiply matrices as 2x2 matrices
  * @returns the multiplication product
  */
-export const multiplyTransformMatrices2 = (
+export const multiplyTransformMatrixArray = (
   matrices: (TMat2D | undefined | null | false)[],
   is2x2?: boolean
 ) =>
@@ -274,7 +274,7 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  return multiplyTransformMatrices2(
+  return multiplyTransformMatrixArray(
     [
       createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
       skewX && createSkewXMatrix(skewX),
@@ -306,7 +306,7 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  return multiplyTransformMatrices2([
+  return multiplyTransformMatrixArray([
     createTranslateMatrix(translateX, translateY),
     angle && createRotateMatrix({ angle }),
     calcDimensionsMatrix(otherOptions),

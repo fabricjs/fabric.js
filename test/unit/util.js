@@ -489,6 +489,29 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
   });
 
+  QUnit.test('multiplyTransformMatrixArray', function (assert) {
+    assert.ok(typeof fabric.util.multiplyTransformMatrixArray === 'function');
+    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), [
+      23,
+      34,
+      31,
+      46,
+      160,
+      240
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), [
+      23,
+      34,
+      31,
+      46,
+      0,
+      0
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), fabric.util.multiplyTransformMatrices(m1, m2));
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), fabric.util.multiplyTransformMatrices(m1, m2, true));
+  });
+
   QUnit.test('resetObjectTransform', function(assert) {
     assert.ok(typeof fabric.util.resetObjectTransform === 'function');
     var rect = new fabric.Rect({
