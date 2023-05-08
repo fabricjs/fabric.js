@@ -203,7 +203,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Polygon.fromElement === 'function');
 
-    var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    var elPolygonWithoutPoints = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
     elPolygonWithoutPoints.setAttributeNS('http://www.w3.org/2000/svg', 'stroke-width', 0)
     fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, strokeWidth: 0 });
@@ -213,7 +213,7 @@
 
   QUnit.test('fromElement without points but strokeWidth', function(assert) {
     var done = assert.async();
-    var elPolygonWithoutPoints = fabric.getDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    var elPolygonWithoutPoints = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'polygon');
     fabric.Polygon.fromElement(elPolygonWithoutPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
       done();
@@ -223,7 +223,7 @@
   QUnit.test('fromElement with empty points', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygonWithEmptyPoints = fabric.getDocument().createElementNS(namespace, 'polygon');
+    var elPolygonWithEmptyPoints = fabric.getFabricDocument().createElementNS(namespace, 'polygon');
     elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
     fabric.Polygon.fromElement(elPolygonWithEmptyPoints).then((polygon) => {
       assert.deepEqual(polygon.toObject(), { ...REFERENCE_OBJECT, ...REFERENCE_EMPTY_OBJECT, left: -0.5, top: -0.5 });
@@ -234,7 +234,7 @@
   QUnit.test('fromElement with points', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
+    var elPolygon = fabric.getFabricDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
     fabric.Polygon.fromElement(elPolygon).then((polygon) => {
       assert.ok(polygon instanceof fabric.Polygon);
@@ -251,7 +251,7 @@
   QUnit.test('fromElement with points no strokewidth', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygon = fabric.getDocument().createElementNS(namespace, 'polygon');
+    var elPolygon = fabric.getFabricDocument().createElementNS(namespace, 'polygon');
     elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
     elPolygon.setAttributeNS(namespace, 'stroke-width', 0)
     fabric.Polygon.fromElement(elPolygon).then((polygon) => {
@@ -270,7 +270,7 @@
   QUnit.test('fromElement with points and custom attributes', function(assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elPolygonWithAttrs = fabric.getDocument().createElementNS(namespace, 'polygon');
+    var elPolygonWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'polygon');
     elPolygonWithAttrs.setAttributeNS(namespace, 'points', '10,10 20,20 30,30 10,10');
     elPolygonWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
     elPolygonWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');

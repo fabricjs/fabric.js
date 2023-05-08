@@ -36,8 +36,8 @@ QUnit.module('env', (hooks) => {
 
     (!isNode() ? QUnit.module : QUnit.module.skip)('browser', (hooks) => {
         QUnit.test('env', assert => {
-            assert.equal(fabric.getWindow(), window, 'window should be set');
-            assert.equal(fabric.getDocument(), document, 'window should be set');
+            assert.equal(fabric.getFabricWindow(), window, 'window should be set');
+            assert.equal(fabric.getFabricDocument(), document, 'window should be set');
         })
     });
 });

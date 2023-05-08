@@ -171,7 +171,7 @@
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elCircle         = fabric.getDocument().createElementNS(namespace, 'circle'),
+    var elCircle         = fabric.getFabricDocument().createElementNS(namespace, 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -210,13 +210,13 @@
 
 
     }).then(() => {
-      var elFaultyCircle = fabric.getDocument().createElementNS(namespace, 'circle');
+      var elFaultyCircle = fabric.getFabricDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
       return fabric.Circle.fromElement(elFaultyCircle).then((circle) => {
         assert.equal(circle.radius, -10, 'radius will default to -10');
       });
     }).then(() => {
-      var elFaultyCircle = fabric.getDocument().createElementNS(namespace, 'circle');
+      var elFaultyCircle = fabric.getFabricDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.removeAttribute('r');
       return fabric.Circle.fromElement(elFaultyCircle).then((circle) => {
         assert.equal(circle.radius, 0, 'radius will default to 0');

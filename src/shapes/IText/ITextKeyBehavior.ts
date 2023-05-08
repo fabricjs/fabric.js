@@ -1,14 +1,14 @@
 //@ts-nocheck
 
 import { config } from '../../config';
-import { getDocument, getEnv } from '../../env';
+import { getFabricDocument, getEnv } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
 import { TProps } from '../Object/types';
 import { TextProps, SerializedTextProps } from '../Text/Text';
-import { getElementDocument } from '../../util/dom_misc';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -61,8 +61,8 @@ export abstract class ITextKeyBehavior<
    */
   initHiddenTextarea() {
     const doc =
-      (this.canvas && getElementDocument(this.canvas.getElement())) ||
-      getDocument();
+      (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
+      getFabricDocument();
     this.hiddenTextarea = doc.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');

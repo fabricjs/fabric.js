@@ -65,7 +65,7 @@
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -1449,8 +1449,8 @@
 
   QUnit.test('loadFromJSON with no objects', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1468,8 +1468,8 @@
 
   QUnit.test('loadFromJSON without "objects" property', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1490,8 +1490,8 @@
 
   QUnit.test('loadFromJSON with empty fabric.Group', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
         c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
@@ -1925,8 +1925,8 @@
 
   [true, false].forEach(enableRetinaScaling => {
     QUnit.test(`set dimensions, enableRetinaScaling ${enableRetinaScaling}`, async function (assert) {
-      var el = fabric.getDocument().createElement('canvas'),
-        parentEl = fabric.getDocument().createElement('div');
+      var el = fabric.getFabricDocument().createElement('canvas'),
+        parentEl = fabric.getFabricDocument().createElement('div');
       el.width = 200; el.height = 200;
       parentEl.className = 'rootNode';
       parentEl.appendChild(el);
@@ -2207,12 +2207,12 @@
   //     assert.deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.getDocument().location.protocol +
+  //       "backgroundImage": (fabric.getFabricDocument().location.protocol +
   //                           '//' +
-  //                           fabric.getDocument().location.hostname +
-  //                           ((fabric.getDocument().location.port === '' || parseInt(fabric.getDocument().location.port, 10) === 80)
+  //                           fabric.getFabricDocument().location.hostname +
+  //                           ((fabric.getFabricDocument().location.port === '' || parseInt(fabric.getFabricDocument().location.port, 10) === 80)
   //                               ? ''
-  //                               : (':' + fabric.getDocument().location.port)) +
+  //                               : (':' + fabric.getFabricDocument().location.port)) +
   //                           '/assets/pug.jpg'),
   //       "backgroundImageOpacity": 1,
   //       "backgroundImageStretch": true
