@@ -1546,6 +1546,7 @@ export class FabricObject<
    *
    * @param {object} object
    * @param {object} [options]
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
   static fromObject<T extends TProps<SerializedObjectProps>>(
