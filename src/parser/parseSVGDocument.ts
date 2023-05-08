@@ -35,12 +35,12 @@ import { ElementsParser } from './elements_parser';
 
  */
 
-export const emptyResponse: SVGParsingOutput = {
+export const createEmptyResponse: SVGParsingOutput = () => ({
   objects: [],
   elements: [],
   options: {},
   allElements: [],
-};
+});
 
 export async function parseSVGDocument(
   doc: HTMLElement,
@@ -50,7 +50,7 @@ export async function parseSVGDocument(
   if (signal && signal.aborted) {
     console.log('`options.signal` is in `aborted` state');
     // this is an unhappy path, we dont care about speed
-    return cloneDeep(emptyResponse);
+    return createEmptyResponse();
   }
   parseUseDirectives(doc);
 
@@ -72,7 +72,7 @@ export async function parseSVGDocument(
   });
   if (!elements || (elements && !elements.length)) {
     return {
-      ...cloneDeep(emptyResponse),
+      ...createEmptyResponse(),
       options,
       allElements: descendants,
     };
