@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import {
+  Abortable,
   Constructor,
   ImageFormat,
   TCornerPoint,
@@ -1630,8 +1631,8 @@ export class StaticCanvas<
    * @throws if aborted by a consequent call
    */
   dispose() {
+    !this.disposed && this.cleanupDOM();
     this.disposed = true;
-    this.cleanupDOM();
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
         this.destroy();
