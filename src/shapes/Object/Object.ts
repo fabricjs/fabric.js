@@ -10,6 +10,7 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  Abortable,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -1523,10 +1524,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
-    {
-      extraParam,
-      ...options
-    }: { extraParam?: string; signal?: AbortSignal } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1535,7 +1533,7 @@ export class FabricObject<
         // to avoid accidental overrides later
         if (extraParam) {
           const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-ignore;
+          // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
@@ -1553,7 +1551,7 @@ export class FabricObject<
    */
   static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
-    options?: { signal?: AbortSignal }
+    options?: Abortable
   ) {
     return this._fromObject(object, options);
   }
