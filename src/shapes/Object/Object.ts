@@ -1519,6 +1519,7 @@ export class FabricObject<
    * @param {object} object
    * @param {object} [options]
    * @param {string} [options.extraParam] property to pass as first argument to the constructor
+   * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
@@ -1532,7 +1533,7 @@ export class FabricObject<
         // to avoid accidental overrides later
         if (extraParam) {
           const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-ignore;
+          // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
