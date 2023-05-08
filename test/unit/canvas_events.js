@@ -555,8 +555,8 @@
     assert.deepEqual(fired, eventNames, 'bad drop event fired');
   });
 
-  QUnit.test('drag event cycle', async function (assert) {
-    async function testDragCycle(cycle, canDrop) {
+  QUnit.test('drag event cycle', function (assert) {
+    function testDragCycle(cycle, canDrop) {
       var c = new fabric.Canvas();
       var rect = new fabric.Rect({ width: 10, height: 10 });
       rect.canDrop = function () {
@@ -578,23 +578,23 @@
         event.clientY = 5;
         c.upperCanvasEl.dispatchEvent(event);
       });
-      await c.dispose();
+      c.dispose();
       assert.equal(canvasRegistry.length, cycle.length, 'should fire cycle on canvas');
       assert.deepEqual(canvasRegistry, cycle, 'should fire all events on canvas');
       return registery
     }
     var cycle, res;
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
-    res = await testDragCycle(cycle, true);
+    res = testDragCycle(cycle, true);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
-    res = await testDragCycle(cycle, true);
+    res = testDragCycle(cycle, true);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'drop'];
-    res = await testDragCycle(cycle);
+    res = testDragCycle(cycle);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
     cycle = ['dragenter', 'dragover', 'dragover', 'dragover', 'dragleave'];
-    res = await testDragCycle(cycle);
+    res = testDragCycle(cycle);
     assert.deepEqual(res, cycle, 'should fire all events on rect');
   });
 
@@ -1136,7 +1136,7 @@
     });
   });
 
-  QUnit.test('text editing manager', async function (assert) {
+  QUnit.test('text editing manager', function (assert) {
     const canvas = new fabric.Canvas();
     const manager = canvas.textEditingManager;
     assert.ok(manager, 'should exist');
@@ -1207,7 +1207,7 @@
     assert.deepEqual(manager.targets, [b], 'should register instance');
     manager.register(b);
     assert.ok(manager.target === b, 'should register b');
-    await canvas.dispose();
+    canvas.dispose();
     assert.deepEqual(manager.targets, [], 'dispose should clear instances');
     assert.ok(!manager.target, 'should unregister b');
   });

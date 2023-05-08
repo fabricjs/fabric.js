@@ -9,67 +9,65 @@ function assertCanvasDisposing(klass) {
     QUnit.test('dispose', async function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
-        assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
-        await canvas.dispose();
-        assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
+        assert.notOk(canvas.disposed, 'should not have been disposed yet');
+        canvas.dispose();
+        assert.ok(canvas.disposed, 'should have flagged `disposed`');
         done();
     });
 
     QUnit.test('dispose: clear references', async function (assert) {
         const canvas = new klass(null, { renderOnAddRemove: false });
         assert.ok(typeof canvas.dispose === 'function');
-        assert.ok(typeof canvas.destroy === 'function');
         canvas.add(makeRect(), makeRect(), makeRect());
         const lowerCanvas = canvas.lowerCanvasEl;
         assert.equal(lowerCanvas.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
-        await canvas.dispose();
-        assert.equal(canvas.destroyed, true, 'dispose should flag destroyed');
+        canvas.dispose();
+        assert.equal(canvas.disposed, true, 'dispose should flag disposed');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
         assert.equal(canvas.lowerCanvasEl, null, 'dispose should clear lowerCanvasEl');
         assert.equal(lowerCanvas.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
         assert.equal(canvas.contextContainer, null, 'dispose should clear contextContainer');
     });
 
-    QUnit.test('dispose edge case: multiple calls', async function (assert) {
-        const done = assert.async();
+    QUnit.test('dispose edge case: multiple calls', function (assert) {
         const canvas = new klass(null, { renderOnAddRemove: false });
-        assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
-        const res = await Promise.all([
-            canvas.dispose(),
-            canvas.dispose(),
-            canvas.dispose(),
-        ]);
+        assert.notOk(canvas.disposed, 'should not have been disposed yet');
+        canvas.dispose();
+        canvas.dispose();
+        canvas.dispose();
         assert.ok(canvas.disposed, 'should have flagged `disposed`');
-        assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
-        assert.deepEqual(res, [true, false, false], 'should have disposed in the first call');
-        done();
     });
 
-    QUnit.test('dispose edge case: multiple calls after `requestRenderAll', async function (assert) {
+    QUnit.test('dispose edge case: during a requested render', function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
-        assert.notOk(canvas.destroyed, 'should not have been destroyed yet');
+        assert.notOk(canvas.disposed, 'should not have been disposed yet');
+        canvas.on('before:render', () => canvas.dispose());
         canvas.requestRenderAll();
-        const res = await Promise.allSettled([
-            canvas.dispose(),
-            canvas.dispose(),
-            canvas.dispose(),
-        ]);
-        assert.ok(canvas.disposed, 'should have flagged `disposed`');
-        assert.ok(canvas.destroyed, 'should have flagged `destroyed`');
-        assert.deepEqual(res, [
-            { status: 'rejected', reason: 'aborted' },
-            { status: 'rejected', reason: 'aborted' },
-            { status: 'fulfilled', value: true }
-        ], 'should have disposed in the last call, aborting the other calls');
-        done();
+        assert.ok(canvas.nextRenderHandle, 'requested a rendering');
+        canvas.on('after:render', () => {
+            assert.ok(canvas.disposed, 'should have flagged `disposed`');
+            done();
+        });
     });
 
-    QUnit.test('dispose edge case: rendering after dispose', async function (assert) {
-        const done = assert.async();
+    QUnit.test('dispose edge case: before `renderAll`', function (assert) {
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        const _renderAll = canvas.renderAll.bind(canvas);
+        canvas.renderAll = () => {
+            canvas.dispose();
+            _renderAll();
+        }
+        assert.notOk(canvas.disposed, 'should not have been disposed yet');
+        canvas.renderAll();
+        assert.ok(canvas.disposed, 'should have flagged `disposed`');
+    });
+
+
+    QUnit.test('dispose edge case: rendering after dispose', function (assert) {
         const canvas = new klass(null, { renderOnAddRemove: false });
         let called = 0;
-        assert.ok(await canvas.dispose(), 'should dispose');
+        canvas.dispose();
         canvas.on('after:render', () => {
             called++;
         })
@@ -80,7 +78,6 @@ function assertCanvasDisposing(klass) {
         assert.equal(canvas.nextRenderHandle, undefined, '`requestRenderAll` should have no affect');
         canvas.renderAll();
         assert.equal(called, 1, 'should not have rendered, should still equal 1');
-        done();
     });
 
     QUnit.test('dispose edge case: `toCanvasElement` interrupting `requestRenderAll`', function (assert) {
@@ -93,7 +90,7 @@ function assertCanvasDisposing(klass) {
         done();
     });
 
-    QUnit.test('dispose edge case: `toCanvasElement` after dispose', async function (assert) {
+    QUnit.test('dispose edge case: `toCanvasElement` after dispose', function (assert) {
         const done = assert.async();
         const canvas = new klass(null, { renderOnAddRemove: false });
         const testImageData = colorByteVal => {
@@ -108,11 +105,9 @@ function assertCanvasDisposing(klass) {
         canvas.add(makeRect({ fill: 'red', width: 20, height: 20 }));
         assert.ok(testImageData(255), 'control');
         canvas.disposed = true;
-        assert.ok(testImageData(255), 'should render canvas');
-        canvas.destroyed = true;
         assert.ok(testImageData(0), 'should have disabled canvas rendering');
-        canvas.destroyed = false;
-        assert.ok(await canvas.dispose(), 'dispose');
+        canvas.disposed = false;
+        canvas.dispose()
         done();
     });
 
@@ -123,11 +118,10 @@ function assertCanvasDisposing(klass) {
         const animate = () => fabric.util.animate({
             onChange() {
                 if (called === 1) {
-                    canvas.dispose().then(() => {
-                        fabric.runningAnimations.cancelAll();
-                        done();
-                    });
+                    canvas.dispose();
+                    fabric.runningAnimations.cancelAll();
                     assert.ok(canvas.disposed, 'should flag `disposed`');
+                    done();
                 }
                 called++;
                 canvas.contextTopDirty = true;
@@ -166,7 +160,7 @@ function testCanvasDisposing() {
 
     assertCanvasDisposing(fabric.Canvas);
 
-    QUnit.test('dispose: clear refs', async function (assert) {
+    QUnit.test('dispose: clear refs', function (assert) {
         //made local vars to do not dispose the external canvas
         var el = fabric.getDocument().createElement('canvas'),
             parentEl = fabric.getDocument().createElement('div'),
@@ -208,12 +202,11 @@ function testCanvasDisposing() {
         assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
         assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
         assert.ok(typeof canvas.dispose === 'function');
-        assert.ok(typeof canvas.destroy === 'function');
         canvas.add(makeRect(), makeRect(), makeRect());
         canvas.item(0).animate({ scaleX: 10 });
         activeSel.add(canvas.item(1));
         assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
-        await canvas.dispose();
+        canvas.dispose();
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
         assert.equal(canvas.getActiveSelection(), undefined, 'dispose should dispose active selection');
@@ -235,7 +228,7 @@ function testCanvasDisposing() {
 
     });
 
-    // QUnit.test('dispose: events', async function(assert) {
+    // QUnit.test('dispose: events', function(assert) {
     //   function invokeEventsOnCanvas() {
     //     // nextSibling because we need to invoke events on upper canvas
     //     simulateEvent(canvas.getElement().nextSibling, 'mousedown');
@@ -270,7 +263,7 @@ function testCanvasDisposing() {
     //   invokeEventsOnCanvas();
     //   assertInvocationsCount();
 
-    //   await canvas.dispose();
+    //   canvas.dispose();
     //   assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
 
     //   invokeEventsOnCanvas();
