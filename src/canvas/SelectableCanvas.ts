@@ -500,8 +500,8 @@ export class SelectableCanvas<
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  private declare pixelFindCanvasEl: HTMLCanvasElement;
-  private declare pixelFindContext: CanvasRenderingContext2D;
+  protected declare pixelFindCanvasEl: HTMLCanvasElement;
+  protected declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
@@ -1482,6 +1482,7 @@ export class SelectableCanvas<
     const wrapperEl = this.wrapperEl!,
       lowerCanvasEl = this.lowerCanvasEl!,
       upperCanvasEl = this.upperCanvasEl!;
+    super.cleanupDOM();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
     if (wrapperEl.parentNode) {
