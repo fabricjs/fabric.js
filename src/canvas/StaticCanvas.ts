@@ -75,10 +75,6 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-type TCanvasHydrationOption = {
-  signal?: AbortSignal;
-};
-
 export const StaticCanvasDefaults = {
   backgroundColor: '',
   backgroundImage: null,
@@ -240,7 +236,7 @@ export class StaticCanvas<
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
    * @type Boolean
-   * @default
+   * @default true
    */
   declare skipOffscreen: boolean;
 
@@ -869,10 +865,15 @@ export class StaticCanvas<
     }
     if (object) {
       ctx.save();
+      const { skipOffscreen } = this;
+      // if the object doesn't move with the viewport,
+      // the offscreen concept does not apply;
+      this.skipOffscreen = needsVpt;
       if (needsVpt) {
         ctx.transform(...v);
       }
       object.render(ctx);
+      this.skipOffscreen = skipOffscreen;
       ctx.restore();
     }
   }
@@ -1470,7 +1471,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: TCanvasHydrationOption = {}
+    { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));

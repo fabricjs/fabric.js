@@ -1,16 +1,11 @@
 import { noop } from '../../constants';
-import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { TCrossOrigin, TFiller } from '../../typedefs';
+import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 
-export type LoadImageOptions = {
-  /**
-   * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type LoadImageOptions = Abortable & {
   /**
    * cors value for the image loading, default to anonymous
    */
@@ -58,11 +53,7 @@ export const loadImage = (
     img.src = url;
   });
 
-export type EnlivenObjectOptions = {
-  /**
-   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type EnlivenObjectOptions = Abortable & {
   /**
    * Method for further parsing of object elements,
    * called after each fabric object created.
@@ -71,17 +62,12 @@ export type EnlivenObjectOptions = {
     serializedObj: Record<string, any>,
     instance: FabricObject
   ) => void;
-  /**
-   * Namespace to get klass "Class" object from
-   */
-  namespace?: any;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
- * @param {object} [options.namespace] Namespace to get klass "Class" object from
  * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
  * called after each fabric object created.
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -134,7 +120,7 @@ export const enlivenObjectEnlivables = <
   R = Record<string, FabricObject | TFiller | null>
 >(
   serializedObject: any,
-  { signal }: { signal?: AbortSignal } = {}
+  { signal }: Abortable = {}
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller)[] = [];
