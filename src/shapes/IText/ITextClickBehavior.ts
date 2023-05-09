@@ -30,7 +30,7 @@ export abstract class ITextClickBehavior<
   private declare __lastPointer: XY | Record<string, never>;
   private declare __newClickTime: number;
 
-  protected draggableTextDelegate: DraggableTextDelegate;
+  protected draggableTextDelegate!: DraggableTextDelegate;
 
   initBehavior() {
     // Initializes event handlers related to cursor or selection
