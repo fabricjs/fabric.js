@@ -1511,6 +1511,9 @@ export class FabricObject<
     runningAnimations.cancelByTarget(this);
     this.off();
     this._set('canvas', undefined);
+    // clear caches
+    this._cacheCanvas = undefined;
+    this._cacheContext = null;
   }
 
   /**
