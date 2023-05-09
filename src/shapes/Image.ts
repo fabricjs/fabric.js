@@ -9,12 +9,11 @@ import { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
-import type {
-  LoadImageOptions} from '../util/misc/objectEnlive';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
-  loadImage
+  loadImage,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';

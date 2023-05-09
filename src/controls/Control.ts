@@ -11,12 +11,8 @@ import type { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import type {
-  ControlRenderingStyleOverride} from './controlRendering';
-import {
-  renderCircleControl,
-  renderSquareControl,
-} from './controlRendering';
+import type { ControlRenderingStyleOverride } from './controlRendering';
+import { renderCircleControl, renderSquareControl } from './controlRendering';
 
 export class Control {
   /**

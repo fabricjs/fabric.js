@@ -2,7 +2,7 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import type { XY} from '../Point';
+import type { XY } from '../Point';
 import { Point } from '../Point';
 import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';

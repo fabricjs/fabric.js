@@ -19,7 +19,13 @@ import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/types';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import type { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import type {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -30,7 +36,7 @@ import { pick } from '../util/misc/pick';
 import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TDestroyedCanvas , TCanvasSizeOptions } from './StaticCanvas';
+import type { TDestroyedCanvas, TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
 
 export const DefaultCanvasProperties = {

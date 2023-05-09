@@ -19,10 +19,9 @@ import type {
   TSize,
   TSVGReviver,
   TToCanvasElementOptions,
-  TValidToObjectMethod} from '../typedefs';
-import {
-  ImageFormat
+  TValidToObjectMethod,
 } from '../typedefs';
+import { ImageFormat } from '../typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -31,8 +30,7 @@ import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
-import type {
-  EnlivenObjectOptions} from '../util/misc/objectEnlive';
+import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
