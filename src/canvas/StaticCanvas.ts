@@ -1,4 +1,4 @@
-import { getFabricDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -1652,17 +1652,19 @@ export class StaticCanvas<
     return canvasEl;
   }
 
-  /**
-   * Clears the canvas element, disposes of objects and frees resources.
-   *
-   * If a rendering operation is in progress, requested by {@link requestRenderAll} or by an async {@link toCanvasElement},
-   * it will throw a silent error and render nothing (resources will be nullified).
-   */
-  dispose() {
-    if (this.disposed) {
-      return;
-    }
-    this.disposed = true;
+  protected cleanupDOM() {
+    const canvasElement = this.lowerCanvasEl!;
+    // restore canvas style and attributes
+    canvasElement.classList.remove('lower-canvas');
+    canvasElement.removeAttribute('data-fabric');
+    // restore canvas size to original size in case retina scaling was applied
+    canvasElement.setAttribute('width', `${this.width}`);
+    canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
+  }
+
+  protected destroy() {
     this.cancelRequestedRender();
     this.forEachObject((object) => object.dispose());
     this._objects = [];
@@ -1676,17 +1678,23 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl!;
-    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
+    // @ts-expect-error disposing
+    this.lowerCanvasEl = undefined;
+  }
+
+  /**
+   * Clears the canvas element, disposes of objects and frees resources.
+   *
+   * If a rendering operation is in progress, requested by {@link requestRenderAll} or by an async {@link toCanvasElement},
+   * it will throw a silent error and render nothing (resources will be nullified).
+   */
+  dispose() {
+    if (this.disposed) {
+      return;
+    }
+    this.disposed = true;
+    this.cleanupDOM();
+    this.destroy();
   }
 
   /**
