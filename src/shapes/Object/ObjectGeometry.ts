@@ -12,7 +12,8 @@ import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
@@ -26,7 +27,6 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import { ObjectEvents } from '../../EventTypeDefs';
 import { ControlProps } from './types/ControlProps';
-import { translateMatrix } from '../../parser/translateMatrix';
 
 type TLineDescriptor = {
   o: Point;
@@ -662,9 +662,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
+    const rotateMatrix = createRotateMatrix({ angle: this.angle }),
       { x, y } = this.getRelativeCenterPoint(),
-      tMatrix = translateMatrix(x, y),
+      tMatrix = createTranslateMatrix(x, y),
       finalMatrix = multiplyTransformMatrices(tMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
