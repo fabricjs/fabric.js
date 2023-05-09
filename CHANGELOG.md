@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): minor type/import fixes [#8904](https://github.com/fabricjs/fabric.js/pull/8904)
 - chore(TS): pattern cleanup + export types [#8875](https://github.com/fabricjs/fabric.js/pull/8875)
 - fix(): Disable offscreen check for bg and overlay when not needed [#8898](https://github.com/fabricjs/fabric.js/pull/8898)
 - chore(): cleanup #8888 [#8892](https://github.com/fabricjs/fabric.js/pull/8892)
