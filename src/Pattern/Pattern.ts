@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
+import { Abortable, TCrossOrigin, TMat2D } from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
