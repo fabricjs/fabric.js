@@ -1,5 +1,5 @@
 import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
-import {
+import type {
   CanvasEvents,
   DragEventData,
   ObjectEvents,
@@ -9,10 +9,10 @@ import {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { Group } from '../shapes/Group';
+import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { AssertKeys } from '../typedefs';
+import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';

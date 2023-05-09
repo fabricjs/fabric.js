@@ -1,7 +1,7 @@
 import { getFabricWindow } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import {
+import type {
   TWebGLPipelineState,
   TProgramCache,
   TTextureCache,

@@ -1,4 +1,4 @@
-import { Percent, TMat2D } from '../typedefs';
+import type { Percent, TMat2D } from '../typedefs';
 
 export type GradientUnits = 'pixels' | 'percentage';
 

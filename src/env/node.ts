@@ -6,7 +6,7 @@ import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
 import { setEnv } from './index';
-import { TCopyPasteData, TFabricEnv } from './types';
+import type { TCopyPasteData, TFabricEnv } from './types';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
 

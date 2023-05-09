@@ -10,9 +10,8 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
-import {
+import type {
   Constructor,
-  ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
   TFiller,
@@ -20,7 +19,9 @@ import {
   TSize,
   TSVGReviver,
   TToCanvasElementOptions,
-  TValidToObjectMethod,
+  TValidToObjectMethod} from '../typedefs';
+import {
+  ImageFormat
 } from '../typedefs';
 import {
   cancelAnimFrame,
@@ -30,9 +31,10 @@ import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import type {
+  EnlivenObjectOptions} from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
-  EnlivenObjectOptions,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
