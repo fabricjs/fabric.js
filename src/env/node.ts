@@ -50,6 +50,7 @@ export const getEnv = (): TFabricEnv => {
     window: JSDOMWindow,
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
+    dispose,
     copyPasteData,
   };
 };

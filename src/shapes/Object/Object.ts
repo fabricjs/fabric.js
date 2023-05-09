@@ -41,6 +41,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import { SerializedObjectProps } from './types/SerializedObjectProps';
 import { ObjectProps } from './types/ObjectProps';
 import { TProps } from './types';
+import { getEnv } from '../../env';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -1512,6 +1513,7 @@ export class FabricObject<
     this.off();
     this._set('canvas', undefined);
     // clear caches
+    this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
     this._cacheCanvas = undefined;
     this._cacheContext = null;
   }

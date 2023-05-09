@@ -5,8 +5,6 @@ import type { JpegConfig, PngConfig } from 'canvas';
 import {
   Canvas as CanvasBase,
   StaticCanvas as StaticCanvasBase,
-  Image as ImageBase,
-  classRegistry,
 } from './fabric';
 import { FabricObject } from './src/shapes/Object/Object';
 
@@ -55,19 +53,3 @@ export class Canvas extends CanvasBase {
     dispose(pixelFindCanvasEl);
   }
 }
-
-export class Image extends ImageBase {
-  dispose() {
-    const elements = [
-      this._originalElement,
-      this._element,
-      this._filteredEl,
-      this._cacheCanvas,
-    ];
-    super.dispose();
-    elements.forEach((el) => el && dispose(el));
-  }
-}
-
-classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);

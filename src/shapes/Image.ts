@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getFabricDocument } from '../env';
+import { getFabricDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
@@ -256,6 +256,7 @@ export class Image<
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
       (elementKey) => {
+        getEnv().dispose(this[elementKey as keyof this] as Element);
         // @ts-expect-error disposing
         this[elementKey] = undefined;
       }
