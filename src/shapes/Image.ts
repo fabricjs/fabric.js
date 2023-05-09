@@ -254,13 +254,14 @@ export class Image<
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._cacheContext = null;
-    ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
-      (elementKey) => {
-        getEnv().dispose(this[elementKey as keyof this] as Element);
-        // @ts-expect-error disposing
-        this[elementKey] = undefined;
-      }
-    );
+    (
+      ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'] as const
+    ).forEach((elementKey) => {
+      const el = this[elementKey];
+      el && getEnv().dispose(el);
+      // @ts-expect-error disposing
+      this[elementKey] = undefined;
+    });
   }
 
   /**
@@ -785,7 +786,7 @@ export class Image<
    */
   static fromObject<T extends TProps<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
-    options: { signal: AbortSignal }
+    options: Abortable = {}
   ) {
     return Promise.all([
       loadImage(src, { ...options, crossOrigin }),
@@ -827,10 +828,7 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static async fromElement(
-    element: SVGElement,
-    options: { signal?: AbortSignal } = {}
-  ) {
+  static async fromElement(element: SVGElement, options: Abortable = {}) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
     return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
