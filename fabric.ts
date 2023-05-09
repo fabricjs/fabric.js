@@ -1,4 +1,4 @@
-export { getEnv, getDocument, getWindow, setEnv } from './src/env';
+export { getEnv, getFabricDocument, getFabricWindow, setEnv } from './src/env';
 export { cache } from './src/cache';
 export { VERSION as version, iMatrix } from './src/constants';
 export { config } from './src/config';
@@ -15,7 +15,7 @@ export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
 
 export { Gradient } from './src/gradient/Gradient';
-export { Pattern } from './src/Pattern';
+export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';

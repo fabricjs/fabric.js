@@ -1,13 +1,14 @@
 //@ts-nocheck
 
 import { config } from '../../config';
-import { getDocument, getEnv } from '../../env';
+import { getFabricDocument, getEnv } from '../../env';
 import { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import { ITextBehavior, ITextEvents } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
 import { TProps } from '../Object/types';
 import { TextProps, SerializedTextProps } from '../Text/Text';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -59,7 +60,10 @@ export abstract class ITextKeyBehavior<
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = getDocument().createElement('textarea');
+    const doc =
+      (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
+      getFabricDocument();
+    this.hiddenTextarea = doc.createElement('textarea');
     this.hiddenTextarea.setAttribute('autocapitalize', 'off');
     this.hiddenTextarea.setAttribute('autocorrect', 'off');
     this.hiddenTextarea.setAttribute('autocomplete', 'off');
@@ -74,7 +78,7 @@ export abstract class ITextKeyBehavior<
     if (this.hiddenTextareaContainer) {
       this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
     } else {
-      getDocument().body.appendChild(this.hiddenTextarea);
+      doc.body.appendChild(this.hiddenTextarea);
     }
 
     this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
