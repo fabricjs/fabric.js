@@ -1,4 +1,4 @@
-import { getFabricDocument } from '../env';
+import { getEnv, getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -1508,12 +1508,14 @@ export class SelectableCanvas<
     // top canvas
     // @ts-expect-error disposing
     this.contextTop = null;
+    getEnv().dispose(this.upperCanvasEl);
     // @ts-expect-error disposing
     this.upperCanvasEl = undefined;
 
     // pixel find canvas
     // @ts-expect-error disposing
     this.pixelFindContext = null;
+    getEnv().dispose(this.pixelFindCanvasEl);
     // @ts-expect-error disposing
     this.pixelFindCanvasEl = undefined;
 

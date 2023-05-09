@@ -1,4 +1,4 @@
-import { getFabricDocument } from '../env';
+import { getEnv, getFabricDocument } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import {
+  Abortable,
   Constructor,
   ImageFormat,
   TCornerPoint,
@@ -1678,6 +1679,7 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
+    getEnv().dispose(this.lowerCanvasEl);
     // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
   }
