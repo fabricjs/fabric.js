@@ -11,6 +11,7 @@ import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import type {
+  Abortable,
   Constructor,
   TCornerPoint,
   TDataUrlOptions,

@@ -1,2 +1,2 @@
 export { Pattern } from './Pattern';
-export type * from './types';
+export * from './types';
