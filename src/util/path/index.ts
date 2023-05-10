@@ -348,7 +348,10 @@ export const fromArcToBeziers = (
  * @return {TSimplePathData} the simplified array of commands of a parsed SVG path for `Path`
  * TODO: figure out how to remove the type assertions in a nice way
  */
-export const makePathSimpler = (path: TComplexPathData, fractionDigits?: number): TSimplePathData => {
+export const makePathSimpler = (
+  path: TComplexPathData,
+  fractionDigits?: number
+): TSimplePathData => {
   // x and y represent the last point of the path, AKA the previous command point.
   // we add them to each relative command to make it an absolute comment.
   // we also swap the v V h H with L, because are easier to transform.
@@ -367,11 +370,14 @@ export const makePathSimpler = (path: TComplexPathData, fractionDigits?: number)
     controlX = 0,
     controlY = 0;
 
-  const roundCommand = (data: TSimpleParsedCommand) => fractionDigits === undefined ? data : data.map(item => {
-    if (typeof item === 'string') return item;
-    const digits = Math.pow(10, fractionDigits);
-    return Math.round(item * digits) / digits;
-  }) as TSimpleParsedCommand;
+  const roundCommand = (data: TSimpleParsedCommand) =>
+    fractionDigits === undefined
+      ? data
+      : (data.map((item) => {
+          if (typeof item === 'string') return item;
+          const digits = Math.pow(10, fractionDigits);
+          return Math.round(item * digits) / digits;
+        }) as TSimpleParsedCommand);
 
   for (const parsedCommand of path) {
     const current: TComplexParsedCommand = [...parsedCommand];
@@ -491,7 +497,9 @@ export const makePathSimpler = (path: TComplexPathData, fractionDigits?: number)
         current[7] += y;
       // falls through
       case 'A':
-        fromArcToBeziers(x, y, current).forEach((b) => destinationPath.push(roundCommand(b)));
+        fromArcToBeziers(x, y, current).forEach((b) =>
+          destinationPath.push(roundCommand(b))
+        );
         x = current[6];
         y = current[7];
         break;
