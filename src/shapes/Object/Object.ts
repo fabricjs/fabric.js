@@ -749,8 +749,8 @@ export class FabricObject<
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.dirty = false;
       this.drawObject(ctx);
+      this.dirty = false;
     }
     ctx.restore();
   }
