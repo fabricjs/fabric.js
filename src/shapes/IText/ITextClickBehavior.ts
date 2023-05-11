@@ -1,5 +1,5 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
-import type { XY} from '../../Point';
+import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';

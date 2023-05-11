@@ -2,7 +2,7 @@
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { TextStyle, TextStyleDeclaration} from './StyledText';
+import type { TextStyle, TextStyleDeclaration } from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';

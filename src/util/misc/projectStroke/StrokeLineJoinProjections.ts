@@ -1,4 +1,4 @@
-import type { XY} from '../../../Point';
+import type { XY } from '../../../Point';
 import { Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { getBisector, getOrthonormalVector, magnitude } from '../vectors';

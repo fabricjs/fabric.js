@@ -1,4 +1,4 @@
-import type { XY} from '../../Point';
+import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import type { TRadian } from '../../typedefs';
 

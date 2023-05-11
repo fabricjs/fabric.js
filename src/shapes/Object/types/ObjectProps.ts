@@ -3,7 +3,10 @@ import type { Canvas } from '../../../canvas/Canvas';
 import type { StaticCanvas } from '../../../canvas/StaticCanvas';
 import type { TFiller } from '../../../typedefs';
 import type { FabricObject } from '../Object';
-import type { ClipPathProps, SerializedObjectProps } from './SerializedObjectProps';
+import type {
+  ClipPathProps,
+  SerializedObjectProps,
+} from './SerializedObjectProps';
 
 export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
   clipPath?: FabricObject;

@@ -2,13 +2,12 @@ import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import type {
-  TQrDecomposeOut} from '../../util/misc/matrix';
+import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
-  qrDecompose
+  qrDecompose,
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';

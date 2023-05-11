@@ -21,7 +21,7 @@ import type {
   TEndPathInfo,
   TParsedArcCommand,
 } from './typedefs';
-import type { XY} from '../../Point';
+import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import { rePathCommand } from './regex';
 import { cleanupSvgAttribute } from '../internals/cleanupSvgAttribute';
