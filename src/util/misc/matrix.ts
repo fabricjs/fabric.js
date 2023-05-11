@@ -1,6 +1,7 @@
 import { iMatrix } from '../../constants';
-import { Point, XY } from '../../Point';
-import { TDegree, TRadian, TMat2D } from '../../typedefs';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
+import type { TDegree, TRadian, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';

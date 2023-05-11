@@ -1,13 +1,13 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
-import { TDegree, TOriginX, TOriginY } from '../../typedefs';
+import type { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import { BaseProps } from './types/BaseProps';
-import { FillStrokeProps } from './types/FillStrokeProps';
+import type { BaseProps } from './types/BaseProps';
+import type { FillStrokeProps } from './types/FillStrokeProps';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>

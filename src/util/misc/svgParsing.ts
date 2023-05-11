@@ -1,11 +1,12 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import type {
+  TBBox,
+  TMat2D} from '../../typedefs';
 import {
   SupportedSVGUnit,
-  SVGElementName,
-  TBBox,
-  TMat2D,
+  SVGElementName
 } from '../../typedefs';
 import { toFixed } from './toFixed';
 /**

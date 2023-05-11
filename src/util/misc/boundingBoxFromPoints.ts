@@ -1,5 +1,6 @@
-import { XY, Point } from '../../Point';
-import { TBBox } from '../../typedefs';
+import type { XY} from '../../Point';
+import { Point } from '../../Point';
+import type { TBBox } from '../../typedefs';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`

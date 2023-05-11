@@ -4,7 +4,7 @@
  */
 
 import { twoMathPi, halfPI } from '../../constants';
-import { TEasingFunction } from './types';
+import type { TEasingFunction } from './types';
 
 const normalize = (a: number, c: number, p: number, s: number) => {
   if (a < Math.abs(c)) {

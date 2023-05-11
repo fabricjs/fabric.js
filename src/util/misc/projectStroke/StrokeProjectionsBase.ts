@@ -1,12 +1,13 @@
 import { halfPI } from '../../../constants';
-import { XY, Point } from '../../../Point';
+import type { XY} from '../../../Point';
+import { Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
   calcVectorRotation,
   createVector,
 } from '../vectors';
-import { TProjectStrokeOnPointsOptions, TProjection } from './types';
+import type { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 /**
  * @see https://github.com/fabricjs/fabric.js/pull/8344

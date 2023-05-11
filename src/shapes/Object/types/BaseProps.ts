@@ -1,4 +1,4 @@
-import { TDegree, TOriginX, TOriginY } from '../../../typedefs';
+import type { TDegree, TOriginX, TOriginY } from '../../../typedefs';
 
 export interface BaseProps {
   /**

@@ -1,8 +1,9 @@
 // @ts-nocheck
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { TextStyle, TextStyleDeclaration} from './StyledText';
+import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
@@ -21,7 +22,7 @@ import {
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
-import { Path } from '../Path';
+import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
 import type {

@@ -1,5 +1,6 @@
-import { XY, Point } from '../../Point';
-import { TRadian } from '../../typedefs';
+import type { XY} from '../../Point';
+import { Point } from '../../Point';
+import type { TRadian } from '../../typedefs';
 
 const unitVectorX = new Point(1, 0);
 

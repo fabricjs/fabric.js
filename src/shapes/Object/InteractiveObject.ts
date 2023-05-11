@@ -2,20 +2,21 @@ import { Point } from '../../Point';
 import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import type {
+  TQrDecomposeOut} from '../../util/misc/matrix';
 import {
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
-  qrDecompose,
-  TQrDecomposeOut,
+  qrDecompose
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
-import { FabricObjectProps } from './types/FabricObjectProps';
-import { TFabricObjectProps, SerializedObjectProps } from './types';
+import type { FabricObjectProps } from './types/FabricObjectProps';
+import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {

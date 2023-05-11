@@ -1,7 +1,7 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
@@ -38,9 +38,9 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { ObjectProps } from './types/ObjectProps';
-import { TProps } from './types';
+import type { SerializedObjectProps } from './types/SerializedObjectProps';
+import type { ObjectProps } from './types/ObjectProps';
+import type { TProps } from './types';
 
 export type TCachedFabricObject = FabricObject &
   Required<
