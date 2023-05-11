@@ -2,12 +2,13 @@
 
 import { config } from '../../config';
 import { getFabricDocument, getEnv } from '../../env';
-import { TPointerEvent } from '../../EventTypeDefs';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
-import { ITextBehavior, ITextEvents } from './ITextBehavior';
+import type { ITextEvents } from './ITextBehavior';
+import { ITextBehavior } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
-import { TProps } from '../Object/types';
-import { TextProps, SerializedTextProps } from '../Text/Text';
+import type { TProps } from '../Object/types';
+import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 
 export abstract class ITextKeyBehavior<

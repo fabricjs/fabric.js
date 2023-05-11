@@ -1,6 +1,6 @@
-import { Point } from '../../../Point';
-import { TDegree } from '../../../typedefs';
-import { getBisector } from '../vectors';
+import type { Point } from '../../../Point';
+import type { TDegree } from '../../../typedefs';
+import type { getBisector } from '../vectors';
 
 export type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;

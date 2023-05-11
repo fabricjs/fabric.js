@@ -1,5 +1,5 @@
 import { Color } from '../color/Color';
-import { Point } from '../Point';
+import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';

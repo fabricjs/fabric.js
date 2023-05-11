@@ -1,5 +1,5 @@
 import { getFabricDocument } from '../../env';
-import { ImageFormat } from '../../typedefs';
+import type { ImageFormat } from '../../typedefs';
 /**
  * Creates canvas element
  * @return {CanvasElement} initialized canvas element

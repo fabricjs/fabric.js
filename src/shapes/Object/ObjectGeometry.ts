@@ -25,8 +25,8 @@ import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { ControlProps } from './types/ControlProps';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;

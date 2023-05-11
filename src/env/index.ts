@@ -7,7 +7,7 @@
  * since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
  */
 
-import { TFabricEnv } from './types';
+import type { TFabricEnv } from './types';
 import { getEnv as getBrowserEnv } from './browser';
 import type { DOMWindow } from 'jsdom';
 
