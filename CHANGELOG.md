@@ -3,6 +3,7 @@
 ## [next]
 
 - BREAKING fix(): reflect NUM_FRACTION_DIGITS to toObject path data [#8909](https://github.com/fabricjs/fabric.js/pull/8909)
+- fix(Object): dirty unflagging inconsistency [#8910](https://github.com/fabricjs/fabric.js/pull/8910)
 - chore(TS): minor type/import fixes [#8904](https://github.com/fabricjs/fabric.js/pull/8904)
 - chore(): Matrix util cleanup [#8894](https://github.com/fabricjs/fabric.js/pull/8894)
 - chore(TS): pattern cleanup + export types [#8875](https://github.com/fabricjs/fabric.js/pull/8875)
