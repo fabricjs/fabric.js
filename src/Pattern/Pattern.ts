@@ -1,12 +1,12 @@
 import { config } from '../config';
-import { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
+import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { classRegistry } from '../ClassRegistry';
-import {
+import type {
   PatternRepeat,
   PatternOptions,
   SerializedPatternOptions,

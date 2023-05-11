@@ -1,6 +1,6 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
   myParameter: 0,

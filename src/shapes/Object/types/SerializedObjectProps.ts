@@ -1,6 +1,6 @@
-import { Shadow } from '../../../Shadow';
-import { BaseProps } from './BaseProps';
-import { FillStrokeProps } from './FillStrokeProps';
+import type { Shadow } from '../../../Shadow';
+import type { BaseProps } from './BaseProps';
+import type { FillStrokeProps } from './FillStrokeProps';
 
 export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
   /**

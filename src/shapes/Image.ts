@@ -4,15 +4,16 @@ import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Abortable, TClassProperties, TSize } from '../typedefs';
+import type { TClassProperties, TSize } from '../typedefs';
+import type { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
   loadImage,
-  LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';

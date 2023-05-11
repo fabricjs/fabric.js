@@ -21,7 +21,7 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
-import {
+import type {
   FabricObjectProps,
   SerializedObjectProps,
   TProps,

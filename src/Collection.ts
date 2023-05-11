@@ -2,7 +2,7 @@ import type { Constructor, TBBox } from './typedefs';
 import type { BaseFabricObject } from './EventTypeDefs';
 import { removeFromArray } from './util/internals';
 import { Point } from './Point';
-import { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
+import type { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {

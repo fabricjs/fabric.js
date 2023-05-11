@@ -1,7 +1,7 @@
 import { Color } from '../../color/Color';
 import { parsePercent } from '../../parser/percent';
 import { ifNaN } from '../../util/internals';
-import { ColorStop } from '../typedefs';
+import type { ColorStop } from '../typedefs';
 
 const RE_KEY_VALUE_PAIRS = /\s*;\s*/;
 const RE_KEY_VALUE = /\s*:\s*/;

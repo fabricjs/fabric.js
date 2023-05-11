@@ -1,4 +1,4 @@
-import { TMat2D, TRadian } from './typedefs';
+import type { TMat2D, TRadian } from './typedefs';
 import { cos } from './util/misc/cos';
 import { sin } from './util/misc/sin';
 

@@ -1,7 +1,8 @@
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point, XY } from '../Point';
+import type { XY } from '../Point';
+import { Point } from '../Point';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -12,7 +13,7 @@ import {
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import {
+import type {
   TComplexPathData,
   TPathSegmentInfo,
   TSimplePathData,
@@ -23,7 +24,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 
 interface UniquePathProps {

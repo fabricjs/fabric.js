@@ -1,6 +1,6 @@
-import { Image } from '../shapes/Image';
+import type { Image } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { qrDecompose } from './misc/matrix';
 
 type FabricObjectWithTransformMatrix = FabricObject & {

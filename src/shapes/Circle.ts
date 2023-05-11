@@ -6,8 +6,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TClassProperties } from '../typedefs';
-import {
+import type { TClassProperties } from '../typedefs';
+import type {
   FabricObjectProps,
   SerializedObjectProps,
   TProps,
