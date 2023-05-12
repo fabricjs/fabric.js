@@ -14,6 +14,7 @@ import {
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
+import { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
@@ -396,7 +397,7 @@ export class BaseFilter {
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    options: Abortable
   ) {
     return new this(filterOptions);
   }
