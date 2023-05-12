@@ -1,8 +1,9 @@
-import { XY, Point } from '../../../Point';
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
 import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 /**
  * class in charge of finding projections for each type of line cap for start/end of an open path

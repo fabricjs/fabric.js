@@ -1,20 +1,21 @@
 import { Point } from '../../Point';
-import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
-  TQrDecomposeOut,
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
-import { FabricObjectProps } from './types/FabricObjectProps';
-import { TFabricObjectProps, SerializedObjectProps } from './types';
+import type { FabricObjectProps } from './types/FabricObjectProps';
+import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {
@@ -235,8 +236,8 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      rMatrix = calcRotateMatrix({
+      tMatrix = createTranslateMatrix(center.x, center.y),
+      rMatrix = createRotateMatrix({
         angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),

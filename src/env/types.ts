@@ -1,4 +1,4 @@
-import { GLProbe } from '../filters/GLProbes/GLProbe';
+import type { GLProbe } from '../filters/GLProbes/GLProbe';
 import type { DOMWindow } from 'jsdom';
 
 export type TCopyPasteData = {

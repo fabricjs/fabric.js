@@ -1,11 +1,11 @@
-import {
+import type {
   ControlCallback,
   ControlCursorCallback,
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TAxisKey } from '../typedefs';
+import type { TAxisKey } from '../typedefs';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
 import { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
 

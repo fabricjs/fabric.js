@@ -1,6 +1,6 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';

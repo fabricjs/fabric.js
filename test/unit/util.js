@@ -94,9 +94,9 @@
     assert.deepEqual(fabric.util.radiansToDegrees(), NaN);
   });
 
-  QUnit.test('calcRotateMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcRotateMatrix === 'function', 'calcRotateMatrix should exist');
-    var matrix = fabric.util.calcRotateMatrix({ angle: 90 });
+  QUnit.test('createRotateMatrix', function (assert) {
+    assert.ok(typeof fabric.util.createRotateMatrix === 'function', 'createRotateMatrix should exist');
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 });
     var expected = [
       0,
       1,
@@ -106,6 +106,20 @@
       0
     ];
     assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+  });
+
+  QUnit.test('createRotateMatrix with origin', function (assert) {
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 }, { x: 100, y: 200 });
+    var expected = [
+      0,
+      1,
+      -1,
+      0,
+      300,
+      100
+    ];
+    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+    assert.deepEqual(new fabric.Point().rotate(Math.PI / 2, new fabric.Point(100, 200)), new fabric.Point(300, 100), 'rotating 0,0 around origin should equal the matrix translation');
   });
 
   QUnit.test('fabric.util.getRandomInt', function(assert) {
@@ -468,6 +482,29 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
     m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+  });
+
+  QUnit.test('multiplyTransformMatrixArray', function (assert) {
+    assert.ok(typeof fabric.util.multiplyTransformMatrixArray === 'function');
+    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), [
+      23,
+      34,
+      31,
+      46,
+      160,
+      240
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), [
+      23,
+      34,
+      31,
+      46,
+      0,
+      0
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), fabric.util.multiplyTransformMatrices(m1, m2));
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), fabric.util.multiplyTransformMatrices(m1, m2, true));
   });
 
   QUnit.test('resetObjectTransform', function(assert) {
