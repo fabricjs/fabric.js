@@ -1,5 +1,5 @@
 import { Canvas } from '../../canvas/Canvas';
-import { ITextEvents } from './ITextBehavior';
+import type { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import {
   ctrlKeysMapDown,
@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import { AssertKeys, TFiller } from '../../typedefs';
+import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 

@@ -1,5 +1,5 @@
 import { getFabricWindow } from '../env';
-import { LoadImageOptions } from '../util/misc/objectEnlive';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { parseSVGDocument } from './parseSVGDocument';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 

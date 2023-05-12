@@ -1,5 +1,5 @@
 import { config } from './config';
-import { TRectBounds } from './typedefs';
+import type { TRectBounds } from './typedefs';
 
 export class Cache {
   /**

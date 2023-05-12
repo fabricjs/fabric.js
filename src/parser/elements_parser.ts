@@ -10,7 +10,7 @@ import {
 } from '../util/misc/matrix';
 import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 
 const findTag = (el: HTMLElement) =>

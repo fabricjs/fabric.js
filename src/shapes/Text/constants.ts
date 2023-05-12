@@ -1,4 +1,4 @@
-import { TClassProperties } from '../../typedefs';
+import type { TClassProperties } from '../../typedefs';
 import type { Text } from './Text';
 
 const fontProperties = [

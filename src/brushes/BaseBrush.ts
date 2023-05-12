@@ -1,6 +1,6 @@
 import { Color } from '../color/Color';
 import type { Point } from '../Point';
-import { TEvent } from '../EventTypeDefs';
+import type { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/Canvas';
 

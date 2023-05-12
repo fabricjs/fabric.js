@@ -1,12 +1,15 @@
 import { iMatrix } from '../constants';
 import { reNum } from './constants';
-import { multiplyTransformMatrices } from '../util/misc/matrix';
-import { rotateMatrix } from './rotateMatrix';
-import { scaleMatrix } from './scaleMatrix';
-import { translateMatrix } from './translateMatrix';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { cleanupSvgAttribute } from '../util/internals/cleanupSvgAttribute';
-import { skewXMatrix, skewYMatrix } from './skewMatrix';
+import {
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
+  createTranslateMatrix,
+  multiplyTransformMatrixArray,
+} from '../util/misc/matrix';
 
 // == begin transform regexp
 const p = `(${reNum})`;
@@ -64,19 +67,19 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
 
     switch (operation) {
       case 'translate':
-        matrix = translateMatrix(arg0, arg1);
+        matrix = createTranslateMatrix(arg0, arg1);
         break;
       case 'rotate':
-        matrix = rotateMatrix(arg0, arg1, arg2);
+        matrix = createRotateMatrix({ angle: arg0 }, { x: arg1, y: arg2 });
         break;
       case 'scale':
-        matrix = scaleMatrix(arg0, arg1);
+        matrix = createScaleMatrix(arg0, arg1);
         break;
       case 'skewX':
-        matrix = skewXMatrix(arg0);
+        matrix = createSkewXMatrix(arg0);
         break;
       case 'skewY':
-        matrix = skewYMatrix(arg0);
+        matrix = createSkewYMatrix(arg0);
         break;
       case 'matrix':
         matrix = [arg0, arg1, arg2, arg3, arg4, arg5];
@@ -87,8 +90,5 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     matrices.push(matrix);
   }
 
-  return matrices.reduce(
-    (acc, matrix) => multiplyTransformMatrices(acc, matrix),
-    iMatrix
-  );
+  return multiplyTransformMatrixArray(matrices);
 }
