@@ -1,5 +1,7 @@
 # Browsers that we support
 
 chrome >= 64
-safari >= 13
-firefox >= 58
+safari >= 14
+firefox >= 67
+edge >= 75
+Opera >= 51
