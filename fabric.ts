@@ -10,14 +10,16 @@ export { Observable } from './src/Observable';
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
 
+export type { XY } from './src/Point';
 export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
 export * from './src/color/typedefs';
 
-export { Gradient } from './src/gradient/Gradient';
+export * from './src/gradient';
 export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
+export type { SerializedShadowOptions } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
 export * from './src/brushes/typedefs';
