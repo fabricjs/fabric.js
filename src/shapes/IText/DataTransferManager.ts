@@ -34,7 +34,7 @@ export abstract class DataTransferManager<
     }
     dataTransfer.setData(
       'text/html',
-      DataTransferManager.toHTML(this.target, selectionStart, selectionEnd)
+      this.toHTML(selectionStart, selectionEnd)
     );
     dataTransfer.setData('text/svg+xml', `<svg>${this.target.toSVG()}</svg>`);
     dataTransfer.setData('text/plain', this.target.getSelectedText());
@@ -49,8 +49,7 @@ export abstract class DataTransferManager<
     if (!dataTransfer) {
       return {};
     }
-    const data = dataTransfer.getData('text/html');
-    if (data) {
+    if (dataTransfer.types.includes('text/html')) {
       const { text, styles } = this.parseHTML(e);
       return {
         text,
@@ -76,12 +75,12 @@ export abstract class DataTransferManager<
     };
   }
 
-  static toHTML(target: IText, from = 0, to = target.text.length) {
-    const text = target._text.slice(from, to);
+  toHTML(from = 0, to = this.target.text.length) {
+    const text = this.target._text.slice(from, to);
     const textLines = text.join('').split(target._reNewline);
-    const styles = target
+    const styles = this.target
       .getSelectionStyles(from, to)
-      .filter((value, index) => !target._reNewline.test(text[index]));
+      .filter((value, index) => !this.target._reNewline.test(text[index]));
     const { cssText: topLevelStyles } = textStylesToCSS(target);
     let charIndex = 0;
     const markup = textLines
