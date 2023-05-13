@@ -374,7 +374,7 @@ export class Color {
   static sourceFromHex(color: string): TRGBAColorSource | undefined {
     if (color.match(reHex())) {
       const value = color.slice(color.indexOf('#') + 1),
-        isShortNotation = value.length === 3 || value.length === 4;
+        isShortNotation = value.length <= 4;
       let expandedValue: string[];
       if (isShortNotation) {
         expandedValue = value.split('').map((hex) => hex + hex);
