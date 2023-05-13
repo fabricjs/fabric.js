@@ -1,4 +1,4 @@
-import type { TColorArg } from '../../color/Color';
+import type { TColorArg } from '../../color/typedefs';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { TAnimation } from '../../util/animation/animate';
 import { animate, animateColor } from '../../util/animation/animate';

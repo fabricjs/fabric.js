@@ -6,7 +6,7 @@ import type {
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
-import type { TColorArg } from '../../color/Color';
+import type { TColorArg } from '../../color/typedefs';
 
 export type TAnimation<T extends number | number[] | TColorArg> =
   T extends TColorArg
