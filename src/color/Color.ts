@@ -1,23 +1,7 @@
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
+import type { TRGBAColorSource, TColorArg, TRGBColorSource } from './typedefs';
 import { hue2rgb, hexify } from './util';
-
-/**
- * RGB format
- */
-export type TRGBColorSource = [red: number, green: number, blue: number];
-
-/**
- * RGBA format
- */
-export type TRGBAColorSource = [
-  red: number,
-  green: number,
-  blue: number,
-  alpha: number
-];
-
-export type TColorArg = string | TRGBColorSource | TRGBAColorSource | Color;
 
 /**
  * @class Color common color operations
