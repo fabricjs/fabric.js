@@ -5,3 +5,4 @@ safari >= 14
 firefox >= 67
 edge >= 75
 Opera >= 51
+not ie > 0
