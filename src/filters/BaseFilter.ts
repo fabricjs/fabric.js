@@ -7,14 +7,14 @@ import type {
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './utils';
 import { GLPrecision } from './GLProbes/GLProbe';
 import {
   highPsourceCode,
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
-import { Abortable } from '../typedefs';
+import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
