@@ -280,6 +280,7 @@ export class Color {
    */
   static sourceFromRgb(color: string): TRGBAColorSource | undefined {
     const match = color.match(reRGBa());
+    console.log({ match });
     if (match) {
       const r =
           (parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1)) *
