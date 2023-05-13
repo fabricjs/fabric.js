@@ -7,21 +7,11 @@ import {
 } from '../../../util/dom_misc';
 import type { TextStyleDeclaration } from '../../Text/StyledText';
 import type { IText } from '../IText';
+import { AbstractDataTransferManager } from './AbstractDataTransferManager';
 
 export abstract class DataTransferManager<
   T extends ClipboardEvent | DragEvent
-> {
-  protected readonly target: IText;
-  constructor(target: IText) {
-    this.target = target;
-  }
-
-  protected abstract extractDataTransfer(e: T): DataTransfer | null;
-
-  /**
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types
-   * @returns true if {@link DataTransfer} was set
-   */
+> extends AbstractDataTransferManager<T> {
   setData(e: T): boolean {
     const dataTransfer = this.extractDataTransfer(e);
     if (!dataTransfer) {
