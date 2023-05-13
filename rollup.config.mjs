@@ -3,6 +3,7 @@ import terser from '@rollup/plugin-terser';
 import ts from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
 import path from 'path';
+import chalk from 'chalk';
 // import dts from "rollup-plugin-dts";
 
 const splitter = /\n|\s|,/g;
@@ -23,6 +24,20 @@ const plugins = [
     babelHelpers: 'bundled',
   }),
 ];
+
+/**
+ * disallow circular deps
+ * @see https://rollupjs.org/configuration-options/#onwarn
+ * @param {*} warning
+ * @param {*} warn
+ */
+function onwarn(warning, warn) {
+  if (warning.code === 'CIRCULAR_DEPENDENCY') {
+    console.error(chalk.redBright(warning.message));
+    throw Object.assign(new Error(), warning);
+  }
+  warn(warning);
+}
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
@@ -51,6 +66,7 @@ export default [
         : null,
     ],
     plugins,
+    onwarn,
   },
   {
     input: ['./index.node.ts'],
@@ -69,6 +85,7 @@ export default [
       },
     ],
     plugins,
+    onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
 ];

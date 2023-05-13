@@ -164,17 +164,35 @@ function assertDragEventStream(name, a, b) {
                 startDragging(eventData);
                 iText.hiddenTextarea.blur();
                 canvas._onDragEnd(createDragEvent());
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drag start', function (assert) {
                 const e = startDragging(eventData);
-                const charStyle = { "stroke": null, "strokeWidth": 1, "fill": "rgb(0,0,0)", "fontFamily": "Times New Roman", "fontSize": 40, "fontWeight": "normal", "fontStyle": "normal", "underline": false, "overline": false, "linethrough": false, "deltaY": 0, "textBackgroundColor": "" };
                 assert.deepEqual(e.dataTransfer.data, {
                     'text/html': '<html><body><!--StartFragment--><meta charset="utf-8"><p style="opacity:1;color:#000000;stroke:none;background-color:none;fill-rule:nonzero;paint-order:fill;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:miter;stroke-miterlimit:4;stroke-linecap:butt;font-family:Times New Roman;font-size:40px;font-style:normal;font-weight:normal;direction:ltr;background-color:none;"><span style="">test</span></p><!--EndFragment--></body></html>',
                     'text/svg+xml': '<svg><g transform="matrix(1 0 0 1 61.0469 23.1)" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60.5469" y="12.5656" >test test</tspan></text>\n</g>\n</svg>',
                     'text/plain': "test"
                 }, 'should set dataTransfer');
+                const charStyle = {
+                    "stroke": null,
+                    "strokeWidth": 1,
+                    "fill": "rgb(0,0,0)",
+                    "fontFamily": "Times New Roman",
+                    "fontSize": 40,
+                    "fontWeight": "normal",
+                    "fontStyle": "normal",
+                    "underline": false,
+                    "overline": false,
+                    "linethrough": false,
+                    "deltaY": 0,
+                    "textBackgroundColor": ""
+                };
+                assert.equal(e.dataTransfer.data['text/plain'], 'test', 'should set text/plain');
+                assert.deepEqual(JSON.parse(e.dataTransfer.data['application/fabric']), {
+                    value: 'test',
+                    styles: [charStyle, charStyle, charStyle, charStyle]
+                }, 'should set application/fabric');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');
                 assert.ok(e.dataTransfer.dragImageData.img instanceof HTMLCanvasElement, 'drag image was set');
                 assert.equal(e.dataTransfer.dragImageData.x, 30, 'drag image position');
@@ -305,7 +323,7 @@ function assertDragEventStream(name, a, b) {
                     ...dragEvents.slice(32, 93).map(e => ({ e, source: iText, target: iText })),
                     ...dragEvents.slice(93).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
             
             QUnit.test('drag over: target', function (assert) {
@@ -377,7 +395,7 @@ function assertDragEventStream(name, a, b) {
                     ...dragEvents.slice(0, 5).map(e => ({ e, source: iText, target: iText2 })),
                     ...dragEvents.slice(5).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drag over: canvas', function (assert) {
@@ -413,7 +431,7 @@ function assertDragEventStream(name, a, b) {
                         didDrop: false,
                     }
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drop on drag source', function (assert) {
@@ -480,7 +498,7 @@ function assertDragEventStream(name, a, b) {
                         didDrop: true,
                     }
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('drop', function (assert) {
@@ -537,7 +555,7 @@ function assertDragEventStream(name, a, b) {
                         pointer: new fabric.Point(240, 15),
                     },
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
             });
 
             QUnit.test('disable drop', function (assert) {
@@ -580,7 +598,7 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false
                     })),
                 ]);
-                assert.equal(fabric.getDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
+                assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
         });
     });

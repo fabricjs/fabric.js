@@ -1,3 +1,4 @@
+import type { ObjectEvents } from '../EventTypeDefs';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { cos } from '../util/misc/cos';
@@ -5,15 +6,20 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
 
-export class Circle extends FabricObject {
+interface UniqueCircleProps {
   /**
    * Radius of this circle
    * @type Number
    * @default 0
    */
-  declare radius: number;
+  radius: number;
 
   /**
    * degrees of start of the circle.
@@ -21,7 +27,7 @@ export class Circle extends FabricObject {
    * @type Number 0 - 359
    * @default 0
    */
-  declare startAngle: number;
+  startAngle: number;
 
   /**
    * End angle of the circle
@@ -29,14 +35,45 @@ export class Circle extends FabricObject {
    * @type Number 1 - 360
    * @default 360
    */
+  endAngle: number;
+}
+
+export interface SerializedCircleProps
+  extends SerializedObjectProps,
+    UniqueCircleProps {}
+
+export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
+
+const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
+
+export const circleDefaultValues: UniqueCircleProps = {
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+};
+
+export class Circle<
+    Props extends TProps<CircleProps> = Partial<CircleProps>,
+    SProps extends SerializedCircleProps = SerializedCircleProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements UniqueCircleProps
+{
+  declare radius: number;
+  declare startAngle: number;
   declare endAngle: number;
 
-  static cacheProperties = [
-    ...cacheProperties,
-    'radius',
-    'startAngle',
-    'endAngle',
-  ];
+  static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
+
+  static ownDefaults: Record<string, any> = circleDefaultValues;
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...Circle.ownDefaults,
+    };
+  }
 
   /**
    * @private
@@ -99,13 +136,11 @@ export class Circle extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []): object {
-    return super.toObject([
-      'radius',
-      'startAngle',
-      'endAngle',
-      ...propertiesToInclude,
-    ]);
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 
   /* _TO_SVG_START_ */
@@ -164,48 +199,36 @@ export class Circle extends FabricObject {
    * @static
    * @memberOf Circle
    * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static fromElement(element: SVGElement, callback: (circle: Circle) => any) {
+  static async fromElement(element: SVGElement): Promise<Circle> {
     const {
       left = 0,
       top = 0,
-      radius,
+      radius = 0,
       ...otherParsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
-
-    if (!radius || radius < 0) {
-      throw new Error(
-        'value of `r` attribute is required and can not be negative'
-      );
-    }
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.
-    callback(
-      new this({
-        ...otherParsedAttributes,
-        radius,
-        left: left - radius,
-        top: top - radius,
-      })
-    );
+
+    return new this({
+      ...otherParsedAttributes,
+      radius,
+      left: left - radius,
+      top: top - radius,
+    });
   }
 
   /* _FROM_SVG_END_ */
+
+  /**
+   * @todo how do we declare this??
+   */
+  static fromObject<T extends TProps<SerializedCircleProps>>(object: T) {
+    return super._fromObject<Circle>(object);
+  }
 }
-
-export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
-  type: 'circle',
-  radius: 0,
-  startAngle: 0,
-  endAngle: 360,
-};
-
-Object.assign(Circle.prototype, {
-  ...circleDefaultValues,
-});
 
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);

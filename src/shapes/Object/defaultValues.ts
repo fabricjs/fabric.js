@@ -34,7 +34,6 @@ export const cacheProperties = [
 ];
 
 export const fabricObjectDefaultValues = {
-  type: 'object',
   originX: 'left',
   originY: 'top',
   top: 0,
@@ -95,7 +94,6 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  // TODO: restore once default values are refactored to a method
   objectCaching: true,
   noScaleCache: true,
   strokeUniform: false,
@@ -107,4 +105,4 @@ export const fabricObjectDefaultValues = {
   inverted: false,
   absolutePositioned: false,
   FX_DURATION: 500,
-};
+} as const;

@@ -1,4 +1,4 @@
-import { TMat2D } from './typedefs';
+import type { TMat2D } from './typedefs';
 // use this syntax so babel plugin see this import here
 import { version } from '../package.json';
 

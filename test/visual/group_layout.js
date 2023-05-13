@@ -1,5 +1,5 @@
 (function () {
-    fabric.Object.prototype.objectCaching = true;
+    fabric.Object.ownDefaults.objectCaching = true;
     var visualTestLoop;
     if (isNode()) {
         visualTestLoop = global.visualTestLoop;

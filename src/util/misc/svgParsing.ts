@@ -1,12 +1,8 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import {
-  SupportedSVGUnit,
-  SVGElementName,
-  TBBox,
-  TMat2D,
-} from '../../typedefs';
+import type { TBBox, TMat2D } from '../../typedefs';
+import { SupportedSVGUnit, SVGElementName } from '../../typedefs';
 import { toFixed } from './toFixed';
 /**
  * Returns array of attributes for given svg that fabric parses

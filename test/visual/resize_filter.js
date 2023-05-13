@@ -41,7 +41,7 @@
     width: 200,
     height: 200,
     beforeEachHandler: function() {
-      fabric.Object.prototype.objectCaching = false;
+      fabric.Object.ownDefaults.objectCaching = false;
     }
   });
 

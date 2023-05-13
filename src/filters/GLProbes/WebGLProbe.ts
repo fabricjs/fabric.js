@@ -1,5 +1,4 @@
-import { createCanvasElement } from '../../util/misc/dom';
-import { GLProbe, GLPrecision } from './GLProbe';
+import { GLPrecision, GLProbe } from './GLProbe';
 
 /**
  * Lazy initialize WebGL constants
@@ -30,8 +29,7 @@ export class WebGLProbe extends GLProbe {
   /**
    * query browser for WebGL
    */
-  queryWebGL() {
-    const canvas = createCanvasElement();
+  queryWebGL(canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl');
     if (gl) {
       this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);

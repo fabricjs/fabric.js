@@ -1,11 +1,25 @@
 // @ts-nocheck
-
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { createCanvasElement } from '../util/misc/dom';
+
+export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
+  resizeType: 'hermite',
+  scaleX: 1,
+  scaleY: 1,
+  lanczosLobes: 3,
+  fragmentSourceTOP: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform vec2 uDelta;
+    varying vec2 vTexCoord;
+  `,
+};
+
+type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
 /**
  * Resize image filter class
@@ -21,7 +35,7 @@ export class Resize extends BaseFilter {
    * bilinear, hermite, sliceHack, lanczos.
    * @default
    */
-  declare resizeType: 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
+  declare resizeType: TResizeType;
 
   /**
    * Scale factor for resizing, x axis
@@ -45,6 +59,8 @@ export class Resize extends BaseFilter {
   declare lanczosLobes: number;
 
   declare fragmentSourceTOP: string;
+
+  static defaults = resizeDefaultValues;
 
   /**
    * Return WebGL uniform locations for this filter's shader.
@@ -517,25 +533,6 @@ export class Resize extends BaseFilter {
       lanczosLobes: this.lanczosLobes,
     };
   }
-
-  static async fromObject(object: any) {
-    return new Resize(object);
-  }
 }
 
-export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
-  type: 'Resize',
-  resizeType: 'hermite',
-  scaleX: 1,
-  scaleY: 1,
-  lanczosLobes: 3,
-  fragmentSourceTOP: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform vec2 uDelta;
-    varying vec2 vTexCoord;
-  `,
-};
-
-Object.assign(Resize.prototype, resizeDefaultValues);
 classRegistry.setClass(Resize);

@@ -1,6 +1,5 @@
 import type { Canvas } from '../../canvas/Canvas';
-import { getDocument } from '../../env';
-import {
+import type {
   DragEventData,
   DropEventData,
   TPointerEvent,
@@ -10,7 +9,8 @@ import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { DataTransferManager } from './DataTransferManager';
-import { AssertKeys } from '../../typedefs';
+import type { AssertKeys } from '../../typedefs';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -172,8 +172,10 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    getDocument().body.appendChild(dragImage);
-    e.dataTransfer.setDragImage(dragImage, offset.x, offset.y);
+    getDocumentFromElement(
+      (e.target || this.target.hiddenTextarea)! as HTMLElement
+    ).body.appendChild(dragImage);
+    e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
   /**

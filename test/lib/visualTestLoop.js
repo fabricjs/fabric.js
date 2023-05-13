@@ -95,7 +95,7 @@
         .then(res => !res.exists && generateGolden(filename, original));
     }
     return new Promise((resolve, reject) => {
-      const img = fabric.getDocument().createElement('img');
+      const img = fabric.getFabricDocument().createElement('img');
       img.onload = function () {
         img.onerror = null;
         img.onload = null;
@@ -153,7 +153,7 @@
           var height = renderedCanvas.height;
           var totalPixels = width * height;
           var imageDataCanvas = renderedCanvas.getContext('2d').getImageData(0, 0, width, height);
-          var canvas = fabric.getDocument().createElement('canvas');
+          var canvas = fabric.getFabricDocument().createElement('canvas');
           canvas.width = width;
           canvas.height = height;
           var ctx = canvas.getContext('2d');

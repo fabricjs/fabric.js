@@ -12,7 +12,8 @@ import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
@@ -24,7 +25,8 @@ import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;
@@ -45,28 +47,10 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectOrigin<EventSpec> {
-  /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  declare flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  declare flipY: boolean;
-
-  /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
+export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
+  extends ObjectOrigin<EventSpec>
+  implements Pick<ControlProps, 'padding'>
+{
   declare padding: number;
 
   /**
@@ -678,10 +662,10 @@ export class ObjectGeometry<
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
-      center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+    const rotateMatrix = createRotateMatrix({ angle: this.angle }),
+      { x, y } = this.getRelativeCenterPoint(),
+      tMatrix = createTranslateMatrix(x, y),
+      finalMatrix = multiplyTransformMatrices(tMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;

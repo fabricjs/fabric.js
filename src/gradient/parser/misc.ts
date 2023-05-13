@@ -1,4 +1,4 @@
-import { GradientType, GradientUnits } from '../typedefs';
+import type { GradientType, GradientUnits } from '../typedefs';
 
 export function parseType(el: SVGGradientElement): GradientType {
   return el.nodeName === 'linearGradient' || el.nodeName === 'LINEARGRADIENT'

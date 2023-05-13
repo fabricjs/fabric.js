@@ -1,9 +1,10 @@
 import { Canvas } from '../../canvas/Canvas';
-import { ITextEvents } from './ITextBehavior';
+import type { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import { ctrlKeysMapDown, keysMap, keysMapRtl } from './constants';
-import { AssertKeys, TFiller } from '../../typedefs';
+import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
+import type { SerializedTextProps, TextProps } from '../Text/Text';
 
 type CursorBoundaries = {
   left: number;
@@ -11,6 +12,40 @@ type CursorBoundaries = {
   leftOffset: number;
   topOffset: number;
 };
+
+export const iTextDefaultValues = {
+  selectionStart: 0,
+  selectionEnd: 0,
+  selectionColor: 'rgba(17,119,255,0.3)',
+  isEditing: false,
+  editable: true,
+  editingBorderColor: 'rgba(102,153,255,0.25)',
+  cursorWidth: 2,
+  cursorColor: '',
+  cursorDelay: 1000,
+  cursorDuration: 600,
+  caching: true,
+  hiddenTextareaContainer: null,
+  _selectionDirection: null,
+  _reSpace: /\s|\n/,
+  inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp = {},
+};
+
+// @TODO this is not complete
+interface UniqueITextProps {
+  selectionStart: number;
+  selectionEnd: number;
+}
+
+export interface SerializedITextProps
+  extends SerializedTextProps,
+    UniqueITextProps {}
+
+export interface ITextProps extends TextProps, UniqueITextProps {}
 
 /**
  * @fires changed
@@ -56,8 +91,13 @@ type CursorBoundaries = {
  * ```
  */
 export class IText<
-  EventSpec extends ITextEvents = ITextEvents
-> extends ITextClickBehavior<EventSpec> {
+    Props extends ITextProps = ITextProps,
+    SProps extends SerializedITextProps = SerializedITextProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends ITextClickBehavior<Props, SProps, EventSpec>
+  implements UniqueITextProps
+{
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -143,6 +183,16 @@ export class IText<
    * @default
    */
   declare caching: boolean;
+
+  static ownDefaults: Record<string, any> = iTextDefaultValues;
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...IText.ownDefaults };
+  }
+
+  get type() {
+    return 'i-text';
+  }
 
   /**
 
@@ -633,29 +683,6 @@ export class IText<
   }
 }
 
-export const iTextDefaultValues = {
-  type: 'i-text',
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\n/,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp: {},
-};
-
-Object.assign(IText.prototype, iTextDefaultValues);
-
 classRegistry.setClass(IText);
+// legacy
+classRegistry.setClass(IText, 'i-text');

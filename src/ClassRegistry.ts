@@ -31,10 +31,14 @@ export class ClassRegistry {
   }
 
   setClass(classConstructor: any, classType?: string) {
-    this[JSON].set(
-      classType ?? classConstructor.prototype.type,
-      classConstructor
-    );
+    if (classType) {
+      this[JSON].set(classType, classConstructor);
+    } else {
+      this[JSON].set(classConstructor.name, classConstructor);
+      // legacy
+      // @TODO: needs to be removed in fabric 7 or 8
+      this[JSON].set(classConstructor.name.toLowerCase(), classConstructor);
+    }
   }
 
   getSVGClass(SVGTagName: string): any {
@@ -43,7 +47,7 @@ export class ClassRegistry {
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {
     this[SVG].set(
-      SVGTagName ?? classConstructor.prototype.type,
+      SVGTagName ?? classConstructor.name.toLowerCase(),
       classConstructor
     );
   }

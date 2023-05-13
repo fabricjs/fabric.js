@@ -1,4 +1,4 @@
-import { getDocument, getEnv } from '../env';
+import { getFabricDocument, getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -10,9 +10,9 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
-import {
+import type {
+  Abortable,
   Constructor,
-  ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
   TFiller,
@@ -22,6 +22,7 @@ import {
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
+import { ImageFormat } from '../typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -30,9 +31,9 @@ import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
-  EnlivenObjectOptions,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
@@ -40,7 +41,21 @@ import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
 import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
 
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
+type TDestroyed<T, K extends keyof any> = {
+  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
+  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
+};
+
+export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
+  T,
+  | 'contextTop'
+  | 'pixelFindContext'
+  | 'lowerCanvasEl'
+  | 'upperCanvasEl'
+  | 'pixelFindCanvasEl'
+  | 'wrapperEl'
+  | '_activeSelection'
+>;
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -61,8 +76,23 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-type TCanvasHydrationOption = {
-  signal?: AbortSignal;
+export const StaticCanvasDefaults = {
+  backgroundColor: '',
+  backgroundImage: null,
+  overlayColor: '',
+  overlayImage: null,
+  includeDefaultValues: true,
+  renderOnAddRemove: true,
+  controlsAboveOverlay: false,
+  allowTouchScrolling: false,
+  imageSmoothingEnabled: true,
+  viewportTransform: iMatrix.concat(),
+  backgroundVpt: true,
+  overlayVpt: true,
+  enableRetinaScaling: true,
+  svgViewportTransformation: true,
+  skipOffscreen: true,
+  clipPath: undefined,
 };
 
 /**
@@ -207,7 +237,7 @@ export class StaticCanvas<
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
    * @type Boolean
-   * @default
+   * @default true
    */
   declare skipOffscreen: boolean;
 
@@ -268,14 +298,24 @@ export class StaticCanvas<
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
+  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+
   // reference to
   protected declare __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
 
+  static getDefaults(): Record<string, any> {
+    return StaticCanvas.ownDefaults;
+  }
+
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super();
+    Object.assign(
+      this,
+      (this.constructor as typeof StaticCanvas).getDefaults()
+    );
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({
@@ -373,20 +413,6 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
@@ -397,8 +423,8 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
+        (getFabricDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
+        createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */
@@ -840,10 +866,15 @@ export class StaticCanvas<
     }
     if (object) {
       ctx.save();
+      const { skipOffscreen } = this;
+      // if the object doesn't move with the viewport,
+      // the offscreen concept does not apply;
+      this.skipOffscreen = needsVpt;
       if (needsVpt) {
         ctx.transform(...v);
       }
       object.render(ctx);
+      this.skipOffscreen = skipOffscreen;
       ctx.restore();
     }
   }
@@ -1441,7 +1472,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: TCanvasHydrationOption = {}
+    { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));
@@ -1664,9 +1695,8 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl;
-    // @ts-expect-error disposing
-    this.lowerCanvasEl = undefined;
+    const canvasElement = this.lowerCanvasEl!;
+    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
     // restore canvas style and attributes
     canvasElement.classList.remove('lower-canvas');
     canvasElement.removeAttribute('data-fabric');
@@ -1688,22 +1718,3 @@ export class StaticCanvas<
     } }>`;
   }
 }
-
-Object.assign(StaticCanvas.prototype, {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-});

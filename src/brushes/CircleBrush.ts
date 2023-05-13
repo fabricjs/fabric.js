@@ -1,5 +1,5 @@
 import { Color } from '../color/Color';
-import { Point } from '../Point';
+import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
@@ -97,7 +97,7 @@ export class CircleBrush extends BaseBrush {
     const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;
 
-    const circles = [];
+    const circles: Circle[] = [];
 
     for (let i = 0; i < this.points.length; i++) {
       const point = this.points[i],

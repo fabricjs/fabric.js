@@ -8,8 +8,7 @@ import {
 } from './fabric';
 import { FabricObject } from './src/shapes/Object/Object';
 
-// TODO: move back to default values when refactoring to method
-FabricObject.prototype.objectCaching = false;
+FabricObject.ownDefaults.objectCaching = false;
 
 export * from './fabric';
 

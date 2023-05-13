@@ -18,9 +18,14 @@ export {
   invertTransform,
   composeMatrix,
   qrDecompose,
+  createTranslateMatrix,
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
   calcDimensionsMatrix,
-  calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
 export {

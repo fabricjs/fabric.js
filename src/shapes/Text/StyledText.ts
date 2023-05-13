@@ -1,5 +1,11 @@
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from '../Object/types';
 import { FabricObject } from '../Object/FabricObject';
+import { styleProperties } from './constants';
 import type { Text } from './Text';
 
 export type TextStyleDeclaration = Pick<
@@ -23,12 +29,14 @@ export type TextStyle = {
 };
 
 export abstract class StyledText<
-  EventSpec extends ObjectEvents
-> extends FabricObject<EventSpec> {
+  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
-  protected declare abstract _forceClearCache: boolean;
-  protected declare abstract _styleProperties: string[];
+  protected declare _forceClearCache: boolean;
+  static _styleProperties = styleProperties;
   abstract get2DCursorLocation(
     selectionStart: number,
     skipWrapping?: boolean
@@ -275,9 +283,10 @@ export abstract class StyledText<
    */
   getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
     const style = this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styleObject: TextStyleDeclaration = {};
-    for (let i = 0; i < this._styleProperties.length; i++) {
-      const prop = this._styleProperties[i];
+      styleObject: TextStyleDeclaration = {},
+      styleProps = (this.constructor as typeof StyledText)._styleProperties;
+    for (let i = 0; i < styleProps.length; i++) {
+      const prop = styleProps[i];
       styleObject[prop] =
         typeof style[prop] === 'undefined'
           ? this[prop as keyof this]

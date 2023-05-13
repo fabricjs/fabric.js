@@ -54,18 +54,18 @@
                       '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
                       '13.99], ["z", null]]}';
 
-  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
+  var PATH_DATALESS_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"Path","version":"' + fabric.version + '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
                            '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
                            '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                            '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
 
-  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
+  var RECT_JSON = '{"version":"' + fabric.version + '","objects":[{"type":"Rect","version":"' + fabric.version + '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
                   '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
                   '"shadow":null,' +
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -344,7 +344,7 @@
     activeSelection.multiSelectionStacking = multiSelectionStacking;
     activeSelection.add(...existing);
     canvas.setActiveObject(activeSelection);
-    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, target);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true, target: canvas.upperCanvasEl }, target);
   }
 
   QUnit.test('create active selection fires selection:created', function(assert) {
@@ -544,7 +544,7 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(fired, 3, 'event fired for each of 3 rects');
   });
 
@@ -561,9 +561,9 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection created fired');
-    assert.equal(canvas.getActiveObject().type, 'activeSelection', 'an active selection is created');
+    assert.equal(canvas.getActiveObject().constructor.name, 'ActiveSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
     assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
@@ -581,7 +581,7 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection:created fired');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
@@ -737,11 +737,11 @@
     var rect = makeRect({ left: 0, top: 0 }), target;
     canvas.add(rect);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, rect, 'Should return the rect');
     target = canvas.findTarget({
-      clientX: 30, clientY: 30
+      clientX: 30, clientY: 30, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should not find target');
     canvas.remove(rect);
@@ -752,12 +752,12 @@
     var rect = makeRect({ left: 0, top: 0 }),
         rectOver = makeRect({ left: 0, top: 0 }),
         target,
-        pointer = { clientX: 5, clientY: 5 };
+        e = { clientX: 5, clientY: 5, target: canvas.upperCanvasEl };
     canvas.add(rect);
     canvas.add(rectOver);
     canvas.setActiveObject(rect);
     canvas.renderAll();
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e);
     assert.equal(target, rect, 'Should return the rect');
   });
 
@@ -767,19 +767,19 @@
     var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 15, clientY: 15, shiftKey: true },
-        pointer2 = { clientX: 4, clientY: 4 };
+        e1 = { clientX: 15, clientY: 15, shiftKey: true, target: canvas.upperCanvasEl },
+        e2 = { clientX: 4, clientY: 4, target: canvas.upperCanvasEl };
     canvas.add(rect);
     canvas.add(rectOver);
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rectOver, 'Should return the rectOver, rect is not considered');
     canvas.setActiveObject(rect);
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rectOver, 'Should still return rectOver because is above active object');
-    target = canvas.findTarget(pointer2);
+    target = canvas.findTarget(e2);
     assert.equal(target, rect, 'Should rect because a corner of the activeObject has been hit');
     canvas.altSelectionKey = 'shiftKey';
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rect, 'Should rect because active and altSelectionKey is pressed');
     canvas.preserveObjectStacking = false;
   });
@@ -792,31 +792,31 @@
     canvas.add(group);
 
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
     target = canvas.findTarget({
-      clientX: 30, clientY: 30
+      clientX: 30, clientY: 30, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
     group.setCoords();
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
     target = canvas.findTarget({
-      clientX: 32, clientY: 32
+      clientX: 32, clientY: 32, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect2, 'should return the rect2');
@@ -859,42 +859,42 @@
     canvas.add(g);
 
     var target = canvas.findTarget({
-      clientX: 96, clientY: 186
+      clientX: 96, clientY: 186, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 96');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 96');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 98, clientY: 188
+      clientX: 98, clientY: 188, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 98');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 98');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 100, clientY: 190
+      clientX: 100, clientY: 190, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 100');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 100');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 102, clientY: 192
+      clientX: 102, clientY: 192, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 102');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 102');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 104, clientY: 194
+      clientX: 104, clientY: 194, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 104');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 104');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 106, clientY: 196
+      clientX: 106, clientY: 196, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
@@ -911,21 +911,21 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
@@ -942,21 +942,21 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
@@ -969,17 +969,17 @@
     var triangle = makeTriangle({ left: 0, top: 0 }), target;
     canvas.add(triangle);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, triangle, 'Should return the triangle by bounding box');
     //TODO find out why this stops the tests
     canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks');
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, triangle, 'Should return the triangle now');
     canvas.perPixelTargetFind = false;
@@ -1002,65 +1002,65 @@
     canvas.add(group3);
     canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 1');
     target = canvas.findTarget({
-      clientX: 21, clientY: 9
+      clientX: 21, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 2');
     target = canvas.findTarget({
-      clientX: 37, clientY: 7
+      clientX: 37, clientY: 7, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 3');
     target = canvas.findTarget({
-      clientX: 89, clientY: 47
+      clientX: 89, clientY: 47, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 4');
     target = canvas.findTarget({
-      clientX: 16, clientY: 122
+      clientX: 16, clientY: 122, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 5');
     target = canvas.findTarget({
-      clientX: 127, clientY: 37
+      clientX: 127, clientY: 37, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 6');
     target = canvas.findTarget({
-      clientX: 87, clientY: 139
+      clientX: 87, clientY: 139, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 7');
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
     assert.equal(canvas.targets[0], triangle, 'The deepest target should be triangle');
     target = canvas.findTarget({
-      clientX: 50, clientY: 20
+      clientX: 50, clientY: 20, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
     assert.equal(canvas.targets[0], circle, 'The deepest target should be circle');
     target = canvas.findTarget({
-      clientX: 117, clientY: 16
+      clientX: 117, clientY: 16, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], rect2, 'The deepest target should be rect2');
     target = canvas.findTarget({
-      clientX: 100, clientY: 90
+      clientX: 100, clientY: 90, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], rect, 'The deepest target should be rect');
     target = canvas.findTarget({
-      clientX: 9, clientY: 145
+      clientX: 9, clientY: 145, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], circle2, 'The deepest target should be circle2');
     target = canvas.findTarget({
-      clientX: 66, clientY: 143
+      clientX: 66, clientY: 143, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
@@ -1082,32 +1082,32 @@
     group.setCoords();
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the activegroup');
     target = canvas.findTarget({
-      clientX: 40, clientY: 15
+      clientX: 40, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should miss the activegroup');
     assert.ok(!group.__corner, 'not over control');
     target = canvas.findTarget({
-      clientX: 0, clientY: 0
+      clientX: 0, clientY: 0, target: canvas.upperCanvasEl
     });
     assert.equal(group.__corner, 'tl', 'over control');
     assert.ok(target, group, 'should return active selection if over control');
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.ok(target, group, 'should return active selection');
     assert.equal(canvas.targets[0], rect1, 'Should return the rect inside active selection');
     target = canvas.findTarget({
-      clientX: 25, clientY: 5
+      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the active selection');
     assert.deepEqual(canvas.targets, [], 'Should not return the rect behind active selection');
     canvas.discardActiveObject();
     target = canvas.findTarget({
-      clientX: 25, clientY: 5
+      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, rect3, 'Should return the rect3 now that active selection has been cleared');
   });
@@ -1123,12 +1123,12 @@
     group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 8, clientY: 8
+      clientX: 8, clientY: 8, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the activegroup');
 
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should miss the activegroup');
   });
@@ -1245,7 +1245,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
   });
 
 
@@ -1256,7 +1256,7 @@
       version: fabric.version,
       objects: canvasWithClipPath.getObjects(),
       clipPath: {
-        type: 'rect',
+        type: 'Rect',
         version: fabric.version,
         originX: 'left',
         originY: 'top',
@@ -1298,7 +1298,7 @@
     var rect = makeRect();
     canvasWithClipPath.add(rect);
 
-    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.type);
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.name);
   });
 
   QUnit.test('toDatalessObject', function(assert) {
@@ -1313,7 +1313,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.type);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1331,7 +1331,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1359,7 +1359,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1387,7 +1387,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1415,7 +1415,7 @@
     function reviver(obj, instance) {
       assert.deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
-      if (instance.type === 'path') {
+      if (instance.constructor.name === 'Path') {
         instance.customID = 'fabric_1';
       }
     }
@@ -1424,7 +1424,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.type, 'path', 'first object is a path object');
+      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1449,8 +1449,8 @@
 
   QUnit.test('loadFromJSON with no objects', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1468,8 +1468,8 @@
 
   QUnit.test('loadFromJSON without "objects" property', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1490,8 +1490,8 @@
 
   QUnit.test('loadFromJSON with empty fabric.Group', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
         c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
@@ -1536,8 +1536,8 @@
     var serialized = JSON.parse(PATH_JSON);
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.controlsAboveOverlay, true);
@@ -1555,8 +1555,8 @@
     };
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
-    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.prototype.controlsAboveOverlay);
-    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.prototype.preserveObjectStacking);
+    assert.equal(canvas.controlsAboveOverlay, fabric.Canvas.getDefaults().controlsAboveOverlay);
+    assert.equal(canvas.preserveObjectStacking, fabric.Canvas.getDefaults().preserveObjectStacking);
     // before callback the properties are still false.
     assert.equal(canvas.controlsAboveOverlay, false);
     assert.equal(canvas.preserveObjectStacking, false);
@@ -1925,8 +1925,8 @@
 
   [true, false].forEach(enableRetinaScaling => {
     QUnit.test(`set dimensions, enableRetinaScaling ${enableRetinaScaling}`, async function (assert) {
-      var el = fabric.getDocument().createElement('canvas'),
-        parentEl = fabric.getDocument().createElement('div');
+      var el = fabric.getFabricDocument().createElement('canvas'),
+        parentEl = fabric.getFabricDocument().createElement('div');
       el.width = 200; el.height = 200;
       parentEl.className = 'rootNode';
       parentEl.appendChild(el);
@@ -2063,7 +2063,7 @@
     var eventStub = {
       clientX: canvasOffset.left + 100,
       clientY: canvasOffset.top + 100,
-      target: rect
+      target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
     rect.__corner = rect._findTargetCorner(
@@ -2080,7 +2080,7 @@
     eventStub = {
       clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
-      target: rect
+      target: canvas.upperCanvasEl
     };
     rect.__corner = rect._findTargetCorner(
       canvas.getPointer(eventStub, true)
@@ -2108,7 +2108,7 @@
     eventStub = {
       clientX: canvasOffset.left + rect.left - 2,
       clientY: canvasOffset.top + rect.top + rect.height / 2,
-      target: rect,
+      target: canvas.upperCanvasEl,
       shiftKey: true
     };
     rect.__corner = rect._findTargetCorner(
@@ -2126,7 +2126,7 @@
     // eventStub = {
     //   clientX: canvasOffset.left + rect.oCoords.mtr.x,
     //   clientY: canvasOffset.top + rect.oCoords.mtr.y,
-    //   target: rect,
+    //   target: canvas.upperCanvasEl,
     // };
     // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     // t = canvas._currentTransform;
@@ -2147,7 +2147,7 @@
   //   var eventStub = {
   //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
   //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
-  //     target: rect,
+  //     target: canvas.upperCanvasEl,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);
   //   var rotated = canvas._rotateObject(30, 30, 'equally');
@@ -2165,7 +2165,7 @@
   //   var eventStub = {
   //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
   //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
-  //     target: rect,
+  //     target: canvas.upperCanvasEl,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);
   //   assert.equal(rect.originX, 'right');
@@ -2207,12 +2207,12 @@
   //     assert.deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.getDocument().location.protocol +
+  //       "backgroundImage": (fabric.getFabricDocument().location.protocol +
   //                           '//' +
-  //                           fabric.getDocument().location.hostname +
-  //                           ((fabric.getDocument().location.port === '' || parseInt(fabric.getDocument().location.port, 10) === 80)
+  //                           fabric.getFabricDocument().location.hostname +
+  //                           ((fabric.getFabricDocument().location.port === '' || parseInt(fabric.getFabricDocument().location.port, 10) === 80)
   //                               ? ''
-  //                               : (':' + fabric.getDocument().location.port)) +
+  //                               : (':' + fabric.getFabricDocument().location.port)) +
   //                           '/assets/pug.jpg'),
   //       "backgroundImageOpacity": 1,
   //       "backgroundImageStretch": true
@@ -2222,113 +2222,95 @@
   //   }, 1000);
   // });
 
-  QUnit.test('isTargetTransparent', function(assert) {
-    var rect = new fabric.Rect({
-      width: 10,
-      height: 10,
-      strokeWidth: 4,
-      stroke: 'red',
-      fill: '',
-      top: 0,
-      left: 0,
-      objectCaching: true,
-    });
-    canvas.add(rect);
-    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
-    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
-    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
-    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
-    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
-    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
-    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
-    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-    // disabled this pixel because firefox 110 updates
-    // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
-    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
-    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
-    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
-    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
-    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
-  });
+  [true, false].forEach(objectCaching => {
+    function testPixelDetection(assert, canvas, target, expectedHits) {
+      function execute(context = '') {
+        expectedHits.forEach(({ start, end, message, transparent }) => {
+          // make less sensitive by skipping edges for firefox 110
+          const round = 0;
+          for (let index = start + round; index < end - round; index++) {
+            assert.equal(
+              canvas.isTargetTransparent(target, index, index),
+              transparent,
+              `checking transparency of (${index}, ${index}), expected to be ${transparent}, ${message}, ${context}`
+            );
+          }
+        });
+      }
+      execute();
+      canvas.setActiveObject(target);
+      execute('target is selected');
+    }
 
-  QUnit.test('isTargetTransparent without objectCaching', function(assert) {
-    var rect = new fabric.Rect({
-      width: 10,
-      height: 10,
-      strokeWidth: 4,
-      stroke: 'red',
-      fill: '',
-      top: 0,
-      left: 0,
-      objectCaching: false,
+    QUnit.test(`isTargetTransparent, objectCaching ${objectCaching}`, function (assert) {
+      var rect = new fabric.Rect({
+        width: 10,
+        height: 10,
+        strokeWidth: 4,
+        stroke: 'red',
+        fill: '',
+        top: 0,
+        left: 0,
+        objectCaching,
+      });
+      canvas.add(rect);
+      testPixelDetection(assert, canvas, rect, [
+        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: 0, end: 4, message: 'stroke', transparent: false },
+        { start: 4, end: 10, message: 'fill', transparent: true },
+        { start: 10, end: 14, message: 'stroke', transparent: false },
+        { start: 14, end: 20, message: 'outside', transparent: true },
+      ]);
     });
-    canvas.add(rect);
-    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
-    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
-    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
-    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
-    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
-    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
-    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
-    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-    // disabled this pixel because firefox 110 updates
-    // assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
-    assert.equal(canvas.isTargetTransparent(rect, 10, 10), false, 'opaque on 10, 10');
-    assert.equal(canvas.isTargetTransparent(rect, 11, 11), false, 'opaque on 11, 11');
-    assert.equal(canvas.isTargetTransparent(rect, 12, 12), false, 'opaque on 12, 12');
-    assert.equal(canvas.isTargetTransparent(rect, 13, 13), false, 'opaque on 13, 13');
-    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent on 14, 14');
-  });
 
-  QUnit.test('isTargetTransparent as active object', function(assert) {
-    var rect = new fabric.Rect({
-      width: 20,
-      height: 20,
-      strokeWidth: 4,
-      stroke: 'red',
-      fill: '',
-      top: 0,
-      left: 0,
-      objectCaching: true,
+    QUnit.test(`isTargetTransparent, vpt, objectCaching ${objectCaching}`, function (assert) {
+      var rect = new fabric.Rect({
+        width: 10,
+        height: 10,
+        strokeWidth: 4,
+        stroke: 'red',
+        fill: '',
+        top: 0,
+        left: 0,
+        objectCaching,
+      });
+      canvas.add(rect);
+      canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+      testPixelDetection(assert, canvas, rect, [
+        { start: -5, end: 0, message: 'outside', transparent: true },
+        { start: 0, end: 8, message: 'stroke', transparent: false },
+        { start: 8, end: 20, message: 'fill', transparent: true },
+        { start: 20, end: 28, message: 'stroke', transparent: false },
+        { start: 28, end: 40, message: 'outside', transparent: true },
+      ]);
     });
-    canvas.add(rect);
-    canvas.setActiveObject(rect);
-    assert.equal(canvas.isTargetTransparent(rect, 0, 0), false, 'opaque on 0,0');
-    assert.equal(canvas.isTargetTransparent(rect, 1, 1), false, 'opaque on 1,1');
-    assert.equal(canvas.isTargetTransparent(rect, 2, 2), false, 'opaque on 2,2');
-    assert.equal(canvas.isTargetTransparent(rect, 3, 3), false, 'opaque on 3,3');
-    assert.equal(canvas.isTargetTransparent(rect, 4, 4), true, 'transparent on 4,4');
-    assert.equal(canvas.isTargetTransparent(rect, 5, 5), true, 'transparent on 5, 5');
-    assert.equal(canvas.isTargetTransparent(rect, 6, 6), true, 'transparent on 6, 6');
-    assert.equal(canvas.isTargetTransparent(rect, 7, 7), true, 'transparent on 7, 7');
-    assert.equal(canvas.isTargetTransparent(rect, 8, 8), true, 'transparent on 8, 8');
-    assert.equal(canvas.isTargetTransparent(rect, 9, 9), true, 'transparent on 9, 9');
-    assert.equal(canvas.isTargetTransparent(rect, 10, 10), true, 'transparent 10, 10');
-    assert.equal(canvas.isTargetTransparent(rect, 11, 11), true, 'transparent 11, 11');
-    assert.equal(canvas.isTargetTransparent(rect, 12, 12), true, 'transparent 12, 12');
-    assert.equal(canvas.isTargetTransparent(rect, 13, 13), true, 'transparent 13, 13');
-    assert.equal(canvas.isTargetTransparent(rect, 14, 14), true, 'transparent 14, 14');
-    assert.equal(canvas.isTargetTransparent(rect, 15, 15), true, 'transparent 15, 15');
-    assert.equal(canvas.isTargetTransparent(rect, 16, 16), true, 'transparent 16, 16');
-    assert.equal(canvas.isTargetTransparent(rect, 17, 17), true, 'transparent 17, 17');
-    assert.equal(canvas.isTargetTransparent(rect, 18, 18), true, 'transparent 18, 18');
-    // disabled this pixel because firefox 110 updates
-    // assert.equal(canvas.isTargetTransparent(rect, 19, 19), true, 'transparent 19, 19');
-    assert.equal(canvas.isTargetTransparent(rect, 20, 20), false, 'opaque 20, 20');
-    assert.equal(canvas.isTargetTransparent(rect, 21, 21), false, 'opaque 21, 21');
-    assert.equal(canvas.isTargetTransparent(rect, 22, 22), false, 'opaque 22, 22');
-    assert.equal(canvas.isTargetTransparent(rect, 23, 23), false, 'opaque 23, 23');
-    assert.equal(canvas.isTargetTransparent(rect, 24, 24), true, 'transparent 24, 24');
-    assert.equal(canvas.isTargetTransparent(rect, 25, 25), true, 'transparent 25, 25');
-    assert.equal(canvas.isTargetTransparent(rect, 26, 26), true, 'transparent 26, 26');
-    assert.equal(canvas.isTargetTransparent(rect, 27, 27), true, 'transparent 27, 27');
-    assert.equal(canvas.isTargetTransparent(rect, 28, 28), true, 'transparent 28, 28');
-    assert.equal(canvas.isTargetTransparent(rect, 29, 29), true, 'transparent 29, 29');
-    assert.equal(canvas.isTargetTransparent(rect, 30, 30), true, 'transparent 30, 30');
-    assert.equal(canvas.isTargetTransparent(rect, 31, 31), true, 'transparent 31, 31');
 
+    QUnit.test(`isTargetTransparent, vpt, tolerance, objectCaching ${objectCaching}`, function (assert) {
+      var rect = new fabric.Rect({
+        width: 10,
+        height: 10,
+        strokeWidth: 4,
+        stroke: 'red',
+        fill: '',
+        top: 0,
+        left: 0,
+        objectCaching,
+      });
+      canvas.add(rect);
+      canvas.setTargetFindTolerance(5);
+      canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+      testPixelDetection(assert, canvas, rect, [
+        { start: -10, end: -5, message: 'outside', transparent: true },
+        { start: -5, end: 0, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 0, end: 8, message: 'stroke', transparent: false },
+        { start: 8, end: 13, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 13, end: 15, message: 'fill', transparent: true },
+        { start: 15, end: 20, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 20, end: 28, message: 'stroke', transparent: false },
+        { start: 28, end: 33, message: 'stroke tolerance not affected by vpt', transparent: false },
+        { start: 33, end: 40, message: 'outside', transparent: true },
+      ]);
+    });   
   });
 
   QUnit.test('canvas getTopContext', function(assert) {

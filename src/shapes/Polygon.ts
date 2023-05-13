@@ -1,19 +1,20 @@
-import { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { Polyline, polylineDefaultValues } from './Polyline';
 
 export class Polygon extends Polyline {
+  static ownDefaults: Record<string, any> = polylineDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Polyline.ownDefaults,
+    };
+  }
+
   protected isOpen() {
     return false;
   }
 }
-
-export const polygonDefaultValues: Partial<TClassProperties<Polygon>> = {
-  ...polylineDefaultValues,
-  type: 'polygon',
-};
-
-Object.assign(Polygon.prototype, polygonDefaultValues);
 
 classRegistry.setClass(Polygon);
 classRegistry.setSVGClass(Polygon);
