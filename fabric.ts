@@ -13,6 +13,7 @@ export { Canvas } from './src/canvas/Canvas';
 export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
+export * from './src/color/typedefs';
 
 export { Gradient } from './src/gradient/Gradient';
 export * from './src/Pattern';
