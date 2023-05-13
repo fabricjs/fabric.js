@@ -14,9 +14,10 @@ export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
 
-export { Gradient } from './src/gradient';
+export * from './src/gradient';
 export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
+export type { SerializedShadowOptions } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
 export { PencilBrush } from './src/brushes/PencilBrush';

@@ -19,7 +19,7 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   nonScaling: false,
 };
 
-type TShadowSerializedProps = {
+export type SerializedShadowOptions = {
   color: string;
   blur: number;
   offsetX: number;
@@ -191,7 +191,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data: TShadowSerializedProps = {
+    const data: SerializedShadowOptions = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
