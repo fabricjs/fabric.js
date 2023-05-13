@@ -19,6 +19,9 @@ export type TRGBAColorSource = [
 
 export type TColorArg = string | TRGBColorSource | TRGBAColorSource | Color;
 
+const fromAlphaToFloat = (value = '1') =>
+  parseFloat(value) / (value.endsWith('%') ? 100 : 1);
+
 /**
  * @class Color common color operations
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
@@ -287,9 +290,7 @@ export class Color {
           ? Math.round(parsedValue * 2.55)
           : parsedValue;
       });
-      const alpha = match[4] ?? '1';
-      const a = parseFloat(alpha) / (alpha.endsWith('%') ? 100 : 1);
-      return [r, g, b, a];
+      return [r, g, b, fromAlphaToFloat(match[4])];
     }
   }
 
@@ -349,7 +350,7 @@ export class Color {
       Math.round(r * 255),
       Math.round(g * 255),
       Math.round(b * 255),
-      match[4] ? parseFloat(match[4]) : 1,
+      fromAlphaToFloat(match[4]),
     ];
   }
 
