@@ -49,14 +49,3 @@ export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
 
 export * from './src/filters';
-export type {
-  TProgramCache,
-  TTextureCache,
-  TPipelineResources,
-  TWebGLPipelineState,
-  T2DPipelineState,
-  TWebGLUniformLocationMap,
-  TWebGLAttributeLocationMap,
-  TWebGLProgramCacheItem,
-  TApplyFilterArgs,
-} from './src/filters/typedefs';
