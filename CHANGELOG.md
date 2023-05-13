@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(build) remove safari 11 and 12 from build [#8917](https://github.com/fabricjs/fabric.js/pull/8917)
 - chore(TS): export gradient types
 - chore(lint) export filter colors and brushes types [#8913](https://github.com/fabricjs/fabric.js/pull/8913)
 - chore(lint) Add a rule for import type [#8907](https://github.com/fabricjs/fabric.js/pull/8907)
