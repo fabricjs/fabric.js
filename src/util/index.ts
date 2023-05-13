@@ -28,6 +28,7 @@ export {
   multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
+export type { TextStyleArray } from './misc/textStyles';
 export {
   stylesFromArray,
   stylesToArray,
@@ -65,6 +66,10 @@ export {
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
+export type {
+  EnlivenObjectOptions,
+  LoadImageOptions,
+} from './misc/objectEnlive';
 export {
   loadImage,
   enlivenObjects,
