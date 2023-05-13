@@ -18,8 +18,8 @@ const alpha = raw`(?:\d*\.?\d+)?`;
 const optionalAlphaWithSpaces = raw`(?:\s*,(${optionalSurroundingSpace(
   alpha
 )}))?`;
-const rgbNumberSpaced = optionalSurroundingSpace(rgbNumber);
-const rgbPercentageSpaced = optionalSurroundingSpace(rgbPercentage);
+const cssColorNumber = optionalSurroundingSpace(rgbNumber);
+const cssColorPercentage = optionalSurroundingSpace(rgbPercentage);
 const hex = `[0-9a-f]`;
 /**
  * Regex matching color in RGB or RGBA formats (ex: rgb(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
@@ -28,7 +28,7 @@ const hex = `[0-9a-f]`;
  * @memberOf Color
  */
 // eslint-disable-next-line max-len
-export const reRGBa = raw`^rgba?\(${rgbNumberSpaced},${rgbNumberSpaced},${rgbNumberSpaced}${optionalAlphaWithSpaces}\)$`;
+export const reRGBa = raw`^rgba?\(${cssColorNumber},${cssColorNumber},${cssColorNumber}${optionalAlphaWithSpaces}\)$`;
 
 /**
  * Regex matching color in HSL or HSLA formats (ex: hsl(200, 80%, 10%), hsla(300, 50%, 80%, 0.5), hsla( 300 , 50% , 80% , 0.5 ))
@@ -36,7 +36,7 @@ export const reRGBa = raw`^rgba?\(${rgbNumberSpaced},${rgbNumberSpaced},${rgbNum
  * @field
  * @memberOf Color
  */
-export const reHSLa = raw`^hsla?\(${rgbNumberSpaced},${rgbPercentageSpaced},${rgbPercentageSpaced}${optionalAlphaWithSpaces}\)$`;
+export const reHSLa = raw`^hsla?\(${cssColorNumber},${cssColorPercentage},${cssColorPercentage}${optionalAlphaWithSpaces}\)$`;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
