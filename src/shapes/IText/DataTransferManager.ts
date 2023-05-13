@@ -51,7 +51,7 @@ export abstract class DataTransferManager<
     }
     const data = dataTransfer.getData('text/html');
     if (data) {
-      const { text, styles } = DataTransferManager.parseHTML(data);
+      const { text, styles } = this.parseHTML(e);
       return {
         text,
         styles: styles.map((style) =>
@@ -119,8 +119,8 @@ export abstract class DataTransferManager<
   parseHTML(e: T) {
     const html = this.extractDataTransfer(e)!.getData('text/html');
     const el = (e.target || this.target.hiddenTextarea)! as HTMLElement;
-    const doc = getDocumentFromElement(el);
-    const win = getWindowFromElement(el);
+    const doc = getDocumentFromElement(el)!;
+    const win = getWindowFromElement(el)!;
     let text = '';
     const styles: TextStyleDeclaration[] = [];
     const sandbox = doc.createElement('iframe');

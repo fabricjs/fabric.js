@@ -1,6 +1,7 @@
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TextStyleDeclaration } from '../../shapes/Text/StyledText';
 import type { Text } from '../../shapes/Text/Text';
+import { textDecorationProperties } from '../../shapes/Text/constants';
 import { CSSTextTransformationMap } from './CSSTextTransformationMap';
 import { CSSTransformationMap } from './CSSTransformationMap';
 import type { CSSTransformContext } from './types';
@@ -47,7 +48,14 @@ export function stylesFromCSS(
   styles: CSSStyleDeclaration,
   map = CSSTransformationMap
 ) {
-  const options: TextStyleDeclaration = {};
+  const options: Partial<
+    TextStyleDeclaration & {
+      textDecoration: Pick<
+        TextStyleDeclaration,
+        typeof textDecorationProperties
+      >;
+    }
+  > = {};
   for (const key in map) {
     const { key: k = key, restoreValue } = map[key as keyof typeof map];
     const v = styles[k as keyof CSSStyleDeclaration];
