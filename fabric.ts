@@ -19,6 +19,8 @@ export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
+export * from './src/brushes/typedefs';
+
 export { PencilBrush } from './src/brushes/PencilBrush';
 export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
