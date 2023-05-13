@@ -14,6 +14,7 @@ export type { XY } from './src/Point';
 export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
+export * from './src/color/typedefs';
 
 export * from './src/gradient';
 export * from './src/Pattern';
@@ -21,6 +22,8 @@ export { Shadow } from './src/Shadow';
 export type { SerializedShadowOptions } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
+export * from './src/brushes/typedefs';
+
 export { PencilBrush } from './src/brushes/PencilBrush';
 export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';

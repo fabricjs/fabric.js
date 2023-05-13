@@ -7,13 +7,14 @@ import type {
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './utils';
 import { GLPrecision } from './GLProbes/GLProbe';
 import {
   highPsourceCode,
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
+import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
@@ -396,7 +397,7 @@ export class BaseFilter {
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    options: Abortable
   ) {
     return new this(filterOptions);
   }
