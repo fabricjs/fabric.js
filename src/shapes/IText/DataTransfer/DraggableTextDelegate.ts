@@ -1,16 +1,16 @@
-import type { Canvas } from '../../canvas/Canvas';
 import type {
   DragEventData,
   DropEventData,
   TPointerEvent,
-} from '../../EventTypeDefs';
-import { Point } from '../../Point';
-import type { IText } from './IText';
-import { setStyle } from '../../util/dom_style';
-import { cloneDeep } from '../../util/internals/cloneDeep';
+} from '../../../EventTypeDefs';
+import { Point } from '../../../Point';
+import type { Canvas } from '../../../canvas/Canvas';
+import type { AssertKeys } from '../../../typedefs';
+import { getDocumentFromElement } from '../../../util/dom_misc';
+import { setStyle } from '../../../util/dom_style';
+import { cloneDeep } from '../../../util/internals/cloneDeep';
+import type { IText } from '.././IText';
 import { DataTransferManager } from './DataTransferManager';
-import type { AssertKeys } from '../../typedefs';
-import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  * #### Dragging IText/Textbox Lifecycle

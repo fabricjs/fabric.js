@@ -4,7 +4,7 @@ import { Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';
-import { DraggableTextDelegate } from './DraggableTextDelegate';
+import { DraggableTextDelegate } from './DataTransfer/DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
 import type { TProps } from '../Object/types';

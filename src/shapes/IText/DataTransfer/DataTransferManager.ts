@@ -1,12 +1,12 @@
-import { newlineRegExp } from '../../constants';
-import { hasStyleChanged, pick } from '../../util';
-import { textStylesFromCSS, textStylesToCSS } from '../../util/CSSParsing';
+import { newlineRegExp } from '../../../constants';
+import { hasStyleChanged, pick } from '../../../util';
+import { textStylesFromCSS, textStylesToCSS } from '../../../util/CSSParsing';
 import {
   getDocumentFromElement,
   getWindowFromElement,
-} from '../../util/dom_misc';
-import type { TextStyleDeclaration } from '../Text/StyledText';
-import type { IText } from './IText';
+} from '../../../util/dom_misc';
+import type { TextStyleDeclaration } from '../../Text/StyledText';
+import type { IText } from '../IText';
 
 export abstract class DataTransferManager<
   T extends ClipboardEvent | DragEvent

@@ -9,6 +9,7 @@ import type { TKeyMapIText } from './constants';
 import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
+import { ClipboardDataManager } from './DataTransfer/ClipboardDataManager';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
