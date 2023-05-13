@@ -32,7 +32,7 @@ export const iTextDefaultValues = {
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
-  ctrlKeysMapUp = {},
+  ctrlKeysMapUp: {},
 };
 
 // @TODO this is not complete
