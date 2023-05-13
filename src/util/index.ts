@@ -81,6 +81,7 @@ export {
   getPointOnPath,
   transformPath,
   getRegularPolygonPath,
+  roundCommand,
 } from './path';
 export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';

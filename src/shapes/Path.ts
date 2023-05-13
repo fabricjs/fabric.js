@@ -10,6 +10,7 @@ import {
   joinPath,
   makePathSimpler,
   parsePath,
+  roundCommand,
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
@@ -25,7 +26,6 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -203,7 +203,9 @@ export class Path<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: cloneDeep(this.path),
+      path: this.path.map((command) =>
+        roundCommand(command, config.NUM_FRACTION_DIGITS)
+      ),
     };
   }
 
