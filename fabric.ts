@@ -14,7 +14,7 @@ export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
 
-export { Gradient } from './src/gradient/Gradient';
+export { Gradient } from './src/gradient';
 export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
 
