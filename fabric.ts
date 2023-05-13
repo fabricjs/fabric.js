@@ -13,12 +13,15 @@ export { Canvas } from './src/canvas/Canvas';
 export { Point } from './src/Point';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
+export * from './src/color/typedefs';
 
 export { Gradient } from './src/gradient/Gradient';
 export * from './src/Pattern';
 export { Shadow } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
+export * from './src/brushes/typedefs';
+
 export { PencilBrush } from './src/brushes/PencilBrush';
 export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';

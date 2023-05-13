@@ -1,6 +1,6 @@
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 
 /**
