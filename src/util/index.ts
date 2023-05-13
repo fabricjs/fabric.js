@@ -12,7 +12,7 @@ export {
   radiansToDegrees,
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
-export { projectStrokeOnPoints } from './misc/projectStroke';
+export * from './misc/projectStroke';
 export {
   transformPoint,
   invertTransform,
@@ -76,6 +76,7 @@ export {
   enlivenObjectEnlivables,
 } from './misc/objectEnlive';
 export { pick } from './misc/pick';
+export * from './path/typedefs';
 export {
   joinPath,
   parsePath,
@@ -97,7 +98,7 @@ export {
 } from './dom_misc';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';
-export { animate, animateColor } from './animation/animate';
+export * from './animation';
 export * as ease from './animation/easing';
 export {
   requestAnimFrame,
