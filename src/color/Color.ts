@@ -281,17 +281,15 @@ export class Color {
   static sourceFromRgb(color: string): TRGBAColorSource | undefined {
     const match = color.match(reRGBa());
     if (match) {
-      const r =
-          (parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1)) *
-          (/%$/.test(match[1]) ? 255 : 1),
-        g =
-          (parseInt(match[2], 10) / (/%$/.test(match[2]) ? 100 : 1)) *
-          (/%$/.test(match[2]) ? 255 : 1),
-        b =
-          (parseInt(match[3], 10) / (/%$/.test(match[3]) ? 100 : 1)) *
-          (/%$/.test(match[3]) ? 255 : 1);
-
-      return [r, g, b, match[4] ? parseFloat(match[4]) : 1];
+      const [r, g, b] = match.slice(1, 4).map((value) => {
+        const parsedValue = parseInt(value, 10);
+        return value.endsWith('%')
+          ? Math.round(parsedValue * 2.55)
+          : parsedValue;
+      });
+      const alpha = match[4] ?? '1';
+      const a = parseFloat(alpha) / (alpha.endsWith('%') ? 100 : 1);
+      return [r, g, b, a];
     }
   }
 
@@ -332,8 +330,8 @@ export class Color {
     }
 
     const h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
-      s = parseFloat(match[2]) / (/%$/.test(match[2]) ? 100 : 1),
-      l = parseFloat(match[3]) / (/%$/.test(match[3]) ? 100 : 1);
+      s = parseFloat(match[2]) / 100,
+      l = parseFloat(match[3]) / 100;
     let r: number, g: number, b: number;
 
     if (s === 0) {
@@ -376,29 +374,17 @@ export class Color {
   static sourceFromHex(color: string): TRGBAColorSource | undefined {
     if (color.match(reHex())) {
       const value = color.slice(color.indexOf('#') + 1),
-        isShortNotation = value.length === 3 || value.length === 4,
-        isRGBa = value.length === 8 || value.length === 4,
-        r = isShortNotation
-          ? value.charAt(0) + value.charAt(0)
-          : value.substring(0, 2),
-        g = isShortNotation
-          ? value.charAt(1) + value.charAt(1)
-          : value.substring(2, 4),
-        b = isShortNotation
-          ? value.charAt(2) + value.charAt(2)
-          : value.substring(4, 6),
-        a = isRGBa
-          ? isShortNotation
-            ? value.charAt(3) + value.charAt(3)
-            : value.substring(6, 8)
-          : 'FF';
-
-      return [
-        parseInt(r, 16),
-        parseInt(g, 16),
-        parseInt(b, 16),
-        parseFloat((parseInt(a, 16) / 255).toFixed(2)),
-      ];
+        isShortNotation = value.length === 3 || value.length === 4;
+      let expandedValue: string[];
+      if (isShortNotation) {
+        expandedValue = value.split('').map((hex) => hex + hex);
+      } else {
+        expandedValue = value.match(/.{2}/g)!;
+      }
+      const [r, g, b, a = 255] = expandedValue.map((hexCouple) =>
+        parseInt(hexCouple, 16)
+      );
+      return [r, g, b, a / 255];
     }
   }
 }
