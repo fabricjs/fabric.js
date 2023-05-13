@@ -279,7 +279,7 @@ export class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color: string): TRGBAColorSource | undefined {
-    const match = color.match(reRGBa);
+    const match = color.match(new RegExp(reRGBa, 'i'));
     if (match) {
       const r =
           (parseInt(match[1], 10) / (/%$/.test(match[1]) ? 100 : 1)) *
@@ -326,7 +326,7 @@ export class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color: string): TRGBAColorSource | undefined {
-    const match = color.match(reHSLa);
+    const match = color.match(new RegExp(reHSLa, 'i'));
     if (!match) {
       return;
     }
@@ -374,7 +374,7 @@ export class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromHex(color: string): TRGBAColorSource | undefined {
-    if (color.match(reHex)) {
+    if (color.match(new RegExp(reHex, 'i'))) {
       const value = color.slice(color.indexOf('#') + 1),
         isShortNotation = value.length === 3 || value.length === 4,
         isRGBa = value.length === 8 || value.length === 4,
