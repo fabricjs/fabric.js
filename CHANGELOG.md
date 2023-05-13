@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): export types
 - chore(lint) Add a rule for import type [#8907](https://github.com/fabricjs/fabric.js/pull/8907)
 - fix(Object): dirty unflagging inconsistency [#8910](https://github.com/fabricjs/fabric.js/pull/8910)
 - chore(TS): minor type/import fixes [#8904](https://github.com/fabricjs/fabric.js/pull/8904)
