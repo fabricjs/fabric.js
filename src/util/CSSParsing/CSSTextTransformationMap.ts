@@ -1,7 +1,7 @@
 import type { Text } from '../../shapes/Text/Text';
 import { parseUnit } from '../misc/svgParsing';
 import { CSSTransformationMap } from './CSSTransformationMap';
-import { CSSTransformConfig, CSSTransformConfigMap } from './types';
+import type { CSSTransformConfig, CSSTransformConfigMap } from './types';
 import {
   colorRestorer,
   colorRestorerNoBlack,

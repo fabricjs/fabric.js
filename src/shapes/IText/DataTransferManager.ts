@@ -1,10 +1,11 @@
-import { Color } from 'fabric/node';
 import { newlineRegExp } from '../../constants';
-import { getDocument, getWindow } from '../../env';
 import { hasStyleChanged, pick } from '../../util';
 import { textStylesFromCSS, textStylesToCSS } from '../../util/CSSParsing';
-import { TextStyleDeclaration } from '../Text/StyledText';
-import { textDefaultValues } from '../Text/Text';
+import {
+  getDocumentFromElement,
+  getWindowFromElement,
+} from '../../util/dom_misc';
+import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { IText } from './IText';
 
 export abstract class DataTransferManager<
@@ -115,15 +116,19 @@ export abstract class DataTransferManager<
     return `<html><body><!--StartFragment--><meta charset="utf-8">${markup}<!--EndFragment--></body></html>`;
   }
 
-  static parseHTML(html = '') {
+  parseHTML(e: T) {
+    const html = this.extractDataTransfer(e)!.getData('text/html');
+    const el = (e.target || this.target.hiddenTextarea)! as HTMLElement;
+    const doc = getDocumentFromElement(el);
+    const win = getWindowFromElement(el);
     let text = '';
     const styles: TextStyleDeclaration[] = [];
-    const sandbox = getDocument().createElement('iframe');
+    const sandbox = doc.createElement('iframe');
     Object.assign(sandbox.style, {
       position: 'fixed',
       left: `${-sandbox.clientWidth}px`,
     });
-    getDocument().body.append(sandbox);
+    doc.body.append(sandbox);
     const sandboxDoc =
       sandbox.contentDocument || sandbox.contentWindow!.document;
     sandboxDoc.open();
@@ -162,8 +167,8 @@ export abstract class DataTransferManager<
           const parentEl = walker.currentNode.parentElement;
           const style = parentEl
             ? pick(
-                textStylesFromCSS(getWindow().getComputedStyle(parentEl)),
-                textDefaultValues._styleProperties
+                textStylesFromCSS(win.getComputedStyle(parentEl)),
+                (this.target.constructor as typeof IText)._styleProperties
               )
             : {};
           for (let index = 0; index < value.length; index++) {

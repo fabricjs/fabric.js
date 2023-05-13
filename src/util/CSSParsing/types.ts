@@ -1,4 +1,4 @@
-import { FabricObject } from '../../shapes/Object/Object';
+import type { FabricObject } from '../../shapes/Object/Object';
 
 export type CSSTransformContext<T> = {
   target: FabricObject;

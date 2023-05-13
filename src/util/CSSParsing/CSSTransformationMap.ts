@@ -6,7 +6,7 @@ import {
   colorRestorer,
   colorRestorerNoBlack,
 } from './util';
-import { CSSTransformConfigMap } from './types';
+import type { CSSTransformConfigMap } from './types';
 
 export const CSSTransformationMap: CSSTransformConfigMap<
   FabricObject,

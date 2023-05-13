@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { classRegistry } from '../../ClassRegistry';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import type { Point } from '../../Point';
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
@@ -26,7 +26,7 @@ import type {
   SerializedObjectProps,
   TProps,
 } from '../Object/types';
-import { Path } from '../Path';
+import type { Path } from '../Path';
 import type { TextStyle, TextStyleDeclaration } from './StyledText';
 import { StyledText } from './StyledText';
 import { TextSVGExportMixin } from './TextSVGExportMixin';

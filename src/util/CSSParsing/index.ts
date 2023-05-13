@@ -3,7 +3,7 @@ import type { TextStyleDeclaration } from '../../shapes/Text/StyledText';
 import type { Text } from '../../shapes/Text/Text';
 import { CSSTextTransformationMap } from './CSSTextTransformationMap';
 import { CSSTransformationMap } from './CSSTransformationMap';
-import { CSSTransformContext } from './types';
+import type { CSSTransformContext } from './types';
 
 export function stylesToCSS<
   T extends Pick<FabricObject, keyof typeof CSSTransformationMap>
