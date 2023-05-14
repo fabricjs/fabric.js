@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(ci): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)
 - chore(TS): export util types [#8915](https://github.com/fabricjs/fabric.js/pull/8915)
 - chore(TS): change enums with types [#8918](https://github.com/fabricjs/fabric.js/pull/8918)
 - chore(TS): export gradient types
