@@ -1,7 +1,7 @@
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TextStyleDeclaration } from '../../shapes/Text/StyledText';
 import type { Text } from '../../shapes/Text/Text';
-import { textDecorationProperties } from '../../shapes/Text/constants';
+import type { textDecorationProperties } from '../../shapes/Text/constants';
 import { CSSTextTransformationMap } from './CSSTextTransformationMap';
 import { CSSTransformationMap } from './CSSTransformationMap';
 import type { CSSTransformContext } from './types';
