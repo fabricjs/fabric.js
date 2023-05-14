@@ -1,10 +1,7 @@
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
-import type { TRGBAColorSource, TColorArg, TRGBColorSource } from './typedefs';
-import { hue2rgb, hexify } from './util';
-
-const fromAlphaToFloat = (value = '1') =>
-  parseFloat(value) / (value.endsWith('%') ? 100 : 1);
+import type { TRGBAColorSource, TColorArg } from './typedefs';
+import { hue2rgb, hexify, rgb2Hsl, fromAlphaToFloat } from './util';
 
 /**
  * @class Color common color operations
@@ -51,47 +48,6 @@ export class Color {
   }
 
   /**
-   * Adapted from {@link https://gist.github.com/mjackson/5311256 https://gist.github.com/mjackson}
-   * @private
-   * @param {Number} r Red color value
-   * @param {Number} g Green color value
-   * @param {Number} b Blue color value
-   * @param {Number} a Alpha color value pass through
-   * @return {TRGBColorSource} Hsl color
-   */
-  _rgbToHsl(r: number, g: number, b: number, a: number): TRGBAColorSource {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const maxValue = Math.max(r, g, b),
-      minValue = Math.min(r, g, b);
-
-    let h!: number, s: number;
-    const l = (maxValue + minValue) / 2;
-
-    if (maxValue === minValue) {
-      h = s = 0; // achromatic
-    } else {
-      const d = maxValue - minValue;
-      s = l > 0.5 ? d / (2 - maxValue - minValue) : d / (maxValue + minValue);
-      switch (maxValue) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-
-    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100), a];
-  }
-
-  /**
    * Returns source of this color (where source is an array representation; ex: [200, 200, 100, 1])
    * @return {TRGBAColorSource}
    */
@@ -129,7 +85,7 @@ export class Color {
    * @return {String} ex: hsl(0-360,0%-100%,0%-100%)
    */
   toHsl() {
-    const [h, s, l] = this._rgbToHsl(...this.getSource());
+    const [h, s, l] = rgb2Hsl(...this.getSource());
     return `hsl(${h},${s}%,${l}%)`;
   }
 
@@ -138,7 +94,7 @@ export class Color {
    * @return {String} ex: hsla(0-360,0%-100%,0%-100%,0-1)
    */
   toHsla() {
-    const [h, s, l, a] = this._rgbToHsl(...this.getSource());
+    const [h, s, l, a] = rgb2Hsl(...this.getSource());
     return `hsla(${h},${s}%,${l}%,${a})`;
   }
 
