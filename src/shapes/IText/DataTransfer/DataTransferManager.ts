@@ -1,176 +1,55 @@
-import { newlineRegExp } from '../../../constants';
-import { hasStyleChanged, pick } from '../../../util';
-import { textStylesFromCSS, textStylesToCSS } from '../../../util/CSSParsing';
-import {
-  getDocumentFromElement,
-  getWindowFromElement,
-} from '../../../util/dom_misc';
-import type { TextStyleDeclaration } from '../../Text/StyledText';
 import type { IText } from '../IText';
 import { AbstractDataTransferManager } from './AbstractDataTransferManager';
 
 export abstract class DataTransferManager<
   T extends ClipboardEvent | DragEvent
 > extends AbstractDataTransferManager<T> {
-  setData(e: T): boolean {
-    const dataTransfer = this.extractDataTransfer(e);
-    if (!dataTransfer) {
-      return false;
-    }
-    const { selectionStart, selectionEnd } = this.target;
-    if (selectionStart === selectionEnd) {
-      dataTransfer.clearData();
-      return false;
-    }
-    dataTransfer.setData(
-      'text/html',
-      this.toHTML(selectionStart, selectionEnd)
-    );
-    dataTransfer.setData('text/svg+xml', `<svg>${this.target.toSVG()}</svg>`);
-    dataTransfer.setData('text/plain', this.target.getSelectedText());
-    return true;
-  }
-
-  getData(e: T): {
-    text?: string;
-    styles?: TextStyleDeclaration[];
-  } {
-    const dataTransfer = this.extractDataTransfer(e);
-    if (!dataTransfer) {
-      return {};
-    }
-    if (dataTransfer.types.includes('text/html')) {
-      const { text, styles } = this.parseHTML(e);
-      return {
-        text,
-        styles: styles.map((style) =>
-          (
-            Object.entries(style) as [
-              keyof TextStyleDeclaration,
-              TextStyleDeclaration[keyof TextStyleDeclaration]
-            ][]
-          ).reduce((style, [key, value]) => {
-            if (value && this.target[key] !== value) {
-              style[key] = value;
-            }
-            return style;
-          }, {} as TextStyleDeclaration)
-        ),
-      };
-    }
-    return {
-      text: dataTransfer
-        .getData('text/plain')
-        .replace(this.target._reNewline, '\n'),
-    };
-  }
-
-  toHTML(from = 0, to = this.target.text.length) {
-    const text = this.target._text.slice(from, to);
-    const textLines = text.join('').split(target._reNewline);
-    const styles = this.target
-      .getSelectionStyles(from, to)
-      .filter((value, index) => !this.target._reNewline.test(text[index]));
-    const { cssText: topLevelStyles } = textStylesToCSS(target);
-    let charIndex = 0;
-    const markup = textLines
-      .map((text) => {
-        const spans: {
-          text: string;
-          style: TextStyleDeclaration;
-        }[] = [];
-        for (let index = 0; index < text.length; index++) {
-          const style = styles[charIndex++];
-          if (
-            index === 0 ||
-            hasStyleChanged(spans[spans.length - 1].style, style, true)
-          ) {
-            spans.push({ text: text[index], style });
-          } else {
-            spans[spans.length - 1].text += text[index];
-          }
-        }
-        return `<p style="${topLevelStyles}">${spans
-          .map(({ text, style }) => {
-            const { cssText } = textStylesToCSS(target, {
-              ...style,
-              visible: true,
-            });
-            return `<span style="${cssText}">${text}</span>`;
-          })
-          .join('')}</p>`;
-      })
-      .join('');
-
-    return `<html><body><!--StartFragment--><meta charset="utf-8">${markup}<!--EndFragment--></body></html>`;
-  }
-
-  parseHTML(e: T) {
-    const html = this.extractDataTransfer(e)!.getData('text/html');
-    const el = (e.target || this.target.hiddenTextarea)! as HTMLElement;
-    const doc = getDocumentFromElement(el)!;
-    const win = getWindowFromElement(el)!;
-    let text = '';
-    const styles: TextStyleDeclaration[] = [];
-    const sandbox = doc.createElement('iframe');
-    Object.assign(sandbox.style, {
-      position: 'fixed',
-      left: `${-sandbox.clientWidth}px`,
-    });
-    doc.body.append(sandbox);
-    const sandboxDoc =
-      sandbox.contentDocument || sandbox.contentWindow!.document;
-    sandboxDoc.open();
-    sandboxDoc.write(html);
-    sandboxDoc.close();
-    const walker = sandboxDoc.createTreeWalker(
-      sandboxDoc.body,
-      NodeFilter.SHOW_ALL,
+  constructor(target: IText) {
+    super(target);
+    this.types = [
       {
-        acceptNode(node) {
-          return node instanceof HTMLDivElement ||
-            node instanceof HTMLParagraphElement ||
-            node.nodeType === Node.TEXT_NODE
-            ? NodeFilter.FILTER_ACCEPT
-            : NodeFilter.FILTER_SKIP;
+        type: 'application/fabric',
+        getData(e, dataTransfer) {
+          return dataTransfer.types.includes(this.type)
+            ? JSON.parse(dataTransfer.getData(this.type))
+            : undefined;
         },
-      }
-    );
-    let parent: Node | undefined;
-    while (walker.nextNode()) {
-      if (parent && !parent.contains(walker.currentNode)) {
-        parent = undefined;
-        styles.push({});
-        text += '\n';
-      }
-      if (
-        walker.currentNode instanceof HTMLDivElement ||
-        walker.currentNode instanceof HTMLParagraphElement
-      ) {
-        parent = walker.currentNode;
-      } else if (walker.currentNode.nodeType === Node.TEXT_NODE) {
-        const value = (walker.currentNode.textContent || '')
-          // TODO: investigate why line breaks are added while parsing
-          .replace(newlineRegExp, '');
-        if (value.length > 0) {
-          const parentEl = walker.currentNode.parentElement;
-          const style = parentEl
-            ? pick(
-                textStylesFromCSS(win.getComputedStyle(parentEl)),
-                (this.target.constructor as typeof IText)._styleProperties
-              )
-            : {};
-          for (let index = 0; index < value.length; index++) {
-            styles.push(style);
-          }
-          text += value;
-        }
-      }
-    }
-    sandbox.remove();
-    return {
-      text,
-      styles,
-    };
+        setData(e, dataTransfer, target) {
+          dataTransfer.setData(
+            this.type,
+            JSON.stringify({
+              value: target.getSelectedText(),
+              styles: target.getSelectionStyles(
+                target.selectionStart,
+                target.selectionEnd,
+                true
+              ),
+            })
+          );
+        },
+      },
+      {
+        type: 'text/svg+xml',
+        getData() {
+          return;
+        },
+        setData(e, dataTransfer, target) {
+          dataTransfer.setData(this.type, `<svg>${target.toSVG()}</svg>`);
+        },
+      },
+      {
+        type: 'text/plain',
+        getData(e, dataTransfer, target) {
+          return {
+            text: dataTransfer
+              .getData(this.type)
+              .replace(target._reNewline, '\n'),
+          };
+        },
+        setData(e, dataTransfer, target) {
+          dataTransfer.setData(this.type, target.getSelectedText());
+        },
+      },
+    ];
   }
 }
