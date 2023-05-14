@@ -1,4 +1,4 @@
-import { TRGBAColorSource } from './typedefs';
+import type { TRGBAColorSource } from './typedefs';
 
 /**
  * @param {Number} p
