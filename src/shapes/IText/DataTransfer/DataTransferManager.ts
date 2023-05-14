@@ -18,7 +18,7 @@ export abstract class DataTransferManager<
           dataTransfer.setData(
             this.type,
             JSON.stringify({
-              value: target.getSelectedText(),
+              text: target.getSelectedText(),
               styles: target.getSelectionStyles(
                 target.selectionStart,
                 target.selectionEnd,
