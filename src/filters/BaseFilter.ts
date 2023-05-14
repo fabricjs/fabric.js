@@ -8,7 +8,6 @@ import type {
   TWebGLUniformLocationMap,
 } from './typedefs';
 import { isWebGLPipelineState } from './utils';
-import { GLPrecision } from './GLProbes/GLProbe';
 import {
   highPsourceCode,
   identityFragmentShader,
@@ -71,10 +70,10 @@ export class BaseFilter {
     vertexSource: string = this.vertexSource
   ) {
     const { WebGLProbe } = getEnv();
-    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
+    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision)
+        highPsourceCode.replace('highp', WebGLProbe.GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
