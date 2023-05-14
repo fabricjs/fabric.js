@@ -1,10 +1,8 @@
 import { Color } from '../color/Color';
 import type { Point } from '../Point';
-import type { TEvent } from '../EventTypeDefs';
 import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/Canvas';
-
-type TBrushEventData = TEvent & { pointer: Point };
+import type { TBrushEventData } from './typedefs';
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}

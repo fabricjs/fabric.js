@@ -57,9 +57,3 @@ export type TWebGLProgramCacheItem = {
 };
 
 export type TApplyFilterArgs = {};
-
-export const isWebGLPipelineState = (
-  options: TWebGLPipelineState | T2DPipelineState
-): options is TWebGLPipelineState => {
-  return (options as TWebGLPipelineState).webgl !== undefined;
-};
