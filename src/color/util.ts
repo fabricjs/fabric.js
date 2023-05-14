@@ -26,7 +26,5 @@ export function hue2rgb(p: number, q: number, t: number): number {
 /**
  * Convert a value ∈ [0, 255] to hex
  */
-export function hexify(value: number) {
-  const hexValue = value.toString(16).toUpperCase();
-  return hexValue.length === 1 ? `0${hexValue}` : hexValue;
-}
+export const hexify = (value: number) =>
+  Math.min(value, 255).toString(16).toUpperCase().padStart(2, '0');

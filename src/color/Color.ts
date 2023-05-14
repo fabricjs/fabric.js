@@ -56,9 +56,10 @@ export class Color {
    * @param {Number} r Red color value
    * @param {Number} g Green color value
    * @param {Number} b Blue color value
+   * @param {Number} a Alpha color value pass through
    * @return {TRGBColorSource} Hsl color
    */
-  _rgbToHsl(r: number, g: number, b: number): TRGBColorSource {
+  _rgbToHsl(r: number, g: number, b: number, a: number): TRGBAColorSource {
     r /= 255;
     g /= 255;
     b /= 255;
@@ -87,7 +88,7 @@ export class Color {
       h /= 6;
     }
 
-    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100), a];
   }
 
   /**
@@ -120,8 +121,7 @@ export class Color {
    * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
    */
   toRgba() {
-    const [r, g, b, a] = this.getSource();
-    return `rgba(${r},${g},${b},${a})`;
+    return `rgba(${this.getSource().join(',')})`;
   }
 
   /**
@@ -129,9 +129,7 @@ export class Color {
    * @return {String} ex: hsl(0-360,0%-100%,0%-100%)
    */
   toHsl() {
-    const [r, g, b] = this.getSource(),
-      [h, s, l] = this._rgbToHsl(r, g, b);
-
+    const [h, s, l] = this._rgbToHsl(...this.getSource());
     return `hsl(${h},${s}%,${l}%)`;
   }
 
@@ -140,9 +138,7 @@ export class Color {
    * @return {String} ex: hsla(0-360,0%-100%,0%-100%,0-1)
    */
   toHsla() {
-    const [r, g, b, a] = this.getSource(),
-      [h, s, l] = this._rgbToHsl(r, g, b);
-
+    const [h, s, l, a] = this._rgbToHsl(...this.getSource());
     return `hsla(${h},${s}%,${l}%,${a})`;
   }
 
