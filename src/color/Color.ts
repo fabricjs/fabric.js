@@ -111,8 +111,8 @@ export class Color {
    * @return {String} ex: rgb(0-255,0-255,0-255)
    */
   toRgb() {
-    const source = this.getSource();
-    return `rgb(${source[0]},${source[1]},${source[2]})`;
+    const [r, g, b] = this.getSource();
+    return `rgb(${r},${g},${b})`;
   }
 
   /**
@@ -120,8 +120,8 @@ export class Color {
    * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
    */
   toRgba() {
-    const source = this.getSource();
-    return `rgba(${source[0]},${source[1]},${source[2]},${source[3]})`;
+    const [r, g, b, a] = this.getSource();
+    return `rgba(${r},${g},${b},${a})`;
   }
 
   /**
@@ -129,10 +129,10 @@ export class Color {
    * @return {String} ex: hsl(0-360,0%-100%,0%-100%)
    */
   toHsl() {
-    const source = this.getSource(),
-      hsl = this._rgbToHsl(source[0], source[1], source[2]);
+    const [r, g, b] = this.getSource(),
+      [h, s, l] = this._rgbToHsl(r, g, b);
 
-    return `hsl(${hsl[0]},${hsl[1]}%,${hsl[2]}%)`;
+    return `hsl(${h},${s}%,${l}%)`;
   }
 
   /**
@@ -140,10 +140,10 @@ export class Color {
    * @return {String} ex: hsla(0-360,0%-100%,0%-100%,0-1)
    */
   toHsla() {
-    const source = this.getSource(),
-      hsl = this._rgbToHsl(source[0], source[1], source[2]);
+    const [r, g, b, a] = this.getSource(),
+      [h, s, l] = this._rgbToHsl(r, g, b);
 
-    return `hsla(${hsl[0]},${hsl[1]}%,${hsl[2]}%,${source[3]})`;
+    return `hsla(${h},${s}%,${l}%,${a})`;
   }
 
   /**
@@ -151,8 +151,8 @@ export class Color {
    * @return {String} ex: FF5555
    */
   toHex() {
-    const [r, g, b] = this.getSource();
-    return `${hexify(r)}${hexify(g)}${hexify(b)}`;
+    const fullHex = this.toHexa();
+    return fullHex.slice(0, 6);
   }
 
   /**
@@ -160,8 +160,8 @@ export class Color {
    * @return {String} ex: FF5555CC
    */
   toHexa() {
-    const source = this.getSource();
-    return `${this.toHex()}${hexify(Math.round(source[3] * 255))}`;
+    const [r, g, b, a] = this.getSource();
+    return `${hexify(r)}${hexify(g)}${hexify(b)}${hexify(Math.round(a * 255))}`;
   }
 
   /**
@@ -178,9 +178,7 @@ export class Color {
    * @return {Color} thisArg
    */
   setAlpha(alpha: number) {
-    const source = this.getSource();
-    source[3] = alpha;
-    this.setSource(source);
+    this._source[3] = alpha;
     return this;
   }
 
@@ -189,13 +187,9 @@ export class Color {
    * @return {Color} thisArg
    */
   toGrayscale() {
-    const source = this.getSource(),
-      average = parseInt(
-        (source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11).toFixed(0),
-        10
-      ),
-      currentAlpha = source[3];
-    this.setSource([average, average, average, currentAlpha]);
+    const [r, g, b, a] = this.getSource(),
+      average = Math.round(r * 0.3 + g * 0.59 + b * 0.11);
+    this.setSource([average, average, average, a]);
     return this;
   }
 
@@ -205,14 +199,10 @@ export class Color {
    * @return {Color} thisArg
    */
   toBlackWhite(threshold: number) {
-    const source = this.getSource(),
-      currentAlpha = source[3];
-    let average = Math.round(
-      source[0] * 0.3 + source[1] * 0.59 + source[2] * 0.11
-    );
-
-    average = average < (threshold || 127) ? 0 : 255;
-    this.setSource([average, average, average, currentAlpha]);
+    const [r, g, b, a] = this.getSource(),
+      average = Math.round(r * 0.3 + g * 0.59 + b * 0.11),
+      bOrW = average < (threshold || 127) ? 0 : 255;
+    this.setSource([bOrW, bOrW, bOrW, a]);
     return this;
   }
 
@@ -226,14 +216,14 @@ export class Color {
       otherColor = new Color(otherColor);
     }
 
-    const [r, g, b, alpha] = this.getSource(),
+    const source = this.getSource(),
       otherAlpha = 0.5,
       otherSource = otherColor.getSource(),
-      [R, G, B] = [r, g, b].map((value, index) =>
+      [R, G, B] = source.map((value, index) =>
         Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha)
       );
 
-    this.setSource([R, G, B, alpha]);
+    this.setSource([R, G, B, source[3]]);
     return this;
   }
 
