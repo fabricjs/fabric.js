@@ -22,7 +22,6 @@ import type {
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
-import { ImageFormat } from '../typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -1582,7 +1581,7 @@ export class StaticCanvas<
    */
   toDataURL(options = {} as TDataUrlOptions): string {
     const {
-      format = ImageFormat.png,
+      format = 'png',
       quality = 1,
       multiplier = 1,
       enableRetinaScaling = false,
