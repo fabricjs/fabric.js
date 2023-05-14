@@ -120,6 +120,7 @@ export class HTMLDataTransfer implements DataTransferResolver {
           const style = parentEl
             ? pick(
                 textStylesFromCSS(win.getComputedStyle(parentEl)),
+                // @ts-expect-error readonly/mutable array
                 (target.constructor as typeof IText)._styleProperties
               )
             : {};
@@ -145,7 +146,7 @@ export class HTMLDataTransfer implements DataTransferResolver {
             style[key] = value;
           }
           return style;
-        }, {} as TextStyleDeclaration)
+        }, {} as Partial<Record<keyof TextStyleDeclaration, TextStyleDeclaration[keyof TextStyleDeclaration]>>)
       ),
     };
   }

@@ -7,7 +7,7 @@ import { CSSTransformationMap } from './CSSTransformationMap';
 import type { CSSTransformContext } from './types';
 
 export function stylesToCSS<
-  T extends Pick<FabricObject, keyof typeof CSSTransformationMap>
+  T extends Partial<Pick<FabricObject, keyof typeof CSSTransformationMap>>
 >(target: FabricObject, options: T, map = CSSTransformationMap) {
   let cssText = '';
   const context: CSSTransformContext<T> = {
@@ -36,9 +36,8 @@ export function stylesToCSS<
 
 export function textStylesToCSS(
   target: Text,
-  options: Pick<
-    Text,
-    Exclude<keyof typeof CSSTextTransformationMap, 'textDecoration'>
+  options: Partial<
+    Pick<Text, Exclude<keyof typeof CSSTextTransformationMap, 'textDecoration'>>
   > = target
 ) {
   return stylesToCSS(target, options, CSSTextTransformationMap);

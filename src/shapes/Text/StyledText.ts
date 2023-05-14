@@ -8,20 +8,22 @@ import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { Text } from './Text';
 
-export type TextStyleDeclaration = Pick<
-  Text,
-  | 'fill'
-  | 'stroke'
-  | 'strokeWidth'
-  | 'fontSize'
-  | 'fontFamily'
-  | 'fontWeight'
-  | 'fontStyle'
-  | 'textBackgroundColor'
-  | 'deltaY'
-  | 'overline'
-  | 'underline'
-  | 'linethrough'
+export type TextStyleDeclaration = Partial<
+  Pick<
+    Text,
+    | 'fill'
+    | 'stroke'
+    | 'strokeWidth'
+    | 'fontSize'
+    | 'fontFamily'
+    | 'fontWeight'
+    | 'fontStyle'
+    | 'textBackgroundColor'
+    | 'deltaY'
+    | 'overline'
+    | 'underline'
+    | 'linethrough'
+  >
 >;
 
 export type TextStyle = {
