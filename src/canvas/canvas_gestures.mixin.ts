@@ -1,7 +1,7 @@
 //@ts-nocheck
 
 import { scalingEqually } from '../controls/scale';
-import { fireEvent } from '../util/fireEvent';
+import { fireEvent } from '../controls/fireEvent';
 import {
   degreesToRadians,
   radiansToDegrees,

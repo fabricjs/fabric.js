@@ -6,10 +6,7 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
-export const enum ObjectRelation {
-  sibling = 'sibling',
-  child = 'child',
-}
+export type ObjectRelation = 'sibling' | 'child';
 
 /**
  * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
@@ -73,16 +70,10 @@ export const transformPointRelativeToCanvas = (
   relationAfter: ObjectRelation
 ): Point => {
   // is this still needed with TS?
-  if (
-    relationBefore !== ObjectRelation.child &&
-    relationBefore !== ObjectRelation.sibling
-  ) {
+  if (relationBefore !== 'child' && relationBefore !== 'sibling') {
     throw new Error(`fabric.js: received bad argument ${relationBefore}`);
   }
-  if (
-    relationAfter !== ObjectRelation.child &&
-    relationAfter !== ObjectRelation.sibling
-  ) {
+  if (relationAfter !== 'child' && relationAfter !== 'sibling') {
     throw new Error(`fabric.js: received bad argument ${relationAfter}`);
   }
   if (relationBefore === relationAfter) {
