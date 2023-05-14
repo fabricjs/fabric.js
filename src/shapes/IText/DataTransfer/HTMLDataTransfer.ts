@@ -8,7 +8,8 @@ import {
 import type { TextStyleDeclaration } from '../../Text/StyledText';
 import type { IText, ITextProps, SerializedITextProps } from '../IText';
 import type { ITextEvents } from '../ITextBehavior';
-import type { DataTransferResolver } from './AbstractDataTransferManager';
+import type { DataTransferResolver } from './DataTransferManager';
+import { DataTransferManager } from './DataTransferManager';
 
 export class HTMLDataTransfer implements DataTransferResolver {
   type = 'text/html';
@@ -149,3 +150,6 @@ export class HTMLDataTransfer implements DataTransferResolver {
     };
   }
 }
+
+export const applyPlugin = () =>
+  DataTransferManager.types.splice(1, 0, new HTMLDataTransfer());
