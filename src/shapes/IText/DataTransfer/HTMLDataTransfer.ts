@@ -146,7 +146,7 @@ export class HTMLDataTransfer implements DataTransferResolver {
             style[key] = value;
           }
           return style;
-        }, {} as Partial<Record<keyof TextStyleDeclaration, TextStyleDeclaration[keyof TextStyleDeclaration]>>)
+        }, {} as TextStyleDeclaration)
       ),
     };
   }
