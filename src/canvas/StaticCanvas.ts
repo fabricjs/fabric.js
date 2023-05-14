@@ -38,7 +38,12 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
+import {
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from '../util/typeAssertions';
 
 type TDestroyed<T, K extends keyof any> = {
   // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
