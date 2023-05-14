@@ -25,7 +25,7 @@ describe('getRandomInt', () => {
     expect(semiRandom).toBe(9);
   });
   it('thanks to js sillyness could also go out of bounds', () => {
-    global.Math.random.mockReturnValue(0.9999999999999999999999);
+    global.Math.random.mockReturnValue(0.9999999999999999);
     const semiRandom = getRandomInt(4, 9);
     expect(semiRandom).toBe(10);
   });
