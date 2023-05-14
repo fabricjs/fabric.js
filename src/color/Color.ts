@@ -269,7 +269,7 @@ export class Color {
     const match = color.match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map((value) => {
-        const parsedValue = parseInt(value, 10);
+        const parsedValue = parseFloat(value);
         return value.endsWith('%')
           ? Math.round(parsedValue * 2.55)
           : parsedValue;

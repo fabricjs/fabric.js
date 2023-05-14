@@ -14,21 +14,21 @@
  * /^          # Beginning of the string
  * rgba?       # "rgb" or "rgba"
  * \(\s*       # Opening parenthesis and optional whitespace
- * (\d{1,3}    # One to three digits R channel
+ * (\d{0,3}    # 0 to three digits R channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the first color component
  * %?          # Optional percent sign after the first color component
  * \s*         # Optional whitespace
  * [\s|,]      # Separator between color components can be a space or comma
  * \s*         # Optional whitespace
- * (\d{1,3}    # One to three digits G channel
+ * (\d{0,3}    # 0 to three digits G channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the second color component
  * %?          # Optional percent sign after the second color component
  * \s*         # Optional whitespace
  * [\s|,]      # Separator between color components can be a space or comma
  * \s*         # Optional whitespace
- * (\d{1,3}    # One to three digits B channel
+ * (\d{0,3}    # 0 to three digits B channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the third color component
  * %?          # Optional percent sign after the third color component
@@ -52,7 +52,7 @@
  * So the spec does not allow for rgba(30 , 45%  35, 49%) but this will work anyway for us
  */
 export const reRGBa = () =>
-  /^rgba?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{1,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{1,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
+  /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
  * Regex matching color in HSL or HSLA formats (ex: hsl(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
