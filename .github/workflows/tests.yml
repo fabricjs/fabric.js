@@ -55,7 +55,7 @@ jobs:
     name: Jest tests
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Install node-canvas
         run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
       - name: Use Node.js v18
@@ -65,5 +65,3 @@ jobs:
       - run: npm ci
       - name: Run Jest unit test
         run: npm run test:jest
-
-
