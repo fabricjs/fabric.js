@@ -57,7 +57,7 @@
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
-    "test:jest:coverage": "nyc --silent --no-clean jest --runInBand",
+    "test:jest:coverage": "jest --coverage=true --coverageDirectory=./.nyc_output",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
     "lint": "eslint --config .eslintrc.js src",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
