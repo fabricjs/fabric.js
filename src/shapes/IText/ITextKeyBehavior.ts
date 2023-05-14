@@ -10,6 +10,7 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { ClipboardDataManager } from './DataTransfer/ClipboardDataManager';
+import type { AssertKeys } from '../../typedefs';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -289,17 +290,24 @@ export abstract class ITextKeyBehavior<
   }
 
   /**
+   * @override to customize supported {@link DataTransfer} types
+   */
+  createClipboardDataManager() {
+    return new ClipboardDataManager(this);
+  }
+
+  /**
    * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   copy(e: ClipboardEvent) {
-    new ClipboardDataManager(this).setData(e) && this.fire('copy', { e });
+    this.createClipboardDataManager().setData(e) && this.fire('copy', { e });
   }
 
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   cut(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
-    if (new ClipboardDataManager(this).setData(e)) {
+    if (this.createClipboardDataManager().setData(e)) {
       //  remove selection and force recalculating dimensions
       this.removeChars(this.selectionStart, this.selectionEnd);
       this.selectionEnd = this.selectionStart;
@@ -323,7 +331,7 @@ export abstract class ITextKeyBehavior<
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
     // obtain styles from event
-    const { text, styles } = new ClipboardDataManager(this).getData(e);
+    const { text, styles } = this.createClipboardDataManager().getData(e);
     // execute paste logic
     if (text) {
       this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
