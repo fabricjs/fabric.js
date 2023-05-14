@@ -33,6 +33,14 @@ export abstract class ITextClickBehavior<
 
   protected draggableTextDelegate: DraggableTextDelegate;
 
+  /**
+   * @override to customize supported {@link DataTransfer} types
+   */
+  createDraggableTextDelegate() {
+    // @ts-expect-error in reality it is an IText instance
+    return new DraggableTextDelegate(this);
+  }
+
   initBehavior() {
     // Initializes event handlers related to cursor or selection
     this.on('mousedown', this._mouseDownHandler);
@@ -48,8 +56,7 @@ export abstract class ITextClickBehavior<
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
 
-    // @ts-expect-error in reality it is an IText instance
-    this.draggableTextDelegate = new DraggableTextDelegate(this);
+    this.draggableTextDelegate = this.createDraggableTextDelegate();
 
     super.initBehavior();
   }
@@ -173,7 +180,7 @@ export abstract class ITextClickBehavior<
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler({ e, transform, button }: TPointerEventInfo) {
+  mouseUpHandler({ e, transform }: TPointerEventInfo) {
     const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
