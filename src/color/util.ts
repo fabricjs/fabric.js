@@ -74,7 +74,7 @@ export const fromAlphaToFloat = (value = '1') =>
   parseFloat(value) / (value.endsWith('%') ? 100 : 1);
 
 /**
- * Convert a value ∈ [0, 255] to hex
+ * Convert a value in the inclusive range [0, 255] to hex
  */
 export const hexify = (value: number) =>
   Math.min(value, 255).toString(16).toUpperCase().padStart(2, '0');
