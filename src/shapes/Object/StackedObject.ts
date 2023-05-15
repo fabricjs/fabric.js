@@ -3,7 +3,7 @@ import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
-import { isActiveSelection } from '../../util/types';
+import { isActiveSelection } from '../../util/typeAssertions';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;

@@ -3,6 +3,8 @@ import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
+export * from './types';
+
 /**
  *
  * Used to calculate object's bounding box

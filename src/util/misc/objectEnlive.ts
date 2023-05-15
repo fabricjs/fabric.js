@@ -84,7 +84,6 @@ export const enlivenObjects = (
       objects.map((obj) =>
         classRegistry
           .getClass(obj.type)
-          // @ts-ignore
           .fromObject(obj, {
             signal,
             reviver,

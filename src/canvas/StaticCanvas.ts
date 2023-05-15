@@ -22,7 +22,6 @@ import type {
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
-import { ImageFormat } from '../typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -39,7 +38,12 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
+import {
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from '../util/typeAssertions';
 
 type TDestroyed<T, K extends keyof any> = {
   // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
@@ -1577,7 +1581,7 @@ export class StaticCanvas<
    */
   toDataURL(options = {} as TDataUrlOptions): string {
     const {
-      format = ImageFormat.png,
+      format = 'png',
       quality = 1,
       multiplier = 1,
       enableRetinaScaling = false,
