@@ -1,5 +1,5 @@
 /**
- * Regex matching color in RGB or RGBA formats (ex: rgb(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
+ * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
  * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
  * Formal syntax at the time of writing:
