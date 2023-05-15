@@ -49,7 +49,7 @@
  * The alpha channel can be in the format 0.4 .7 or 1 or 73%
  *
  * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
- * So the spec does not allow for rgba(30 , 45%  35, 49%) but this will work anyway for us
+ * So the spec does not allow for `rgba(30 , 45%  35, 49%)` but this will work anyways for us
  */
 export const reRGBa = () =>
   /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
