@@ -96,7 +96,7 @@ export const reRGBa = () =>
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
  *
  * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
- * So the spec does not allow for hsl(30 , 45%  35, 49%) but this will work anyway for us
+ * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
 export const reHSLa = () =>
   /^hsla?\(\s*(\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
