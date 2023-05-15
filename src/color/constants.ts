@@ -95,7 +95,7 @@ export const reRGBa = () =>
  * \)                // Matches the closing parenthesis
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
  *
- * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
+ * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
  * So the spec does not allow for hsl(30 , 45%  35, 49%) but this will work anyway for us
  */
 export const reHSLa = () =>
