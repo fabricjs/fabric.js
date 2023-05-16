@@ -1,7 +1,13 @@
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import type { TRGBAColorSource, TColorArg } from './typedefs';
-import { hue2rgb, hexify, rgb2Hsl, fromAlphaToFloat } from './util';
+import {
+  hue2rgb,
+  hexify,
+  rgb2Hsl,
+  fromAlphaToFloat,
+  greyAverage,
+} from './util';
 
 /**
  * @class Color common color operations
@@ -139,8 +145,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toGrayscale() {
-    const [r, g, b, a] = this.getSource(),
-      average = Math.round(r * 0.3 + g * 0.59 + b * 0.11);
+    const [average, a] = greyAverage(...this.getSource());
     this.setSource([average, average, average, a]);
     return this;
   }
@@ -151,8 +156,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toBlackWhite(threshold: number) {
-    const [r, g, b, a] = this.getSource(),
-      average = Math.round(r * 0.3 + g * 0.59 + b * 0.11),
+    const [average, a] = greyAverage(...this.getSource()),
       bOrW = average < (threshold || 127) ? 0 : 255;
     this.setSource([bOrW, bOrW, bOrW, a]);
     return this;
