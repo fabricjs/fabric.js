@@ -1,5 +1,5 @@
 /**
- * Regex matching color in RGB or RGBA formats (ex: rgb(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
+ * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
  * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
  * Formal syntax at the time of writing:
@@ -49,7 +49,7 @@
  * The alpha channel can be in the format 0.4 .7 or 1 or 73%
  *
  * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
- * So the spec does not allow for rgba(30 , 45%  35, 49%) but this will work anyway for us
+ * So the spec does not allow for `rgba(30 , 45%  35, 49%)` but this will work anyways for us
  */
 export const reRGBa = () =>
   /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
@@ -95,8 +95,8 @@ export const reRGBa = () =>
  * \)                // Matches the closing parenthesis
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
  *
- * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
- * So the spec does not allow for hsl(30 , 45%  35, 49%) but this will work anyway for us
+ * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
+ * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
 export const reHSLa = () =>
   /^hsla?\(\s*(\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
