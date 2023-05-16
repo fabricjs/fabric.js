@@ -99,7 +99,7 @@ export const reRGBa = () =>
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
 export const reHSLa = () =>
-  /^hsla?\(\s*(\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
+  /^hsla?\(\s*([+-]?\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)

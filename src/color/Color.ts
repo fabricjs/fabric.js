@@ -260,7 +260,7 @@ export class Color {
       return;
     }
 
-    const h = ((parseFloat(match[1]) + 360) % 360) / 360,
+    const h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / 100,
       l = parseFloat(match[3]) / 100;
     let r: number, g: number, b: number;

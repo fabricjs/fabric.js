@@ -221,8 +221,12 @@
     expectedSource: [89, 191, 64, 0.2]
   },{
     name: 'fromHsla no commas(with whitespaces)',
-    stringToParse: 'hsl(  108  50%   50%  / .5)',
+    stringToParse: 'hsl( 108  50%   50%  / .5)',
     expectedSource: [89, 191, 64, 0.5]
+  },{
+    name: 'fromHsla with very counterClockwise value)',
+    stringToParse: 'hsl( -450,  50%,   50%, .5)',
+    expectedSource: [127, 64, 191, 0.5]
   }].forEach(({ name, stringToParse, expectedSource }) => {
     QUnit.test(name, function(assert) {
       var oColor = fabric.Color.fromHsla(stringToParse);
