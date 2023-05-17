@@ -994,6 +994,10 @@ export abstract class ITextBehavior<
     this.removeStyleFromTo(start, end);
     this._text.splice(start, end - start);
     this.text = this._text.join('');
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+    }
     this.set('dirty', true);
     this.initDimensions();
     this.setCoords();
@@ -1029,6 +1033,10 @@ export abstract class ITextBehavior<
       ...this._text.slice(end),
     ];
     this.text = this._text.join('');
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+    }
     this.set('dirty', true);
     this.initDimensions();
     this.setCoords();

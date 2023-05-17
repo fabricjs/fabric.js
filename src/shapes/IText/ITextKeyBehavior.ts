@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 import { getFabricDocument } from '../../env';
 import type { TPointerEvent } from '../../EventTypeDefs';
@@ -11,6 +11,20 @@ import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { ClipboardDataManager } from './DataTransfer/ClipboardDataManager';
 import type { AssertKeys } from '../../typedefs';
+import type { TextStyleDeclaration } from '../Text/StyledText';
+
+export type DiffFromInput = {
+  value: {
+    before: string[];
+    after: string[];
+  };
+  inserted: {
+    value: string[];
+    index: number;
+    styles?: TextStyleDeclaration[];
+  };
+  deleted: { value: string[]; index: number };
+};
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -170,27 +184,11 @@ export abstract class ITextKeyBehavior<
     this.canvas && this.canvas.requestRenderAll();
   }
 
-  /**
-   * Handles onInput event
-   * @param {Event} e Event object
-   */
-  onInput(e: Event) {
-    e && e.stopPropagation();
+  getDiffFromInput(
+    this: AssertKeys<this, 'hiddenTextarea'>
+  ): DiffFromInput | null {
     if (!this.isEditing) {
-      return;
-    }
-    const updateAndFire = () => {
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-    };
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      updateAndFire();
-      return;
+      return null;
     }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
@@ -200,72 +198,96 @@ export abstract class ITextKeyBehavior<
       nextCharCount = nextText.length,
       selectionStart = this.selectionStart,
       selectionEnd = this.selectionEnd,
-      selection = selectionStart !== selectionEnd;
-    let copiedStyle,
-      removedText,
-      charDiff = nextCharCount - charCount,
-      removeFrom,
-      removeTo;
+      isTextSelected = selectionStart !== selectionEnd,
+      textareaSelection = this.fromStringToGraphemeSelection(
+        this.hiddenTextarea.selectionStart,
+        this.hiddenTextarea.selectionEnd,
+        this.hiddenTextarea.value
+      ),
+      backDelete = selectionStart > textareaSelection.selectionStart,
+      charDiff =
+        nextCharCount -
+        charCount +
+        (isTextSelected ? selectionEnd - selectionStart : 0);
 
-    const textareaSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
-    );
-    const backDelete = selectionStart > textareaSelection.selectionStart;
-
-    if (selection) {
-      removedText = this._text.slice(selectionStart, selectionEnd);
-      charDiff += selectionEnd - selectionStart;
-    } else if (nextCharCount < charCount) {
-      if (backDelete) {
-        removedText = this._text.slice(selectionEnd + charDiff, selectionEnd);
-      } else {
-        removedText = this._text.slice(
-          selectionStart,
-          selectionStart - charDiff
-        );
-      }
-    }
+    const insertedAt = textareaSelection.selectionEnd - charDiff;
     const insertedText = nextText.slice(
-      textareaSelection.selectionEnd - charDiff,
+      insertedAt,
       textareaSelection.selectionEnd
     );
-    if (removedText && removedText.length) {
-      if (insertedText.length) {
-        // let's copy some style before deleting.
-        // we want to copy the style before the cursor OR the style at the cursor if selection
-        // is bigger than 0.
-        copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
-          false
-        );
-        // now duplicate the style one for each inserted text.
-        copiedStyle = insertedText.map(
-          () =>
-            // this return an array of references, but that is fine since we are
+
+    const deletedText = isTextSelected
+      ? this._text.slice(selectionStart, selectionEnd)
+      : nextCharCount < charCount
+      ? backDelete
+        ? this._text.slice(selectionEnd + charDiff, selectionEnd)
+        : this._text.slice(selectionStart, selectionStart - charDiff)
+      : [];
+    const deletedFrom = isTextSelected
+      ? selectionStart
+      : // detect differences between forwardDelete and backDelete
+      backDelete
+      ? selectionEnd - deletedText.length
+      : selectionEnd;
+
+    return {
+      value: { before: this._text, after: nextText },
+      inserted: {
+        value: insertedText,
+        index: insertedAt,
+        // we want to copy the style before the cursor OR the style at the cursor if selection exists
+        styles: insertedText.length
+          ? // we want to copy the style before the cursor OR the style at the cursor if selection exists
+            // and duplicate for each char
+            // this creates an array of the same reference, but that is fine since we are
             // copying the style later.
-            copiedStyle[0]
-        );
-      }
-      if (selection) {
-        removeFrom = selectionStart;
-        removeTo = selectionEnd;
-      } else if (backDelete) {
-        // detect differences between forwardDelete and backDelete
-        removeFrom = selectionEnd - removedText.length;
-        removeTo = selectionEnd;
-      } else {
-        removeFrom = selectionEnd;
-        removeTo = selectionEnd + removedText.length;
-      }
-      this.removeStyleFromTo(removeFrom, removeTo);
+            new Array(insertedText.length).fill(
+              this.getSelectionStyles(
+                selectionStart,
+                selectionStart + 1,
+                false
+              )[0]
+            )
+          : undefined,
+      },
+      deleted: {
+        value: deletedText,
+        index: deletedFrom,
+      },
+    };
+  }
+
+  updateStylesOnInput(diff: DiffFromInput) {
+    if (diff.value.after.length) {
+      const {
+        inserted: { value: insertedValue, index: insertStart, styles },
+        deleted: { value: deletedValue, index: deleteStart },
+      } = diff;
+      deletedValue.length &&
+        this.removeStyleFromTo(deleteStart, deletedValue.length);
+      insertedValue.length &&
+        this.insertNewStyleBlock(insertedValue, insertStart, styles);
+    } else {
+      this.styles = {};
     }
-    if (insertedText.length) {
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+  }
+
+  /**
+   * Handles onInput event
+   * @param {Event} e Event object
+   */
+  onInput(this: AssertKeys<this, 'hiddenTextarea'>, e: Event) {
+    e && e.stopPropagation();
+    if (!this.isEditing) {
+      return;
     }
-    updateAndFire();
+    this.updateStylesOnInput(this.getDiffFromInput()!);
+    this.updateFromTextArea();
+    this.fire('changed');
+    if (this.canvas) {
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
   }
 
   /**
@@ -300,24 +322,22 @@ export abstract class ITextKeyBehavior<
    * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   copy(e: ClipboardEvent) {
-    this.createClipboardDataManager().setData(e) && this.fire('copy', { e });
+    this.createClipboardDataManager().setData(e);
+    this.fire('copy', { e });
   }
 
   /**
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  cut(this: AssertKeys<this, 'hiddenTextarea'>, e: ClipboardEvent) {
-    if (this.createClipboardDataManager().setData(e)) {
-      //  remove selection and force recalculating dimensions
-      this.removeChars(this.selectionStart, this.selectionEnd);
-      this.selectionEnd = this.selectionStart;
-      this.hiddenTextarea.value = this.text;
-      this._updateTextarea();
-      this.fire('cut', { e });
-      this.fire('changed', { index: this.selectionStart, action: 'cut' });
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+  cut(this: AssertKeys<this, 'hiddenTextarea' | 'canvas'>, e: ClipboardEvent) {
+    this.createClipboardDataManager().setData(e);
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('cut', { e });
+    this.selectionEnd = this.selectionStart;
+    this.removeChars(this.selectionStart, this.selectionEnd);
+    this.fire('changed', { index: this.selectionStart, action: 'cut' });
+    this.canvas.fire('text:changed', { target: this });
+    this.canvas.requestRenderAll();
   }
 
   /**
@@ -326,7 +346,10 @@ export abstract class ITextKeyBehavior<
    *
    * The input event handles the actual pasting after this method completes
    */
-  paste(e: ClipboardEvent) {
+  paste(
+    this: AssertKeys<this, 'hiddenTextarea' | 'canvas'>,
+    e: ClipboardEvent
+  ) {
     e.preventDefault();
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
@@ -334,11 +357,9 @@ export abstract class ITextKeyBehavior<
     const { text, styles } = this.createClipboardDataManager().getData(e);
     // execute paste logic
     if (text) {
-      this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
       this.selectionStart = this.selectionEnd =
         this.selectionStart + text.length;
-      this.hiddenTextarea.value = this.text;
-      this._updateTextarea();
+      this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
       this.fire('changed', { index: this.selectionStart, action: 'paste' });
       this.canvas.fire('text:changed', { target: this });
       this.canvas.requestRenderAll();
