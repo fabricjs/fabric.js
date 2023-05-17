@@ -116,7 +116,7 @@ export class Canvas extends SelectableCanvas {
 
   private _isClick: boolean;
 
-  textEditingManager = new TextEditingManager();
+  textEditingManager = new TextEditingManager(this);
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
