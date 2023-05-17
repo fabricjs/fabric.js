@@ -68,8 +68,6 @@ export abstract class ITextKeyBehavior<
    */
   declare hiddenTextareaContainer?: HTMLElement | null;
 
-  private declare _clickHandlerInitialized: boolean;
-
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
@@ -114,18 +112,6 @@ export abstract class ITextKeyBehavior<
       'compositionend',
       this.onCompositionEnd.bind(this)
     );
-
-    if (!this._clickHandlerInitialized && this.canvas) {
-      this.canvas.upperCanvasEl.addEventListener(
-        'click',
-        this.onClick.bind(this)
-      );
-      this._clickHandlerInitialized = true;
-    }
-  }
-
-  onClick() {
-    this.hiddenTextarea && this.hiddenTextarea.focus();
   }
 
   /**
