@@ -28,7 +28,11 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
+import {
+  isFiller,
+  isSerializableFiller,
+  isTextObject,
+} from '../../util/typeAssertions';
 import type { Image } from '../Image';
 import {
   cacheProperties,
