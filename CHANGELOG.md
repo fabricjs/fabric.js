@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(build) remove safari 11 and 12 from build [#8917](https://github.com/fabricjs/fabric.js/pull/8917)
+- chore(build) simple deps update [#8929](https://github.com/fabricjs/fabric.js/pull/8929)
+- fix(Canvas): sync cleanup of dom elements in dispose [#8903](https://github.com/fabricjs/fabric.js/pull/8903)
 - chore(TS): export util types [#8915](https://github.com/fabricjs/fabric.js/pull/8915)
 - chore(TS): change enums with types [#8918](https://github.com/fabricjs/fabric.js/pull/8918)
 - chore(TS): export gradient types
