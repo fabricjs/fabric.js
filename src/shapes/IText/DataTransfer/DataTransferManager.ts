@@ -86,9 +86,9 @@ export abstract class DataTransferManager<
     if (!dataTransfer) {
       return false;
     }
+    dataTransfer.clearData();
     const { selectionStart, selectionEnd } = this.target;
     if (selectionStart === selectionEnd) {
-      dataTransfer.clearData();
       return false;
     }
     this.types.forEach((resolver) =>
