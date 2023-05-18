@@ -351,6 +351,7 @@ export class SelectableCanvas<
    * @default
    */
   declare perPixelTargetFind: boolean;
+
   /**
    * Number of pixels around target pixel to tolerate (consider active) during object detection
    * @type Number
