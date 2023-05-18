@@ -38,6 +38,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
+import { CENTER } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -865,8 +866,8 @@ export class SelectableCanvas<
       };
 
     if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
+      transform.originX = CENTER;
+      transform.originY = CENTER;
     }
     this._currentTransform = transform;
     // @ts-ignore

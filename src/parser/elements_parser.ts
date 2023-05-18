@@ -142,8 +142,8 @@ const ElementsParser = function (
       });
       clipPath.setPositionByOrigin(
         new Point(translateX, translateY),
-        'center',
-        'center'
+        CENTER,
+        CENTER
       );
       obj.clipPath = clipPath;
     } else {

@@ -616,7 +616,7 @@ export class Text<
     ctx.textBaseline = 'alphabetic';
     if (this.path) {
       switch (this.pathAlign) {
-        case 'center':
+        case CENTER:
           ctx.textBaseline = 'middle';
           break;
         case 'ascender':
@@ -889,7 +889,7 @@ export class Text<
         case 'left':
           positionInPath = reverse ? totalPathLength - width : 0;
           break;
-        case 'center':
+        case CENTER:
           positionInPath = (totalPathLength - width) / 2;
           break;
         case 'right':
@@ -1416,7 +1416,7 @@ export class Text<
     ) {
       return 0;
     }
-    if (textAlign === 'center') {
+    if (textAlign === CENTER) {
       leftOffset = lineDiff / 2;
     }
     if (textAlign === 'right') {
@@ -1437,7 +1437,7 @@ export class Text<
         leftOffset = 0;
       } else if (textAlign === 'left' || textAlign === 'justify-left') {
         leftOffset = -lineDiff;
-      } else if (textAlign === 'center' || textAlign === 'justify-center') {
+      } else if (textAlign === CENTER || textAlign === 'justify-center') {
         leftOffset = -lineDiff / 2;
       }
     }
@@ -1829,7 +1829,7 @@ export class Text<
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (textAnchor === 'center') {
+    if (textAnchor === CENTER) {
       offX = text.getScaledWidth() / 2;
     }
     if (textAnchor === 'right') {

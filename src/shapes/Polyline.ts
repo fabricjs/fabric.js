@@ -18,6 +18,7 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER } from '../constants';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -176,8 +177,8 @@ export class Polyline<
     adjustPosition &&
       this.setPositionByOrigin(
         new Point(left + width / 2, top + height / 2),
-        'center',
-        'center'
+        CENTER,
+        CENTER
       );
   }
 

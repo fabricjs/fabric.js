@@ -26,6 +26,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER } from '../constants';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -296,7 +297,7 @@ export class Path<
     this.set({ width, height, pathOffset });
     // using pathOffset because it match the use case.
     // if pathOffset change here we need to use left + width/2 , top + height/2
-    adjustPosition && this.setPositionByOrigin(pathOffset, 'center', 'center');
+    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
   }
 
   _calcBoundsFromPath(): TBBox {
