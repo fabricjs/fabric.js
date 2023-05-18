@@ -1,7 +1,7 @@
 import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
-import { createCanvasElement, getElementOffset } from '../../util';
-import { isHTMLCanvas } from '../../util/misc/dom';
+import { getElementOffset } from '../../util/dom_misc';
+import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
 import type { CanvasItem, TCanvasSizeOptions } from './types';
 import { setCanvasDimensions } from './util';
 
@@ -34,6 +34,7 @@ export class StaticCanvasElements {
       /* _DEV_MODE_END_ */
     }
     this._originalCanvasStyle = el.style.cssText;
+    el.setAttribute('data-fabric', 'main');
     el.classList.add('lower-canvas');
     return el;
   }

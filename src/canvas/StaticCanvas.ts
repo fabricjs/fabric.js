@@ -1,4 +1,3 @@
-import { getFabricDocument, getEnv } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -26,9 +25,8 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
+import { createCanvasElement, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
@@ -44,27 +42,8 @@ import {
   isPattern,
   isTextObject,
 } from '../util/typeAssertions';
-
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
-};
-
-export type TDestroyedCanvas<T extends StaticCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'pixelFindContext'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'pixelFindCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
-
-export type TCanvasSizeOptions = {
-  backstoreOnly?: boolean;
-  cssOnly?: boolean;
-};
+import { StaticCanvasElements } from './ElementsManager/StaticCanvasElements';
+import type { TCanvasSizeOptions } from './ElementsManager/types';
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -259,9 +238,13 @@ export class StaticCanvas<
    * Can be use to read the raw pixels, but never write or manipulate
    * @type HTMLCanvasElement
    */
-  declare lowerCanvasEl: HTMLCanvasElement;
+  get lowerCanvasEl() {
+    return this.elements.lower.el;
+  }
 
-  declare contextContainer: CanvasRenderingContext2D;
+  get contextContainer() {
+    return this.elements.lower.ctx;
+  }
 
   /**
    * Width in virtual/logical pixels of the canvas.
@@ -291,16 +274,11 @@ export class StaticCanvas<
    */
   declare disposed?: boolean;
 
-  /**
-   * Keeps a copy of the canvas style before setting retina scaling and other potions
-   * in order to return it to original state on dispose
-   * @type string
-   */
-  declare _originalCanvasStyle?: string;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
+
+  declare elements: StaticCanvasElements;
 
   static ownDefaults: Record<string, any> = StaticCanvasDefaults;
 
@@ -323,16 +301,15 @@ export class StaticCanvas<
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({
-      width: this.width || this.lowerCanvasEl.width || 0,
-      height: this.height || this.lowerCanvasEl.height || 0,
+      width: this.width || this.elements.lower.el.width || 0,
+      height: this.height || this.elements.lower.el.height || 0,
     });
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+    this.elements = new StaticCanvasElements(el);
   }
 
   add(...objects: FabricObject[]) {
@@ -394,52 +371,12 @@ export class StaticCanvas<
     return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
-  protected _initRetinaScaling() {
-    this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
-  }
-
-  protected __initRetinaScaling(
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D
-  ) {
-    const scaleRatio = config.devicePixelRatio;
-    canvas.setAttribute('width', (this.width * scaleRatio).toString());
-    canvas.setAttribute('height', (this.height * scaleRatio).toString());
-    context.scale(scaleRatio, scaleRatio);
-  }
-
   /**
    * Calculates canvas element offset relative to the document
    * This method is also attached as "resize" event handler of window
    */
   calcOffset() {
-    return (this._offset = getElementOffset(this.lowerCanvasEl));
-  }
-
-  /**
-   * Creates a bottom canvas
-   * @private
-   * @param {HTMLElement} [canvasEl]
-   */
-  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
-    // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
-    if (isHTMLCanvas(canvasEl)) {
-      this.lowerCanvasEl = canvasEl;
-    } else {
-      this.lowerCanvasEl =
-        (getFabricDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        createCanvasElement();
-    }
-    if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
-      /* _DEV_MODE_START_ */
-      throw new Error(
-        'fabric.js: trying to initialize a canvas that has already been initialized'
-      );
-      /* _DEV_MODE_END_ */
-    }
-    this.lowerCanvasEl.classList.add('lower-canvas');
-    this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
+    return (this._offset = this.elements.calcOffset());
   }
 
   /**
@@ -488,23 +425,18 @@ export class StaticCanvas<
    */
   protected _setDimensionsImpl(
     dimensions: Partial<TSize>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    options: TCanvasSizeOptions = {}
   ) {
-    Object.entries(dimensions).forEach(([prop, value]) => {
-      let cssValue = `${value}`;
-
-      if (!cssOnly) {
-        this._setBackstoreDimension(prop as keyof TSize, value);
-        cssValue += 'px';
-        this.hasLostContext = true;
-      }
-
-      if (!backstoreOnly) {
-        this._setCssDimension(prop as keyof TSize, cssValue);
-      }
+    const size = { width: this.width, height: this.height, ...dimensions };
+    this.elements.setDimensions(size, {
+      ...options,
+      retinaScaling: this.getRetinaScaling(),
     });
-
-    this._isRetinaScaling() && this._initRetinaScaling();
+    if (!options.cssOnly) {
+      this.hasLostContext = true;
+      this.width = size.width;
+      this.height = size.height;
+    }
     this.calcOffset();
   }
 
@@ -528,29 +460,6 @@ export class StaticCanvas<
     if (!cssOnly) {
       this.requestRenderAll();
     }
-  }
-
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   * @todo subclass in canvas and handle upperCanvasEl there.
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    this.lowerCanvasEl[prop] = value;
-    this[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   * @todo subclass in canvas and handle upperCanvasEl there.
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    this.lowerCanvasEl.style[prop] = value;
   }
 
   /**
@@ -643,7 +552,7 @@ export class StaticCanvas<
    * @return {HTMLCanvasElement}
    */
   getElement(): HTMLCanvasElement {
-    return this.lowerCanvasEl;
+    return this.elements.lower.el;
   }
 
   /**
@@ -659,7 +568,7 @@ export class StaticCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getContext(): CanvasRenderingContext2D {
-    return this.contextContainer;
+    return this.elements.lower.ctx;
   }
 
   /**
@@ -671,7 +580,7 @@ export class StaticCanvas<
     this.overlayImage = null;
     this.backgroundColor = '';
     this.overlayColor = '';
-    this.clearContext(this.contextContainer);
+    this.clearContext(this.getContext());
     this.fire('canvas:cleared');
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -684,7 +593,7 @@ export class StaticCanvas<
     if (this.destroyed) {
       return;
     }
-    this.renderCanvas(this.contextContainer, this._objects);
+    this.renderCanvas(this.getContext(), this._objects);
   }
 
   /**
@@ -1652,6 +1561,7 @@ export class StaticCanvas<
    */
   dispose() {
     this.disposed = true;
+    this.elements.cleanupDOM({ width: this.width, height: this.height });
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
         this.destroy();
@@ -1697,19 +1607,7 @@ export class StaticCanvas<
       this.overlayImage.dispose();
     }
     this.overlayImage = null;
-    // @ts-expect-error disposing
-    this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl!;
-    (this as TDestroyedCanvas<StaticCanvas>).lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
+    this.elements.dispose();
   }
 
   /**
