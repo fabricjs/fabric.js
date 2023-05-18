@@ -20908,6 +20908,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           break;
         };
       }
+      gl.getExtension("WEBGL_lose_context").loseContext();
     }
     this.isSupported = isSupported;
     return isSupported;
