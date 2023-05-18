@@ -1560,9 +1560,9 @@ export class StaticCanvas<
    * @throws if aborted by a consequent call
    */
   dispose() {
-    !this.disposed && this.cleanupDOM();
+    !this.disposed &&
+      this.elements.cleanupDOM({ width: this.width, height: this.height });
     this.disposed = true;
-    this.elements.cleanupDOM({ width: this.width, height: this.height });
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
         this.destroy();
