@@ -1,5 +1,5 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import { BaseFabricObject } from './EventTypeDefs';
+import type { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
 import type { XY, Point } from './Point';
@@ -43,26 +43,11 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export const enum ImageFormat {
-  jpeg = 'jpeg',
-  jpg = 'jpeg',
-  png = 'png',
-}
+export type ImageFormat = 'jpeg' | 'png';
 
-export const enum SVGElementName {
-  linearGradient = 'linearGradient',
-  radialGradient = 'radialGradient',
-  stop = 'stop',
-}
+export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
-export const enum SupportedSVGUnit {
-  mm = 'mm',
-  cm = 'cm',
-  in = 'in',
-  pt = 'pt',
-  pc = 'pc',
-  em = 'em',
-}
+export type SupportedSVGUnit = 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'em';
 
 /**
  * A transform matrix.
@@ -128,3 +113,11 @@ export type TDataUrlOptions = TToCanvasElementOptions & {
 };
 
 export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;
+
+export type Abortable = {
+  /**
+   * handle aborting
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal?: AbortSignal;
+};

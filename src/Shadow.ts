@@ -2,7 +2,7 @@ import { Color } from './color/Color';
 import { config } from './config';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import { TClassProperties } from './typedefs';
+import type { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';
 import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
@@ -19,7 +19,7 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   nonScaling: false,
 };
 
-type TShadowSerializedProps = {
+export type SerializedShadowOptions = {
   color: string;
   blur: number;
   offsetX: number;
@@ -191,7 +191,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data: TShadowSerializedProps = {
+    const data: SerializedShadowOptions = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,

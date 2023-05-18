@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -94,9 +94,9 @@
     assert.deepEqual(fabric.util.radiansToDegrees(), NaN);
   });
 
-  QUnit.test('calcRotateMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcRotateMatrix === 'function', 'calcRotateMatrix should exist');
-    var matrix = fabric.util.calcRotateMatrix({ angle: 90 });
+  QUnit.test('createRotateMatrix', function (assert) {
+    assert.ok(typeof fabric.util.createRotateMatrix === 'function', 'createRotateMatrix should exist');
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 });
     var expected = [
       0,
       1,
@@ -106,6 +106,20 @@
       0
     ];
     assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+  });
+
+  QUnit.test('createRotateMatrix with origin', function (assert) {
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 }, { x: 100, y: 200 });
+    var expected = [
+      0,
+      1,
+      -1,
+      0,
+      300,
+      100
+    ];
+    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+    assert.deepEqual(new fabric.Point().rotate(Math.PI / 2, new fabric.Point(100, 200)), new fabric.Point(300, 100), 'rotating 0,0 around origin should equal the matrix translation');
   });
 
   QUnit.test('fabric.util.getRandomInt', function(assert) {
@@ -169,19 +183,19 @@
   QUnit.test('fabric.util.wrapElement', function(assert) {
     var wrapElement = fabric.util.wrapElement;
     assert.ok(typeof wrapElement === 'function');
-    var wrapper = fabric.getDocument().createElement('div');
-    var el = fabric.getDocument().createElement('p');
+    var wrapper = fabric.getFabricDocument().createElement('div');
+    var el = fabric.getFabricDocument().createElement('p');
     var wrapper = wrapElement(el, wrapper);
 
     assert.equal(wrapper.tagName.toLowerCase(), 'div');
     assert.equal(wrapper.firstChild, el);
 
-    var childEl = fabric.getDocument().createElement('span');
-    var parentEl = fabric.getDocument().createElement('p');
+    var childEl = fabric.getFabricDocument().createElement('span');
+    var parentEl = fabric.getFabricDocument().createElement('p');
 
     parentEl.appendChild(childEl);
 
-    wrapper = wrapElement(childEl, fabric.getDocument().createElement('strong'));
+    wrapper = wrapElement(childEl, fabric.getFabricDocument().createElement('strong'));
 
     // wrapper is now in between parent and child
     assert.equal(wrapper.parentNode, parentEl);
@@ -193,8 +207,8 @@
 
     assert.ok(typeof makeElementUnselectable === 'function');
 
-    var el = fabric.getDocument().createElement('p');
-    el.appendChild(fabric.getDocument().createTextNode('foo'));
+    var el = fabric.getFabricDocument().createElement('p');
+    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
 
     assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
 
@@ -218,8 +232,8 @@
 
     assert.ok(typeof makeElementSelectable === 'function');
 
-    var el = fabric.getDocument().createElement('p');
-    el.appendChild(fabric.getDocument().createTextNode('foo'));
+    var el = fabric.getFabricDocument().createElement('p');
+    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
 
     makeElementUnselectable(el);
     makeElementSelectable(el);
@@ -250,25 +264,20 @@
     var done = assert.async();
     assert.equal('function', typeof fabric.loadSVGFromString);
 
-    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(loadedObjects) {
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING).then(({ objects: loadedObjects }) => {
       assert.ok(loadedObjects[0] instanceof fabric.Polygon);
       assert.equal('red', loadedObjects[0].fill);
-      setTimeout(done, 1000);
+      done();
     });
   });
 
   QUnit.test('fabric.loadSVGFromString with surrounding whitespace', function(assert) {
     var done = assert.async();
-    var loadedObjects = [];
-    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
-      assert.ok(loadedObjects[0] instanceof fabric.Polygon);
-      assert.equal('red', loadedObjects[0] && loadedObjects[0].fill);
+    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ').then(({ objects }) => {
+      assert.ok(objects[0] instanceof fabric.Polygon);
+      assert.equal(objects[0].fill, 'red');
       done();
-    }, 1000);
+    });
   });
 
   QUnit.test('fabric.util.loadImage', function(assert) {
@@ -366,7 +375,7 @@
     assert.ok(typeof fabric.util.groupSVGElements === 'function');
 
     var group1;
-    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT).then(({ objects, options }) => {
       group1 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group1 instanceof fabric.Polygon, 'it returns just the first element in case is just one');
       done();
@@ -376,7 +385,7 @@
   QUnit.test('fabric.util.groupSVGElements #2', function(assert) {
     var done = assert.async();
     var group2;
-    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS).then(({ objects, options }) => {
       group2 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group2 instanceof fabric.Group);
       done();
@@ -389,7 +398,7 @@
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.getDocument().createElement('div');
+      var el = fabric.getFabricDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
@@ -473,6 +482,29 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
     m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+  });
+
+  QUnit.test('multiplyTransformMatrixArray', function (assert) {
+    assert.ok(typeof fabric.util.multiplyTransformMatrixArray === 'function');
+    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), [
+      23,
+      34,
+      31,
+      46,
+      160,
+      240
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), [
+      23,
+      34,
+      31,
+      46,
+      0,
+      0
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), fabric.util.multiplyTransformMatrices(m1, m2));
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), fabric.util.multiplyTransformMatrices(m1, m2, true));
   });
 
   QUnit.test('resetObjectTransform', function(assert) {

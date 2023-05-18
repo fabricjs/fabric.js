@@ -1,7 +1,8 @@
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point, XY } from '../Point';
+import type { XY } from '../Point';
+import { Point } from '../Point';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -12,7 +13,7 @@ import {
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import {
+import type {
   TComplexPathData,
   TPathSegmentInfo,
   TSimplePathData,
@@ -23,7 +24,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 
 interface UniquePathProps {
@@ -56,8 +57,6 @@ export class Path<
   declare path: TSimplePathData;
 
   declare pathOffset: Point;
-
-  declare fromSVG?: boolean;
 
   declare sourcePath?: string;
 
@@ -293,10 +292,11 @@ export class Path<
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
+    const { width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    // using pathOffset because it match the use case.
+    // if pathOffset change here we need to use left + width/2 , top + height/2
+    adjustPosition && this.setPositionByOrigin(pathOffset, 'center', 'center');
   }
 
   _calcBoundsFromPath(): TBBox {
@@ -372,12 +372,9 @@ export class Path<
    */
   _calcDimensions(): IPathBBox {
     const bbox = this._calcBoundsFromPath();
-    const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
     return {
       ...bbox,
-      left: bbox.left - strokeCorrection,
-      top: bbox.top - strokeCorrection,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
         bbox.top + bbox.height / 2
@@ -411,25 +408,20 @@ export class Path<
    * @static
    * @memberOf Path
    * @param {SVGElement} element to parse
-   * @param {(path: Path) => void} callback Callback to invoke after the element has been parsed
    * @param {Partial<PathProps>} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (path: Path) => void,
-    options: Partial<PathProps>
-  ) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    callback(
-      new this(parsedAttributes.d, {
-        ...parsedAttributes,
-        ...options,
-        // we pass undefined to instruct the constructor to position the object using the bbox
-        left: undefined,
-        top: undefined,
-        fromSVG: true,
-      })
+  static async fromElement(element: SVGElement, options: Partial<PathProps>) {
+    const { d, ...parsedAttributes } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES
     );
+    return new this(d, {
+      ...parsedAttributes,
+      ...options,
+      // we pass undefined to instruct the constructor to position the object using the bbox
+      left: undefined,
+      top: undefined,
+    });
   }
 }
 

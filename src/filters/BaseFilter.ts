@@ -7,13 +7,13 @@ import type {
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
-import { GLPrecision } from './GLProbes/GLProbe';
+import { isWebGLPipelineState } from './utils';
 import {
   highPsourceCode,
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
+import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
@@ -69,11 +69,13 @@ export class BaseFilter {
     fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
-    const { WebGLProbe } = getEnv();
-    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
+    const {
+      WebGLProbe: { GLPrecision = 'highp' },
+    } = getEnv();
+    if (GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision)
+        highPsourceCode.replace('highp', GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -396,7 +398,7 @@ export class BaseFilter {
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    options: Abortable
   ) {
     return new this(filterOptions);
   }

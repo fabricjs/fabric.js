@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';

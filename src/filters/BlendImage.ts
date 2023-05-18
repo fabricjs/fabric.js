@@ -7,7 +7,7 @@ import type {
   TWebGLPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { WebGLFilterBackend } from './WebGLFilterBackend';
+import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blendImage';
 

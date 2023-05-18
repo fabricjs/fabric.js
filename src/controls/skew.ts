@@ -1,4 +1,4 @@
-import {
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
@@ -6,7 +6,7 @@ import {
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
-import { TAxis, TAxisKey } from '../typedefs';
+import type { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,

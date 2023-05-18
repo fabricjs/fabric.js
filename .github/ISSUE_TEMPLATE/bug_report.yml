@@ -47,6 +47,7 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.0.0-beta5
         - 6.0.0-beta4
         - 6.0.0-beta3
         - 6.0.0-beta1
@@ -251,6 +252,8 @@ body:
         `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-xewlhg?file=%2FREADME.md),
         [Node template <
         `v6`](https://codesandbox.io/p/sandbox/fabric-node-sandbox-forked-ddztl5?file=%2FREADME.md)
+
+        - [Opening a github repository in codesandbox](https://codesandbox.io/docs/learn/getting-started/your-first-sandbox#opening-a-github-repository-as-a-cloud-sandbox)
 
         ⛔ No reproduction === closed issue ⛔
     validations:

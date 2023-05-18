@@ -1,7 +1,7 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
@@ -10,6 +10,7 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  Abortable,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -27,7 +28,11 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
+import {
+  isFiller,
+  isSerializableFiller,
+  isTextObject,
+} from '../../util/typeAssertions';
 import type { Image } from '../Image';
 import {
   cacheProperties,
@@ -37,9 +42,10 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { ObjectProps } from './types/ObjectProps';
-import { TProps } from './types';
+import type { SerializedObjectProps } from './types/SerializedObjectProps';
+import type { ObjectProps } from './types/ObjectProps';
+import type { TProps } from './types';
+import { getEnv } from '../../env';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -748,8 +754,8 @@ export class FabricObject<
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.dirty = false;
       this.drawObject(ctx);
+      this.dirty = false;
     }
     ctx.restore();
   }
@@ -1510,6 +1516,10 @@ export class FabricObject<
     runningAnimations.cancelByTarget(this);
     this.off();
     this._set('canvas', undefined);
+    // clear caches
+    this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
+    this._cacheCanvas = undefined;
+    this._cacheContext = null;
   }
 
   /**
@@ -1523,10 +1533,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
-    {
-      extraParam,
-      ...options
-    }: { extraParam?: string; signal?: AbortSignal } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1535,7 +1542,7 @@ export class FabricObject<
         // to avoid accidental overrides later
         if (extraParam) {
           const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-ignore;
+          // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
@@ -1553,7 +1560,7 @@ export class FabricObject<
    */
   static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
-    options?: { signal?: AbortSignal }
+    options?: Abortable
   ) {
     return this._fromObject(object, options);
   }

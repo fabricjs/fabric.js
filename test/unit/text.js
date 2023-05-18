@@ -203,7 +203,7 @@
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.getDocument().createElement('text');
+    var elText = fabric.getFabricDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
@@ -222,8 +222,9 @@
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.getDocument().createElementNS(namespace, 'text');
+    var elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
@@ -244,7 +245,7 @@
     elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
     elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
-    fabric.Text.fromElement(elTextWithAttrs, function(textWithAttrs) {
+    fabric.Text.fromElement(elTextWithAttrs).then((textWithAttrs) => {
       // temp workaround for text objects not obtaining width under node
       textWithAttrs.width = CHAR_WIDTH;
 
@@ -274,12 +275,7 @@
         underline:        true,
       };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
-    });
-  });
-
-  QUnit.test('empty fromElement', function(assert) {
-    fabric.Text.fromElement(null, function(text) {
-      assert.equal(text, null);
+      done();
     });
   });
 

@@ -1,18 +1,12 @@
 import { Color } from '../color/Color';
-import { Point } from '../Point';
+import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
-
-export type CircleBrushPoint = {
-  x: number;
-  y: number;
-  radius: number;
-  fill: string;
-};
+import type { CircleBrushPoint } from './typedefs';
 
 export class CircleBrush extends BaseBrush {
   /**

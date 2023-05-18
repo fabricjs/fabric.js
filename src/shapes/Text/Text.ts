@@ -1,8 +1,9 @@
 // @ts-nocheck
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { TextStyle, TextStyleDeclaration } from './StyledText';
+import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
@@ -21,7 +22,7 @@ import {
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
-import { Path } from '../Path';
+import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
 import type {
@@ -1766,46 +1767,22 @@ export class Text<
    * @static
    * @memberOf Text
    * @param {SVGElement} element Element to parse
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (text: Text | null) => any,
-    options: object
-  ) {
-    if (!element) {
-      return callback(null);
-    }
+  static async fromElement(element: SVGElement, options: object) {
+    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
 
-    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
-      parsedAnchor = parsedAttributes.textAnchor || 'left';
-    options = Object.assign({}, options, parsedAttributes);
-
-    options.top = options.top || 0;
-    options.left = options.left || 0;
-    if (parsedAttributes.textDecoration) {
-      const textDecoration = parsedAttributes.textDecoration;
-      if (textDecoration.indexOf('underline') !== -1) {
-        options.underline = true;
-      }
-      if (textDecoration.indexOf('overline') !== -1) {
-        options.overline = true;
-      }
-      if (textDecoration.indexOf('line-through') !== -1) {
-        options.linethrough = true;
-      }
-      delete options.textDecoration;
-    }
-    if ('dx' in parsedAttributes) {
-      options.left += parsedAttributes.dx;
-    }
-    if ('dy' in parsedAttributes) {
-      options.top += parsedAttributes.dy;
-    }
-    if (!('fontSize' in options)) {
-      options.fontSize = DEFAULT_SVG_FONT_SIZE;
-    }
+    const {
+      textAnchor = 'left',
+      textDecoration = '',
+      dx = 0,
+      dy = 0,
+      top = 0,
+      left = 0,
+      fontSize = DEFAULT_SVG_FONT_SIZE,
+      strokeWidth = 1,
+      ...restOfOptions
+    } = { ...options, ...parsedAttributes };
 
     let textContent = '';
 
@@ -1825,10 +1802,21 @@ export class Text<
     textContent = textContent
       .replace(/^\s+|\s+$|\n+/g, '')
       .replace(/\s+/g, ' ');
-    const originalStrokeWidth = options.strokeWidth;
-    options.strokeWidth = 0;
 
-    const text = new this(textContent, options),
+    // this code here is probably the usual issue for SVG center find
+    // this can later looked at again and probably removed.
+
+    const text = new this(textContent, {
+        left: left + dx,
+        top: top + dy,
+        underline: textDecoration.includes('underline'),
+        overline: textDecoration.includes('overline'),
+        linethrough: textDecoration.includes('line-through'),
+        // we initialize this as 0
+        strokeWidth: 0,
+        fontSize,
+        ...restOfOptions,
+      }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1841,10 +1829,10 @@ export class Text<
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (parsedAnchor === 'center') {
+    if (textAnchor === 'center') {
       offX = text.getScaledWidth() / 2;
     }
-    if (parsedAnchor === 'right') {
+    if (textAnchor === 'right') {
       offX = text.getScaledWidth();
     }
     text.set({
@@ -1853,10 +1841,9 @@ export class Text<
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
           text.lineHeight,
-      strokeWidth:
-        typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
+      strokeWidth,
     });
-    callback(text);
+    return text;
   }
 
   /* _FROM_SVG_END_ */

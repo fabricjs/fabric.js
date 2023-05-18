@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { TSVGReviver } from '../../typedefs';
+import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
 

@@ -1,5 +1,4 @@
-import { getDocument } from '../../env';
-import {
+import type {
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
@@ -8,11 +7,12 @@ import { Point } from '../../Point';
 import type { FabricObject } from '../Object/Object';
 import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
-import { TOnAnimationChangeCallback } from '../../util/animation/types';
+import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import { TProps } from '../Object/types';
+import type { TProps } from '../Object/types';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  *  extend this regex to support non english languages
@@ -403,9 +403,9 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
+    const el = this.hiddenTextarea!;
     // regain focus
-    getDocument().activeElement !== this.hiddenTextarea &&
-      this.hiddenTextarea!.focus();
+    getDocumentFromElement(el).activeElement !== el && el.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,

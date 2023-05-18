@@ -1,8 +1,8 @@
-import { TDegree } from '../../../typedefs';
-import { BorderProps } from './BorderProps';
-import { ControlProps } from './ControlProps';
-import { LockInteractionProps } from './LockInteractionProps';
-import { ObjectProps } from './ObjectProps';
+import type { TDegree } from '../../../typedefs';
+import type { BorderProps } from './BorderProps';
+import type { ControlProps } from './ControlProps';
+import type { LockInteractionProps } from './LockInteractionProps';
+import type { ObjectProps } from './ObjectProps';
 
 export interface FabricObjectProps
   extends ObjectProps,

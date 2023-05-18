@@ -6,8 +6,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TClassProperties } from '../typedefs';
-import {
+import type { TClassProperties } from '../typedefs';
+import type {
   FabricObjectProps,
   SerializedObjectProps,
   TProps,
@@ -199,33 +199,25 @@ export class Circle<
    * @static
    * @memberOf Circle
    * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static fromElement(element: SVGElement, callback: (circle: Circle) => any) {
+  static async fromElement(element: SVGElement): Promise<Circle> {
     const {
       left = 0,
       top = 0,
-      radius,
+      radius = 0,
       ...otherParsedAttributes
     } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
 
-    if (!radius || radius < 0) {
-      throw new Error(
-        'value of `r` attribute is required and can not be negative'
-      );
-    }
-
     // this probably requires to be fixed for default origins not being top/left.
-    callback(
-      new this({
-        ...otherParsedAttributes,
-        radius,
-        left: left - radius,
-        top: top - radius,
-      })
-    );
+
+    return new this({
+      ...otherParsedAttributes,
+      radius,
+      left: left - radius,
+      top: top - radius,
+    });
   }
 
   /* _FROM_SVG_END_ */

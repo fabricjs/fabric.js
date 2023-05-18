@@ -1,9 +1,9 @@
-import { getDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
-import {
+import type {
   CanvasEvents,
   ModifierKey,
   TOptionalModifierKey,
@@ -15,11 +15,17 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection } from '../util/types';
+import { StaticCanvas } from './StaticCanvas';
+import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import type {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -27,10 +33,11 @@ import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
+import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TDestroyedCanvas } from './StaticCanvas';
+import type { TCanvasSizeOptions } from './StaticCanvas';
+import { createCanvasElement } from '../util';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -500,8 +507,8 @@ export class SelectableCanvas<
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  private declare pixelFindCanvasEl: HTMLCanvasElement;
-  private declare pixelFindContext: CanvasRenderingContext2D;
+  protected declare pixelFindCanvasEl: HTMLCanvasElement;
+  protected declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
@@ -1192,7 +1199,7 @@ export class SelectableCanvas<
 
     // if there is no upperCanvas (most common case) we create one.
     if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
+      this.upperCanvasEl = createCanvasElement();
     }
     const upperCanvasEl = this.upperCanvasEl;
     // we assign the same classname of the lowerCanvas
@@ -1210,7 +1217,7 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.pixelFindCanvasEl = this._createCanvasElement();
+    this.pixelFindCanvasEl = createCanvasElement();
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
@@ -1218,7 +1225,7 @@ export class SelectableCanvas<
   }
 
   protected _initWrapperElement() {
-    const container = getDocument().createElement('div');
+    const container = getFabricDocument().createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
@@ -1478,41 +1485,47 @@ export class SelectableCanvas<
     }
   }
 
-  /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
-   */
-  destroy() {
-    const wrapperEl = this.wrapperEl as HTMLDivElement,
+  protected cleanupDOM(): void {
+    const wrapperEl = this.wrapperEl!,
       lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!,
-      activeSelection = this._activeSelection!;
-    // dispose of active selection
-    activeSelection.removeAll();
-    (this as TDestroyedCanvas<this>)._activeSelection = undefined;
-    activeSelection.dispose();
-    super.destroy();
+      upperCanvasEl = this.upperCanvasEl!;
+    super.cleanupDOM();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    (this as TDestroyedCanvas<this>).pixelFindContext = null;
-    (this as TDestroyedCanvas<this>).contextTop = null;
-    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    getEnv().dispose(upperCanvasEl);
-    (this as TDestroyedCanvas<this>).upperCanvasEl = undefined;
-    getEnv().dispose(this.pixelFindCanvasEl!);
-    (this as TDestroyedCanvas<this>).pixelFindCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
-    (this as TDestroyedCanvas<this>).wrapperEl = undefined;
+  }
+
+  /**
+   * @override clears active selection ref and interactive canvas elements and contexts
+   */
+  destroy() {
+    // dispose of active selection
+    const activeSelection = this._activeSelection!;
+    activeSelection.removeAll();
+    // @ts-expect-error disposing
+    this._activeSelection = undefined;
+    activeSelection.dispose();
+
+    super.destroy();
+
+    // free resources
+
+    // top canvas
+    // @ts-expect-error disposing
+    this.contextTop = null;
+    // @ts-expect-error disposing
+    this.upperCanvasEl = undefined;
+
+    // pixel find canvas
+    // @ts-expect-error disposing
+    this.pixelFindContext = null;
+    // @ts-expect-error disposing
+    this.pixelFindCanvasEl = undefined;
+
+    // @ts-expect-error disposing
+    this.wrapperEl = undefined;
   }
 
   /**

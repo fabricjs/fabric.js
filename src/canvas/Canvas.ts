@@ -1,6 +1,5 @@
 import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
-import { getDocument, getWindow } from '../env';
-import {
+import type {
   CanvasEvents,
   DragEventData,
   ObjectEvents,
@@ -10,16 +9,17 @@ import {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { Group } from '../shapes/Group';
+import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { AssertKeys } from '../typedefs';
+import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
-} from '../util/types';
+} from '../util/typeAssertions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -165,7 +165,7 @@ export class Canvas extends SelectableCanvas {
   addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    functor(getWindow(), 'resize', this._onResize);
+    functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     functor(
       canvasElement,
@@ -207,25 +207,26 @@ export class Canvas extends SelectableCanvas {
     this.addOrRemove(removeListener, 'remove');
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}up`,
       this._onMouseUp as EventListener
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -614,14 +615,15 @@ export class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(canvasElement);
     addListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     addListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -629,7 +631,7 @@ export class Canvas extends SelectableCanvas {
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(
       canvasElement,
-      eventTypePrefix + 'down',
+      `${eventTypePrefix}down`,
       this._onMouseDown as EventListener
     );
   }
@@ -649,13 +651,10 @@ export class Canvas extends SelectableCanvas {
       this._onMouseMove as EventListener,
       addEventOptions
     );
+    const doc = getDocumentFromElement(canvasElement);
+    addListener(doc, `${eventTypePrefix}up`, this._onMouseUp as EventListener);
     addListener(
-      getDocument(),
-      `${eventTypePrefix}up`,
-      this._onMouseUp as EventListener
-    );
-    addListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
@@ -675,14 +674,15 @@ export class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     this.mainTouchId = null;
     const eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -695,7 +695,7 @@ export class Canvas extends SelectableCanvas {
       // from touch devices
       addListener(
         this.upperCanvasEl,
-        eventTypePrefix + 'down',
+        `${eventTypePrefix}down`,
         this._onMouseDown as EventListener
       );
       this._willAddMouseDown = 0;
@@ -712,13 +712,14 @@ export class Canvas extends SelectableCanvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
+      const doc = getDocumentFromElement(this.upperCanvasEl);
       removeListener(
-        getDocument(),
+        doc,
         `${eventTypePrefix}up`,
         this._onMouseUp as EventListener
       );
       removeListener(
-        getDocument(),
+        doc,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
         addEventOptions

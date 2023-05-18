@@ -8,7 +8,7 @@
 
   QUnit.module('fabric.Pattern');
 
-  var img = fabric.getDocument().createElement('img');
+  var img = fabric.getFabricDocument().createElement('img');
   setSrc(img, IMG_SRC);
 
   function createPattern() {

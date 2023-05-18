@@ -1,4 +1,4 @@
-import {
+import type {
   TPointerEvent,
   Transform,
   TransformAction,
@@ -7,7 +7,7 @@ import {
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TOriginX, TOriginY } from '../typedefs';
+import type { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,

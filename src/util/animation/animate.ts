@@ -1,12 +1,12 @@
 import { ValueAnimation } from './ValueAnimation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
-import {
+import type {
   ValueAnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
 } from './types';
-import { TColorArg } from '../../color/Color';
+import type { TColorArg } from '../../color/typedefs';
 
 export type TAnimation<T extends number | number[] | TColorArg> =
   T extends TColorArg

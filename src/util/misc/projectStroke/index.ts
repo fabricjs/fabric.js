@@ -1,7 +1,9 @@
-import { XY } from '../../../Point';
+import type { XY } from '../../../Point';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
+
+export * from './types';
 
 /**
  *
