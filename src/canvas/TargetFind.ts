@@ -48,11 +48,26 @@ export class TargetFind {
   }
 
   /**
+   * Render target for pixel testing
+   * @override customize target rendering logic. e.g. removing target's shadow etc. **DO NOT** transform {@link ctx}.
+   *
+   * @param ctx transformed correctly to position {@link target} in the right place
+   * @param target
+   */
+  renderTarget(ctx: CanvasRenderingContext2D, target: FabricObject) {
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
+    target.render(ctx);
+    target.selectionBackgroundColor = selectionBgc;
+  }
+
+  /**
    * Returns true if object is transparent at a certain location
    * Clarification: this is `is target transparent at location X or are controls there`
    * @TODO this seems dumb that we treat controls with transparency. we can find controls
    * programmatically without painting them, the cache canvas optimization is always valid
-   * @override to customize logic. e.g. adding math for predictable shapes, removing object shadow etc.
+   * @override customize logic, @see {@link renderTarget}. e.g. adding math testing for predictable shapes instead of pixel testing
+   *
    * @param {FabricObject} target Object to check
    * @param {Number} x Left coordinate
    * @param {Number} y Top coordinate
@@ -65,10 +80,7 @@ export class TargetFind {
     ctx.save();
     ctx.translate(-x + tolerance, -y + tolerance);
     ctx.transform(...this.canvas.viewportTransform);
-    const selectionBgc = target.selectionBackgroundColor;
-    target.selectionBackgroundColor = '';
-    target.render(ctx);
-    target.selectionBackgroundColor = selectionBgc;
+    this.renderTarget(ctx, target);
     ctx.restore();
     // our canvas is square, and made around tolerance.
     // so tolerance in this case also represent the center of the canvas.
