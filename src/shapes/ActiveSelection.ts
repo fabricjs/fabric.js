@@ -4,6 +4,10 @@ import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
+  static TAGS = {
+    selection: true,
+  };
+
   declare _objects: FabricObject[];
 
   /**

@@ -49,6 +49,10 @@ export class Path<
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
+  static TAGS = {
+    path: true,
+  };
+
   /**
    * Array of path points
    * @type Array

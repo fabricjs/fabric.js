@@ -98,6 +98,18 @@ export class FabricObject<
   extends AnimatableObject<EventSpec>
   implements ObjectProps
 {
+  static TAGS: Record<string, boolean> = {};
+
+  /**
+   * A workaroud instead of using `type` that is deprecated or `instanceof` that cause import cycles
+   * @param tags
+   * @returns
+   */
+  is(...tags: string[]) {
+    const { TAGS } = this.constructor as typeof FabricObject;
+    return tags.every((tag) => TAGS[tag]);
+  }
+
   declare minScaleLimit: number;
 
   declare opacity: number;
@@ -1443,6 +1455,7 @@ export class FabricObject<
 
   /**
    * Returns true if any of the specified types is identical to the type of an instance
+   * @deprecated use `instanceof` or `is`
    * @param {String} type Type to check against
    * @return {Boolean}
    */

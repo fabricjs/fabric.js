@@ -103,6 +103,11 @@ export class IText<
   extends ITextClickBehavior<Props, SProps, EventSpec>
   implements UniqueITextProps
 {
+  static TAGS = {
+    text: true,
+    interactive: true,
+  };
+
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number

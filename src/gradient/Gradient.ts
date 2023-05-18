@@ -203,7 +203,7 @@ export class Gradient<
     }
     if (
       object instanceof BaseFabricObject &&
-      object.isType('Path') &&
+      object.is('path') &&
       this.gradientUnits !== 'percentage'
     ) {
       offsetX -= object.pathOffset.x;

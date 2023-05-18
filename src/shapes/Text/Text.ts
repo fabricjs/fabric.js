@@ -109,6 +109,10 @@ export class Text<
   extends StyledText<Props, SProps, EventSpec>
   implements UniqueTextProps
 {
+  static TAGS = {
+    text: true,
+  };
+
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
