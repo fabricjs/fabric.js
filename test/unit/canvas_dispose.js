@@ -15,7 +15,40 @@ function assertCanvasDisposing(klass) {
         done();
     });
 
-    QUnit.test('dispose: clear references', async function (assert) {
+    QUnit.test('dispose: clear references sync', function (assert) {
+        var el = fabric.getFabricDocument().createElement('canvas'),
+            parentEl = fabric.getFabricDocument().createElement('div');
+
+        el.width = 200; el.height = 200;
+        parentEl.className = 'rootNode';
+        parentEl.appendChild(el);
+
+        fabric.config.configure({ devicePixelRatio: 1.25 });
+
+        el.style.position = 'relative';
+        var elStyle = el.style.cssText;
+        assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+        var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        assert.equal(el.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
+        assert.ok(typeof canvas.dispose === 'function');
+        assert.ok(typeof canvas.destroy === 'function');
+        canvas.add(makeRect(), makeRect(), makeRect());
+        canvas.item(0).animate({ scaleX: 10 });
+        assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
+        canvas.dispose();
+        assert.equal(canvas.disposed, true, 'dispose should flag disposed');
+        assert.equal(el.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
+        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+        assert.equal(el.width, 200, 'restored width');
+        assert.equal(el.height, 200, 'restored height');
+    });
+
+    
+    QUnit.test('dispose: clear references async', async function (assert) {
         const canvas = new klass(null, { renderOnAddRemove: false });
         assert.ok(typeof canvas.dispose === 'function');
         assert.ok(typeof canvas.destroy === 'function');
@@ -166,7 +199,7 @@ function testCanvasDisposing() {
 
     assertCanvasDisposing(fabric.Canvas);
 
-    QUnit.test('dispose: clear refs', async function (assert) {
+    QUnit.test('dispose: clear refs sync', function (assert) {
         //made local vars to do not dispose the external canvas
         var el = fabric.getFabricDocument().createElement('canvas'),
             parentEl = fabric.getFabricDocument().createElement('div'),
@@ -199,7 +232,65 @@ function testCanvasDisposing() {
         assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
         assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
         if (!isNode()) {
-            assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appendend to rootNode');
+            assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
+        }
+        //looks like i cannot use parentNode
+        //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
+        //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
+        //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
+        assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
+        assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
+        assert.ok(typeof canvas.dispose === 'function');
+        assert.ok(typeof canvas.destroy === 'function');
+        canvas.add(makeRect(), makeRect(), makeRect());
+        canvas.item(0).animate({ scaleX: 10 });
+        activeSel.add(canvas.item(1));
+        assert.equal(fabric.runningAnimations.length, 1, 'should have a running animation');
+        canvas.dispose();
+        assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
+        if (!isNode()) {
+            assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
+        }
+        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
+        assert.equal(el.width, 200, 'restored width');
+        assert.equal(el.height, 200, 'restored height');
+    });
+
+    QUnit.test('dispose: clear refs async', async function (assert) {
+        //made local vars to do not dispose the external canvas
+        var el = fabric.getFabricDocument().createElement('canvas'),
+            parentEl = fabric.getFabricDocument().createElement('div'),
+            wrapperEl, lowerCanvasEl, upperCanvasEl;
+        el.width = 200; el.height = 200;
+        parentEl.className = 'rootNode';
+        parentEl.appendChild(el);
+
+        fabric.config.configure({ devicePixelRatio: 1.25 });
+
+        assert.equal(parentEl.firstChild, el, 'canvas should be appended at partentEl');
+        assert.equal(parentEl.childNodes.length, 1, 'parentEl has 1 child only');
+
+        el.style.position = 'relative';
+        var elStyle = el.style.cssText;
+        assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
+
+        var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+        wrapperEl = canvas.wrapperEl;
+        lowerCanvasEl = canvas.lowerCanvasEl;
+        upperCanvasEl = canvas.upperCanvasEl;
+        const activeSel = canvas.getActiveSelection();
+        assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
+        assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
+        assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
+        assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
+        assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
+        assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
+        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
+        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        if (!isNode()) {
+            assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
         }
         //looks like i cannot use parentNode
         //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');

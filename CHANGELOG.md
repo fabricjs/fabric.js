@@ -3,6 +3,10 @@
 ## [next]
 
 - chore(ci): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)
+- feat(Color) Improve regex for new standards, more documentation and code cleanup [#8916](https://github.com/fabricjs/fabric.js/pull/8916)
+- fix(TS): extending canvas and object event types (`type` => `interface`) [#8926](https://github.com/fabricjs/fabric.js/pull/8926)
+- chore(build) simple deps update [#8929](https://github.com/fabricjs/fabric.js/pull/8929)
+- fix(Canvas): sync cleanup of dom elements in dispose [#8903](https://github.com/fabricjs/fabric.js/pull/8903)
 - chore(TS): export util types [#8915](https://github.com/fabricjs/fabric.js/pull/8915)
 - chore(TS): change enums with types [#8918](https://github.com/fabricjs/fabric.js/pull/8918)
 - chore(TS): export gradient types
