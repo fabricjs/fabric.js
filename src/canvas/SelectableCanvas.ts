@@ -14,6 +14,7 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
+import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -35,7 +36,6 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasElements } from './ElementsManager/CanvasElements';
-import type { TCanvasSizeOptions } from './ElementsManager/types';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,

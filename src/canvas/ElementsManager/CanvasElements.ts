@@ -6,9 +6,10 @@ import {
   setStyle,
 } from '../../util';
 import type { CSSDimensions } from '../../util/dom_misc';
+import { allowTouchScrolling } from '../../util/dom_misc';
 import { setCSSDimensions } from '../../util/dom_misc';
+import type { CanvasItem } from './StaticCanvasElements';
 import { StaticCanvasElements } from './StaticCanvasElements';
-import type { CanvasItem } from './types';
 import { setCanvasDimensions } from './util';
 
 export class CanvasElements extends StaticCanvasElements {
@@ -72,17 +73,14 @@ export class CanvasElements extends StaticCanvasElements {
    */
   protected applyCanvasStyle(
     element: HTMLCanvasElement,
-    { allowTouchScrolling }: { allowTouchScrolling: boolean }
+    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean }
   ) {
-    const touchAction = allowTouchScrolling ? 'manipulation' : 'none';
     setStyle(element, {
       position: 'absolute',
       left: 0,
       top: 0,
-      'touch-action': touchAction,
-      '-ms-touch-action': touchAction,
     });
-
+    allowTouchScrolling(element, allow);
     makeElementUnselectable(element);
   }
 

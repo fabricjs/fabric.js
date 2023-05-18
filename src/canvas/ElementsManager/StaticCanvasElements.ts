@@ -3,8 +3,12 @@ import type { TSize } from '../../typedefs';
 import type { CSSDimensions } from '../../util/dom_misc';
 import { getElementOffset, setCSSDimensions } from '../../util/dom_misc';
 import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
-import type { CanvasItem } from './types';
 import { setCanvasDimensions } from './util';
+
+export type CanvasItem = {
+  el: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+};
 
 export class StaticCanvasElements {
   /**

@@ -43,8 +43,12 @@ import {
   isTextObject,
 } from '../util/typeAssertions';
 import { StaticCanvasElements } from './ElementsManager/StaticCanvasElements';
-import type { TCanvasSizeOptions } from './ElementsManager/types';
 import type { CSSDimensions } from '../util/dom_misc';
+
+export type TCanvasSizeOptions = {
+  backstoreOnly?: boolean;
+  cssOnly?: boolean;
+};
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;

@@ -1,3 +1,5 @@
+import { setStyle } from './dom_style';
+
 /**
  * Returns element scroll offsets
  * @param {HTMLElement} element Element to operate on
@@ -101,6 +103,14 @@ export function makeElementSelectable(element: HTMLElement) {
   }
   element.style.userSelect = '';
   return element;
+}
+
+export function allowTouchScrolling(element: HTMLElement, allow: boolean) {
+  const touchAction = allow ? 'manipulation' : 'none';
+  setStyle(element, {
+    'touch-action': touchAction,
+    '-ms-touch-action': touchAction,
+  });
 }
 
 export const getDocumentFromElement = (el: HTMLElement) =>
