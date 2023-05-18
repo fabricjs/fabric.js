@@ -84,6 +84,11 @@
     assert.equal(oColor.toHex(), '000000');
   });
 
+  QUnit.test('toHexa rounds', function(assert) {
+    var oColor = new fabric.Color([211.23213213, 0, 128.1233123131]);
+    assert.equal(oColor.toHexa(), 'D30080FF');
+  });
+
   QUnit.test('toHexa', function(assert) {
     var oColor = new fabric.Color('ffffffff');
     assert.ok(typeof oColor.toHexa === 'function');
