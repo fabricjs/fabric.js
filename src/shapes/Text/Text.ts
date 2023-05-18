@@ -35,6 +35,7 @@ import {
   textDefaultValues,
   textLayoutProperties,
 } from './constants';
+import { CENTER } from '../../constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
