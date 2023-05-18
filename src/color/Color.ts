@@ -145,8 +145,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toGrayscale() {
-    const [average, a] = greyAverage(...this.getSource());
-    this.setSource([average, average, average, a]);
+    this.setSource(greyAverage(this.getSource()));
     return this;
   }
 
@@ -156,7 +155,7 @@ export class Color {
    * @return {Color} thisArg
    */
   toBlackWhite(threshold: number) {
-    const [average, a] = greyAverage(...this.getSource()),
+    const [average, , , a] = greyAverage(this.getSource()),
       bOrW = average < (threshold || 127) ? 0 : 255;
     this.setSource([bOrW, bOrW, bOrW, a]);
     return this;

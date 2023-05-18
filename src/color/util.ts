@@ -82,12 +82,12 @@ export const hexify = (value: number) =>
 /**
  * Calculate the grey average value for rgb and pass through alpha
  */
-export const greyAverage = (
-  r: number,
-  g: number,
-  b: number,
-  a = 1
-): [average: number, alpha: number] => [
-  Math.round(r * 0.3 + g * 0.59 + b * 0.11),
-  a,
-];
+export const greyAverage = ([
+  r,
+  g,
+  b,
+  a = 1,
+]: TRGBAColorSource): TRGBAColorSource => {
+  const avg = Math.round(r * 0.3 + g * 0.59 + b * 0.11);
+  return [avg, avg, avg, a];
+};
