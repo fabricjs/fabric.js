@@ -35,7 +35,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasElements } from './ElementsManager/CanvasElements';
-import { TCanvasSizeOptions } from './ElementsManager/types';
+import type { TCanvasSizeOptions } from './ElementsManager/types';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -1400,16 +1400,7 @@ export class SelectableCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
+   * @override clears active selection ref and interactive canvas elements and contexts
    */
   destroy() {
     // dispose of active selection

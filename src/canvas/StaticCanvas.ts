@@ -1560,6 +1560,7 @@ export class StaticCanvas<
    * @throws if aborted by a consequent call
    */
   dispose() {
+    !this.disposed && this.cleanupDOM();
     this.disposed = true;
     this.elements.cleanupDOM({ width: this.width, height: this.height });
     return new Promise<boolean>((resolve, reject) => {
@@ -1583,7 +1584,24 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources
+   * Invoked as part of the **sync** operation of {@link dispose}.
+   */
+  protected cleanupDOM() {
+    const canvasElement = this.lowerCanvasEl!;
+    // restore canvas style and attributes
+    canvasElement.classList.remove('lower-canvas');
+    canvasElement.removeAttribute('data-fabric');
+    // restore canvas size to original size in case retina scaling was applied
+    canvasElement.setAttribute('width', `${this.width}`);
+    canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
+  }
+
+  /**
+   * Clears the canvas element, disposes objects and frees resources.
+   *
+   * Invoked as part of the **async** operation of {@link dispose}.
    *
    * **CAUTION**:
    *
