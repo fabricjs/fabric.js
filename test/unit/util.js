@@ -180,28 +180,6 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  // QUnit.test('fabric.util.wrapElement', function(assert) {
-  //   var wrapElement = fabric.util.wrapElement;
-  //   assert.ok(typeof wrapElement === 'function');
-  //   var wrapper = fabric.getFabricDocument().createElement('div');
-  //   var el = fabric.getFabricDocument().createElement('p');
-  //   var wrapper = wrapElement(el, wrapper);
-
-  //   assert.equal(wrapper.tagName.toLowerCase(), 'div');
-  //   assert.equal(wrapper.firstChild, el);
-
-  //   var childEl = fabric.getFabricDocument().createElement('span');
-  //   var parentEl = fabric.getFabricDocument().createElement('p');
-
-  //   parentEl.appendChild(childEl);
-
-  //   wrapper = wrapElement(childEl, fabric.getFabricDocument().createElement('strong'));
-
-  //   // wrapper is now in between parent and child
-  //   assert.equal(wrapper.parentNode, parentEl);
-  //   assert.equal(wrapper.firstChild, childEl);
-  // });
-
   QUnit.test('fabric.util.makeElementUnselectable', function(assert) {
     var makeElementUnselectable = fabric.util.makeElementUnselectable;
 

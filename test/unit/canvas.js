@@ -110,6 +110,19 @@
     assert.throws(() => new fabric.Canvas(canvas.lowerCanvasEl));
   });
 
+  QUnit.test('initialization with element exisiting in the dom', function (assert) {
+    const doc = fabric.getFabricDocument();
+    const wrapper = doc.createElement('div');
+    const canvasEl = doc.createElement('canvas');
+    wrapper.appendChild(canvasEl);
+    doc.body.appendChild(wrapper);
+    const canvas = new fabric.Canvas(canvasEl);
+    assert.equal(wrapper.firstChild, canvas.elements.container, 'replaced canvas el in dom');
+    assert.equal(canvas.elements.container.firstChild, canvas.elements.lower.el, 'appended canvas el to container');
+    assert.equal(canvas.elements.container.lastChild, canvas.elements.upper.el, 'appended upper canvas el to container');
+  });
+
+
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
     assert.equal(canvas.includeDefaultValues, true);
