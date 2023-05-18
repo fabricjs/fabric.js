@@ -1,8 +1,9 @@
 import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
-import { getElementOffset } from '../../util/dom_misc';
+import type { CSSDimensions } from '../../util/dom_misc';
+import { getElementOffset, setCSSDimensions } from '../../util/dom_misc';
 import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
-import type { CanvasItem, TCanvasSizeOptions } from './types';
+import type { CanvasItem } from './types';
 import { setCanvasDimensions } from './util';
 
 export class StaticCanvasElements {
@@ -51,8 +52,13 @@ export class StaticCanvasElements {
     this._originalCanvasStyle = undefined;
   }
 
-  setDimensions(size: TSize, options: TCanvasSizeOptions = {}) {
-    setCanvasDimensions(this.lower, size, options);
+  setDimensions(size: TSize, retinaScaling: number) {
+    const { el, ctx } = this.lower;
+    setCanvasDimensions(el, ctx, size, retinaScaling);
+  }
+
+  setCSSDimensions(size: Partial<CSSDimensions>) {
+    setCSSDimensions(this.lower.el, size);
   }
 
   /**

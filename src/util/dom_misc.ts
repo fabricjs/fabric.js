@@ -108,3 +108,17 @@ export const getDocumentFromElement = (el: HTMLElement) =>
 
 export const getWindowFromElement = (el: HTMLElement) =>
   el.ownerDocument?.defaultView || null;
+
+export type CSSDimensions = {
+  width: number | `${number}${string}`;
+  height: number | `${number}${string}`;
+};
+
+export const setCSSDimensions = (
+  el: HTMLElement,
+  { width, height }: Partial<CSSDimensions>
+) => {
+  width && (el.style.width = typeof width === 'number' ? `${width}px` : width);
+  height &&
+    (el.style.height = typeof height === 'number' ? `${height}px` : height);
+};

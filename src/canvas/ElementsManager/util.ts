@@ -1,5 +1,4 @@
 import type { TSize } from '../../typedefs';
-import type { CanvasItem, TCanvasSizeOptions } from './types';
 
 export const initRetinaScaling = (
   canvas: HTMLCanvasElement,
@@ -13,22 +12,12 @@ export const initRetinaScaling = (
 };
 
 export const setCanvasDimensions = (
-  { el, ctx }: CanvasItem,
-  { width, height }: TSize,
-  {
-    cssOnly = false,
-    backstoreOnly = false,
-    retinaScaling = 1,
-  }: TCanvasSizeOptions = {}
+  el: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  size: TSize,
+  retinaScaling = 1
 ) => {
-  if (!cssOnly) {
-    el.width = width;
-    el.height = height;
-  }
-  if (!backstoreOnly) {
-    el.style.width = `${width}px`;
-    el.style.height = `${height}px`;
-  }
-  retinaScaling > 1 &&
-    initRetinaScaling(el, ctx, { width, height }, retinaScaling);
+  el.width = size.width;
+  el.height = size.height;
+  retinaScaling > 1 && initRetinaScaling(el, ctx, size, retinaScaling);
 };

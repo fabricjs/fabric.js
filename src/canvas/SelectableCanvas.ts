@@ -504,10 +504,10 @@ export class SelectableCanvas<
 
   declare elements: CanvasElements;
   get upperCanvasEl() {
-    return this.elements.upper.el;
+    return this.elements.upper?.el;
   }
   get contextTop() {
-    return this.elements.upper.ctx;
+    return this.elements.upper?.ctx;
   }
   get wrapperEl() {
     return this.elements.container;
@@ -528,7 +528,9 @@ export class SelectableCanvas<
   protected initElements(el: string | HTMLCanvasElement) {
     this.elements = new CanvasElements(el, {
       allowTouchScrolling: this.allowTouchScrolling,
+      containerClass: this.containerClass,
     });
+    this._createCacheCanvas();
   }
 
   /**

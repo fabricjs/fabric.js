@@ -1,7 +1,6 @@
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
   cssOnly?: boolean;
-  retinaScaling?: number;
 };
 
 export type CanvasItem = {

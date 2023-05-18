@@ -5,8 +5,10 @@ import {
   makeElementUnselectable,
   setStyle,
 } from '../../util';
+import type { CSSDimensions } from '../../util/dom_misc';
+import { setCSSDimensions } from '../../util/dom_misc';
 import { StaticCanvasElements } from './StaticCanvasElements';
-import type { CanvasItem, TCanvasSizeOptions } from './types';
+import type { CanvasItem } from './types';
 import { setCanvasDimensions } from './util';
 
 export class CanvasElements extends StaticCanvasElements {
@@ -15,21 +17,23 @@ export class CanvasElements extends StaticCanvasElements {
 
   constructor(
     arg0: string | HTMLCanvasElement,
-    { allowTouchScrolling = false }: { allowTouchScrolling?: boolean } = {}
+    {
+      allowTouchScrolling = false,
+      containerClass = '',
+    }: { allowTouchScrolling?: boolean; containerClass?: string } = {}
   ) {
     super(arg0);
     const { el: lowerCanvasEl } = this.lower;
     const upperCanvasEl = this.createUpperCanvas();
     this.upper = { el: upperCanvasEl, ctx: upperCanvasEl.getContext('2d')! };
     this.applyCanvasStyle(lowerCanvasEl, {
-      position: 'relative',
       allowTouchScrolling,
     });
     this.applyCanvasStyle(upperCanvasEl, {
-      position: 'absolute',
       allowTouchScrolling,
     });
     const container = this.createContainerElement();
+    container.classList.add(containerClass);
     if (lowerCanvasEl.parentNode) {
       lowerCanvasEl.parentNode.replaceChild(container, lowerCanvasEl);
     }
@@ -52,13 +56,10 @@ export class CanvasElements extends StaticCanvasElements {
     return el;
   }
 
-  protected createContainerElement(/*{ width, height }: TSize*/) {
+  protected createContainerElement() {
     const container = getFabricDocument().createElement('div');
-    // container.classList.add(this.containerClass);
     container.setAttribute('data-fabric', 'wrapper');
     setStyle(container, {
-      // width: `${width}px`,
-      // height: `${height}px`,
       position: 'relative',
     });
     makeElementUnselectable(container);
@@ -71,14 +72,11 @@ export class CanvasElements extends StaticCanvasElements {
    */
   protected applyCanvasStyle(
     element: HTMLCanvasElement,
-    {
-      position,
-      allowTouchScrolling,
-    }: { position: 'relative' | 'absolute'; allowTouchScrolling: boolean }
+    { allowTouchScrolling }: { allowTouchScrolling: boolean }
   ) {
     const touchAction = allowTouchScrolling ? 'manipulation' : 'none';
     setStyle(element, {
-      position,
+      position: 'absolute',
       left: 0,
       top: 0,
       'touch-action': touchAction,
@@ -88,10 +86,16 @@ export class CanvasElements extends StaticCanvasElements {
     makeElementUnselectable(element);
   }
 
-  setDimensions(size: TSize, options: TCanvasSizeOptions = {}) {
-    super.setDimensions(size, options);
-    setCanvasDimensions(this.upper, size, options);
-    // this.wrapperEl.style[prop] = value;css dims
+  setDimensions(size: TSize, retinaScaling: number) {
+    super.setDimensions(size, retinaScaling);
+    const { el, ctx } = this.upper;
+    setCanvasDimensions(el, ctx, size, retinaScaling);
+  }
+
+  setCSSDimensions(size: Partial<CSSDimensions>): void {
+    super.setCSSDimensions(size);
+    setCSSDimensions(this.upper.el, size);
+    setCSSDimensions(this.container, size);
   }
 
   cleanupDOM(size: TSize) {

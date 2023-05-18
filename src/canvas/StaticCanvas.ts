@@ -44,6 +44,7 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasElements } from './ElementsManager/StaticCanvasElements';
 import type { TCanvasSizeOptions } from './ElementsManager/types';
+import type { CSSDimensions } from '../util/dom_misc';
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -239,11 +240,11 @@ export class StaticCanvas<
    * @type HTMLCanvasElement
    */
   get lowerCanvasEl() {
-    return this.elements.lower.el;
+    return this.elements.lower?.el;
   }
 
   get contextContainer() {
-    return this.elements.lower.ctx;
+    return this.elements.lower?.ctx;
   }
 
   /**
@@ -424,19 +425,24 @@ export class StaticCanvas<
    * @protected
    */
   protected _setDimensionsImpl(
-    dimensions: Partial<TSize>,
-    options: TCanvasSizeOptions = {}
+    dimensions: Partial<TSize | CSSDimensions>,
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
   ) {
-    const size = { width: this.width, height: this.height, ...dimensions };
-    this.elements.setDimensions(size, {
-      ...options,
-      retinaScaling: this.getRetinaScaling(),
-    });
-    if (!options.cssOnly) {
+    if (!cssOnly) {
+      const size = {
+        width: this.width,
+        height: this.height,
+        ...(dimensions as Partial<TSize>),
+      };
+      this.elements.setDimensions(size, this.getRetinaScaling());
       this.hasLostContext = true;
       this.width = size.width;
       this.height = size.height;
     }
+    if (!backstoreOnly) {
+      this.elements.setCSSDimensions(dimensions);
+    }
+
     this.calcOffset();
   }
 
@@ -1581,21 +1587,6 @@ export class StaticCanvas<
         task();
       }
     });
-  }
-
-  /**
-   * Invoked as part of the **sync** operation of {@link dispose}.
-   */
-  protected cleanupDOM() {
-    const canvasElement = this.lowerCanvasEl!;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
   }
 
   /**
