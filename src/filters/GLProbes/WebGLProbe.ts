@@ -37,6 +37,7 @@ export class WebGLProbe extends GLProbe {
       this.GLPrecision = (['highp', 'mediump', 'lowp'] as const).find(
         (precision) => this.testPrecision(gl, precision)
       );
+      gl.getExtension('WEBGL_lose_context')!.loseContext();
       console.log(`fabric: max texture size ${this.maxTextureSize}`);
     }
   }
