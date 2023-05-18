@@ -66,6 +66,7 @@
 
       assert.ok(iText instanceof fabric.IText);
       assert.ok(iText instanceof fabric.Text);
+      assert.ok(iText.is('text', 'interactive'), 'TAG');
     });
 
     QUnit.test('initial properties', function(assert) {

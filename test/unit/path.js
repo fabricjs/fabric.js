@@ -79,7 +79,8 @@
     makePathObject(function(path) {
       assert.ok(path instanceof fabric.Path);
       assert.ok(path instanceof fabric.Object);
-
+      
+      assert.ok(path.is('path'), 'TAG');
       assert.equal(path.constructor.name, 'Path');
 
       var error;

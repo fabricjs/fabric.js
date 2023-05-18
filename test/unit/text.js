@@ -75,6 +75,7 @@
     assert.ok(text instanceof fabric.Text);
     assert.ok(text instanceof fabric.Object);
 
+    assert.ok(text.is('text'), 'TAG');
     assert.equal(text.constructor.name, 'Text');
     assert.equal(text.get('text'), 'x');
   });

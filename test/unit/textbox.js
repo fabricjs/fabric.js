@@ -81,6 +81,7 @@
     assert.ok(textbox instanceof fabric.Textbox);
     assert.ok(textbox instanceof fabric.IText);
     assert.ok(textbox instanceof fabric.Text);
+    assert.ok(textbox.is('text', 'interactive'), 'TAG');
   });
 
   QUnit.test('constructor with width', function(assert) {
