@@ -77,7 +77,7 @@ export const fromAlphaToFloat = (value = '1') =>
  * Convert a value in the inclusive range [0, 255] to hex
  */
 export const hexify = (value: number) =>
-  Math.min(value, 255).toString(16).toUpperCase().padStart(2, '0');
+  Math.min(Math.round(value), 255).toString(16).toUpperCase().padStart(2, '0');
 
 /**
  * Calculate the grey average value for rgb and pass through alpha
