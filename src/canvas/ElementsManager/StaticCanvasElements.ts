@@ -1,4 +1,4 @@
-import { getFabricDocument } from '../../env';
+import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import { createCanvasElement, getElementOffset } from '../../util';
 import { isHTMLCanvas } from '../../util/misc/dom';
@@ -38,7 +38,7 @@ export class StaticCanvasElements {
     return el;
   }
 
-  protected cleanupDOM({ width, height }: TSize) {
+  cleanupDOM({ width, height }: TSize) {
     const { el } = this.lower;
     // restore canvas style and attributes
     el.classList.remove('lower-canvas');
@@ -62,6 +62,7 @@ export class StaticCanvasElements {
   }
 
   dispose() {
+    getEnv().dispose(this.lower.el);
     // @ts-expect-error disposing
     delete this.lower;
   }

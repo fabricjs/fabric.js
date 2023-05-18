@@ -1,9 +1,9 @@
-import { getFabricDocument } from '../../env';
+import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import {
-  setStyle,
-  makeElementUnselectable,
   createCanvasElement,
+  makeElementUnselectable,
+  setStyle,
 } from '../../util';
 import { StaticCanvasElements } from './StaticCanvasElements';
 import type { CanvasItem, TCanvasSizeOptions } from './types';
@@ -91,9 +91,10 @@ export class CanvasElements extends StaticCanvasElements {
   setDimensions(size: TSize, options: TCanvasSizeOptions = {}) {
     super.setDimensions(size, options);
     setCanvasDimensions(this.upper, size, options);
+    // this.wrapperEl.style[prop] = value;css dims
   }
 
-  protected cleanupDOM(size: TSize) {
+  cleanupDOM(size: TSize) {
     const container = this.container,
       { el: lowerCanvasEl } = this.lower,
       { el: upperCanvasEl } = this.upper;
@@ -107,6 +108,7 @@ export class CanvasElements extends StaticCanvasElements {
 
   dispose() {
     super.dispose();
+    getEnv().dispose(this.upper.el);
     // @ts-expect-error disposing
     delete this.upper;
     // @ts-expect-error disposing
