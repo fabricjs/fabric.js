@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [6.0.0-beta6]
 
 - feat(Color) Improve regex for new standards, more documentation and code cleanup [#8916](https://github.com/fabricjs/fabric.js/pull/8916)
 - fix(TS): extending canvas and object event types (`type` => `interface`) [#8926](https://github.com/fabricjs/fabric.js/pull/8926)
