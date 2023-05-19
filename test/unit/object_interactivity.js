@@ -205,7 +205,7 @@
     assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
     cObj.setCoords();
     cObj.canvas = {
-      _activeObject: cObj
+      getActiveObject() { return cObj }
     };
     assert.equal(cObj._findTargetCorner(cObj.controlCoords.br.position), 'br');
     assert.equal(cObj._findTargetCorner(cObj.controlCoords.tl.position), 'tl');
@@ -223,7 +223,7 @@
     var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
     cObj.setCoords();
     cObj.canvas = {
-      _activeObject: cObj
+      getActiveObject() { return cObj }
     };
     var pointNearBr = {
       x: cObj.controlCoords.br.position.x + cObj.cornerSize / 3,
@@ -237,6 +237,27 @@
     };
     assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
     assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
+  });
+
+  QUnit.test('_findTargetCorner for non active object', function (assert) {
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
+    cObj.setCoords();
+    cObj.canvas = {
+      getActiveObject() { return }
+    };
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), '', 'object is not active');
+  });
+
+  QUnit.test('_findTargetCorner for non visible control', function (assert) {
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
+    cObj.setCoords();
+    cObj.canvas = {
+      getActiveObject() { return cObj }
+    };
+    cObj.isControlVisible = () => false;
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), '', 'object is not active');
   });
 
   QUnit.test.skip('_calculateCurrentDimensions', function(assert) {

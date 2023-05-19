@@ -185,11 +185,7 @@ export class InteractiveFabricObject<
    * @return {String} corner code (tl, tr, bl, br, etc.), or an empty string if nothing is found.
    */
   _findTargetCorner(pointer: Point, forTouch = false): string {
-    if (
-      !this.hasControls ||
-      !this.canvas ||
-      (this.canvas._activeObject as unknown as this) !== this
-    ) {
+    if (!this.hasControls || !this.canvas) {
       return '';
     }
 
@@ -198,10 +194,8 @@ export class InteractiveFabricObject<
     const cornerEntries = Object.entries(this.controlCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, coord] = cornerEntries[i];
-      if (!this.isControlVisible(key)) {
-        continue;
-      }
       if (
+        this.controls[key].shouldActivate(key, this) &&
         PlaneBBox.build(
           forTouch ? coord.touchCorner : coord.corner
         ).containsPoint(pointer)
@@ -210,6 +204,7 @@ export class InteractiveFabricObject<
         return key;
       }
     }
+
     return '';
   }
 
