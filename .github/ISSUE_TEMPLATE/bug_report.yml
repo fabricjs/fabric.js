@@ -90,6 +90,7 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 20.2.0
         - 20.1.0
         - 20.0.0
         - 19.8.1
