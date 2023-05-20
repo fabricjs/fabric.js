@@ -578,14 +578,7 @@
       stopPropagation() {
 
       },
-      dataTransfer: {
-        setData() {
-
-        },
-        setDragImage(imageSource, x, y) {
-
-        }
-      }
+      dataTransfer: new DataTransfer()
     });
     canvas._onDragOver({
       clientX: 25,

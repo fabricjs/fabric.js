@@ -131,7 +131,10 @@ function assertDragEventStream(name, a, b) {
                     clientY: y,
                     dataTransfer: {
                         ...eventData.dataTransfer,
-                        ...dataTransfer
+                        ...dataTransfer,
+                        clearData() {
+                            
+                        }
                     }
                 };
             }
