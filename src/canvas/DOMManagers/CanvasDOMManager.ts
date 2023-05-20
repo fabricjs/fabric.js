@@ -21,7 +21,13 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     {
       allowTouchScrolling = false,
       containerClass = '',
-    }: { allowTouchScrolling?: boolean; containerClass?: string } = {}
+    }: {
+      allowTouchScrolling?: boolean;
+      /**
+       * @deprecated here only for backward compatibility
+       */
+      containerClass?: string;
+    } = {}
   ) {
     super(arg0);
     const { el: lowerCanvasEl } = this.lower;

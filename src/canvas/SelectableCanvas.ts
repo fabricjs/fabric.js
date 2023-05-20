@@ -343,6 +343,7 @@ export class SelectableCanvas<
    * Default element class that's given to wrapper (div) element of canvas
    * @type String
    * @default
+   * @deprecated customize {@link CanvasDOMManager} instead or access {@link elements} directly
    */
   declare containerClass: string;
 
