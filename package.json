@@ -117,8 +117,8 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "module": "./dist/index.mjs",
-  "main": "./dist/index.node.cjs",
+  "module": "./dist/es/index.js",
+  "main": "./dist/node/cjs/index.node.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     ">=4.2": {
@@ -126,7 +126,7 @@
         "dist/index.d.ts"
       ],
       "node": [
-        "dist/index.node.d.ts"
+        "dist/node/es/index.node.d.ts"
       ],
       "src/*": [
         "src/*"
@@ -135,18 +135,18 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
+      "import": "./dist/es/index.js",
       "require": "./dist/index.js",
       "default": "./dist/index.js",
       "node": null,
       "types": "./dist/index.d.ts"
     },
     "./node": {
-      "import": "./dist/index.node.mjs",
-      "require": "./dist/index.node.cjs",
-      "default": "./dist/index.node.cjs",
-      "node": "./dist/index.node.cjs",
-      "types": "./dist/index.node.d.ts"
+      "import": "./dist/node/es/index.node.js",
+      "require": "./dist/node/cjs/index.node.js",
+      "default": "./dist/node/cjs/index.node.js",
+      "node": "./dist/node/cjs/index.node.js",
+      "types": "./dist/node/es/index.node.d.ts"
     }
   }
 }

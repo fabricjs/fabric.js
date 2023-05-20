@@ -9,7 +9,7 @@ QUnit.module('env', (hooks) => {
             const done = assert.async();
             global.window = { devicePixelRatio: 1.25 };
             global.document = { foo: 'bar' };
-            const imported = await import('../../dist/index.node.cjs');
+            const imported = await import('../../dist/node/cjs/index.node.js');
             const required = require('../..');
             assert.equal(imported.getEnv().document.foo, undefined, 'should be node env');
             assert.equal(required.getEnv().document.foo, undefined, 'should be node env');
