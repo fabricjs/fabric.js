@@ -319,9 +319,10 @@ export abstract class ITextKeyBehavior<
     this.createClipboardDataManager().setData(e);
     //  fire event before logic to allow overriding clipboard data
     this.fire('cut', { e });
-    this.selectionEnd = this.selectionStart;
-    this.removeChars(this.selectionStart, this.selectionEnd);
-    this.fire('changed', { index: this.selectionStart, action: 'cut' });
+    const { selectionStart, selectionEnd } = this;
+    this.selectionEnd = selectionStart;
+    this.removeChars(selectionStart, selectionEnd);
+    this.fire('changed', { index: selectionStart, action: 'cut' });
     this.canvas.fire('text:changed', { target: this });
     this.canvas.requestRenderAll();
   }
@@ -343,10 +344,10 @@ export abstract class ITextKeyBehavior<
     const { text, styles } = this.createClipboardDataManager().getData(e);
     // execute paste logic
     if (text) {
-      this.selectionStart = this.selectionEnd =
-        this.selectionStart + text.length;
-      this.insertChars(text, styles, this.selectionStart, this.selectionEnd);
-      this.fire('changed', { index: this.selectionStart, action: 'paste' });
+      const { selectionStart, selectionEnd } = this;
+      this.selectionStart = this.selectionEnd = selectionStart + text.length;
+      this.insertChars(text, styles, selectionStart, selectionEnd);
+      this.fire('changed', { index: selectionStart, action: 'paste' });
       this.canvas.fire('text:changed', { target: this });
       this.canvas.requestRenderAll();
     }
