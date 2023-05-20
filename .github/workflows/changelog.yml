@@ -15,7 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: Check ${{ env.file }}
         id: check
@@ -25,6 +24,9 @@ jobs:
             echo "Expected '${{ env.file }}' to be modified"
             exit 1
           fi
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Update ${{ env.file }}
         id: update
         if: (github.action != 'edited' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
@@ -47,16 +49,14 @@ jobs:
                 content.slice(insertAt);
             }
 
-            const insertAt = content.indexOf('\n', `${title}\n`) + 1;
+            const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
             const index = content.indexOf(log, insertAt);
             if (index > -1) {
                 content = content.slice(0, index) + content.slice(index);
                 exists = false;
             }
 
-            console.log(exists, content)
             if (!exists) {
-                console.log(content)
                 content = content.slice(0, insertAt) + log + content.slice(insertAt);
                 fs.writeFileSync(file, content);
                 return true;
