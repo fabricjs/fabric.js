@@ -63,8 +63,8 @@ jobs:
       - name: Commit & Push
         if: steps.update.outputs.result
         run: |
-          git config user.name ${{ github.event.sender.name }}
-          git config user.email ${{ github.event.sender.email }}
+          git config user.name ${{ github.event.pull_request.user.name }}
+          git config user.email ${{ github.event.pull_request.user.email }}
           git add ${{ env.file }}
           git commit -m "update ${{ env.file }}"
           git push
