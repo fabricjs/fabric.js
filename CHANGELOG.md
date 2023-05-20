@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+
 ## [6.0.0-beta6]
 
 - patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
