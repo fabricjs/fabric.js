@@ -9,7 +9,7 @@ import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { getDragData, setDragData } from './DataTransfer';
+import { getData, setData } from './DataTransfer';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -177,7 +177,7 @@ export class DraggableTextDelegate {
         selectionStart: target.selectionStart,
         selectionEnd: target.selectionEnd,
       });
-      setDragData(e, {
+      setData(e, {
         text: target._text
           .slice(selection.selectionStart, selection.selectionEnd)
           .join(''),
@@ -264,7 +264,7 @@ export class DraggableTextDelegate {
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
     e.preventDefault();
-    const { text, styles } = getDragData(e) || {};
+    const { text, styles } = getData(e) || {};
     let insert = text;
     if (insert && !didDrop) {
       const target = this.target;

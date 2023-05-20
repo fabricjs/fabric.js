@@ -10,7 +10,7 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import type { AssertKeys } from '../../typedefs';
-import { getClipboardData, handleClipboardEvent } from './DataTransfer';
+import { getData, setClipboardData } from './DataTransfer';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -87,7 +87,7 @@ export abstract class ITextKeyBehavior<
     this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
     this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
     this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
+    this.hiddenTextarea.addEventListener('cut', this.cut.bind(this));
     this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
     this.hiddenTextarea.addEventListener(
       'compositionstart',
@@ -289,7 +289,7 @@ export abstract class ITextKeyBehavior<
    * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   copy(e: ClipboardEvent) {
-    handleClipboardEvent(e);
+    setClipboardData(e, this);
     this.fire('copy', { e });
   }
 
@@ -297,11 +297,11 @@ export abstract class ITextKeyBehavior<
    * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
   cut(this: AssertKeys<this, 'hiddenTextarea' | 'canvas'>, e: ClipboardEvent) {
-    handleClipboardEvent(e);
+    setClipboardData(e, this);
     //  fire event before logic to allow overriding clipboard data
     this.fire('cut', { e });
     // since we must call `preventDefault` for the copy operation
-    // we must handle text changes
+    // we must handle text changes as well
     const { selectionStart, selectionEnd } = this;
     this.removeChars(selectionStart, selectionEnd);
     this.selectionEnd = selectionStart;
@@ -328,7 +328,7 @@ export abstract class ITextKeyBehavior<
     //  fire event before logic to allow overriding clipboard data
     this.fire('paste', { e });
     // obtain styles from event
-    const { text, styles } = getClipboardData(e) || {};
+    const { text, styles } = getData(e) || {};
     // execute paste logic
     if (text) {
       const { selectionStart, selectionEnd } = this;

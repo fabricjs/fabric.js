@@ -1,5 +1,5 @@
 import type { TextStyleDeclaration } from '../Text/StyledText';
-import { IText } from './IText';
+import type { IText } from './IText';
 
 export const enum DataTransferTypes {
   fabric = 'application/fabric',
@@ -12,8 +12,13 @@ export type TransferredData = {
 };
 
 export const getData = (
-  dataTransfer: DataTransfer
+  e: ClipboardEvent | DragEvent
 ): Partial<TransferredData> | void => {
+  const dataTransfer =
+    (e as ClipboardEvent).clipboardData || (e as DragEvent).dataTransfer;
+  if (!dataTransfer) {
+    return;
+  }
   const types = [...dataTransfer.types];
   if (types.includes(DataTransferTypes.fabric)) {
     return JSON.parse(dataTransfer.getData(DataTransferTypes.fabric));
@@ -23,7 +28,15 @@ export const getData = (
   return;
 };
 
-export const setData = (dataTransfer: DataTransfer, data: TransferredData) => {
+export const setData = (
+  e: ClipboardEvent | DragEvent,
+  data: TransferredData
+) => {
+  const dataTransfer =
+    (e as ClipboardEvent).clipboardData || (e as DragEvent).dataTransfer;
+  if (!dataTransfer) {
+    return;
+  }
   dataTransfer.clearData();
   // The order in which the {@link DataTransfer} is get/set
   // @see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drag_data
@@ -31,21 +44,13 @@ export const setData = (dataTransfer: DataTransfer, data: TransferredData) => {
   dataTransfer.setData(DataTransferTypes.text, data.text);
 };
 
-export const getClipboardData = (e: ClipboardEvent) => {
-  const dataTransfer = e.clipboardData;
-  return dataTransfer && getData(dataTransfer);
-};
-
-export const setClipboardData = (e: ClipboardEvent, data: TransferredData) => {
-  // we must prevent default for `DataTransfer#setData`
-  // see https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event
+/**
+ * we must prevent default for `DataTransfer#setData` to have an effect
+ * see https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event
+ */
+export const setClipboardData = (e: ClipboardEvent, target: IText) => {
   e.preventDefault();
-  const dataTransfer = e.clipboardData;
-  dataTransfer && setData(dataTransfer, data);
-};
-
-export const handleClipboardEvent = (e: ClipboardEvent, target: IText) =>
-  setClipboardData(e, {
+  setData(e, {
     text: target.getSelectedText(),
     styles: target.getSelectionStyles(
       target.selectionStart,
@@ -53,13 +58,4 @@ export const handleClipboardEvent = (e: ClipboardEvent, target: IText) =>
       true
     ),
   });
-
-export const getDragData = (e: DragEvent) => {
-  const dataTransfer = e.dataTransfer;
-  return dataTransfer && getData(dataTransfer);
-};
-
-export const setDragData = (e: DragEvent, data: TransferredData) => {
-  const dataTransfer = e.dataTransfer;
-  dataTransfer && setData(dataTransfer, data);
 };
