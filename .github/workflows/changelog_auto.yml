@@ -11,7 +11,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     needs: check
-    if: (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (needs.check.result == 'success' || needs.check.result == 'failure')
+    if: failure() && (github.event.action == 'opened' || (success() && github.event.changes.title.from != github.event.pull_request.title))
     env:
       file: CHANGELOG.md
       next_version: next
