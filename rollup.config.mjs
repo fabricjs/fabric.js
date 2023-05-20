@@ -13,18 +13,6 @@ const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');
 
-const plugins = [
-  json(),
-  ts({
-    noForceEmit: true,
-    tsconfig: './tsconfig.json',
-  }),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
-  }),
-];
-
 /**
  * disallow circular deps
  * @see https://rollupjs.org/configuration-options/#onwarn
@@ -39,53 +27,85 @@ function onwarn(warning, warn) {
   warn(warning);
 }
 
+function createPlugins(outDir = 'dist') {
+  return [
+    json(),
+    ts({
+      noForceEmit: true,
+      tsconfig: './tsconfig.json',
+      outDir: path.resolve(dirname, outDir),
+    }),
+    babel({
+      extensions: ['.ts', '.js'],
+      babelHelpers: 'bundled',
+    }),
+  ];
+}
+
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
     output: [
       {
-        file: path.resolve(dirname, `${basename}.mjs`),
+        dir: path.resolve(dirname, 'es'),
         name: 'fabric',
         format: 'es',
         sourcemap: true,
       },
+    ],
+    plugins: createPlugins('es'),
+    onwarn,
+  },
+  {
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    output: [
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
         format: 'umd',
         sourcemap: true,
+        inlineDynamicImports: true,
       },
       Number(process.env.MINIFY)
         ? {
             file: path.resolve(dirname, `${basename}.min.js`),
             name: 'fabric',
             format: 'umd',
+            inlineDynamicImports: true,
             plugins: [terser()],
           }
         : null,
     ],
-    plugins,
+    plugins: createPlugins(),
     onwarn,
   },
   {
     input: ['./index.node.ts'],
     output: [
       {
-        file: path.resolve(dirname, `${basename}.node.mjs`),
+        dir: path.resolve(dirname, 'node/es'),
         name: 'fabric',
         format: 'es',
         sourcemap: true,
       },
+    ],
+    onwarn,
+    plugins: createPlugins('node/es'),
+    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  },
+  {
+    input: ['./index.node.ts'],
+    output: [
       {
-        file: path.resolve(dirname, `${basename}.node.cjs`),
+        dir: path.resolve(dirname, 'node/cjs'),
         name: 'fabric',
         format: 'cjs',
         sourcemap: true,
       },
     ],
-    plugins,
     onwarn,
+    plugins: createPlugins('node/cjs'),
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
 ];
