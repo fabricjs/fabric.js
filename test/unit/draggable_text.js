@@ -167,6 +167,7 @@ function assertDragEventStream(name, a, b) {
             QUnit.test('drag start', function (assert) {
                 const e = startDragging(eventData);
                 assert.deepEqual(e.dataTransfer.data, {
+                    'application/fabric':'{\"text\":\"test\",\"styles\":[{\"fontSize\":40,\"fontWeight\":\"normal\",\"fontFamily\":\"Times New Roman\",\"fontStyle\":\"normal\",\"underline\":false,\"overline\":false,\"linethrough\":false,\"stroke\":null,\"strokeWidth\":1,\"fill\":\"rgb(0,0,0)\",\"deltaY\":0,\"textBackgroundColor\":\"\"},{\"fontSize\":40,\"fontWeight\":\"normal\",\"fontFamily\":\"Times New Roman\",\"fontStyle\":\"normal\",\"underline\":false,\"overline\":false,\"linethrough\":false,\"stroke\":null,\"strokeWidth\":1,\"fill\":\"rgb(0,0,0)\",\"deltaY\":0,\"textBackgroundColor\":\"\"},{\"fontSize\":40,\"fontWeight\":\"normal\",\"fontFamily\":\"Times New Roman\",\"fontStyle\":\"normal\",\"underline\":false,\"overline\":false,\"linethrough\":false,\"stroke\":null,\"strokeWidth\":1,\"fill\":\"rgb(0,0,0)\",\"deltaY\":0,\"textBackgroundColor\":\"\"},{\"fontSize\":40,\"fontWeight\":\"normal\",\"fontFamily\":\"Times New Roman\",\"fontStyle\":\"normal\",\"underline\":false,\"overline\":false,\"linethrough\":false,\"stroke\":null,\"strokeWidth\":1,\"fill\":\"rgb(0,0,0)\",\"deltaY\":0,\"textBackgroundColor\":\"\"}]}',
                     'text/html': '<html><body><!--StartFragment--><meta charset="utf-8"><p style="opacity:1;color:#000000;stroke:none;background-color:none;fill-rule:nonzero;paint-order:fill;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-linejoin:miter;stroke-miterlimit:4;stroke-linecap:butt;font-family:Times New Roman;font-size:40px;font-style:normal;font-weight:normal;direction:ltr;background-color:none;"><span style="">test</span></p><!--EndFragment--></body></html>',
                     'text/svg+xml': '<svg><g transform="matrix(1 0 0 1 61.0469 23.1)" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60.5469" y="12.5656" >test test</tspan></text>\n</g>\n</svg>',
                     'text/plain': "test"
@@ -187,7 +188,7 @@ function assertDragEventStream(name, a, b) {
                 };
                 assert.equal(e.dataTransfer.data['text/plain'], 'test', 'should set text/plain');
                 assert.deepEqual(JSON.parse(e.dataTransfer.data['application/fabric']), {
-                    value: 'test',
+                    text: 'test',
                     styles: [charStyle, charStyle, charStyle, charStyle]
                 }, 'should set application/fabric');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');

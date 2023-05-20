@@ -36,7 +36,7 @@ export class DataTransferManager<T extends ClipboardEvent | DragEvent> {
               target.selectionEnd,
               true
             ),
-          })
+          } as ParsedDataTransfer)
         );
       },
     },
