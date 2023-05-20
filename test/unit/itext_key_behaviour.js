@@ -385,8 +385,8 @@
           Object.keys(ref).forEach(key => target.cleanStyle(key));
         }
         cleanStyle(target);
-        assert.deepEqual({ fill: 'rgba(255,0,0,1)', fontSize: 25 }, target.styles[0][4], 'style is copied fully and equal after cleanup');
-        assert.deepEqual({ fill: 'rgba(0,0,255,1)', fontSize: 25 }, target.styles[0][5], 'style is copied fully and equal after cleanup');
+        assert.deepEqual({ fill: 'red', fontSize: 25 }, target.styles[0][4], 'style is copied fully and equal after cleanup');
+        assert.deepEqual({ fill: 'blue', fontSize: 25 }, target.styles[0][5], 'style is copied fully and equal after cleanup');
       });
       
     });
