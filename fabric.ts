@@ -12,6 +12,8 @@ export { Observable } from './src/Observable';
 
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
+export { CanvasDOMManager } from './src/canvas/DOMManagers/CanvasDOMManager';
+export { StaticCanvasDOMManager } from './src/canvas/DOMManagers/StaticCanvasDOMManager';
 
 export type { XY } from './src/Point';
 export { Point } from './src/Point';
