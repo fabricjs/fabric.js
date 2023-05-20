@@ -48,7 +48,6 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
-            const { execSync } = require('child_process');
             const file = './${{ env.file }}';
             let content = fs.readFileSync(file).toString();
             const title = '[${{ env.next_version }}]';
@@ -76,7 +75,6 @@ jobs:
             if (!exists) {
                 content = content.slice(0, insertAt) + log + content.slice(insertAt);
                 fs.writeFileSync(file, content);
-                // execSync(`prettier --write ${file}`);
                 return true;
             }
 
