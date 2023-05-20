@@ -9,4 +9,4 @@ jobs:
   changelog:
     uses: ./.github/workflows/changelog.yml
     with:
-      log: true
+      update: true
