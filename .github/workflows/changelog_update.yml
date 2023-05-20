@@ -1,4 +1,4 @@
-name: 'Auto 📋'
+name: 'Update 📋'
 
 on:
   pull_request:
@@ -7,6 +7,7 @@ on:
 
 jobs:
   changelog:
+    if: github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title
     uses: ./.github/workflows/changelog.yml
     with:
       update: true
