@@ -11,6 +11,7 @@ jobs:
     env:
       file: CHANGELOG.md
       next_version: next
+      link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -31,9 +32,8 @@ jobs:
         if: (github.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
         uses: actions/github-script@v6
         env:
-          link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
           log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n'
-          prev_log: ${{ (github.action == 'edited' && '- ${{ github.event.changes.title.from }} ${{ env.link }}\n') || '' }}
+          prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n'
         with:
           result-encoding: string
           script: |
@@ -42,7 +42,6 @@ jobs:
             let content = fs.readFileSync(file).toString();
             const title = '[${{ env.next_version }}]';
             const log = '${{ env.log }}';
-            const prevLog = '${{ env.prev_log }}';
             let exists = ${{ steps.check.outcome == 'success' }};
 
             if (!content.includes(title)) {
@@ -54,7 +53,8 @@ jobs:
             }
 
             const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
-            if (exists && prevLog) {
+            if (exists && ${{ github.action == 'edited' }}) {
+                const prevLog = '${{ env.prev_log }}';
                 const index = content.indexOf(prevLog, insertAt);
                 if (index > -1) {
                     content = content.slice(0, index) + content.slice(index + prevLog.length);
