@@ -11,6 +11,7 @@ import { setStyle } from '../../../util/dom_style';
 import { cloneDeep } from '../../../util/internals/cloneDeep';
 import type { IText } from '.././IText';
 import { DataTransferManager } from './DataTransferManager';
+import type { ParsedDataTransfer } from './typedefs';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -48,17 +49,20 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
     };
   }
 
-  protected extractDataTransfer(e: DragEvent): DataTransfer | null {
-    return e.dataTransfer;
+  getData(e: DragEvent): ParsedDataTransfer {
+    return e.dataTransfer ? super.getData(e, e.dataTransfer) : {};
   }
 
-  setData(e: DragEvent): boolean {
-    if (super.setData(e)) {
-      this.extractDataTransfer(e)!.effectAllowed = 'copyMove';
-      this.setDragImage(e as AssertKeys<DragEvent, 'dataTransfer'>);
-      return true;
+  setData(e: DragEvent) {
+    const { dataTransfer } = e;
+    if (!dataTransfer) {
+      return;
     }
-    return false;
+    super.setData(e, dataTransfer);
+    dataTransfer.effectAllowed = 'copyMove';
+    const { selectionStart, selectionEnd } = this.target;
+    selectionStart !== selectionEnd &&
+      this.setDragImage(e as AssertKeys<DragEvent, 'dataTransfer'>);
   }
 
   isPointerOverSelection(e: TPointerEvent) {

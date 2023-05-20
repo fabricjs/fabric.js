@@ -1,39 +1,34 @@
-import type { TextStyleDeclaration } from '../../Text/StyledText';
 import type { IText } from '../IText';
+import type { DataTransferResolver, ParsedDataTransfer } from './typedefs';
+import { DataTransferTypes } from './typedefs';
 
-export interface DataTransferResolver<
-  T extends ClipboardEvent | DragEvent = ClipboardEvent | DragEvent
-> {
-  type: string;
+export class DataTransferManager<T extends ClipboardEvent | DragEvent> {
   /**
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types
+   * The default order in which the {@link DataTransfer} is get/set
    */
-  setData(e: T, dataTransfer: DataTransfer, target: IText): void;
+  static priority = [
+    DataTransferTypes.fabric,
+    /**
+     * html is opt-in
+     */
+    DataTransferTypes.html,
+    DataTransferTypes.svg,
+    DataTransferTypes.text,
+  ];
 
-  getData(
-    e: T,
-    dataTransfer: DataTransfer,
-    target: IText
-  ): {
-    text: string;
-    styles?: TextStyleDeclaration[];
-  } | void;
-}
-
-export abstract class DataTransferManager<
-  T extends ClipboardEvent | DragEvent
-> {
-  static types: DataTransferResolver<ClipboardEvent | DragEvent>[] = [
-    {
-      type: 'application/fabric',
+  /**
+   * In order to opt-in to the html type call {@link pluginHTML}
+   */
+  static types: Partial<
+    Record<DataTransferTypes, DataTransferResolver<ClipboardEvent | DragEvent>>
+  > = {
+    [DataTransferTypes.fabric]: {
       getData(e, dataTransfer) {
-        return dataTransfer.types.includes(this.type)
-          ? JSON.parse(dataTransfer.getData(this.type))
-          : undefined;
+        return JSON.parse(dataTransfer.getData(DataTransferTypes.fabric));
       },
       setData(e, dataTransfer, target) {
         dataTransfer.setData(
-          this.type,
+          DataTransferTypes.fabric,
           JSON.stringify({
             text: target.getSelectedText(),
             styles: target.getSelectionStyles(
@@ -45,68 +40,83 @@ export abstract class DataTransferManager<
         );
       },
     },
-    {
-      type: 'text/svg+xml',
+    [DataTransferTypes.svg]: {
       getData() {
         return;
       },
       setData(e, dataTransfer, target) {
-        dataTransfer.setData(this.type, `<svg>${target.toSVG()}</svg>`);
+        dataTransfer.setData(
+          DataTransferTypes.svg,
+          `<svg>${target.toSVG()}</svg>`
+        );
       },
     },
-    {
-      type: 'text/plain',
+    [DataTransferTypes.text]: {
       getData(e, dataTransfer, target) {
         return {
           text: dataTransfer
-            .getData(this.type)
+            .getData(DataTransferTypes.text)
             .replace(target._reNewline, '\n'),
         };
       },
       setData(e, dataTransfer, target) {
-        dataTransfer.setData(this.type, target.getSelectedText());
+        dataTransfer.setData(DataTransferTypes.text, target.getSelectedText());
       },
     },
-  ];
+  };
+
+  /**
+   * Call this method to opt-in to the html type
+   */
+  static async pluginHTML() {
+    this.types[DataTransferTypes.html] = (
+      await import('./HTMLDataTransfer')
+    ).HTMLResolver;
+  }
 
   protected readonly target: IText;
 
-  constructor(target: IText) {
+  types: Record<string, DataTransferResolver<T>>;
+
+  /**
+   * The order in which the {@link DataTransfer} is get/set
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#drag_data
+   */
+  priority: string[];
+
+  constructor(
+    target: IText,
+    types = DataTransferManager.types,
+    priority = DataTransferManager.priority
+  ) {
     this.target = target;
+    this.types = types;
+    this.priority = priority;
   }
 
-  get types(): DataTransferResolver<T>[] {
-    return (this.constructor as typeof DataTransferManager).types;
-  }
-
-  protected abstract extractDataTransfer(e: T): DataTransfer | null;
-
-  setData(e: T): boolean {
-    const dataTransfer = this.extractDataTransfer(e);
-    if (!dataTransfer) {
-      return false;
-    }
+  setData(e: T, dataTransfer: DataTransfer): void {
     dataTransfer.clearData();
+
     const { selectionStart, selectionEnd } = this.target;
     if (selectionStart === selectionEnd) {
-      return false;
+      return;
     }
-    this.types.forEach((resolver) =>
-      resolver.setData(e, dataTransfer, this.target)
+
+    this.priority.forEach(
+      (type) =>
+        this.types[type] &&
+        this.types[type].setData(e, dataTransfer, this.target)
     );
-    return true;
   }
 
-  getData(e: T): {
-    text?: string;
-    styles?: TextStyleDeclaration[];
-  } {
-    const dataTransfer = this.extractDataTransfer(e);
-    if (!dataTransfer) {
-      return {};
-    }
-    for (let index = 0; index < this.types.length; index++) {
-      const data = this.types[index].getData(e, dataTransfer, this.target);
+  getData(e: T, dataTransfer: DataTransfer): ParsedDataTransfer {
+    const dataTransferTypes = [...dataTransfer.types];
+    for (let index = 0; index < this.priority.length; index++) {
+      const type = this.priority[index];
+      if (!dataTransferTypes.includes(type) || !this.types[type]) {
+        continue;
+      }
+      const data = this.types[type].getData(e, dataTransfer, this.target);
       if (data) {
         return data;
       }
