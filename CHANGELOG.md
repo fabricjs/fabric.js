@@ -1,9 +1,4 @@
 # Changelog
-- ci(): automate PR changelog  [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
-
-## [next]
-
-
 
 ## [6.0.0-beta6]
 
