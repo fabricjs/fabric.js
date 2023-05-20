@@ -6,7 +6,7 @@ on:
   workflow_call:
 
 jobs:
-  update:
+  check:
     runs-on: ubuntu-latest
     env:
       file: CHANGELOG.md
