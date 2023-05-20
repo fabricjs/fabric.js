@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Update ${{ env.file }}
+      - name: Update ${{ env.file }} ${{ github.action }}
         id: update
         if: (github.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
         uses: actions/github-script@v6
