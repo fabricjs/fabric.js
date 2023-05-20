@@ -35,7 +35,7 @@ import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
-import { CanvasElements } from './ElementsManager/CanvasElements';
+import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -502,7 +502,7 @@ export class SelectableCanvas<
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
   }
 
-  declare elements: CanvasElements;
+  declare elements: CanvasDOMManager;
   get upperCanvasEl() {
     return this.elements.upper?.el;
   }
@@ -526,7 +526,7 @@ export class SelectableCanvas<
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    this.elements = new CanvasElements(el, {
+    this.elements = new CanvasDOMManager(el, {
       allowTouchScrolling: this.allowTouchScrolling,
       containerClass: this.containerClass,
     });

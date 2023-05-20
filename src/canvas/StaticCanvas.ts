@@ -42,7 +42,7 @@ import {
   isPattern,
   isTextObject,
 } from '../util/typeAssertions';
-import { StaticCanvasElements } from './ElementsManager/StaticCanvasElements';
+import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from '../util/dom_misc';
 
 export type TCanvasSizeOptions = {
@@ -283,7 +283,7 @@ export class StaticCanvas<
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
-  declare elements: StaticCanvasElements;
+  declare elements: StaticCanvasDOMManager;
 
   static ownDefaults: Record<string, any> = StaticCanvasDefaults;
 
@@ -314,7 +314,7 @@ export class StaticCanvas<
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    this.elements = new StaticCanvasElements(el);
+    this.elements = new StaticCanvasDOMManager(el);
   }
 
   add(...objects: FabricObject[]) {

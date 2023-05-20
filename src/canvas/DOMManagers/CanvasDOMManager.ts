@@ -8,11 +8,11 @@ import {
 import type { CSSDimensions } from '../../util/dom_misc';
 import { allowTouchScrolling } from '../../util/dom_misc';
 import { setCSSDimensions } from '../../util/dom_misc';
-import type { CanvasItem } from './StaticCanvasElements';
-import { StaticCanvasElements } from './StaticCanvasElements';
+import type { CanvasItem } from './StaticCanvasDOMManager';
+import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
 import { setCanvasDimensions } from './util';
 
-export class CanvasElements extends StaticCanvasElements {
+export class CanvasDOMManager extends StaticCanvasDOMManager {
   upper: CanvasItem;
   container: HTMLDivElement;
 

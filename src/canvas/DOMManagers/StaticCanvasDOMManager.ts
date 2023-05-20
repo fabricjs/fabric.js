@@ -10,7 +10,7 @@ export type CanvasItem = {
   ctx: CanvasRenderingContext2D;
 };
 
-export class StaticCanvasElements {
+export class StaticCanvasDOMManager {
   /**
    * Keeps a copy of the canvas style before setting retina scaling and other potions
    * in order to return it to original state on dispose
