@@ -58,7 +58,7 @@ jobs:
             if (!exists) {
                 content = content.slice(0, insertAt) + log + content.slice(insertAt);
                 fs.writeFileSync(file, content);
-                execSync(`prettier --write ${file}`);
+                // execSync(`prettier --write ${file}`);
                 return true;
             }
 
