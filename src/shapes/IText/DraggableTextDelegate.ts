@@ -8,8 +8,8 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
+import { getDragData, setDragData } from './DataTransfer';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -177,24 +177,18 @@ export class DraggableTextDelegate {
         selectionStart: target.selectionStart,
         selectionEnd: target.selectionEnd,
       });
-      const value = target._text
-        .slice(selection.selectionStart, selection.selectionEnd)
-        .join('');
-      const data = { text: target.text, value, ...selection };
-      e.dataTransfer.setData('text/plain', value);
-      e.dataTransfer.setData(
-        'application/fabric',
-        JSON.stringify({
-          value: value,
-          styles: target.getSelectionStyles(
-            selection.selectionStart,
-            selection.selectionEnd,
-            true
-          ),
-        })
-      );
+      setDragData(e, {
+        text: target._text
+          .slice(selection.selectionStart, selection.selectionEnd)
+          .join(''),
+        styles: target.getSelectionStyles(
+          selection.selectionStart,
+          selection.selectionEnd,
+          true
+        ),
+      });
       e.dataTransfer.effectAllowed = 'copyMove';
-      this.setDragImage(e, data);
+      this.setDragImage(e, selection);
     }
     target.abortCursorAnimation();
     return active;
@@ -270,16 +264,12 @@ export class DraggableTextDelegate {
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
     e.preventDefault();
-    let insert = e.dataTransfer?.getData('text/plain');
+    const { text, styles } = getDragData(e) || {};
+    let insert = text;
     if (insert && !didDrop) {
       const target = this.target;
       const canvas = target.canvas!;
       let insertAt = target.getSelectionStartFromPointer(e);
-      const { styles } = (
-        e.dataTransfer!.types.includes('application/fabric')
-          ? JSON.parse(e.dataTransfer!.getData('application/fabric'))
-          : {}
-      ) as { styles: TextStyleDeclaration[] };
       const trailing = insert[Math.max(0, insert.length - 1)];
       const selectionStartOffset = 0;
       //  drag and drop in same instance
