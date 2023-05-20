@@ -18,6 +18,7 @@ import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isTransparent } from '../util/misc/isTransparent';
 import type {
   AssertKeys,
   TMat2D,
@@ -33,8 +34,8 @@ import { pick } from '../util/misc/pick';
 import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
+import { createCanvasElement } from '../util';
 import { CanvasElements } from './ElementsManager/CanvasElements';
-import { TargetFind } from './TargetFind';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -370,8 +371,6 @@ export class SelectableCanvas<
    */
   declare skipTargetFind: boolean;
 
-  declare targetFind: TargetFind;
-
   /**
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
    * After mousedown, mousemove creates a shape,
@@ -513,6 +512,8 @@ export class SelectableCanvas<
   get wrapperEl() {
     return this.elements.container;
   }
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
@@ -529,7 +530,7 @@ export class SelectableCanvas<
       allowTouchScrolling: this.allowTouchScrolling,
       containerClass: this.containerClass,
     });
-    this.targetFind = new TargetFind(this, this.targetFindTolerance);
+    this._createCacheCanvas();
   }
 
   /**
@@ -641,12 +642,17 @@ export class SelectableCanvas<
   }
 
   /**
-   * Set the canvas tolerance value for pixel target find.
+   * Set the canvas tolerance value for pixel taret find.
    * Use only integer numbers.
    * @private
    */
   setTargetFindTolerance(value: number) {
-    this.targetFind.setTolerance(value);
+    value = Math.round(value);
+    this.targetFindTolerance = value;
+    const retina = this.getRetinaScaling();
+    const size = Math.ceil((value * 2 + 1) * retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    this.pixelFindContext.scale(retina, retina);
   }
 
   /**
@@ -660,7 +666,26 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    return this.targetFind.isTargetTransparent(target, x, y);
+    const tolerance = this.targetFindTolerance;
+    const ctx = this.pixelFindContext;
+    this.clearContext(ctx);
+    ctx.save();
+    ctx.translate(-x + tolerance, -y + tolerance);
+    ctx.transform(...this.viewportTransform);
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
+    target.render(ctx);
+    target.selectionBackgroundColor = selectionBgc;
+    ctx.restore();
+    // our canvas is square, and made around tolerance.
+    // so tolerance in this case also represent the center of the canvas.
+    const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
+    return isTransparent(
+      ctx,
+      enhancedTolerance,
+      enhancedTolerance,
+      enhancedTolerance
+    );
   }
 
   /**
@@ -1142,6 +1167,14 @@ export class SelectableCanvas<
     }
   }
 
+  protected _createCacheCanvas() {
+    this.pixelFindCanvasEl = createCanvasElement();
+    this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
+      willReadFrequently: true,
+    })!;
+    this.setTargetFindTolerance(this.targetFindTolerance);
+  }
+
   /**
    * Returns context of top canvas where interactions are drawn
    * @returns {CanvasRenderingContext2D}
@@ -1382,7 +1415,12 @@ export class SelectableCanvas<
     super.destroy();
 
     // free resources
-    this.targetFind.dispose();
+
+    // pixel find canvas
+    // @ts-expect-error disposing
+    this.pixelFindContext = null;
+    // @ts-expect-error disposing
+    this.pixelFindCanvasEl = undefined;
   }
 
   /**
