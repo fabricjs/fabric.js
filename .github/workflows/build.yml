@@ -107,6 +107,3 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
           update-comment: true
-  changelog:
-    if: ${{ always() }}
-    uses: ./.github/workflows/changelog.yml
