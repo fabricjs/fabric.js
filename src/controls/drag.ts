@@ -1,5 +1,5 @@
 import type { TransformActionHandler } from '../EventTypeDefs';
-import { fireEvent } from '../util/fireEvent';
+import { fireEvent } from './fireEvent';
 import { commonEventInfo, isLocked } from './util';
 
 /**

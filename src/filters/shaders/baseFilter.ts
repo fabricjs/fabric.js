@@ -1,6 +1,4 @@
-import { GLPrecision } from '../GLProbes/GLProbe';
-
-export const highPsourceCode = `precision ${GLPrecision.high} float`;
+export const highPsourceCode = `precision highp float`;
 
 export const identityFragmentShader = `
     ${highPsourceCode};

@@ -1,9 +1,14 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import type { TBBox, TMat2D } from '../../typedefs';
-import { SupportedSVGUnit, SVGElementName } from '../../typedefs';
+import type {
+  TBBox,
+  TMat2D,
+  SVGElementName,
+  SupportedSVGUnit,
+} from '../../typedefs';
 import { toFixed } from './toFixed';
+
 /**
  * Returns array of attributes for given svg that fabric parses
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
@@ -12,7 +17,7 @@ import { toFixed } from './toFixed';
 export const getSvgAttributes = (type: SVGElementName) => {
   const commonAttributes = ['instantiated_by_use', 'style', 'id', 'class'];
   switch (type) {
-    case SVGElementName.linearGradient:
+    case 'linearGradient':
       return commonAttributes.concat([
         'x1',
         'y1',
@@ -52,23 +57,23 @@ export const parseUnit = (
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
   const dpi = config.DPI;
-  switch (unit?.[0]) {
-    case SupportedSVGUnit.mm:
+  switch (unit?.[0] as SupportedSVGUnit) {
+    case 'mm':
       return (number * dpi) / 25.4;
 
-    case SupportedSVGUnit.cm:
+    case 'cm':
       return (number * dpi) / 2.54;
 
-    case SupportedSVGUnit.in:
+    case 'in':
       return number * dpi;
 
-    case SupportedSVGUnit.pt:
+    case 'pt':
       return (number * dpi) / 72; // or * 4 / 3
 
-    case SupportedSVGUnit.pc:
+    case 'pc':
       return ((number * dpi) / 72) * 12; // or * 16
 
-    case SupportedSVGUnit.em:
+    case 'em':
       return number * fontSize;
 
     default:
@@ -76,17 +81,9 @@ export const parseUnit = (
   }
 };
 
-export const enum MeetOrSlice {
-  meet = 'meet',
-  slice = 'slice',
-}
+export type MeetOrSlice = 'meet' | 'slice';
 
-export const enum MinMidMax {
-  min = 'Min',
-  mid = 'Mid',
-  max = 'Max',
-  none = 'none',
-}
+export type MinMidMax = 'Min' | 'Mid' | 'Max' | 'none';
 
 export type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
@@ -97,12 +94,12 @@ export type TPreserveArParsed = {
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align: string): MinMidMax[] => {
   //divide align in alignX and alignY
-  if (align && align !== MinMidMax.none) {
+  if (align && align !== 'none') {
     return [align.slice(1, 4) as MinMidMax, align.slice(5, 8) as MinMidMax];
-  } else if (align === MinMidMax.none) {
+  } else if (align === 'none') {
     return [align, align];
   }
-  return [MinMidMax.mid, MinMidMax.mid];
+  return ['Mid', 'Mid'];
 };
 
 /**
@@ -120,7 +117,7 @@ export const parsePreserveAspectRatioAttribute = (
   ];
   const [alignX, alignY] = parseAlign(firstPart);
   return {
-    meetOrSlice: secondPart || MeetOrSlice.meet,
+    meetOrSlice: secondPart || 'meet',
     alignX,
     alignY,
   };

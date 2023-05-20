@@ -43,26 +43,11 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export const enum ImageFormat {
-  jpeg = 'jpeg',
-  jpg = 'jpeg',
-  png = 'png',
-}
+export type ImageFormat = 'jpeg' | 'png';
 
-export const enum SVGElementName {
-  linearGradient = 'linearGradient',
-  radialGradient = 'radialGradient',
-  stop = 'stop',
-}
+export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
-export const enum SupportedSVGUnit {
-  mm = 'mm',
-  cm = 'cm',
-  in = 'in',
-  pt = 'pt',
-  pc = 'pc',
-  em = 'em',
-}
+export type SupportedSVGUnit = 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'em';
 
 /**
  * A transform matrix.

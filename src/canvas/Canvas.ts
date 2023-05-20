@@ -19,7 +19,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
-} from '../util/types';
+} from '../util/typeAssertions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
