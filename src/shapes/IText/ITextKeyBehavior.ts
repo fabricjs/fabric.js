@@ -320,8 +320,12 @@ export abstract class ITextKeyBehavior<
     //  fire event before logic to allow overriding clipboard data
     this.fire('cut', { e });
     const { selectionStart, selectionEnd } = this;
-    this.selectionEnd = selectionStart;
     this.removeChars(selectionStart, selectionEnd);
+    this.selectionEnd = selectionStart;
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+    }
     this.fire('changed', { index: selectionStart, action: 'cut' });
     this.canvas.fire('text:changed', { target: this });
     this.canvas.requestRenderAll();
@@ -345,8 +349,12 @@ export abstract class ITextKeyBehavior<
     // execute paste logic
     if (text) {
       const { selectionStart, selectionEnd } = this;
-      this.selectionStart = this.selectionEnd = selectionStart + text.length;
       this.insertChars(text, styles, selectionStart, selectionEnd);
+      this.selectionStart = this.selectionEnd = selectionStart + text.length;
+      if (this.hiddenTextarea) {
+        this.hiddenTextarea.value = this.text;
+        this._updateTextarea();
+      }
       this.fire('changed', { index: selectionStart, action: 'paste' });
       this.canvas.fire('text:changed', { target: this });
       this.canvas.requestRenderAll();
