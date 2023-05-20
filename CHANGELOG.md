@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+
 ## [6.0.0-beta6]
 
 - refactor(IText): `copyPasteData` => clipboard events, cross platform clipboard event support [#8708](https://github.com/fabricjs/fabric.js/issues/8708)
