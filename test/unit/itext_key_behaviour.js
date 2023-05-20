@@ -298,6 +298,7 @@
 
     QUnit.module('Clipboard Events', (hooks) => {
       let fabricCanvas;
+      hooks.before(() => fabric.ClipboardDataManager.pluginHTML());
       hooks.beforeEach(() => {
         fabricCanvas = new fabric.Canvas(canvas);
       });
