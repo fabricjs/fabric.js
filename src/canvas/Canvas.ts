@@ -1593,7 +1593,7 @@ export class Canvas extends SelectableCanvas {
    * @override clear {@link textEditingManager}
    */
   clear() {
-    this.textEditingManager.dispose();
+    this.textEditingManager.clear();
     super.clear();
   }
 
@@ -1602,7 +1602,7 @@ export class Canvas extends SelectableCanvas {
    */
   destroy() {
     this.removeListeners();
-    super.destroy();
     this.textEditingManager.dispose();
+    super.destroy();
   }
 }
