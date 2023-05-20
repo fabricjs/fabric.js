@@ -37,19 +37,12 @@ function assertDragEventStream(name, a, b) {
         QUnit.module(`enableRetinaScaling = ${enableRetinaScaling}`, function (hooks) {
             let canvas, eventData, iText, iText2, eventStream, renderEffects;
             let count = 0, countCanvas = 0;
-            hooks.before(() => {
-                fabric.config.configure({ devicePixelRatio: 2 });
-            });
-            hooks.after(() => {
-                fabric.config.restoreDefaults();
-            });
-            hooks.beforeEach(() => {
-                canvas = new fabric.Canvas(null, {
-                    enableRetinaScaling,
-                });
-                eventData = {
+
+            function createDragEvent(x, y, dropEffect = 'none') {
+                return {
                     which: 1,
                     target: canvas.upperCanvasEl,
+                    defaultPrevented: false,
                     preventDefault() {
                         this.defaultPrevented = true;
                     },
@@ -61,7 +54,7 @@ function assertDragEventStream(name, a, b) {
                         get types() {
                             return Object.keys(this.data);
                         },
-                        dropEffect: 'none',
+                        dropEffect,
                         getData(type) {
                             return this.data[type];
                         },
@@ -71,15 +64,32 @@ function assertDragEventStream(name, a, b) {
                         setDragImage(img, x, y) {
                             this.dragImageData = { img, x, y };
                         },
+                        clearData() {
+                            this.data = {};
+                        }
                     },
                     ...(enableRetinaScaling ? {
-                        clientX: 60,
-                        clientY: 30
+                        clientX: x ?? 60,
+                        clientY: y ?? 30
                     } : {
-                        clientX: 30,
-                        clientY: 15
+                        clientX: x ?? 30,
+                        clientY: y ?? 15
                     })
                 };
+            }
+            
+            hooks.before(() => {
+                fabric.config.configure({ devicePixelRatio: 2 });
+                return fabric.DataTransferManager.pluginHTML();
+            });
+            hooks.after(() => {
+                fabric.config.restoreDefaults();
+            });
+            hooks.beforeEach(() => {
+                canvas = new fabric.Canvas(null, {
+                    enableRetinaScaling,
+                });
+                eventData = createDragEvent();
                 iText = new fabric.IText('test test');
                 iText2 = new fabric.IText('test2 test2', { left: 200 });
                 canvas.add(iText, iText2);
@@ -117,26 +127,10 @@ function assertDragEventStream(name, a, b) {
             hooks.afterEach(() => canvas.dispose());
             
             function startDragging(eventData) {
-                const e = { ...eventData };
-                canvas._onMouseDown({ ...eventData });
+                const e = createDragEvent(eventData.clientX, eventData.clientY);
+                canvas._onMouseDown(createDragEvent(eventData.clientX, eventData.clientY));
                 canvas._onDragStart(e);
                 return e;
-            }
-
-            function createDragEvent(x = eventData.clientX, y = eventData.clientY, dataTransfer = {}) {
-                return {
-                    ...eventData,
-                    defaultPrevented: false,
-                    clientX: x,
-                    clientY: y,
-                    dataTransfer: {
-                        ...eventData.dataTransfer,
-                        ...dataTransfer,
-                        clearData() {
-                            
-                        }
-                    }
-                };
             }
 
             QUnit.test('click sets cursor', async function (assert) {
@@ -446,7 +440,7 @@ function assertDragEventStream(name, a, b) {
                     canvas._onDragOver(dragOverEvent);
                     dragEvents.push(dragOverEvent);
                 }
-                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'move' });
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, 'move');
                 canvas._onDrop(drop);
                 canvas._onDragEnd(drop);
                 assert.equal(iText.text, ' testestt', 'text after drop');
@@ -513,7 +507,7 @@ function assertDragEventStream(name, a, b) {
                     canvas._onDragOver(dragOverEvent);
                     dragEvents.push(dragOverEvent);
                 }
-                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'move' });
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, 'move');
                 canvas._onDrop(drop);
                 canvas._onDragEnd(drop);
                 assert.equal(iText2.text, 'testestt2 test2', 'text after drop');
@@ -571,7 +565,7 @@ function assertDragEventStream(name, a, b) {
                     canvas._onDragOver(dragOverEvent);
                     dragEvents.push(dragOverEvent);
                 }
-                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling(), undefined, { dropEffect: 'none' });
+                const drop = createDragEvent(eventData.clientX + index * canvas.getRetinaScaling());
                 // the window will not invoke a drop event so we call drag end to simulate correctly
                 canvas._onDragEnd(drop);
                 assert.equal(iText2.text, 'test2 test2', 'text after drop');
