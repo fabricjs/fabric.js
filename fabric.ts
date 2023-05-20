@@ -44,6 +44,7 @@ export { Polyline } from './src/shapes/Polyline';
 export { Polygon } from './src/shapes/Polygon';
 export { Text } from './src/shapes/Text/Text';
 export { IText } from './src/shapes/IText/IText';
+export * from './src/shapes/IText/DataTransfer';
 export { Textbox } from './src/shapes/Textbox';
 export { Group } from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
