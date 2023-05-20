@@ -27,9 +27,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Update ${{ env.file }} ${{ github.event.action }}
+      - name: Update ${{ env.file }}
         id: update
-        if: (github.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
+        if: (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
         uses: actions/github-script@v6
         env:
           log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n'
@@ -53,7 +53,7 @@ jobs:
             }
 
             const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
-            if (exists && ${{ github.action == 'edited' }}) {
+            if (exists && ${{ github.event.action == 'edited' }}) {
                 const prevLog = '${{ env.prev_log }}';
                 const index = content.indexOf(prevLog, insertAt);
                 if (index > -1) {
