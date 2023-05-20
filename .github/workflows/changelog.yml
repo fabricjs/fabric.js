@@ -11,7 +11,6 @@ jobs:
     env:
       file: CHANGELOG.md
       next_version: next
-      log: '- ${{ github.event.pull_request.title }} [#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,8 +28,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Update ${{ env.file }}
         id: update
-        if: (github.action != 'edited' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
+        if: (github.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title) && (steps.check.outcome == 'success' || steps.check.outcome == 'failure')
         uses: actions/github-script@v6
+        env:
+          link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
+          log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n'
+          prev_log: ${{ (github.action == 'edited' && '- ${{ github.event.changes.title.from }} ${{ env.link }}\n') || '' }}
         with:
           result-encoding: string
           script: |
@@ -38,7 +41,8 @@ jobs:
             const file = './${{ env.file }}';
             let content = fs.readFileSync(file).toString();
             const title = '[${{ env.next_version }}]';
-            const log = '${{ env.log }}\n';
+            const log = '${{ env.log }}';
+            const prevLog = '${{ env.prev_log }}';
             let exists = ${{ steps.check.outcome == 'success' }};
 
             if (!content.includes(title)) {
@@ -50,10 +54,12 @@ jobs:
             }
 
             const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
-            const index = content.indexOf(log, insertAt);
-            if (index > -1) {
-                content = content.slice(0, index) + content.slice(index);
-                exists = false;
+            if (exists && prevLog) {
+                const index = content.indexOf(prevLog, insertAt);
+                if (index > -1) {
+                    content = content.slice(0, index) + content.slice(index + prevLog.length);
+                    exists = false;
+                }
             }
 
             if (!exists) {
