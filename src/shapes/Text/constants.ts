@@ -8,7 +8,7 @@ const fontProperties = [
   'fontStyle',
 ] as const;
 
-const textDecorationProperties = [
+export const textDecorationProperties = [
   'underline',
   'overline',
   'linethrough',
