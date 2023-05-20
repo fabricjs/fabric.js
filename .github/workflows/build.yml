@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       minified: dist/index.min.js
-      bundled: dist/index.mjs
+      bundled: dist/es/index.js
     steps:
       - uses: actions/checkout@v3
         with:
