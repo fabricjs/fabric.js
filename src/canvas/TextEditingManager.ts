@@ -13,9 +13,9 @@ export class TextEditingManager {
 
   constructor(canvas: Canvas) {
     const cb = () => this.target?.hiddenTextarea?.focus();
-    canvas.upperCanvasEl.addEventListener('click', cb);
-    this.__disposer = () =>
-      canvas.upperCanvasEl.removeEventListener('click', cb);
+    const el = canvas.upperCanvasEl;
+    el.addEventListener('click', cb);
+    this.__disposer = () => el.removeEventListener('click', cb);
   }
 
   exitTextEditing() {
