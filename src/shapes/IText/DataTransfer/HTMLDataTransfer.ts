@@ -11,8 +11,100 @@ import type { ITextEvents } from '../ITextBehavior';
 import type { DataTransferResolver } from './DataTransferManager';
 import { DataTransferManager } from './DataTransferManager';
 
-export class HTMLDataTransfer implements DataTransferResolver {
-  type = 'text/html';
+export function toHTML(target: IText) {
+  const { selectionStart: from, selectionEnd: to } = target;
+  const text = target._text.slice(from, to);
+  const textLines = text.join('').split(target._reNewline);
+  const styles = target
+    .getSelectionStyles(from, to)
+    .filter((value, index) => !target._reNewline.test(text[index]));
+  const { cssText: topLevelStyles } = textStylesToCSS(target);
+  let charIndex = 0;
+  const markup = textLines
+    .map((text) => {
+      const spans: {
+        text: string;
+        style: TextStyleDeclaration;
+      }[] = [];
+      for (let index = 0; index < text.length; index++) {
+        const style = styles[charIndex++];
+        if (
+          index === 0 ||
+          hasStyleChanged(spans[spans.length - 1].style, style, true)
+        ) {
+          spans.push({ text: text[index], style });
+        } else {
+          spans[spans.length - 1].text += text[index];
+        }
+      }
+      return `<p style="${topLevelStyles}">${spans
+        .map(({ text, style }) => {
+          const { cssText } = textStylesToCSS(target, {
+            ...style,
+            visible: true,
+          });
+          return `<span style="${cssText}">${text}</span>`;
+        })
+        .join('')}</p>`;
+    })
+    .join('');
+
+  return `<html><body><!--StartFragment--><meta charset="utf-8">${markup}<!--EndFragment--></body></html>`;
+}
+
+export function createHTMLParsingHelper(
+  e: ClipboardEvent | DragEvent,
+  target: IText
+) {
+  const el = (e.target || target.hiddenTextarea)! as HTMLElement;
+  return {
+    document: getDocumentFromElement(el)!,
+    window: getWindowFromElement(el)!,
+  };
+}
+
+export function fromHTML(e: ClipboardEvent | DragEvent, target: IText) {
+  const el = (e.target || target.hiddenTextarea)! as HTMLElement;
+  const win = getWindowFromElement(el)!;
+  const doc = getDocumentFromElement(el)!;
+
+  return {
+    document: getDocumentFromElement(el)!,
+    parse(html: string) {
+      const sandbox = doc.createElement('iframe');
+      Object.assign(sandbox.style, {
+        position: 'fixed',
+        left: `${-sandbox.clientWidth}px`,
+      });
+      doc.body.append(sandbox);
+      const sandboxDoc =
+        sandbox.contentDocument || sandbox.contentWindow!.document;
+      sandboxDoc.open();
+      sandboxDoc.write(html);
+      sandboxDoc.close();
+      const walker = sandboxDoc.createTreeWalker(
+        sandboxDoc.body,
+        NodeFilter.SHOW_ALL,
+        {
+          acceptNode(node) {
+            return node instanceof HTMLDivElement ||
+              node instanceof HTMLParagraphElement ||
+              node.nodeType === Node.TEXT_NODE
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_SKIP;
+          },
+        }
+      );
+      return { walker, dispose: () => sandbox.remove() };
+    },
+    getElementStyles(el: HTMLElement) {
+      return textStylesFromCSS(win.getComputedStyle(el));
+    },
+  };
+}
+
+export const HTMLDataTransfer: DataTransferResolver = {
+  type: 'text/html',
 
   setData(
     e: ClipboardEvent | DragEvent,
@@ -59,7 +151,7 @@ export class HTMLDataTransfer implements DataTransferResolver {
     const html = `<html><body><!--StartFragment--><meta charset="utf-8">${markup}<!--EndFragment--></body></html>`;
 
     dataTransfer.setData(this.type, html);
-  }
+  },
 
   getData(
     e: ClipboardEvent | DragEvent,
@@ -149,8 +241,8 @@ export class HTMLDataTransfer implements DataTransferResolver {
         }, {} as TextStyleDeclaration)
       ),
     };
-  }
-}
+  },
+};
 
 export const applyPlugin = () =>
   DataTransferManager.types.splice(1, 0, new HTMLDataTransfer());
