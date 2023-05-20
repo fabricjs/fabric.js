@@ -584,6 +584,9 @@
         },
         setDragImage(imageSource, x, y) {
 
+        },
+        clearData() {
+          
         }
       }
     });
