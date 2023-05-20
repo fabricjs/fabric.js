@@ -50,9 +50,13 @@ export class TextEditingManager {
     this.target?.isEditing && this.target.updateSelectionOnMouseMove(e);
   }
 
-  dispose() {
+  clear() {
     this.targets = [];
     this.target = undefined;
+  }
+
+  dispose() {
+    this.clear();
     this.__disposer();
     // @ts-expect-error disposing
     delete this.__disposer;
