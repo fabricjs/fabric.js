@@ -190,7 +190,7 @@ export class DraggableTextDelegate extends DataTransferManager<DragEvent> {
     const target = this.target;
     const { selectionStart, selectionEnd } = target;
     const active = this.isActive();
-    if (active && e.dataTransfer) {
+    if (active) {
       this.__dragStartSelection = {
         selectionStart,
         selectionEnd,
