@@ -6,7 +6,7 @@ on:
     types: [opened, edited]
 
 jobs:
-  update-changelog:
+  update:
     runs-on: ubuntu-latest
     env:
       file: CHANGELOG.md
@@ -17,7 +17,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
-      - name: Checking ${{ env.file }}
+      - name: Check ${{ env.file }}
         id: check
         continue-on-error: true
         run: |
@@ -54,7 +54,9 @@ jobs:
                 exists = false;
             }
 
+            console.log(exists, content)
             if (!exists) {
+                console.log(content)
                 content = content.slice(0, insertAt) + log + content.slice(insertAt);
                 fs.writeFileSync(file, content);
                 return true;
