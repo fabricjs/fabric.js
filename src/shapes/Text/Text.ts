@@ -34,6 +34,10 @@ import {
   additionalProps,
   textDefaultValues,
   textLayoutProperties,
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT } from '../../constants';
 
@@ -447,7 +451,7 @@ export class Text<
         this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
       this.height = this.calcTextHeight();
     }
-    if (this.textAlign.indexOf('justify') !== -1) {
+    if (this.textAlign.includes(JUSTIFY)) {
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
@@ -466,7 +470,7 @@ export class Text<
       spaces;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (
-        this.textAlign !== 'justify' &&
+        this.textAlign !== JUSTIFY &&
         (i === len - 1 || this.isEndOfWrapping(i))
       ) {
         continue;
@@ -1118,7 +1122,7 @@ export class Text<
     lineIndex: number
   ) {
     const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.indexOf('justify') !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1410,10 +1414,10 @@ export class Text<
       isEndOfWrapping = this.isEndOfWrapping(lineIndex);
     let leftOffset = 0;
     if (
-      textAlign === 'justify' ||
-      (textAlign === 'justify-center' && !isEndOfWrapping) ||
-      (textAlign === 'justify-right' && !isEndOfWrapping) ||
-      (textAlign === 'justify-left' && !isEndOfWrapping)
+      textAlign === JUSTIFY ||
+      (textAlign === JUSTIFY_CENTER && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_RIGHT && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_LEFT && !isEndOfWrapping)
     ) {
       return 0;
     }
@@ -1423,22 +1427,22 @@ export class Text<
     if (textAlign === 'right') {
       leftOffset = lineDiff;
     }
-    if (textAlign === 'justify-center') {
+    if (textAlign === JUSTIFY_CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'justify-right') {
+    if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
     if (direction === 'rtl') {
       if (
         textAlign === 'right' ||
-        textAlign === 'justify' ||
-        textAlign === 'justify-right'
+        textAlign === JUSTIFY ||
+        textAlign === JUSTIFY_RIGHT
       ) {
         leftOffset = 0;
-      } else if (textAlign === LEFT || textAlign === 'justify-left') {
+      } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;
-      } else if (textAlign === CENTER || textAlign === 'justify-center') {
+      } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
         leftOffset = -lineDiff / 2;
       }
     }
