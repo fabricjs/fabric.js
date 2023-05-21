@@ -4,6 +4,7 @@
 
 - chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
+- chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 
 ## [6.0.0-beta6]
