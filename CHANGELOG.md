@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+- refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
 
 ## [6.0.0-beta6]
 
