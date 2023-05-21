@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 
 ## [6.0.0-beta6]
