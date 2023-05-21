@@ -2,6 +2,7 @@
 import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
+import { NONE } from '../../constants';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -21,7 +22,7 @@ export class FabricObjectSVGExportMixin {
       strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
       strokeDashArray = this.strokeDashArray
         ? this.strokeDashArray.join(' ')
-        : 'none',
+        : NONE,
       strokeDashOffset = this.strokeDashOffset ? this.strokeDashOffset : '0',
       strokeLineCap = this.strokeLineCap ? this.strokeLineCap : 'butt',
       strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : 'miter',

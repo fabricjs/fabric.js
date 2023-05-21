@@ -38,7 +38,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
-import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
+import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -1252,8 +1252,8 @@ export class SelectableCanvas<
       height: height + 'px',
       left: 0,
       top: 0,
-      'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
+      'touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
+      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
     });
     element.width = width;
     element.height = height;

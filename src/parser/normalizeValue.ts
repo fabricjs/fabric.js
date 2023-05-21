@@ -2,18 +2,18 @@
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
-import { CENTER, LEFT, RIGHT } from '../constants';
+import { CENTER, LEFT, RIGHT, NONE } from '../constants';
 
 export function normalizeValue(attr, value, parentAttributes, fontSize) {
   const isArray = Array.isArray(value);
   let parsed;
 
-  if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
+  if ((attr === 'fill' || attr === 'stroke') && value === NONE) {
     value = '';
   } else if (attr === 'strokeUniform') {
     return value === 'non-scaling-stroke';
   } else if (attr === 'strokeDashArray') {
-    if (value === 'none') {
+    if (value === NONE) {
       value = null;
     } else {
       value = value.replace(/,/g, ' ').split(/\s+/).map(parseFloat);
@@ -28,7 +28,7 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
       value = parseTransformAttribute(value);
     }
   } else if (attr === 'visible') {
-    value = value !== 'none' && value !== 'hidden';
+    value = value !== NONE && value !== 'hidden';
     // display=none on parent element always takes precedence over child element
     if (parentAttributes && parentAttributes.visible === false) {
       value = false;

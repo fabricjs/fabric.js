@@ -1,4 +1,4 @@
-import { LEFT, TOP } from '../constants';
+import { LEFT, TOP, NONE } from '../constants';
 
 /**
  * Wraps element with another element
@@ -103,7 +103,7 @@ export function makeElementUnselectable(element: HTMLElement) {
   if (typeof element.onselectstart !== 'undefined') {
     element.onselectstart = () => false;
   }
-  element.style.userSelect = 'none';
+  element.style.userSelect = NONE;
   return element;
 }
 
