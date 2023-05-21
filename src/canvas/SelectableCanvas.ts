@@ -38,7 +38,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
-import { CENTER, LEFT, TOP } from '../constants';
+import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
