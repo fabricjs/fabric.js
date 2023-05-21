@@ -64,42 +64,39 @@ export abstract class ITextKeyBehavior<
     const doc =
       (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
       getFabricDocument();
-    this.hiddenTextarea = doc.createElement('textarea');
-    this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.setAttribute('autocorrect', 'off');
-    this.hiddenTextarea.setAttribute('autocomplete', 'off');
-    this.hiddenTextarea.setAttribute('spellcheck', 'false');
-    this.hiddenTextarea.setAttribute('data-fabric', 'textarea');
-    this.hiddenTextarea.setAttribute('wrap', 'off');
+    const attributes = {
+      autocapitalize: 'off',
+      autocorrect: 'off',
+      autocomplete: 'off',
+      spellcheck: 'false',
+      'data-fabric': 'textarea',
+      wrap: 'off',
+    };
+    const textarea = doc.createElement('textarea');
+    Object.entries(attributes).map(([attribute, value]) =>
+      textarea.setAttribute(attribute, value)
+    );
     const style = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
-    this.hiddenTextarea.style.cssText = `position: absolute; top: ${style.top}; left: ${style.left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${style.fontSize};`;
+    textarea.style.cssText = `position: absolute; top: ${style.top}; left: ${style.left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${style.fontSize};`;
 
-    if (this.hiddenTextareaContainer) {
-      this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
-    } else {
-      doc.body.appendChild(this.hiddenTextarea);
-    }
+    (this.hiddenTextareaContainer || doc.body).appendChild(textarea);
 
-    this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
-    this.hiddenTextarea.addEventListener('keydown', this.onKeyDown.bind(this));
-    this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
-    this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
-    this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
-    this.hiddenTextarea.addEventListener(
-      'compositionstart',
-      this.onCompositionStart.bind(this)
-    );
-    this.hiddenTextarea.addEventListener(
-      'compositionupdate',
-      this.onCompositionUpdate.bind(this)
-    );
-    this.hiddenTextarea.addEventListener(
-      'compositionend',
-      this.onCompositionEnd.bind(this)
+    const eventsHandlers: Record<string, keyof this> = {
+      blur: 'blur',
+      keydown: 'onKeyDown',
+      keyup: 'onKeyUp',
+      input: 'onInput',
+      copy: 'copy',
+      cut: 'copy',
+      paste: 'paste',
+      compositionstart: 'onCompositionStart',
+      compositionupdate: 'onCompositionUpdate',
+      onCompositionUpdate: 'onCompositionEnd',
+    };
+    Object.entries(eventsHandlers).map(([eventName, handler]) =>
+      textarea.addEventListener(eventName, this[handler].bind(this))
     );
   }
 
