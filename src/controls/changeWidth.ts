@@ -1,5 +1,5 @@
 import type { TransformActionHandler } from '../EventTypeDefs';
-import { CENTER } from '../constants';
+import { CENTER, LEFT } from '../constants';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
@@ -30,7 +30,7 @@ export const changeObjectWidth: TransformActionHandler = (
   if (
     transform.originX === CENTER ||
     (transform.originX === 'right' && localPoint.x < 0) ||
-    (transform.originX === 'left' && localPoint.x > 0)
+    (transform.originX === LEFT && localPoint.x > 0)
   ) {
     const { target } = transform,
       strokePadding =

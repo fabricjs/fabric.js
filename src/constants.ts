@@ -20,3 +20,5 @@ export const MIDDLE_CLICK = 2;
 export const RIGHT_CLICK = 3;
 
 export const CENTER = 'center';
+export const LEFT = 'left';
+export const TOP = 'top';

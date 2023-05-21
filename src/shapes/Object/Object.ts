@@ -1,6 +1,13 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
-import { ALIASING_LIMIT, CENTER, iMatrix, VERSION } from '../../constants';
+import {
+  ALIASING_LIMIT,
+  CENTER,
+  iMatrix,
+  LEFT,
+  TOP,
+  VERSION,
+} from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
@@ -580,7 +587,7 @@ export class FabricObject<
       : Object.getPrototypeOf(this);
 
     return pickBy(object, (value, key) => {
-      if (key === 'left' || key === 'top' || key === 'type') {
+      if (key === LEFT || key === TOP || key === 'type') {
         return true;
       }
       const baseValue = baseValues[key];

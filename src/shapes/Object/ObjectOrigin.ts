@@ -8,7 +8,7 @@ import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import type { BaseProps } from './types/BaseProps';
 import type { FillStrokeProps } from './types/FillStrokeProps';
-import { CENTER } from '../../constants';
+import { CENTER, LEFT, TOP } from '../../constants';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
@@ -270,8 +270,8 @@ export class ObjectOrigin<EventSpec>
   _getLeftTopCoords() {
     return this.translateToOriginPoint(
       this.getRelativeCenterPoint(),
-      'left',
-      'top'
+      LEFT,
+      TOP
     );
   }
 }

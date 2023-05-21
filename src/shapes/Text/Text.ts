@@ -35,7 +35,7 @@ import {
   textDefaultValues,
   textLayoutProperties,
 } from './constants';
-import { CENTER } from '../../constants';
+import { CENTER, LEFT } from '../../constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -887,7 +887,7 @@ export class Text<
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
-        case 'left':
+        case LEFT:
           positionInPath = reverse ? totalPathLength - width : 0;
           break;
         case CENTER:
@@ -1143,7 +1143,7 @@ export class Text<
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
-      ctx.textAlign = isLtr ? 'left' : 'right';
+      ctx.textAlign = isLtr ? LEFT : 'right';
     }
     top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
     if (shortCut) {
@@ -1436,7 +1436,7 @@ export class Text<
         textAlign === 'justify-right'
       ) {
         leftOffset = 0;
-      } else if (textAlign === 'left' || textAlign === 'justify-left') {
+      } else if (textAlign === LEFT || textAlign === 'justify-left') {
         leftOffset = -lineDiff;
       } else if (textAlign === CENTER || textAlign === 'justify-center') {
         leftOffset = -lineDiff / 2;
@@ -1774,7 +1774,7 @@ export class Text<
     const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
 
     const {
-      textAnchor = 'left',
+      textAnchor = LEFT,
       textDecoration = '',
       dx = 0,
       dy = 0,

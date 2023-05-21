@@ -26,7 +26,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER } from '../constants';
+import { CENTER, LEFT, TOP } from '../constants';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -77,8 +77,8 @@ export class Path<
   ) {
     super(options as Props);
     this._setPath(path || [], true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   /**

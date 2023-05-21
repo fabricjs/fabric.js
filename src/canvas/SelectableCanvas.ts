@@ -38,7 +38,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
-import { CENTER } from '../constants';
+import { CENTER, LEFT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -789,14 +789,14 @@ export class SelectableCanvas<
       origin.x = 'right';
       // is a right control ?
     } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
+      origin.x = LEFT;
     }
     // is a top control ?
     if (['tl', 'mt', 'tr'].includes(controlName)) {
       origin.y = 'bottom';
       // is a bottom control ?
     } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
+      origin.y = TOP;
     }
     return origin;
   }
@@ -1118,10 +1118,10 @@ export class SelectableCanvas<
       boundsHeight = bounds.height || 0;
 
     if (!boundsWidth || !boundsHeight) {
-      if ('top' in bounds && 'bottom' in bounds) {
+      if (TOP in bounds && 'bottom' in bounds) {
         boundsHeight = Math.abs(bounds.top - bounds.bottom);
       }
-      if ('right' in bounds && 'left' in bounds) {
+      if ('right' in bounds && LEFT in bounds) {
         boundsWidth = Math.abs(bounds.right - bounds.left);
       }
     }
@@ -1590,12 +1590,12 @@ export class SelectableCanvas<
         'angle',
         'flipX',
         'flipY',
-        'left',
+        LEFT,
         'scaleX',
         'scaleY',
         'skewX',
         'skewY',
-        'top',
+        TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
       addTransformToObject(instance, this._activeObject.calcOwnMatrix());

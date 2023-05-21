@@ -10,7 +10,7 @@ import {
 import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import { CENTER } from '../../constants';
+import { CENTER, LEFT } from '../../constants';
 
 type CursorBoundaries = {
   left: number;
@@ -449,10 +449,7 @@ export class IText<
         this.textAlign === 'justify-right'
       ) {
         boundaries.left *= -1;
-      } else if (
-        this.textAlign === 'left' ||
-        this.textAlign === 'justify-left'
-      ) {
+      } else if (this.textAlign === LEFT || this.textAlign === 'justify-left') {
         boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       } else if (
         this.textAlign === CENTER ||
@@ -625,7 +622,7 @@ export class IText<
         ) {
           drawStart = this.width - drawStart - drawWidth;
         } else if (
-          this.textAlign === 'left' ||
+          this.textAlign === LEFT ||
           this.textAlign === 'justify-left'
         ) {
           drawStart = boundaries.left + lineOffset - boxEnd;

@@ -1,3 +1,4 @@
+import { LEFT } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { Text } from './Text';
 
@@ -58,7 +59,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   underline: false,
   overline: false,
   linethrough: false,
-  textAlign: 'left',
+  textAlign: LEFT,
   fontStyle: 'normal',
   lineHeight: 1.16,
   superscript: {
@@ -74,7 +75,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   shadow: null,
   path: null,
   pathStartOffset: 0,
-  pathSide: 'left',
+  pathSide: LEFT,
   pathAlign: 'baseline',
   _fontSizeFraction: 0.222,
   offsets: {

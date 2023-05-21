@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { getSvgRegex } from './getSvgRegex';
+import { LEFT, TOP } from '../constants';
 
 export const cssRules = {};
 export const gradientDefs = {};
@@ -49,11 +50,11 @@ export const svgValidTagNames = [
   ],
   svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs'],
   attributesMap = {
-    cx: 'left',
-    x: 'left',
+    cx: LEFT,
+    x: LEFT,
     r: 'radius',
-    cy: 'top',
-    y: 'top',
+    cy: TOP,
+    y: TOP,
     display: 'visible',
     visibility: 'visible',
     transform: 'transformMatrix',
