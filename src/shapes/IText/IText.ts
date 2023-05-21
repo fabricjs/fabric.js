@@ -16,7 +16,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, LEFT } from '../../constants';
+import { CENTER, LEFT, RIGHT } from '../../constants';
 
 type CursorBoundaries = {
   left: number;
@@ -450,7 +450,7 @@ export class IText<
     };
     if (this.direction === 'rtl') {
       if (
-        this.textAlign === 'right' ||
+        this.textAlign === RIGHT ||
         this.textAlign === JUSTIFY ||
         this.textAlign === JUSTIFY_RIGHT
       ) {
@@ -622,7 +622,7 @@ export class IText<
       }
       if (this.direction === 'rtl') {
         if (
-          this.textAlign === 'right' ||
+          this.textAlign === RIGHT ||
           this.textAlign === JUSTIFY ||
           this.textAlign === JUSTIFY_RIGHT
         ) {

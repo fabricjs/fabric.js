@@ -1,5 +1,5 @@
 import type { TransformActionHandler } from '../EventTypeDefs';
-import { CENTER, LEFT } from '../constants';
+import { CENTER, LEFT, RIGHT } from '../constants';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
@@ -29,7 +29,7 @@ export const changeObjectWidth: TransformActionHandler = (
   //  make sure the control changes width ONLY from it's side of target
   if (
     transform.originX === CENTER ||
-    (transform.originX === 'right' && localPoint.x < 0) ||
+    (transform.originX === RIGHT && localPoint.x < 0) ||
     (transform.originX === LEFT && localPoint.x > 0)
   ) {
     const { target } = transform,

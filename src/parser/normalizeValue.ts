@@ -2,7 +2,7 @@
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
-import { CENTER, LEFT } from '../constants';
+import { CENTER, LEFT, RIGHT } from '../constants';
 
 export function normalizeValue(attr, value, parentAttributes, fontSize) {
   const isArray = Array.isArray(value);
@@ -39,7 +39,7 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
       value *= parentAttributes.opacity;
     }
   } else if (attr === 'textAnchor' /* text-anchor */) {
-    value = value === 'start' ? LEFT : value === 'end' ? 'right' : CENTER;
+    value = value === 'start' ? LEFT : value === 'end' ? RIGHT : CENTER;
   } else if (attr === 'charSpacing') {
     // parseUnit returns px and we convert it to em
     parsed = (parseUnit(value, fontSize) / fontSize) * 1000;

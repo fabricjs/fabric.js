@@ -786,14 +786,14 @@ export class SelectableCanvas<
     };
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
+      origin.x = RIGHT;
       // is a right control ?
     } else if (['mr', 'tr', 'br'].includes(controlName)) {
       origin.x = LEFT;
     }
     // is a top control ?
     if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
+      origin.y = BOTTOM;
       // is a bottom control ?
     } else if (['bl', 'mb', 'br'].includes(controlName)) {
       origin.y = TOP;
@@ -1118,10 +1118,10 @@ export class SelectableCanvas<
       boundsHeight = bounds.height || 0;
 
     if (!boundsWidth || !boundsHeight) {
-      if (TOP in bounds && 'bottom' in bounds) {
+      if (TOP in bounds && BOTTOM in bounds) {
         boundsHeight = Math.abs(bounds.top - bounds.bottom);
       }
-      if ('right' in bounds && LEFT in bounds) {
+      if (RIGHT in bounds && LEFT in bounds) {
         boundsWidth = Math.abs(bounds.right - bounds.left);
       }
     }

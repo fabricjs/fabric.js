@@ -10,7 +10,7 @@ import type { TKeyMapIText } from './constants';
 import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT } from '../../constants';
+import { LEFT, RIGHT } from '../../constants';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -477,7 +477,7 @@ export abstract class ITextKeyBehavior<
    */
   _moveCursorUpOrDown(direction: 'Up' | 'Down', e: TPointerEvent) {
     const action = `get${direction}CursorOffset`,
-      offset = this[action](e, this._selectionDirection === 'right');
+      offset = this[action](e, this._selectionDirection === RIGHT);
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     } else {
@@ -598,7 +598,7 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorLeftWithShift(e: TPointerEvent) {
     if (
-      this._selectionDirection === 'right' &&
+      this._selectionDirection === RIGHT &&
       this.selectionStart !== this.selectionEnd
     ) {
       return this._moveLeft(e, 'selectionEnd');
@@ -655,7 +655,7 @@ export abstract class ITextKeyBehavior<
     ) {
       return this._moveRight(e, 'selectionStart');
     } else if (this.selectionEnd !== this._text.length) {
-      this._selectionDirection = 'right';
+      this._selectionDirection = RIGHT;
       return this._moveRight(e, 'selectionEnd');
     }
   }
@@ -666,7 +666,7 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorRightWithoutShift(e: TPointerEvent) {
     let changed = true;
-    this._selectionDirection = 'right';
+    this._selectionDirection = RIGHT;
 
     if (this.selectionStart === this.selectionEnd) {
       changed = this._moveRight(e, 'selectionStart');

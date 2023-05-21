@@ -39,7 +39,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from './constants';
-import { CENTER, LEFT } from '../../constants';
+import { CENTER, LEFT, RIGHT } from '../../constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -861,7 +861,7 @@ export class Text<
       prevGrapheme: string | undefined,
       graphemeInfo: GraphemeBBox | undefined;
 
-    const reverse = this.pathSide === 'right',
+    const reverse = this.pathSide === RIGHT,
       path = this.path,
       line = this._textLines[lineIndex],
       llength = line.length,
@@ -897,7 +897,7 @@ export class Text<
         case CENTER:
           positionInPath = (totalPathLength - width) / 2;
           break;
-        case 'right':
+        case RIGHT:
           positionInPath = reverse ? 0 : totalPathLength - width;
           break;
         //todo - add support for justify
@@ -943,7 +943,7 @@ export class Text<
     const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
-    graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
+    graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
   }
 
   /**
@@ -1147,7 +1147,7 @@ export class Text<
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
-      ctx.textAlign = isLtr ? LEFT : 'right';
+      ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
     top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
     if (shortCut) {
@@ -1424,7 +1424,7 @@ export class Text<
     if (textAlign === CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'right') {
+    if (textAlign === RIGHT) {
       leftOffset = lineDiff;
     }
     if (textAlign === JUSTIFY_CENTER) {
@@ -1435,7 +1435,7 @@ export class Text<
     }
     if (direction === 'rtl') {
       if (
-        textAlign === 'right' ||
+        textAlign === RIGHT ||
         textAlign === JUSTIFY ||
         textAlign === JUSTIFY_RIGHT
       ) {
@@ -1837,7 +1837,7 @@ export class Text<
     if (textAnchor === CENTER) {
       offX = text.getScaledWidth() / 2;
     }
-    if (textAnchor === 'right') {
+    if (textAnchor === RIGHT) {
       offX = text.getScaledWidth();
     }
     text.set({
