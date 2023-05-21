@@ -1,5 +1,4 @@
-import { getDocument } from '../../env';
-import {
+import type {
   ObjectEvents,
   TPointerEvent,
   TPointerEventInfo,
@@ -8,9 +7,12 @@ import { Point } from '../../Point';
 import type { FabricObject } from '../Object/Object';
 import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
-import { TOnAnimationChangeCallback } from '../../util/animation/types';
+import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
-import { TextStyleDeclaration } from '../Text/StyledText';
+import type { TextStyleDeclaration } from '../Text/StyledText';
+import type { SerializedTextProps, TextProps } from '../Text/Text';
+import type { TProps } from '../Object/types';
+import { getDocumentFromElement } from '../../util/dom_misc';
 
 /**
  *  extend this regex to support non english languages
@@ -36,8 +38,10 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<EventSpec> {
+> extends Text<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;
@@ -399,9 +403,9 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
+    const el = this.hiddenTextarea!;
     // regain focus
-    getDocument().activeElement !== this.hiddenTextarea &&
-      this.hiddenTextarea!.focus();
+    getDocumentFromElement(el).activeElement !== el && el.focus();
 
     const newSelectionStart = this.getSelectionStartFromPointer(e),
       currentStart = this.selectionStart,
@@ -511,15 +515,15 @@ export abstract class ITextBehavior<
       return;
     }
     this.cursorOffsetCache = {};
-    this.text = this.hiddenTextarea.value;
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    const textarea = this.hiddenTextarea;
+    this.text = textarea.value;
+    this.set('dirty', true);
+    this.initDimensions();
+    this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.value
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
     if (!this.inCompositionMode) {
@@ -669,7 +673,7 @@ export abstract class ITextBehavior<
     this.selectionEnd = this.selectionStart;
     this._exitEditing();
     this._restoreEditingProps();
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache) {
       this.initDimensions();
       this.setCoords();
     }
@@ -978,18 +982,13 @@ export abstract class ITextBehavior<
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
-  removeChars(start: number, end: number) {
-    if (typeof end === 'undefined') {
-      end = start + 1;
-    }
+  removeChars(start: number, end: number = start + 1) {
     this.removeStyleFromTo(start, end);
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 
@@ -1023,10 +1022,8 @@ export abstract class ITextBehavior<
     ];
     this.text = this._text.join('');
     this.set('dirty', true);
-    if (this._shouldClearDimensionCache()) {
-      this.initDimensions();
-      this.setCoords();
-    }
+    this.initDimensions();
+    this.setCoords();
     this._removeExtraneousStyles();
   }
 

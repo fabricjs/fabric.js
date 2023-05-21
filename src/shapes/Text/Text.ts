@@ -1,8 +1,9 @@
 // @ts-nocheck
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { TextStyle, TextStyleDeclaration } from './StyledText';
+import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
@@ -21,9 +22,19 @@ import {
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
-import { Path } from '../Path';
+import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from '../Object/types';
+import {
+  additionalProps,
+  textDefaultValues,
+  textLayoutProperties,
+} from './constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -37,6 +48,10 @@ function getMeasuringContext() {
   }
   return measuringContext;
 }
+
+type TPathSide = 'left' | 'right';
+
+type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
 
 /**
  * Measure and return the info of a single grapheme.
@@ -58,111 +73,42 @@ export type GraphemeBBox<onPath = false> = {
     }
   : Record<string, never>);
 
-const additionalProps = [
-  'fontFamily',
-  'fontWeight',
-  'fontSize',
-  'text',
-  'underline',
-  'overline',
-  'linethrough',
-  'textAlign',
-  'fontStyle',
-  'lineHeight',
-  'textBackgroundColor',
-  'charSpacing',
-  'styles',
-  'direction',
-  'path',
-  'pathStartOffset',
-  'pathSide',
-  'pathAlign',
-] as const;
+// @TODO this is not complete
+interface UniqueTextProps {
+  charSpacing: number;
+  lineHeight: number;
+  fontSize: number;
+  fontWeight: string;
+  fontFamily: string;
+  fontStyle: string;
+  pathSide: TPathSide;
+  pathAlign: TPathAlign;
+  underline: boolean;
+  overline: boolean;
+  linethrough: boolean;
+  textAlign: string;
+  direction: CanvasDirection;
+  path?: Path;
+}
 
-const textLayoutProperties: string[] = [
-  'fontSize',
-  'fontWeight',
-  'fontFamily',
-  'fontStyle',
-  'lineHeight',
-  'text',
-  'charSpacing',
-  'textAlign',
-  'styles',
-  'path',
-  'pathStartOffset',
-  'pathSide',
-  'pathAlign',
-];
+export interface SerializedTextProps
+  extends SerializedObjectProps,
+    UniqueTextProps {}
 
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _styleProperties: [
-    'stroke',
-    'strokeWidth',
-    'fill',
-    'fontFamily',
-    'fontSize',
-    'fontWeight',
-    'fontStyle',
-    'underline',
-    'overline',
-    'linethrough',
-    'deltaY',
-    'textBackgroundColor',
-  ],
-  _reNewline: /\r?\n/,
-  _reSpacesAndTabs: /[ \t\r]/g,
-  _reSpaceAndTab: /[ \t\r]/,
-  _reWords: /\S+/g,
-  fontSize: 40,
-  fontWeight: 'normal',
-  fontFamily: 'Times New Roman',
-  underline: false,
-  overline: false,
-  linethrough: false,
-  textAlign: 'left',
-  fontStyle: 'normal',
-  lineHeight: 1.16,
-  superscript: {
-    size: 0.6, // fontSize factor
-    baseline: -0.35, // baseline-shift factor (upwards)
-  },
-  subscript: {
-    size: 0.6, // fontSize factor
-    baseline: 0.11, // baseline-shift factor (downwards)
-  },
-  textBackgroundColor: '',
-  stroke: null,
-  shadow: null,
-  path: null,
-  pathStartOffset: 0,
-  pathSide: 'left',
-  pathAlign: 'baseline',
-  _fontSizeFraction: 0.222,
-  offsets: {
-    underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88,
-  },
-  _fontSizeMult: 1.13,
-  charSpacing: 0,
-  styles: null,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2,
-};
+export interface TextProps extends FabricObjectProps, UniqueTextProps {}
 
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends StyledText<EventSpec> {
+    Props extends TProps<TextProps> = Partial<TextProps>,
+    SProps extends SerializedTextProps = SerializedTextProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends StyledText<Props, SProps, EventSpec>
+  implements UniqueTextProps
+{
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
@@ -301,8 +247,6 @@ export class Text<
    */
   declare textBackgroundColor: string;
 
-  protected declare _styleProperties: string[];
-
   declare styles: TextStyle;
 
   /**
@@ -327,7 +271,7 @@ export class Text<
    * });
    * @default
    */
-  declare path: Path;
+  declare path: Path | null;
 
   /**
    * Offset amount for text path starting position
@@ -340,20 +284,20 @@ export class Text<
   /**
    * Which side of the path the text should be drawn on.
    * Only used when text has a path
-   * @type {String} 'left|right'
+   * @type {TPathSide} 'left|right'
    * @default
    */
-  declare pathSide: string;
+  declare pathSide: TPathSide;
 
   /**
    * How text is aligned to the path. This property determines
    * the perpendicular position of each character relative to the path.
    * (one of "baseline", "center", "ascender", "descender")
    * This feature is in BETA, and its behavior may change
-   * @type String
+   * @type TPathAlign
    * @default
    */
-  declare pathAlign: string;
+  declare pathAlign: TPathAlign;
 
   /**
    * @private
@@ -395,10 +339,10 @@ export class Text<
    * some interesting link for the future
    * https://www.w3.org/International/questions/qa-bidi-unicode-controls
    * @since 4.5.0
-   * @type {String} 'ltr|rtl'
+   * @type {CanvasDirection} 'ltr|rtl'
    * @default
    */
-  declare direction: string;
+  declare direction: CanvasDirection;
 
   /**
    * contains characters bounding boxes
@@ -441,8 +385,6 @@ export class Text<
   declare cursorWidth: number;
   declare __lineHeights: number[];
   declare __lineWidths: number[];
-  declare _forceClearCache: boolean;
-
   declare initialized?: true;
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
@@ -495,6 +437,7 @@ export class Text<
   initDimensions() {
     this._splitText();
     this._clearCache();
+    this.dirty = true;
     if (this.path) {
       this.width = this.path.width;
       this.height = this.path.height;
@@ -846,7 +789,7 @@ export class Text<
     }
     if (stylesAreEqual && fontCache[couple] !== undefined) {
       coupleWidth = fontCache[couple];
-      kernedWidth = coupleWidth - previousWidth;
+      kernedWidth = coupleWidth - previousWidth!;
     }
     if (
       width === undefined ||
@@ -1505,21 +1448,10 @@ export class Text<
    * @private
    */
   _clearCache() {
+    this._forceClearCache = false;
     this.__lineWidths = [];
     this.__lineHeights = [];
     this.__charBounds = [];
-  }
-
-  /**
-   * @private
-   */
-  _shouldClearDimensionCache() {
-    const shouldClear = this._forceClearCache;
-    if (shouldClear) {
-      this.dirty = true;
-      this._forceClearCache = false;
-    }
-    return shouldClear;
   }
 
   /**
@@ -1708,7 +1640,7 @@ export class Text<
     ) {
       return;
     }
-    if (this._shouldClearDimensionCache()) {
+    if (this._forceClearCache) {
       this.initDimensions();
     }
     super.render(ctx);
@@ -1754,7 +1686,10 @@ export class Text<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject([...additionalProps, ...propertiesToInclude]),
       styles: stylesToArray(this.styles, this.text),
@@ -1832,46 +1767,22 @@ export class Text<
    * @static
    * @memberOf Text
    * @param {SVGElement} element Element to parse
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (text: Text | null) => any,
-    options: object
-  ) {
-    if (!element) {
-      return callback(null);
-    }
+  static async fromElement(element: SVGElement, options: object) {
+    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
 
-    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
-      parsedAnchor = parsedAttributes.textAnchor || 'left';
-    options = Object.assign({}, options, parsedAttributes);
-
-    options.top = options.top || 0;
-    options.left = options.left || 0;
-    if (parsedAttributes.textDecoration) {
-      const textDecoration = parsedAttributes.textDecoration;
-      if (textDecoration.indexOf('underline') !== -1) {
-        options.underline = true;
-      }
-      if (textDecoration.indexOf('overline') !== -1) {
-        options.overline = true;
-      }
-      if (textDecoration.indexOf('line-through') !== -1) {
-        options.linethrough = true;
-      }
-      delete options.textDecoration;
-    }
-    if ('dx' in parsedAttributes) {
-      options.left += parsedAttributes.dx;
-    }
-    if ('dy' in parsedAttributes) {
-      options.top += parsedAttributes.dy;
-    }
-    if (!('fontSize' in options)) {
-      options.fontSize = DEFAULT_SVG_FONT_SIZE;
-    }
+    const {
+      textAnchor = 'left',
+      textDecoration = '',
+      dx = 0,
+      dy = 0,
+      top = 0,
+      left = 0,
+      fontSize = DEFAULT_SVG_FONT_SIZE,
+      strokeWidth = 1,
+      ...restOfOptions
+    } = { ...options, ...parsedAttributes };
 
     let textContent = '';
 
@@ -1891,10 +1802,21 @@ export class Text<
     textContent = textContent
       .replace(/^\s+|\s+$|\n+/g, '')
       .replace(/\s+/g, ' ');
-    const originalStrokeWidth = options.strokeWidth;
-    options.strokeWidth = 0;
 
-    const text = new this(textContent, options),
+    // this code here is probably the usual issue for SVG center find
+    // this can later looked at again and probably removed.
+
+    const text = new this(textContent, {
+        left: left + dx,
+        top: top + dy,
+        underline: textDecoration.includes('underline'),
+        overline: textDecoration.includes('overline'),
+        linethrough: textDecoration.includes('line-through'),
+        // we initialize this as 0
+        strokeWidth: 0,
+        fontSize,
+        ...restOfOptions,
+      }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1907,10 +1829,10 @@ export class Text<
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (parsedAnchor === 'center') {
+    if (textAnchor === 'center') {
       offX = text.getScaledWidth() / 2;
     }
-    if (parsedAnchor === 'right') {
+    if (textAnchor === 'right') {
       offX = text.getScaledWidth();
     }
     text.set({
@@ -1919,10 +1841,9 @@ export class Text<
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
           text.lineHeight,
-      strokeWidth:
-        typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
+      strokeWidth,
     });
-    callback(text);
+    return text;
   }
 
   /* _FROM_SVG_END_ */
@@ -1932,8 +1853,8 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject(object: Record<string, any>): Promise<Text> {
-    return this._fromObject(
+  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
+    return this._fromObject<Text>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),

@@ -1,8 +1,9 @@
-import { IPoint, Point } from '../../../Point';
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { getBisector, getOrthonormalVector, magnitude } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 /**
  * class in charge of finding projections for each type of line join
@@ -34,12 +35,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
    */
   declare bisector: ReturnType<typeof getBisector>;
 
-  constructor(
-    A: IPoint,
-    B: IPoint,
-    C: IPoint,
-    options: TProjectStrokeOnPointsOptions
-  ) {
+  constructor(A: XY, B: XY, C: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.B = new Point(B);

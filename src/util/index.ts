@@ -12,17 +12,23 @@ export {
   radiansToDegrees,
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
-export { projectStrokeOnPoints } from './misc/projectStroke';
+export * from './misc/projectStroke';
 export {
   transformPoint,
   invertTransform,
   composeMatrix,
   qrDecompose,
+  createTranslateMatrix,
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
   calcDimensionsMatrix,
-  calcRotateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
+export type { TextStyleArray } from './misc/textStyles';
 export {
   stylesFromArray,
   stylesToArray,
@@ -60,12 +66,17 @@ export {
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
+export type {
+  EnlivenObjectOptions,
+  LoadImageOptions,
+} from './misc/objectEnlive';
 export {
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
 } from './misc/objectEnlive';
 export { pick } from './misc/pick';
+export * from './path/typedefs';
 export {
   joinPath,
   parsePath,
@@ -87,7 +98,7 @@ export {
 } from './dom_misc';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';
-export { animate, animateColor } from './animation/animate';
+export * from './animation';
 export * as ease from './animation/easing';
 export {
   requestAnimFrame,

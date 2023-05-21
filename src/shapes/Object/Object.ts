@@ -1,7 +1,7 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
@@ -10,7 +10,7 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
-  TClassProperties,
+  Abortable,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -24,11 +24,15 @@ import {
   saveObjectTransform,
 } from '../../util/misc/objectTransforms';
 import { sendObjectToPlane } from '../../util/misc/planeChange';
-import { pick } from '../../util/misc/pick';
+import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
+import {
+  isFiller,
+  isSerializableFiller,
+  isTextObject,
+} from '../../util/typeAssertions';
 import type { Image } from '../Image';
 import {
   cacheProperties,
@@ -38,9 +42,10 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { ObjectProps } from './types/ObjectProps';
-import { TProps } from './types';
+import type { SerializedObjectProps } from './types/SerializedObjectProps';
+import type { ObjectProps } from './types/ObjectProps';
+import type { TProps } from './types';
+import { getEnv } from '../../env';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -122,6 +127,7 @@ export class FabricObject<
   declare clipPath?: FabricObject;
   declare inverted: boolean;
   declare absolutePositioned: boolean;
+  declare centeredRotation: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
@@ -280,7 +286,7 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options?: Props) {
+  constructor(options: Props = {} as Props) {
     super();
     Object.assign(
       this,
@@ -487,13 +493,10 @@ export class FabricObject<
 
   /**
    * Returns an object representation of an instance
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude?: K[]): { [R in K]: T[K] } & SProps {
+  protected toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -504,7 +507,7 @@ export class FabricObject<
             }
           : null,
       object = {
-        ...pick(this, propertiesToInclude),
+        ...pick(this, propertiesToInclude as (keyof this)[]),
         type: this.constructor.name,
         version: VERSION,
         originX: this.originX,
@@ -558,7 +561,7 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toDatalessObject(propertiesToInclude?: string[]) {
+  toDatalessObject(propertiesToInclude?: any[]): any {
     // will be overwritten by subclasses
     return this.toObject(propertiesToInclude);
   }
@@ -576,25 +579,22 @@ export class FabricObject<
       ? defaults
       : Object.getPrototypeOf(this);
 
-    Object.keys(object).forEach(function (prop) {
-      if (prop === 'left' || prop === 'top' || prop === 'type') {
-        return;
+    return pickBy(object, (value, key) => {
+      if (key === 'left' || key === 'top' || key === 'type') {
+        return true;
       }
-      if (object[prop] === baseValues[prop]) {
-        delete object[prop];
-      }
-      // basically a check for [] === []
-      if (
-        Array.isArray(object[prop]) &&
-        Array.isArray(baseValues[prop]) &&
-        object[prop].length === 0 &&
-        baseValues[prop].length === 0
-      ) {
-        delete object[prop];
-      }
+      const baseValue = baseValues[key];
+      return (
+        value !== baseValue &&
+        // basically a check for [] === []
+        !(
+          Array.isArray(value) &&
+          Array.isArray(baseValue) &&
+          value.length === 0 &&
+          baseValue.length === 0
+        )
+      );
     });
-
-    return object;
   }
 
   /**
@@ -754,8 +754,8 @@ export class FabricObject<
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.dirty = false;
       this.drawObject(ctx);
+      this.dirty = false;
     }
     ctx.restore();
   }
@@ -1244,8 +1244,10 @@ export class FabricObject<
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling;
-    pCanvas.width = width;
-    pCanvas.height = height;
+    // in case width and height are less than 1px, we have to round up.
+    // since the pattern is no-repeat, this is fine
+    pCanvas.width = Math.ceil(width);
+    pCanvas.height = Math.ceil(height);
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
@@ -1514,6 +1516,10 @@ export class FabricObject<
     runningAnimations.cancelByTarget(this);
     this.off();
     this._set('canvas', undefined);
+    // clear caches
+    this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
+    this._cacheCanvas = undefined;
+    this._cacheContext = null;
   }
 
   /**
@@ -1527,10 +1533,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
-    {
-      extraParam,
-      ...options
-    }: { extraParam?: string; signal?: AbortSignal } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1539,7 +1542,7 @@ export class FabricObject<
         // to avoid accidental overrides later
         if (extraParam) {
           const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-ignore;
+          // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
@@ -1557,8 +1560,8 @@ export class FabricObject<
    */
   static fromObject<T extends TProps<SerializedObjectProps>>(
     object: T,
-    options?: { signal?: AbortSignal }
-  ): Promise<FabricObject> {
+    options?: Abortable
+  ) {
     return this._fromObject(object, options);
   }
 }

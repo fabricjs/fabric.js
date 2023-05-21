@@ -1,9 +1,9 @@
-import { getDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
-import {
+import type {
   CanvasEvents,
   ModifierKey,
   TOptionalModifierKey,
@@ -15,11 +15,17 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import { StaticCanvas } from './StaticCanvas';
+import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import type {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -27,25 +33,11 @@ import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
 import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
+import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
-};
-
-export type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'contextCache'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'cacheCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
+import type { TCanvasSizeOptions } from './StaticCanvas';
+import { createCanvasElement } from '../util';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -481,15 +473,6 @@ export class SelectableCanvas<
   contextTopDirty = false;
 
   /**
-   * a reference to the context of an additional canvas that is used for scratch operations
-   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
-   * and is a memory waste. We should either have one that gets added/deleted
-   * @type CanvasRenderingContext2D
-   * @private
-   */
-  declare contextCache: CanvasRenderingContext2D;
-
-  /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
    * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
@@ -524,7 +507,9 @@ export class SelectableCanvas<
   declare upperCanvasEl: HTMLCanvasElement;
   declare contextTop: CanvasRenderingContext2D;
   declare wrapperEl: HTMLDivElement;
-  declare cacheCanvasEl: HTMLCanvasElement;
+  protected declare pixelFindCanvasEl: HTMLCanvasElement;
+  protected declare pixelFindContext: CanvasRenderingContext2D;
+
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
@@ -646,7 +631,7 @@ export class SelectableCanvas<
 
   /**
    * Given a pointer on the canvas with a viewport applied,
-   * find out the opinter in
+   * find out the pointer in object coordinates
    * @private
    */
   _normalizePointer(object: FabricObject, pointer: Point): Point {
@@ -654,6 +639,20 @@ export class SelectableCanvas<
       this.restorePointerVpt(pointer),
       invertTransform(object.calcTransformMatrix())
     );
+  }
+
+  /**
+   * Set the canvas tolerance value for pixel taret find.
+   * Use only integer numbers.
+   * @private
+   */
+  setTargetFindTolerance(value: number) {
+    value = Math.round(value);
+    this.targetFindTolerance = value;
+    const retina = this.getRetinaScaling();
+    const size = Math.ceil((value * 2 + 1) * retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    this.pixelFindContext.scale(retina, retina);
   }
 
   /**
@@ -667,44 +666,26 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimizatio: we can reuse the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-
-      return isTransparent(
-        target._cacheContext,
-        Math.round(targetRelativeX),
-        Math.round(targetRelativeY),
-        this.targetFindTolerance
-      );
-    }
-
-    const ctx = this.contextCache,
-      originalColor = target.selectionBackgroundColor,
-      v = this.viewportTransform;
-
-    target.selectionBackgroundColor = '';
-
+    const tolerance = this.targetFindTolerance;
+    const ctx = this.pixelFindContext;
     this.clearContext(ctx);
-
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    ctx.translate(-x + tolerance, -y + tolerance);
+    ctx.transform(...this.viewportTransform);
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
     target.render(ctx);
+    target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
-
-    target.selectionBackgroundColor = originalColor;
-
-    return isTransparent(ctx, x, y, this.targetFindTolerance);
+    // our canvas is square, and made around tolerance.
+    // so tolerance in this case also represent the center of the canvas.
+    const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
+    return isTransparent(
+      ctx,
+      enhancedTolerance,
+      enhancedTolerance,
+      enhancedTolerance
+    );
   }
 
   /**
@@ -1195,7 +1176,6 @@ export class SelectableCanvas<
   _setBackstoreDimension(prop: keyof TSize, value: number) {
     super._setBackstoreDimension(prop, value);
     this.upperCanvasEl[prop] = value;
-    this.cacheCanvasEl[prop] = value;
   }
 
   /**
@@ -1219,7 +1199,7 @@ export class SelectableCanvas<
 
     // if there is no upperCanvas (most common case) we create one.
     if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
+      this.upperCanvasEl = createCanvasElement();
     }
     const upperCanvasEl = this.upperCanvasEl;
     // we assign the same classname of the lowerCanvas
@@ -1237,12 +1217,15 @@ export class SelectableCanvas<
   }
 
   protected _createCacheCanvas() {
-    this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
+    this.pixelFindCanvasEl = createCanvasElement();
+    this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
+      willReadFrequently: true,
+    })!;
+    this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
   protected _initWrapperElement() {
-    const container = getDocument().createElement('div');
+    const container = getFabricDocument().createElement('div');
     container.classList.add(this.containerClass);
     this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
     this.wrapperEl.setAttribute('data-fabric', 'wrapper');
@@ -1502,41 +1485,46 @@ export class SelectableCanvas<
     }
   }
 
-  /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
-   */
-  destroy(this: TDestroyedCanvas<this>) {
-    const wrapperEl = this.wrapperEl as HTMLDivElement,
+  protected cleanupDOM(): void {
+    const wrapperEl = this.wrapperEl!,
       lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!,
-      activeSelection = this._activeSelection!;
-    // dispose of active selection
-    activeSelection.removeAll();
-    this._activeSelection = undefined;
-    activeSelection.dispose();
-    super.destroy();
+      upperCanvasEl = this.upperCanvasEl!;
+    super.cleanupDOM();
     wrapperEl.removeChild(upperCanvasEl);
     wrapperEl.removeChild(lowerCanvasEl);
-    this.contextCache = null;
-    this.contextTop = null;
-    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    getEnv().dispose(upperCanvasEl);
-    this.upperCanvasEl = undefined;
-    getEnv().dispose(cacheCanvasEl);
-    this.cacheCanvasEl = undefined;
     if (wrapperEl.parentNode) {
       wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
     }
+  }
+
+  /**
+   * @override clears active selection ref and interactive canvas elements and contexts
+   */
+  destroy() {
+    // dispose of active selection
+    const activeSelection = this._activeSelection!;
+    activeSelection.removeAll();
+    // @ts-expect-error disposing
+    this._activeSelection = undefined;
+    activeSelection.dispose();
+
+    super.destroy();
+
+    // free resources
+
+    // top canvas
+    // @ts-expect-error disposing
+    this.contextTop = null;
+    // @ts-expect-error disposing
+    this.upperCanvasEl = undefined;
+
+    // pixel find canvas
+    // @ts-expect-error disposing
+    this.pixelFindContext = null;
+    // @ts-expect-error disposing
+    this.pixelFindCanvasEl = undefined;
+
+    // @ts-expect-error disposing
     this.wrapperEl = undefined;
   }
 

@@ -1,4 +1,4 @@
-import { getDocument, getEnv } from '../env';
+import { getFabricDocument } from '../env';
 import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
@@ -10,9 +10,9 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
-import {
+import type {
+  Abortable,
   Constructor,
-  ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
   TFiller,
@@ -30,17 +30,20 @@ import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
-  EnlivenObjectOptions,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
-
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
+import {
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from '../util/typeAssertions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -59,10 +62,6 @@ export type TSVGExportOptions = {
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
-};
-
-type TCanvasHydrationOption = {
-  signal?: AbortSignal;
 };
 
 export const StaticCanvasDefaults = {
@@ -226,7 +225,7 @@ export class StaticCanvas<
    * If One of the corner of the bounding box of the object is on the canvas
    * the objects get rendered.
    * @type Boolean
-   * @default
+   * @default true
    */
   declare skipOffscreen: boolean;
 
@@ -402,20 +401,6 @@ export class StaticCanvas<
   }
 
   /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
    * Creates a bottom canvas
    * @private
    * @param {HTMLElement} [canvasEl]
@@ -426,8 +411,8 @@ export class StaticCanvas<
       this.lowerCanvasEl = canvasEl;
     } else {
       this.lowerCanvasEl =
-        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
+        (getFabricDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
+        createCanvasElement();
     }
     if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */
@@ -869,10 +854,15 @@ export class StaticCanvas<
     }
     if (object) {
       ctx.save();
+      const { skipOffscreen } = this;
+      // if the object doesn't move with the viewport,
+      // the offscreen concept does not apply;
+      this.skipOffscreen = needsVpt;
       if (needsVpt) {
         ctx.transform(...v);
       }
       object.render(ctx);
+      this.skipOffscreen = skipOffscreen;
       ctx.restore();
     }
   }
@@ -1470,7 +1460,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: TCanvasHydrationOption = {}
+    { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));
@@ -1575,7 +1565,7 @@ export class StaticCanvas<
    */
   toDataURL(options = {} as TDataUrlOptions): string {
     const {
-      format = ImageFormat.png,
+      format = 'png',
       quality = 1,
       multiplier = 1,
       enableRetinaScaling = false,
@@ -1645,6 +1635,7 @@ export class StaticCanvas<
    * @throws if aborted by a consequent call
    */
   dispose() {
+    !this.disposed && this.cleanupDOM();
     this.disposed = true;
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
@@ -1667,7 +1658,24 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources
+   * Invoked as part of the **sync** operation of {@link dispose}.
+   */
+  protected cleanupDOM() {
+    const canvasElement = this.lowerCanvasEl!;
+    // restore canvas style and attributes
+    canvasElement.classList.remove('lower-canvas');
+    canvasElement.removeAttribute('data-fabric');
+    // restore canvas size to original size in case retina scaling was applied
+    canvasElement.setAttribute('width', `${this.width}`);
+    canvasElement.setAttribute('height', `${this.height}`);
+    canvasElement.style.cssText = this._originalCanvasStyle || '';
+    this._originalCanvasStyle = undefined;
+  }
+
+  /**
+   * Clears the canvas element, disposes objects and frees resources.
+   *
+   * Invoked as part of the **async** operation of {@link dispose}.
    *
    * **CAUTION**:
    *
@@ -1693,18 +1701,8 @@ export class StaticCanvas<
     this.overlayImage = null;
     // @ts-expect-error disposing
     this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl;
     // @ts-expect-error disposing
     this.lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
   }
 
   /**

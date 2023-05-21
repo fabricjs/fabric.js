@@ -84,6 +84,11 @@
     assert.equal(oColor.toHex(), '000000');
   });
 
+  QUnit.test('toHexa rounds', function(assert) {
+    var oColor = new fabric.Color([211.23213213, 0, 128.1233123131]);
+    assert.equal(oColor.toHexa(), 'D30080FF');
+  });
+
   QUnit.test('toHexa', function(assert) {
     var oColor = new fabric.Color('ffffffff');
     assert.ok(typeof oColor.toHexa === 'function');
@@ -133,187 +138,113 @@
     assert.equal(oColor.toHex(), '000000', 'should work with threshold');
   });
 
-  QUnit.test('fromRgb', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgb === 'function');
-    var originalRgb = 'rgb(255,255,255)';
-    var oColor = fabric.Color.fromRgb(originalRgb);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgb(), originalRgb);
-    assert.equal(oColor.toHex(), 'FFFFFF');
+  QUnit.module('parsing colors');
+  [{
+    name: 'fromRgb',
+    stringToParse: 'rgb(255,255,255)',
+    expectedSource: [255, 255, 255, 1]
+  },{
+    name: 'fromRgb no commas',
+    stringToParse: 'rgb(255 0 255)',
+    expectedSource: [255, 0, 255, 1]
+  },{
+    name: 'fromRgb (with whitespaces)',
+    stringToParse: 'rgb( 255 , 128 , 64 )',
+    expectedSource: [255, 128, 64, 1]
+  },{
+    name: 'fromRgb no commas (with whitespaces)',
+    stringToParse: 'rgb( 255    128 64 )',
+    expectedSource: [255, 128, 64, 1]
+  },{
+    name: 'fromRgb (percentage values)',
+    stringToParse: 'rgb(100%,50%,25%)',
+    expectedSource: [255, 127, 64, 1]
+  },{
+    name: 'fromRgb (percentage values with whitespaces)',
+    stringToParse: 'rgb(100% ,   50% ,  25%)',
+    expectedSource: [255, 127, 64, 1]
+  },{
+    name: 'fromRgba',
+    stringToParse: 'rgba(255,12,10,0.5)',
+    expectedSource: [255, 12, 10, 0.5]
+  },{
+    name: 'fromRgba without commas',
+    stringToParse: 'rgba(255 12 10 / 0.5)',
+    expectedSource: [255, 12, 10, 0.5]
+  },{
+    name: 'fromRgba (with spaces and missing 0)',
+    stringToParse: 'rgba( 255 , 12 , 10 , .3 )',
+    expectedSource: [255, 12, 10, 0.3]
+  },{
+    name: 'fromRgba (with whitespaces)',
+    stringToParse: 'rgba( 255 , 33 , 44 , 0.6 )',
+    expectedSource: [255, 33, 44, 0.6]
+  },{
+    name: 'fromRgba (percentage values)',
+    stringToParse: 'rgba(100%,50%,25%,33%)',
+    expectedSource: [255, 127, 64, 0.33]
+  },{
+    name: 'fromRgba (percentage values)',
+    stringToParse: 'rgba(  100.00%  ,50.40%,   25.1%   ,  33%  )',
+    expectedSource: [255, 129, 64, 0.33]
+  },{
+    name: 'fromRgba (percentage values with whitespaces)',
+    stringToParse: 'rgba(  100.00%  ,50.80%,   25.1%   ,  33%  )',
+    expectedSource: [255, 130, 64, 0.33]
+  },{
+    name: 'fromRgba (percentage values with whitespaces no zeroes)',
+    stringToParse: 'rgba(  .99%  ,50.40%,   25.1%   ,  .33  )',
+    expectedSource: [3, 129, 64, 0.33]
+  }].forEach(({ name, stringToParse, expectedSource }) => {
+    QUnit.test(name, function(assert) {
+      var oColor = fabric.Color.fromRgba(stringToParse);
+      assert.ok(oColor);
+      assert.ok(oColor instanceof fabric.Color);
+      assert.deepEqual(oColor.getSource(), expectedSource);
+      var oColorUppercase = fabric.Color.fromRgb(stringToParse.toUpperCase());
+      assert.ok(oColorUppercase);
+      assert.ok(oColorUppercase instanceof fabric.Color);
+      assert.deepEqual(oColorUppercase.getSource(), expectedSource);
+    });
+  });
+  
+  [{
+    name: 'fromHsl',
+    stringToParse: 'hsl(262,80%,12%)',
+    expectedSource: [24, 6, 55, 1]
+  },{
+    name: 'fromHsl (with whitespaces)',
+    stringToParse: 'hsl( 262 , 80% , 12% )',
+    expectedSource: [24, 6, 55, 1]
+  },{
+    name: 'fromHsla',
+    stringToParse: 'hsla(108,50%,50%,0.7)',
+    expectedSource: [89, 191, 64, 0.7]
+  },{
+    name: 'fromHsla (with whitespaces)',
+    stringToParse: 'hsla(  108  ,50%  , 50%    ,.2)',
+    expectedSource: [89, 191, 64, 0.2]
+  },{
+    name: 'fromHsla no commas(with whitespaces)',
+    stringToParse: 'hsl( 108  50%   50%  / .5)',
+    expectedSource: [89, 191, 64, 0.5]
+  },{
+    name: 'fromHsla with very counterClockwise value)',
+    stringToParse: 'hsl( -450,  50%,   50%, .5)',
+    expectedSource: [127, 64, 191, 0.5]
+  }].forEach(({ name, stringToParse, expectedSource }) => {
+    QUnit.test(name, function(assert) {
+      var oColor = fabric.Color.fromHsla(stringToParse);
+      assert.ok(oColor);
+      assert.ok(oColor instanceof fabric.Color);
+      assert.deepEqual(oColor.getSource(), expectedSource);
+      var oColorUppercase = fabric.Color.fromHsla(stringToParse.toUpperCase());
+      assert.ok(oColorUppercase);
+      assert.ok(oColorUppercase instanceof fabric.Color);
+      assert.deepEqual(oColorUppercase.getSource(), expectedSource);
+    });
   });
 
-  QUnit.test('fromRgb (with whitespaces)', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgb === 'function');
-    var originalRgb = 'rgb( 255 , 255 , 255 )';
-    var oColor = fabric.Color.fromRgb(originalRgb);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgb(), 'rgb(255,255,255)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-  });
-
-  QUnit.test('fromRgb (percentage values)', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgb === 'function');
-    var originalRgb = 'rgb(100%,100%,100%)';
-    var oColor = fabric.Color.fromRgb(originalRgb);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgb(), 'rgb(255,255,255)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-  });
-
-  QUnit.test('fromRgb (percentage values with whitespaces)', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgb === 'function');
-    var originalRgb = 'rgb( 100% , 100% , 100% )';
-    var oColor = fabric.Color.fromRgb(originalRgb);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgb(), 'rgb(255,255,255)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-  });
-
-  QUnit.test('fromRgb (uppercase)', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgb === 'function');
-    var originalRgb = 'RGB(255,255,255)';
-    var oColor = fabric.Color.fromRgb(originalRgb);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHex(), 'FFFFFF');
-  });
-
-  QUnit.test('fromRgba (uppercase)', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgba === 'function');
-    var originalRgba = 'RGBA(255,255,255,0.5)';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba', function(assert) {
-    assert.ok(typeof fabric.Color.fromRgba === 'function');
-    var originalRgba = 'rgba(255,255,255,0.5)';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgba(), originalRgba);
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba (with missing 0)', function(assert) {
-    var originalRgba = 'rgba( 255 , 255 , 255 , .3 )';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.3)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.3, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba (with whitespaces)', function(assert) {
-    var originalRgba = 'rgba( 255 , 255 , 255 , 0.5 )';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba (percentage values)', function(assert) {
-    var originalRgba = 'rgba(100%,100%,100%,0.5)';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba (percentage values with whitespaces)', function(assert) {
-    var originalRgba = 'rgba( 100% , 100% , 100% , 0.5 )';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromRgba (percentage values with decimals)', function(assert) {
-    var originalRgba = 'rgba( 100.00%, 100.00%, 100.00% , 0.5 )';
-    var oColor = fabric.Color.fromRgba(originalRgba);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toRgba(), 'rgba(255,255,255,0.5)');
-    assert.equal(oColor.toHex(), 'FFFFFF');
-    assert.equal(oColor.getAlpha(), 0.5, 'alpha should be set properly');
-  });
-
-
-  QUnit.test('fromHsl', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsl === 'function');
-    var originalHsl = 'hsl(262,80%,12%)';
-    var oColor = fabric.Color.fromHsl(originalHsl);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHsl(), originalHsl);
-    assert.equal(oColor.toHex(), '180637');
-  });
-
-  QUnit.test('fromHsl (with whitespaces)', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsl === 'function');
-    var originalHsl = 'hsl( 262 , 80% , 12% )';
-    var oColor = fabric.Color.fromHsl(originalHsl);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHsl(), 'hsl(262,80%,12%)');
-    assert.equal(oColor.toHex(), '180637');
-  });
-
-  QUnit.test('fromHsl (uppercase)', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsl === 'function');
-    var originalHsl = 'HSL(270,50%,40%)';
-    var oColor = fabric.Color.fromHsl(originalHsl);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHex(), '663399');
-    assert.equal(oColor.toRgba(), 'rgba(102,51,153,1)');
-  });
-
-  QUnit.test('fromHsla (uppercase)', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsla === 'function');
-    var originalHsla = 'HSLA(108,50%,50%,0.7)';
-    var oColor = fabric.Color.fromHsla(originalHsla);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHex(), '59BF40');
-    assert.equal(oColor.toRgba(), 'rgba(89,191,64,0.7)');
-    assert.equal(oColor.getAlpha(), 0.7, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromHsla', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsla === 'function');
-    var originalHsla = 'hsla(262,80%,12%,0.2)';
-    var oColor = fabric.Color.fromHsla(originalHsla);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHsla(), originalHsla);
-    assert.equal(oColor.toHex(), '180637');
-    assert.equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
-  });
-
-  QUnit.test('fromHsla (with whitespaces)', function(assert) {
-    assert.ok(typeof fabric.Color.fromHsla === 'function');
-    var originalHsla = 'hsla( 262 , 80% , 12% , 0.2 )';
-    var oColor = fabric.Color.fromHsla(originalHsla);
-    assert.ok(oColor);
-    assert.ok(oColor instanceof fabric.Color);
-    assert.equal(oColor.toHsla(), 'hsla(262,80%,12%,0.2)');
-    assert.equal(oColor.toHex(), '180637');
-    assert.equal(oColor.getAlpha(), 0.2, 'alpha should be set properly');
-  });
 
   QUnit.test('fromHex', function(assert) {
     assert.ok(typeof fabric.Color.fromHex === 'function');

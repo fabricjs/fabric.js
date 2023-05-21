@@ -1,5 +1,5 @@
-import { createCanvasElement } from '../../util/misc/dom';
-import { GLProbe, GLPrecision } from './GLProbe';
+import { GLProbe } from './GLProbe';
+import type { GLPrecision } from './GLProbe';
 
 /**
  * Lazy initialize WebGL constants
@@ -30,13 +30,12 @@ export class WebGLProbe extends GLProbe {
   /**
    * query browser for WebGL
    */
-  queryWebGL() {
-    const canvas = createCanvasElement();
+  queryWebGL(canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl');
     if (gl) {
       this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this.GLPrecision = Object.values(GLPrecision).find((precision) =>
-        this.testPrecision(gl, precision)
+      this.GLPrecision = (['highp', 'mediump', 'lowp'] as const).find(
+        (precision) => this.testPrecision(gl, precision)
       );
       console.log(`fabric: max texture size ${this.maxTextureSize}`);
     }

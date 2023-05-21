@@ -4,7 +4,7 @@ import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { FabricObject as BaseFabricObject } from '../shapes/Object/Object';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -15,7 +15,7 @@ import {
   parseGradientUnits,
   parseType,
 } from './parser';
-import {
+import type {
   ColorStop,
   GradientCoords,
   GradientOptions,
@@ -377,6 +377,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
+    const center = instance._findCenterFromElement();
     return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
@@ -391,8 +392,8 @@ export class Gradient<
       ),
       ...(gradientUnits === 'pixels'
         ? {
-            offsetX: -instance.left,
-            offsetY: -instance.top,
+            offsetX: instance.width / 2 - center.x,
+            offsetY: instance.height / 2 - center.y,
           }
         : {
             offsetX: 0,

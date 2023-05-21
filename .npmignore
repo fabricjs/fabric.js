@@ -8,3 +8,5 @@ coverage/
 test/
 test*
 .DS_Store
+.codesandbox/
+.devcontainer/

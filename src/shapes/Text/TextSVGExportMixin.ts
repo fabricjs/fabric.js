@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { config } from '../../config';
-import { TSVGReviver } from '../../typedefs';
+import type { TSVGReviver } from '../../typedefs';
 import { escapeXml } from '../../util/lang_string';
 import { createSVGRect } from '../../util/misc/svgParsing';
 import { hasStyleChanged } from '../../util/misc/textStyles';
