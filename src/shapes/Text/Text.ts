@@ -39,7 +39,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from './constants';
-import { CENTER, LEFT, RIGHT } from '../../constants';
+import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -625,10 +625,10 @@ export class Text<
           ctx.textBaseline = 'middle';
           break;
         case 'ascender':
-          ctx.textBaseline = 'top';
+          ctx.textBaseline = TOP;
           break;
         case 'descender':
-          ctx.textBaseline = 'bottom';
+          ctx.textBaseline = BOTTOM;
           break;
       }
     }
