@@ -116,7 +116,7 @@ export class Canvas extends SelectableCanvas {
 
   private _isClick: boolean;
 
-  textEditingManager = new TextEditingManager();
+  textEditingManager = new TextEditingManager(this);
 
   constructor(el: string | HTMLCanvasElement, options = {}) {
     super(el, options);
@@ -1593,7 +1593,7 @@ export class Canvas extends SelectableCanvas {
    * @override clear {@link textEditingManager}
    */
   clear() {
-    this.textEditingManager.dispose();
+    this.textEditingManager.clear();
     super.clear();
   }
 
@@ -1602,7 +1602,7 @@ export class Canvas extends SelectableCanvas {
    */
   destroy() {
     this.removeListeners();
-    super.destroy();
     this.textEditingManager.dispose();
+    super.destroy();
   }
 }
