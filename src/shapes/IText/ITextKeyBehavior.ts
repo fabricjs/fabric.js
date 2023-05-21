@@ -76,10 +76,10 @@ export abstract class ITextKeyBehavior<
     Object.entries(attributes).map(([attribute, value]) =>
       textarea.setAttribute(attribute, value)
     );
-    const style = this._calcTextareaPosition();
+    const { top, left, fontSize } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
-    textarea.style.cssText = `position: absolute; top: ${style.top}; left: ${style.left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${style.fontSize};`;
+    textarea.style.cssText = `position: absolute; top: ${top}; left: ${left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${fontSize};`;
 
     (this.hiddenTextareaContainer || doc.body).appendChild(textarea);
 
