@@ -2,6 +2,11 @@
 
 ## [next]
 
+- chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+
+## [6.0.0-beta6]
+
+- patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
 - feat(Color) Improve regex for new standards, more documentation and code cleanup [#8916](https://github.com/fabricjs/fabric.js/pull/8916)
 - fix(TS): extending canvas and object event types (`type` => `interface`) [#8926](https://github.com/fabricjs/fabric.js/pull/8926)
 - chore(build) simple deps update [#8929](https://github.com/fabricjs/fabric.js/pull/8929)
