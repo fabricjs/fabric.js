@@ -90,3 +90,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
 };
+
+export const JUSTIFY = 'justify';
+export const JUSTIFY_LEFT = 'justify-left';
+export const JUSTIFY_RIGHT = 'justify-right';
+export const JUSTIFY_CENTER = 'justify-center';

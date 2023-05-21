@@ -2,10 +2,6 @@ import { Canvas } from '../../canvas/Canvas';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import {
-  JUSTIFY,
-  JUSTIFY_CENTER,
-  JUSTIFY_LEFT,
-  JUSTIFY_RIGHT,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
   keysMap,
@@ -14,6 +10,12 @@ import {
 import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
+import {
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
+} from '../Text/constants';
 import { CENTER, LEFT } from '../../constants';
 
 type CursorBoundaries = {

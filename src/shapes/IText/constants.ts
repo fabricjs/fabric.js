@@ -51,8 +51,3 @@ export const ctrlKeysMapUp: TKeyMapIText = {
 export const ctrlKeysMapDown: TKeyMapIText = {
   65: 'selectAll',
 };
-
-export const JUSTIFY = 'justify';
-export const JUSTIFY_LEFT = 'justify-left';
-export const JUSTIFY_RIGHT = 'justify-right';
-export const JUSTIFY_CENTER = 'justify-center';
