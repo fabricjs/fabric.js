@@ -571,11 +571,12 @@ export class Text<
 
   getCacheState() {
     const data = super.getCacheState();
+    const lineHeight = this.getHeightOfLine(0);
     // IMHO in these lines we are using zoomX and zoomY not the this version.
     const additionalWidth =
-      data.additionalSize.width + this.getHeightOfLine(0) * this.zoomX!;
+      data.additionalSize.width + lineHeight * this.zoomX!;
     const additionalHeight =
-      data.additionalSize.height + this.getHeightOfLine(0) * this.zoomY!;
+      data.additionalSize.height + lineHeight * this.zoomY!;
     return {
       ...data,
       redraw: true,
@@ -584,8 +585,8 @@ export class Text<
         height: additionalHeight,
       },
       resize: {
-        width: Math.ceil(width + additionalWidth),
-        height: Math.ceil(height + additionalHeight),
+        width: Math.ceil(data.width + additionalWidth),
+        height: Math.ceil(data.height + additionalHeight),
       },
     };
   }
