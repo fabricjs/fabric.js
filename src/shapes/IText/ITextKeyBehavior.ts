@@ -1,5 +1,4 @@
-//@ts-nocheck
-
+// @ts-nocheck
 import { config } from '../../config';
 import { getFabricDocument, getEnv } from '../../env';
 import type { TPointerEvent } from '../../EventTypeDefs';
@@ -64,18 +63,15 @@ export abstract class ITextKeyBehavior<
     const doc =
       (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
       getFabricDocument();
-    const attributes = {
+    const textarea = doc.createElement('textarea');
+    Object.entries({
       autocapitalize: 'off',
       autocorrect: 'off',
       autocomplete: 'off',
       spellcheck: 'false',
       'data-fabric': 'textarea',
       wrap: 'off',
-    };
-    const textarea = doc.createElement('textarea');
-    Object.entries(attributes).map(([attribute, value]) =>
-      textarea.setAttribute(attribute, value)
-    );
+    }).map(([attribute, value]) => textarea.setAttribute(attribute, value));
     const { top, left, fontSize } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
@@ -83,7 +79,7 @@ export abstract class ITextKeyBehavior<
 
     (this.hiddenTextareaContainer || doc.body).appendChild(textarea);
 
-    const eventsHandlers: Record<string, keyof this> = {
+    Object.entries({
       blur: 'blur',
       keydown: 'onKeyDown',
       keyup: 'onKeyUp',
@@ -94,9 +90,11 @@ export abstract class ITextKeyBehavior<
       compositionstart: 'onCompositionStart',
       compositionupdate: 'onCompositionUpdate',
       onCompositionUpdate: 'onCompositionEnd',
-    };
-    Object.entries(eventsHandlers).map(([eventName, handler]) =>
-      textarea.addEventListener(eventName, this[handler].bind(this))
+    } as Record<string, keyof this>).map(([eventName, handler]) =>
+      textarea.addEventListener(
+        eventName,
+        (this[handler] as Function).bind(this)
+      )
     );
     this.hiddenTextarea = textarea;
   }
