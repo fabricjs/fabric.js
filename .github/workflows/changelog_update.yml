@@ -3,11 +3,11 @@ name: 'Update 📋'
 on:
   pull_request:
     branches: [master]
-    types: [edited]
+    types: [opened, edited]
 
 jobs:
   changelog:
-    if: github.event.changes.title.from != github.event.pull_request.title
+    if: github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title
     uses: ./.github/workflows/changelog.yml
     with:
       update: true
