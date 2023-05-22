@@ -1585,10 +1585,6 @@ export class Canvas extends SelectableCanvas {
     return true;
   }
 
-  exitTextEditing() {
-    this.textEditingManager.exitTextEditing();
-  }
-
   /**
    * @override clear {@link textEditingManager}
    */
