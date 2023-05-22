@@ -4,8 +4,6 @@ import type { FabricObject } from '../shapes/Object/Object';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
-import type { IText } from '../shapes/IText/IText';
-import type { Textbox } from '../shapes/Textbox';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -45,12 +43,4 @@ export const isTextObject = (
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
   return !!fabricObject && fabricObject.isType('Text', 'IText', 'Textbox');
-};
-
-export const isInteractiveTextObject = (
-  fabricObject?: FabricObject
-): fabricObject is IText | Textbox => {
-  // we could use instanceof but that would mean pulling in Text code for a simple check
-  // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('IText', 'Textbox');
 };

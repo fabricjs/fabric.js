@@ -16,7 +16,6 @@ import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { isInteractiveTextObject } from '../util/typeAssertions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -870,13 +869,7 @@ export class Canvas extends SelectableCanvas {
     target && (target.__corner = undefined);
     if (shouldRender) {
       this.requestRenderAll();
-    } else if (
-      !isClick &&
-      !(
-        isInteractiveTextObject(this._activeObject) &&
-        this._activeObject.isEditing
-      )
-    ) {
+    } else if (!isClick && !(this._activeObject as IText).isEditing) {
       this.renderTop();
     }
   }
