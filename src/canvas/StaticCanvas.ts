@@ -10,6 +10,7 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
+import type { Text } from '../shapes/Text';
 import type {
   Abortable,
   Constructor,
@@ -38,12 +39,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isCollection, isFiller, isPattern } from '../util/typeAssertions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1305,7 +1301,6 @@ export class StaticCanvas<
    */
   createSVGFontFacesMarkup(): string {
     const objects: FabricObject[] = [],
-      fontList: Record<string, boolean> = {},
       fontPaths = config.fontPaths;
 
     this._objects.forEach(function add(object) {
@@ -1315,29 +1310,15 @@ export class StaticCanvas<
       }
     });
 
-    objects.forEach((obj) => {
-      if (!isTextObject(obj)) {
-        return;
-      }
-      let fontFamily = obj.fontFamily;
-      if (fontList[fontFamily] || !fontPaths[fontFamily]) {
-        return;
-      }
-      fontList[fontFamily] = true;
-      if (!obj.styles) {
-        return;
-      }
-      Object.values(obj.styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach((textCharStyle) => {
-          fontFamily = textCharStyle.fontFamily;
-          if (!fontList[fontFamily] && fontPaths[fontFamily]) {
-            fontList[fontFamily] = true;
-          }
-        });
-      });
-    });
-
-    const fontListMarkup = Object.keys(fontList)
+    const fontListMarkup = Object.keys(
+      objects.reduce(
+        (list, obj) =>
+          typeof (obj as Text).getSVGFontList === 'function'
+            ? Object.assign(list, (obj as Text).getSVGFontList() || {})
+            : list,
+        {} as Record<string, boolean>
+      )
+    )
       .map(
         (fontFamily) =>
           `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`

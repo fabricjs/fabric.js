@@ -285,4 +285,26 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   getSvgStyles(skipShadow?: boolean) {
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
+
+  getSVGFontList() {
+    let fontFamily = this.fontFamily;
+    const fontList: Record<string, boolean> = {},
+      fontPaths = config.fontPaths;
+    if (fontList[fontFamily] || !fontPaths[fontFamily]) {
+      return;
+    }
+    fontList[fontFamily] = true;
+    if (!this.styles) {
+      return;
+    }
+    Object.values(this.styles).forEach((styleRow) => {
+      Object.values(styleRow).forEach((textCharStyle) => {
+        fontFamily = textCharStyle.fontFamily;
+        if (!fontList[fontFamily] && fontPaths[fontFamily]) {
+          fontList[fontFamily] = true;
+        }
+      });
+    });
+    return fontList;
+  }
 }
