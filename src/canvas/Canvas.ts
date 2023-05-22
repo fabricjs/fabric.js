@@ -1,4 +1,4 @@
-import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
+import { LEFT_CLICK, MIDDLE_CLICK, NONE, RIGHT_CLICK } from '../constants';
 import type {
   CanvasEvents,
   DragEventData,
@@ -361,7 +361,7 @@ export class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   private _onDragEnd(e: DragEvent) {
-    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== 'none',
+    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== NONE,
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,

@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
 - ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)

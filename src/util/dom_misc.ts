@@ -1,3 +1,5 @@
+import { LEFT, TOP, NONE } from '../constants';
+
 /**
  * Wraps element with another element
  * @param {HTMLElement} element Element to wrap
@@ -62,10 +64,10 @@ export function getElementOffset(element: HTMLElement) {
   const doc = element && getDocumentFromElement(element),
     offset = { left: 0, top: 0 },
     offsetAttributes = {
-      borderLeftWidth: 'left',
-      borderTopWidth: 'top',
-      paddingLeft: 'left',
-      paddingTop: 'top',
+      borderLeftWidth: LEFT,
+      borderTopWidth: TOP,
+      paddingLeft: LEFT,
+      paddingTop: TOP,
     } as const;
 
   if (!doc) {
@@ -101,7 +103,7 @@ export function makeElementUnselectable(element: HTMLElement) {
   if (typeof element.onselectstart !== 'undefined') {
     element.onselectstart = () => false;
   }
-  element.style.userSelect = 'none';
+  element.style.userSelect = NONE;
   return element;
 }
 

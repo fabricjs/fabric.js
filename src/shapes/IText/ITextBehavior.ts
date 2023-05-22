@@ -13,6 +13,7 @@ import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TProps } from '../Object/types';
 import { getDocumentFromElement } from '../../util/dom_misc';
+import { LEFT, RIGHT } from '../../constants';
 
 /**
  *  extend this regex to support non english languages
@@ -1038,14 +1039,14 @@ export abstract class ITextBehavior<
   ) {
     if (newSelection <= start) {
       if (end === start) {
-        this._selectionDirection = 'left';
-      } else if (this._selectionDirection === 'right') {
-        this._selectionDirection = 'left';
+        this._selectionDirection = LEFT;
+      } else if (this._selectionDirection === RIGHT) {
+        this._selectionDirection = LEFT;
         this.selectionEnd = start;
       }
       this.selectionStart = newSelection;
     } else if (newSelection > start && newSelection < end) {
-      if (this._selectionDirection === 'right') {
+      if (this._selectionDirection === RIGHT) {
         this.selectionEnd = newSelection;
       } else {
         this.selectionStart = newSelection;
@@ -1053,9 +1054,9 @@ export abstract class ITextBehavior<
     } else {
       // newSelection is > selection start and end
       if (end === start) {
-        this._selectionDirection = 'right';
-      } else if (this._selectionDirection === 'left') {
-        this._selectionDirection = 'right';
+        this._selectionDirection = RIGHT;
+      } else if (this._selectionDirection === LEFT) {
+        this._selectionDirection = RIGHT;
         this.selectionStart = end;
       }
       this.selectionEnd = newSelection;

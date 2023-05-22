@@ -1,7 +1,7 @@
 import { Point } from '../Point';
 import { Control } from './Control';
 import type { TMat2D } from '../typedefs';
-import { iMatrix } from '../constants';
+import { CENTER, iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
@@ -49,7 +49,7 @@ const polyActionHandler = (
 ) => {
   const poly = transform.target as Polyline,
     pointIndex = transform.pointIndex,
-    mouseLocalPosition = getLocalPoint(transform, 'center', 'center', x, y),
+    mouseLocalPosition = getLocalPoint(transform, CENTER, CENTER, x, y),
     polygonBaseSize = getSize(poly),
     size = poly._getTransformedDimensions(),
     sizeFactor = polygonBaseSize.divide(size),
