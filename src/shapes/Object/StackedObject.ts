@@ -3,7 +3,6 @@ import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
-import { isActiveSelection } from '../../util/typeAssertions';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
@@ -42,17 +41,14 @@ export class StackedObject<
    * A reference to the parent of the object
    * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
    */
-  declare __owningGroup?: Group;
+  declare parent?: Group;
 
   /**
    * Returns instance's parent **EXCLUDING** `ActiveSelection`
    * @param {boolean} [strict] exclude canvas as well
    */
   getParent<T extends boolean>(strict?: T): TAncestor | undefined {
-    return (
-      (isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
-      (strict ? undefined : this.canvas)
-    );
+    return this.parent || (strict ? undefined : this.canvas);
   }
 
   /**
@@ -63,12 +59,14 @@ export class StackedObject<
    */
   isDescendantOf(target: TAncestor): boolean {
     return (
-      this.__owningGroup === target ||
+      this.parent === target ||
       this.group === target ||
       this.canvas === target ||
       // walk up
-      (!!this.__owningGroup && this.__owningGroup.isDescendantOf(target)) ||
-      (!!this.group && this.group.isDescendantOf(target))
+      (!!this.parent && this.parent.isDescendantOf(target)) ||
+      (!!this.group &&
+        this.group !== this.parent &&
+        this.group.isDescendantOf(target))
     );
   }
 

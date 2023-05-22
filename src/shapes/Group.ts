@@ -408,6 +408,7 @@ export class Group extends createCollectionMixin(
       object.group.remove(object);
     }
     this._enterGroup(object, removeParentTransform);
+    object._set('parent', this);
     return true;
   }
 
@@ -451,6 +452,7 @@ export class Group extends createCollectionMixin(
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    object._set('parent', undefined);
     object._set('canvas', undefined);
   }
 

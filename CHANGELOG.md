@@ -133,6 +133,7 @@
 - chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
 - BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+- chore(): cleanup type assertions, expose `Object#parent` => rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 
 ## [6.0.0-beta7]
 
@@ -140,6 +141,7 @@
 - chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
 - ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
+- chore(): cleanup type assertions, expose `Object#parent` => rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 - refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
