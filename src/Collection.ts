@@ -1,8 +1,17 @@
-import type { Constructor, TBBox } from './typedefs';
 import type { BaseFabricObject } from './EventTypeDefs';
-import { removeFromArray } from './util/internals';
 import { Point } from './Point';
+import type { ActiveSelection } from './shapes/ActiveSelection';
+import type { Group } from './shapes/Group';
 import type { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
+import type { FabricObject } from './shapes/Object/Object';
+import type { Constructor, TBBox } from './typedefs';
+import { removeFromArray } from './util/internals';
+
+export const isCollection = (
+  fabricObject?: FabricObject
+): fabricObject is Group | ActiveSelection => {
+  return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
+};
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {

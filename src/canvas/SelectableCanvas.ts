@@ -16,7 +16,7 @@ import {
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import { StaticCanvas } from './StaticCanvas';
-import { isCollection } from '../util/typeAssertions';
+import { isCollection } from '../Collection';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {

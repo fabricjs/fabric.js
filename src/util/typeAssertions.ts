@@ -1,5 +1,3 @@
-import type { ActiveSelection } from '../shapes/ActiveSelection';
-import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/Object';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
@@ -23,12 +21,6 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
     (filler as Pattern).offsetX !== undefined &&
     (filler as Pattern).source !== undefined
   );
-};
-
-export const isCollection = (
-  fabricObject?: FabricObject
-): fabricObject is Group | ActiveSelection => {
-  return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
 
 export const isTextObject = (

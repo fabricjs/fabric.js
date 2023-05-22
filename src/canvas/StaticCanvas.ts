@@ -3,7 +3,7 @@ import { config } from '../config';
 import { iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
-import { createCollectionMixin } from '../Collection';
+import { createCollectionMixin, isCollection } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
@@ -38,12 +38,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isFiller, isPattern, isTextObject } from '../util/typeAssertions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
