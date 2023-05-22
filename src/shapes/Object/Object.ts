@@ -7,11 +7,11 @@ import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
   TDegree,
-  TFiller,
   TSize,
   TCacheCanvasDimensions,
   Abortable,
 } from '../../typedefs';
+import type { TFiller } from '../../fillers/typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
@@ -28,11 +28,8 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import {
-  isFiller,
-  isSerializableFiller,
-  isTextObject,
-} from '../../util/typeAssertions';
+import { isTextObject } from '../../util/typeAssertions';
+import { isFiller } from '../../fillers/Filler';
 import type { Image } from '../Image';
 import {
   cacheProperties,
@@ -516,12 +513,8 @@ export class FabricObject<
         top: toFixed(this.top, NUM_FRACTION_DIGITS),
         width: toFixed(this.width, NUM_FRACTION_DIGITS),
         height: toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill: isSerializableFiller(this.fill)
-          ? this.fill.toObject()
-          : this.fill,
-        stroke: isSerializableFiller(this.stroke)
-          ? this.stroke.toObject()
-          : this.stroke,
+        fill: isFiller(this.fill) ? this.fill.toObject() : this.fill,
+        stroke: isFiller(this.stroke) ? this.stroke.toObject() : this.stroke,
         strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
         strokeDashArray: this.strokeDashArray
           ? this.strokeDashArray.concat()

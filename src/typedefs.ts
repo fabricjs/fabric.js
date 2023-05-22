@@ -1,7 +1,5 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { BaseFabricObject } from './EventTypeDefs';
-import type { Gradient } from './gradient/Gradient';
-import type { Pattern } from './Pattern';
 import type { XY, Point } from './Point';
 
 interface NominalTag<T> {
@@ -28,8 +26,6 @@ export type TRadian = Nominal<number, Radian>;
 export type TAxis = 'x' | 'y';
 
 export type TAxisKey<T extends string> = `${T}${Capitalize<TAxis>}`;
-
-export type TFiller = Gradient<'linear'> | Gradient<'radial'> | Pattern;
 
 export type TSize = {
   width: number;

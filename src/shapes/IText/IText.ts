@@ -7,7 +7,8 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { AssertKeys, TFiller } from '../../typedefs';
+import type { AssertKeys } from '../../typedefs';
+import type { TFiller } from '../../fillers/typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 

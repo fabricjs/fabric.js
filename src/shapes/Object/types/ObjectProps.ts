@@ -1,7 +1,7 @@
 import type { Shadow } from '../../../Shadow';
 import type { Canvas } from '../../../canvas/Canvas';
 import type { StaticCanvas } from '../../../canvas/StaticCanvas';
-import type { TFiller } from '../../../typedefs';
+import type { TFiller } from '../../../fillers/typedefs';
 import type { FabricObject } from '../Object';
 import type {
   ClipPathProps,

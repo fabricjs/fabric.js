@@ -5,7 +5,7 @@ import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
-import type { Pattern } from '../Pattern';
+import { Pattern } from '../Pattern';
 import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
@@ -15,13 +15,13 @@ import type {
   Constructor,
   TCornerPoint,
   TDataUrlOptions,
-  TFiller,
   TMat2D,
   TSize,
   TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
+import type { TFiller } from '../fillers/typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -38,12 +38,8 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isCollection, isTextObject } from '../util/typeAssertions';
+import { isFiller } from '../fillers/Filler';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1405,20 +1401,27 @@ export class StaticCanvas<
         additionalTransform = shouldInvert
           ? matrixToSVG(invertTransform(this.viewportTransform))
           : '';
+      const { width = finalWidth, height = finalHeight } =
+        filler instanceof Pattern
+          ? {
+              width:
+                repeat === 'repeat-y' || repeat === 'no-repeat'
+                  ? filler.source.width
+                  : undefined,
+              height:
+                repeat === 'repeat-x' || repeat === 'no-repeat'
+                  ? filler.source.height
+                  : undefined,
+            }
+          : {};
       markup.push(
         `<rect transform="${additionalTransform} translate(${finalWidth / 2},${
           finalHeight / 2
         })" x="${filler.offsetX - finalWidth / 2}" y="${
           filler.offsetY - finalHeight / 2
-        }" width="${
-          (repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.width
-            : finalWidth
-        }" height="${
-          (repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.height
-            : finalHeight
-        }" fill="url(#SVGID_${filler.id})"></rect>\n`
+        }" width="${width}" height="${height}" fill="url(#SVGID_${
+          filler.id
+        })"></rect>\n`
       );
     } else {
       markup.push(

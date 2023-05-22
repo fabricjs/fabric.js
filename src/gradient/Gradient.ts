@@ -6,7 +6,6 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import { FabricObject as BaseFabricObject } from '../shapes/Object/Object';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
-import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import {
@@ -24,6 +23,7 @@ import type {
   SVGOptions,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { Filler } from '../fillers/Filler';
 
 /**
  * Gradient class
@@ -33,21 +33,7 @@ import { classRegistry } from '../ClassRegistry';
 export class Gradient<
   S,
   T extends GradientType = S extends GradientType ? S : 'linear'
-> {
-  /**
-   * Horizontal offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  declare offsetX: number;
-
-  /**
-   * Vertical offset for aligning gradients coming from SVG when outside pathgroups
-   * @type Number
-   * @default 0
-   */
-  declare offsetY: number;
-
+> extends Filler<CanvasGradient> {
   /**
    * A transform matrix to apply to the gradient before painting.
    * Imported from svg gradients, is not applied with the current transform in the center.
@@ -111,6 +97,7 @@ export class Gradient<
     gradientTransform = null,
     id,
   }: GradientOptions<T>) {
+    super();
     this.id = id ? `${id}_${uid()}` : uid();
     this.type = type;
     this.gradientUnits = gradientUnits;
@@ -150,9 +137,9 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this | string)[]) {
+  toObject<T extends keyof this>(propertiesToInclude?: T[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...super.toObject(propertiesToInclude),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,

@@ -7,11 +7,8 @@ import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
-import type {
-  TCacheCanvasDimensions,
-  TClassProperties,
-  TFiller,
-} from '../../typedefs';
+import type { TCacheCanvasDimensions, TClassProperties } from '../../typedefs';
+import type { TFiller } from '../../fillers/typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
