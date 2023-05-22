@@ -23,6 +23,12 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
   );
 };
 
+export const isActiveSelection = (
+  fabricObject?: FabricObject
+): fabricObject is ActiveSelection => {
+  return !!fabricObject && fabricObject.isType('ActiveSelection');
+};
+
 export const isTextObject = (
   fabricObject?: FabricObject
 ): fabricObject is Text => {
