@@ -1,12 +1,7 @@
 import { Canvas } from '../../canvas/Canvas';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
-import {
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-  keysMap,
-  keysMapRtl,
-} from './constants';
+import { ctrlKeysMapDown, keysMap, keysMapRtl } from './constants';
 import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
@@ -37,7 +32,7 @@ export const iTextDefaultValues = {
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
-  ctrlKeysMapUp,
+  ctrlKeysMapUp: {},
 };
 
 // @TODO this is not complete
@@ -60,9 +55,9 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * @fires dragstart
  * @fires drag drag event firing on the drag source
  * @fires dragend
- * @fires copy
- * @fires cut
- * @fires paste
+ * @fires copy provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires cut provides ability to modify {@link ClipboardEvent#clipboardData}
+ * @fires paste provides ability to modify {@link ClipboardEvent#clipboardData}
  *
  * #### Supported key combinations
  * ```

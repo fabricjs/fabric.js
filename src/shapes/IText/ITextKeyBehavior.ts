@@ -1,7 +1,6 @@
 //@ts-nocheck
 
-import { config } from '../../config';
-import { getFabricDocument, getEnv } from '../../env';
+import { getFabricDocument } from '../../env';
 import type { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import type { ITextEvents } from './ITextBehavior';
@@ -10,6 +9,8 @@ import type { TKeyMapIText } from './constants';
 import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
+import type { AssertKeys } from '../../typedefs';
+import { getData, setClipboardData } from './DataTransfer';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -55,7 +56,6 @@ export abstract class ITextKeyBehavior<
 
   private declare _clickHandlerInitialized: boolean;
   private declare _copyDone: boolean;
-  private declare fromPaste: boolean;
 
   /**
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
@@ -87,7 +87,7 @@ export abstract class ITextKeyBehavior<
     this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
     this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
     this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
+    this.hiddenTextarea.addEventListener('cut', this.cut.bind(this));
     this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
     this.hiddenTextarea.addEventListener(
       'compositionstart',
@@ -146,8 +146,7 @@ export abstract class ITextKeyBehavior<
    * @param {KeyboardEvent} e Event object
    */
   onKeyUp(e: KeyboardEvent) {
-    if (!this.isEditing || this._copyDone || this.inCompositionMode) {
-      this._copyDone = false;
+    if (!this.isEditing || this.inCompositionMode) {
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
@@ -165,8 +164,6 @@ export abstract class ITextKeyBehavior<
    * @param {Event} e Event object
    */
   onInput(e: Event) {
-    const fromPaste = this.fromPaste;
-    this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
       return;
@@ -193,11 +190,11 @@ export abstract class ITextKeyBehavior<
       selectionStart = this.selectionStart,
       selectionEnd = this.selectionEnd,
       selection = selectionStart !== selectionEnd;
-    let copiedStyle,
-      removedText,
+    let copiedStyles: TextStyleDeclaration[],
+      removedText: string,
       charDiff = nextCharCount - charCount,
-      removeFrom,
-      removeTo;
+      removeFrom: number,
+      removeTo: number;
 
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
@@ -224,23 +221,19 @@ export abstract class ITextKeyBehavior<
       textareaSelection.selectionEnd
     );
     if (removedText && removedText.length) {
-      if (insertedText.length) {
-        // let's copy some style before deleting.
-        // we want to copy the style before the cursor OR the style at the cursor if selection
-        // is bigger than 0.
-        copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
-          false
-        );
-        // now duplicate the style one for each inserted text.
-        copiedStyle = insertedText.map(
-          () =>
-            // this return an array of references, but that is fine since we are
-            // copying the style later.
-            copiedStyle[0]
-        );
-      }
+      // we want to copy the style before the cursor OR the style at the cursor if selection exists
+      // and duplicate for each char
+      // this creates an array of the same reference, but that is fine since we are
+      // copying the style later.
+      copiedStyles = insertedText.length
+        ? new Array(insertedText.length).fill(
+            this.getSelectionStyles(
+              selectionStart,
+              selectionStart + 1,
+              false
+            )[0]
+          )
+        : undefined;
       if (selection) {
         removeFrom = selectionStart;
         removeTo = selectionEnd;
@@ -253,17 +246,8 @@ export abstract class ITextKeyBehavior<
         removeTo = selectionEnd + removedText.length;
       }
       this.removeStyleFromTo(removeFrom, removeTo);
-    }
-    if (insertedText.length) {
-      const { copyPasteData } = getEnv();
-      if (
-        fromPaste &&
-        insertedText.join('') === copyPasteData.copiedText &&
-        !config.disableStyleCopyPaste
-      ) {
-        copiedStyle = copyPasteData.copiedTextStyle;
-      }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      copiedStyles &&
+        this.insertNewStyleBlock(insertedText, selectionStart, copiedStyles);
     }
     updateAndFire();
   }
@@ -290,32 +274,62 @@ export abstract class ITextKeyBehavior<
   }
 
   /**
-   * Copies selected text
+   * @fires `copy`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  copy() {
-    if (this.selectionStart === this.selectionEnd) {
-      //do not cut-copy if no selection
-      return;
-    }
-    const { copyPasteData } = getEnv();
-    copyPasteData.copiedText = this.getSelectedText();
-    if (!config.disableStyleCopyPaste) {
-      copyPasteData.copiedTextStyle = this.getSelectionStyles(
-        this.selectionStart,
-        this.selectionEnd,
-        true
-      );
-    } else {
-      copyPasteData.copiedTextStyle = null;
-    }
-    this._copyDone = true;
+  copy(e: ClipboardEvent) {
+    setClipboardData(e, this);
+    this.fire('copy', { e });
   }
 
   /**
-   * Pastes text
+   * @fires `cut`, use this event to modify the {@link ClipboardEvent#clipboardData}
    */
-  paste() {
-    this.fromPaste = true;
+  cut(this: AssertKeys<this, 'hiddenTextarea' | 'canvas'>, e: ClipboardEvent) {
+    setClipboardData(e, this);
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('cut', { e });
+    // since we must call `preventDefault` for the copy operation
+    // we must handle text changes as well
+    const { selectionStart, selectionEnd } = this;
+    this.removeChars(selectionStart, selectionEnd);
+    this.selectionEnd = selectionStart;
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.value = this.text;
+      this._updateTextarea();
+    }
+    this.fire('changed', { index: selectionStart, action: 'cut' });
+    this.canvas.fire('text:changed', { target: this });
+    this.canvas.requestRenderAll();
+  }
+
+  /**
+   * @override Override the `text/plain | text/plain` types of {@link ClipboardEvent#clipboardData}
+   * in order to change the pasted value or to customize styling respectively, by listening to the `paste` event
+   *
+   * The input event handles the actual pasting after this method completes
+   */
+  paste(
+    this: AssertKeys<this, 'hiddenTextarea' | 'canvas'>,
+    e: ClipboardEvent
+  ) {
+    e.preventDefault();
+    //  fire event before logic to allow overriding clipboard data
+    this.fire('paste', { e });
+    // obtain styles from event
+    const { text, styles } = getData(e) || {};
+    // execute paste logic
+    if (text) {
+      const { selectionStart, selectionEnd } = this;
+      this.insertChars(text, styles, selectionStart, selectionEnd);
+      this.selectionStart = this.selectionEnd = selectionStart + text.length;
+      if (this.hiddenTextarea) {
+        this.hiddenTextarea.value = this.text;
+        this._updateTextarea();
+      }
+      this.fire('changed', { index: selectionStart, action: 'paste' });
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
   }
 
   /**

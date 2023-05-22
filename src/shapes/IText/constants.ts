@@ -31,15 +31,6 @@ export const keysMapRtl: TKeyMapIText = {
 };
 
 /**
- * For functionalities on keyUp + ctrl || cmd
- */
-export const ctrlKeysMapUp: TKeyMapIText = {
-  67: 'copy',
-  // @ts-ignore there was a reason this wasn't deleted. for now leave it here
-  88: 'cut',
-};
-
-/**
  * For functionalities on keyDown + ctrl || cmd
  */
 export const ctrlKeysMapDown: TKeyMapIText = {

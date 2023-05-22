@@ -68,6 +68,9 @@ function assertDragEventStream(name, a, b) {
                         setData(type, value) {
                             this.data[type] = value;
                         },
+                        clearData() {
+                            this.data = {};
+                        },
                         setDragImage(img, x, y) {
                             this.dragImageData = { img, x, y };
                         },
@@ -185,7 +188,7 @@ function assertDragEventStream(name, a, b) {
                 };
                 assert.equal(e.dataTransfer.data['text/plain'], 'test', 'should set text/plain');
                 assert.deepEqual(JSON.parse(e.dataTransfer.data['application/fabric']), {
-                    value: 'test',
+                    text: 'test',
                     styles: [charStyle, charStyle, charStyle, charStyle]
                 }, 'should set application/fabric');
                 assert.equal(e.dataTransfer.effectAllowed, 'copyMove', 'should set effectAllowed');

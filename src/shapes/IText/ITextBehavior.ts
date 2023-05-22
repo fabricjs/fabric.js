@@ -35,6 +35,9 @@ export type ITextEvents = ObjectEvents & {
   tripleclick: TPointerEventInfo;
   'editing:entered': never | { e: TPointerEvent };
   'editing:exited': never;
+  copy: { e: ClipboardEvent };
+  cut: { e: ClipboardEvent };
+  paste: { e: ClipboardEvent };
 };
 
 export abstract class ITextBehavior<
@@ -917,6 +920,11 @@ export abstract class ITextBehavior<
     start: number,
     copiedStyle?: TextStyleDeclaration[]
   ) {
+    if (copiedStyle && insertedText.length !== copiedStyle.length) {
+      throw new Error(
+        `fabric.js: expected ${insertedText.length} style declarations, found ${copiedStyle.length}`
+      );
+    }
     const cursorLoc = this.get2DCursorLocation(start, true),
       addedLines = [0];
     let linesLength = 0;
@@ -1000,13 +1008,13 @@ export abstract class ITextBehavior<
    * start/end ar per grapheme position in _text array.
    *
    * @param {String} text text to insert
-   * @param {Array} style array of style objects
+   * @param {Array} styles array of style objects
    * @param {Number} start
    * @param {Number} end default to start + 1
    */
   insertChars(
     text: string,
-    style: TextStyleDeclaration[] | undefined,
+    styles: TextStyleDeclaration[] | undefined,
     start: number,
     end: number = start
   ) {
@@ -1014,7 +1022,7 @@ export abstract class ITextBehavior<
       this.removeStyleFromTo(start, end);
     }
     const graphemes = this.graphemeSplit(text);
-    this.insertNewStyleBlock(graphemes, start, style);
+    this.insertNewStyleBlock(graphemes, start, styles);
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,
