@@ -3,7 +3,6 @@ import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
-import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 import { classRegistry } from '../ClassRegistry';
 import type {
@@ -11,12 +10,13 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { Filler } from '../fillers/Filler';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
-export class Pattern {
+export class Pattern extends Filler<CanvasPattern> {
   /**
    * Legacy identifier of the class. Prefer using this.constructor.name 'Pattern'
    * or utils like isPattern
@@ -38,20 +38,6 @@ export class Pattern {
    * @defaults
    */
   repeat: PatternRepeat = 'repeat';
-
-  /**
-   * Pattern horizontal offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetX = 0;
-
-  /**
-   * Pattern vertical offset from object's left/top corner
-   * @type Number
-   * @default
-   */
-  offsetY = 0;
 
   /**
    * @type TCrossOrigin
@@ -144,10 +130,10 @@ export class Pattern {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object} Object representation of a pattern instance
    */
-  toObject(propertiesToInclude: string[] = []): Record<string, any> {
+  toObject<T extends keyof this>(propertiesToInclude?: T[]) {
     const { repeat, crossOrigin } = this;
     return {
-      ...pick(this, propertiesToInclude as (keyof this)[]),
+      ...super.toObject(propertiesToInclude),
       type: 'pattern',
       source: this.sourceToString(),
       repeat,
