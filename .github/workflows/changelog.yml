@@ -3,8 +3,13 @@ name: changelog
 on:
   workflow_call:
     inputs:
-      update:
+      create:
         description: Add a log to the changelog
+        type: boolean
+        required: false
+        default: false
+      update:
+        description: Update the existing changelog
         type: boolean
         required: false
         default: false
@@ -27,7 +32,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     needs: changelog
-    if: inputs.update && (failure() || success())
+    if: (inputs.create && failure()) || (inputs.update && success())
+    continue-on-error: true
     env:
       file: CHANGELOG.md
       next_version: next
