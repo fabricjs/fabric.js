@@ -1,5 +1,12 @@
 # Changelog
 
+## [next]
+
+- ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
+- ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
+- chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+- refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
+
 ## [6.0.0-beta6]
 
 - patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
