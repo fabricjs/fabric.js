@@ -169,6 +169,14 @@ export class Control {
    */
   declare mouseUpHandler?: ControlActionHandler;
 
+  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+    // TODO: locking logic can be handled here instead of in the control handler logic
+    return (
+      fabricObject.canvas?.getActiveObject() === fabricObject &&
+      fabricObject.isControlVisible(controlKey)
+    );
+  }
+
   /**
    * Returns control actionHandler
    * @param {Event} eventData the native mouse event

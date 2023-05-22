@@ -10,6 +10,13 @@ import {
 import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
+import {
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
+} from '../Text/constants';
+import { CENTER, LEFT, RIGHT } from '../../constants';
 
 type CursorBoundaries = {
   left: number;
@@ -443,19 +450,16 @@ export class IText<
     };
     if (this.direction === 'rtl') {
       if (
-        this.textAlign === 'right' ||
-        this.textAlign === 'justify' ||
-        this.textAlign === 'justify-right'
+        this.textAlign === RIGHT ||
+        this.textAlign === JUSTIFY ||
+        this.textAlign === JUSTIFY_RIGHT
       ) {
         boundaries.left *= -1;
-      } else if (
-        this.textAlign === 'left' ||
-        this.textAlign === 'justify-left'
-      ) {
+      } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
         boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       } else if (
-        this.textAlign === 'center' ||
-        this.textAlign === 'justify-center'
+        this.textAlign === CENTER ||
+        this.textAlign === JUSTIFY_CENTER
       ) {
         boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       }
@@ -567,7 +571,7 @@ export class IText<
   ) {
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
-      isJustify = this.textAlign.indexOf('justify') !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       start = this.get2DCursorLocation(selectionStart),
       end = this.get2DCursorLocation(selectionEnd),
       startLine = start.lineIndex,
@@ -618,19 +622,16 @@ export class IText<
       }
       if (this.direction === 'rtl') {
         if (
-          this.textAlign === 'right' ||
-          this.textAlign === 'justify' ||
-          this.textAlign === 'justify-right'
+          this.textAlign === RIGHT ||
+          this.textAlign === JUSTIFY ||
+          this.textAlign === JUSTIFY_RIGHT
         ) {
           drawStart = this.width - drawStart - drawWidth;
-        } else if (
-          this.textAlign === 'left' ||
-          this.textAlign === 'justify-left'
-        ) {
+        } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         } else if (
-          this.textAlign === 'center' ||
-          this.textAlign === 'justify-center'
+          this.textAlign === CENTER ||
+          this.textAlign === JUSTIFY_CENTER
         ) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         }

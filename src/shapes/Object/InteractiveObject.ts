@@ -184,31 +184,27 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
-    if (
-      !this.hasControls ||
-      !this.canvas ||
-      (this.canvas._activeObject as unknown as this) !== this
-    ) {
-      return 0;
+  _findTargetCorner(pointer: Point, forTouch = false): string {
+    if (!this.hasControls || !this.canvas) {
+      return '';
     }
 
     this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
-      const [cornerKey, corner] = cornerEntries[i];
-      if (!this.isControlVisible(cornerKey)) {
-        continue;
+      const [key, corner] = cornerEntries[i];
+      if (this.controls[key].shouldActivate(key, this)) {
+        const lines = this._getImageLines(
+          forTouch ? corner.touchCorner : corner.corner
+        );
+        const xPoints = this._findCrossPoints(pointer, lines);
+        if (xPoints !== 0 && xPoints % 2 === 1) {
+          this.__corner = key;
+          return key;
+        }
       }
-      const lines = this._getImageLines(
-        forTouch ? corner.touchCorner : corner.corner
-      );
-      const xPoints = this._findCrossPoints(pointer, lines);
-      if (xPoints !== 0 && xPoints % 2 === 1) {
-        this.__corner = cornerKey;
-        return cornerKey;
-      }
+
       // // debugging
       //
       // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
@@ -223,7 +219,7 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return 0;
+    return '';
   }
 
   /**

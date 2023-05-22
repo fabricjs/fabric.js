@@ -1182,7 +1182,7 @@
     assert.ok(manager.target === a, 'should register a');
     canvas.remove(a);
     assert.ok(!manager.target, 'should unregister a');
-    manager.dispose();
+    manager.clear();
     assert.ok(!manager.target, 'should have disposed ref');
     assert.deepEqual(manager.targets, [], 'should have disposed refs');
     const g = new fabric.Group([a]);
