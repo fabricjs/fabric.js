@@ -5,31 +5,9 @@ import type {
   TCachedFabricObject,
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
-import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
-import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
-
-export const isFiller = (
-  filler: TFiller | string | null
-): filler is TFiller => {
-  return !!filler && (filler as TFiller).toLive !== undefined;
-};
-
-export const isSerializableFiller = (
-  filler: TFiller | string | null
-): filler is TFiller => {
-  return !!filler && typeof (filler as TFiller).toObject === 'function';
-};
-
-export const isPattern = (filler: TFiller): filler is Pattern => {
-  return (
-    !!filler &&
-    (filler as Pattern).offsetX !== undefined &&
-    (filler as Pattern).source !== undefined
-  );
-};
 
 export const isCollection = (
   fabricObject?: FabricObject
