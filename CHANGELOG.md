@@ -2,9 +2,8 @@
 
 ## [next]
 
-- chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
-- chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
-- chore() Try to use constants for repeated strings. [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
+- chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
+- ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 
