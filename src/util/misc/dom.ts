@@ -6,7 +6,7 @@ import type { ImageFormat } from '../../typedefs';
  */
 export const createCanvasElement = (): HTMLCanvasElement => {
   const element = getFabricDocument().createElement('canvas');
-  if (!element || typeof element.getContext === 'undefined') {
+  if (!element || element.getContext === undefined) {
     throw new Error('Failed to create `canvas` element');
   }
   return element;

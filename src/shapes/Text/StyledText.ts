@@ -41,9 +41,7 @@ export abstract class StyledText<
       return true;
     }
     const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
+      lineIndex === undefined ? this.styles : { line: this.styles[lineIndex] };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
         // eslint-disable-next-line no-unused-vars
@@ -70,9 +68,7 @@ export abstract class StyledText<
       return false;
     }
     const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { 0: this.styles[lineIndex] };
+      lineIndex === undefined ? this.styles : { 0: this.styles[lineIndex] };
     // eslint-disable-next-line
     for (const p1 in obj) {
       // eslint-disable-next-line
@@ -274,9 +270,7 @@ export abstract class StyledText<
     for (let i = 0; i < styleProps.length; i++) {
       const prop = styleProps[i];
       styleObject[prop] =
-        typeof style[prop] === 'undefined'
-          ? this[prop as keyof this]
-          : style[prop];
+        style[prop] === undefined ? this[prop as keyof this] : style[prop];
     }
     return styleObject;
   }

@@ -164,9 +164,7 @@ export class Textbox extends IText {
       nextOffset = mapNextLine.offset;
     }
     const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
+      lineIndex === undefined ? this.styles : { line: this.styles[lineIndex] };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
         if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {

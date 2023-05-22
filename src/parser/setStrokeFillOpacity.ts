@@ -12,13 +12,13 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 export function setStrokeFillOpacity(attributes) {
   for (const attr in colorAttributes) {
     if (
-      typeof attributes[colorAttributes[attr]] === 'undefined' ||
+      attributes[colorAttributes[attr]] === undefined ||
       attributes[attr] === ''
     ) {
       continue;
     }
     const defaults = FabricObject.getDefaults();
-    if (typeof attributes[attr] === 'undefined') {
+    if (attributes[attr] === undefined) {
       if (!defaults[attr]) {
         continue;
       }

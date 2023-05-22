@@ -30,7 +30,7 @@ export function parseAttributes(
     fontSize,
     parentFontSize;
 
-  if (typeof svgUid === 'undefined') {
+  if (svgUid === undefined) {
     svgUid = element.getAttribute('svgUid');
   }
   // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards

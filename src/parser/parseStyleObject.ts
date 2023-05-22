@@ -3,7 +3,7 @@
 export function parseStyleObject(style, oStyle) {
   let attr, value;
   for (const prop in style) {
-    if (typeof style[prop] === 'undefined') {
+    if (style[prop] === undefined) {
       continue;
     }
 

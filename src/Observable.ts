@@ -146,7 +146,7 @@ export class Observable<EventSpec> {
     }
 
     // remove all key/value pairs (event name -> event handler)
-    if (typeof arg0 === 'undefined') {
+    if (arg0 === undefined) {
       for (const eventName in this.__eventListeners) {
         this._removeEventListener(eventName);
       }
