@@ -8,7 +8,6 @@ import { Shadow } from '../../Shadow';
 import type {
   TDegree,
   TFiller,
-  TSize,
   TCacheCanvasDimensions,
   Abortable,
 } from '../../typedefs';
@@ -28,11 +27,7 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import {
-  isFiller,
-  isSerializableFiller,
-  isTextObject,
-} from '../../util/typeAssertions';
+import { isFiller, isSerializableFiller } from '../../util/typeAssertions';
 import type { Image } from '../Image';
 import {
   cacheProperties,
@@ -323,8 +318,8 @@ export class FabricObject<
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
-  ) {
+    dims = this._getCacheCanvasDimensions()
+  ): TCacheCanvasDimensions {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
@@ -386,6 +381,58 @@ export class FabricObject<
       zoomY: objectScale.y,
       x: neededX,
       y: neededY,
+      capped: false,
+    };
+  }
+
+  getCacheState() {
+    const { x, y, width, height, zoomX, zoomY, capped } =
+      this._limitCacheSize();
+    let shouldRedraw = this.zoomX !== zoomX || this.zoomY !== zoomY,
+      shouldResizeCanvas = false,
+      additionalWidth = 0,
+      additionalHeight = 0;
+
+    if (width !== this.cacheWidth || height !== this.cacheHeight) {
+      const minCacheSize = config.minCacheSideLimit;
+      const { width: canvasWidth, height: canvasHeight } = this
+          ._cacheCanvas as HTMLCanvasElement,
+        sizeGrowing = width > canvasWidth || height > canvasHeight,
+        sizeShrinking =
+          (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
+          canvasWidth > minCacheSize &&
+          canvasHeight > minCacheSize;
+      shouldResizeCanvas = sizeGrowing || sizeShrinking;
+      if (
+        sizeGrowing &&
+        !capped &&
+        (width > minCacheSize || height > minCacheSize)
+      ) {
+        additionalWidth = width * 0.1;
+        additionalHeight = height * 0.1;
+      }
+      shouldRedraw = true;
+    }
+
+    return {
+      x,
+      y,
+      width,
+      height,
+      zoomX,
+      zoomY,
+      capped,
+      redraw: shouldRedraw,
+      additionalSize: {
+        width: additionalWidth,
+        height: additionalHeight,
+      },
+      resize: shouldResizeCanvas
+        ? {
+            width: Math.ceil(width + additionalWidth),
+            height: Math.ceil(height + additionalHeight),
+          }
+        : null,
     };
   }
 
@@ -397,63 +444,23 @@ export class FabricObject<
    */
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
-      context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = config.minCacheSideLimit,
-      width = dims.width,
-      height = dims.height,
-      zoomX = dims.zoomX,
-      zoomY = dims.zoomY,
-      dimensionsChanged =
-        width !== this.cacheWidth || height !== this.cacheHeight,
-      zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
-
+      context = this._cacheContext;
     if (!canvas || !context) {
       return false;
     }
 
-    let drawingWidth,
-      drawingHeight,
-      shouldRedraw = dimensionsChanged || zoomChanged,
-      additionalWidth = 0,
-      additionalHeight = 0,
-      shouldResizeCanvas = false;
-
-    if (dimensionsChanged) {
-      const canvasWidth = (this._cacheCanvas as HTMLCanvasElement).width,
-        canvasHeight = (this._cacheCanvas as HTMLCanvasElement).height,
-        sizeGrowing = width > canvasWidth || height > canvasHeight,
-        sizeShrinking =
-          (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
-          canvasWidth > minCacheSize &&
-          canvasHeight > minCacheSize;
-      shouldResizeCanvas = sizeGrowing || sizeShrinking;
-      if (
-        sizeGrowing &&
-        !dims.capped &&
-        (width > minCacheSize || height > minCacheSize)
-      ) {
-        additionalWidth = width * 0.1;
-        additionalHeight = height * 0.1;
-      }
-    }
-    if (isTextObject(this) && this.path) {
-      shouldRedraw = true;
-      shouldResizeCanvas = true;
-      // IMHO in those lines we are using zoomX and zoomY not the this version.
-      additionalWidth += this.getHeightOfLine(0) * this.zoomX!;
-      additionalHeight += this.getHeightOfLine(0) * this.zoomY!;
-    }
-    if (shouldRedraw) {
-      if (shouldResizeCanvas) {
-        canvas.width = Math.ceil(width + additionalWidth);
-        canvas.height = Math.ceil(height + additionalHeight);
+    const { redraw, resize, x, y, width, height, zoomX, zoomY } =
+      this.getCacheState();
+    if (redraw) {
+      if (resize) {
+        canvas.width = resize.width;
+        canvas.height = resize.height;
       } else {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      drawingWidth = dims.x / 2;
-      drawingHeight = dims.y / 2;
+      const drawingWidth = x / 2;
+      const drawingHeight = y / 2;
       this.cacheTranslationX =
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
@@ -1239,7 +1246,7 @@ export class FabricObject<
     ctx: CanvasRenderingContext2D,
     filler: TFiller
   ) {
-    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+    const dims = this._limitCacheSize(),
       pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,

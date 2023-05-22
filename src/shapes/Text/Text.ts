@@ -569,6 +569,27 @@ export class Text<
     return dims;
   }
 
+  getCacheState() {
+    const data = super.getCacheState();
+    // IMHO in these lines we are using zoomX and zoomY not the this version.
+    const additionalWidth =
+      data.additionalSize.width + this.getHeightOfLine(0) * this.zoomX!;
+    const additionalHeight =
+      data.additionalSize.height + this.getHeightOfLine(0) * this.zoomY!;
+    return {
+      ...data,
+      redraw: true,
+      additionalSize: {
+        width: additionalWidth,
+        height: additionalHeight,
+      },
+      resize: {
+        width: Math.ceil(width + additionalWidth),
+        height: Math.ceil(height + additionalHeight),
+      },
+    };
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
