@@ -758,21 +758,13 @@ export class Canvas extends SelectableCanvas {
    */
   _shouldRender(target: FabricObject | undefined) {
     const activeObject = this.getActiveObject();
-
     // if just one of them is available or if they are both but are different objects
-    if (
+    // this covers: switch of target, from target to no target, selection of target
+    // multiSelection with key and mouse
+    return (
       !!activeObject !== !!target ||
       (activeObject && target && activeObject !== target)
-    ) {
-      // this covers: switch of target, from target to no target, selection of target
-      // multiSelection with key and mouse
-      return true;
-    } else if (isInteractiveTextObject(activeObject)) {
-      // if we mouse up/down over a editing textbox a cursor change,
-      // there is no need to re render
-      return false;
-    }
-    return false;
+    );
   }
 
   /**
