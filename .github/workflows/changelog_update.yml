@@ -10,4 +10,5 @@ jobs:
     if: github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title
     uses: ./.github/workflows/changelog.yml
     with:
-      update: true
+      create: ${{ github.event.action == 'opened' }}
+      update: ${{ github.event.changes.title.from != github.event.pull_request.title }}
