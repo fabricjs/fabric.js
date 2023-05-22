@@ -869,7 +869,7 @@ export class Canvas extends SelectableCanvas {
     target && (target.__corner = undefined);
     if (shouldRender) {
       this.requestRenderAll();
-    } else if (!isClick && !(this._activeObject as IText).isEditing) {
+    } else if (!isClick && !(this._activeObject as IText)?.isEditing) {
       this.renderTop();
     }
   }
