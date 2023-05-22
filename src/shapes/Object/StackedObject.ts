@@ -3,7 +3,6 @@ import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
-import { isActiveSelection } from '../../util/typeAssertions';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
@@ -50,8 +49,7 @@ export class StackedObject<
    */
   getParent<T extends boolean>(strict?: T): TAncestor | undefined {
     return (
-      (isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
-      (strict ? undefined : this.canvas)
+      this.__owningGroup || this.group || (strict ? undefined : this.canvas)
     );
   }
 
