@@ -158,7 +158,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textTopOffset: number
   ) {
     const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.includes(JUSTIFY) !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       line = this._textLines[lineIndex];
     let actualStyle,
       nextStyle,
