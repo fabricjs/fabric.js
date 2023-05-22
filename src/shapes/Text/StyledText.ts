@@ -6,9 +6,25 @@ import type {
 } from '../Object/types';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
+import type { Text } from './Text';
 
-// @TODO properly type this
-export type TextStyleDeclaration = Record<string, any>;
+export type TextStyleDeclaration = Partial<
+  Pick<
+    Text,
+    | 'fill'
+    | 'stroke'
+    | 'strokeWidth'
+    | 'fontSize'
+    | 'fontFamily'
+    | 'fontWeight'
+    | 'fontStyle'
+    | 'textBackgroundColor'
+    | 'deltaY'
+    | 'overline'
+    | 'underline'
+    | 'linethrough'
+  >
+>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };

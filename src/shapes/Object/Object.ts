@@ -1,6 +1,13 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
-import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
+import {
+  ALIASING_LIMIT,
+  CENTER,
+  iMatrix,
+  LEFT,
+  TOP,
+  VERSION,
+} from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
@@ -580,7 +587,7 @@ export class FabricObject<
       : Object.getPrototypeOf(this);
 
     return pickBy(object, (value, key) => {
-      if (key === 'left' || key === 'top' || key === 'type') {
+      if (key === LEFT || key === TOP || key === 'type') {
         return true;
       }
       const baseValue = baseValues[key];
@@ -1392,8 +1399,8 @@ export class FabricObject<
     }
     this.setPositionByOrigin(
       new Point(canvas.width / 2, canvas.height / 2),
-      'center',
-      'center'
+      CENTER,
+      CENTER
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
@@ -1473,7 +1480,7 @@ export class FabricObject<
    */
   rotate(angle: TDegree) {
     const shouldCenterOrigin =
-      (this.originX !== 'center' || this.originY !== 'center') &&
+      (this.originX !== CENTER || this.originY !== CENTER) &&
       this.centeredRotation;
 
     if (shouldCenterOrigin) {

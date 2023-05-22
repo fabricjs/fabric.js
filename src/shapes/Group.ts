@@ -26,6 +26,7 @@ import type {
   SerializedObjectProps,
   TProps,
 } from './Object/types';
+import { CENTER } from '../constants';
 
 export type LayoutContextType =
   | 'initialization'
@@ -640,7 +641,7 @@ export class Group extends createCollectionMixin(
         this._adjustObjectPosition(this.clipPath, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
-        this.setPositionByOrigin(newCenter, 'center', 'center');
+        this.setPositionByOrigin(newCenter, CENTER, CENTER);
         initialTransform && this.set(initialTransform);
         this.setCoords();
       }

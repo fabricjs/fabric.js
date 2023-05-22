@@ -1,6 +1,6 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
 import type {
   TBBox,
   TMat2D,
@@ -94,9 +94,9 @@ export type TPreserveArParsed = {
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align: string): MinMidMax[] => {
   //divide align in alignX and alignY
-  if (align && align !== 'none') {
+  if (align && align !== NONE) {
     return [align.slice(1, 4) as MinMidMax, align.slice(5, 8) as MinMidMax];
-  } else if (align === 'none') {
+  } else if (align === NONE) {
     return [align, align];
   }
   return ['Mid', 'Mid'];
