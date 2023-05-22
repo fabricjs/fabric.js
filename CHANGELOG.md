@@ -1,5 +1,10 @@
 # Changelog
 
+## [next]
+
+- feat(): support native copy/paste [#8942](https://github.com/fabricjs/fabric.js/pull/8942)
+
+
 ## [6.0.0-beta6]
 
 - patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
