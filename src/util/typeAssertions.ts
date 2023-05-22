@@ -7,28 +7,14 @@ import type {
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
-import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
+import { Filler } from '../fillers/Filler';
 
 export const isFiller = (
   filler: TFiller | string | null
 ): filler is TFiller => {
-  return !!filler && (filler as TFiller).toLive !== undefined;
-};
-
-export const isSerializableFiller = (
-  filler: TFiller | string | null
-): filler is TFiller => {
-  return !!filler && typeof (filler as TFiller).toObject === 'function';
-};
-
-export const isPattern = (filler: TFiller): filler is Pattern => {
-  return (
-    !!filler &&
-    (filler as Pattern).offsetX !== undefined &&
-    (filler as Pattern).source !== undefined
-  );
+  return !!filler && filler instanceof Filler;
 };
 
 export const isCollection = (

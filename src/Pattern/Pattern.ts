@@ -18,8 +18,7 @@ import { Filler } from '../fillers/Filler';
  */
 export class Pattern extends Filler<CanvasPattern> {
   /**
-   * Legacy identifier of the class. Prefer using this.constructor.name 'Pattern'
-   * or utils like isPattern
+   * Legacy identifier of the class. Prefer using this.constructor.name or `instanceof`
    * Will be removed in fabric 7 or 8.
    * @TODO add sustainable warning message
    * @type string
@@ -76,6 +75,7 @@ export class Pattern extends Filler<CanvasPattern> {
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
   constructor(options: PatternOptions = {}) {
+    super();
     this.id = uid();
     Object.assign(this, options);
   }

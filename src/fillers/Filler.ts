@@ -1,6 +1,6 @@
 import { config } from '../config';
-import { Point } from '../Point';
-import type { TMat2D, TSize } from '../typedefs';
+import type { Point } from '../Point';
+import type { TSize } from '../typedefs';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 
@@ -13,21 +13,7 @@ export type TFillerRenderingOptions = {
   noTransform?: boolean;
 };
 
-export type TCanvasFiller = CanvasPattern | CanvasGradient;
-
-export type TFillerExportedKeys = 'offsetX' | 'offsetY';
-
-export type TFillerOptions = {
-  action: TFillerAction;
-  filler: Filler<TCanvasFiller> | string;
-  size: TSize;
-};
-
-export type TCanvasFillerOptions = Omit<TFillerOptions, 'action'> & {
-  preTransform?: TMat2D;
-};
-
-export abstract class Filler<T extends TCanvasFiller> {
+export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
   /**
    * horizontal offset from object's left/top corner
    * @type Number
@@ -64,52 +50,5 @@ export abstract class Filler<T extends TCanvasFiller> {
 
   toJSON() {
     return this.toObject();
-  }
-
-  static buildPath(ctx: CanvasRenderingContext2D, { width, height }: TSize) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(width, 0);
-    ctx.lineTo(width, height);
-    ctx.lineTo(0, height);
-    ctx.closePath();
-  }
-
-  static prepare(
-    ctx: CanvasRenderingContext2D,
-    { action, filler, size }: TFillerOptions
-  ) {
-    if (filler instanceof Filler) {
-      return filler.prepare(ctx, {
-        action,
-        size,
-        offset: new Point(size.width, size.height)
-          .scalarDivide(-2)
-          .add(new Point(filler.offsetX, filler.offsetY)),
-      });
-    } else if (filler) {
-      // is a color
-      ctx[`${action}Style`] = filler;
-    }
-  }
-
-  static prepareCanvasFill(
-    ctx: CanvasRenderingContext2D,
-    { filler, size, preTransform }: TCanvasFillerOptions
-  ) {
-    // mark area for fill
-    Filler.buildPath(ctx, size);
-    if (filler instanceof Filler) {
-      preTransform && ctx.transform(...preTransform);
-      return filler.prepare(ctx, {
-        action: 'fill',
-        size,
-        offset: new Point(filler.offsetX, filler.offsetY),
-      });
-    } else if (filler) {
-      // is a color
-      ctx.fillStyle = filler;
-    }
   }
 }
