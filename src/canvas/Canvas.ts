@@ -16,10 +16,7 @@ import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import {
-  isFabricObjectWithDragSupport,
-  isInteractiveTextObject,
-} from '../util/typeAssertions';
+import { isInteractiveTextObject } from '../util/typeAssertions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -294,10 +291,7 @@ export class Canvas extends SelectableCanvas {
   private _onDragStart(e: DragEvent) {
     this._isClick = false;
     const activeObject = this.getActiveObject();
-    if (
-      isFabricObjectWithDragSupport(activeObject) &&
-      activeObject.onDragStart(e)
-    ) {
+    if (activeObject && activeObject.onDragStart(e)) {
       this._dragSource = activeObject;
       const options = { e, target: activeObject };
       this.fire('dragstart', options);
@@ -743,8 +737,7 @@ export class Canvas extends SelectableCanvas {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        (isFabricObjectWithDragSupport(activeObject) &&
-          !activeObject.shouldStartDragging())) &&
+        !activeObject.shouldStartDragging()) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);

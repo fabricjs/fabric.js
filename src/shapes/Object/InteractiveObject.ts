@@ -37,13 +37,6 @@ type TStyleOverride = ControlRenderingStyleOverride &
     }
   >;
 
-export interface DragMethods {
-  shouldStartDragging(): boolean;
-  onDragStart(e: DragEvent): boolean;
-}
-
-export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
-
 const interactiveDefaults = {};
 
 export class InteractiveFabricObject<
@@ -632,11 +625,28 @@ export class InteractiveFabricObject<
   }
 
   /**
+   * Override to customize Drag behavior
+   * Fired from {@link Canvas#_onMouseMove}
+   * @returns true in order for the window to start a drag session
+   */
+  shouldStartDragging() {
+    return false;
+  }
+
+  /**
+   * Override to customize Drag behavior\
+   * Fired once a drag session has started
+   * @returns true to handle the drag event
+   */
+  onDragStart(e: DragEvent) {
+    return false;
+  }
+
+  /**
    * Override to customize drag and drop behavior
-   * return true if the object currently dragged can be dropped on the target
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
+   * @returns {boolean} true if the object currently dragged can be dropped on the target
    */
   canDrop(e: DragEvent): boolean {
     return false;
@@ -648,7 +658,6 @@ export class InteractiveFabricObject<
    * example: render the selection status for the part of text that is being dragged from a text object
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
    */
   renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
@@ -661,7 +670,6 @@ export class InteractiveFabricObject<
    * object will change when dropping. example: show the cursor where the text is about to be dropped
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
    */
   renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
     // for subclasses
