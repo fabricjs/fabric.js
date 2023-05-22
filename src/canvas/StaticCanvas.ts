@@ -15,13 +15,13 @@ import type {
   Constructor,
   TCornerPoint,
   TDataUrlOptions,
-  TFiller,
   TMat2D,
   TSize,
   TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
 } from '../typedefs';
+import type { TFiller } from '../fillers/typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
@@ -38,7 +38,8 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isTextObject } from '../util/typeAssertions';
+import { isCollection, isTextObject } from '../util/typeAssertions';
+import { isFiller } from '../fillers/Filler';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;

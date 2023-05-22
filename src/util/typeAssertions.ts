@@ -5,17 +5,9 @@ import type {
   TCachedFabricObject,
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
-import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
-import { Filler } from '../fillers/Filler';
-
-export const isFiller = (
-  filler: TFiller | string | null
-): filler is TFiller => {
-  return !!filler && filler instanceof Filler;
-};
 
 export const isCollection = (
   fabricObject?: FabricObject

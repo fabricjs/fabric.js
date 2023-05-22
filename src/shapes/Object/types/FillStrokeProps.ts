@@ -1,4 +1,4 @@
-import type { TFiller } from '../../../typedefs';
+import type { TFiller } from '../../../fillers/typedefs';
 
 export interface FillStrokeProps {
   /**

@@ -4,7 +4,7 @@ import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
-import { isFiller } from '../util/typeAssertions';
+import { isFiller } from '../fillers/Filler';
 import type {
   FabricObjectProps,
   SerializedObjectProps,

@@ -1,7 +1,8 @@
 import { noop } from '../../constants';
 import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
+import type { Abortable, TCrossOrigin } from '../../typedefs';
+import type { TFiller } from '../../fillers/typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 

@@ -1,6 +1,7 @@
 import { config } from '../config';
 import type { Point } from '../Point';
 import type { TSize } from '../typedefs';
+import type { TFiller } from './typedefs';
 import { pick } from '../util/misc/pick';
 import { toFixed } from '../util/misc/toFixed';
 
@@ -11,6 +12,12 @@ export type TFillerRenderingOptions = {
   size: TSize;
   offset: Point;
   noTransform?: boolean;
+};
+
+export const isFiller = (
+  filler: TFiller | string | null
+): filler is TFiller => {
+  return !!filler && filler instanceof Filler;
 };
 
 export abstract class Filler<T extends CanvasPattern | CanvasGradient> {
