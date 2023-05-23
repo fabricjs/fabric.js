@@ -243,21 +243,23 @@ export class WebGLFilterBackend {
    * Accepts specific dimensions to initialize the texture to or a source image.
    *
    * @param {WebGLRenderingContext} gl The GL context to use for creating the texture.
-   * @param {Number} width The width to initialize the texture at.
-   * @param {Number} height The height to initialize the texture.
-   * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source for the texture data.
+   * @param {number} width The width to initialize the texture at.
+   * @param {number} height The height to initialize the texture.
+   * @param {TexImageSource} textureImageSource A source for the texture data.
+   * @param {number} filter gl.NEAREST default or gl.LINEAR A source for the texture data.
    * @returns {WebGLTexture}
    */
   createTexture(
     gl: WebGLRenderingContext,
     width: number,
     height: number,
-    textureImageSource?: TexImageSource
+    textureImageSource?: TexImageSource,
+    filter = gl.NEAREST
   ) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     if (textureImageSource) {
@@ -294,7 +296,10 @@ export class WebGLFilterBackend {
    * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source to use to create the
    * texture cache entry if one does not already exist.
    */
-  getCachedTexture(uniqueId: string, textureImageSource: TexImageSource) {
+  getCachedTexture(
+    uniqueId: string,
+    textureImageSource: TexImageSource
+  ): WebGLTexture | null {
     if (this.textureCache[uniqueId]) {
       return this.textureCache[uniqueId];
     } else {
@@ -304,7 +309,9 @@ export class WebGLFilterBackend {
         textureImageSource.height,
         textureImageSource
       );
-      this.textureCache[uniqueId] = texture;
+      if (texture) {
+        this.textureCache[uniqueId] = texture;
+      }
       return texture;
     }
   }
