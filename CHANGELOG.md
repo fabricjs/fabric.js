@@ -2,7 +2,7 @@
 
 ## [next]
 
-- feat(): Missing features from fabric 5 [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
+- feat(): Export setFilterBackend and port the texture filtering option from fabric 5 [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
 - chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
 - ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
