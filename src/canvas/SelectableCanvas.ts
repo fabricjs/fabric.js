@@ -36,6 +36,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
+import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -786,17 +787,17 @@ export class SelectableCanvas<
     };
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
+      origin.x = RIGHT;
       // is a right control ?
     } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
+      origin.x = LEFT;
     }
     // is a top control ?
     if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
+      origin.y = BOTTOM;
       // is a bottom control ?
     } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
+      origin.y = TOP;
     }
     return origin;
   }
@@ -866,8 +867,8 @@ export class SelectableCanvas<
       };
 
     if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
+      transform.originX = CENTER;
+      transform.originY = CENTER;
     }
     this._currentTransform = transform;
     // @ts-ignore
@@ -1118,10 +1119,10 @@ export class SelectableCanvas<
       boundsHeight = bounds.height || 0;
 
     if (!boundsWidth || !boundsHeight) {
-      if ('top' in bounds && 'bottom' in bounds) {
+      if (TOP in bounds && BOTTOM in bounds) {
         boundsHeight = Math.abs(bounds.top - bounds.bottom);
       }
-      if ('right' in bounds && 'left' in bounds) {
+      if (RIGHT in bounds && LEFT in bounds) {
         boundsWidth = Math.abs(bounds.right - bounds.left);
       }
     }
@@ -1485,12 +1486,12 @@ export class SelectableCanvas<
         'angle',
         'flipX',
         'flipY',
-        'left',
+        LEFT,
         'scaleX',
         'scaleY',
         'skewX',
         'skewY',
-        'top',
+        TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
       addTransformToObject(instance, this._activeObject.calcOwnMatrix());

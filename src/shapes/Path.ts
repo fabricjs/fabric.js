@@ -26,6 +26,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER, LEFT, TOP } from '../constants';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -76,8 +77,8 @@ export class Path<
   ) {
     super(options as Props);
     this._setPath(path || [], true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   /**
@@ -296,7 +297,7 @@ export class Path<
     this.set({ width, height, pathOffset });
     // using pathOffset because it match the use case.
     // if pathOffset change here we need to use left + width/2 , top + height/2
-    adjustPosition && this.setPositionByOrigin(pathOffset, 'center', 'center');
+    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
   }
 
   _calcBoundsFromPath(): TBBox {

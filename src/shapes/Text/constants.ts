@@ -1,3 +1,4 @@
+import { LEFT } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { Text } from './Text';
 
@@ -8,7 +9,7 @@ const fontProperties = [
   'fontStyle',
 ] as const;
 
-const textDecorationProperties = [
+export const textDecorationProperties = [
   'underline',
   'overline',
   'linethrough',
@@ -58,7 +59,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   underline: false,
   overline: false,
   linethrough: false,
-  textAlign: 'left',
+  textAlign: LEFT,
   fontStyle: 'normal',
   lineHeight: 1.16,
   superscript: {
@@ -74,7 +75,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   shadow: null,
   path: null,
   pathStartOffset: 0,
-  pathSide: 'left',
+  pathSide: LEFT,
   pathAlign: 'baseline',
   _fontSizeFraction: 0.222,
   offsets: {
@@ -89,3 +90,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
 };
+
+export const JUSTIFY = 'justify';
+export const JUSTIFY_LEFT = 'justify-left';
+export const JUSTIFY_RIGHT = 'justify-right';
+export const JUSTIFY_CENTER = 'justify-center';

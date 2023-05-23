@@ -18,3 +18,10 @@ export const kRect = 1 - 0.5522847498;
 export const LEFT_CLICK = 1;
 export const MIDDLE_CLICK = 2;
 export const RIGHT_CLICK = 3;
+
+export const CENTER = 'center';
+export const LEFT = 'left';
+export const TOP = 'top';
+export const BOTTOM = 'bottom';
+export const RIGHT = 'right';
+export const NONE = 'none';
