@@ -246,7 +246,8 @@ export class WebGLFilterBackend {
    * @param {number} width The width to initialize the texture at.
    * @param {number} height The height to initialize the texture.
    * @param {TexImageSource} textureImageSource A source for the texture data.
-   * @param {number} filter gl.NEAREST default or gl.LINEAR A source for the texture data.
+   * @param {number} filter gl.NEAREST default or gl.LINEAR filters for the texture.
+   * This filter is very useful for LUTs filters. If you need interpolation use gl.LINEAR
    * @returns {WebGLTexture}
    */
   createTexture(
