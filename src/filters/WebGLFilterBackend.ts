@@ -311,8 +311,9 @@ export class WebGLFilterBackend {
     uniqueId: string,
     textureImageSource: TexImageSource
   ): WebGLTexture | null {
-    if (this.textureCache[uniqueId]) {
-      return this.textureCache[uniqueId];
+    const { textureCache } = this;
+    if (textureCache[uniqueId]) {
+      return textureCache[uniqueId];
     } else {
       const texture = this.createTexture(
         this.gl,
@@ -321,7 +322,7 @@ export class WebGLFilterBackend {
         textureImageSource
       );
       if (texture) {
-        this.textureCache[uniqueId] = texture;
+        textureCache[uniqueId] = texture;
       }
       return texture;
     }
