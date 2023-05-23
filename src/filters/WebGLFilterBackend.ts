@@ -257,31 +257,41 @@ export class WebGLFilterBackend {
     textureImageSource?: TexImageSource,
     filter = gl.NEAREST
   ) {
+    const {
+      TEXTURE_2D,
+      RGBA,
+      UNSIGNED_BYTE,
+      CLAMP_TO_EDGE,
+      TEXTURE_MAG_FILTER,
+      TEXTURE_MIN_FILTER,
+      TEXTURE_WRAP_S,
+      TEXTURE_WRAP_T,
+    } = gl;
     const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindTexture(TEXTURE_2D, texture);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
     if (textureImageSource) {
       gl.texImage2D(
-        gl.TEXTURE_2D,
+        TEXTURE_2D,
         0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
+        RGBA,
+        RGBA,
+        UNSIGNED_BYTE,
         textureImageSource
       );
     } else {
       gl.texImage2D(
-        gl.TEXTURE_2D,
+        TEXTURE_2D,
         0,
-        gl.RGBA,
+        RGBA,
         width,
         height,
         0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
+        RGBA,
+        UNSIGNED_BYTE,
         null
       );
     }
