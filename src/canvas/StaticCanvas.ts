@@ -10,7 +10,7 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
-import type { Text } from '../shapes/Text';
+import type { Text } from '../shapes/Text/Text';
 import type {
   Abortable,
   Constructor,
