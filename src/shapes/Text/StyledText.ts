@@ -110,7 +110,6 @@ export abstract class StyledText<
       letterCount = 0;
       for (const p2 in obj[p1]) {
         const styleObject = obj[p1][p2] || {},
-          // TODO: this shouldn't be necessary anymore with modern browsers
           stylePropertyHasBeenSet = styleObject[property] !== undefined;
 
         stylesCount++;
