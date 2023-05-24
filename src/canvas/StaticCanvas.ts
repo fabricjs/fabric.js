@@ -1300,35 +1300,28 @@ export class StaticCanvas<
    * @return {String}
    */
   createSVGFontFacesMarkup(): string {
-    const objects: FabricObject[] = [],
-      fontPaths = config.fontPaths;
+    const { fontPaths } = config,
+      fontList = {} as Record<string, boolean>;
 
-    this._objects.forEach(function add(object) {
-      objects.push(object);
+    this._objects.forEach(function listFonts(object) {
+      typeof (object as Text).getSVGFontList === 'function' &&
+        Object.assign(fontList, (object as Text).getSVGFontList() || {});
       if (isCollection(object)) {
-        object._objects.forEach(add);
+        object._objects.forEach(listFonts);
       }
     });
 
-    const fontListMarkup = Object.keys(
-      objects.reduce(
-        (list, obj) =>
-          typeof (obj as Text).getSVGFontList === 'function'
-            ? Object.assign(list, (obj as Text).getSVGFontList() || {})
-            : list,
-        {} as Record<string, boolean>
-      )
-    )
-      .map(
-        (fontFamily) =>
-          `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+    const fontListMarkup = Object.keys(fontList)
+      .map((fontFamily) =>
+        fontPaths[fontFamily]
+          ? `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+          : ''
       )
       .join('');
 
-    if (fontListMarkup) {
-      return `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`;
-    }
-    return '';
+    return fontListMarkup
+      ? `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`
+      : '';
   }
 
   /**
