@@ -1,6 +1,6 @@
 import { getFabricDocument } from '../env';
 import { config } from '../config';
-import { iMatrix, VERSION } from '../constants';
+import { CENTER, iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
@@ -976,7 +976,7 @@ export class StaticCanvas<
    * @param {Point} center Center point
    */
   _centerObject(object: FabricObject, center: Point) {
-    object.setXY(center, 'center', 'center');
+    object.setXY(center, CENTER, CENTER);
     object.setCoords();
     this.renderOnAddRemove && this.requestRenderAll();
   }

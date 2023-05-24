@@ -1,6 +1,8 @@
+import { TOP, LEFT } from '../../constants';
+
 export const stateProperties = [
-  'top',
-  'left',
+  TOP,
+  LEFT,
   'scaleX',
   'scaleY',
   'flipX',
@@ -34,8 +36,8 @@ export const cacheProperties = [
 ];
 
 export const fabricObjectDefaultValues = {
-  originX: 'left',
-  originY: 'top',
+  originX: LEFT,
+  originY: TOP,
   top: 0,
   left: 0,
   width: 0,

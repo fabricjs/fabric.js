@@ -5,7 +5,7 @@ import {
   parseUnit,
 } from '../util/misc/svgParsing';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
-
+import { NONE } from '../constants';
 /**
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
@@ -85,7 +85,7 @@ export function applyViewboxTransform(element) {
 
   // default is to preserve aspect ratio
   preserveAspectRatio = parsePreserveAspectRatioAttribute(preserveAspectRatio);
-  if (preserveAspectRatio.alignX !== 'none') {
+  if (preserveAspectRatio.alignX !== NONE) {
     //translate all container for the effect of Mid, Min, Max
     if (preserveAspectRatio.meetOrSlice === 'meet') {
       scaleY = scaleX = scaleX > scaleY ? scaleY : scaleX;
