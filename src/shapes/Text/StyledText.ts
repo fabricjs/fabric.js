@@ -6,25 +6,10 @@ import type {
 } from '../Object/types';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
+import type { StylePropertiesType } from './constants';
 import type { Text } from './Text';
 
-export type TextStyleDeclaration = Partial<
-  Pick<
-    Text,
-    | 'fill'
-    | 'stroke'
-    | 'strokeWidth'
-    | 'fontSize'
-    | 'fontFamily'
-    | 'fontWeight'
-    | 'fontStyle'
-    | 'textBackgroundColor'
-    | 'deltaY'
-    | 'overline'
-    | 'underline'
-    | 'linethrough'
-  >
->;
+export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
@@ -38,7 +23,7 @@ export abstract class StyledText<
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
   protected declare _forceClearCache: boolean;
-  static _styleProperties = styleProperties;
+  static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
   abstract get2DCursorLocation(
     selectionStart: number,
     skipWrapping?: boolean
@@ -78,8 +63,8 @@ export abstract class StyledText<
    * @param {Number} lineIndex to check the style on
    * @return {Boolean}
    */
-  styleHas(property: string, lineIndex?: number): boolean {
-    if (!this.styles || !property || property === '') {
+  styleHas(property: keyof TextStyleDeclaration, lineIndex?: number): boolean {
+    if (!this.styles) {
       return false;
     }
     if (typeof lineIndex !== 'undefined' && !this.styles[lineIndex]) {
@@ -111,8 +96,8 @@ export abstract class StyledText<
    *
    * @param {string} property The property to compare between characters and text.
    */
-  cleanStyle(property: string) {
-    if (!this.styles || !property || property === '') {
+  cleanStyle(property: keyof TextStyleDeclaration) {
+    if (!this.styles) {
       return false;
     }
     const obj = this.styles;
@@ -124,12 +109,9 @@ export abstract class StyledText<
     for (const p1 in obj) {
       letterCount = 0;
       for (const p2 in obj[p1]) {
-        const styleObject = obj[p1][p2],
+        const styleObject = obj[p1][p2] || {},
           // TODO: this shouldn't be necessary anymore with modern browsers
-          stylePropertyHasBeenSet = Object.prototype.hasOwnProperty.call(
-            styleObject,
-            property
-          );
+          stylePropertyHasBeenSet = styleObject[property] !== undefined;
 
         stylesCount++;
 
@@ -164,6 +146,7 @@ export abstract class StyledText<
       graphemeCount += this._textLines[i].length;
     }
     if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
+      // @ts-expect-error conspiracy theory of TS
       this[property as keyof this] = stylePropertyValue;
       this.removeStyle(property);
     }
@@ -176,8 +159,8 @@ export abstract class StyledText<
    *
    * @param {String} props The property to remove from character styles.
    */
-  removeStyle(property: string) {
-    if (!this.styles || !property || property === '') {
+  removeStyle(property: keyof TextStyleDeclaration) {
+    if (!this.styles) {
       return;
     }
     const obj = this.styles;
@@ -289,6 +272,7 @@ export abstract class StyledText<
       styleProps = (this.constructor as typeof StyledText)._styleProperties;
     for (let i = 0; i < styleProps.length; i++) {
       const prop = styleProps[i];
+      // @ts-expect-error TS complains even when we serve everything on a silver plate.
       styleObject[prop] =
         typeof style[prop] === 'undefined'
           ? this[prop as keyof this]
