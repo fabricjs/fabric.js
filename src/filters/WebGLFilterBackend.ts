@@ -255,9 +255,12 @@ export class WebGLFilterBackend {
     width: number,
     height: number,
     textureImageSource?: TexImageSource,
-    filter = gl.NEAREST
+    filter?:
+      | WebGLRenderingContextBase['NEAREST']
+      | WebGLRenderingContextBase['LINEAR']
   ) {
     const {
+      NEAREST,
       TEXTURE_2D,
       RGBA,
       UNSIGNED_BYTE,
@@ -269,8 +272,8 @@ export class WebGLFilterBackend {
     } = gl;
     const texture = gl.createTexture();
     gl.bindTexture(TEXTURE_2D, texture);
-    gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter);
-    gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter || NEAREST);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter || NEAREST);
     gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
     gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
     if (textureImageSource) {
@@ -309,7 +312,10 @@ export class WebGLFilterBackend {
    */
   getCachedTexture(
     uniqueId: string,
-    textureImageSource: TexImageSource
+    textureImageSource: TexImageSource,
+    filter?:
+      | WebGLRenderingContextBase['NEAREST']
+      | WebGLRenderingContextBase['LINEAR']
   ): WebGLTexture | null {
     const { textureCache } = this;
     if (textureCache[uniqueId]) {
@@ -319,7 +325,8 @@ export class WebGLFilterBackend {
         this.gl,
         textureImageSource.width,
         textureImageSource.height,
-        textureImageSource
+        textureImageSource,
+        filter
       );
       if (texture) {
         textureCache[uniqueId] = texture;
