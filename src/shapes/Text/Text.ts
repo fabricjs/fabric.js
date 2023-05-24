@@ -1893,6 +1893,13 @@ export class Text<
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Text<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends TextSVGExportMixin {}
 applyMixins(Text, [TextSVGExportMixin]);
+
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);
