@@ -1319,17 +1319,16 @@ export class StaticCanvas<
       if (!isTextObject(obj)) {
         return;
       }
-      let fontFamily = obj.fontFamily;
+      const { styles, fontFamily } = obj;
       if (fontList[fontFamily] || !fontPaths[fontFamily]) {
         return;
       }
       fontList[fontFamily] = true;
-      if (!obj.styles) {
+      if (!styles) {
         return;
       }
-      Object.values(obj.styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach((textCharStyle) => {
-          fontFamily = textCharStyle.fontFamily;
+      Object.values(styles).forEach((styleRow) => {
+        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
           if (!fontList[fontFamily] && fontPaths[fontFamily]) {
             fontList[fontFamily] = true;
           }
