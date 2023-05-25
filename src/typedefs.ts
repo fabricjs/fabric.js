@@ -93,6 +93,7 @@ export type TCacheCanvasDimensions = {
   zoomY: number;
   x: number;
   y: number;
+  capped: boolean;
 };
 
 export type TRectBounds = [min: XY, max: XY];

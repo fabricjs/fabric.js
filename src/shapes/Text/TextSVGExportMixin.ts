@@ -29,7 +29,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(reviver: TSVGReviver) {
+  toSVG(reviver?: TSVGReviver) {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
@@ -285,5 +285,16 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    */
   getSvgStyles(skipShadow?: boolean) {
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
+  }
+
+  getSVGFontList() {
+    const fontList: Record<string, boolean> = { [this.fontFamily]: true };
+    this.styles &&
+      Object.values(this.styles).forEach((styleRow) => {
+        Object.values(styleRow).forEach(({ fontFamily }) => {
+          fontFamily && (fontList[fontFamily] = true);
+        });
+      });
+    return fontList;
   }
 }

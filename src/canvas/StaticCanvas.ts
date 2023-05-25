@@ -10,6 +10,7 @@ import { Point } from '../Point';
 import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
+import type { Text } from '../shapes/Text/Text';
 import type {
   Abortable,
   Constructor,
@@ -38,12 +39,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isCollection, isFiller, isPattern } from '../util/typeAssertions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1304,49 +1300,28 @@ export class StaticCanvas<
    * @return {String}
    */
   createSVGFontFacesMarkup(): string {
-    const objects: FabricObject[] = [],
-      fontList: Record<string, boolean> = {},
-      fontPaths = config.fontPaths;
+    const { fontPaths } = config,
+      fontList = {} as Record<string, boolean>;
 
-    this._objects.forEach(function add(object) {
-      objects.push(object);
+    this._objects.forEach(function listFonts(object) {
+      typeof (object as Text).getSVGFontList === 'function' &&
+        Object.assign(fontList, (object as Text).getSVGFontList() || {});
       if (isCollection(object)) {
-        object._objects.forEach(add);
+        object._objects.forEach(listFonts);
       }
-    });
-
-    objects.forEach((obj) => {
-      if (!isTextObject(obj)) {
-        return;
-      }
-      const { styles, fontFamily } = obj;
-      if (fontList[fontFamily] || !fontPaths[fontFamily]) {
-        return;
-      }
-      fontList[fontFamily] = true;
-      if (!styles) {
-        return;
-      }
-      Object.values(styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
-          if (!fontList[fontFamily] && fontPaths[fontFamily]) {
-            fontList[fontFamily] = true;
-          }
-        });
-      });
     });
 
     const fontListMarkup = Object.keys(fontList)
-      .map(
-        (fontFamily) =>
-          `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+      .map((fontFamily) =>
+        fontPaths[fontFamily]
+          ? `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+          : ''
       )
       .join('');
 
-    if (fontListMarkup) {
-      return `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`;
-    }
-    return '';
+    return fontListMarkup
+      ? `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`
+      : '';
   }
 
   /**

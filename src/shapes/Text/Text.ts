@@ -574,6 +574,28 @@ export class Text<
     return dims;
   }
 
+  getCacheState() {
+    const data = super.getCacheState();
+    const lineHeight = this.getHeightOfLine(0);
+    // IMHO in these lines we are using zoomX and zoomY not the this version.
+    const additionalWidth =
+      data.additionalSize.width + lineHeight * this.zoomX!;
+    const additionalHeight =
+      data.additionalSize.height + lineHeight * this.zoomY!;
+    return {
+      ...data,
+      redraw: true,
+      additionalSize: {
+        width: additionalWidth,
+        height: additionalHeight,
+      },
+      resize: {
+        width: Math.ceil(data.width + additionalWidth),
+        height: Math.ceil(data.height + additionalHeight),
+      },
+    };
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -1871,6 +1893,13 @@ export class Text<
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Text<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends TextSVGExportMixin {}
 applyMixins(Text, [TextSVGExportMixin]);
+
 classRegistry.setClass(Text);
 classRegistry.setSVGClass(Text);

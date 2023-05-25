@@ -1043,27 +1043,27 @@
   QUnit.test('_getCacheCanvasDimensions returns dimensions and zoom for cache canvas', function(assert) {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     var dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1, x: 10, y: 10 }, 'if no scaling is applied cache is as big as object');
+    assert.deepEqual(dims, { width: 12, height: 12, zoomX: 1, zoomY: 1, x: 10, y: 10, capped: false }, 'if no scaling is applied cache is as big as object');
     object.strokeWidth = 2;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'cache contains the stroke');
+    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12, capped: false }, 'cache contains the stroke');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3, x: 24, y: 36 }, 'cache is as big as the scaled object');
+    assert.deepEqual(dims, { width: 26, height: 38, zoomX: 2, zoomY: 3, x: 24, y: 36, capped: false }, 'cache is as big as the scaled object');
   });
 
   QUnit.test('_getCacheCanvasDimensions and strokeUniform', function(assert) {
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 2 });
     var dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'if no scaling is applied cache is as big as object + strokeWidth');
+    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12, capped: false }, 'if no scaling is applied cache is as big as object + strokeWidth');
     object.strokeUniform = true;
     var dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12 }, 'if no scaling is applied strokeUniform makes no difference');
+    assert.deepEqual(dims, { width: 14, height: 14, zoomX: 1, zoomY: 1, x: 12, y: 12, capped: false }, 'if no scaling is applied strokeUniform makes no difference');
     object.scaleX = 2;
     object.scaleY = 3;
     dims = object._getCacheCanvasDimensions();
-    assert.deepEqual(dims, { width: 24, height: 34, zoomX: 2, zoomY: 3, x: 22, y: 32 }, 'cache is as big as the scaled object');
+    assert.deepEqual(dims, { width: 24, height: 34, zoomX: 2, zoomY: 3, x: 22, y: 32, capped: false }, 'cache is as big as the scaled object');
   });
 
   QUnit.test('_updateCacheCanvas check if cache canvas should be updated', function(assert) {

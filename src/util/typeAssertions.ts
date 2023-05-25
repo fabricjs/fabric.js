@@ -6,7 +6,6 @@ import type {
 } from '../shapes/Object/Object';
 import type { FabricObjectWithDragSupport } from '../shapes/Object/InteractiveObject';
 import type { TFiller } from '../typedefs';
-import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
@@ -41,14 +40,6 @@ export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection => {
   return !!fabricObject && fabricObject.isType('ActiveSelection');
-};
-
-export const isTextObject = (
-  fabricObject?: FabricObject
-): fabricObject is Text => {
-  // we could use instanceof but that would mean pulling in Text code for a simple check
-  // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('Text', 'IText', 'Textbox');
 };
 
 export const isInteractiveTextObject = (
