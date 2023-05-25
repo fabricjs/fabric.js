@@ -3,8 +3,15 @@
 ## [next]
 
 - chore(): cleanup Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)
+## [6.0.0-beta7]
+
+- feat(): Export setFilterBackend and port the texture filtering option from fabric 5, exports some extra types [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
+- chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
+- chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
+- ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+- refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
 
 ## [6.0.0-beta6]
 

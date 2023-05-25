@@ -1,4 +1,5 @@
 import { Point } from '../../Point';
+import { CENTER } from '../../constants';
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
@@ -63,7 +64,7 @@ export const applyTransformToObject = (
   object.flipY = false;
   Object.assign(object, otherOptions);
   object.set({ scaleX, scaleY });
-  object.setPositionByOrigin(center, 'center', 'center');
+  object.setPositionByOrigin(center, CENTER, CENTER);
 };
 /**
  * reset an object transform state to neutral. Top and left are not accounted for

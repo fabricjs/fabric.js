@@ -25,6 +25,7 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
+import { NONE } from '../constants';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -188,8 +189,8 @@ export class Image<
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: Props);
-  constructor(element: ImageSource, options: Props);
+  constructor(elementId: string, options?: Props);
+  constructor(element: ImageSource, options?: Props);
   constructor(arg0: ImageSource | string, options: Props = {} as Props) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
@@ -699,7 +700,7 @@ export class Image<
       cropY = 0,
       offset;
 
-    if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
+    if (pAR && (pAR.alignX !== NONE || pAR.alignY !== NONE)) {
       if (pAR.meetOrSlice === 'meet') {
         scaleX = scaleY = findScaleToFit(this._element, parsedAttributes);
         offset = (pWidth - rWidth * scaleX) / 2;

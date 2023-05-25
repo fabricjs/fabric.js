@@ -12,6 +12,7 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { makeBoundingBoxFromPoints } from '../util';
+import { CENTER, LEFT, TOP } from '../constants';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
@@ -75,8 +76,8 @@ export class Line<
     super({ ...options, x1, y1, x2, y2 });
     this._setWidthHeight();
     const { left, top } = options;
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   /**
@@ -92,7 +93,7 @@ export class Line<
       { x: x2, y: y2 },
     ]);
     const position = new Point(left + width / 2, top + height / 2);
-    this.setPositionByOrigin(position, 'center', 'center');
+    this.setPositionByOrigin(position, CENTER, CENTER);
   }
 
   /**

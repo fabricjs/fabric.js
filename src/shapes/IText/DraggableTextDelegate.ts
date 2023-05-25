@@ -10,6 +10,7 @@ import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
+import { NONE } from '../../constants';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -151,7 +152,7 @@ export class DraggableTextDelegate {
     setStyle(dragImage, {
       position: 'fixed',
       left: `${-dragImage.width}px`,
-      border: 'none',
+      border: NONE,
       width: `${dragImage.width / retinaScaling}px`,
       height: `${dragImage.height / retinaScaling}px`,
     });
@@ -345,8 +346,8 @@ export class DraggableTextDelegate {
         const target = this.target;
         const canvas = this.target.canvas!;
         const { selectionStart, selectionEnd } = this.__dragStartSelection;
-        const dropEffect = e.dataTransfer?.dropEffect || 'none';
-        if (dropEffect === 'none') {
+        const dropEffect = e.dataTransfer?.dropEffect || NONE;
+        if (dropEffect === NONE) {
           // pointer is back over selection
           target.selectionStart = selectionStart;
           target.selectionEnd = selectionEnd;

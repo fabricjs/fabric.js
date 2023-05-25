@@ -34,7 +34,12 @@ import {
   additionalProps,
   textDefaultValues,
   textLayoutProperties,
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
 } from './constants';
+import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -446,7 +451,7 @@ export class Text<
         this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
       this.height = this.calcTextHeight();
     }
-    if (this.textAlign.indexOf('justify') !== -1) {
+    if (this.textAlign.includes(JUSTIFY)) {
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
@@ -465,7 +470,7 @@ export class Text<
       spaces;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (
-        this.textAlign !== 'justify' &&
+        this.textAlign !== JUSTIFY &&
         (i === len - 1 || this.isEndOfWrapping(i))
       ) {
         continue;
@@ -616,14 +621,14 @@ export class Text<
     ctx.textBaseline = 'alphabetic';
     if (this.path) {
       switch (this.pathAlign) {
-        case 'center':
+        case CENTER:
           ctx.textBaseline = 'middle';
           break;
         case 'ascender':
-          ctx.textBaseline = 'top';
+          ctx.textBaseline = TOP;
           break;
         case 'descender':
-          ctx.textBaseline = 'bottom';
+          ctx.textBaseline = BOTTOM;
           break;
       }
     }
@@ -856,7 +861,7 @@ export class Text<
       prevGrapheme: string | undefined,
       graphemeInfo: GraphemeBBox | undefined;
 
-    const reverse = this.pathSide === 'right',
+    const reverse = this.pathSide === RIGHT,
       path = this.path,
       line = this._textLines[lineIndex],
       llength = line.length,
@@ -886,13 +891,13 @@ export class Text<
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
-        case 'left':
+        case LEFT:
           positionInPath = reverse ? totalPathLength - width : 0;
           break;
-        case 'center':
+        case CENTER:
           positionInPath = (totalPathLength - width) / 2;
           break;
-        case 'right':
+        case RIGHT:
           positionInPath = reverse ? 0 : totalPathLength - width;
           break;
         //todo - add support for justify
@@ -938,7 +943,7 @@ export class Text<
     const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
-    graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
+    graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
   }
 
   /**
@@ -1117,7 +1122,7 @@ export class Text<
     lineIndex: number
   ) {
     const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.indexOf('justify') !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1142,7 +1147,7 @@ export class Text<
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
-      ctx.textAlign = isLtr ? 'left' : 'right';
+      ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
     top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
     if (shortCut) {
@@ -1409,35 +1414,35 @@ export class Text<
       isEndOfWrapping = this.isEndOfWrapping(lineIndex);
     let leftOffset = 0;
     if (
-      textAlign === 'justify' ||
-      (textAlign === 'justify-center' && !isEndOfWrapping) ||
-      (textAlign === 'justify-right' && !isEndOfWrapping) ||
-      (textAlign === 'justify-left' && !isEndOfWrapping)
+      textAlign === JUSTIFY ||
+      (textAlign === JUSTIFY_CENTER && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_RIGHT && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_LEFT && !isEndOfWrapping)
     ) {
       return 0;
     }
-    if (textAlign === 'center') {
+    if (textAlign === CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'right') {
+    if (textAlign === RIGHT) {
       leftOffset = lineDiff;
     }
-    if (textAlign === 'justify-center') {
+    if (textAlign === JUSTIFY_CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'justify-right') {
+    if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
     if (direction === 'rtl') {
       if (
-        textAlign === 'right' ||
-        textAlign === 'justify' ||
-        textAlign === 'justify-right'
+        textAlign === RIGHT ||
+        textAlign === JUSTIFY ||
+        textAlign === JUSTIFY_RIGHT
       ) {
         leftOffset = 0;
-      } else if (textAlign === 'left' || textAlign === 'justify-left') {
+      } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;
-      } else if (textAlign === 'center' || textAlign === 'justify-center') {
+      } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
         leftOffset = -lineDiff / 2;
       }
     }
@@ -1773,7 +1778,7 @@ export class Text<
     const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
 
     const {
-      textAnchor = 'left',
+      textAnchor = LEFT,
       textDecoration = '',
       dx = 0,
       dy = 0,
@@ -1829,10 +1834,10 @@ export class Text<
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (textAnchor === 'center') {
+    if (textAnchor === CENTER) {
       offX = text.getScaledWidth() / 2;
     }
-    if (textAnchor === 'right') {
+    if (textAnchor === RIGHT) {
       offX = text.getScaledWidth();
     }
     text.set({

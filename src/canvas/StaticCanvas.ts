@@ -1,6 +1,6 @@
 import { getFabricDocument } from '../env';
 import { config } from '../config';
-import { iMatrix, VERSION } from '../constants';
+import { CENTER, iMatrix, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin, isCollection } from '../Collection';
@@ -975,7 +975,7 @@ export class StaticCanvas<
    * @param {Point} center Center point
    */
   _centerObject(object: FabricObject, center: Point) {
-    object.setXY(center, 'center', 'center');
+    object.setXY(center, CENTER, CENTER);
     object.setCoords();
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -1314,17 +1314,16 @@ export class StaticCanvas<
       if (!isTextObject(obj)) {
         return;
       }
-      let fontFamily = obj.fontFamily;
+      const { styles, fontFamily } = obj;
       if (fontList[fontFamily] || !fontPaths[fontFamily]) {
         return;
       }
       fontList[fontFamily] = true;
-      if (!obj.styles) {
+      if (!styles) {
         return;
       }
-      Object.values(obj.styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach((textCharStyle) => {
-          fontFamily = textCharStyle.fontFamily;
+      Object.values(styles).forEach((styleRow) => {
+        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
           if (!fontList[fontFamily] && fontPaths[fontFamily]) {
             fontList[fontFamily] = true;
           }

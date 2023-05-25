@@ -7,6 +7,7 @@ import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { CircleBrushPoint } from './typedefs';
+import { CENTER } from '../constants';
 
 export class CircleBrush extends BaseBrush {
   /**
@@ -99,8 +100,8 @@ export class CircleBrush extends BaseBrush {
           radius: point.radius,
           left: point.x,
           top: point.y,
-          originX: 'center',
-          originY: 'center',
+          originX: CENTER,
+          originY: CENTER,
           fill: point.fill,
         });
 

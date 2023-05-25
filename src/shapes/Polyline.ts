@@ -18,6 +18,7 @@ import type {
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER, LEFT, TOP } from '../constants';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -105,8 +106,8 @@ export class Polyline<
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   protected isOpen() {
@@ -176,8 +177,8 @@ export class Polyline<
     adjustPosition &&
       this.setPositionByOrigin(
         new Point(left + width / 2, top + height / 2),
-        'center',
-        'center'
+        CENTER,
+        CENTER
       );
   }
 
