@@ -291,8 +291,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const fontList: Record<string, boolean> = { [this.fontFamily]: true };
     this.styles &&
       Object.values(this.styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
-          fontList[fontFamily] = true;
+        Object.values(styleRow).forEach(({ fontFamily }) => {
+          fontFamily && (fontList[fontFamily] = true);
         });
       });
     return fontList;
