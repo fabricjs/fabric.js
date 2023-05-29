@@ -2,6 +2,8 @@
 
 ## [next]
 
+- refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+
 ## [6.0.0-beta7]
 
 - feat(): Export setFilterBackend and port the texture filtering option from fabric 5, exports some extra types [#8954](https://github.com/fabricjs/fabric.js/pull/8954)

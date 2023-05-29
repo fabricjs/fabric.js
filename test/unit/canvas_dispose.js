@@ -30,8 +30,8 @@ function assertCanvasDisposing(klass) {
         assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
         var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         assert.equal(el.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
         assert.ok(typeof canvas.dispose === 'function');
         assert.ok(typeof canvas.destroy === 'function');
@@ -41,7 +41,7 @@ function assertCanvasDisposing(klass) {
         canvas.dispose();
         assert.equal(canvas.disposed, true, 'dispose should flag disposed');
         assert.equal(el.hasAttribute('data-fabric'), false, 'dispose should clear lowerCanvasEl data-fabric attr');
-        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(canvas.elements._originalCanvasStyle, undefined, 'removed original canvas style');
         assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
         assert.equal(el.width, 200, 'restored width');
         assert.equal(el.height, 200, 'restored height');
@@ -228,9 +228,9 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
         assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
         assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
-        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
         }
@@ -251,7 +251,7 @@ function testCanvasDisposing() {
         if (!isNode()) {
             assert.equal(parentEl.childNodes[0], lowerCanvasEl, 'canvas should be back to its firstChild place');
         }
-        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(canvas.elements._originalCanvasStyle, undefined, 'removed original canvas style');
         assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
         assert.equal(el.width, 200, 'restored width');
         assert.equal(el.height, 200, 'restored height');
@@ -286,9 +286,9 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.className, canvas.containerClass, 'DIV class should be set');
         assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
-        assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+        assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
         assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
-        assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+        assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
         }
@@ -319,7 +319,7 @@ function testCanvasDisposing() {
         assert.equal(canvas.pixelFindCanvasEl, null, 'pixelFindCanvasEl should be deleted');
         assert.equal(canvas.contextTop, null, 'contextTop should be deleted');
         assert.equal(canvas.pixelFindContext, null, 'pixelFindContext should be deleted');
-        assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+        assert.equal(canvas.elements._originalCanvasStyle, undefined, 'removed original canvas style');
         assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
         assert.equal(el.width, 200, 'restored width');
         assert.equal(el.height, 200, 'restored height');
