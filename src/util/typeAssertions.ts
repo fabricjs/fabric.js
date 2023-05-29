@@ -2,6 +2,7 @@ import type { FabricObject } from '../shapes/Object/Object';
 import type { TFiller } from '../typedefs';
 import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 
 export const isFiller = (
   filler: TFiller | string | null
