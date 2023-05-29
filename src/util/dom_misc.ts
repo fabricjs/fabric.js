@@ -37,19 +37,6 @@ export function getScrollLeftTop(element: HTMLElement) {
   return { left, top };
 }
 
-/**
- * Makes element selectable
- * @param {HTMLElement} element Element to make selectable
- * @return {HTMLElement} Element that was passed in
- */
-export function makeElementSelectable(element: HTMLElement) {
-  if (typeof element.onselectstart !== 'undefined') {
-    element.onselectstart = null;
-  }
-  element.style.userSelect = '';
-  return element;
-}
-
 export const getDocumentFromElement = (el: HTMLElement) =>
   el.ownerDocument || null;
 

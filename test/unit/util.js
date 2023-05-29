@@ -180,53 +180,6 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  QUnit.test('fabric.util.makeElementUnselectable', function(assert) {
-    var makeElementUnselectable = fabric.util.makeElementUnselectable;
-
-    assert.ok(typeof makeElementUnselectable === 'function');
-
-    var el = fabric.getFabricDocument().createElement('p');
-    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
-
-    assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
-
-    if (typeof el.onselectstart !== 'undefined') {
-      assert.equal(el.onselectstart.toString(), (() => false).toString());
-    }
-
-    // not sure if it's a good idea to test implementation details here
-    // functional test would probably make more sense
-    if (typeof el.unselectable === 'string') {
-      assert.equal('on', el.unselectable);
-    }
-    else if (typeof el.userSelect !== 'undefined') {
-      assert.equal('none', el.userSelect);
-    }
-  });
-
-  QUnit.test('fabric.util.makeElementSelectable', function(assert) {
-    var makeElementSelectable = fabric.util.makeElementSelectable,
-        makeElementUnselectable = fabric.util.makeElementUnselectable;
-
-    assert.ok(typeof makeElementSelectable === 'function');
-
-    var el = fabric.getFabricDocument().createElement('p');
-    el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
-
-    makeElementUnselectable(el);
-    makeElementSelectable(el);
-
-    if (typeof el.onselectstart !== 'undefined') {
-      assert.equal(el.onselectstart, null);
-    }
-    if (typeof el.unselectable === 'string') {
-      assert.equal('', el.unselectable);
-    }
-    else if (typeof el.userSelect !== 'undefined') {
-      assert.equal('', el.userSelect);
-    }
-  });
-
   QUnit.test('fabric.loadSVGFromURL', function(assert) {
     assert.equal('function', typeof fabric.loadSVGFromURL);
   });

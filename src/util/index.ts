@@ -90,10 +90,6 @@ export {
 } from './path';
 export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
-export {
-  // getScrollLeftTop,
-  makeElementSelectable,
-} from './dom_misc';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';
 export * from './animation';
