@@ -35,7 +35,21 @@ export const additionalProps = [
   'direction',
 ] as const;
 
-export const styleProperties = [
+export type StylePropertiesType =
+  | 'fill'
+  | 'stroke'
+  | 'strokeWidth'
+  | 'fontSize'
+  | 'fontFamily'
+  | 'fontWeight'
+  | 'fontStyle'
+  | 'textBackgroundColor'
+  | 'deltaY'
+  | 'overline'
+  | 'underline'
+  | 'linethrough';
+
+export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
   ...textDecorationProperties,
   'stroke',

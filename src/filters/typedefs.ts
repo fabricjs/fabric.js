@@ -3,7 +3,7 @@ import type { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 
 export type TProgramCache = any;
 
-export type TTextureCache = any;
+export type TTextureCache = Record<string, WebGLTexture>;
 
 export type TPipelineResources = {
   blendImage?: HTMLCanvasElement;

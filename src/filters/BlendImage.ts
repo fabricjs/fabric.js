@@ -74,7 +74,7 @@ export class BlendImage extends BaseFilter {
   applyToWebGL(options: TWebGLPipelineState) {
     const gl = options.context,
       texture = this.createTexture(options.filterBackend, this.image);
-    this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
+    this.bindAdditionalTexture(gl, texture!, gl.TEXTURE1);
     super.applyToWebGL(options);
     this.unbindAdditionalTexture(gl, gl.TEXTURE1);
   }
