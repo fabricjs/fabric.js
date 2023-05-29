@@ -391,11 +391,10 @@
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
     canvas.setActiveObject(text);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasEl = canvas.getElement();
     var eventStub = {
-      clientX: canvasOffset.left + text.width,
-      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+      clientX: text.width,
+      clientY: text.oCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };
@@ -419,11 +418,10 @@
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
     canvas.add(text);
     canvas.setActiveObject(text);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasEl = canvas.getElement();
     var eventStub = {
-      clientX: canvasOffset.left + text.left,
-      clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
+      clientX: text.left,
+      clientY: text.oCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };

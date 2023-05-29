@@ -1,4 +1,3 @@
-import { getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -15,6 +14,7 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
+import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../Collection';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -29,15 +29,13 @@ import type {
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
-import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TCanvasSizeOptions } from './StaticCanvas';
 import { createCanvasElement } from '../util';
+import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
@@ -346,6 +344,7 @@ export class SelectableCanvas<
    * Default element class that's given to wrapper (div) element of canvas
    * @type String
    * @default
+   * @deprecated customize {@link CanvasDOMManager} instead or access {@link elements} directly
    */
   declare containerClass: string;
 
@@ -505,11 +504,18 @@ export class SelectableCanvas<
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
   }
 
-  declare upperCanvasEl: HTMLCanvasElement;
-  declare contextTop: CanvasRenderingContext2D;
-  declare wrapperEl: HTMLDivElement;
-  protected declare pixelFindCanvasEl: HTMLCanvasElement;
-  protected declare pixelFindContext: CanvasRenderingContext2D;
+  declare elements: CanvasDOMManager;
+  get upperCanvasEl() {
+    return this.elements.upper?.el;
+  }
+  get contextTop() {
+    return this.elements.upper?.ctx;
+  }
+  get wrapperEl() {
+    return this.elements.container;
+  }
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
@@ -522,16 +528,11 @@ export class SelectableCanvas<
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    super.initElements(el);
-    this._applyCanvasStyle(this.lowerCanvasEl);
-    this._initWrapperElement();
-    this._createUpperCanvas();
+    this.elements = new CanvasDOMManager(el, {
+      allowTouchScrolling: this.allowTouchScrolling,
+      containerClass: this.containerClass,
+    });
     this._createCacheCanvas();
-  }
-
-  protected _initRetinaScaling() {
-    super._initRetinaScaling();
-    this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
 
   /**
@@ -597,7 +598,7 @@ export class SelectableCanvas<
     }
     !this._objectsToRender &&
       (this._objectsToRender = this._chooseObjectsToRender());
-    this.renderCanvas(this.contextContainer, this._objectsToRender);
+    this.renderCanvas(this.getContext(), this._objectsToRender);
   }
 
   /**
@@ -1168,55 +1169,6 @@ export class SelectableCanvas<
     }
   }
 
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    super._setBackstoreDimension(prop, value);
-    this.upperCanvasEl[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    super._setCssDimension(prop, value);
-    this.upperCanvasEl.style[prop] = value;
-    this.wrapperEl.style[prop] = value;
-  }
-
-  /**
-   * @private
-   * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
-   */
-  protected _createUpperCanvas() {
-    const lowerCanvasEl = this.lowerCanvasEl;
-
-    // if there is no upperCanvas (most common case) we create one.
-    if (!this.upperCanvasEl) {
-      this.upperCanvasEl = createCanvasElement();
-    }
-    const upperCanvasEl = this.upperCanvasEl;
-    // we assign the same classname of the lowerCanvas
-    upperCanvasEl.className = lowerCanvasEl.className;
-    // but then we remove the lower-canvas specific className
-    upperCanvasEl.classList.remove('lower-canvas');
-    // we add the specific upper-canvas class
-    upperCanvasEl.classList.add('upper-canvas');
-    upperCanvasEl.setAttribute('data-fabric', 'top');
-    this.wrapperEl.appendChild(upperCanvasEl);
-    upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
-    this._applyCanvasStyle(upperCanvasEl);
-    upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext('2d')!;
-  }
-
   protected _createCacheCanvas() {
     this.pixelFindCanvasEl = createCanvasElement();
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
@@ -1225,47 +1177,12 @@ export class SelectableCanvas<
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
-  protected _initWrapperElement() {
-    const container = getFabricDocument().createElement('div');
-    container.classList.add(this.containerClass);
-    this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
-    this.wrapperEl.setAttribute('data-fabric', 'wrapper');
-    setStyle(this.wrapperEl, {
-      width: `${this.width}px`,
-      height: `${this.height}px`,
-      position: 'relative',
-    });
-    makeElementUnselectable(this.wrapperEl);
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  protected _applyCanvasStyle(element: HTMLCanvasElement) {
-    const width = this.width || element.width,
-      height = this.height || element.height;
-
-    setStyle(element, {
-      position: 'absolute',
-      width: width + 'px',
-      height: height + 'px',
-      left: 0,
-      top: 0,
-      'touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
-      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
-    });
-    element.width = width;
-    element.height = height;
-    makeElementUnselectable(element);
-  }
-
   /**
    * Returns context of top canvas where interactions are drawn
    * @returns {CanvasRenderingContext2D}
    */
   getTopContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1274,7 +1191,7 @@ export class SelectableCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getSelectionContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1282,7 +1199,7 @@ export class SelectableCanvas<
    * @return {HTMLCanvasElement}
    */
   getSelectionElement(): HTMLCanvasElement {
-    return this.upperCanvasEl;
+    return this.elements.upper.el;
   }
 
   /**
@@ -1486,18 +1403,6 @@ export class SelectableCanvas<
     }
   }
 
-  protected cleanupDOM(): void {
-    const wrapperEl = this.wrapperEl!,
-      lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!;
-    super.cleanupDOM();
-    wrapperEl.removeChild(upperCanvasEl);
-    wrapperEl.removeChild(lowerCanvasEl);
-    if (wrapperEl.parentNode) {
-      wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
-    }
-  }
-
   /**
    * @override clears active selection ref and interactive canvas elements and contexts
    */
@@ -1513,20 +1418,11 @@ export class SelectableCanvas<
 
     // free resources
 
-    // top canvas
-    // @ts-expect-error disposing
-    this.contextTop = null;
-    // @ts-expect-error disposing
-    this.upperCanvasEl = undefined;
-
     // pixel find canvas
     // @ts-expect-error disposing
     this.pixelFindContext = null;
     // @ts-expect-error disposing
     this.pixelFindCanvasEl = undefined;
-
-    // @ts-expect-error disposing
-    this.wrapperEl = undefined;
   }
 
   /**

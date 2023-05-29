@@ -110,6 +110,19 @@
     assert.throws(() => new fabric.Canvas(canvas.lowerCanvasEl));
   });
 
+  QUnit.test('initialization with element exisiting in the dom', function (assert) {
+    const doc = fabric.getFabricDocument();
+    const wrapper = doc.createElement('div');
+    const canvasEl = doc.createElement('canvas');
+    wrapper.appendChild(canvasEl);
+    doc.body.appendChild(wrapper);
+    const canvas = new fabric.Canvas(canvasEl);
+    assert.equal(wrapper.firstChild, canvas.elements.container, 'replaced canvas el in dom');
+    assert.equal(canvas.elements.container.firstChild, canvas.elements.lower.el, 'appended canvas el to container');
+    assert.equal(canvas.elements.container.lastChild, canvas.elements.upper.el, 'appended upper canvas el to container');
+  });
+
+
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
     assert.equal(canvas.includeDefaultValues, true);
@@ -1944,15 +1957,15 @@
       var canvas = new fabric.Canvas(el, { enableRetinaScaling, renderOnAddRemove: false });
 
       canvas.setDimensions({ width: 500, height: 500 });
-      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+      assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+      assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
       assert.equal(el.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(el.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
       assert.equal(canvas.upperCanvasEl.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(canvas.upperCanvasEl.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
 
       await canvas.dispose();
-      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+      assert.equal(canvas.elements._originalCanvasStyle, undefined, 'removed original canvas style');
       assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
       assert.equal(el.width, 500, 'restored width');
       assert.equal(el.height, 500, 'restored height');
@@ -2058,8 +2071,7 @@
 
     var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
     canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasOffset = canvas.calcOffset();
     var eventStub = {
       clientX: canvasOffset.left + 100,
       clientY: canvasOffset.top + 100,
