@@ -1,7 +1,6 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform, transformPoint } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
@@ -18,13 +17,10 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
-    Props extends TProps<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ITextEvents = ITextEvents
-  >
-  extends ITextKeyBehavior<Props, SProps, EventSpec>
-  implements DragMethods
-{
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
