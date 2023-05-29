@@ -2071,8 +2071,7 @@
 
     var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
     canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasOffset = canvas.calcOffset();
     var eventStub = {
       clientX: canvasOffset.left + 100,
       clientY: canvasOffset.top + 100,

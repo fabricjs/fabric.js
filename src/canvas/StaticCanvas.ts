@@ -43,7 +43,7 @@ import {
   isTextObject,
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
-import type { CSSDimensions } from '../util/dom_misc';
+import type { CSSDimensions } from './DOMManagers/util';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;

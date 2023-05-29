@@ -92,8 +92,6 @@ export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
 export {
   // getScrollLeftTop,
-  getElementOffset,
-  makeElementUnselectable,
   makeElementSelectable,
 } from './dom_misc';
 export { isTransparent } from './misc/isTransparent';

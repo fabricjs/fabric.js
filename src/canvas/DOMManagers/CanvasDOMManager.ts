@@ -1,13 +1,12 @@
 import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
+import { createCanvasElement, setStyle } from '../../util';
+import type { CSSDimensions } from './util';
 import {
-  createCanvasElement,
+  allowTouchScrolling,
   makeElementUnselectable,
-  setStyle,
-} from '../../util';
-import type { CSSDimensions } from '../../util/dom_misc';
-import { allowTouchScrolling } from '../../util/dom_misc';
-import { setCSSDimensions } from '../../util/dom_misc';
+  setCSSDimensions,
+} from './util';
 import type { CanvasItem } from './StaticCanvasDOMManager';
 import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
 import { setCanvasDimensions } from './util';

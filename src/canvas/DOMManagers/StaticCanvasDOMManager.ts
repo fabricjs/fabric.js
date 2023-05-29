@@ -1,7 +1,7 @@
 import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
-import type { CSSDimensions } from '../../util/dom_misc';
-import { getElementOffset, setCSSDimensions } from '../../util/dom_misc';
+import type { CSSDimensions } from './util';
+import { setCSSDimensions, getElementOffset } from './util';
 import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
 import { setCanvasDimensions } from './util';
 

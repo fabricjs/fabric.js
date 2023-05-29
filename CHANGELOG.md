@@ -2,6 +2,8 @@
 
 ## [next]
 
+- refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+
 ## [6.0.0-beta7]
 
 - feat(): Export setFilterBackend and port the texture filtering option from fabric 5, exports some extra types [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
@@ -14,7 +16,6 @@
 
 ## [6.0.0-beta6]
 
-- POC(): Canvas Delegation [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
 - feat(Color) Improve regex for new standards, more documentation and code cleanup [#8916](https://github.com/fabricjs/fabric.js/pull/8916)
 - fix(TS): extending canvas and object event types (`type` => `interface`) [#8926](https://github.com/fabricjs/fabric.js/pull/8926)

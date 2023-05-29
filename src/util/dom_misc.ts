@@ -1,6 +1,3 @@
-import { setStyle } from './dom_style';
-import { LEFT, TOP, NONE } from '../constants';
-
 /**
  * Returns element scroll offsets
  * @param {HTMLElement} element Element to operate on
@@ -41,59 +38,6 @@ export function getScrollLeftTop(element: HTMLElement) {
 }
 
 /**
- * Returns offset for a given element
- * @param {HTMLElement} element Element to get offset for
- * @return {Object} Object with "left" and "top" properties
- */
-export function getElementOffset(element: HTMLElement) {
-  let box = { left: 0, top: 0 };
-  const doc = element && getDocumentFromElement(element),
-    offset = { left: 0, top: 0 },
-    offsetAttributes = {
-      borderLeftWidth: LEFT,
-      borderTopWidth: TOP,
-      paddingLeft: LEFT,
-      paddingTop: TOP,
-    } as const;
-
-  if (!doc) {
-    return offset;
-  }
-  const elemStyle =
-    getWindowFromElement(element)?.getComputedStyle(element, null) || {};
-  for (const attr in offsetAttributes) {
-    // @ts-expect-error TS learn to iterate!
-    offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
-  }
-
-  const docElem = doc.documentElement;
-  if (typeof element.getBoundingClientRect !== 'undefined') {
-    box = element.getBoundingClientRect();
-  }
-
-  const scrollLeftTop = getScrollLeftTop(element);
-
-  return {
-    left:
-      box.left + scrollLeftTop.left - (docElem.clientLeft || 0) + offset.left,
-    top: box.top + scrollLeftTop.top - (docElem.clientTop || 0) + offset.top,
-  };
-}
-
-/**
- * Makes element unselectable
- * @param {HTMLElement} element Element to make unselectable
- * @return {HTMLElement} Element that was passed in
- */
-export function makeElementUnselectable(element: HTMLElement) {
-  if (typeof element.onselectstart !== 'undefined') {
-    element.onselectstart = () => false;
-  }
-  element.style.userSelect = NONE;
-  return element;
-}
-
-/**
  * Makes element selectable
  * @param {HTMLElement} element Element to make selectable
  * @return {HTMLElement} Element that was passed in
@@ -106,30 +50,8 @@ export function makeElementSelectable(element: HTMLElement) {
   return element;
 }
 
-export function allowTouchScrolling(element: HTMLElement, allow: boolean) {
-  const touchAction = allow ? 'manipulation' : NONE;
-  setStyle(element, {
-    'touch-action': touchAction,
-    '-ms-touch-action': touchAction,
-  });
-}
-
 export const getDocumentFromElement = (el: HTMLElement) =>
   el.ownerDocument || null;
 
 export const getWindowFromElement = (el: HTMLElement) =>
   el.ownerDocument?.defaultView || null;
-
-export type CSSDimensions = {
-  width: number | `${number}${string}`;
-  height: number | `${number}${string}`;
-};
-
-export const setCSSDimensions = (
-  el: HTMLElement,
-  { width, height }: Partial<CSSDimensions>
-) => {
-  width && (el.style.width = typeof width === 'number' ? `${width}px` : width);
-  height &&
-    (el.style.height = typeof height === 'number' ? `${height}px` : height);
-};
