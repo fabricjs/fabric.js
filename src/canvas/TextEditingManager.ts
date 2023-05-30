@@ -1,6 +1,7 @@
 import type { TPointerEvent } from '../EventTypeDefs';
 import type { ITextBehavior } from '../shapes/IText/ITextBehavior';
 import { removeFromArray } from '../util/internals';
+import type { Canvas } from './Canvas';
 
 /**
  * In charge of synchronizing all interactive text instances of a canvas
@@ -8,6 +9,14 @@ import { removeFromArray } from '../util/internals';
 export class TextEditingManager {
   private targets: ITextBehavior[] = [];
   private declare target?: ITextBehavior;
+  private __disposer: VoidFunction;
+
+  constructor(canvas: Canvas) {
+    const cb = () => this.target?.hiddenTextarea?.focus();
+    const el = canvas.upperCanvasEl;
+    el.addEventListener('click', cb);
+    this.__disposer = () => el.removeEventListener('click', cb);
+  }
 
   exitTextEditing() {
     this.target = undefined;
@@ -41,8 +50,15 @@ export class TextEditingManager {
     this.target?.isEditing && this.target.updateSelectionOnMouseMove(e);
   }
 
-  dispose() {
+  clear() {
     this.targets = [];
     this.target = undefined;
+  }
+
+  dispose() {
+    this.clear();
+    this.__disposer();
+    // @ts-expect-error disposing
+    delete this.__disposer;
   }
 }

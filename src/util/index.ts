@@ -91,12 +91,6 @@ export {
 } from './path';
 export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
-export {
-  // getScrollLeftTop,
-  getElementOffset,
-  makeElementUnselectable,
-  makeElementSelectable,
-} from './dom_misc';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';
 export * from './animation';
@@ -107,7 +101,6 @@ export {
 } from './animation/AnimationFrameProvider';
 export { removeFromArray } from './internals/removeFromArray';
 export { getRandomInt } from './internals/getRandomInt';
-export { wrapElement } from './dom_misc';
 export { request } from './dom_request';
 
 // for test compatibility. We don't want to export it

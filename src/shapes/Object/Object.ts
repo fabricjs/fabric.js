@@ -1,6 +1,13 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
-import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
+import {
+  ALIASING_LIMIT,
+  CENTER,
+  iMatrix,
+  LEFT,
+  TOP,
+  VERSION,
+} from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
@@ -45,6 +52,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import type { TProps } from './types';
+import { getEnv } from '../../env';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -579,7 +587,7 @@ export class FabricObject<
       : Object.getPrototypeOf(this);
 
     return pickBy(object, (value, key) => {
-      if (key === 'left' || key === 'top' || key === 'type') {
+      if (key === LEFT || key === TOP || key === 'type') {
         return true;
       }
       const baseValue = baseValues[key];
@@ -1291,11 +1299,11 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<FabricObject>}
    */
-  clone(propertiesToInclude: string[]) {
+  clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     return (this.constructor as typeof FabricObject).fromObject(
       objectForm
-    ) as unknown as this;
+    ) as unknown as Promise<this>;
   }
 
   /**
@@ -1391,8 +1399,8 @@ export class FabricObject<
     }
     this.setPositionByOrigin(
       new Point(canvas.width / 2, canvas.height / 2),
-      'center',
-      'center'
+      CENTER,
+      CENTER
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
@@ -1472,7 +1480,7 @@ export class FabricObject<
    */
   rotate(angle: TDegree) {
     const shouldCenterOrigin =
-      (this.originX !== 'center' || this.originY !== 'center') &&
+      (this.originX !== CENTER || this.originY !== CENTER) &&
       this.centeredRotation;
 
     if (shouldCenterOrigin) {
@@ -1515,6 +1523,10 @@ export class FabricObject<
     runningAnimations.cancelByTarget(this);
     this.off();
     this._set('canvas', undefined);
+    // clear caches
+    this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
+    this._cacheCanvas = undefined;
+    this._cacheContext = null;
   }
 
   /**

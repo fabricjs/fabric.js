@@ -12,6 +12,8 @@ export { Observable } from './src/Observable';
 
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
+export { CanvasDOMManager } from './src/canvas/DOMManagers/CanvasDOMManager';
+export { StaticCanvasDOMManager } from './src/canvas/DOMManagers/StaticCanvasDOMManager';
 
 export type { XY } from './src/Point';
 export { Point } from './src/Point';
@@ -34,6 +36,7 @@ export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
 export { FabricObject as Object } from './src/shapes/Object/FabricObject';
+export type { TProps } from './src/shapes/Object/types';
 export { Line } from './src/shapes/Line';
 export { Circle } from './src/shapes/Circle';
 export { Triangle } from './src/shapes/Triangle';
@@ -48,6 +51,11 @@ export { Textbox } from './src/shapes/Textbox';
 export { Group } from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
+export type {
+  ImageSource,
+  SerializedImageProps,
+  ImageProps,
+} from './src/shapes/Image';
 export { createCollectionMixin } from './src/Collection';
 
 export * as util from './src/util';

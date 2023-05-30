@@ -102,10 +102,7 @@ export const stylesFromArray = (
     return cloneDeep(styles);
   }
   const textLines = text.split('\n'),
-    stylesObject = {} as Record<
-      string | number,
-      Record<string | number, Record<string, string>>
-    >;
+    stylesObject: TextStyle = {};
   let charIndex = -1,
     styleIndex = 0;
   //loop through each textLine

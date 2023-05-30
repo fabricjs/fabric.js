@@ -29,9 +29,7 @@
   QUnit.test('_beforeTransform', function (assert) {
     assert.ok(typeof canvas._beforeTransform === 'function');
 
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
-
+    var canvasOffset = canvas.calcOffset();
     var rect = new fabric.Rect({ left: 50, top: 50, width: 50, height: 50 });
     canvas.add(rect);
     canvas.setActiveObject(rect);
@@ -1182,7 +1180,7 @@
     assert.ok(manager.target === a, 'should register a');
     canvas.remove(a);
     assert.ok(!manager.target, 'should unregister a');
-    manager.dispose();
+    manager.clear();
     assert.ok(!manager.target, 'should have disposed ref');
     assert.deepEqual(manager.targets, [], 'should have disposed refs');
     const g = new fabric.Group([a]);

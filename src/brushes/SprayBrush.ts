@@ -6,6 +6,7 @@ import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { SprayBrushPoint } from './typedefs';
+import { CENTER } from '../constants';
 
 /**
  *
@@ -128,8 +129,8 @@ export class SprayBrush extends BaseBrush {
           height: chunck.width,
           left: chunck.x + 1,
           top: chunck.y + 1,
-          originX: 'center',
-          originY: 'center',
+          originX: CENTER,
+          originY: CENTER,
           fill: this.color,
         });
         rects.push(rect);

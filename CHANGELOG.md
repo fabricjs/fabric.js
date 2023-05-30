@@ -3,6 +3,26 @@
 ## [next]
 
 - BREAKING fix(): reflect NUM_FRACTION_DIGITS to toObject path data [#8909](https://github.com/fabricjs/fabric.js/pull/8909)
+- BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+- refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+
+## [6.0.0-beta7]
+
+- feat(): Export setFilterBackend and port the texture filtering option from fabric 5, exports some extra types [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
+- chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
+- chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
+- ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
+- ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
+- chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
+- refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
+
+## [6.0.0-beta6]
+
+- patch(): expose `Control#shouldActivate` [#8934](https://github.com/fabricjs/fabric.js/pull/8934)
+- feat(Color) Improve regex for new standards, more documentation and code cleanup [#8916](https://github.com/fabricjs/fabric.js/pull/8916)
+- fix(TS): extending canvas and object event types (`type` => `interface`) [#8926](https://github.com/fabricjs/fabric.js/pull/8926)
+- chore(build) simple deps update [#8929](https://github.com/fabricjs/fabric.js/pull/8929)
+- fix(Canvas): sync cleanup of dom elements in dispose [#8903](https://github.com/fabricjs/fabric.js/pull/8903)
 - chore(TS): export util types [#8915](https://github.com/fabricjs/fabric.js/pull/8915)
 - chore(TS): change enums with types [#8918](https://github.com/fabricjs/fabric.js/pull/8918)
 - chore(TS): export gradient types
