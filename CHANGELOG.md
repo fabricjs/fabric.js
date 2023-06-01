@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): regression to itext focusing from #8939 [#8970](https://github.com/fabricjs/fabric.js/pull/8970)
 - BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 
