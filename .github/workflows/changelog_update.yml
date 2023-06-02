@@ -12,3 +12,12 @@ jobs:
     with:
       create: ${{ github.event.action == 'opened' }}
       update: ${{ github.event.changes.title.from != github.event.pull_request.title }}
+  # manually invoke workflows if the changelog has been updated beause they are skipped in this case
+  invoke-build:
+    needs: changelog
+    if: needs.changelog.result == 'success'
+    uses: ./.github/workflows/build.yml
+  invoke-tests:
+    needs: changelog
+    if: needs.changelog.result == 'success'
+    uses: ./.github/workflows/tests.yml
