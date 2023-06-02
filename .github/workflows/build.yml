@@ -4,7 +4,6 @@ on:
   pull_request:
     branches: [master]
     paths-ignore: [CHANGELOG.md]
-  workflow_call:
 
 jobs:
   build:
