@@ -1,12 +1,13 @@
-import { IPoint, Point } from '../../Point';
-import { TBBox } from '../../typedefs';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
+import type { TBBox } from '../../typedefs';
 
 /**
  * Calculates bounding box (left, top, width, height) from given `points`
- * @param {IPoint[]} points
+ * @param {XY[]} points
  * @return {Object} Object with left, top, width, height properties
  */
-export const makeBoundingBoxFromPoints = (points: IPoint[]): TBBox => {
+export const makeBoundingBoxFromPoints = (points: XY[]): TBBox => {
   if (points.length === 0) {
     return {
       left: 0,

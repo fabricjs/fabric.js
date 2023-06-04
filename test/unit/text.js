@@ -17,7 +17,7 @@
 
   var REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
-    type:                      'text',
+    type:                      'Text',
     originX:                   'left',
     originY:                   'top',
     left:                      0,
@@ -75,7 +75,7 @@
     assert.ok(text instanceof fabric.Text);
     assert.ok(text instanceof fabric.Object);
 
-    assert.equal(text.get('type'), 'text');
+    assert.equal(text.constructor.name, 'Text');
     assert.equal(text.get('text'), 'x');
   });
 
@@ -203,7 +203,7 @@
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.getDocument().createElement('text');
+    var elText = fabric.getFabricDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
@@ -222,8 +222,9 @@
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.getDocument().createElementNS(namespace, 'text');
+    var elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
@@ -244,7 +245,7 @@
     elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
     elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
-    fabric.Text.fromElement(elTextWithAttrs, function(textWithAttrs) {
+    fabric.Text.fromElement(elTextWithAttrs).then((textWithAttrs) => {
       // temp workaround for text objects not obtaining width under node
       textWithAttrs.width = CHAR_WIDTH;
 
@@ -274,12 +275,7 @@
         underline:        true,
       };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
-    });
-  });
-
-  QUnit.test('empty fromElement', function(assert) {
-    fabric.Text.fromElement(null, function(text) {
-      assert.equal(text, null);
+      done();
     });
   });
 
@@ -889,7 +885,7 @@
     });
     var toObject = text.toObject();
     fabric.Text.fromObject(toObject).then(function(text) {
-      assert.equal(text.path.type, 'path', 'the path is restored');
+      assert.equal(text.path.constructor.name, 'Path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');
       done();
@@ -898,7 +894,7 @@
 
   QUnit.test('cacheProperties for text', function(assert) {
     var text = new fabric.Text('a');
-    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontFamily-fontWeight-fontSize-text-underline-overline-linethrough-textAlign-fontStyle-lineHeight-textBackgroundColor-charSpacing-styles-direction-path-pathStartOffset-pathSide-pathAlign');
+    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction');
   });
 
   QUnit.test('_getLineLeftOffset', function(assert) {

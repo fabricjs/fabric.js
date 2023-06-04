@@ -1,6 +1,6 @@
 (function() {
 
-  var canvas = fabric.getDocument().createElement('canvas'),
+  var canvas = fabric.getFabricDocument().createElement('canvas'),
       context = canvas.getContext('2d');
 
   function _createImageData(context) {
@@ -114,11 +114,6 @@
 
     assert.equal(filter.type, 'Composed');
 
-  });
-
-  QUnit.test('has not applyTo2d', function(assert) {
-    var filter = new fabric.filters.Composed();
-    assert.ok(typeof filter.applyTo2d === 'undefined');
   });
 
   QUnit.test('toObject', function(assert) {

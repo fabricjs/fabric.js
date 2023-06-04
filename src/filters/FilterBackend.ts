@@ -1,5 +1,6 @@
 import { config } from '../config';
 import { getEnv } from '../env';
+import { createCanvasElement } from '../util/misc/dom';
 import { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 
@@ -12,7 +13,7 @@ let filterBackend: FilterBackend;
  */
 export function initFilterBackend(): FilterBackend {
   const { WebGLProbe } = getEnv();
-  WebGLProbe.queryWebGL();
+  WebGLProbe.queryWebGL(createCanvasElement());
   if (config.enableGLFiltering && WebGLProbe.isSupported(config.textureSize)) {
     return new WebGLFilterBackend({ tileSize: config.textureSize });
   } else {
@@ -30,4 +31,8 @@ export function getFilterBackend(strict = true): FilterBackend {
     filterBackend = initFilterBackend();
   }
   return filterBackend;
+}
+
+export function setFilterBackend(backend: FilterBackend) {
+  filterBackend = backend;
 }

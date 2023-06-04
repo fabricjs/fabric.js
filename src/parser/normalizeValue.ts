@@ -2,17 +2,18 @@
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
+import { CENTER, LEFT, RIGHT, NONE } from '../constants';
 
 export function normalizeValue(attr, value, parentAttributes, fontSize) {
-  let isArray = Array.isArray(value),
-    parsed;
+  const isArray = Array.isArray(value);
+  let parsed;
 
-  if ((attr === 'fill' || attr === 'stroke') && value === 'none') {
+  if ((attr === 'fill' || attr === 'stroke') && value === NONE) {
     value = '';
   } else if (attr === 'strokeUniform') {
     return value === 'non-scaling-stroke';
   } else if (attr === 'strokeDashArray') {
-    if (value === 'none') {
+    if (value === NONE) {
       value = null;
     } else {
       value = value.replace(/,/g, ' ').split(/\s+/).map(parseFloat);
@@ -27,7 +28,7 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
       value = parseTransformAttribute(value);
     }
   } else if (attr === 'visible') {
-    value = value !== 'none' && value !== 'hidden';
+    value = value !== NONE && value !== 'hidden';
     // display=none on parent element always takes precedence over child element
     if (parentAttributes && parentAttributes.visible === false) {
       value = false;
@@ -38,14 +39,14 @@ export function normalizeValue(attr, value, parentAttributes, fontSize) {
       value *= parentAttributes.opacity;
     }
   } else if (attr === 'textAnchor' /* text-anchor */) {
-    value = value === 'start' ? 'left' : value === 'end' ? 'right' : 'center';
+    value = value === 'start' ? LEFT : value === 'end' ? RIGHT : CENTER;
   } else if (attr === 'charSpacing') {
     // parseUnit returns px and we convert it to em
     parsed = (parseUnit(value, fontSize) / fontSize) * 1000;
   } else if (attr === 'paintFirst') {
     const fillIndex = value.indexOf('fill');
     const strokeIndex = value.indexOf('stroke');
-    var value = 'fill';
+    value = 'fill';
     if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
       value = 'stroke';
     } else if (fillIndex === -1 && strokeIndex > -1) {

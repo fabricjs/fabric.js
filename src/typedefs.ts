@@ -1,9 +1,8 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import { BaseFabricObject } from './EventTypeDefs';
+import type { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
-import type { Point } from './Point';
-import type { FabricObject } from './shapes/Object/FabricObject';
+import type { XY, Point } from './Point';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -11,8 +10,8 @@ interface NominalTag<T> {
 
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type TNonFunctionPropertyNames<T> = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -44,33 +43,28 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export const enum ImageFormat {
-  jpeg = 'jpeg',
-  jpg = 'jpeg',
-  png = 'png',
-}
+export type ImageFormat = 'jpeg' | 'png';
 
-export const enum SVGElementName {
-  linearGradient = 'linearGradient',
-  radialGradient = 'radialGradient',
-  stop = 'stop',
-}
+export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
-export const enum SupportedSVGUnit {
-  mm = 'mm',
-  cm = 'cm',
-  in = 'in',
-  pt = 'pt',
-  pc = 'pc',
-  em = 'em',
-}
-
-export type TMat2D = [number, number, number, number, number, number];
+export type SupportedSVGUnit = 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'em';
 
 /**
- * SVG path commands
+ * A transform matrix.
+ * Basically a matrix in the form
+ * [ a c e ]
+ * [ b d f ]
+ * [ 0 0 1 ]
+ * For more details, see @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix
  */
-export type PathData = (string | number)[][];
+export type TMat2D = [
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  e: number,
+  f: number
+];
 
 /**
  * An invalid keyword and an empty string will be handled as the `anonymous` keyword.
@@ -101,6 +95,8 @@ export type TCacheCanvasDimensions = {
   y: number;
 };
 
+export type TRectBounds = [min: XY, max: XY];
+
 export type TToCanvasElementOptions = {
   left?: number;
   top?: number;
@@ -117,3 +113,11 @@ export type TDataUrlOptions = TToCanvasElementOptions & {
 };
 
 export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;
+
+export type Abortable = {
+  /**
+   * handle aborting
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal?: AbortSignal;
+};

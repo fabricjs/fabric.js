@@ -1,15 +1,21 @@
-//@ts-nocheck
-
+// @ts-nocheck
 import { config } from '../../config';
-import { getDocument, getEnv } from '../../env';
-import { TPointerEvent } from '../../EventTypeDefs';
+import { getFabricDocument, getEnv } from '../../env';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
-import { ITextBehavior, ITextEvents } from './ITextBehavior';
+import type { ITextEvents } from './ITextBehavior';
+import { ITextBehavior } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
+import type { TProps } from '../Object/types';
+import type { TextProps, SerializedTextProps } from '../Text/Text';
+import { getDocumentFromElement } from '../../util/dom_misc';
+import { LEFT, RIGHT } from '../../constants';
 
 export abstract class ITextKeyBehavior<
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends ITextBehavior<EventSpec> {
+> extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
    * Map a special key to a function of the instance/prototype
@@ -55,55 +61,43 @@ export abstract class ITextKeyBehavior<
    * Initializes hidden textarea (needed to bring up keyboard in iOS)
    */
   initHiddenTextarea() {
-    this.hiddenTextarea = getDocument().createElement('textarea');
-    this.hiddenTextarea.setAttribute('autocapitalize', 'off');
-    this.hiddenTextarea.setAttribute('autocorrect', 'off');
-    this.hiddenTextarea.setAttribute('autocomplete', 'off');
-    this.hiddenTextarea.setAttribute('spellcheck', 'false');
-    this.hiddenTextarea.setAttribute('data-fabric', 'textarea');
-    this.hiddenTextarea.setAttribute('wrap', 'off');
-    const style = this._calcTextareaPosition();
+    const doc =
+      (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
+      getFabricDocument();
+    const textarea = doc.createElement('textarea');
+    Object.entries({
+      autocapitalize: 'off',
+      autocorrect: 'off',
+      autocomplete: 'off',
+      spellcheck: 'false',
+      'data-fabric': 'textarea',
+      wrap: 'off',
+    }).map(([attribute, value]) => textarea.setAttribute(attribute, value));
+    const { top, left, fontSize } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
-    this.hiddenTextarea.style.cssText = `position: absolute; top: ${style.top}; left: ${style.left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${style.fontSize};`;
+    textarea.style.cssText = `position: absolute; top: ${top}; left: ${left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${fontSize};`;
 
-    if (this.hiddenTextareaContainer) {
-      this.hiddenTextareaContainer.appendChild(this.hiddenTextarea);
-    } else {
-      getDocument().body.appendChild(this.hiddenTextarea);
-    }
+    (this.hiddenTextareaContainer || doc.body).appendChild(textarea);
 
-    this.hiddenTextarea.addEventListener('blur', this.blur.bind(this));
-    this.hiddenTextarea.addEventListener('keydown', this.onKeyDown.bind(this));
-    this.hiddenTextarea.addEventListener('keyup', this.onKeyUp.bind(this));
-    this.hiddenTextarea.addEventListener('input', this.onInput.bind(this));
-    this.hiddenTextarea.addEventListener('copy', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('cut', this.copy.bind(this));
-    this.hiddenTextarea.addEventListener('paste', this.paste.bind(this));
-    this.hiddenTextarea.addEventListener(
-      'compositionstart',
-      this.onCompositionStart.bind(this)
+    Object.entries({
+      blur: 'blur',
+      keydown: 'onKeyDown',
+      keyup: 'onKeyUp',
+      input: 'onInput',
+      copy: 'copy',
+      cut: 'copy',
+      paste: 'paste',
+      compositionstart: 'onCompositionStart',
+      compositionupdate: 'onCompositionUpdate',
+      onCompositionUpdate: 'onCompositionEnd',
+    } as Record<string, keyof this>).map(([eventName, handler]) =>
+      textarea.addEventListener(
+        eventName,
+        (this[handler] as Function).bind(this)
+      )
     );
-    this.hiddenTextarea.addEventListener(
-      'compositionupdate',
-      this.onCompositionUpdate.bind(this)
-    );
-    this.hiddenTextarea.addEventListener(
-      'compositionend',
-      this.onCompositionEnd.bind(this)
-    );
-
-    if (!this._clickHandlerInitialized && this.canvas) {
-      this.canvas.upperCanvasEl.addEventListener(
-        'click',
-        this.onClick.bind(this)
-      );
-      this._clickHandlerInitialized = true;
-    }
-  }
-
-  onClick() {
-    this.hiddenTextarea && this.hiddenTextarea.focus();
+    this.hiddenTextarea = textarea;
   }
 
   /**
@@ -174,6 +168,19 @@ export abstract class ITextKeyBehavior<
     if (!this.isEditing) {
       return;
     }
+    const updateAndFire = () => {
+      this.updateFromTextArea();
+      this.fire('changed');
+      if (this.canvas) {
+        this.canvas.fire('text:changed', { target: this });
+        this.canvas.requestRenderAll();
+      }
+    };
+    if (this.hiddenTextarea.value === '') {
+      this.styles = {};
+      updateAndFire();
+      return;
+    }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
         this.hiddenTextarea.value
@@ -188,16 +195,6 @@ export abstract class ITextKeyBehavior<
       charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-      return;
-    }
 
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
@@ -265,12 +262,7 @@ export abstract class ITextKeyBehavior<
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
-    this.updateFromTextArea();
-    this.fire('changed');
-    if (this.canvas) {
-      this.canvas.fire('text:changed', { target: this });
-      this.canvas.requestRenderAll();
-    }
+    updateAndFire();
   }
 
   /**
@@ -481,7 +473,7 @@ export abstract class ITextKeyBehavior<
    */
   _moveCursorUpOrDown(direction: 'Up' | 'Down', e: TPointerEvent) {
     const action = `get${direction}CursorOffset`,
-      offset = this[action](e, this._selectionDirection === 'right');
+      offset = this[action](e, this._selectionDirection === RIGHT);
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     } else {
@@ -505,7 +497,7 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorWithShift(offset: number) {
     const newSelection =
-      this._selectionDirection === 'left'
+      this._selectionDirection === LEFT
         ? this.selectionStart + offset
         : this.selectionEnd + offset;
     this.setSelectionStartEndWithShift(
@@ -582,7 +574,7 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorLeftWithoutShift(e: TPointerEvent) {
     let change = true;
-    this._selectionDirection = 'left';
+    this._selectionDirection = LEFT;
 
     // only move cursor when there is no selection,
     // otherwise we discard it, and leave cursor on same place
@@ -602,12 +594,12 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorLeftWithShift(e: TPointerEvent) {
     if (
-      this._selectionDirection === 'right' &&
+      this._selectionDirection === RIGHT &&
       this.selectionStart !== this.selectionEnd
     ) {
       return this._moveLeft(e, 'selectionEnd');
     } else if (this.selectionStart !== 0) {
-      this._selectionDirection = 'left';
+      this._selectionDirection = LEFT;
       return this._moveLeft(e, 'selectionStart');
     }
   }
@@ -654,12 +646,12 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorRightWithShift(e: TPointerEvent) {
     if (
-      this._selectionDirection === 'left' &&
+      this._selectionDirection === LEFT &&
       this.selectionStart !== this.selectionEnd
     ) {
       return this._moveRight(e, 'selectionStart');
     } else if (this.selectionEnd !== this._text.length) {
-      this._selectionDirection = 'right';
+      this._selectionDirection = RIGHT;
       return this._moveRight(e, 'selectionEnd');
     }
   }
@@ -670,7 +662,7 @@ export abstract class ITextKeyBehavior<
    */
   moveCursorRightWithoutShift(e: TPointerEvent) {
     let changed = true;
-    this._selectionDirection = 'right';
+    this._selectionDirection = RIGHT;
 
     if (this.selectionStart === this.selectionEnd) {
       changed = this._moveRight(e, 'selectionStart');

@@ -1,13 +1,13 @@
 //@ts-nocheck
 
 import { scalingEqually } from '../controls/scale';
-import { fireEvent } from '../util/fireEvent';
+import { fireEvent } from '../controls/fireEvent';
 import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
 import { Canvas } from './Canvas';
-
+import { CENTER } from '../constants';
 /**
  * Adds support for multi-touch gestures using the Event.js library.
  * Fires the following custom events:
@@ -34,7 +34,7 @@ Object.assign(Canvas.prototype, {
       return;
     }
 
-    var target = this.findTarget(e);
+    const target = this.findTarget(e);
     if ('undefined' !== typeof target) {
       this.__gesturesParams = {
         e: e,
@@ -57,12 +57,12 @@ Object.assign(Canvas.prototype, {
       return;
     }
 
-    var self = this.__gesturesParams.self,
-      t = this._currentTransform,
-      e = this.__gesturesParams.e;
+    const self = this.__gesturesParams.self;
+    const t = this._currentTransform;
+    const e = this.__gesturesParams.e;
 
     t.action = 'scale';
-    t.originX = t.originY = 'center';
+    t.originX = t.originY = CENTER;
 
     this._scaleObjectBy(self.scale, e);
 
@@ -152,8 +152,8 @@ Object.assign(Canvas.prototype, {
    * @param {Event} e Event object by Event.js
    */
   _scaleObjectBy: function (s, e) {
-    var t = this._currentTransform,
-      target = t.target;
+    const t = this._currentTransform;
+    const target = t.target;
     t.gestureScale = s;
     target._scaling = true;
     return scalingEqually(e, t, 0, 0);
@@ -165,7 +165,7 @@ Object.assign(Canvas.prototype, {
    * @param {Event} e Event object by Event.js
    */
   _rotateObjectByAngle: function (curAngle, e) {
-    var t = this._currentTransform;
+    const t = this._currentTransform;
 
     if (t.target.get('lockRotation')) {
       return;

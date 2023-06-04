@@ -6,11 +6,11 @@
  * @return {Object} CSS rules of this document
  */
 export function getCSSRules(doc) {
-  let styles = doc.getElementsByTagName('style'),
-    i,
-    len,
-    allRules = {},
-    rules;
+  const styles = doc.getElementsByTagName('style');
+  let i;
+  let len;
+  const allRules = {};
+  let rules;
 
   // very crude parsing of style contents
   for (i = 0, len = styles.length; i < len; i++) {

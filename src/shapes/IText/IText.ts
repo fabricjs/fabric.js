@@ -1,5 +1,5 @@
 import { Canvas } from '../../canvas/Canvas';
-import { ITextEvents } from './ITextBehavior';
+import type { ITextEvents } from './ITextBehavior';
 import { ITextClickBehavior } from './ITextClickBehavior';
 import {
   ctrlKeysMapDown,
@@ -7,9 +7,16 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import { AssertKeys, TFiller } from '../../typedefs';
+import type { AssertKeys, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
-import { Text } from '../Text/Text';
+import type { SerializedTextProps, TextProps } from '../Text/Text';
+import {
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
+} from '../Text/constants';
+import { CENTER, LEFT, RIGHT } from '../../constants';
 
 type CursorBoundaries = {
   left: number;
@@ -17,6 +24,40 @@ type CursorBoundaries = {
   leftOffset: number;
   topOffset: number;
 };
+
+export const iTextDefaultValues = {
+  selectionStart: 0,
+  selectionEnd: 0,
+  selectionColor: 'rgba(17,119,255,0.3)',
+  isEditing: false,
+  editable: true,
+  editingBorderColor: 'rgba(102,153,255,0.25)',
+  cursorWidth: 2,
+  cursorColor: '',
+  cursorDelay: 1000,
+  cursorDuration: 600,
+  caching: true,
+  hiddenTextareaContainer: null,
+  _selectionDirection: null,
+  _reSpace: /\s|\n/,
+  inCompositionMode: false,
+  keysMap,
+  keysMapRtl,
+  ctrlKeysMapDown,
+  ctrlKeysMapUp,
+};
+
+// @TODO this is not complete
+interface UniqueITextProps {
+  selectionStart: number;
+  selectionEnd: number;
+}
+
+export interface SerializedITextProps
+  extends SerializedTextProps,
+    UniqueITextProps {}
+
+export interface ITextProps extends TextProps, UniqueITextProps {}
 
 /**
  * @fires changed
@@ -62,8 +103,13 @@ type CursorBoundaries = {
  * ```
  */
 export class IText<
-  EventSpec extends ITextEvents = ITextEvents
-> extends ITextClickBehavior<EventSpec> {
+    Props extends ITextProps = ITextProps,
+    SProps extends SerializedITextProps = SerializedITextProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends ITextClickBehavior<Props, SProps, EventSpec>
+  implements UniqueITextProps
+{
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
@@ -149,6 +195,16 @@ export class IText<
    * @default
    */
   declare caching: boolean;
+
+  static ownDefaults: Record<string, any> = iTextDefaultValues;
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...IText.ownDefaults };
+  }
+
+  get type() {
+    return 'i-text';
+  }
 
   /**
 
@@ -394,19 +450,16 @@ export class IText<
     };
     if (this.direction === 'rtl') {
       if (
-        this.textAlign === 'right' ||
-        this.textAlign === 'justify' ||
-        this.textAlign === 'justify-right'
+        this.textAlign === RIGHT ||
+        this.textAlign === JUSTIFY ||
+        this.textAlign === JUSTIFY_RIGHT
       ) {
         boundaries.left *= -1;
-      } else if (
-        this.textAlign === 'left' ||
-        this.textAlign === 'justify-left'
-      ) {
+      } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
         boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       } else if (
-        this.textAlign === 'center' ||
-        this.textAlign === 'justify-center'
+        this.textAlign === CENTER ||
+        this.textAlign === JUSTIFY_CENTER
       ) {
         boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       }
@@ -518,7 +571,7 @@ export class IText<
   ) {
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
-      isJustify = this.textAlign.indexOf('justify') !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       start = this.get2DCursorLocation(selectionStart),
       end = this.get2DCursorLocation(selectionEnd),
       startLine = start.lineIndex,
@@ -569,19 +622,16 @@ export class IText<
       }
       if (this.direction === 'rtl') {
         if (
-          this.textAlign === 'right' ||
-          this.textAlign === 'justify' ||
-          this.textAlign === 'justify-right'
+          this.textAlign === RIGHT ||
+          this.textAlign === JUSTIFY ||
+          this.textAlign === JUSTIFY_RIGHT
         ) {
           drawStart = this.width - drawStart - drawWidth;
-        } else if (
-          this.textAlign === 'left' ||
-          this.textAlign === 'justify-left'
-        ) {
+        } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         } else if (
-          this.textAlign === 'center' ||
-          this.textAlign === 'justify-center'
+          this.textAlign === CENTER ||
+          this.textAlign === JUSTIFY_CENTER
         ) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         }
@@ -639,29 +689,6 @@ export class IText<
   }
 }
 
-export const iTextDefaultValues = {
-  type: 'i-text',
-  selectionStart: 0,
-  selectionEnd: 0,
-  selectionColor: 'rgba(17,119,255,0.3)',
-  isEditing: false,
-  editable: true,
-  editingBorderColor: 'rgba(102,153,255,0.25)',
-  cursorWidth: 2,
-  cursorColor: '',
-  cursorDelay: 1000,
-  cursorDuration: 600,
-  caching: true,
-  hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\n/,
-  inCompositionMode: false,
-  keysMap,
-  keysMapRtl,
-  ctrlKeysMapDown,
-  ctrlKeysMapUp,
-};
-
-Object.assign(IText.prototype, iTextDefaultValues);
-
 classRegistry.setClass(IText);
+// legacy
+classRegistry.setClass(IText, 'i-text');

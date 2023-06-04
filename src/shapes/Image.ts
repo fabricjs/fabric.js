@@ -1,32 +1,84 @@
-//@ts-nocheck
-import { getDocument, getEnv } from '../env';
+// @ts-nocheck
+import { getFabricDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties, TSize } from '../typedefs';
+import type { TClassProperties, TSize } from '../typedefs';
+import type { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
+import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
   loadImage,
-  LoadImageOptions,
 } from '../util/misc/objectEnlive';
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
+import { NONE } from '../constants';
+
+// @todo Would be nice to have filtering code not imported directly.
 
 export type ImageSource =
   | HTMLImageElement
   | HTMLVideoElement
   | HTMLCanvasElement;
 
+interface UniqueImageProps {
+  srcFromAttribute: boolean;
+  minimumScaleTrigger: number;
+  cropX: number;
+  cropY: number;
+  imageSmoothing: boolean;
+  crossOrigin: string | null;
+  filters: BaseFilter[];
+  resizeFilter?: BaseFilter;
+}
+
+export const imageDefaultValues: Partial<UniqueImageProps> &
+  Partial<FabricObjectProps> = {
+  strokeWidth: 0,
+  srcFromAttribute: false,
+  minimumScaleTrigger: 0.5,
+  cropX: 0,
+  cropY: 0,
+  imageSmoothing: true,
+};
+
+export interface SerializedImageProps extends SerializedObjectProps {
+  src: string;
+  crossOrigin: string | null;
+  filters: any[];
+  resizeFilter?: any;
+  cropX: number;
+  cropY: number;
+}
+
+export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
+
+const IMAGE_PROPS = ['cropX', 'cropY'] as const;
+
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image extends FabricObject {
+export class Image<
+    Props extends TProps<ImageProps> = Partial<ImageProps>,
+    SProps extends SerializedImageProps = SerializedImageProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements ImageProps
+{
   /**
    * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
@@ -118,7 +170,16 @@ export class Image extends FabricObject {
   protected declare _originalElement: ImageSource;
   protected declare _filteredEl: ImageSource;
 
-  static cacheProperties = [...cacheProperties, 'cropX', 'cropY'];
+  static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
+
+  static ownDefaults: Record<string, any> = imageDefaultValues;
+
+  static getDefaults() {
+    return {
+      ...super.getDefaults(),
+      ...Image.ownDefaults,
+    };
+  }
   /**
    * Constructor
    * Image can be initialized with any canvas drawable or a string.
@@ -128,13 +189,18 @@ export class Image extends FabricObject {
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: any = {});
-  constructor(element: ImageSource, options: any = {});
-  constructor(arg0: ImageSource | string, options: any = {}) {
+  constructor(elementId: string, options?: Props);
+  constructor(element: ImageSource, options?: Props);
+  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;
     this.setElement(
-      (typeof arg0 === 'string' && getDocument().getElementById(arg0)) || arg0,
+      typeof arg0 === 'string'
+        ? ((
+            (this.canvas && getElementDocument(this.canvas.getElement())) ||
+            getFabricDocument()
+          ).getElementById(arg0) as ImageSource)
+        : arg0,
       options
     );
   }
@@ -177,7 +243,7 @@ export class Image extends FabricObject {
    */
   removeTexture(key: string) {
     const backend = getFilterBackend(false);
-    if (backend && backend.evictCachesForKey) {
+    if (backend instanceof WebGLFilterBackend) {
       backend.evictCachesForKey(key);
     }
   }
@@ -190,19 +256,20 @@ export class Image extends FabricObject {
     this.removeTexture(this.cacheKey);
     this.removeTexture(`${this.cacheKey}_filtered`);
     this._cacheContext = null;
-    ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(
-      (element) => {
-        getEnv().dispose(this[element as keyof this]);
-        // @ts-expect-error disposing
-        this[element] = undefined;
-      }
-    );
+    (
+      ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'] as const
+    ).forEach((elementKey) => {
+      const el = this[elementKey];
+      el && getEnv().dispose(el);
+      // @ts-expect-error disposing
+      this[elementKey] = undefined;
+    });
   }
 
   /**
    * Get the crossOrigin value (of the corresponding image element)
    */
-  getCrossOrigin() {
+  getCrossOrigin(): string | null {
     return (
       this._originalElement &&
       ((this._originalElement as any).crossOrigin || null)
@@ -250,13 +317,16 @@ export class Image extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []): Record<string, any> {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());
     });
     return {
-      ...super.toObject(['cropX', 'cropY', ...propertiesToInclude]),
+      ...super.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
       filters,
@@ -331,7 +401,7 @@ export class Image extends FabricObject {
       '" width="',
       element.width || element.naturalWidth,
       '" height="',
-      element.height || element.height,
+      element.height || element.naturalHeight,
       imageRendering,
       '"',
       clipPath,
@@ -370,7 +440,7 @@ export class Image extends FabricObject {
    * @param {Boolean} filtered indicates if the src is needed for svg
    * @return {String} Source of an image
    */
-  getSrc(filtered?: boolean) {
+  getSrc(filtered?: boolean): string {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
       if (element.toDataURL) {
@@ -630,7 +700,7 @@ export class Image extends FabricObject {
       cropY = 0,
       offset;
 
-    if (pAR && (pAR.alignX !== 'none' || pAR.alignY !== 'none')) {
+    if (pAR && (pAR.alignX !== NONE || pAR.alignY !== NONE)) {
       if (pAR.meetOrSlice === 'meet') {
         scaleX = scaleY = findScaleToFit(this._element, parsedAttributes);
         offset = (pWidth - rWidth * scaleX) / 2;
@@ -716,13 +786,14 @@ export class Image extends FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject(
-    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: any,
-    options: { signal: AbortSignal }
-  ): Promise<Image> {
+  static fromObject<T extends TProps<SerializedImageProps>>(
+    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
+    options: Abortable = {}
+  ) {
     return Promise.all([
       loadImage(src, { ...options, crossOrigin }),
       f && enlivenObjects(f, options),
+      // TODO: redundant - handled by enlivenObjectEnlivables
       rf && enlivenObjects([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
@@ -744,7 +815,10 @@ export class Image extends FabricObject {
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL(url: string, options: LoadImageOptions = {}): Promise<Image> {
+  static fromURL<T extends TProps<SerializedImageProps>>(
+    url: string,
+    options: T & LoadImageOptions = {}
+  ): Promise<Image> {
     return loadImage(url, options).then((img) => new this(img, options));
   }
 
@@ -756,32 +830,17 @@ export class Image extends FabricObject {
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (image: Image) => any,
-    options: { signal?: AbortSignal } = {}
-  ) {
+  static async fromElement(element: SVGElement, options: Abortable = {}) {
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    this.fromURL(parsedAttributes['xlink:href'], {
+    return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
-    }).then(callback);
+    }).catch((err) => {
+      console.log(err);
+      return null;
+    });
   }
 }
-
-export const imageDefaultValues: Partial<TClassProperties<Image>> = {
-  type: 'image',
-  strokeWidth: 0,
-  srcFromAttribute: false,
-  minimumScaleTrigger: 0.5,
-  cropX: 0,
-  cropY: 0,
-  imageSmoothing: true,
-};
-
-Object.assign(Image.prototype, {
-  ...imageDefaultValues,
-});
 
 classRegistry.setClass(Image);
 classRegistry.setSVGClass(Image);

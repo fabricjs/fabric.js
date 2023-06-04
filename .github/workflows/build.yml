@@ -3,6 +3,7 @@ name: '🩺'
 on:
   pull_request:
     branches: [master]
+    paths-ignore: [CHANGELOG.md]
 
 jobs:
   build:
@@ -12,7 +13,7 @@ jobs:
       - name: Uglified build
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run build
   stats:
@@ -27,7 +28,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - name: build stats
         run: npm run build
@@ -42,7 +43,7 @@ jobs:
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: checkout src files
-        run: git checkout origin/master -- src fabric.ts index.ts index.node.ts
+        run: git checkout origin/master -- src fabric.ts index.ts index.node.ts .browserslistrc rollup.config.mjs
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist
@@ -75,7 +76,7 @@ jobs:
       - name: Linting
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run lint
   prettier:
@@ -85,7 +86,7 @@ jobs:
       - name: Prettier check
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run prettier:check
   coverage:
@@ -96,7 +97,7 @@ jobs:
       - name: Code Coverage Report Updater
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
       - run: npm ci
       - run: npm run build -- -f
       - run: npm run test:coverage && npm run test:visual:coverage
@@ -106,18 +107,3 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
           update-comment: true
-  changelog:
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    env:
-      file: CHANGELOG.md
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Checking ${{ env.file }}
-        run: |
-          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
-            echo "Expected '${{ env.file }}' to be modified"
-            exit 1
-          fi

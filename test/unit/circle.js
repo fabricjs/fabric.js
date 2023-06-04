@@ -10,7 +10,7 @@
     assert.ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
     assert.ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.deepEqual(circle.type, 'circle');
+    assert.deepEqual(circle.constructor.name, 'Circle');
   });
 
   QUnit.test('constructor with radius', function(assert) {
@@ -87,7 +87,7 @@
     var circle = new fabric.Circle();
     var defaultProperties = {
       version:                  fabric.version,
-      type:                     'circle',
+      type:                     'Circle',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -138,6 +138,18 @@
     });
   });
 
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Circle({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "Circle",
+      version: fabric.version,
+      left: 0,
+      top: 0
+    });
+  });
+
   QUnit.test('toSVG with full circle', function(assert) {
     var circle = new fabric.Circle({ width: 100, height: 100, radius: 10 });
     var svg = circle.toSVG();
@@ -155,10 +167,11 @@
   });
 
   QUnit.test('fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Circle.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elCircle         = fabric.getDocument().createElementNS(namespace, 'circle'),
+    var elCircle         = fabric.getFabricDocument().createElementNS(namespace, 'circle'),
         radius           = 10,
         left             = 12,
         top              = 15,
@@ -182,7 +195,7 @@
     elCircle.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
     elCircle.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
-    fabric.Circle.fromElement(elCircle, function(oCircle) {
+    fabric.Circle.fromElement(elCircle).then((oCircle) => {
       assert.ok(oCircle instanceof fabric.Circle);
       assert.equal(oCircle.get('radius'), radius);
       assert.equal(oCircle.get('left'), left - radius);
@@ -195,33 +208,25 @@
       assert.equal(oCircle.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oCircle.get('strokeMiterLimit'), strokeMiterLimit);
 
-      var elFaultyCircle = fabric.getDocument().createElementNS(namespace, 'circle');
+
+    }).then(() => {
+      var elFaultyCircle = fabric.getFabricDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
-
-      var error;
-      try {
-        fabric.Circle.fromElement(elFaultyCircle);
-      }
-      catch (err) {
-        error = err;
-      }
-      assert.ok(error, 'negative attribute should throw');
-
+      return fabric.Circle.fromElement(elFaultyCircle).then((circle) => {
+        assert.equal(circle.radius, -10, 'radius will default to -10');
+      });
+    }).then(() => {
+      var elFaultyCircle = fabric.getFabricDocument().createElementNS(namespace, 'circle');
       elFaultyCircle.removeAttribute('r');
-
-      error = void 0;
-      try {
-        fabric.Circle.fromElement(elFaultyCircle);
-      }
-      catch (err) {
-        error = err;
-      }
-
-      assert.ok(error, 'inexstent attribute should throw');
+      return fabric.Circle.fromElement(elFaultyCircle).then((circle) => {
+        assert.equal(circle.radius, 0, 'radius will default to 0');
+      });
+    }).then(() => {
+      done();
     });
   });
 
-  QUnit.test('fromObject', function(assert) {
+  QUnit.test('fromObject', async function(assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Circle.fromObject === 'function');
 

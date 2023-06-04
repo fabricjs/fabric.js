@@ -1,0 +1,18 @@
+{
+  "name": "fabric-node-sandbox",
+  "version": "1.0.0",
+  "description": "fabric.js on node",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "open-cli http://localhost:8080/ && nodemon --config nodemon.config.json src/index.mjs 8080",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "fabric": "file:../../.."
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19",
+    "open-cli": "^7.0.1"
+  },
+  "keywords": []
+}

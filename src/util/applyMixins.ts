@@ -1,4 +1,4 @@
-import { Constructor } from '../typedefs';
+import type { Constructor } from '../typedefs';
 
 /***
  * https://www.typescriptlang.org/docs/handbook/mixins.html#alternative-pattern

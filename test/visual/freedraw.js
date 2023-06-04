@@ -2031,7 +2031,7 @@ QUnit.module('Free Drawing', hooks => {
     return ['chrome', 'firefox', 'edge'].find(name => navigator.userAgent.toLowerCase().indexOf(name) > -1);
   }
   hooks.before(() => {
-    objectCachingDefault = fabric.Object.prototype.objectCaching;
+    objectCachingDefault = fabric.Object.ownDefaults.objectCaching;
     if (isNode()) {
       fabric.config.configure({
         browserShadowBlurConstant: BROWSER_SHADOW_BLUR[process.env.launcher?.toLowerCase() || 'node']
@@ -2043,11 +2043,11 @@ QUnit.module('Free Drawing', hooks => {
     fabric.config.configure({
       enableGLFiltering: false
     });
-    fabric.Object.prototype.objectCaching = true;
+    fabric.Object.ownDefaults.objectCaching = true;
   });
   hooks.after(() => {
     // fabric.config.restoreDefaults();
-    fabric.Object.prototype.objectCaching = objectCachingDefault;
+    fabric.Object.ownDefaults.objectCaching = objectCachingDefault;
   });
 
   const tests = [];

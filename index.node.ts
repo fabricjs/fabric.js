@@ -8,14 +8,13 @@ import {
 } from './fabric';
 import { FabricObject } from './src/shapes/Object/Object';
 
-// TODO: move back to default values when refactoring to method
-FabricObject.prototype.objectCaching = false;
+FabricObject.ownDefaults.objectCaching = false;
 
 export * from './fabric';
 
 export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);
@@ -25,9 +24,15 @@ export class StaticCanvas extends StaticCanvasBase {
   }
 }
 
+/**
+ * **NOTICE**:
+ * {@link Canvas} is designed for interactivity.
+ * Therefore, using it in node has no benefit.
+ * Use {@link StaticCanvas} instead.
+ */
 export class Canvas extends CanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);

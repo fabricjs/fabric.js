@@ -12,7 +12,7 @@
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.equal(ellipse.type, 'ellipse');
+    assert.equal(ellipse.constructor.name, 'Ellipse');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -25,7 +25,7 @@
     var ellipse = new fabric.Ellipse();
     var defaultProperties = {
       version:                  fabric.version,
-      type:                     'ellipse',
+      type:                     'Ellipse',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -83,6 +83,18 @@
     assert.deepEqual(ellipse.getRx(), ellipse.rx * ellipse.scaleX);
   });
 
+  QUnit.test('toObject without defaults', function(assert) {
+    const circle = new fabric.Ellipse({
+      includeDefaultValues: false,
+    });
+    assert.deepEqual(circle.toObject(), {
+      type: "Ellipse",
+      version: fabric.version,
+      left: 0,
+      top: 0
+    });
+  });
+
   QUnit.test('isNotVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0);
@@ -116,10 +128,11 @@
   });
 
   QUnit.test('fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elEllipse        = fabric.getDocument().createElementNS(namespace, 'ellipse'),
+    var elEllipse        = fabric.getFabricDocument().createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,
@@ -144,7 +157,7 @@
     elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
     elEllipse.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
-    fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
+    fabric.Ellipse.fromElement(elEllipse).then((oEllipse) => {
       assert.ok(oEllipse instanceof fabric.Ellipse);
       assert.equal(oEllipse.get('rx'), rx);
       assert.equal(oEllipse.get('ry'), ry);
@@ -157,6 +170,7 @@
       assert.equal(oEllipse.get('strokeLineCap'), strokeLineCap);
       assert.equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+      done();
     });
   });
 

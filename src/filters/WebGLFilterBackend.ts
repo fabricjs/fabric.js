@@ -1,7 +1,7 @@
-import { getWindow } from '../env';
+import { getFabricWindow } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
-import {
+import type {
   TWebGLPipelineState,
   TProgramCache,
   TTextureCache,
@@ -97,13 +97,13 @@ export class WebGLFilterBackend {
     targetCanvas.width = width;
     targetCanvas.height = height;
 
-    startTime = getWindow().performance.now();
+    startTime = getFabricWindow().performance.now();
     this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
-    const drawImageTime = getWindow().performance.now() - startTime;
+    const drawImageTime = getFabricWindow().performance.now() - startTime;
 
-    startTime = getWindow().performance.now();
+    startTime = getFabricWindow().performance.now();
     copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
-    const putImageDataTime = getWindow().performance.now() - startTime;
+    const putImageDataTime = getFabricWindow().performance.now() - startTime;
 
     if (drawImageTime > putImageDataTime) {
       this.imageBuffer = imageBuffer;
@@ -190,7 +190,7 @@ export class WebGLFilterBackend {
           width,
           height,
           !cachedTexture ? source : undefined
-        ),
+        )!,
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,
@@ -243,42 +243,58 @@ export class WebGLFilterBackend {
    * Accepts specific dimensions to initialize the texture to or a source image.
    *
    * @param {WebGLRenderingContext} gl The GL context to use for creating the texture.
-   * @param {Number} width The width to initialize the texture at.
-   * @param {Number} height The height to initialize the texture.
-   * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source for the texture data.
+   * @param {number} width The width to initialize the texture at.
+   * @param {number} height The height to initialize the texture.
+   * @param {TexImageSource} textureImageSource A source for the texture data.
+   * @param {number} filter gl.NEAREST default or gl.LINEAR filters for the texture.
+   * This filter is very useful for LUTs filters. If you need interpolation use gl.LINEAR
    * @returns {WebGLTexture}
    */
   createTexture(
     gl: WebGLRenderingContext,
     width: number,
     height: number,
-    textureImageSource?: TexImageSource
+    textureImageSource?: TexImageSource,
+    filter?:
+      | WebGLRenderingContextBase['NEAREST']
+      | WebGLRenderingContextBase['LINEAR']
   ) {
+    const {
+      NEAREST,
+      TEXTURE_2D,
+      RGBA,
+      UNSIGNED_BYTE,
+      CLAMP_TO_EDGE,
+      TEXTURE_MAG_FILTER,
+      TEXTURE_MIN_FILTER,
+      TEXTURE_WRAP_S,
+      TEXTURE_WRAP_T,
+    } = gl;
     const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindTexture(TEXTURE_2D, texture);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, filter || NEAREST);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, filter || NEAREST);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+    gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
     if (textureImageSource) {
       gl.texImage2D(
-        gl.TEXTURE_2D,
+        TEXTURE_2D,
         0,
-        gl.RGBA,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
+        RGBA,
+        RGBA,
+        UNSIGNED_BYTE,
         textureImageSource
       );
     } else {
       gl.texImage2D(
-        gl.TEXTURE_2D,
+        TEXTURE_2D,
         0,
-        gl.RGBA,
+        RGBA,
         width,
         height,
         0,
-        gl.RGBA,
-        gl.UNSIGNED_BYTE,
+        RGBA,
+        UNSIGNED_BYTE,
         null
       );
     }
@@ -294,17 +310,27 @@ export class WebGLFilterBackend {
    * @param {HTMLImageElement|HTMLCanvasElement} textureImageSource A source to use to create the
    * texture cache entry if one does not already exist.
    */
-  getCachedTexture(uniqueId: string, textureImageSource: TexImageSource) {
-    if (this.textureCache[uniqueId]) {
-      return this.textureCache[uniqueId];
+  getCachedTexture(
+    uniqueId: string,
+    textureImageSource: TexImageSource,
+    filter?:
+      | WebGLRenderingContextBase['NEAREST']
+      | WebGLRenderingContextBase['LINEAR']
+  ): WebGLTexture | null {
+    const { textureCache } = this;
+    if (textureCache[uniqueId]) {
+      return textureCache[uniqueId];
     } else {
       const texture = this.createTexture(
         this.gl,
         textureImageSource.width,
         textureImageSource.height,
-        textureImageSource
+        textureImageSource,
+        filter
       );
-      this.textureCache[uniqueId] = texture;
+      if (texture) {
+        textureCache[uniqueId] = texture;
+      }
       return texture;
     }
   }

@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { halfPI } from '../constants';
-import {
+import type {
   ControlActionHandler,
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import type { FabricObject } from '../shapes/Object/Object';
-import { TDegree, TMat2D } from '../typedefs';
+import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
+import type { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import {
-  ControlRenderingStyleOverride,
-  renderCircleControl,
-  renderSquareControl,
-} from './controlRendering';
+import type { ControlRenderingStyleOverride } from './controlRendering';
+import { renderCircleControl, renderSquareControl } from './controlRendering';
 
 export class Control {
   /**
@@ -172,6 +169,14 @@ export class Control {
    */
   declare mouseUpHandler?: ControlActionHandler;
 
+  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+    // TODO: locking logic can be handled here instead of in the control handler logic
+    return (
+      fabricObject.canvas?.getActiveObject() === fabricObject &&
+      fabricObject.isControlVisible(controlKey)
+    );
+  }
+
   /**
    * Returns control actionHandler
    * @param {Event} eventData the native mouse event
@@ -181,7 +186,7 @@ export class Control {
    */
   getActionHandler(
     eventData: TPointerEvent,
-    fabricObject: FabricObject,
+    fabricObject: InteractiveFabricObject,
     control: Control
   ): TransformActionHandler | undefined {
     return this.actionHandler;
@@ -196,7 +201,7 @@ export class Control {
    */
   getMouseDownHandler(
     eventData: TPointerEvent,
-    fabricObject: FabricObject,
+    fabricObject: InteractiveFabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseDownHandler;
@@ -212,7 +217,7 @@ export class Control {
    */
   getMouseUpHandler(
     eventData: TPointerEvent,
-    fabricObject: FabricObject,
+    fabricObject: InteractiveFabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
@@ -230,7 +235,7 @@ export class Control {
   cursorStyleHandler(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: FabricObject
+    fabricObject: InteractiveFabricObject
   ) {
     return control.cursorStyle;
   }
@@ -245,7 +250,7 @@ export class Control {
   getActionName(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: FabricObject
+    fabricObject: InteractiveFabricObject
   ) {
     return control.actionName;
   }
@@ -256,8 +261,7 @@ export class Control {
    * @param {String} controlKey key where the control is memorized on the
    * @return {Boolean}
    */
-  getVisibility(fabricObject: FabricObject, controlKey: string) {
-    // @ts-expect-error TODO remove directive once fixed
+  getVisibility(fabricObject: InteractiveFabricObject, controlKey: string) {
     return fabricObject._controlsVisibility?.[controlKey] ?? this.visible;
   }
 
@@ -266,14 +270,18 @@ export class Control {
    * @param {Boolean} visibility for the object
    * @return {Void}
    */
-  setVisibility(visibility: boolean, name: string, fabricObject: FabricObject) {
+  setVisibility(
+    visibility: boolean,
+    name: string,
+    fabricObject: InteractiveFabricObject
+  ) {
     this.visible = visibility;
   }
 
   positionHandler(
     dim: Point,
     finalMatrix: TMat2D,
-    fabricObject: FabricObject,
+    fabricObject: InteractiveFabricObject,
     currentControl: Control
   ) {
     return new Point(
@@ -349,7 +357,7 @@ export class Control {
     left: number,
     top: number,
     styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: FabricObject
+    fabricObject: InteractiveFabricObject
   ) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {

@@ -2,11 +2,31 @@ import { Color } from './color/Color';
 import { config } from './config';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import { TClassProperties } from './typedefs';
+import type { TClassProperties } from './typedefs';
 import { uid } from './util/internals/uid';
+import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
 import { rotateVector } from './util/misc/vectors';
+
+export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
+  color: 'rgb(0,0,0)',
+  blur: 0,
+  offsetX: 0,
+  offsetY: 0,
+  affectStroke: false,
+  includeDefaultValues: true,
+  nonScaling: false,
+};
+
+export type SerializedShadowOptions = {
+  color: string;
+  blur: number;
+  offsetX: number;
+  offsetY: number;
+  affectStroke: boolean;
+  nonScaling: boolean;
+};
 
 export class Shadow {
   /**
@@ -61,6 +81,7 @@ export class Shadow {
 
   declare id: number;
 
+  static ownDefaults = shadowDefaultValues;
   /**
    * @see {@link http://fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
@@ -70,6 +91,7 @@ export class Shadow {
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
     const options: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
+    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
     for (const prop in options) {
       // @ts-expect-error for loops are so messy in TS
       this[prop] = options[prop];
@@ -169,7 +191,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data = {
+    const data: SerializedShadowOptions = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
@@ -177,21 +199,10 @@ export class Shadow {
       affectStroke: this.affectStroke,
       nonScaling: this.nonScaling,
     };
-
-    if (this.includeDefaultValues) {
-      return data;
-    }
-
-    const defaults = Shadow.prototype;
-    const out: Record<string, unknown> = {};
-    for (const key in data) {
-      if (
-        data[key as keyof typeof data] !== defaults[key as keyof typeof data]
-      ) {
-        out[key] = data[key as keyof typeof data];
-      }
-    }
-    return out;
+    const defaults = Shadow.ownDefaults;
+    return !this.includeDefaultValues
+      ? pickBy(data, (value, key) => value !== defaults[key])
+      : data;
   }
 
   /**
@@ -201,15 +212,3 @@ export class Shadow {
   static reOffsetsAndBlur =
     /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
 }
-
-export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
-  color: 'rgb(0,0,0)',
-  blur: 0,
-  offsetX: 0,
-  offsetY: 0,
-  affectStroke: false,
-  includeDefaultValues: true,
-  nonScaling: false,
-};
-
-Object.assign(Shadow.prototype, shadowDefaultValues);

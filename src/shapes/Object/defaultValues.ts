@@ -1,6 +1,8 @@
+import { TOP, LEFT } from '../../constants';
+
 export const stateProperties = [
-  'top',
-  'left',
+  TOP,
+  LEFT,
   'scaleX',
   'scaleY',
   'flipX',
@@ -34,9 +36,8 @@ export const cacheProperties = [
 ];
 
 export const fabricObjectDefaultValues = {
-  type: 'object',
-  originX: 'left',
-  originY: 'top',
+  originX: LEFT,
+  originY: TOP,
   top: 0,
   left: 0,
   width: 0,
@@ -95,7 +96,6 @@ export const fabricObjectDefaultValues = {
   lockSkewingY: false,
   lockScalingFlip: false,
   excludeFromExport: false,
-  // TODO: restore once default values are refactored to a method
   objectCaching: true,
   noScaleCache: true,
   strokeUniform: false,
@@ -107,4 +107,4 @@ export const fabricObjectDefaultValues = {
   inverted: false,
   absolutePositioned: false,
   FX_DURATION: 500,
-};
+} as const;

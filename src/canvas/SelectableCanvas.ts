@@ -1,9 +1,8 @@
-import { getDocument, getEnv } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
-import {
+import type {
   CanvasEvents,
   ModifierKey,
   TOptionalModifierKey,
@@ -15,37 +14,59 @@ import {
   resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
-import { StaticCanvas, TCanvasSizeOptions } from './StaticCanvas';
-import { isCollection, isFabricObjectCached } from '../util/types';
+import type { TCanvasSizeOptions } from './StaticCanvas';
+import { StaticCanvas } from './StaticCanvas';
+import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import { AssertKeys, TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import type {
+  AssertKeys,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
-import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
-import { TSVGReviver } from '../typedefs';
+import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
+import { createCanvasElement } from '../util';
+import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
+import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
 
-type TDestroyed<T, K extends keyof any> = {
-  // @ts-expect-error TS doesn't recognize protected/private fields using the `keyof` directive so we use `keyof any`
-  [R in K | keyof T]: R extends K ? T[R] | undefined | null : T[R];
+export const DefaultCanvasProperties = {
+  uniformScaling: true,
+  uniScaleKey: 'shiftKey',
+  centeredScaling: false,
+  centeredRotation: false,
+  centeredKey: 'altKey',
+  altActionKey: 'shiftKey',
+  selection: true,
+  selectionKey: 'shiftKey',
+  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
+  selectionDashArray: [],
+  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
+  selectionLineWidth: 1,
+  selectionFullyContained: false,
+  hoverCursor: 'move',
+  moveCursor: 'move',
+  defaultCursor: 'default',
+  freeDrawingCursor: 'crosshair',
+  notAllowedCursor: 'not-allowed',
+  containerClass: 'canvas-container',
+  perPixelTargetFind: false,
+  targetFindTolerance: 0,
+  skipTargetFind: false,
+  preserveObjectStacking: false,
+  stopContextMenu: false,
+  fireRightClick: false,
+  fireMiddleClick: false,
+  enablePointerEvents: false,
 };
-
-type TDestroyedCanvas<T extends SelectableCanvas> = TDestroyed<
-  T,
-  | 'contextTop'
-  | 'contextCache'
-  | 'lowerCanvasEl'
-  | 'upperCanvasEl'
-  | 'cacheCanvasEl'
-  | 'wrapperEl'
-  | '_activeSelection'
->;
 
 /**
  * Canvas class
@@ -323,6 +344,7 @@ export class SelectableCanvas<
    * Default element class that's given to wrapper (div) element of canvas
    * @type String
    * @default
+   * @deprecated customize {@link CanvasDOMManager} instead or access {@link elements} directly
    */
   declare containerClass: string;
 
@@ -451,15 +473,6 @@ export class SelectableCanvas<
   contextTopDirty = false;
 
   /**
-   * a reference to the context of an additional canvas that is used for scratch operations
-   * @TODOL This is created automatically when needed, while it shouldn't. is probably not even often needed
-   * and is a memory waste. We should either have one that gets added/deleted
-   * @type CanvasRenderingContext2D
-   * @private
-   */
-  declare contextCache: CanvasRenderingContext2D;
-
-  /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
    * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
@@ -485,10 +498,25 @@ export class SelectableCanvas<
    */
   protected declare _target?: FabricObject;
 
-  declare upperCanvasEl: HTMLCanvasElement;
-  declare contextTop: CanvasRenderingContext2D;
-  declare wrapperEl: HTMLDivElement;
-  declare cacheCanvasEl: HTMLCanvasElement;
+  static ownDefaults: Record<string, any> = DefaultCanvasProperties;
+
+  static getDefaults(): Record<string, any> {
+    return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
+  }
+
+  declare elements: CanvasDOMManager;
+  get upperCanvasEl() {
+    return this.elements.upper?.el;
+  }
+  get contextTop() {
+    return this.elements.upper?.ctx;
+  }
+  get wrapperEl() {
+    return this.elements.container;
+  }
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
+
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
@@ -500,16 +528,11 @@ export class SelectableCanvas<
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    super.initElements(el);
-    this._applyCanvasStyle(this.lowerCanvasEl);
-    this._initWrapperElement();
-    this._createUpperCanvas();
+    this.elements = new CanvasDOMManager(el, {
+      allowTouchScrolling: this.allowTouchScrolling,
+      containerClass: this.containerClass,
+    });
     this._createCacheCanvas();
-  }
-
-  protected _initRetinaScaling() {
-    super._initRetinaScaling();
-    this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
 
   /**
@@ -575,7 +598,7 @@ export class SelectableCanvas<
     }
     !this._objectsToRender &&
       (this._objectsToRender = this._chooseObjectsToRender());
-    this.renderCanvas(this.contextContainer, this._objectsToRender);
+    this.renderCanvas(this.getContext(), this._objectsToRender);
   }
 
   /**
@@ -610,7 +633,7 @@ export class SelectableCanvas<
 
   /**
    * Given a pointer on the canvas with a viewport applied,
-   * find out the opinter in
+   * find out the pointer in object coordinates
    * @private
    */
   _normalizePointer(object: FabricObject, pointer: Point): Point {
@@ -618,6 +641,20 @@ export class SelectableCanvas<
       this.restorePointerVpt(pointer),
       invertTransform(object.calcTransformMatrix())
     );
+  }
+
+  /**
+   * Set the canvas tolerance value for pixel taret find.
+   * Use only integer numbers.
+   * @private
+   */
+  setTargetFindTolerance(value: number) {
+    value = Math.round(value);
+    this.targetFindTolerance = value;
+    const retina = this.getRetinaScaling();
+    const size = Math.ceil((value * 2 + 1) * retina);
+    this.pixelFindCanvasEl.width = this.pixelFindCanvasEl.height = size;
+    this.pixelFindContext.scale(retina, retina);
   }
 
   /**
@@ -631,44 +668,26 @@ export class SelectableCanvas<
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
-    // in case the target is the activeObject, we cannot execute this optimization
-    // because we need to draw controls too.
-    if (isFabricObjectCached(target) && target !== this._activeObject) {
-      // optimizatio: we can reuse the cache
-      const normalizedPointer = this._normalizePointer(target, new Point(x, y)),
-        targetRelativeX = Math.max(
-          target.cacheTranslationX + normalizedPointer.x * target.zoomX,
-          0
-        ),
-        targetRelativeY = Math.max(
-          target.cacheTranslationY + normalizedPointer.y * target.zoomY,
-          0
-        );
-
-      return isTransparent(
-        target._cacheContext,
-        Math.round(targetRelativeX),
-        Math.round(targetRelativeY),
-        this.targetFindTolerance
-      );
-    }
-
-    const ctx = this.contextCache,
-      originalColor = target.selectionBackgroundColor,
-      v = this.viewportTransform;
-
-    target.selectionBackgroundColor = '';
-
+    const tolerance = this.targetFindTolerance;
+    const ctx = this.pixelFindContext;
     this.clearContext(ctx);
-
     ctx.save();
-    ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+    ctx.translate(-x + tolerance, -y + tolerance);
+    ctx.transform(...this.viewportTransform);
+    const selectionBgc = target.selectionBackgroundColor;
+    target.selectionBackgroundColor = '';
     target.render(ctx);
+    target.selectionBackgroundColor = selectionBgc;
     ctx.restore();
-
-    target.selectionBackgroundColor = originalColor;
-
-    return isTransparent(ctx, x, y, this.targetFindTolerance);
+    // our canvas is square, and made around tolerance.
+    // so tolerance in this case also represent the center of the canvas.
+    const enhancedTolerance = Math.round(tolerance * this.getRetinaScaling());
+    return isTransparent(
+      ctx,
+      enhancedTolerance,
+      enhancedTolerance,
+      enhancedTolerance
+    );
   }
 
   /**
@@ -768,17 +787,17 @@ export class SelectableCanvas<
     };
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
-      origin.x = 'right';
+      origin.x = RIGHT;
       // is a right control ?
     } else if (['mr', 'tr', 'br'].includes(controlName)) {
-      origin.x = 'left';
+      origin.x = LEFT;
     }
     // is a top control ?
     if (['tl', 'mt', 'tr'].includes(controlName)) {
-      origin.y = 'bottom';
+      origin.y = BOTTOM;
       // is a bottom control ?
     } else if (['bl', 'mb', 'br'].includes(controlName)) {
-      origin.y = 'top';
+      origin.y = TOP;
     }
     return origin;
   }
@@ -848,8 +867,8 @@ export class SelectableCanvas<
       };
 
     if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = 'center';
-      transform.originY = 'center';
+      transform.originX = CENTER;
+      transform.originY = CENTER;
     }
     this._currentTransform = transform;
     // @ts-ignore
@@ -1100,10 +1119,10 @@ export class SelectableCanvas<
       boundsHeight = bounds.height || 0;
 
     if (!boundsWidth || !boundsHeight) {
-      if ('top' in bounds && 'bottom' in bounds) {
+      if (TOP in bounds && BOTTOM in bounds) {
         boundsHeight = Math.abs(bounds.top - bounds.bottom);
       }
-      if ('right' in bounds && 'left' in bounds) {
+      if (RIGHT in bounds && LEFT in bounds) {
         boundsWidth = Math.abs(bounds.right - bounds.left);
       }
     }
@@ -1150,94 +1169,12 @@ export class SelectableCanvas<
     }
   }
 
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    super._setBackstoreDimension(prop, value);
-    this.upperCanvasEl[prop] = value;
-    this.cacheCanvasEl[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    super._setCssDimension(prop, value);
-    this.upperCanvasEl.style[prop] = value;
-    this.wrapperEl.style[prop] = value;
-  }
-
-  /**
-   * @private
-   * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
-   */
-  protected _createUpperCanvas() {
-    const lowerCanvasEl = this.lowerCanvasEl;
-
-    // if there is no upperCanvas (most common case) we create one.
-    if (!this.upperCanvasEl) {
-      this.upperCanvasEl = this._createCanvasElement();
-    }
-    const upperCanvasEl = this.upperCanvasEl;
-    // we assign the same classname of the lowerCanvas
-    upperCanvasEl.className = lowerCanvasEl.className;
-    // but then we remove the lower-canvas specific className
-    upperCanvasEl.classList.remove('lower-canvas');
-    // we add the specific upper-canvas class
-    upperCanvasEl.classList.add('upper-canvas');
-    upperCanvasEl.setAttribute('data-fabric', 'top');
-    this.wrapperEl.appendChild(upperCanvasEl);
-    upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
-    this._applyCanvasStyle(upperCanvasEl);
-    upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext('2d')!;
-  }
-
   protected _createCacheCanvas() {
-    this.cacheCanvasEl = this._createCanvasElement();
-    this.contextCache = this.cacheCanvasEl.getContext('2d')!;
-  }
-
-  protected _initWrapperElement() {
-    const container = getDocument().createElement('div');
-    container.classList.add(this.containerClass);
-    this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
-    this.wrapperEl.setAttribute('data-fabric', 'wrapper');
-    setStyle(this.wrapperEl, {
-      width: `${this.width}px`,
-      height: `${this.height}px`,
-      position: 'relative',
-    });
-    makeElementUnselectable(this.wrapperEl);
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  protected _applyCanvasStyle(element: HTMLCanvasElement) {
-    const width = this.width || element.width,
-      height = this.height || element.height;
-
-    setStyle(element, {
-      position: 'absolute',
-      width: width + 'px',
-      height: height + 'px',
-      left: 0,
-      top: 0,
-      'touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : 'none',
-    });
-    element.width = width;
-    element.height = height;
-    makeElementUnselectable(element);
+    this.pixelFindCanvasEl = createCanvasElement();
+    this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
+      willReadFrequently: true,
+    })!;
+    this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
   /**
@@ -1245,7 +1182,7 @@ export class SelectableCanvas<
    * @returns {CanvasRenderingContext2D}
    */
   getTopContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1254,7 +1191,7 @@ export class SelectableCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getSelectionContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1262,7 +1199,7 @@ export class SelectableCanvas<
    * @return {HTMLCanvasElement}
    */
   getSelectionElement(): HTMLCanvasElement {
-    return this.upperCanvasEl;
+    return this.elements.upper.el;
   }
 
   /**
@@ -1467,41 +1404,25 @@ export class SelectableCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects, removes all event listeners and frees resources
-   *
-   * **CAUTION**:
-   *
-   * This method is **UNSAFE**.
-   * You may encounter a race condition using it if there's a requested render.
-   * Call this method only if you are sure rendering has settled.
-   * Consider using {@link dispose} as it is **SAFE**
-   *
-   * @private
+   * @override clears active selection ref and interactive canvas elements and contexts
    */
-  destroy(this: TDestroyedCanvas<this>) {
-    const wrapperEl = this.wrapperEl as HTMLDivElement,
-      lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!,
-      cacheCanvasEl = this.cacheCanvasEl!,
-      activeSelection = this._activeSelection!;
+  destroy() {
     // dispose of active selection
+    const activeSelection = this._activeSelection!;
     activeSelection.removeAll();
+    // @ts-expect-error disposing
     this._activeSelection = undefined;
     activeSelection.dispose();
+
     super.destroy();
-    wrapperEl.removeChild(upperCanvasEl);
-    wrapperEl.removeChild(lowerCanvasEl);
-    this.contextCache = null;
-    this.contextTop = null;
-    // TODO: interactive canvas should NOT be used in node, therefore there is no reason to cleanup node canvas
-    getEnv().dispose(upperCanvasEl);
-    this.upperCanvasEl = undefined;
-    getEnv().dispose(cacheCanvasEl);
-    this.cacheCanvasEl = undefined;
-    if (wrapperEl.parentNode) {
-      wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
-    }
-    this.wrapperEl = undefined;
+
+    // free resources
+
+    // pixel find canvas
+    // @ts-expect-error disposing
+    this.pixelFindContext = null;
+    // @ts-expect-error disposing
+    this.pixelFindCanvasEl = undefined;
   }
 
   /**
@@ -1565,12 +1486,12 @@ export class SelectableCanvas<
         'angle',
         'flipX',
         'flipY',
-        'left',
+        LEFT,
         'scaleX',
         'scaleY',
         'skewX',
         'skewY',
-        'top',
+        TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
       addTransformToObject(instance, this._activeObject.calcOwnMatrix());
@@ -1595,33 +1516,3 @@ export class SelectableCanvas<
     instance.set(originalProperties);
   }
 }
-
-Object.assign(SelectableCanvas.prototype, {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-});
