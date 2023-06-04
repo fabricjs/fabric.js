@@ -35,15 +35,14 @@ function onwarn(warning, warn) {
   // we error at any warning.
   // we allow-list the errors we understand are not harmful
   if (
-    warning.code === 'PLUGIN_WARNING' &&
-    !warning.message.includes('sourcemap')
+    (warning.code === 'PLUGIN_WARNING' &&
+      !warning.message.includes('sourcemap')) ||
+    warning.code === 'CIRCULAR_DEPENDENCY'
   ) {
     console.error(chalk.redBright(warning.message));
-    throw Object.assign(new Error(), warning);
-  }
-  if (warning.code === 'CIRCULAR_DEPENDENCY') {
-    console.error(chalk.redBright(warning.message));
-    throw Object.assign(new Error(), warning);
+    if (process.env.CI) {
+      throw Object.assign(new Error(), warning);
+    }
   }
   warn(warning);
 }
