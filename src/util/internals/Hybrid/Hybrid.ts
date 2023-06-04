@@ -1,6 +1,6 @@
-import { THybrid, HybridProtected, Hybrid } from './types';
-import { TARGETS_KEY, MONITOR_KEY, SOURCE_KEY } from './constants';
-import { disconnectSource, connectSource, bubbleChange } from './bubbling';
+import { bubbleChange, connectSource, disconnectSource } from './bubbling';
+import { MONITOR_KEY, SOURCE_KEY, TARGETS_KEY } from './constants';
+import type { Hybrid, HybridProtected, THybrid } from './types';
 
 export function createHybrid<T extends THybrid<T>, S extends object>(
   target: T,

@@ -1,5 +1,5 @@
-import { THybrid, ChangeContext, HybridProtected, Hybrid } from './types';
-import { TARGETS_KEY, MONITOR_KEY } from './constants';
+import { MONITOR_KEY, TARGETS_KEY } from './constants';
+import type { ChangeContext, Hybrid, HybridProtected, THybrid } from './types';
 
 /**
  * adds target to source's targets monitor in order to bubble changes from source to target
