@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): proxy to handle side effects trapping get, set, delete [#8980](https://github.com/fabricjs/fabric.js/pull/8980)
 - ci(): warn build errors in dev mode [#8971](https://github.com/fabricjs/fabric.js/pull/8971)
 - ci(): invoke tests after changelog action [#8974](https://github.com/fabricjs/fabric.js/pull/8974)
 - chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
