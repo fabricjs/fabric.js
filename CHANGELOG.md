@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(IText): cursor detection [#8972](https://github.com/fabricjs/fabric.js/pull/8972)
 - fix(Text): styles line break [#8973](https://github.com/fabricjs/fabric.js/pull/8973)
 - fix(): regression to itext focusing from #8939 [#8970](https://github.com/fabricjs/fabric.js/pull/8970)
 - ci(): warn build errors in dev mode [#8971](https://github.com/fabricjs/fabric.js/pull/8971)
