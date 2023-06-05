@@ -80,11 +80,12 @@ export class Circle<
     context: ChangeContext<K, this[K]>,
     receiver: this
   ): boolean {
-    if (context.key === 'radius') {
+    const accepted = super.onChange(context, receiver);
+    if (accepted && context.key === 'radius') {
       this.width = this.height =
         ((context as ChangeContext<'radius', number>).value || 0) * 2;
     }
-    return super.onChange(context, receiver);
+    return accepted;
   }
 
   /**
