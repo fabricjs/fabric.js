@@ -28,8 +28,8 @@ export class CommonMethods<EventSpec>
    * @param context
    * @param target {@link Reflect} target
    */
-  protected transformValue<K extends keyof this>(
-    context: TransformValueContext<this, K>,
+  protected transformValue<K extends keyof this, V extends this[K]>(
+    context: TransformValueContext<K, V>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     target: this
   ) {
@@ -61,9 +61,9 @@ export class CommonMethods<EventSpec>
    * @param target {@link Reflect} target
    * @returns true if the change should be accepted and `false` to revert the `set` operation
    */
-  protected onChange<K extends keyof this>(
+  protected onChange<K extends keyof this, V extends this[K]>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: ChangeContext<this, K>,
+    context: ChangeContext<K, V>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     target: this
   ): boolean {

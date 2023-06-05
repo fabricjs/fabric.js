@@ -1,39 +1,39 @@
-export type TransformValueContext<T, K extends keyof T = keyof T> = {
+export type TransformValueContext<K, V> = {
   key: K;
-  value: T[K];
+  value: V;
 } & (
   | {
       operation: 'get';
     }
   | {
-      newValue: T[K];
+      newValue: V;
       operation: 'set';
     }
 );
 
-export type ChangeContext<T, K extends keyof T = keyof T> = {
+export type ChangeContext<K, V> = {
   key: K;
-  value: T[K];
-  prevValue: T[K];
+  value: V;
+  prevValue: V;
 };
 
 export interface ProxyTarget {
   /**
    * @returns the value to commit
    */
-  transformValue?: <K extends keyof this>(
-    context: TransformValueContext<this, K>,
+  transformValue?: <K extends keyof this, V extends this[K]>(
+    context: TransformValueContext<K, V>,
     /**
      * {@link Reflect} target
      */
     target: this
-  ) => this[K];
+  ) => V;
 
   /**
    * @returns true if the change is accepted
    */
-  onChange?: <K extends keyof this>(
-    context: ChangeContext<this, K>,
+  onChange?: <K extends keyof this, V extends this[K]>(
+    context: ChangeContext<K, V>,
     /**
      * {@link Reflect} target
      */
