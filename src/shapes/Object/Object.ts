@@ -53,6 +53,7 @@ import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import type { TProps } from './types';
 import { getEnv } from '../../env';
+import { ChangeContext, TransformValueContext } from '../../util/internals';
 
 export type TCachedFabricObject = FabricObject &
   Required<
@@ -675,48 +676,59 @@ export class FabricObject<
     return value;
   }
 
-  /**
-   * Handles setting values on the instance and handling internal side effects
-   * @protected
-   * @param {String} key
-   * @param {*} value
-   */
-  _set(key: string, value: any) {
-    const isChanged = this[key as keyof this] !== value;
-
-    if (key === 'scaleX' || key === 'scaleY') {
-      value = this._constrainScale(value);
-    }
-    if (key === 'scaleX' && value < 0) {
-      this.flipX = !this.flipX;
-      value *= -1;
-    } else if (key === 'scaleY' && value < 0) {
-      this.flipY = !this.flipY;
-      value *= -1;
-      // i don't like this automatic initialization here
-    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
-      value = new Shadow(value);
-    } else if (key === 'dirty' && this.group) {
-      this.group.set('dirty', value);
-    }
-
-    this[key as keyof this] = value;
-
-    if (isChanged) {
-      const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (
-        (this.constructor as typeof FabricObject).cacheProperties.includes(key)
-      ) {
-        this.dirty = true;
-        groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (
-        groupNeedsUpdate &&
-        (this.constructor as typeof FabricObject).stateProperties.includes(key)
-      ) {
-        this.group!.set('dirty', true);
+  protected transformValue<K extends keyof this>(
+    context: TransformValueContext<K, this[K]>,
+    target: this
+  ): this[K] {
+    if (context.operation === 'set') {
+      switch (context.key) {
+        case 'scaleX': {
+          const value = this._constrainScale(context.newValue as number);
+          value < 0 && (this.flipX = !this.flipX);
+          return Math.abs(value) as this[K];
+        }
+        case 'scaleY': {
+          const value = this._constrainScale(context.newValue as number);
+          value < 0 && (this.flipY = !this.flipY);
+          return Math.abs(value) as this[K];
+        }
+        case 'shadow': {
+          // TODO: remove this unwanted logic
+          if (context.newValue && !(context.newValue instanceof Shadow)) {
+            return new Shadow(context.newValue as string) as this[K];
+          }
+        }
       }
     }
-    return this;
+    return super.transformValue(context, target);
+  }
+
+  protected onChange<K extends keyof this>(
+    context: ChangeContext<K, this[K]>,
+    receiver: this
+  ): boolean {
+    const accepted = super.onChange(context, receiver);
+    if (
+      accepted &&
+      (this.constructor as typeof FabricObject).cacheProperties.includes(
+        context.key as string
+      )
+    ) {
+      this.dirty = true;
+    }
+    if (
+      accepted &&
+      this.group &&
+      this.group.isOnACache &&
+      this.group.isOnACache() &&
+      (this.dirty ||
+        (this.constructor as typeof FabricObject).stateProperties.includes(
+          context.key as string
+        ))
+    ) {
+      this.group.dirty = true;
+    }
+    return accepted;
   }
 
   /*
