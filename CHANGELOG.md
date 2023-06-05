@@ -2,8 +2,8 @@
 
 ## [next]
 
-- feat(): Hybrid Object solving default values, shared controls, get/set hooks [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
-- chore(TS): Export more types  [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
+- feat(): proxy for get/set hooks [#8682](https://github.com/fabricjs/fabric.js/pull/8682)
+- chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
 - BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 

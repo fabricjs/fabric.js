@@ -6,7 +6,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { ChangeContext } from '../util/internals';
+import type { ChangeContext } from '../util/internals';
 import type { TClassProperties } from '../typedefs';
 import type {
   FabricObjectProps,
@@ -119,10 +119,10 @@ export class Circle<
 
   /**
    * Sets radius of an object (and updates width accordingly)
+   * @deprecated
    */
   setRadius(value: number) {
     this.radius = value;
-    this.set({ width: value * 2, height: value * 2 });
   }
 
   /**

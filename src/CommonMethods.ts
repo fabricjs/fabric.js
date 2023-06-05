@@ -1,40 +1,22 @@
 import { Observable } from './Observable';
-import {
+import type {
   ChangeContext,
-  createHybrid,
+  ProxyTarget,
   TransformValueContext,
 } from './util/internals';
+import { createProxy } from './util/internals';
 
-export class CommonMethods<EventSpec> extends Observable<EventSpec> {
+export class CommonMethods<EventSpec>
+  extends Observable<EventSpec>
+  implements ProxyTarget
+{
   static getDefaultValues() {
     return {};
   }
 
   constructor(options?: any) {
     super();
-    return createHybrid(
-      Object.assign(this, options),
-      (this.constructor as typeof CommonMethods).getDefaultValues()
-    );
-  }
-
-  /**
-   *
-   * @param key key to restore
-   * @returns true if value changed
-   */
-  restoreDefault(key: keyof this): boolean {
-    // @ts-expect-error TS doesn't recognize `Hybrid` as super
-    return super.restoreDefault(key);
-  }
-
-  /**
-   * restores all default values
-   * @returns a map indicating which keys were changed
-   */
-  restoreDefaults(): Record<keyof this, boolean> {
-    // @ts-expect-error TS doesn't recognize `Hybrid` as super
-    return super.restoreDefaults();
+    return createProxy(Object.assign(this, options));
   }
 
   /**
@@ -44,8 +26,8 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @param context
    * @param target {@link Reflect} target
    */
-  protected transformValue(
-    context: TransformValueContext<this>,
+  protected transformValue<K extends keyof this>(
+    context: TransformValueContext<this, K>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     target: this
   ) {
@@ -77,8 +59,12 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @param target {@link Reflect} target
    * @returns true if the change should be accepted and `false` to revert the `set` operation
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected onChange(context: ChangeContext<this>, target: this): boolean {
+  protected onChange<K extends keyof this>(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    context: ChangeContext<this, K>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    target: this
+  ): boolean {
     return true;
   }
 
