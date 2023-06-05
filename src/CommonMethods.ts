@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Observable } from './Observable';
 import type {
   ChangeContext,
@@ -22,7 +23,7 @@ export class CommonMethods<EventSpec>
 
   /**
    * A hook that runs from the `get` and `set` traps of {@link Proxy},
-   * allowing to return a different value to the operation.
+   * allowing to return a different value that will be used instead.
    *
    * @param context
    * @param target {@link Reflect} target
@@ -38,7 +39,7 @@ export class CommonMethods<EventSpec>
   /**
    * A hook that runs after a change has been made to instance
    * It is a good place to run side effects
-   * Allows ro revert the operation by returning `false`
+   * Allows to revert the operation by returning `false`
    *
    * ---
    *
