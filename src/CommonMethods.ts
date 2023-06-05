@@ -12,10 +12,6 @@ export class CommonMethods<EventSpec>
   extends Observable<EventSpec>
   implements ProxyTarget
 {
-  static getDefaultValues() {
-    return {};
-  }
-
   constructor(options?: any) {
     super();
     return createProxy(Object.assign(this, options));
