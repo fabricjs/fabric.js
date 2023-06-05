@@ -716,8 +716,8 @@ export class FabricObject<
     if (
       accepted &&
       this.group &&
-      this.group.isOnACache &&
       !this.group.dirty &&
+      this.group.isOnACache &&
       this.group.isOnACache() &&
       (this.dirty ||
         (this.constructor as typeof FabricObject).stateProperties.includes(
