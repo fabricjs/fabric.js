@@ -166,6 +166,10 @@ QUnit.module('Proxy', () => {
         proxy.x = 25;
         assert.equal(proxy.x, 3, 'transform get value, set value blocked');
         proxy.foo = 'bar';
+        // no change does not invoke the method
+        proxy.foo = 'bar';
+        proxy.foo = 'bar';
+        proxy.foo = 'bar';
         assert.equal(proxy.foo, 'bar', 'transform value');
         Object.defineProperty(proxy, 'z', {
             value: 0,

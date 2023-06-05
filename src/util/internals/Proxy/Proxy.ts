@@ -22,8 +22,9 @@ export function createProxy<T extends ProxyTarget>(target: T) {
       const prevValue = Reflect.get(target, p);
       const descriptor = Reflect.getOwnPropertyDescriptor(target, p);
       const enumerable = !descriptor || descriptor.enumerable;
+      const changed = prevValue !== newValue;
       // transform value
-      if (target.transformValue && enumerable) {
+      if (changed && target.transformValue && enumerable) {
         newValue = target.transformValue(
           {
             operation: 'set',
@@ -36,7 +37,7 @@ export function createProxy<T extends ProxyTarget>(target: T) {
       }
       // set property
       if (Reflect.set(target, p, newValue)) {
-        if (prevValue !== newValue && target.onChange && enumerable) {
+        if (changed && target.onChange && enumerable) {
           // a change occurred => run side effects
           target.onChange(
             { key: p as keyof T, value: newValue, prevValue },
