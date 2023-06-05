@@ -6,6 +6,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type { ChangeContext } from '../util/internals';
 import type { TClassProperties } from '../typedefs';
 import type {
   FabricObjectProps,
@@ -75,19 +76,21 @@ export class Circle<
     };
   }
 
-  /**
-   * @private
-   * @param {String} key
-   * @param {*} value
-   */
-  _set(key: string, value: any) {
-    super._set(key, value);
+  constructor(options?: Props) {
+    super(options);
+    this.width = this.height = this.radius * 2;
+  }
 
-    if (key === 'radius') {
-      this.setRadius(value);
+  protected onChange<K extends keyof this>(
+    context: ChangeContext<K, this[K]>,
+    receiver: this
+  ): boolean {
+    const accepted = super.onChange(context, receiver);
+    if (accepted && context.key === 'radius') {
+      this.width = this.height =
+        ((context as ChangeContext<'radius', number>).value || 0) * 2;
     }
-
-    return this;
+    return accepted;
   }
 
   /**
@@ -112,7 +115,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusX(): number {
-    return this.get('radius') * this.get('scaleX');
+    return this.radius * this.scaleX;
   }
 
   /**
@@ -120,15 +123,15 @@ export class Circle<
    * @return {Number}
    */
   getRadiusY(): number {
-    return this.get('radius') * this.get('scaleY');
+    return this.radius * this.scaleY;
   }
 
   /**
    * Sets radius of an object (and updates width accordingly)
+   * @deprecated
    */
   setRadius(value: number) {
     this.radius = value;
-    this.set({ width: value * 2, height: value * 2 });
   }
 
   /**

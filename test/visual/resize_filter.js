@@ -117,9 +117,11 @@
   function blendImageTest2(canvas, callback) {
     getFixture('parrot.png', false, function(img) {
       var image = new fabric.Image(img);
-      var backdropImage = new fabric.Image(img);
+      var backdropImage = new fabric.Image(img, {
+        scaleX: -1
+      });
       backdropImage.left = backdropImage.width;
-      backdropImage.scaleX = -1;
+      
       image.filters.push(new fabric.filters.BlendImage({ image: backdropImage }));
       image.applyFilters();
       image.scaleToWidth(400);
@@ -134,6 +136,35 @@
   tests.push({
     test: 'Blend image test with flip',
     code: blendImageTest2,
+    golden: 'parrotblend2.png',
+    newModule: 'Image Blend test',
+    percentage: 0.06,
+    width: 400,
+    height: 400,
+  });
+
+    function blendImageTest3(canvas, callback) {
+    getFixture('parrot.png', false, function(img) {
+      var image = new fabric.Image(img);
+      var backdropImage = new fabric.Image(img, {
+        flipX: true
+      });
+      backdropImage.left = backdropImage.width;
+      
+      image.filters.push(new fabric.filters.BlendImage({ image: backdropImage }));
+      image.applyFilters();
+      image.scaleToWidth(400);
+      canvas.add(image);
+      canvas.renderAll();
+      image.dispose();
+      backdropImage.dispose();
+      callback(canvas.lowerCanvasEl);
+    });
+  }
+
+  tests.push({
+    test: 'Blend image test with flip',
+    code: blendImageTest3,
     golden: 'parrotblend2.png',
     newModule: 'Image Blend test',
     percentage: 0.06,

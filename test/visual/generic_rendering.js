@@ -77,24 +77,23 @@
       strokeDashArray: [2, 2],
       top: 65,
       left: 30,
+      scaleX: -2,
+      scaleY: -4,
     });
-    // do not do this at init time or they will be positive
-    rect.scaleX = -2;
-    rect.scaleY = -4;
-
     var rect2 = new fabric.Rect({
       width: 10,
       height: 10,
       fill: 'transparent',
       stroke: 'red',
       strokeWidth: 15,
-      scaleX: -2,
-      scaleY: -4,
       strokeDashArray: [2, 2],
       strokeUniform: true,
       top: 10,
       left: 55,
     });
+    // do this after init time so the side effect is triggered
+    rect2.scaleX = -2;
+    rect2.scaleY = -4;
     canvas.add(rect, rect2);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
