@@ -15,6 +15,7 @@ export type ChangeContext<K, V> = {
   key: K;
   value: V | undefined;
   prevValue: V | undefined;
+  operation: 'set' | 'delete';
 };
 
 export interface ProxyTarget {
