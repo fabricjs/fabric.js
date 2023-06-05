@@ -72,7 +72,7 @@ export class CommonMethods<EventSpec>
 
   /**
    * Sets object's properties from options, for initialization only
-   * @protected
+   * @deprecated
    * @param {Object} [options] Options object
    */
   protected _setOptions(options: any = {}) {
@@ -82,7 +82,7 @@ export class CommonMethods<EventSpec>
   }
 
   /**
-   * @private
+   * @deprecated
    */
   _setObject(obj: Record<string, any>) {
     for (const prop in obj) {
@@ -94,6 +94,7 @@ export class CommonMethods<EventSpec>
    * Sets property to a given value. When changing position/dimension -related properties (left, top, scale, angle, etc.) `set` does not update position of object's borders/controls. If you need to update those, call `setCoords()`.
    * @param {String|Object} key Property name or object (if object, iterate over the object properties)
    * @param {Object|Function} value Property value (if function, the value is passed into it and its return value is used as a new one)
+   * @deprecated
    */
   set(key: string | Record<string, any>, value?: any) {
     if (typeof key === 'object') {
@@ -104,6 +105,9 @@ export class CommonMethods<EventSpec>
     return this;
   }
 
+  /**
+   * @deprecated
+   */
   _set(key: string, value: any) {
     this[key] = value;
   }
@@ -111,6 +115,7 @@ export class CommonMethods<EventSpec>
   /**
    * Toggles specified property from `true` to `false` or from `false` to `true`
    * @param {String} property Property to toggle
+   * @deprecated
    */
   toggle(property: string) {
     const value = this.get(property);
@@ -124,6 +129,7 @@ export class CommonMethods<EventSpec>
    * Basic getter
    * @param {String} property Property name
    * @return {*} value of a property
+   * @deprecated
    */
   get(property: string) {
     return this[property];

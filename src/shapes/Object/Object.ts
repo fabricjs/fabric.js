@@ -479,7 +479,7 @@ export class FabricObject<
   /**
    * Sets object's properties from options, for class constructor only.
    * Needs to be overridden for different defaults.
-   * @protected
+   * @deprecated
    * @param {Object} [options] Options object
    */
   protected setOptions(options: Record<string, any> = {}) {
