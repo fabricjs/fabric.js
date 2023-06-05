@@ -656,7 +656,7 @@
     equalsControl('rect7');
   });
 
-  QUnit.test.only('dirty flag propagation from children up', function(assert) {
+  QUnit.test('dirty flag propagation from children up', function(assert) {
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
