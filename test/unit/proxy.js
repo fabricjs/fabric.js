@@ -32,8 +32,9 @@ QUnit.module('Proxy', () => {
         }, {
             onChange: {
                 enumerable: false,
-                value({ key, value, prevValue }, receiver) {
+                value({ key, value, prevValue, operation }, receiver) {
                     assert.equal(receiver, proxy, 'same ref');
+                    assert.equal(operation, 'set', 'set operation');
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }
@@ -93,8 +94,9 @@ QUnit.module('Proxy', () => {
         }, {
             onChange: {
                 enumerable: false,
-                value({ key, value, prevValue }, receiver) {
+                value({ key, value, prevValue, operation }, receiver) {
                     assert.equal(receiver, proxy, 'same ref');
+                    assert.equal(operation, 'delete', 'delete operation');
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }

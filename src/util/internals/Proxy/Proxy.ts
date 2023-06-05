@@ -40,7 +40,12 @@ export function createProxy<T extends ProxyTarget>(target: T) {
         if (changed && target.onChange && enumerable) {
           // a change occurred => run side effects
           target.onChange(
-            { key: p as keyof T, value: newValue, prevValue },
+            {
+              operation: 'set',
+              key: p as keyof T,
+              value: newValue,
+              prevValue,
+            },
             receiver
           ) ||
             // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
@@ -65,7 +70,12 @@ export function createProxy<T extends ProxyTarget>(target: T) {
         ) {
           // a change occurred => run side effects
           target.onChange(
-            { key: p as keyof T, value: undefined, prevValue },
+            {
+              operation: 'delete',
+              key: p as keyof T,
+              value: undefined,
+              prevValue,
+            },
             // the receiver is not passed to the trap, see https://github.com/tc39/ecma262/issues/1198
             proxy
           ) ||
