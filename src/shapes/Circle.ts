@@ -76,6 +76,11 @@ export class Circle<
     };
   }
 
+  constructor(options?: Props) {
+    super(options);
+    this.width = this.height = this.radius * 2;
+  }
+
   protected onChange<K extends keyof this>(
     context: ChangeContext<K, this[K]>,
     receiver: this
