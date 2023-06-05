@@ -706,6 +706,7 @@ export class FabricObject<
     const accepted = super.onChange(context, receiver);
     if (
       accepted &&
+      !this.dirty &&
       (this.constructor as typeof FabricObject).cacheProperties.includes(
         context.key as string
       )
@@ -716,6 +717,7 @@ export class FabricObject<
       accepted &&
       this.group &&
       this.group.isOnACache &&
+      !this.group.dirty &&
       this.group.isOnACache() &&
       (this.dirty ||
         (this.constructor as typeof FabricObject).stateProperties.includes(
