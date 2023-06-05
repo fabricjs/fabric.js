@@ -294,11 +294,7 @@ export class FabricObject<
    * @param {Object} [options] Options object
    */
   constructor(options: Props = {} as Props) {
-    super();
-    Object.assign(
-      this,
-      (this.constructor as typeof FabricObject).getDefaults()
-    );
+    super(options);
     this.setOptions(options);
   }
 
@@ -479,7 +475,7 @@ export class FabricObject<
   /**
    * Sets object's properties from options, for class constructor only.
    * Needs to be overridden for different defaults.
-   * @protected
+   * @deprecated
    * @param {Object} [options] Options object
    */
   protected setOptions(options: Record<string, any> = {}) {
