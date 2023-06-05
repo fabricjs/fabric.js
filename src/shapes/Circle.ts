@@ -76,13 +76,13 @@ export class Circle<
     };
   }
 
-  protected onChange<K extends keyof this, V extends this[K]>(
-    context: ChangeContext<K, V>,
+  protected onChange<K extends keyof this>(
+    context: ChangeContext<K, this[K]>,
     target: this
   ): boolean {
     if (context.key === 'radius') {
       this.width = this.height =
-        (context as ChangeContext<'radius', number>).value * 2;
+        ((context as ChangeContext<'radius', number>).value || 0) * 2;
     }
     return super.onChange(context, target);
   }

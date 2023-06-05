@@ -13,8 +13,8 @@ export type TransformValueContext<K, V> = {
 
 export type ChangeContext<K, V> = {
   key: K;
-  value: V;
-  prevValue: V;
+  value: V | undefined;
+  prevValue: V | undefined;
 };
 
 export interface ProxyTarget {

@@ -9,7 +9,7 @@ export function createProxy<T extends ProxyTarget>(target: T) {
         ? target.transformValue(
             {
               operation: 'get',
-              key: p,
+              key: p as keyof T,
               value,
             },
             target
@@ -27,7 +27,7 @@ export function createProxy<T extends ProxyTarget>(target: T) {
         newValue = target.transformValue(
           {
             operation: 'set',
-            key: p,
+            key: p as keyof T,
             newValue,
             value: prevValue,
           },
@@ -38,7 +38,10 @@ export function createProxy<T extends ProxyTarget>(target: T) {
       if (Reflect.set(target, p, newValue)) {
         if (prevValue !== newValue && target.onChange && enumerable) {
           // a change occurred => run side effects
-          target.onChange({ key: p, value: newValue, prevValue }, target) ||
+          target.onChange(
+            { key: p as keyof T, value: newValue, prevValue },
+            target
+          ) ||
             // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
             !(has
               ? Reflect.set(target, p, prevValue)
@@ -60,7 +63,10 @@ export function createProxy<T extends ProxyTarget>(target: T) {
           (!descriptor || descriptor.enumerable)
         ) {
           // a change occurred => run side effects
-          target.onChange({ key: p, value: undefined, prevValue }, target) ||
+          target.onChange(
+            { key: p as keyof T, value: undefined, prevValue },
+            target
+          ) ||
             // change was refused by side effects => revert by redefining the property
             !Reflect.defineProperty(target, p, {
               ...descriptor,
