@@ -93,11 +93,11 @@ export class BlendImage extends BaseFilter {
     const image = this.image,
       { width, height } = image.getElement();
     return [
-      1 / image.scaleX,
+      1 / (image.scaleX * (image.flipX ? -1 : 1)),
       0,
       0,
       0,
-      1 / image.scaleY,
+      1 / (image.scaleY * (image.flipY ? -1 : 1)),
       0,
       -image.left / width,
       -image.top / height,
@@ -128,10 +128,10 @@ export class BlendImage extends BaseFilter {
       context.clearRect(0, 0, width, height);
     }
     context.setTransform(
-      image.scaleX,
+      image.scaleX * (image.flipX ? -1 : 1),
       0,
       0,
-      image.scaleY,
+      image.scaleY * (image.flipY ? -1 : 1),
       image.left,
       image.top
     );
