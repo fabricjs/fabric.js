@@ -1,8 +1,8 @@
 import type { ProxyTarget } from './types';
 
 export function createProxy<T extends ProxyTarget>(target: T) {
-  return new Proxy(target, {
-    get(target, p) {
+  const proxy = new Proxy(target, {
+    get(target, p, receiver) {
       const value = Reflect.get(target, p);
       return target.transformValue &&
         Reflect.getOwnPropertyDescriptor(target, p)?.enumerable
@@ -12,12 +12,12 @@ export function createProxy<T extends ProxyTarget>(target: T) {
               key: p as keyof T,
               value,
             },
-            target
+            receiver
           )
         : value;
     },
 
-    set(target, p, newValue) {
+    set(target, p, newValue, receiver) {
       const has = Reflect.has(target, p);
       const prevValue = Reflect.get(target, p);
       const descriptor = Reflect.getOwnPropertyDescriptor(target, p);
@@ -32,7 +32,7 @@ export function createProxy<T extends ProxyTarget>(target: T) {
             newValue,
             value: prevValue,
           },
-          target
+          receiver
         );
       }
       // set property
@@ -41,7 +41,7 @@ export function createProxy<T extends ProxyTarget>(target: T) {
           // a change occurred => run side effects
           target.onChange(
             { key: p as keyof T, value: newValue, prevValue },
-            target
+            receiver
           ) ||
             // change was refused by side effects => revert by resetting/deleting the property if it existed/didn't
             !(has
@@ -66,7 +66,8 @@ export function createProxy<T extends ProxyTarget>(target: T) {
           // a change occurred => run side effects
           target.onChange(
             { key: p as keyof T, value: undefined, prevValue },
-            target
+            // the receiver is not passed to the trap, see https://github.com/tc39/ecma262/issues/1198
+            proxy
           ) ||
             // change was refused by side effects => revert by redefining the property
             !Reflect.defineProperty(target, p, {
@@ -79,4 +80,5 @@ export function createProxy<T extends ProxyTarget>(target: T) {
       return false;
     },
   });
+  return proxy;
 }

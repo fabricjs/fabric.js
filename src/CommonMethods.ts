@@ -25,30 +25,27 @@ export class CommonMethods<EventSpec>
    * A hook that runs from the `get` and `set` traps of {@link Proxy},
    * allowing to return a different value that will be used instead.
    *
+   * This method is bound to the {@link Proxy} `target`, which means that accessing `this.` will not be trapped by the proxy.
+   * The {@link receiver} (`= proxy`) can be used for that (**caution** is advised in order to avoid triggering an infinite loop).
+   *
    * @param context
-   * @param target {@link Reflect} target
+   * @param receiver {@link Reflect} receiver (the proxy)
    */
   protected transformValue<K extends keyof this>(
     context: TransformValueContext<K, this[K]>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    target: this
+    receiver: this
   ) {
     return context.operation === 'set' ? context.newValue : context.value;
   }
 
   /**
-   * A hook that runs after a change has been made to instance
-   * It is a good place to run side effects
-   * Allows to revert the operation by returning `false`
+   * A hook that runs **after** a change has been made to instance from the `set` and `deleteProperty` traps of {@link Proxy}.
+   * It is a good place to run side effects.
+   * Allows to revert the operation by returning `false`.
    *
-   * ---
-   *
-   * **IMPORTANT**
-   *
-   * Setting the value of `key` in this block will result in an infinite loop.\
-   * To do so use {@link Reflect} or {@link Object}
-   *
-   * ---
+   * This method is bound to the {@link Proxy} `target`, which means that accessing `this.` will not be trapped by the proxy.
+   * The {@link receiver} (`= proxy`) can be used for that (**caution** is advised in order to avoid triggering an infinite loop).
    *
    * @todo
    * **Migration Path**
@@ -58,14 +55,14 @@ export class CommonMethods<EventSpec>
    * - Use {@link transformValue} when needed
    *
    * @param context
-   * @param target {@link Reflect} target
+   * @param receiver {@link Reflect} receiver (the proxy)
    * @returns true if the change should be accepted and `false` to revert the `set` operation
    */
   protected onChange<K extends keyof this>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: ChangeContext<K, this[K]>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    target: this
+    receiver: this
   ): boolean {
     return true;
   }

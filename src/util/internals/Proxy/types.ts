@@ -24,9 +24,9 @@ export interface ProxyTarget {
   transformValue?: <K extends keyof this, V extends this[K]>(
     context: TransformValueContext<K, V>,
     /**
-     * {@link Reflect} target
+     * {@link Reflect} receiver
      */
-    target: this
+    receiver: this
   ) => V;
 
   /**
@@ -35,8 +35,8 @@ export interface ProxyTarget {
   onChange?: <K extends keyof this, V extends this[K]>(
     context: ChangeContext<K, V>,
     /**
-     * {@link Reflect} target
+     * {@link Reflect} receiver
      */
-    target: this
+    receiver: this
   ) => boolean;
 }

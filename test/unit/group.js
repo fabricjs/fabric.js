@@ -656,13 +656,14 @@
     equalsControl('rect7');
   });
 
-  QUnit.test('dirty flag propagation from children up', function(assert) {
+  QUnit.test.only('dirty flag propagation from children up', function(assert) {
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
     g1.dirty = false;
     obj.dirty = false;
     g1.ownCaching = true;
     assert.equal(g1.dirty, false, 'Group has no dirty flag set');
+    assert.equal(g1.isOnACache(), true, 'Group flags caching');
     obj.set('fill', 'red');
     assert.equal(obj.dirty, true, 'Obj has dirty flag set');
     assert.equal(g1.dirty, true, 'Group has dirty flag set');

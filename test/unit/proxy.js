@@ -32,7 +32,8 @@ QUnit.module('Proxy', () => {
         }, {
             onChange: {
                 enumerable: false,
-                value({ key, value, prevValue }) {
+                value({ key, value, prevValue }, receiver) {
+                    assert.equal(receiver, proxy, 'same ref');
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }
@@ -92,7 +93,8 @@ QUnit.module('Proxy', () => {
         }, {
             onChange: {
                 enumerable: false,
-                value({ key, value, prevValue }) {
+                value({ key, value, prevValue }, receiver) {
+                    assert.equal(receiver, proxy, 'same ref');
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }
@@ -135,11 +137,26 @@ QUnit.module('Proxy', () => {
         const proxy = createProxy(Object.defineProperties({
             x: 1
         }, {
+            _x: {
+                enumerable: true,
+                configurable: true,
+                writable: false,
+                value: 0
+            },
+            _X: {
+                enumerable: true,
+                configurable: true,
+                writable: false,
+                value: 0
+            },
             transformValue: {
                 enumerable: false,
-                value({ operation, key, newValue, value }) {
+                value({ operation, key, newValue, value }, receiver) {
+                    assert.equal(receiver, proxy, 'same ref');
                     calls.push({ operation, key, newValue, value })
                     if (operation === 'set') {
+                        // setting target prop shouldn't trigger the proxy
+                        this.baz = typeof this.baz === 'number' ? this.baz++ : 0;
                         switch (key) {
                             case 'a':
                                 return newValue + 5;
@@ -152,6 +169,10 @@ QUnit.module('Proxy', () => {
                         switch (key) {
                             case 'x':
                                 return value + 2;
+                            case '_x':
+                                return this.x;
+                            case '_X':
+                                return receiver.x;
                             default:
                                 return value;
                         }
@@ -165,6 +186,8 @@ QUnit.module('Proxy', () => {
         assert.equal(proxy.a, 30, 'transform set value');
         proxy.x = 25;
         assert.equal(proxy.x, 3, 'transform get value, set value blocked');
+        assert.equal(proxy._x, 1, 'get target value');
+        assert.equal(proxy._X, 3, 'get receiver value');
         proxy.foo = 'bar';
         // no change does not invoke the method
         proxy.foo = 'bar';
@@ -184,6 +207,10 @@ QUnit.module('Proxy', () => {
             { operation: 'set', key: 'a', newValue: 25, value: 10 },
             { operation: 'get', key: 'a', newValue: undefined, value: 30 },
             { operation: 'set', key: 'x', newValue: 25, value: 1 },
+            { operation: 'get', key: 'x', newValue: undefined, value: 1 },
+            { operation: 'get', key: '_x', newValue: undefined, value: 0 },
+            { operation: 'get', key: '_X', newValue: undefined, value: 0 },
+            // `onChange` accessing `x` from `receiver`
             { operation: 'get', key: 'x', newValue: undefined, value: 1 },
             { operation: 'set', key: 'foo', newValue: 'bar', value: undefined },
             { operation: 'get', key: 'foo', newValue: undefined, value: 'bar' }
