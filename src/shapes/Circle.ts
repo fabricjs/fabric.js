@@ -106,7 +106,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusX(): number {
-    return this.get('radius') * this.get('scaleX');
+    return this.radius * this.scaleX;
   }
 
   /**
@@ -114,7 +114,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusY(): number {
-    return this.get('radius') * this.get('scaleY');
+    return this.radius * this.scaleY;
   }
 
   /**
