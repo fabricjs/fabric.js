@@ -7,18 +7,18 @@ QUnit.module('Proxy', () => {
             a,
             o,
         };
-        const hybrid = createProxy(target);
-        assert.equal(hybrid.a, a, 'get from target');
-        assert.equal(hybrid.o, o, 'get from target');
-        assert.equal(hybrid.z, undefined, 'doesn\'t exist');
-        assert.deepEqual(Object.keys(hybrid), ['a', 'o']);
-        assert.deepEqual({ ...hybrid }, target);
+        const proxy = createProxy(target);
+        assert.equal(proxy.a, a, 'get from target');
+        assert.equal(proxy.o, o, 'get from target');
+        assert.equal(proxy.z, undefined, 'doesn\'t exist');
+        assert.deepEqual(Object.keys(proxy), ['a', 'o']);
+        assert.deepEqual({ ...proxy }, target);
         // mutate target
         const z = {};
         target.z = z;
         assert.equal(target.z, z, 'set target');
         assert.deepEqual(Object.getOwnPropertyDescriptor(target, 'z'), {
-            value: undefined,
+            value: z,
             writable: true,
             enumerable: true,
             configurable: true
@@ -27,7 +27,7 @@ QUnit.module('Proxy', () => {
     QUnit.test('set trap calls on change', assert => {
         const changes = [];
         let controller = true;
-        const hybrid = createProxy(Object.defineProperties({
+        const proxy = createProxy(Object.defineProperties({
             x: 1
         }, {
             onChange: {
@@ -36,34 +36,38 @@ QUnit.module('Proxy', () => {
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }
+            },
+            bar: {
+                value: 0,
+                enumerable: false,
+                configurable: true,
+                writable: true,
             }
-        }), {
-            z: 3
-        }, keyOrder);
-        hybrid.x = 2;
-        assert.equal(hybrid.x, 2, 'set');
+        }));
+        proxy.x = 2;
+        assert.equal(proxy.x, 2, 'set');
         controller = false;
-        hybrid.x = 3;
-        assert.equal(hybrid.x, 2, 'refused to change');
-        Object.assign(hybrid, { x: 4, y: 5 });
-        Object.assign(hybrid, { y: 5 });
-        assert.deepEqual(hybrid, { x: 2, z: 3 }, 'refused to change, deleted y');
-        assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true }, 'monitoring defined keys');
+        proxy.x = 3;
+        assert.equal(proxy.x, 2, 'refused to change');
+        Object.assign(proxy, { x: 4, y: 5 });
+        Object.assign(proxy, { y: 5 });
+        assert.deepEqual(proxy, { x: 2 }, 'refused to change, deleted y');
         controller = true;
-        hybrid.x = 3;
-        assert.equal(hybrid.x, 3, 'accepted');
-        assert.deepEqual(Object.assign(hybrid, { x: 4, y: 5 }), { x: 4, y: 5, z: 3 }, 'changed x, y, skipped z');
-        assert.deepEqual(hybrid, { x: 4, y: 5, z: 3 }, 'changed x, y, skipped z');
-        assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true, y: true }, 'monitoring keys');
-        delete hybrid.z;
-        assert.ok(hybrid.__monitor__.z, 'monitoring z');
-        assert.deepEqual(Object.assign(hybrid, { z: 4 }), { x: 4, y: 5, z: 4 }, 'changed');
-        assert.equal(hybrid.z, 4, 'accepted');
-        hybrid.__source__.bar = 1;
-        hybrid.bar = 1; // no on change call
-        hybrid.bar = 2;
+        proxy.x = 3;
+        assert.equal(proxy.x, 3, 'accepted');
+        assert.deepEqual(Object.assign(proxy, { x: 4, y: 5 }), { x: 4, y: 5 }, 'changed x, y');
+        assert.deepEqual(proxy, { x: 4, y: 5 }, 'changed x, y');
+        delete proxy.z;
+        assert.deepEqual(Object.assign(proxy, { z: 4 }), { x: 4, y: 5, z: 4 }, 'changed');
+        assert.equal(proxy.z, 4, 'accepted');
+        proxy.bar = 1;
+        assert.equal(proxy.bar, 1, 'accepted bar');
+        controller = false;
+        proxy.bar = 2;
+        assert.equal(proxy.bar, 2, 'accepted bar because it is not enumerable');
+        controller = true;
         // no value change => no side effect
-        hybrid.x = 4;
+        proxy.x = 4;
         Object.assign({ y: 5 });
             
         // check on change calls
@@ -76,16 +80,15 @@ QUnit.module('Proxy', () => {
             { key: 'x', value: 3, prevValue: 2, accepted: true },
             { key: 'x', value: 4, prevValue: 3, accepted: true },
             { key: 'y', value: 5, prevValue: undefined, accepted: true },
-            { key: 'z', value: undefined, prevValue: 3, accepted: true },
             { key: 'z', value: 4, prevValue: undefined, accepted: true },
-            { key: 'bar', value: 2, prevValue: 1, accepted: true }
         ], 'called on change');
     });
     QUnit.test('delete trap calls on change', assert => {
         const changes = [];
         let controller = true;
-        const hybrid = createProxy(Object.defineProperties({
-            x: 1
+        const proxy = createProxy(Object.defineProperties({
+            x: 1,
+            z: 3,
         }, {
             onChange: {
                 enumerable: false,
@@ -93,31 +96,31 @@ QUnit.module('Proxy', () => {
                     changes.push({ key, value, prevValue, accepted: controller });
                     return controller;
                 }
+            },
+            bar: {
+                value: 1,
+                enumerable: false,
+                configurable: true,
+                writable: true,
             }
-        }), {
-            z: 3
-        }, keyOrder);
+        }));
         controller = false;
-        delete hybrid.x;
-        delete hybrid.z;
-        assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true }, 'monitoring defined keys');
+        delete proxy.x;
+        delete proxy.z;
         controller = true;
-        delete hybrid.x;
-        assert.deepEqual(hybrid, { z: 3 }, 'removed x');
-        assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true }, 'monitoring defined keys');
-        delete hybrid.z;
-        assert.deepEqual(hybrid, {}, 'removed z');
-        assert.deepEqual(hybrid.__monitor__, { __monitor__: true, __source__: true, x: true, z: true }, 'monitoring deleted keys');
+        delete proxy.x;
+        assert.deepEqual(proxy, { z: 3 }, 'removed x');
+        delete proxy.z;
+        assert.deepEqual(proxy, {}, 'removed z');
             
         // delete, on change edge cases
         // deleted already
-        delete hybrid.x;
-        delete hybrid.z;
-        // not monitored
-        hybrid.__source__.bar = 1;
-        delete hybrid.bar;
+        delete proxy.x;
+        delete proxy.z;
+        // not enumerable
+        delete proxy.bar;
         // doesn't exist
-        delete hybrid.y;
+        delete proxy.y;
             
         // check on change calls
         assert.deepEqual(changes, [
@@ -125,12 +128,11 @@ QUnit.module('Proxy', () => {
             { key: 'z', value: undefined, prevValue: 3, accepted: false },
             { key: 'x', value: undefined, prevValue: 1, accepted: true },
             { key: 'z', value: undefined, prevValue: 3, accepted: true },
-            { key: 'bar', value: undefined, prevValue: 1, accepted: true }
         ], 'called on change');
     });
     QUnit.test('transform value', assert => {
         const calls = [];
-        const hybrid = createProxy(Object.defineProperties({
+        const proxy = createProxy(Object.defineProperties({
             x: 1
         }, {
             transformValue: {
@@ -156,24 +158,22 @@ QUnit.module('Proxy', () => {
                     }
                 }
             },
-        }), {
-            z: 3
-        }, keyOrder);
-        hybrid.a = 5;
-        assert.equal(hybrid.a, 10, 'transform set value');
-        hybrid.a = 25;
-        assert.equal(hybrid.a, 30, 'transform set value');
-        hybrid.x = 25;
-        assert.equal(hybrid.x, 3, 'transform get value, set value blocked');
-        hybrid.foo = 'bar';
-        assert.equal(hybrid.foo, 'bar', 'transform value');
-        Object.defineProperty(hybrid, 'z', {
+        }));
+        proxy.a = 5;
+        assert.equal(proxy.a, 10, 'transform set value');
+        proxy.a = 25;
+        assert.equal(proxy.a, 30, 'transform set value');
+        proxy.x = 25;
+        assert.equal(proxy.x, 3, 'transform get value, set value blocked');
+        proxy.foo = 'bar';
+        assert.equal(proxy.foo, 'bar', 'transform value');
+        Object.defineProperty(proxy, 'z', {
             value: 0,
             configurable: true,
             enumerable: false,
             writable: true
         });
-        hybrid.z = 1;
+        proxy.z = 1;
         assert.deepEqual(calls, [
             { operation: 'set', key: 'a', newValue: 5, value: undefined },
             { operation: 'get', key: 'a', newValue: undefined, value: 10 },

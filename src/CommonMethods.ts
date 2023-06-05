@@ -6,6 +6,7 @@ import type {
 } from './util/internals';
 import { createProxy } from './util/internals';
 
+// @ts-expect-error ProxyTarget methods should be protected
 export class CommonMethods<EventSpec>
   extends Observable<EventSpec>
   implements ProxyTarget
