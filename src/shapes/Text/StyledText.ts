@@ -8,6 +8,7 @@ import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
 import type { Text } from './Text';
+import { pick } from '../../util';
 
 export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
 
@@ -252,10 +253,7 @@ export abstract class StyledText<
    */
   _getStyleDeclaration(lineIndex: number, charIndex: number) {
     const lineStyle = this.styles && this.styles[lineIndex];
-    if (!lineStyle) {
-      return null;
-    }
-    return lineStyle[charIndex];
+    return lineStyle ? lineStyle[charIndex] : null;
   }
 
   /**
@@ -266,18 +264,11 @@ export abstract class StyledText<
    * @return {Object} style object
    */
   getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const style = this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styleObject: TextStyleDeclaration = {},
-      styleProps = (this.constructor as typeof StyledText)._styleProperties;
-    for (let i = 0; i < styleProps.length; i++) {
-      const prop = styleProps[i];
-      // @ts-expect-error TS complains even when we serve everything on a silver plate.
-      styleObject[prop] =
-        typeof style[prop] === 'undefined'
-          ? this[prop as keyof this]
-          : style[prop];
-    }
-    return styleObject;
+    return {
+      // @ts-expect-error readonly
+      ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
+      ...(this._getStyleDeclaration(lineIndex, charIndex) || {}),
+    };
   }
 
   /**
