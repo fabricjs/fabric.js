@@ -386,17 +386,23 @@ export class Textbox extends IText {
     // layout words
     for (i = 0; i < parts.length; i++) {
       const { graphemes, width, infixWidth } = data[i];
-      lineWidth += infixWidth + width;
-      if (lineWidth - additionalSpace > maxWidth && !lineJustStarted) {
+
+      if (
+        lineWidth + width + infixWidth - additionalSpace > maxWidth &&
+        !lineJustStarted
+      ) {
         graphemeLines.push(currentLine);
         currentLine = [];
-        lineWidth = width;
+        lineWidth = 0;
         lineJustStarted = true;
       }
 
-      if (!lineJustStarted && !splitByGrapheme) {
+      if (!lineJustStarted && infix.length > 0) {
         currentLine.push(infix);
+        lineWidth += infixWidth;
       }
+
+      lineWidth += width;
       currentLine = currentLine.concat(graphemes);
       lineJustStarted = false;
     }
