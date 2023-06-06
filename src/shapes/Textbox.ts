@@ -318,6 +318,8 @@ export class Textbox extends IText {
    * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
+   *
+   * @todo do we need to account for different spacing/offsetting in different languages?
    */
   _wrapLine(
     line: string,
@@ -331,45 +333,64 @@ export class Textbox extends IText {
       parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
       infix = splitByGrapheme ? '' : ' ';
 
-    let lineWidth = 0,
-      currentLine = [],
-      // spaces in different languages?
-      offset = 0,
-      infixWidth = 0,
-      largestWordWidth = 0,
-      lineJustStarted = true;
     // fix a difference between split and graphemeSplit
     if (parts.length === 0) {
       parts.push([]);
     }
-    desiredWidth -= reservedSpace;
+
     // measure words
-    const data = parts.map((part) => {
-      // if using splitByGrapheme words are already in graphemes.
-      const graphemes = splitByGrapheme ? part : this.graphemeSplit(part);
-      const width = this._measureWord(graphemes, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += graphemes.length + infix.length;
-      return { graphemes, width };
-    });
+    const { data, largestWordWidth } = parts.reduce(
+      ({ data, offset, largestWordWidth }, part, index) => {
+        // first measure the infix, should we account for different spaces for different languages?
+        let infixWidth = 0;
+        if (index > 0 && infix.length > 0) {
+          // measure infix
+          infixWidth = this._measureWord(infix, lineIndex, offset);
+          // move cursor after the infix
+          offset += infix.length;
+        }
+        // split words if necessary
+        const graphemes = !splitByGrapheme ? this.graphemeSplit(part) : part;
+        // measure
+        const width = this._measureWord(graphemes, lineIndex, offset);
+        data.push({ graphemes, offset, width, infixWidth });
+        return {
+          offset: offset + graphemes.length,
+          data,
+          largestWordWidth: Math.max(width, largestWordWidth),
+        };
+      },
+      {
+        offset: 0,
+        data: [] as {
+          graphemes: string | string[];
+          offset: number;
+          width: number;
+          infixWidth: number;
+        },
+        largestWordWidth: 0,
+      }
+    );
 
     const maxWidth = Math.max(
-      desiredWidth,
+      desiredWidth - reservedSpace,
       largestWordWidth,
       this.dynamicMinWidth
     );
-    // layout words
-    offset = 0;
-    let i;
-    for (i = 0; i < parts.length; i++) {
-      const { graphemes, width: wordWidth } = data[i];
-      offset += graphemes.length;
 
-      lineWidth += infixWidth + wordWidth;
+    let lineWidth = 0,
+      currentLine = [],
+      lineJustStarted = true,
+      i;
+
+    // layout words
+    for (i = 0; i < parts.length; i++) {
+      const { graphemes, width, infixWidth } = data[i];
+      lineWidth += infixWidth + width;
       if (lineWidth - additionalSpace > maxWidth && !lineJustStarted) {
         graphemeLines.push(currentLine);
         currentLine = [];
-        lineWidth = wordWidth;
+        lineWidth = width;
         lineJustStarted = true;
       }
 
@@ -377,8 +398,6 @@ export class Textbox extends IText {
         currentLine.push(infix);
       }
       currentLine = currentLine.concat(graphemes);
-      infixWidth = this._measureWord(infix, lineIndex, offset);
-      offset += infix.length;
       lineJustStarted = false;
     }
 
