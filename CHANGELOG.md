@@ -2,6 +2,8 @@
 
 ## [next]
 
+- patch(): Text styles [#8987](https://github.com/fabricjs/fabric.js/pull/8987)
+
 ## [6.0.0-beta8]
 
 - BREAKING fix(IText): detect cursor from proper offsets, remove getLocalPointer from IText class [#8972](https://github.com/fabricjs/fabric.js/pull/8972)
