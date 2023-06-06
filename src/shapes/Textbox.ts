@@ -278,7 +278,11 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(
+    word: string | string[],
+    lineIndex: number,
+    charOffset = 0
+  ): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
@@ -360,29 +364,23 @@ export class Textbox extends IText {
     offset = 0;
     let i;
     for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
+      const { word, width: wordWidth } = data[i];
       offset += word.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
+      lineWidth += infixWidth + wordWidth;
+      if (lineWidth - additionalSpace > maxWidth && !lineJustStarted) {
         graphemeLines.push(line);
         line = [];
         lineWidth = wordWidth;
         lineJustStarted = true;
-      } else {
-        lineWidth += additionalSpace;
       }
 
       if (!lineJustStarted && !splitByGrapheme) {
         line.push(infix);
       }
       line = line.concat(word);
-
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
-      offset++;
+      infixWidth = this._measureWord(infix, lineIndex, offset);
+      offset += infix.length;
       lineJustStarted = false;
     }
 
