@@ -256,8 +256,8 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
+  _wrapText(lines: Array<any>, desiredWidth: number) {
+    const wrapped: string[][] = [];
     this.isWrapping = true;
     for (let i = 0; i < lines.length; i++) {
       wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
@@ -320,39 +320,37 @@ export class Textbox extends IText {
    * to.
    */
   _wrapLine(
-    _line,
+    line: string,
     lineIndex: number,
     desiredWidth: number,
     reservedSpace = 0
-  ): Array<any> {
+  ) {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplit(_line)
-        : this.wordSplit(_line),
+      graphemeLines = [] as string[][],
+      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
-      line = [],
+      currentLine = [],
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
       largestWordWidth = 0,
       lineJustStarted = true;
     // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
+    if (parts.length === 0) {
+      parts.push([]);
     }
     desiredWidth -= reservedSpace;
     // measure words
-    const data = words.map((word) => {
+    const data = parts.map((part) => {
       // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplit(word);
-      const width = this._measureWord(word, lineIndex, offset);
+      const graphemes = splitByGrapheme ? part : this.graphemeSplit(part);
+      const width = this._measureWord(graphemes, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + infix.length;
-      return { word, width };
+      offset += graphemes.length + infix.length;
+      return { graphemes, width };
     });
 
     const maxWidth = Math.max(
@@ -363,28 +361,28 @@ export class Textbox extends IText {
     // layout words
     offset = 0;
     let i;
-    for (i = 0; i < words.length; i++) {
-      const { word, width: wordWidth } = data[i];
-      offset += word.length;
+    for (i = 0; i < parts.length; i++) {
+      const { graphemes, width: wordWidth } = data[i];
+      offset += graphemes.length;
 
       lineWidth += infixWidth + wordWidth;
       if (lineWidth - additionalSpace > maxWidth && !lineJustStarted) {
-        graphemeLines.push(line);
-        line = [];
+        graphemeLines.push(currentLine);
+        currentLine = [];
         lineWidth = wordWidth;
         lineJustStarted = true;
       }
 
       if (!lineJustStarted && !splitByGrapheme) {
-        line.push(infix);
+        currentLine.push(infix);
       }
-      line = line.concat(word);
+      currentLine = currentLine.concat(graphemes);
       infixWidth = this._measureWord(infix, lineIndex, offset);
       offset += infix.length;
       lineJustStarted = false;
     }
 
-    i && graphemeLines.push(line);
+    i && graphemeLines.push(currentLine);
 
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
