@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Textbox): `splitByGrapheme` measurements [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
+- patch(Text): styles es6 minor patch [#8988](https://github.com/fabricjs/fabric.js/pull/8988)
 
 ## [6.0.0-beta8]
 
