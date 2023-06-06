@@ -347,7 +347,7 @@ export class Textbox extends IText {
       word = splitByGrapheme ? word : this.graphemeSplit(word);
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
+      offset += word.length + Number(!splitByGrapheme);
       return { word: word, width: width };
     });
 
