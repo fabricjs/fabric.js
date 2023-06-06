@@ -268,7 +268,7 @@ export abstract class StyledText<
       // @ts-expect-error readonly
       ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
       ...(this._getStyleDeclaration(lineIndex, charIndex) || {}),
-    };
+    } as TextStyleDeclaration;
   }
 
   /**
