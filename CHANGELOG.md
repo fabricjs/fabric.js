@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): `splitByGrapheme` measurements [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
 ## [6.0.0-beta8]
 
 - BREAKING fix(IText): detect cursor from proper offsets, remove getLocalPointer from IText class [#8972](https://github.com/fabricjs/fabric.js/pull/8972)
