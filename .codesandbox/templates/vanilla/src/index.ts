@@ -9,9 +9,25 @@ canvas.setDimensions({
   width: 500,
   height: 500,
 });
-const text = new fabric.Text('fabric.js sandbox', {
+const textValue = 'fabric.js sandbox';
+const text = new fabric.Textbox(textValue, {
   originX: 'center',
+  splitByGrapheme: true,
+  width: 200,
   top: 20,
+  styles: fabric.util.stylesFromArray(
+    [
+      {
+        style: {
+          fontWeight: 'bold',
+          fontSize: 64,
+        },
+        start: 0,
+        end: 9,
+      },
+    ],
+    textValue
+  ),
 });
 canvas.add(text);
 canvas.centerObjectH(text);
@@ -28,4 +44,4 @@ function animate(toState) {
     }
   );
 }
-animate(1);
+// animate(1);
