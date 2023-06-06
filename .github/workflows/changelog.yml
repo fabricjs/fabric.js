@@ -62,7 +62,7 @@ jobs:
             const insertAt = content.indexOf('\n') + 1;
             content =
                 content.slice(0, insertAt) +
-                `\n## ${title}\n\n\n` +
+                `\n## ${title}\n\n\n\n` +
                 content.slice(insertAt);
             }
 
