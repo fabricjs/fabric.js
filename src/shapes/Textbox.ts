@@ -350,7 +350,10 @@ export class Textbox extends IText {
           offset += infix.length;
         }
         // split words if necessary
-        const graphemes = !splitByGrapheme ? this.graphemeSplit(part) : part;
+        const graphemes = !splitByGrapheme
+          ? this.graphemeSplit(part)
+          : // we must use concat for compatibility
+            [].concat(part);
         // measure
         const width = this._measureWord(graphemes, lineIndex, offset);
         data.push({ graphemes, offset, width, infixWidth });
@@ -379,29 +382,26 @@ export class Textbox extends IText {
     );
 
     let lineWidth = 0,
-      currentLine = [],
+      currentLine: string[] = [],
       i;
 
     // layout words
     for (i = 0; i < parts.length; i++) {
       const { graphemes, width, infixWidth } = data[i];
-
-      if (
-        lineWidth + width + infixWidth - additionalSpace > maxWidth &&
-        i > 0
-      ) {
+      // i === 0 => infixWidth === 0
+      const lineWidthAfter = lineWidth + infixWidth + width;
+      if (lineWidthAfter - additionalSpace > maxWidth && i > 0) {
         // push a new line
         graphemeLines.push(currentLine);
-        currentLine = [];
-        lineWidth = 0;
-      } else if (i > 0 && infix.length > 0) {
-        // push an infix
-        currentLine.push(infix);
-        lineWidth += infixWidth;
+        currentLine = [...graphemes];
+        lineWidth = width;
+      } else {
+        // push an infix if necessary
+        i > 0 && infix.length > 0 && currentLine.push(infix);
+        // push graphemes
+        currentLine.push(...graphemes);
+        lineWidth = lineWidthAfter;
       }
-
-      lineWidth += width;
-      currentLine = currentLine.concat(graphemes);
     }
 
     i && graphemeLines.push(currentLine);
