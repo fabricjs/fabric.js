@@ -310,6 +310,57 @@ export class Textbox extends IText {
     return value.split(this._wordJoiners);
   }
 
+  measureLineForWrapping(line: string, lineIndex: number) {
+    const splitByGrapheme = this.splitByGrapheme,
+      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
+      INFIX = splitByGrapheme ? '' : ' ';
+
+    if (parts.length === 0) {
+      return null;
+    }
+
+    // measure words
+    const { data, largestWordWidth } = parts.reduce(
+      ({ data, offset, largestWordWidth }, part, index) => {
+        let infixWidth = 0;
+        let infix = '';
+        if (index > 0 && INFIX.length > 0) {
+          infix = INFIX;
+          // measure infix
+          infixWidth = this._measureWord(infix, lineIndex, offset);
+          // move cursor after the infix
+          offset += infix.length;
+        }
+        // split words if necessary
+        const graphemes = !splitByGrapheme
+          ? this.graphemeSplit(part)
+          : // we must use concat for compatibility
+            [].concat(part);
+        // measure
+        const width = this._measureWord(graphemes, lineIndex, offset);
+        data.push({ graphemes, offset, width, infix, infixWidth });
+        return {
+          offset: offset + graphemes.length,
+          data,
+          largestWordWidth: Math.max(width, largestWordWidth),
+        };
+      },
+      {
+        offset: 0,
+        data: [] as {
+          graphemes: string[];
+          offset: number;
+          width: number;
+          infix: string;
+          infixWidth: number;
+        }[],
+        largestWordWidth: 0,
+      }
+    );
+
+    return { data, largestWordWidth };
+  }
+
   /**
    * Wraps a line of text using the width of the Textbox and a context.
    * @param {Array} line The grapheme array that represent the line
@@ -327,52 +378,15 @@ export class Textbox extends IText {
     desiredWidth: number,
     reservedSpace = 0
   ) {
-    const additionalSpace = this._getWidthOfCharSpacing(),
-      splitByGrapheme = this.splitByGrapheme,
-      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
-      infix = splitByGrapheme ? '' : ' ';
+    const measurements = this.measureLineForWrapping(line, lineIndex);
 
     // fix a difference between split and graphemeSplit
-    if (parts.length === 0) {
+    if (!measurements) {
       return [[]];
     }
 
-    // measure words
-    const { data, largestWordWidth } = parts.reduce(
-      ({ data, offset, largestWordWidth }, part, index) => {
-        // first measure the infix, should we account for different spaces for different languages?
-        let infixWidth = 0;
-        if (index > 0 && infix.length > 0) {
-          // measure infix
-          infixWidth = this._measureWord(infix, lineIndex, offset);
-          // move cursor after the infix
-          offset += infix.length;
-        }
-        // split words if necessary
-        const graphemes = !splitByGrapheme
-          ? this.graphemeSplit(part)
-          : // we must use concat for compatibility
-            [].concat(part);
-        // measure
-        const width = this._measureWord(graphemes, lineIndex, offset);
-        data.push({ graphemes, offset, width, infixWidth });
-        return {
-          offset: offset + graphemes.length,
-          data,
-          largestWordWidth: Math.max(width, largestWordWidth),
-        };
-      },
-      {
-        offset: 0,
-        data: [] as {
-          graphemes: string | string[];
-          offset: number;
-          width: number;
-          infixWidth: number;
-        }[],
-        largestWordWidth: 0,
-      }
-    );
+    const { data, largestWordWidth } = measurements;
+    const additionalSpace = this._getWidthOfCharSpacing();
 
     const maxWidth = Math.max(
       desiredWidth - reservedSpace,
@@ -386,7 +400,7 @@ export class Textbox extends IText {
 
     // layout words
     return data.reduce(
-      ({ lines, lineWidth }, { graphemes, infixWidth, width }, i) => {
+      ({ lines, lineWidth }, { graphemes, infix, infixWidth, width }, i) => {
         // i === 0 => infixWidth === 0
         const lineWidthAfter = lineWidth + infixWidth + width;
         if (i === 0 || lineWidthAfter - additionalSpace > maxWidth) {
