@@ -335,7 +335,7 @@ export class Textbox extends IText {
 
     // fix a difference between split and graphemeSplit
     if (parts.length === 0) {
-      parts.push([]);
+      return [[]];
     }
 
     // measure words
@@ -370,7 +370,7 @@ export class Textbox extends IText {
           offset: number;
           width: number;
           infixWidth: number;
-        },
+        }[],
         largestWordWidth: 0,
       }
     );
