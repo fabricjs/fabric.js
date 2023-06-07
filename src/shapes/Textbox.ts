@@ -329,7 +329,6 @@ export class Textbox extends IText {
   ) {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [] as string[][],
       parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
       infix = splitByGrapheme ? '' : ' ';
 
@@ -381,35 +380,31 @@ export class Textbox extends IText {
       this.dynamicMinWidth
     );
 
-    let lineWidth = 0,
-      currentLine: string[] = [],
-      i;
-
-    // layout words
-    for (i = 0; i < parts.length; i++) {
-      const { graphemes, width, infixWidth } = data[i];
-      // i === 0 => infixWidth === 0
-      const lineWidthAfter = lineWidth + infixWidth + width;
-      if (lineWidthAfter - additionalSpace > maxWidth && i > 0) {
-        // push a new line
-        graphemeLines.push(currentLine);
-        currentLine = [...graphemes];
-        lineWidth = width;
-      } else {
-        // push an infix if necessary
-        i > 0 && infix.length > 0 && currentLine.push(infix);
-        // push graphemes
-        currentLine.push(...graphemes);
-        lineWidth = lineWidthAfter;
-      }
-    }
-
-    i && graphemeLines.push(currentLine);
-
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
     }
-    return graphemeLines;
+
+    // layout words
+    return data.reduce(
+      ({ lines, lineWidth }, { graphemes, infixWidth, width }, i) => {
+        // i === 0 => infixWidth === 0
+        const lineWidthAfter = lineWidth + infixWidth + width;
+        if (i === 0 || lineWidthAfter - additionalSpace > maxWidth) {
+          // push a new line
+          lines.push([...graphemes]);
+          lineWidth = width;
+        } else {
+          const currentLine = lines[lines.length - 1];
+          // push an infix if necessary
+          i > 0 && infix.length > 0 && currentLine.push(infix);
+          // push graphemes
+          currentLine.push(...graphemes);
+          lineWidth = lineWidthAfter;
+        }
+        return { lines, lineWidth };
+      },
+      { lines: [] as string[][], lineWidth: 0 }
+    ).lines;
   }
 
   /**
