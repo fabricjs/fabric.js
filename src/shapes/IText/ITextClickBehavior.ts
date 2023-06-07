@@ -131,7 +131,12 @@ export abstract class ITextClickBehavior<
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
+    if (
+      !this.canvas ||
+      !this.editable ||
+      notALeftClick(e as MouseEvent) ||
+      this.__corner
+    ) {
       return;
     }
 

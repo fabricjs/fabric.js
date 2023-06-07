@@ -404,6 +404,10 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
+    if (this.__corner) {
+      return;
+    }
+
     const el = this.hiddenTextarea!;
     // regain focus
     getDocumentFromElement(el).activeElement !== el && el.focus();
