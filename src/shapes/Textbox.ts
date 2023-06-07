@@ -380,7 +380,6 @@ export class Textbox extends IText {
 
     let lineWidth = 0,
       currentLine = [],
-      lineJustStarted = true,
       i;
 
     // layout words
@@ -389,22 +388,20 @@ export class Textbox extends IText {
 
       if (
         lineWidth + width + infixWidth - additionalSpace > maxWidth &&
-        !lineJustStarted
+        i > 0
       ) {
+        // push a new line
         graphemeLines.push(currentLine);
         currentLine = [];
         lineWidth = 0;
-        lineJustStarted = true;
-      }
-
-      if (!lineJustStarted && infix.length > 0) {
+      } else if (i > 0 && infix.length > 0) {
+        // push an infix
         currentLine.push(infix);
         lineWidth += infixWidth;
       }
 
       lineWidth += width;
       currentLine = currentLine.concat(graphemes);
-      lineJustStarted = false;
     }
 
     i && graphemeLines.push(currentLine);
