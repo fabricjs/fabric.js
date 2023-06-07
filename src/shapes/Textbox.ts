@@ -318,16 +318,15 @@ export class Textbox extends IText {
       return null;
     }
 
-    // measure words
     const { data, minWidth } = parts.reduce(
       ({ data, offset, minWidth }, part, index) => {
         let infixWidth = 0;
         let infix: string | null = null;
         if (index > 0 && !splitByGrapheme) {
           infix = ' ';
-          // measure infix
+          // measure infix at offset to respect styling etc.
           infixWidth = this._measureWord(infix, lineIndex, offset);
-          // move cursor after the infix
+          // move cursor after infix
           offset += infix.length;
         }
         // split words if necessary
@@ -400,19 +399,19 @@ export class Textbox extends IText {
       this.dynamicMinWidth = minWidth - additionalSpace + reservedSpace;
     }
 
-    // layout words
+    // layout
     return data.reduce(
       ({ lines, lineWidth }, { graphemes, infix, infixWidth, width }, i) => {
-        // i === 0 => infixWidth === 0
+        // `i === 0` => `infixWidth === 0`
         const lineWidthAfter = lineWidth + infixWidth + width;
         if (i === 0 || lineWidthAfter - additionalSpace > maxWidth) {
-          // push a new line
+          // push a new line, we spread to protect `data` from mutation
           lines.push([...graphemes]);
           lineWidth = width;
         } else {
           const currentLine = lines[lines.length - 1];
-          // push an infix if necessary
-          i > 0 && infix && currentLine.push(infix);
+          // push infix if necessary, `i === 0 || splitByGrapheme` => `infix === null`
+          infix && currentLine.push(infix);
           // push graphemes
           currentLine.push(...graphemes);
           lineWidth = lineWidthAfter;
