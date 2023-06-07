@@ -256,7 +256,7 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: Array<any>, desiredWidth: number) {
+  _wrapText(lines: string[], desiredWidth: number) {
     const wrapped: string[][] = [];
     this.isWrapping = true;
     for (let i = 0; i < lines.length; i++) {
@@ -350,6 +350,9 @@ export class Textbox extends IText {
           graphemes: string[];
           offset: number;
           width: number;
+          /**
+           * space to insert before `graphemes`
+           */
           infix: string | null;
           infixWidth: number;
         }[],
