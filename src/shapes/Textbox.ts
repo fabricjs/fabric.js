@@ -312,8 +312,7 @@ export class Textbox extends IText {
 
   measureLineForWrapping(line: string, lineIndex: number) {
     const splitByGrapheme = this.splitByGrapheme,
-      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line),
-      INFIX = splitByGrapheme ? '' : ' ';
+      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line);
 
     if (parts.length === 0) {
       return null;
@@ -323,9 +322,9 @@ export class Textbox extends IText {
     const { data, largestWordWidth } = parts.reduce(
       ({ data, offset, largestWordWidth }, part, index) => {
         let infixWidth = 0;
-        let infix = '';
-        if (index > 0 && INFIX.length > 0) {
-          infix = INFIX;
+        let infix: string | null = null;
+        if (index > 0 && !splitByGrapheme) {
+          infix = ' ';
           // measure infix
           infixWidth = this._measureWord(infix, lineIndex, offset);
           // move cursor after the infix
@@ -351,7 +350,7 @@ export class Textbox extends IText {
           graphemes: string[];
           offset: number;
           width: number;
-          infix: string;
+          infix: string | null;
           infixWidth: number;
         }[],
         largestWordWidth: 0,
@@ -410,7 +409,7 @@ export class Textbox extends IText {
         } else {
           const currentLine = lines[lines.length - 1];
           // push an infix if necessary
-          i > 0 && infix.length > 0 && currentLine.push(infix);
+          i > 0 && infix && currentLine.push(infix);
           // push graphemes
           currentLine.push(...graphemes);
           lineWidth = lineWidthAfter;
