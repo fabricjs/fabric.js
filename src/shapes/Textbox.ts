@@ -311,8 +311,9 @@ export class Textbox extends IText {
   }
 
   measureLineForWrapping(line: string, lineIndex: number) {
-    const splitByGrapheme = this.splitByGrapheme,
-      parts = splitByGrapheme ? this.graphemeSplit(line) : this.wordSplit(line);
+    const parts = this.splitByGrapheme
+      ? this.graphemeSplit(line)
+      : this.wordSplit(line);
 
     if (parts.length === 0) {
       return null;
@@ -322,7 +323,7 @@ export class Textbox extends IText {
       ({ data, offset, minWidth }, part, index) => {
         let infixWidth = 0;
         let infix: string | null = null;
-        if (index > 0 && !splitByGrapheme) {
+        if (index > 0 && !this.splitByGrapheme) {
           infix = ' ';
           // measure infix at offset to respect styling etc.
           infixWidth = this._measureWord(infix, lineIndex, offset);
@@ -330,7 +331,7 @@ export class Textbox extends IText {
           offset += infix.length;
         }
         // split words if necessary
-        const graphemes = !splitByGrapheme
+        const graphemes = !this.splitByGrapheme
           ? this.graphemeSplit(part)
           : // we must use concat for compatibility
             [].concat(part);
