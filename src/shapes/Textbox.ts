@@ -319,8 +319,8 @@ export class Textbox extends IText {
     }
 
     // measure words
-    const { data, largestWordWidth } = parts.reduce(
-      ({ data, offset, largestWordWidth }, part, index) => {
+    const { data, minWidth } = parts.reduce(
+      ({ data, offset, minWidth }, part, index) => {
         let infixWidth = 0;
         let infix: string | null = null;
         if (index > 0 && !splitByGrapheme) {
@@ -341,7 +341,7 @@ export class Textbox extends IText {
         return {
           offset: offset + graphemes.length,
           data,
-          largestWordWidth: Math.max(width, largestWordWidth),
+          minWidth: Math.max(width, minWidth),
         };
       },
       {
@@ -353,11 +353,11 @@ export class Textbox extends IText {
           infix: string | null;
           infixWidth: number;
         }[],
-        largestWordWidth: 0,
+        minWidth: 0,
       }
     );
 
-    return { data, largestWordWidth };
+    return { data, minWidth };
   }
 
   /**
@@ -384,17 +384,17 @@ export class Textbox extends IText {
       return [[]];
     }
 
-    const { data, largestWordWidth } = measurements;
+    const { data, minWidth } = measurements;
     const additionalSpace = this._getWidthOfCharSpacing();
 
     const maxWidth = Math.max(
       desiredWidth - reservedSpace,
-      largestWordWidth,
+      minWidth,
       this.dynamicMinWidth
     );
 
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+    if (minWidth + reservedSpace > this.dynamicMinWidth) {
+      this.dynamicMinWidth = minWidth - additionalSpace + reservedSpace;
     }
 
     // layout words
