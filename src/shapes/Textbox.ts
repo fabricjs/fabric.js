@@ -261,7 +261,7 @@ export class Textbox extends IText {
   _wrapText(lines: string[], desiredWidth: number, reservedSpace = 0) {
     const wrapped: string[][] = [];
     this.isWrapping = true;
-    const { data, minWidth } = this.measureLinesForWrapping(lines);
+    const { lines: data, minWidth } = this.measureLinesForWrapping(lines);
     const additionalSpace = this._getWidthOfCharSpacing();
     const maxWidth = Math.max(
       desiredWidth - reservedSpace,
@@ -273,7 +273,10 @@ export class Textbox extends IText {
     }
     for (let i = 0; i < lines.length; i++) {
       wrapped.push(
-        ...this._wrapLine({ data, minWidth, additionalSpace }, i, maxWidth)
+        ...this._wrapLine(
+          { lines: data, minWidth, maxWidth, additionalSpace },
+          i
+        )
       );
     }
     this.isWrapping = false;
@@ -332,7 +335,7 @@ export class Textbox extends IText {
         : this.wordSplit(line);
 
       if (parts.length === 0) {
-        return { data: [], minWidth: 0 };
+        return { parts: [], minWidth: 0 };
       }
 
       const { data, minWidth } = parts.reduce(
@@ -390,9 +393,9 @@ export class Textbox extends IText {
         }
       );
       min = Math.max(min, minWidth);
-      return { data, minWidth };
+      return { parts: data, minWidth };
     });
-    return { data, minWidth: min };
+    return { lines: data, minWidth: min };
   }
 
   /**
@@ -408,15 +411,16 @@ export class Textbox extends IText {
    */
   _wrapLine(
     {
-      data,
+      lines,
       additionalSpace,
+      maxWidth: desiredWidth,
     }: ReturnType<this['measureLinesForWrapping']> & {
+      maxWidth: number;
       additionalSpace: number;
     },
-    lineIndex: number,
-    desiredWidth: number
+    lineIndex: number
   ) {
-    const { data: lineData } = data[lineIndex];
+    const { parts: lineData } = lines[lineIndex];
 
     // fix a difference between split and graphemeSplit
     if (!lineData.length) {
