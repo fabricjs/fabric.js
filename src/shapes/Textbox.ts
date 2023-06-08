@@ -258,11 +258,23 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: string[], desiredWidth: number) {
+  _wrapText(lines: string[], desiredWidth: number, reservedSpace = 0) {
     const wrapped: string[][] = [];
     this.isWrapping = true;
+    const { data, minWidth } = this.measureLinesForWrapping(lines);
+    const additionalSpace = this._getWidthOfCharSpacing();
+    const maxWidth = Math.max(
+      desiredWidth - reservedSpace,
+      minWidth,
+      this.dynamicMinWidth
+    );
+    if (minWidth + reservedSpace > this.dynamicMinWidth) {
+      this.dynamicMinWidth = minWidth - additionalSpace + reservedSpace;
+    }
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+      wrapped.push(
+        ...this._wrapLine({ data, minWidth, additionalSpace }, i, maxWidth)
+      );
     }
     this.isWrapping = false;
     return wrapped;
@@ -312,71 +324,75 @@ export class Textbox extends IText {
     return value.split(this._wordJoiners);
   }
 
-  measureLineForWrapping(line: string, lineIndex: number) {
-    const parts = this.splitByGrapheme
-      ? this.graphemeSplit(line)
-      : this.wordSplit(line);
+  measureLinesForWrapping(lines: string[]) {
+    let min = 0;
+    const data = lines.map((line, lineIndex) => {
+      const parts = this.splitByGrapheme
+        ? this.graphemeSplit(line)
+        : this.wordSplit(line);
 
-    if (parts.length === 0) {
-      return null;
-    }
-
-    const { data, minWidth } = parts.reduce(
-      ({ data, offset, minWidth }, part, index) => {
-        let infixWidth = 0;
-        let infix: string | null = null;
-        if (index > 0 && !this.splitByGrapheme) {
-          infix = ' ';
-          // measure infix at offset to respect styling etc.
-          infixWidth = this._measureWord(infix, lineIndex, offset).width;
-          // move cursor after infix
-          offset += infix.length;
-        }
-        // split words if necessary
-        const graphemes = !this.splitByGrapheme
-          ? this.graphemeSplit(part)
-          : // we must use concat for compatibility
-            [].concat(part);
-        // measure
-        const {
-          width,
-          height,
-          data: d,
-        } = this._measureWord(graphemes, lineIndex, offset);
-        data.push({
-          graphemes,
-          offset,
-          width,
-          height,
-          data: d,
-          infix,
-          infixWidth,
-        });
-        return {
-          offset: offset + graphemes.length,
-          data,
-          minWidth: Math.max(width, minWidth),
-        };
-      },
-      {
-        offset: 0,
-        data: [] as {
-          graphemes: string[];
-          offset: number;
-          width: number;
-          height: number;
-          data: GraphemeBBox<false>[];
-          /**
-           * space to insert before `graphemes`
-           */
-          infix: string | null;
-          infixWidth: number;
-        }[],
-        minWidth: 0,
+      if (parts.length === 0) {
+        return { data: [], minWidth: 0 };
       }
-    );
 
-    return { data, minWidth };
+      const { data, minWidth } = parts.reduce(
+        ({ data, offset, minWidth }, part, index) => {
+          let infixWidth = 0;
+          let infix: string | null = null;
+          if (index > 0 && !this.splitByGrapheme) {
+            infix = ' ';
+            // measure infix at offset to respect styling etc.
+            infixWidth = this._measureWord(infix, lineIndex, offset).width;
+            // move cursor after infix
+            offset += infix.length;
+          }
+          // split words if necessary
+          const graphemes = !this.splitByGrapheme
+            ? this.graphemeSplit(part)
+            : // we must use concat for compatibility
+              [].concat(part);
+          // measure
+          const {
+            width,
+            height,
+            data: d,
+          } = this._measureWord(graphemes, lineIndex, offset);
+          data.push({
+            graphemes,
+            offset,
+            width,
+            height,
+            data: d,
+            infix,
+            infixWidth,
+          });
+          return {
+            offset: offset + graphemes.length,
+            data,
+            minWidth: Math.max(width, minWidth),
+          };
+        },
+        {
+          offset: 0,
+          data: [] as {
+            graphemes: string[];
+            offset: number;
+            width: number;
+            height: number;
+            data: GraphemeBBox<false>[];
+            /**
+             * space to insert before `graphemes`
+             */
+            infix: string | null;
+            infixWidth: number;
+          }[],
+          minWidth: 0,
+        }
+      );
+      min = Math.max(min, minWidth);
+      return { data, minWidth };
+    });
+    return { data, minWidth: min };
   }
 
   /**
@@ -391,37 +407,28 @@ export class Textbox extends IText {
    * @todo do we need to account for different spacing/offsetting in different languages?
    */
   _wrapLine(
-    line: string,
+    {
+      data,
+      additionalSpace,
+    }: ReturnType<this['measureLinesForWrapping']> & {
+      additionalSpace: number;
+    },
     lineIndex: number,
-    desiredWidth: number,
-    reservedSpace = 0
+    desiredWidth: number
   ) {
-    const measurements = this.measureLineForWrapping(line, lineIndex);
+    const { data: lineData } = data[lineIndex];
 
     // fix a difference between split and graphemeSplit
-    if (!measurements) {
+    if (!lineData.length) {
       return [[]];
     }
 
-    const { data, minWidth } = measurements;
-    const additionalSpace = this._getWidthOfCharSpacing();
-
-    const maxWidth = Math.max(
-      desiredWidth - reservedSpace,
-      minWidth,
-      this.dynamicMinWidth
-    );
-
-    if (minWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = minWidth - additionalSpace + reservedSpace;
-    }
-
     // layout
-    return data.reduce(
+    return lineData.reduce(
       ({ lines, lineWidth }, { graphemes, infix, infixWidth, width }, i) => {
         // `i === 0` => `infixWidth === 0`
         const lineWidthAfter = lineWidth + infixWidth + width;
-        if (i === 0 || lineWidthAfter - additionalSpace > maxWidth) {
+        if (i === 0 || lineWidthAfter - additionalSpace > desiredWidth) {
           // push a new line, we spread to protect `data` from mutation
           lines.push([...graphemes]);
           lineWidth = width;
