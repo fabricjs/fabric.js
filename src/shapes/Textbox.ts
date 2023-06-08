@@ -276,28 +276,28 @@ export class Textbox extends IText {
    * @param {String} text
    * @param {number} lineIndex
    * @param {number} charOffset
-   * @returns {number}
    */
-  _measureWord(
-    word: string | string[],
-    lineIndex: number,
-    charOffset = 0
-  ): number {
+  _measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
     let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
+      height = 0;
+    const data: GraphemeBBox<false>[] = [];
+    for (let i = 0, prevGrapheme: string | undefined; i < word.length; i++) {
       const box = this._getGraphemeBox(
         word[i],
         lineIndex,
         i + charOffset,
         prevGrapheme,
-        skipLeft
+        true
       );
+      // TODO: support vertical text
       width += box.kernedWidth;
+      height = Math.max(height, box.height);
+
+      data.push(box);
       prevGrapheme = word[i];
     }
-    return width;
+
+    return { width, height, data };
   }
 
   /**
@@ -326,7 +326,7 @@ export class Textbox extends IText {
         if (index > 0 && !this.splitByGrapheme) {
           infix = ' ';
           // measure infix at offset to respect styling etc.
-          infixWidth = this._measureWord(infix, lineIndex, offset);
+          infixWidth = this._measureWord(infix, lineIndex, offset).width;
           // move cursor after infix
           offset += infix.length;
         }
@@ -336,8 +336,20 @@ export class Textbox extends IText {
           : // we must use concat for compatibility
             [].concat(part);
         // measure
-        const width = this._measureWord(graphemes, lineIndex, offset);
-        data.push({ graphemes, offset, width, infix, infixWidth });
+        const {
+          width,
+          height,
+          data: d,
+        } = this._measureWord(graphemes, lineIndex, offset);
+        data.push({
+          graphemes,
+          offset,
+          width,
+          height,
+          data: d,
+          infix,
+          infixWidth,
+        });
         return {
           offset: offset + graphemes.length,
           data,
@@ -350,6 +362,8 @@ export class Textbox extends IText {
           graphemes: string[];
           offset: number;
           width: number;
+          height: number;
+          data: GraphemeBBox<false>[];
           /**
            * space to insert before `graphemes`
            */
