@@ -7,7 +7,7 @@ import type {
   TWebGLPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { WebGLFilterBackend } from './WebGLFilterBackend';
+import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blendImage';
 
@@ -74,7 +74,7 @@ export class BlendImage extends BaseFilter {
   applyToWebGL(options: TWebGLPipelineState) {
     const gl = options.context,
       texture = this.createTexture(options.filterBackend, this.image);
-    this.bindAdditionalTexture(gl, texture, gl.TEXTURE1);
+    this.bindAdditionalTexture(gl, texture!, gl.TEXTURE1);
     super.applyToWebGL(options);
     this.unbindAdditionalTexture(gl, gl.TEXTURE1);
   }
@@ -215,11 +215,12 @@ export class BlendImage extends BaseFilter {
    * @returns {Promise<BlendImage>}
    */
   static fromObject(
-    object: Record<string, any>,
+    { type, image, ...filterOptions }: Record<string, any>,
     options: { signal: AbortSignal }
   ) {
-    return Image.fromObject(object.image, options).then(
-      (image) => new BlendImage({ ...object, image })
+    return Image.fromObject(image, options).then(
+      (enlivedImage) =>
+        new this({ ...filterOptions, image: enlivedImage }) as BaseFilter
     );
   }
 }

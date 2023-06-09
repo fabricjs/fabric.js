@@ -2,26 +2,43 @@ import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import { IPoint, Point } from '../Point';
-import { TClassProperties } from '../typedefs';
+import type { XY } from '../Point';
+import { Point } from '../Point';
+import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TProps,
+} from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER, LEFT, TOP } from '../constants';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
 };
 
-export class Polyline extends FabricObject {
+export interface SerializedPolylineProps extends SerializedObjectProps {
+  points: XY[];
+}
+
+export class Polyline<
+  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedPolylineProps = SerializedPolylineProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Points array
    * @type Array
    * @default
    */
-  declare points: IPoint[];
+  declare points: XY[];
 
   /**
    * WARNING: Feature in progress
@@ -59,8 +76,6 @@ export class Polyline extends FabricObject {
     'points',
   ];
 
-  declare fromSVG: boolean;
-
   declare pathOffset: Point;
 
   declare strokeOffset: Point;
@@ -86,12 +101,13 @@ export class Polyline extends FabricObject {
    *   top: 100
    * });
    */
-  constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
+  constructor(points: XY[] = [], options: Props = {} as Props) {
     super({ points, ...options });
+    const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   protected isOpen() {
@@ -130,18 +146,24 @@ export class Polyline extends FabricObject {
       offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
     const pathOffsetY =
       offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
-    // TODO: remove next line
-    const legacyCorrection =
-      !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
-      left: bbox.left - legacyCorrection,
-      top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
         new Point(bbox.left, bbox.top)
       ),
     };
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = makeBoundingBoxFromPoints(this.points);
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   setDimensions() {
@@ -153,7 +175,11 @@ export class Polyline extends FabricObject {
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset });
     adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+      this.setPositionByOrigin(
+        new Point(left + width / 2, top + height / 2),
+        CENTER,
+        CENTER
+      );
   }
 
   /**
@@ -213,10 +239,13 @@ export class Polyline extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject(propertiesToInclude?: string[]): object {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      points: this.points.concat(),
+      points: cloneDeep(this.points),
     };
   }
 
@@ -293,17 +322,9 @@ export class Polyline extends FabricObject {
    * @static
    * @memberOf Polyline
    * @param {SVGElement} element Element to parser
-   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (poly: Polyline | null) => any,
-    options?: any
-  ) {
-    if (!element) {
-      return callback(null);
-    }
+  static async fromElement(element: SVGElement, options?: any) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -311,13 +332,10 @@ export class Polyline extends FabricObject {
         element,
         this.ATTRIBUTE_NAMES
       );
-    callback(
-      new this(points || [], {
-        ...parsedAttributes,
-        ...options,
-        fromSVG: true,
-      })
-    );
+    return new this(points || [], {
+      ...parsedAttributes,
+      ...options,
+    });
   }
 
   /* _FROM_SVG_END_ */
@@ -329,8 +347,8 @@ export class Polyline extends FabricObject {
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject(object: Record<string, unknown>) {
-    return this._fromObject(object, {
+  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
+    return this._fromObject<Polyline>(object, {
       extraParam: 'points',
     });
   }

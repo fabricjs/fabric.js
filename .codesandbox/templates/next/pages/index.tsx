@@ -9,26 +9,27 @@ const IndexPage: NextPage = () => {
       width: window.innerWidth,
       height: 500,
     });
-    const text = new fabric.Text('fabric.js sandbox', {
+    const textValue = 'fabric.js sandbox';
+    const text = new fabric.Textbox(textValue, {
       originX: 'center',
       top: 20,
+      textAlign: 'center',
+      styles: fabric.util.stylesFromArray(
+        [
+          {
+            style: {
+              fontWeight: 'bold',
+              fontSize: 64,
+            },
+            start: 0,
+            end: 9,
+          },
+        ],
+        textValue
+      ),
     });
     canvas.add(text);
     canvas.centerObjectH(text);
-    function animate(toState: 0 | 1) {
-      text.animate(
-        { scaleX: Math.max(toState, 0.1) * 2 },
-        {
-          onChange: () => canvas.renderAll(),
-          onComplete: () => animate(Number(!toState) as 0 | 1),
-          duration: 1000,
-          easing: toState
-            ? fabric.util.ease.easeInOutQuad
-            : fabric.util.ease.easeInOutSine,
-        }
-      );
-    }
-    animate(1);
   }, []);
 
   return (

@@ -1,4 +1,4 @@
-import {
+import type {
   TPointerEvent,
   Transform,
   TransformAction,
@@ -7,12 +7,13 @@ import {
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TOriginX, TOriginY } from '../typedefs';
+import type { TOriginX, TOriginY } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
+import { CENTER } from '../constants';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -41,7 +42,7 @@ export const getActionFromCorner = (
  * @return {Boolean} true if transform is centered
  */
 export function isTransformCentered(transform: Transform) {
-  return transform.originX === 'center' && transform.originY === 'center';
+  return transform.originX === CENTER && transform.originY === CENTER;
 }
 
 export function invertOrigin(origin: TOriginX | TOriginY) {
@@ -104,8 +105,8 @@ function normalizePoint(
       typeof originX !== 'undefined' && typeof originY !== 'undefined'
         ? target.translateToGivenOrigin(
             center,
-            'center',
-            'center',
+            CENTER,
+            CENTER,
             originX,
             originY
           )

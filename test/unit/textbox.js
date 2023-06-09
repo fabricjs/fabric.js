@@ -101,7 +101,7 @@
     assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
   });
 
-  QUnit.test('toObject', function(assert) {
+  QUnit.test('toObject with styles', function(assert) {
     var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
       width: 120,
       styles: {
@@ -129,6 +129,37 @@
     assert.deepEqual(obj.styles[0].style, TEXTBOX_OBJECT.styles[0].style, 'style properties match at first index');
     assert.deepEqual(obj.styles[1], TEXTBOX_OBJECT.styles[1], 'styles array matches at second index');
     assert.deepEqual(obj.styles[1].style, TEXTBOX_OBJECT.styles[1].style, 'style properties match at second index');
+  });
+
+  QUnit.test('stylesToArray edge case', function (assert) {
+    var textbox = new fabric.Textbox('The quick \nbrown \nfox', {
+      width: 120,
+      styles: {
+        "0": {
+          "5": { fill: "red" },
+          "6": { fill: "red" },
+          "7": { fill: "red" },
+          "8": { fill: "red" },
+          "9": { fill: "red" },
+          "10": { fill: "red" },
+        },
+        "2": {
+          "0": { fill: "red" },
+        }
+      }
+    });
+    assert.deepEqual(textbox.toObject().styles, [
+      {
+        start: 5,
+        end: 10,
+        style: { fill: "red" }
+      },
+      {
+        start: 16,
+        end: 17,
+        style: { fill: "red" }
+      }
+    ], 'stylesToArray output matches');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -273,6 +304,31 @@
     textbox.initDimensions();
     assert.equal(textbox.textLines[0], 'xa', 'first line match expectations spacing 800');
   });
+  QUnit.test('wrapping with splitByGrapheme and styles', function (assert) {
+    const value = 'xaxbxcxdeyaybid'
+    const textbox = new fabric.Textbox(value, {
+      width: 190,
+      splitByGrapheme: true,
+      styles: fabric.util.stylesFromArray(
+        [
+          {
+            style: {
+              fontWeight: 'bold',
+              fontSize: 64,
+            },
+            start: 0,
+            end: 9,
+          },
+        ],
+        value
+      ),
+    });
+    assert.deepEqual(
+      textbox.textLines,
+      ['xaxbx', 'cxdeyay', 'bid'],
+      'lines match splitByGrapheme with styles'
+    );
+  });
   QUnit.test('wrapping with charspacing and splitByGrapheme positive', function(assert) {
     var textbox = new fabric.Textbox('xaxbxcxdeyaybid', {
       width: 190,
@@ -360,21 +416,23 @@
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
     canvas.setActiveObject(text);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasEl = canvas.getElement();
     var eventStub = {
-      clientX: canvasOffset.left + text.width,
-      clientY: canvasOffset.top + text.oCoords.mr.corner.tl.y + 1,
+      clientX: text.width,
+      clientY: text.oCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
+      target: canvas.upperCanvasEl
     };
     var originalWidth = text.width;
     canvas.__onMouseDown(eventStub);
     canvas.__onMouseMove({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
     canvas.__onMouseUp({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mouseup',
@@ -385,21 +443,23 @@
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0, left: 40 });
     canvas.add(text);
     canvas.setActiveObject(text);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasEl = canvas.getElement();
     var eventStub = {
-      clientX: canvasOffset.left + text.left,
-      clientY: canvasOffset.top + text.oCoords.ml.corner.tl.y + 2,
+      clientX: text.left,
+      clientY: text.oCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
+      target: canvas.upperCanvasEl
     };
     var originalWidth = text.width;
     canvas.__onMouseDown(eventStub);
     canvas.__onMouseMove({
+      ...eventStub,
       clientX: eventStub.clientX - 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
     canvas.__onMouseUp({
+      ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mouseup',

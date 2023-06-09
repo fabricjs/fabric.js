@@ -8,7 +8,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
-    "fabric": "*"
+    "fabric": "file:../../.."
   },
   "devDependencies": {
     "nodemon": "^2.0.19",

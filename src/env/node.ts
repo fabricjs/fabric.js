@@ -6,7 +6,7 @@ import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
 import { setEnv } from './index';
-import { TCopyPasteData, TFabricEnv } from './types';
+import type { TCopyPasteData, TFabricEnv } from './types';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
 
@@ -32,23 +32,25 @@ export const getNodeCanvas = (canvasEl: HTMLCanvasElement) => {
   return (impl._canvas || impl._image) as NodeCanvas;
 };
 
+export const dispose = (element: Element) => {
+  const impl = jsdomImplForWrapper(element);
+  if (impl) {
+    impl._image = null;
+    impl._canvas = null;
+    // unsure if necessary
+    impl._currentSrc = null;
+    impl._attributes = null;
+    impl._classList = null;
+  }
+};
+
 export const getEnv = (): TFabricEnv => {
   return {
     document: JSDOMWindow.document,
     window: JSDOMWindow,
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
-    dispose(element) {
-      const impl = jsdomImplForWrapper(element);
-      if (impl) {
-        impl._image = null;
-        impl._canvas = null;
-        // unsure if necessary
-        impl._currentSrc = null;
-        impl._attributes = null;
-        impl._classList = null;
-      }
-    },
+    dispose,
     copyPasteData,
   };
 };

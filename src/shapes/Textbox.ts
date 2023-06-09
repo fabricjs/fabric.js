@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
-
+import { JUSTIFY } from './Text/constants';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -79,7 +79,7 @@ export class Textbox extends IText {
     if (this.dynamicMinWidth > this.width) {
       this._set('width', this.dynamicMinWidth);
     }
-    if (this.textAlign.indexOf('justify') !== -1) {
+    if (this.textAlign.includes(JUSTIFY)) {
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
@@ -347,8 +347,8 @@ export class Textbox extends IText {
       word = splitByGrapheme ? word : this.graphemeSplit(word);
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word: word, width: width };
+      offset += word.length + infix.length;
+      return { word, width };
     });
 
     const maxWidth = Math.max(

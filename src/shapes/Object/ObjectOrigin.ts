@@ -1,13 +1,14 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
-import { TDegree, TOriginX, TOriginY } from '../../typedefs';
+import type { TDegree, TOriginX, TOriginY } from '../../typedefs';
 import { transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import { BaseProps } from './types/BaseProps';
-import { FillStrokeProps } from './types/FillStrokeProps';
+import type { BaseProps } from './types/BaseProps';
+import type { FillStrokeProps } from './types/FillStrokeProps';
+import { CENTER, LEFT, TOP } from '../../constants';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
@@ -131,8 +132,8 @@ export class ObjectOrigin<EventSpec>
       point,
       originX,
       originY,
-      'center',
-      'center'
+      CENTER,
+      CENTER
     );
     if (this.angle) {
       return p.rotate(degreesToRadians(this.angle), point);
@@ -154,8 +155,8 @@ export class ObjectOrigin<EventSpec>
   ): Point {
     const p = this.translateToGivenOrigin(
       center,
-      'center',
-      'center',
+      CENTER,
+      CENTER,
       originX,
       originY
     );
@@ -230,8 +231,8 @@ export class ObjectOrigin<EventSpec>
 
     const center = this.getRelativeCenterPoint();
 
-    this.originX = 'center';
-    this.originY = 'center';
+    this.originX = CENTER;
+    this.originY = CENTER;
 
     this.left = center.x;
     this.top = center.y;
@@ -269,8 +270,8 @@ export class ObjectOrigin<EventSpec>
   _getLeftTopCoords() {
     return this.translateToOriginPoint(
       this.getRelativeCenterPoint(),
-      'left',
-      'top'
+      LEFT,
+      TOP
     );
   }
 }

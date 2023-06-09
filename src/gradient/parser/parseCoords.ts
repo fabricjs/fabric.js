@@ -1,6 +1,6 @@
 import { isPercent } from '../../parser/percent';
-import { TSize } from '../../typedefs';
-import { GradientCoords, GradientType, GradientUnits } from '../typedefs';
+import type { TSize } from '../../typedefs';
+import type { GradientCoords, GradientType, GradientUnits } from '../typedefs';
 import { parseGradientUnits, parseType } from './misc';
 
 function convertPercentUnitsToValues<

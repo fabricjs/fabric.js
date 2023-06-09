@@ -7,13 +7,13 @@ import type {
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
-import { GLPrecision } from './GLProbes/GLProbe';
+import { isWebGLPipelineState } from './utils';
 import {
   highPsourceCode,
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
+import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
@@ -39,7 +39,7 @@ export class BaseFilter {
    * mainParameter
    * @private
    */
-  declare mainParameter?: keyof this;
+  declare mainParameter?: keyof this | undefined;
 
   /**
    * Constructor
@@ -69,11 +69,13 @@ export class BaseFilter {
     fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
-    const { WebGLProbe } = getEnv();
-    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
+    const {
+      WebGLProbe: { GLPrecision = 'highp' },
+    } = getEnv();
+    if (GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision)
+        highPsourceCode.replace('highp', GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -394,7 +396,10 @@ export class BaseFilter {
     return this.toObject();
   }
 
-  static async fromObject({ type, ...options }: any) {
-    return new this(options);
+  static async fromObject(
+    { type, ...filterOptions }: Record<string, any>,
+    options: Abortable
+  ) {
+    return new this(filterOptions);
   }
 }
