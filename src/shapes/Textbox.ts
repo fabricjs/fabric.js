@@ -276,9 +276,10 @@ export class Textbox extends IText {
     return wrapped;
   }
 
-  /*
+  /**
    * For each line of text terminated by an hard line stop,
-   * measure each word width an
+   * measure each word width and extract the largest word from all.
+   * @param {string[]} lines the lines we need to measure
    */
   measureWords(lines: string[]): WordsWidthData {
     const splitByGrapheme = this.splitByGrapheme,
@@ -356,10 +357,13 @@ export class Textbox extends IText {
   }
 
   /**
-   * Wraps a line of text using the width of the Textbox and a context.
+   * Wraps a line of text using the width of the Textbox as desiredWidth
+   * and leveraging the known width o words from WordsWidthData
+   * @private
    * @param {Array} line The grapheme array that represent the line
    * @param {Number} lineIndex
    * @param {Number} desiredWidth width you want to wrap the line to
+   * @param {WordsWidthData} desiredWidth an object containing all the lines' words width.
    * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
