@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Fix minimum word width calculation [#9004](https://github.com/fabricjs/fabric.js/pull/9004)
 - fix(lib): fix aligning_guideline zoom [#8998](https://github.com/fabricjs/fabric.js/pull/8998)
 - fix(IText): support control interaction in text editing mode [#8995](https://github.com/fabricjs/fabric.js/pull/8995)
 - fix(Textbox): `splitByGrapheme` measurements infix length bug [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
