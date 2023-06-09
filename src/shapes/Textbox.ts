@@ -266,6 +266,7 @@ export class Textbox extends IText {
    */
   _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
     this.isWrapping = true;
+    // extract all the width of all the words to optimally wrap text
     const wordsData = this.measureWords(lines);
     const wrapped = [];
     for (let i = 0; i < lines.length; i++) {
