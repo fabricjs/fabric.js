@@ -303,7 +303,7 @@ export class Textbox extends IText {
       data[i] = words.map((word) => {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
+        const width = this._measureWord(word, i, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + infix.length;
         return { word, width };
