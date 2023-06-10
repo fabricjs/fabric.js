@@ -270,7 +270,9 @@ export class Textbox extends IText {
     const wordsData = this.measureWords(lines);
     const wrapped = [];
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth, wordsData));
+      wrapped.push(
+        ...this._wrapLine(lines[i], i, desiredWidth, wordsData, reservedSpace)
+      );
     }
     this.isWrapping = false;
     return wrapped;
@@ -286,10 +288,10 @@ export class Textbox extends IText {
       data = [],
       infix = splitByGrapheme ? '' : ' ';
 
-    let largestWordWidth = 0,
-      offset = 0;
+    let largestWordWidth = 0;
 
     for (let i = 0; i < lines.length; i++) {
+      let offset = 0;
       const words = splitByGrapheme
         ? this.graphemeSplit(lines[i])
         : this.wordSplit(lines[i]);
