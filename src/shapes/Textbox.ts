@@ -270,9 +270,7 @@ export class Textbox extends IText {
     const wordsData = this.measureWords(lines);
     const wrapped = [];
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(
-        ...this._wrapLine(lines[i], i, desiredWidth, wordsData, reservedSpace)
-      );
+      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth, wordsData));
     }
     this.isWrapping = false;
     return wrapped;
