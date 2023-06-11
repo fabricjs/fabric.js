@@ -447,7 +447,7 @@
       width: 2000,
     });
     const wordsData = textbox.measureWords(['xa xb xc xd xe ya yb id']);
-    var line1 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, wordsData, 0);
+    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     var expected1 =  [
       ['x', 'a', ' ', 'x', 'b'],
       ['x', 'c', ' ', 'x', 'd'],
@@ -455,7 +455,7 @@
       ['y', 'b', ' ', 'i', 'd']];
     assert.deepEqual(line1, expected1, 'line1 match expected');
     assert.deepEqual(textbox.dynamicMinWidth, 40, 'texbox width is 40');
-    var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, wordsData, 50);
+    var line2 = textbox._wrapLine(0, 100, wordsData, 50);
     var expected2 =  [
       ['x', 'a'],
       ['x', 'b'],
@@ -473,10 +473,10 @@
       width: 10,
     });
     const wordsData = textbox.measureWords(['']);
-    var line1 = textbox._wrapLine('', 0, 100, wordsData, 0);
+    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
     textbox.splitByGrapheme = true;
-    var line2 = textbox._wrapLine('', 0, 100, wordsData, 0);
+    var line2 = textbox._wrapLine(0, 100, wordsData, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
   QUnit.test('wrapping respects max line width', function (assert) {

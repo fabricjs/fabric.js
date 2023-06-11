@@ -16,7 +16,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   splitByGrapheme: false,
 };
 
-export type WordsWidthData = {
+export type GraphemeData = {
   wordsData: {
     word: string;
     width: number;
@@ -264,13 +264,13 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
+  _wrapText(lines: string[], desiredWidth: number): string[][] {
     this.isWrapping = true;
-    // extract all the width of all the words to optimally wrap text
-    const wordsData = this.measureWords(lines);
-    const wrapped = [];
+    // extract all thewords and the widths to optimally wrap lines.
+    const wordsData = this.getGraphemeDataForRender(lines);
+    const wrapped: string[][] = [];
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth, wordsData));
+      wrapped.push(...this._wrapLine(i, desiredWidth, wordsData));
     }
     this.isWrapping = false;
     return wrapped;
@@ -279,36 +279,36 @@ export class Textbox extends IText {
   /**
    * For each line of text terminated by an hard line stop,
    * measure each word width and extract the largest word from all.
+   * The returned words here are the one that at the end will be rendered.
    * @param {string[]} lines the lines we need to measure
+   *
    */
-  measureWords(lines: string[]): WordsWidthData {
+  getGraphemeDataForRender(lines: string[]): GraphemeData {
     const splitByGrapheme = this.splitByGrapheme,
-      data = [],
       infix = splitByGrapheme ? '' : ' ';
 
     let largestWordWidth = 0;
 
-    for (let i = 0; i < lines.length; i++) {
+    const data = lines.map((line, lineIndex) => {
       let offset = 0;
       const words = splitByGrapheme
-        ? this.graphemeSplit(lines[i])
-        : this.wordSplit(lines[i]);
+        ? this.graphemeSplit(line)
+        : this.wordSplit(line);
 
       // fix a difference between split and graphemeSplit
       if (words.length === 0) {
         words.push([]);
       }
 
-      // measure words
-      data[i] = words.map((word) => {
+      return words.map((word) => {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, i, offset);
+        const width = this._measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + infix.length;
         return { word, width };
       });
-    }
+    });
 
     return {
       wordsData: data,
@@ -358,21 +358,19 @@ export class Textbox extends IText {
 
   /**
    * Wraps a line of text using the width of the Textbox as desiredWidth
-   * and leveraging the known width o words from WordsWidthData
+   * and leveraging the known width o words from GraphemeData
    * @private
-   * @param {Array} line The grapheme array that represent the line
    * @param {Number} lineIndex
    * @param {Number} desiredWidth width you want to wrap the line to
-   * @param {WordsWidthData} desiredWidth an object containing all the lines' words width.
+   * @param {GraphemeData} graphemeData an object containing all the lines' words width.
    * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
   _wrapLine(
-    _line,
     lineIndex: number,
     desiredWidth: number,
-    WordsWidthData: WordsWidthData,
+    { largestWordWidth, wordsData }: GraphemeData,
     reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
@@ -389,8 +387,6 @@ export class Textbox extends IText {
 
     desiredWidth -= reservedSpace;
 
-    const { largestWordWidth, wordsData } = WordsWidthData;
-
     const maxWidth = Math.max(
       desiredWidth,
       largestWordWidth,
@@ -401,8 +397,7 @@ export class Textbox extends IText {
     offset = 0;
     let i;
     for (i = 0; i < data.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
+      const { word, width: wordWidth } = data[i];
       offset += word.length;
 
       lineWidth += infixWidth + wordWidth - additionalSpace;
