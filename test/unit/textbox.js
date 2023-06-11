@@ -355,7 +355,7 @@
   });
   QUnit.test('Measure words', function(assert) {
     const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
-    const { wordsData, largestWordWidth } = textbox.measureWords(textbox.textLines);
+    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
     assert.deepEqual(
       wordsData[0],
       [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }, { word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
@@ -400,7 +400,7 @@
         }
       }
     };
-    const { wordsData, largestWordWidth } = textbox.measureWords(textbox.textLines);
+    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
     assert.equal(
       Math.round(wordsData[0][0].width),
       82,
@@ -446,7 +446,7 @@
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 2000,
     });
-    const wordsData = textbox.measureWords(['xa xb xc xd xe ya yb id']);
+    const wordsData = textbox.getGraphemeDataForRender(['xa xb xc xd xe ya yb id']);
     var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     var expected1 =  [
       ['x', 'a', ' ', 'x', 'b'],
@@ -472,7 +472,7 @@
     var textbox = new fabric.Textbox('', {
       width: 10,
     });
-    const wordsData = textbox.measureWords(['']);
+    const wordsData = textbox.getGraphemeDataForRender(['']);
     var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
     textbox.splitByGrapheme = true;
