@@ -372,7 +372,7 @@ export class Textbox extends IText {
     _line,
     lineIndex: number,
     desiredWidth: number,
-    { largestWordWidth, wordsData }: WordsWidthData,
+    WordsWidthData: WordsWidthData,
     reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
@@ -388,6 +388,8 @@ export class Textbox extends IText {
       lineJustStarted = true;
 
     desiredWidth -= reservedSpace;
+
+    const { largestWordWidth, wordsData } = WordsWidthData;
 
     const maxWidth = Math.max(
       desiredWidth,
