@@ -689,6 +689,5 @@ export class IText<
   }
 }
 
-classRegistry.setClass(IText);
-// legacy
-classRegistry.setClass(IText, 'i-text');
+classRegistry.setClass(IText, 'IText');
+classRegistry.setClass(IText, 'i-text'); // fabric 5 JSON compatibility

@@ -59,4 +59,4 @@ export class HueRotation extends ColorMatrix {
   }
 }
 
-classRegistry.setClass(HueRotation);
+classRegistry.setClass(HueRotation, 'HueRotation');

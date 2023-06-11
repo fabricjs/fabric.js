@@ -1098,4 +1098,5 @@ export class Group extends createCollectionMixin(
   }
 }
 
-classRegistry.setClass(Group);
+classRegistry.setClass(Group, 'Group');
+classRegistry.setClass(Group, 'group'); // fabric 5 JSON compatibility

@@ -132,4 +132,4 @@ export class RemoveColor extends BaseFilter {
   }
 }
 
-classRegistry.setClass(RemoveColor);
+classRegistry.setClass(RemoveColor, 'RemoveColor');

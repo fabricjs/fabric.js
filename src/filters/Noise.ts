@@ -91,4 +91,4 @@ export class Noise extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Noise);
+classRegistry.setClass(Noise, 'Noise');

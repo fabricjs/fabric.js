@@ -200,6 +200,6 @@ export class Pattern {
   }
 }
 
-classRegistry.setClass(Pattern);
+classRegistry.setClass(Pattern, 'Pattern');
 // kept for compatibility reason
 classRegistry.setClass(Pattern, 'pattern');

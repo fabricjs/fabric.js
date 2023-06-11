@@ -842,5 +842,6 @@ export class Image<
   }
 }
 
-classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);
+classRegistry.setClass(Image, 'Image');
+classRegistry.setClass(Image, 'image'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Image, 'image');

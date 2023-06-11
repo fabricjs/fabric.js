@@ -230,5 +230,6 @@ export class Circle<
   }
 }
 
-classRegistry.setClass(Circle);
-classRegistry.setSVGClass(Circle);
+classRegistry.setClass(Circle, 'Circle');
+classRegistry.setClass(Circle, 'circle'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Circle, 'circle');

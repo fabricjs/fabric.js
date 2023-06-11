@@ -279,5 +279,6 @@ export class Line<
   }
 }
 
-classRegistry.setClass(Line);
-classRegistry.setSVGClass(Line);
+classRegistry.setClass(Line, 'Line');
+classRegistry.setClass(Line, 'line'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Line, 'line');

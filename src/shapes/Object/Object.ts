@@ -1573,5 +1573,5 @@ export class FabricObject<
   }
 }
 
-classRegistry.setClass(FabricObject);
-classRegistry.setClass(FabricObject, 'object');
+classRegistry.setClass(FabricObject, 'FabricObject');
+classRegistry.setClass(FabricObject, 'object'); // fabric 5 JSON compatibility

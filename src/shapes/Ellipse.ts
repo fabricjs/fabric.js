@@ -171,5 +171,6 @@ export class Ellipse<
   /* _FROM_SVG_END_ */
 }
 
-classRegistry.setClass(Ellipse);
-classRegistry.setSVGClass(Ellipse);
+classRegistry.setClass(Ellipse, 'Ellipse');
+classRegistry.setClass(Ellipse, 'ellipse'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Ellipse, 'ellipse');

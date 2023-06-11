@@ -16,5 +16,6 @@ export class Polygon extends Polyline {
   }
 }
 
-classRegistry.setClass(Polygon);
-classRegistry.setSVGClass(Polygon);
+classRegistry.setClass(Polygon, 'Polygon');
+classRegistry.setClass(Polygon, 'polygon'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Polygon, 'polygon');

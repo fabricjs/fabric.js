@@ -354,5 +354,6 @@ export class Polyline<
   }
 }
 
-classRegistry.setClass(Polyline);
-classRegistry.setSVGClass(Polyline);
+classRegistry.setClass(Polyline, 'Polyline');
+classRegistry.setClass(Polyline, 'polyline'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Polyline, 'polyline');

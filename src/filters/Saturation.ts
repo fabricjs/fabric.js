@@ -84,4 +84,4 @@ export class Saturation extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Saturation);
+classRegistry.setClass(Saturation, 'Saturation');

@@ -142,4 +142,4 @@ export class ColorMatrix extends BaseFilter {
   }
 }
 
-classRegistry.setClass(ColorMatrix);
+classRegistry.setClass(ColorMatrix, 'ColorMatrix');

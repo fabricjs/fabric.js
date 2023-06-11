@@ -93,4 +93,4 @@ export class Pixelate extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Pixelate);
+classRegistry.setClass(Pixelate, 'Pixelate');

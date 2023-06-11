@@ -224,5 +224,6 @@ export class Rect<
   /* _FROM_SVG_END_ */
 }
 
-classRegistry.setClass(Rect);
-classRegistry.setSVGClass(Rect);
+classRegistry.setClass(Rect, 'Rect');
+classRegistry.setClass(Rect, 'rect'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Rect, 'rect');

@@ -181,4 +181,4 @@ export class Convolute extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Convolute);
+classRegistry.setClass(Convolute, 'Convolute');

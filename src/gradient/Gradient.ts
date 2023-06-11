@@ -405,3 +405,4 @@ export class Gradient<
 }
 
 classRegistry.setClass(Gradient, 'gradient');
+classRegistry.setClass(Gradient, 'Gradient');

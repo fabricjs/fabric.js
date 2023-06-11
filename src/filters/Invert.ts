@@ -96,4 +96,4 @@ export class Invert extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Invert);
+classRegistry.setClass(Invert, 'Invert');

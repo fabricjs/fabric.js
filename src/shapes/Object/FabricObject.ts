@@ -23,7 +23,7 @@ export class FabricObject<
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
-classRegistry.setClass(FabricObject);
-classRegistry.setClass(FabricObject, 'object');
+classRegistry.setClass(FabricObject, 'FabricObject');
+classRegistry.setClass(FabricObject, 'object'); // fabric 5 JSON compatibility
 
 export { cacheProperties } from './defaultValues';

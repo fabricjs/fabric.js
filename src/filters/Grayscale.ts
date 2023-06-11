@@ -99,4 +99,4 @@ export class Grayscale extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Grayscale);
+classRegistry.setClass(Grayscale, 'Grayscale');

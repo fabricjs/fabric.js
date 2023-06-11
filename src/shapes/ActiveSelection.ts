@@ -185,5 +185,5 @@ export class ActiveSelection extends Group {
   }
 }
 
-classRegistry.setClass(ActiveSelection);
-classRegistry.setClass(ActiveSelection, 'activeSelection');
+classRegistry.setClass(ActiveSelection, 'ActiveSelection');
+classRegistry.setClass(ActiveSelection, 'activeSelection'); // fabric 5 JSON compatibility

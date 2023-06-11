@@ -80,4 +80,4 @@ export class Brightness extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Brightness);
+classRegistry.setClass(Brightness, 'Brightness');

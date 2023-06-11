@@ -535,4 +535,4 @@ export class Resize extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Resize);
+classRegistry.setClass(Resize, 'Resize');

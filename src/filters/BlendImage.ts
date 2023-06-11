@@ -225,4 +225,4 @@ export class BlendImage extends BaseFilter {
   }
 }
 
-classRegistry.setClass(BlendImage);
+classRegistry.setClass(BlendImage, 'BlendImage');

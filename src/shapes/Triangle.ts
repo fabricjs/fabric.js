@@ -56,5 +56,6 @@ export class Triangle<
   }
 }
 
-classRegistry.setClass(Triangle);
-classRegistry.setSVGClass(Triangle);
+classRegistry.setClass(Triangle, 'Triangle');
+classRegistry.setClass(Triangle, 'triangle'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Triangle, 'triangle');

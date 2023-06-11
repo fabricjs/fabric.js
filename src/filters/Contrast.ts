@@ -79,4 +79,4 @@ export class Contrast extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Contrast);
+classRegistry.setClass(Contrast, 'Contrast');

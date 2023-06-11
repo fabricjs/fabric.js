@@ -426,7 +426,6 @@ export class Path<
   }
 }
 
-classRegistry.setClass(Path);
-classRegistry.setSVGClass(Path);
-
-/* _FROM_SVG_START_ */
+classRegistry.setClass(Path, 'Path');
+classRegistry.setClass(Path, 'path'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Path, 'path');

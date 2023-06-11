@@ -1872,5 +1872,6 @@ export class Text<
 }
 
 applyMixins(Text, [TextSVGExportMixin]);
-classRegistry.setClass(Text);
-classRegistry.setSVGClass(Text);
+classRegistry.setClass(Text, 'Text');
+classRegistry.setClass(Text, 'text'); // fabric 5 JSON compatibility
+classRegistry.setSVGClass(Text, 'text');

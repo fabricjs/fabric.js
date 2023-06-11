@@ -107,4 +107,4 @@ export class Gamma extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Gamma);
+classRegistry.setClass(Gamma, 'Gamma');

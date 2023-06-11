@@ -5,14 +5,6 @@
     assert.ok(fabric.classRegistry, 'classRegistry is available');
     assert.throws(() => classRegistry.getClass('rect'), new Error(`No class registered for rect`), 'initially Rect is undefined');
   });
-  QUnit.test('getClass will return specific class matched by name', function (assert) {
-    class TestClass {
-
-    }
-    classRegistry.setClass(TestClass);
-    assert.equal(classRegistry.getClass('TestClass'), TestClass, 'resolves class correctly');
-    assert.equal(classRegistry.getClass('testclass'), TestClass, 'resolves class correctly to lower case');
-  });
   QUnit.test('getClass will return specific class from custom type', function (assert) {
     class TestClass2 {
 

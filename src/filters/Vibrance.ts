@@ -85,4 +85,4 @@ export class Vibrance extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Vibrance);
+classRegistry.setClass(Vibrance, 'Vibrance');

@@ -73,4 +73,4 @@ export class Composed extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Composed);
+classRegistry.setClass(Composed, 'Composed');

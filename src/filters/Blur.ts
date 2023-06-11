@@ -176,4 +176,4 @@ export class Blur extends BaseFilter {
   }
 }
 
-classRegistry.setClass(Blur);
+classRegistry.setClass(Blur, 'Blur');
