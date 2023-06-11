@@ -474,4 +474,5 @@ export class Textbox extends IText {
   }
 }
 
-classRegistry.setClass(Textbox);
+classRegistry.setClass(Textbox, 'Textbox');
+classRegistry.setClass(Textbox, 'textbox'); // fabric 5 JSON compatibility
