@@ -358,8 +358,60 @@
     const { wordsData, largestWordWidth } = textbox.measureWords(textbox.textLines);
     assert.deepEqual(
       wordsData[0],
-      [{ word: 'word', width: largestWordWidth }, { word: 'word', width: largestWordWidth }]
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }, { word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line 0'
     );
+    assert.deepEqual(
+      wordsData[1],
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line1'
+    );
+    assert.equal(largestWordWidth, 82.2, 'largest word is 82.2');
+  });
+  QUnit.test('Measure words with styles', function(assert) {
+    const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
+    textbox.styles = {
+      0: {
+        5: {
+          fontSize: 100,
+        },
+        6: {
+          fontSize: 100,
+        },
+        7: {
+          fontSize: 100,
+        },
+        8: {
+          fontSize: 100,
+        }
+      },
+      2: {
+        0: {
+          fontSize: 200,
+        },
+        1: {
+          fontSize: 200,
+        },
+        2: {
+          fontSize: 200,
+        },
+        3: {
+          fontSize: 200,
+        }
+      }
+    };
+    const { wordsData, largestWordWidth } = textbox.measureWords(textbox.textLines);
+    assert.deepEqual(
+      wordsData[0],
+      [{ word: ['w', 'o', 'r', 'd'], width: 82.2 }, { word: ['w', 'o', 'r', 'd'], width: 205.5 }],
+      'style is acounted for'
+    );
+    assert.deepEqual(
+      wordsData[2],
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line1'
+    );
+    assert.equal(largestWordWidth, 411, 'largest word is 82.2');
   });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
