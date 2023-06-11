@@ -214,4 +214,4 @@ export class BlendColor extends BaseFilter {
   }
 }
 
-classRegistry.setClass(BlendColor);
+classRegistry.setClass(BlendColor, 'BlendColor');
