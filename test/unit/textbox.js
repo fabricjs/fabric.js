@@ -353,6 +353,14 @@
       'lines match splitByGrapheme charSpacing -100'
     );
   });
+  QUnit.test('Measure words', function(assert) {
+    const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
+    const { wordsData, largestWordWidth } = textbox.measureWords(textbox.textLines);
+    assert.deepEqual(
+      wordsData[0],
+      [{ word: 'word', width: largestWordWidth }, { word: 'word', width: largestWordWidth }]
+    );
+  });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
       width: 16,
