@@ -287,7 +287,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    const name = this.constructor.type;
+    const name = (this.constructor as typeof FabricObject).type;
     if (name === 'FabricObject') {
       return 'object';
     }
@@ -524,7 +524,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.constructor.type,
+        type: (this.constructor as typeof FabricObject).type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -618,7 +618,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${this.constructor.type}>`;
+    return `#<${(this.constructor as typeof FabricObject).type}>`;
   }
 
   /**
@@ -1463,7 +1463,10 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.constructor.type) || types.includes(this.type);
+    return (
+      types.includes((this.constructor as typeof FabricObject).type) ||
+      types.includes(this.type)
+    );
   }
 
   /**

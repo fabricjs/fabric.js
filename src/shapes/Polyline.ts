@@ -271,7 +271,11 @@ export class Polyline<
       );
     }
     return [
-      `<${this.constructor.type.toLowerCase() as 'polyline' | 'polygon'} `,
+      `<${
+        (this.constructor as typeof Polyline).type.toLowerCase() as
+          | 'polyline'
+          | 'polygon'
+      } `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];
