@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Textbox): minWidth of text, measure lines before wrapping [#8994](https://github.com/fabricjs/fabric.js/pull/8994)
+- fix(lib): fix aligning_guideline zoom [#8998](https://github.com/fabricjs/fabric.js/pull/8998)
 - fix(IText): support control interaction in text editing mode [#8995](https://github.com/fabricjs/fabric.js/pull/8995)
 - fix(Textbox): `splitByGrapheme` measurements infix length bug [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
 - patch(Text): styles es6 minor patch [#8988](https://github.com/fabricjs/fabric.js/pull/8988)
