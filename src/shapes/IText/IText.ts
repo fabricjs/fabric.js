@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { AssertKeys, TFiller } from '../../typedefs';
+import type { TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -542,11 +542,11 @@ export class IText<
   /**
    * Renders drag start text selection
    */
-  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+  renderDragSourceEffect() {
     const dragStartSelection =
       this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
-      this.canvas.contextTop,
+      this.canvas!.contextTop,
       dragStartSelection,
       this._getCursorBoundaries(dragStartSelection.selectionStart, true)
     );
