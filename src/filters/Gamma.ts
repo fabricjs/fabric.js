@@ -32,6 +32,8 @@ export class Gamma extends BaseFilter {
     b: Uint8Array;
   };
 
+  static type = 'Gamma';
+
   static defaults = gammaDefaultValues;
 
   getFragmentSource() {

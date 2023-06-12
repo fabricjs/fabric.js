@@ -25,6 +25,8 @@ export class Contrast extends BaseFilter {
    */
   declare contrast: number;
 
+  static type = 'Contrast';
+
   static defaults = contrastDefaultValues;
 
   getFragmentSource() {
