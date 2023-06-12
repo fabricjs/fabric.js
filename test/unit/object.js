@@ -293,7 +293,7 @@
 
   QUnit.test('toString', function (assert) {
     class Moo extends fabric.Object {
-      static type = 'moo'
+      static type = 'Moo'
     }
     var cObj = new fabric.Object();
     assert.equal(cObj.toString(), '#<FabricObject>');
