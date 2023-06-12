@@ -38,6 +38,8 @@ export class Blur extends BaseFilter {
   declare horizontal: boolean;
   declare aspectRatio: number;
 
+  static type = 'Blur';
+
   static defaults = blurDefaultValues;
 
   getFragmentSource(): string {

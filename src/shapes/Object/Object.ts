@@ -269,6 +269,15 @@ export class FabricObject<
   }
 
   /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'FabricObject';
+
+  /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists because is very hard to catch all the ways in which a type value
@@ -278,7 +287,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    const name = this.constructor.name;
+    const name = this.constructor.type;
     if (name === 'FabricObject') {
       return 'object';
     }
@@ -515,7 +524,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.constructor.name,
+        type: this.constructor.type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -609,7 +618,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${this.constructor.name}>`;
+    return `#<${this.constructor.type}>`;
   }
 
   /**
@@ -1454,7 +1463,7 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.constructor.name) || types.includes(this.type);
+    return types.includes(this.constructor.type) || types.includes(this.type);
   }
 
   /**

@@ -66,6 +66,8 @@ export class BlendColor extends BaseFilter {
 
   static defaults = blendColorDefaultValues;
 
+  static type = 'BlendColor';
+
   getCacheKey() {
     return `${this.type}_${this.mode}`;
   }

@@ -27,6 +27,8 @@ export class Brightness extends BaseFilter {
    */
   declare brightness: number;
 
+  static type = 'Brightness';
+
   static defaults = brightnessDefaultValues;
 
   getFragmentSource() {
