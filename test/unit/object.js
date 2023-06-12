@@ -27,7 +27,7 @@
     assert.ok(cObj instanceof fabric.Object);
     assert.ok(cObj.constructor === fabric.Object);
 
-    assert.equal(cObj.constructor.name, 'FabricObject');
+    assert.equal(cObj.constructor.type, 'FabricObject');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 

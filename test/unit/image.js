@@ -118,7 +118,7 @@
       assert.ok(image instanceof fabric.Image);
       assert.ok(image instanceof fabric.Object);
 
-      assert.equal(image.constructor.name, 'Image');
+      assert.equal(image.constructor.type, 'Image');
 
       done();
     });
