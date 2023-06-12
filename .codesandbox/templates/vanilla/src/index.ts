@@ -1,10 +1,8 @@
-import * as fabric from 'fabric/dist/index.min.js';
+import * as fabric from 'fabric';
 import './styles.css';
 
 const el = document.getElementById('canvas');
 const canvas = new fabric.Canvas(el);
-
-window.fabric = fabric;
 
 //  edit from here
 canvas.setDimensions({
