@@ -1,9 +1,11 @@
 // @ts-nocheck
 import type { TClassProperties } from '../typedefs';
-import { IText } from './IText/IText';
+import { IText, ITextProps, SerializedITextProps } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
+import { TProps } from './Object/types';
+import { ITextEvents } from './IText/ITextBehavior';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -16,13 +18,27 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   splitByGrapheme: false,
 };
 
+export interface ITextboxProps extends ITextProps {}
+
+interface UniqueTextboxProps {
+  minWidth: number;
+  splitByGrapheme: boolean;
+}
+
+export interface SerializedTextboxProps
+  extends SerializedITextProps,
+    UniqueTextboxProps {}
+
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class Textbox extends IText {
+export class Textbox<
+  Props extends TProps<ITextboxProps> = Partial<ITextboxProps>,
+  EventSpec extends ITextEvents = ITextEvents
+> extends IText<Props, EventSpec> {
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -467,7 +483,9 @@ export class Textbox extends IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: Array<any>): object {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedTextboxProps> = []
+  ): SerializedTextboxProps {
     return super.toObject(
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );

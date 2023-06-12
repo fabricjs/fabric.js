@@ -6,7 +6,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { TClassProperties } from '../typedefs';
 import type {
   FabricObjectProps,
   SerializedObjectProps,
@@ -54,10 +53,9 @@ export const circleDefaultValues: UniqueCircleProps = {
 
 export class Circle<
     Props extends TProps<CircleProps> = Partial<CircleProps>,
-    SProps extends SerializedCircleProps = SerializedCircleProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements UniqueCircleProps
 {
   declare radius: number;
@@ -136,10 +134,9 @@ export class Circle<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedCircleProps> = []
+  ): SerializedCircleProps {
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
 

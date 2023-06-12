@@ -30,9 +30,8 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
 
 export class Polyline<
   Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-  SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<Props, SProps, EventSpec> {
+> extends FabricObject<Props, EventSpec> {
   /**
    * Points array
    * @type Array
@@ -239,10 +238,9 @@ export class Polyline<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedPolylineProps> = []
+  ): SerializedPolylineProps {
     return {
       ...super.toObject(propertiesToInclude),
       points: cloneDeep(this.points),

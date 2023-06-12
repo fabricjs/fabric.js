@@ -24,7 +24,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type { TBBox, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 
@@ -47,9 +47,8 @@ export interface IPathBBox extends TBBox {
 
 export class Path<
   Props extends TProps<PathProps> = Partial<PathProps>,
-  SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<Props, SProps, EventSpec> {
+> extends FabricObject<Props, EventSpec> {
   /**
    * Array of path points
    * @type Array
@@ -198,10 +197,9 @@ export class Path<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedPathProps> = []
+  ): SerializedPathProps {
     return {
       ...super.toObject(propertiesToInclude),
       path: cloneDeep(this.path),
@@ -213,11 +211,10 @@ export class Path<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
-    const o = this.toObject<T, K>(propertiesToInclude);
+  toDatalessObject(
+    propertiesToInclude: Array<keyof SerializedPathProps> = []
+  ): SerializedPathProps {
+    const o = this.toObject(propertiesToInclude);
     if (this.sourcePath) {
       delete o.path;
       o.sourcePath = this.sourcePath;

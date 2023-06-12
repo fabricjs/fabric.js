@@ -104,10 +104,9 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  */
 export class IText<
     Props extends ITextProps = ITextProps,
-    SProps extends SerializedITextProps = SerializedITextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
-  extends ITextClickBehavior<Props, SProps, EventSpec>
+  extends ITextClickBehavior<Props, EventSpec>
   implements UniqueITextProps
 {
   /**

@@ -1,10 +1,6 @@
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, TProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 
 export const triangleDefaultValues = {
@@ -14,10 +10,9 @@ export const triangleDefaultValues = {
 
 export class Triangle<
     Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements FabricObjectProps
 {
   static ownDefaults: Record<string, any> = triangleDefaultValues;

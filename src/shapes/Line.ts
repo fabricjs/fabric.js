@@ -1,6 +1,5 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
@@ -31,10 +30,9 @@ export interface SerializedLineProps
 
 export class Line<
     Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedLineProps = SerializedLineProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements UniqueLineProps
 {
   /**
@@ -157,10 +155,9 @@ export class Line<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedLineProps> = []
+  ): SerializedLineProps {
     return {
       ...super.toObject(propertiesToInclude),
       ...this.calcLinePoints(),

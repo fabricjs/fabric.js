@@ -7,11 +7,7 @@ import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { Point } from '../../Point';
-import type {
-  TCacheCanvasDimensions,
-  TClassProperties,
-  TFiller,
-} from '../../typedefs';
+import type { TCacheCanvasDimensions, TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
@@ -40,6 +36,7 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
+import { SerializedITextProps } from '../IText/IText';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -108,10 +105,9 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {}
  */
 export class Text<
     Props extends TProps<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends StyledText<Props, SProps, EventSpec>
+  extends StyledText<Props, EventSpec>
   implements UniqueTextProps
 {
   /**
@@ -1691,10 +1687,9 @@ export class Text<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedITextProps> = []
+  ): SerializedITextProps {
     return {
       ...super.toObject([...additionalProps, ...propertiesToInclude]),
       styles: stylesToArray(this.styles, this.text),

@@ -31,10 +31,9 @@ const RECT_PROPS = ['rx', 'ry'] as const;
 
 export class Rect<
     Props extends TProps<RectProps> = Partial<RectProps>,
-    SProps extends SerializedRectProps = SerializedRectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements RectProps
 {
   /**
@@ -148,10 +147,9 @@ export class Rect<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedRectProps> = []
+  ): SerializedRectProps {
     return super.toObject([...RECT_PROPS, ...propertiesToInclude]);
   }
 

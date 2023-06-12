@@ -4,7 +4,7 @@ import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TSize } from '../typedefs';
+import type { TSize } from '../typedefs';
 import type { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
@@ -73,10 +73,9 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
  */
 export class Image<
     Props extends TProps<ImageProps> = Partial<ImageProps>,
-    SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements ImageProps
 {
   /**
@@ -317,10 +316,9 @@ export class Image<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedImageProps> = []
+  ): SerializedImageProps {
     const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
       filterObj && filters.push(filterObj.toObject());

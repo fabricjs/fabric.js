@@ -10,7 +10,7 @@ import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
-import type { SerializedTextProps, TextProps } from '../Text/Text';
+import type { TextProps } from '../Text/Text';
 import type { TProps } from '../Object/types';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
@@ -40,9 +40,8 @@ export type ITextEvents = ObjectEvents & {
 
 export abstract class ITextBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
-  SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<Props, SProps, EventSpec> {
+> extends Text<Props, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;

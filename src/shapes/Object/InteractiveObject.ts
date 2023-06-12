@@ -15,7 +15,7 @@ import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import type { FabricObjectProps } from './types/FabricObjectProps';
-import type { TFabricObjectProps, SerializedObjectProps } from './types';
+import type { TFabricObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {
@@ -48,10 +48,9 @@ const interactiveDefaults = {};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;

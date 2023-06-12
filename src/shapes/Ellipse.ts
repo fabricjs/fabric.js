@@ -1,7 +1,6 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -31,10 +30,9 @@ const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
     Props extends TProps<EllipseProps> = Partial<EllipseProps>,
-    SProps extends SerializedEllipseProps = SerializedEllipseProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends FabricObject<Props, EventSpec>
   implements EllipseProps
 {
   /**
@@ -105,10 +103,9 @@ export class Ellipse<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(
+    propertiesToInclude: Array<keyof SerializedEllipseProps> = []
+  ): SerializedEllipseProps {
     return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 
