@@ -20,6 +20,8 @@ export class Triangle<
   extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
+  static type = 'Triangle';
+
   static ownDefaults: Record<string, any> = triangleDefaultValues;
 
   static getDefaults() {

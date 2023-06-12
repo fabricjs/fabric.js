@@ -65,6 +65,8 @@ export class Line<
    */
   declare y2: number;
 
+  static type = 'Line';
+
   static cacheProperties = [...cacheProperties, ...coordProps];
   /**
    * Constructor

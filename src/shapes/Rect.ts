@@ -51,6 +51,8 @@ export class Rect<
    */
   declare ry: number;
 
+  static type = 'Rect';
+
   static cacheProperties = [...cacheProperties, ...RECT_PROPS];
 
   static ownDefaults: Record<string, any> = rectDefaultValues;
