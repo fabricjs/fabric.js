@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Revert "invoke tests after changelog action (#8974)" [#9013](https://github.com/fabricjs/fabric.js/pull/9013)
 - fix(lib): fix aligning_guideline zoom [#8998](https://github.com/fabricjs/fabric.js/pull/8998)
 - fix(IText): support control interaction in text editing mode [#8995](https://github.com/fabricjs/fabric.js/pull/8995)
 - fix(Textbox): `splitByGrapheme` measurements infix length bug [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
@@ -15,7 +16,6 @@
 - ci(): warn build errors in dev mode [#8971](https://github.com/fabricjs/fabric.js/pull/8971)
 - ci(): invoke tests after changelog action [#8974](https://github.com/fabricjs/fabric.js/pull/8974)
 - chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
-- chore(TS): Export more types  [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
 - BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 
