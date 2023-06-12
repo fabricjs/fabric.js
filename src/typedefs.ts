@@ -112,8 +112,6 @@ export type TDataUrlOptions = TToCanvasElementOptions & {
   enableRetinaScaling?: boolean;
 };
 
-export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;
-
 export type Abortable = {
   /**
    * handle aborting
