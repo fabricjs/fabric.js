@@ -19,13 +19,7 @@ import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import type {
-  AssertKeys,
-  TMat2D,
-  TOriginX,
-  TOriginY,
-  TSize,
-} from '../typedefs';
+import type { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
@@ -36,7 +30,7 @@ import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
-import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
+import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -1298,10 +1292,7 @@ export class SelectableCanvas<
    * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  setActiveObject(
-    object: FabricObject,
-    e?: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  setActiveObject(object: FabricObject, e?: TPointerEvent) {
     // we can't inline this, since _setActiveObject will change what getActiveObjects returns
     const currentActives = this.getActiveObjects();
     const selected = this._setActiveObject(object, e);
@@ -1317,10 +1308,7 @@ export class SelectableCanvas<
    * @param {Event} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  _setActiveObject(
-    object: FabricObject,
-    e?: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
     if (this._activeObject === object) {
       return false;
     }

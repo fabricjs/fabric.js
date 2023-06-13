@@ -12,7 +12,6 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -339,14 +338,14 @@ export class Canvas extends SelectableCanvas {
     if (source) {
       ctx.save();
       source.transform(ctx);
-      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      source.renderDragSourceEffect(e);
       ctx.restore();
       dirty = true;
     }
     if (target) {
       ctx.save();
       target.transform(ctx);
-      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      target.renderDropTargetEffect(e);
       ctx.restore();
       dirty = true;
     }
@@ -1457,10 +1456,7 @@ export class Canvas extends SelectableCanvas {
    * @param {FabricObject} target target of event to select/deselect
    * @returns true if grouping occurred
    */
-  protected handleMultiSelection(
-    e: TPointerEvent,
-    target?: FabricObject
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleMultiSelection(e: TPointerEvent, target?: FabricObject) {
     const activeObject = this._activeObject;
     const activeSelection = this._activeSelection;
     const isAS = activeObject === activeSelection;
@@ -1538,9 +1534,7 @@ export class Canvas extends SelectableCanvas {
    * ---
    * runs on mouse up
    */
-  protected handleSelection(
-    e: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleSelection(e: TPointerEvent) {
     if (!this.selection || !this._groupSelector) {
       return false;
     }
