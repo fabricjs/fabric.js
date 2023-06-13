@@ -6,7 +6,6 @@ import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
-import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type { Rect } from '../shapes/Rect';
 import type {
@@ -44,6 +43,7 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -336,7 +336,7 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    if (obj.canvas && obj.canvas !== this) {
+    if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
         'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
