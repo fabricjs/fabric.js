@@ -36,23 +36,33 @@ export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
 export { FabricObject as Object } from './src/shapes/Object/FabricObject';
-export type { TProps } from './src/shapes/Object/types';
+export type { TProps, SerializedObjectProps } from './src/shapes/Object/types';
 export { Line } from './src/shapes/Line';
+export type { SerializedLineProps } from './src/shapes/Line';
 export { Circle } from './src/shapes/Circle';
+export type { SerializedCircleProps } from './src/shapes/Circle';
 export { Triangle } from './src/shapes/Triangle';
 export { Ellipse } from './src/shapes/Ellipse';
+export type { SerializedEllipseProps } from './src/shapes/Ellipse';
 export { Rect } from './src/shapes/Rect';
+export type { SerializedRectProps } from './src/shapes/Rect';
 export { Path } from './src/shapes/Path';
+export type { SerializedPathProps } from './src/shapes/Path';
 export { Polyline } from './src/shapes/Polyline';
+export type { SerializedPolylineProps } from './src/shapes/Polyline';
 export { Polygon } from './src/shapes/Polygon';
 export { Text } from './src/shapes/Text/Text';
+export type { SerializedTextProps } from './src/shapes/Text/Text';
 export { IText } from './src/shapes/IText/IText';
+export type { SerializedITextProps } from './src/shapes/IText/IText';
 export { Textbox } from './src/shapes/Textbox';
+export type { SerializedTextboxProps } from './src/shapes/Textbox';
 export type {
   TextStyleDeclaration,
   TextStyle,
 } from './src/shapes/Text/StyledText';
 export { Group } from './src/shapes/Group';
+export type { SerializedGroupProps } from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
 export type {

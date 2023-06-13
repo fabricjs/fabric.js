@@ -1,11 +1,12 @@
 // @ts-nocheck
 import type { TClassProperties } from '../typedefs';
-import { IText, ITextProps, SerializedITextProps } from './IText/IText';
+import { IText, ITextProps } from './IText/IText';
+import type { SerializedITextProps } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
-import { TProps } from './Object/types';
-import { ITextEvents } from './IText/ITextBehavior';
+import type { TProps } from './Object/types';
+import type { ITextEvents } from './IText/ITextBehavior';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
