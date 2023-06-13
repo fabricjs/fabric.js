@@ -202,6 +202,8 @@ export class IText<
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
+  static type = 'IText';
+
   get type() {
     return 'i-text';
   }

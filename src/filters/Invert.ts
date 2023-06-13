@@ -31,6 +31,8 @@ export class Invert extends BaseFilter {
    */
   declare invert: boolean;
 
+  static type = 'Invert';
+
   static defaults = invertDefaultValues;
 
   /**

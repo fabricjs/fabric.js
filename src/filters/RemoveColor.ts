@@ -41,6 +41,8 @@ export class RemoveColor extends BaseFilter {
    **/
   declare useAlpha: boolean;
 
+  static type = 'RemoveColor';
+
   static defaults = removeColorDefaultValues;
 
   getFragmentShader() {
