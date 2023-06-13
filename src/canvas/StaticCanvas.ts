@@ -408,7 +408,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions) {
+  setWidth(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ width: value }, options);
   }
 
@@ -420,7 +420,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions) {
+  setHeight(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ height: value }, options);
   }
 
