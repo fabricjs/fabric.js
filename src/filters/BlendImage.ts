@@ -61,6 +61,8 @@ export class BlendImage extends BaseFilter {
    **/
   declare alpha: number;
 
+  static type = 'BlendImage';
+
   static defaults = blendImageDefaultValues;
 
   getCacheKey() {

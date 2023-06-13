@@ -170,6 +170,8 @@ export class Image<
   protected declare _originalElement: ImageSource;
   protected declare _filteredEl: ImageSource;
 
+  static type = 'Image';
+
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
   static ownDefaults: Record<string, any> = imageDefaultValues;

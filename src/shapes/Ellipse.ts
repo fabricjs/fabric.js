@@ -51,6 +51,8 @@ export class Ellipse<
    */
   declare ry: number;
 
+  static type = 'Ellipse';
+
   static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
   static ownDefaults: Record<string, any> = ellipseDefaultValues;
