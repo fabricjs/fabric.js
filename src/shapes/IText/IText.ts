@@ -204,10 +204,6 @@ export class IText<
 
   static type = 'IText';
 
-  get type() {
-    return 'i-text';
-  }
-
   /**
 
    * Constructor
