@@ -46,7 +46,7 @@
     assert.ok(rect instanceof fabric.Rect);
     assert.ok(rect instanceof fabric.Object);
 
-    assert.deepEqual(rect.constructor.name, 'Rect');
+    assert.deepEqual(rect.constructor.type, 'Rect');
   });
 
   QUnit.test('complexity', function(assert) {

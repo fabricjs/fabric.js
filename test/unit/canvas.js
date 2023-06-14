@@ -576,7 +576,7 @@
     });
     canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection created fired');
-    assert.equal(canvas.getActiveObject().constructor.name, 'ActiveSelection', 'an active selection is created');
+    assert.equal(canvas.getActiveObject().constructor.type, 'ActiveSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
     assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
@@ -1258,7 +1258,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
   });
 
 
@@ -1311,7 +1311,7 @@
     var rect = makeRect();
     canvasWithClipPath.add(rect);
 
-    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.type);
   });
 
   QUnit.test('toDatalessObject', function(assert) {
@@ -1326,7 +1326,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1344,7 +1344,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1372,7 +1372,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1400,7 +1400,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1428,7 +1428,7 @@
     function reviver(obj, instance) {
       assert.deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
-      if (instance.constructor.name === 'Path') {
+      if (instance.constructor.type === 'Path') {
         instance.customID = 'fabric_1';
       }
     }
@@ -1437,7 +1437,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
