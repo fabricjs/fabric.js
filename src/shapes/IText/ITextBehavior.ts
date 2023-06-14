@@ -336,14 +336,13 @@ export abstract class ITextBehavior<
    */
   selectWord(selectionStart: number) {
     selectionStart = selectionStart || this.selectionStart;
-    const newSelectionStart = this.searchWordBoundary(
-        selectionStart,
-        -1
-      ) /* search backwards */,
-      newSelectionEnd = this.searchWordBoundary(
-        selectionStart,
-        1
-      ); /* search forward */
+    // search backwards
+    const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
+      // search forward
+      newSelectionEnd = Math.max(
+        newSelectionStart,
+        this.searchWordBoundary(selectionStart, 1)
+      );
 
     this.selectionStart = newSelectionStart;
     this.selectionEnd = newSelectionEnd;
