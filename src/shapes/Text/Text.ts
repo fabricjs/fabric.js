@@ -1361,10 +1361,10 @@ export class Text<
 
     ctx.font = this._getFontDeclaration(fullDecl);
 
-    if (decl && decl.textBackgroundColor) {
+    if (decl.textBackgroundColor) {
       this._removeShadow(ctx);
     }
-    if (decl && decl.deltaY) {
+    if (decl.deltaY) {
       top += decl.deltaY;
     }
 

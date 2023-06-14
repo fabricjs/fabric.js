@@ -181,21 +181,18 @@ export abstract class StyledText<
     }
   }
 
-  private _extendStyles(index: number, styles: TextStyleDeclaration) {
+  private _extendStyles(index: number, styles: TextStyleDeclaration): void {
     const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
     }
 
-    if (!this._getStyleDeclaration(lineIndex, charIndex)) {
+    if (!Object.keys(this._getStyleDeclaration(lineIndex, charIndex)).length) {
       this._setStyleDeclaration(lineIndex, charIndex, {});
     }
 
-    return Object.assign(
-      this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styles
-    );
+    Object.assign(this._getStyleDeclaration(lineIndex, charIndex), styles);
   }
 
   /**
@@ -226,11 +223,9 @@ export abstract class StyledText<
    */
   getStyleAtPosition(position: number, complete?: boolean) {
     const { lineIndex, charIndex } = this.get2DCursorLocation(position);
-    return (
-      (complete
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
-        : this._getStyleDeclaration(lineIndex, charIndex)) || {}
-    );
+    return complete
+      ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
+      : this._getStyleDeclaration(lineIndex, charIndex);
   }
 
   /**
@@ -248,10 +243,11 @@ export abstract class StyledText<
   }
 
   /**
-   * get the reference, not a clone, of the style object for a given character
+   * get the reference, not a clone, of the style object for a given character,
+   * if not style is set for a pre det
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {Object} style object
+   * @return {Object} style object a REFERENCE to the existing one or a new empty object
    */
   _getStyleDeclaration(
     lineIndex: number,
@@ -275,7 +271,7 @@ export abstract class StyledText<
     return {
       // @ts-expect-error readonly
       ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
-      ...(this._getStyleDeclaration(lineIndex, charIndex) || {}),
+      ...this._getStyleDeclaration(lineIndex, charIndex),
     } as CompleteTextStyleDeclaration;
   }
 

@@ -193,7 +193,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
       }
       if (timeToRender) {
-        style = this._getStyleDeclaration(lineIndex, i) || {};
+        style = this._getStyleDeclaration(lineIndex, i);
         textSpans.push(
           this._createTextCharSpan(
             charsToRender,
