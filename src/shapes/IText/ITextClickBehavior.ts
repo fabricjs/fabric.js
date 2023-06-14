@@ -271,10 +271,12 @@ export abstract class ITextClickBehavior<
       if (mouseOffset.x <= widthAfter) {
         // if the pointer is closer to the end of the char we increment charIndex
         // in order to position the cursor after the char
-        charIndex += Number(
+        if (
           Math.abs(mouseOffset.x - widthAfter) <=
-            Math.abs(mouseOffset.x - width)
-        );
+          Math.abs(mouseOffset.x - width)
+        ) {
+          charIndex++;
+        }
         break;
       }
       width = widthAfter;
