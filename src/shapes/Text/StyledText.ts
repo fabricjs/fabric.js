@@ -10,7 +10,9 @@ import type { StylePropertiesType } from './constants';
 import type { Text } from './Text';
 import { pick } from '../../util';
 
-export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
+export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
+
+export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
@@ -251,9 +253,12 @@ export abstract class StyledText<
    * @param {Number} charIndex
    * @return {Object} style object
    */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  _getStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
-    return lineStyle ? lineStyle[charIndex] : null;
+    return lineStyle ? lineStyle[charIndex] : {};
   }
 
   /**
@@ -263,12 +268,15 @@ export abstract class StyledText<
    * @param {Number} charIndex position of the character on the line
    * @return {Object} style object
    */
-  getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  getCompleteStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): CompleteTextStyleDeclaration {
     return {
       // @ts-expect-error readonly
       ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
       ...(this._getStyleDeclaration(lineIndex, charIndex) || {}),
-    } as TextStyleDeclaration;
+    } as CompleteTextStyleDeclaration;
   }
 
   /**

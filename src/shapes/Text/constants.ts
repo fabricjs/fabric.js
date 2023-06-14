@@ -87,7 +87,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   textBackgroundColor: '',
   stroke: null,
   shadow: null,
-  path: null,
+  path: undefined,
   pathStartOffset: 0,
   pathSide: LEFT,
   pathAlign: 'baseline',
