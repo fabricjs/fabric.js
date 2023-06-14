@@ -83,9 +83,16 @@ jobs:
             }
 
             return false;
+      - name: Setup node
+        if: fromJson(steps.update.outputs.result)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
       - name: Commit & Push
         if: fromJson(steps.update.outputs.result)
         run: |
+          npm ci
+          npx prettier --write ${{ env.file }}
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
           git add ${{ env.file }}
