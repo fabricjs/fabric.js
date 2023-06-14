@@ -39,7 +39,7 @@ export const iTextDefaultValues = {
   caching: true,
   hiddenTextareaContainer: null,
   _selectionDirection: null,
-  _reSpace: /\s|\n/,
+  _reSpace: /\s|\r?\n/,
   inCompositionMode: false,
   keysMap,
   keysMapRtl,
