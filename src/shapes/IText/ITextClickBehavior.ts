@@ -247,7 +247,8 @@ export abstract class ITextClickBehavior<
     let height = 0,
       charIndex = 0,
       lineIndex = 0;
-    for (let i = 0, len = this._textLines.length; i < len; i++) {
+
+    for (let i = 0; i < this._textLines.length; i++) {
       if (height <= mouseOffset.y) {
         height += this.getHeightOfLine(i);
         lineIndex = i;
@@ -261,54 +262,29 @@ export abstract class ITextClickBehavior<
     }
     const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
     let width = lineLeftOffset;
-    const jlen = this._textLines[lineIndex].length;
-    let prevWidth = 0;
-    for (let j = 0; j < jlen; j++) {
-      prevWidth = width;
+    const charLength = this._textLines[lineIndex].length;
+    const chars = this.__charBounds[lineIndex];
+    for (let j = 0; j < charLength; j++) {
       // i removed something about flipX here, check.
-      width += this.__charBounds[lineIndex][j].kernedWidth;
-      if (width <= mouseOffset.x) {
-        charIndex++;
-      } else {
+      const charWidth = chars[j].kernedWidth;
+      const widthAfter = width + charWidth;
+      if (mouseOffset.x <= widthAfter) {
+        // if the pointer is closer to the end of the char we increment charIndex
+        // in order to position the cursor after the char
+        charIndex += Number(
+          Math.abs(mouseOffset.x - widthAfter) <=
+            Math.abs(mouseOffset.x - width)
+        );
         break;
       }
+      width = widthAfter;
+      charIndex++;
     }
-    return this._getNewSelectionStartFromOffset(
-      mouseOffset,
-      prevWidth,
-      width,
-      charIndex,
-      jlen
+
+    return Math.min(
+      // if object is horizontally flipped, mirror cursor location from the end
+      this.flipX ? charLength - charIndex : charIndex,
+      this._text.length
     );
-  }
-
-  /**
-   * @private
-   */
-  _getNewSelectionStartFromOffset(
-    mouseOffset: XY,
-    prevWidth: number,
-    width: number,
-    index: number,
-    jlen: number
-  ) {
-    const distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
-      distanceBtwNextCharAndCursor = width - mouseOffset.x,
-      offset =
-        distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
-        distanceBtwNextCharAndCursor < 0
-          ? 0
-          : 1;
-    let newSelectionStart = index + offset;
-    // if object is horizontally flipped, mirror cursor location from the end
-    if (this.flipX) {
-      newSelectionStart = jlen - newSelectionStart;
-    }
-
-    if (newSelectionStart > this._text.length) {
-      newSelectionStart = this._text.length;
-    }
-
-    return newSelectionStart;
   }
 }
