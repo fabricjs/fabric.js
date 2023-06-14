@@ -13,7 +13,7 @@ import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TProps } from '../Object/types';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT } from '../../constants';
+import { LEFT, RIGHT, reNewline } from '../../constants';
 
 /**
  *  extend this regex to support non english languages
@@ -313,19 +313,23 @@ export abstract class ITextBehavior<
    * @param {Number} direction 1 or -1
    * @return {Number} Index of the beginning or end of a word
    */
-  searchWordBoundary(selectionStart: number, direction: number): number {
+  searchWordBoundary(selectionStart: number, direction: 1 | -1): number {
     const text = this._text;
-    let index = this._reSpace.test(text[selectionStart])
-        ? selectionStart - 1
-        : selectionStart,
+    // if we land on a space we move the cursor backwards
+    // if we are searching boundary end we move the cursor backwards ONLY if we don't land on a line break
+    let index =
+        this._reSpace.test(text[selectionStart]) &&
+        selectionStart > 0 &&
+        (direction < 0 || !reNewline.test(text[selectionStart - 1]))
+          ? selectionStart - 1
+          : selectionStart,
       _char = text[index];
-
     while (!reNonWord.test(_char) && index > 0 && index < text.length) {
       index += direction;
       _char = text[index];
     }
-    if (reNonWord.test(_char)) {
-      index += direction === 1 ? 0 : 1;
+    if (reNonWord.test(_char) && direction < 0) {
+      index++;
     }
     return index;
   }
