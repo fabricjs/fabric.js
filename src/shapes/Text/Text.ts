@@ -45,7 +45,7 @@ import {
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
-import type { Gradient, Pattern } from 'fabric/node';
+import type { Gradient, Pattern } from 'fabric';
 
 let measuringContext: CanvasRenderingContext2D | null;
 

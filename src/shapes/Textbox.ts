@@ -4,7 +4,7 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
-import type { TextStyleDeclaration } from 'fabric/node';
+import type { TextStyleDeclaration } from 'fabric';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -188,7 +188,7 @@ export class Textbox extends IText {
    * @param {Number} charIndex
    * @private
    */
-  protected _getStyleDeclaration(
+  _getStyleDeclaration(
     lineIndex: number,
     charIndex: number
   ): TextStyleDeclaration {
