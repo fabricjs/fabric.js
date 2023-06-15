@@ -1,23 +1,23 @@
-//@ts-nocheck
-
 /**
  * Returns CSS rules for a given SVG document
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-export function getCSSRules(doc) {
+export function getCSSRules(doc: Document) {
   const styles = doc.getElementsByTagName('style');
   let i;
   let len;
-  const allRules = {};
+  const allRules: Record<string, Record<string, string>> = {};
   let rules;
 
   // very crude parsing of style contents
   for (i = 0, len = styles.length; i < len; i++) {
-    let styleContents = styles[i].textContent;
+    const styleContents = (styles[i].textContent || '').replace(
+      // remove comments
+      /\/\*[\s\S]*?\*\//g,
+      ''
+    );
 
-    // remove comments
-    styleContents = styleContents.replace(/\/\*[\s\S]*?\*\//g, '');
     if (styleContents.trim() === '') {
       continue;
     }
@@ -32,7 +32,7 @@ export function getCSSRules(doc) {
     // eslint-disable-next-line no-loop-func
     rules.forEach(function (rule) {
       const match = rule.split('{'),
-        ruleObj = {},
+        ruleObj: Record<string, string> = {},
         declaration = match[1].trim(),
         propertyValuePairs = declaration.split(';').filter(function (pair) {
           return pair.trim();
@@ -45,16 +45,15 @@ export function getCSSRules(doc) {
         ruleObj[property] = value;
       }
       rule = match[0].trim();
-      rule.split(',').forEach(function (_rule) {
+      rule.split(',').forEach((_rule) => {
         _rule = _rule.replace(/^svg/i, '').trim();
         if (_rule === '') {
           return;
         }
-        if (allRules[_rule]) {
-          Object.assign(allRules[_rule], ruleObj);
-        } else {
-          allRules[_rule] = Object.assign({}, ruleObj);
-        }
+        allRules[_rule] = {
+          ...(allRules[_rule] || {}),
+          ...ruleObj,
+        };
       });
     });
   }
