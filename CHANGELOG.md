@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
+
 ## [6.0.0-beta9]
 
 - fix(fabric): Fix the serialization and registry dependency from minification [#9009](https://github.com/fabricjs/fabric.js/pull/9009)
