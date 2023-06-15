@@ -254,7 +254,7 @@ export abstract class StyledText<
     charIndex: number
   ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
-    return lineStyle ? lineStyle[charIndex] : {};
+    return lineStyle ? lineStyle[charIndex] ?? {} : {};
   }
 
   /**

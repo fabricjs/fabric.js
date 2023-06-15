@@ -46,7 +46,7 @@
     charSpacing:              0,
     styles:                   [],
     strokeUniform:            false,
-    path:                     null,
+    path:                     undefined,
     direction:                'ltr',
     pathStartOffset:          0,
     pathSide:                 'left',
