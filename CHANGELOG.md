@@ -2,6 +2,9 @@
 
 ## [next]
 
+- fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
+- ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
+
 ## [6.0.0-beta9]
 
 - fix(fabric): Fix the serialization and registry dependency from minification [#9009](https://github.com/fabricjs/fabric.js/pull/9009)
