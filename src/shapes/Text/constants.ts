@@ -1,4 +1,4 @@
-import { LEFT } from '../../constants';
+import { LEFT, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { Text } from './Text';
 
@@ -35,7 +35,21 @@ export const additionalProps = [
   'direction',
 ] as const;
 
-export const styleProperties = [
+export type StylePropertiesType =
+  | 'fill'
+  | 'stroke'
+  | 'strokeWidth'
+  | 'fontSize'
+  | 'fontFamily'
+  | 'fontWeight'
+  | 'fontStyle'
+  | 'textBackgroundColor'
+  | 'deltaY'
+  | 'overline'
+  | 'underline'
+  | 'linethrough';
+
+export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
   ...textDecorationProperties,
   'stroke',
@@ -49,7 +63,7 @@ export const styleProperties = [
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
 export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _reNewline: /\r?\n/,
+  _reNewline: reNewline,
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,

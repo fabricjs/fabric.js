@@ -47,6 +47,8 @@ export class Textbox extends IText {
    */
   declare splitByGrapheme: boolean;
 
+  static type = 'Textbox';
+
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = textboxDefaultValues;
@@ -347,8 +349,8 @@ export class Textbox extends IText {
       word = splitByGrapheme ? word : this.graphemeSplit(word);
       const width = this._measureWord(word, lineIndex, offset);
       largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + 1;
-      return { word: word, width: width };
+      offset += word.length + infix.length;
+      return { word, width };
     });
 
     const maxWidth = Math.max(

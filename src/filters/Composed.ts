@@ -12,6 +12,8 @@ export class Composed extends BaseFilter {
    */
   declare subFilters: BaseFilter[];
 
+  static type = 'Composed';
+
   constructor({
     subFilters = [],
     ...options

@@ -9,17 +9,27 @@ const IndexPage: NextPage = () => {
       width: window.innerWidth,
       height: 500,
     });
-    const text = new fabric.Textbox('fabric.js sandbox', {
+    const textValue = 'fabric.js sandbox';
+    const text = new fabric.Textbox(textValue, {
       originX: 'center',
       top: 20,
+      textAlign: 'center',
+      styles: fabric.util.stylesFromArray(
+        [
+          {
+            style: {
+              fontWeight: 'bold',
+              fontSize: 64,
+            },
+            start: 0,
+            end: 9,
+          },
+        ],
+        textValue
+      ),
     });
     canvas.add(text);
     canvas.centerObjectH(text);
-    console.log(
-      fabric.util.parsePath(
-        'M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0 M 3 4 Q 3 5 2 1 4 0 Q 9 12 2 1 4 0'
-      )
-    );
   }, []);
 
   return (

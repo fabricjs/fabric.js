@@ -21,6 +21,8 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
 export class Grayscale extends BaseFilter {
   declare mode: TGrayscaleMode;
 
+  static type = 'Grayscale';
+
   static defaults = grayscaleDefaultValues;
 
   /**

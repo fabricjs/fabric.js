@@ -2,7 +2,34 @@
 
 ## [next]
 
-- chore(ci): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)
+- ci(): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)
+- ci(): Added playwright testing [#8616](https://github.com/fabricjs/fabric.js/pull/8616)
+- fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
+- ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
+
+## [6.0.0-beta9]
+
+- fix(fabric): Fix the serialization and registry dependency from minification [#9009](https://github.com/fabricjs/fabric.js/pull/9009)
+- chore(TS): remove troublesome `AssertKeys` TS construct [#9012](https://github.com/fabricjs/fabric.js/pull/9012)
+- fix(lib): fix aligning_guideline zoom [#8998](https://github.com/fabricjs/fabric.js/pull/8998)
+- fix(IText): support control interaction in text editing mode [#8995](https://github.com/fabricjs/fabric.js/pull/8995)
+- fix(Textbox): `splitByGrapheme` measurements infix length bug [#8990](https://github.com/fabricjs/fabric.js/pull/8990)
+- patch(Text): styles es6 minor patch [#8988](https://github.com/fabricjs/fabric.js/pull/8988)
+
+## [6.0.0-beta8]
+
+- BREAKING fix(IText): detect cursor from proper offsets, remove getLocalPointer from IText class [#8972](https://github.com/fabricjs/fabric.js/pull/8972)
+- fix(Text): styles line break [#8973](https://github.com/fabricjs/fabric.js/pull/8973)
+- fix(): regression to itext focusing from #8939 [#8970](https://github.com/fabricjs/fabric.js/pull/8970)
+- ci(): warn build errors in dev mode [#8971](https://github.com/fabricjs/fabric.js/pull/8971)
+- ci(): invoke tests after changelog action [#8974](https://github.com/fabricjs/fabric.js/pull/8974)
+- chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
+- BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+- refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
+
+## [6.0.0-beta7]
+
+- feat(): Export setFilterBackend and port the texture filtering option from fabric 5, exports some extra types [#8954](https://github.com/fabricjs/fabric.js/pull/8954)
 - chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
 - ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)

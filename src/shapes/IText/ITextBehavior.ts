@@ -404,6 +404,10 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
+    if (this.__corner) {
+      return;
+    }
+
     const el = this.hiddenTextarea!;
     // regain focus
     getDocumentFromElement(el).activeElement !== el && el.focus();
@@ -664,6 +668,7 @@ export abstract class ITextBehavior<
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
+    this.selectionStart !== this.selectionEnd && this.clearContextTop();
   }
 
   /**
@@ -671,8 +676,8 @@ export abstract class ITextBehavior<
    */
   exitEditing() {
     const isTextChanged = this._textBeforeEdit !== this.text;
-    this.selectionEnd = this.selectionStart;
     this._exitEditing();
+    this.selectionEnd = this.selectionStart;
     this._restoreEditingProps();
     if (this._forceClearCache) {
       this.initDimensions();

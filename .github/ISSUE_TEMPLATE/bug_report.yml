@@ -47,6 +47,9 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.0.0-beta9
+        - 6.0.0-beta8
+        - 6.0.0-beta7
         - 6.0.0-beta6
         - 6.0.0-beta5
         - 6.0.0-beta4

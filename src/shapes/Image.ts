@@ -170,6 +170,8 @@ export class Image<
   protected declare _originalElement: ImageSource;
   protected declare _filteredEl: ImageSource;
 
+  static type = 'Image';
+
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
   static ownDefaults: Record<string, any> = imageDefaultValues;
@@ -189,8 +191,8 @@ export class Image<
    * @param {ImageSource | string} element Image element
    * @param {Object} [options] Options object
    */
-  constructor(elementId: string, options: Props);
-  constructor(element: ImageSource, options: Props);
+  constructor(elementId: string, options?: Props);
+  constructor(element: ImageSource, options?: Props);
   constructor(arg0: ImageSource | string, options: Props = {} as Props) {
     super({ filters: [], ...options });
     this.cacheKey = `texture${uid()}`;

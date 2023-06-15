@@ -7,6 +7,8 @@ export function createColorMatrixFilter(key: string, matrix: number[]) {
       return key;
     }
 
+    static type = key;
+
     static defaults = {
       ...colorMatrixDefaultValues,
       /**

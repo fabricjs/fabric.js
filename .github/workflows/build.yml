@@ -3,7 +3,6 @@ name: '🩺'
 on:
   pull_request:
     branches: [master]
-    paths-ignore: [CHANGELOG.md]
 
 jobs:
   build:
@@ -43,7 +42,7 @@ jobs:
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: checkout src files
-        run: git checkout origin/master -- src fabric.ts index.ts index.node.ts .browserslistrc
+        run: git checkout origin/master -- src fabric.ts index.ts index.node.ts .browserslistrc rollup.config.mjs
       - name: upstream build stats
         run: npm run build -- -s
       - name: persist

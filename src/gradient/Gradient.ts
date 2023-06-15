@@ -101,6 +101,8 @@ export class Gradient<
    */
   declare readonly id: string | number;
 
+  static type = 'Gradient';
+
   constructor({
     type = 'linear' as T,
     gradientUnits = 'pixels',

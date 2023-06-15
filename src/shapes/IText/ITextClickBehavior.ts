@@ -3,7 +3,7 @@ import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
-import { invertTransform, transformPoint } from '../../util/misc/matrix';
+import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
@@ -131,7 +131,12 @@ export abstract class ITextClickBehavior<
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
+    if (
+      !this.canvas ||
+      !this.editable ||
+      notALeftClick(e as MouseEvent) ||
+      this.__corner
+    ) {
       return;
     }
 
@@ -231,24 +236,14 @@ export abstract class ITextClickBehavior<
   }
 
   /**
-   * Returns coordinates of a pointer relative to object's top left corner in object's plane
-   * @param {Point} [pointer] Pointer to operate upon
-   * @return {Point} Coordinates of a pointer (x, y)
-   */
-  getLocalPointer(pointer: Point): Point {
-    return transformPoint(
-      pointer,
-      invertTransform(this.calcTransformMatrix())
-    ).add(new Point(this.width / 2, this.height / 2));
-  }
-
-  /**
    * Returns index of a character corresponding to where an object was clicked
    * @param {TPointerEvent} e Event object
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.getLocalPointer(this.canvas!.getPointer(e));
+    const mouseOffset = this.canvas!.getPointer(e)
+      .transform(invertTransform(this.calcTransformMatrix()))
+      .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,
       charIndex = 0,
       lineIndex = 0;
@@ -267,13 +262,6 @@ export abstract class ITextClickBehavior<
     const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
     let width = lineLeftOffset;
     const jlen = this._textLines[lineIndex].length;
-    // handling of RTL: in order to get things work correctly,
-    // we assume RTL writing is mirrored compared to LTR writing.
-    // so in position detection we mirror the X offset, and when is time
-    // of rendering it, we mirror it again.
-    if (this.direction === 'rtl') {
-      mouseOffset.x = this.width - mouseOffset.x;
-    }
     let prevWidth = 0;
     for (let j = 0; j < jlen; j++) {
       prevWidth = width;
