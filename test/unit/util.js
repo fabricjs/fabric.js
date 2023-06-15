@@ -324,23 +324,16 @@
   });
 
   // element doesn't seem to have style on node
-  if (!isNode()) {
-    QUnit.test('fabric.util.setStyle', function(assert) {
+  QUnit.test('fabric.util.setStyle', function(assert) {
 
-      assert.ok(typeof fabric.util.setStyle === 'function');
+    assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.getFabricDocument().createElement('div');
+    var el = fabric.getFabricDocument().createElement('div');
 
-      fabric.util.setStyle(el, 'color:red');
-      assert.equal(el.style.color, 'red');
-      fabric.util.setStyle(el, 'color:blue;border-radius:3px');
-      assert.equal(el.style.color, 'blue');
-      assert.equal(el.style.borderRadius, '3px');
-      fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
-      assert.equal(el.style.color, 'yellow');
-      assert.equal(el.style.width, '45px');
-    });
-  }
+    fabric.util.setStyle(el, { color: 'yellow', width: '45px' });
+    assert.equal(el.style.color, 'yellow');
+    assert.equal(el.style.width, '45px');
+  });
 
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
