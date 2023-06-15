@@ -151,6 +151,8 @@ export class Group extends createCollectionMixin(
     'layout',
   ];
 
+  static type = 'Group';
+
   static ownDefaults: Record<string, any> = groupDefaultValues;
   private __objectSelectionTracker: (ev: ObjectEvents['selected']) => void;
   private __objectSelectionDisposer: (ev: ObjectEvents['deselected']) => void;

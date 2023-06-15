@@ -60,6 +60,8 @@ export class Resize extends BaseFilter {
 
   declare fragmentSourceTOP: string;
 
+  static type = 'Resize';
+
   static defaults = resizeDefaultValues;
 
   /**

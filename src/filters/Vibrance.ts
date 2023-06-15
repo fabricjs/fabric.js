@@ -29,6 +29,8 @@ export class Vibrance extends BaseFilter {
    */
   declare vibrance: number;
 
+  static type = 'Vibrance';
+
   static defaults = vibranceDefaultValues;
 
   getFragmentSource() {

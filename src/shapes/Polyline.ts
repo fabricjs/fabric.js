@@ -55,6 +55,8 @@ export class Polyline<
 
   static ownDefaults: Record<string, any> = polylineDefaultValues;
 
+  static type = 'Polyline';
+
   static getDefaults() {
     return {
       ...super.getDefaults(),
@@ -269,7 +271,11 @@ export class Polyline<
       );
     }
     return [
-      `<${this.constructor.name.toLowerCase() as 'polyline' | 'polygon'} `,
+      `<${
+        (this.constructor as typeof Polyline).type.toLowerCase() as
+          | 'polyline'
+          | 'polygon'
+      } `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];

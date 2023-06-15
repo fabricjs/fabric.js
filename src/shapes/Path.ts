@@ -63,6 +63,8 @@ export class Path<
 
   declare segmentsInfo?: TPathSegmentInfo[];
 
+  static type = 'Path';
+
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
   /**

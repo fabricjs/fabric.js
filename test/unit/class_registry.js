@@ -7,11 +7,12 @@
   });
   QUnit.test('getClass will return specific class matched by name', function (assert) {
     class TestClass {
-
+      static type = 'NonTestClass';
     }
     classRegistry.setClass(TestClass);
-    assert.equal(classRegistry.getClass('TestClass'), TestClass, 'resolves class correctly');
-    assert.equal(classRegistry.getClass('testclass'), TestClass, 'resolves class correctly to lower case');
+    assert.equal(classRegistry.getClass('NonTestClass'), TestClass, 'resolves class correctly');
+    assert.equal(classRegistry.getClass('nontestclass'), TestClass, 'resolves class correctly to lower case');
+    assert.throws(() => classRegistry.getClass('TestClass'), new Error(`No class registered for TestClass`), 'Does not resolve by class constructor name');
   });
   QUnit.test('getClass will return specific class from custom type', function (assert) {
     class TestClass2 {
