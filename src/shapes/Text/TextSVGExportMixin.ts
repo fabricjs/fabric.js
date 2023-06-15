@@ -226,18 +226,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       boxStart = 0,
       charBox,
       currentColor,
-      lastColor = this.getValueOfPropertyAt<'textBackgroundColor'>(
-        i,
-        0,
-        'textBackgroundColor'
-      );
+      lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
     for (let j = 0; j < line.length; j++) {
       charBox = this.__charBounds[i][j];
-      currentColor = this.getValueOfPropertyAt<'textBackgroundColor'>(
-        i,
-        j,
-        'textBackgroundColor'
-      );
+      currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
       if (currentColor !== lastColor) {
         lastColor &&
           textBgRects.push(

@@ -497,14 +497,10 @@ export class IText<
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
-      charHeight = this.getValueOfPropertyAt<'fontSize'>(
-        lineIndex,
-        charIndex,
-        'fontSize'
-      ),
+      charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
       multiplier = this.scaleX * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      dy = this.getValueOfPropertyAt<'deltaY'>(lineIndex, charIndex, 'deltaY'),
+      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =
         boundaries.topOffset +
         ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
@@ -518,11 +514,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      (this.getValueOfPropertyAt<'fill'>(
-        lineIndex,
-        charIndex,
-        'fill'
-      ) as string);
+      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -665,7 +657,7 @@ export class IText<
    */
   getCurrentCharFontSize(): number {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt<'fontSize'>(cp.l, cp.c, 'fontSize');
+    return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
   }
 
   /**
@@ -678,7 +670,7 @@ export class IText<
    */
   getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt<'fill'>(cp.l, cp.c, 'fill');
+    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }
 
   /**

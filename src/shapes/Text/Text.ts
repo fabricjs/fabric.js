@@ -705,19 +705,11 @@ export class Text<
       let boxStart = 0;
       let drawStart;
       let currentColor;
-      let lastColor = this.getValueOfPropertyAt<'textBackgroundColor'>(
-        i,
-        0,
-        'textBackgroundColor'
-      );
+      let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
-        currentColor = this.getValueOfPropertyAt<'textBackgroundColor'>(
-          i,
-          j,
-          'textBackgroundColor'
-        );
+        currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
         if (this.path) {
           ctx.save();
           ctx.translate(charBox.renderLeft, charBox.renderTop);
@@ -846,7 +838,7 @@ export class Text<
    * @return {Number} fontSize of the character
    */
   getHeightOfChar(line: number, _char: number): number {
-    return this.getValueOfPropertyAt<'fontSize'>(line, _char, 'fontSize');
+    return this.getValueOfPropertyAt(line, _char, 'fontSize');
   }
 
   /**
@@ -1423,16 +1415,12 @@ export class Text<
     }
   ) {
     const loc = this.get2DCursorLocation(start, true),
-      fontSize = this.getValueOfPropertyAt<'fontSize'>(
+      fontSize = this.getValueOfPropertyAt(
         loc.lineIndex,
         loc.charIndex,
         'fontSize'
       ),
-      dy = this.getValueOfPropertyAt<'deltaY'>(
-        loc.lineIndex,
-        loc.charIndex,
-        'deltaY'
-      ),
+      dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'),
       style = {
         fontSize: fontSize * schema.size,
         deltaY: dy + fontSize * schema.baseline,
@@ -1532,7 +1520,7 @@ export class Text<
   getValueOfPropertyAt<T extends StylePropertiesType>(
     lineIndex: number,
     charIndex: number,
-    property: StylePropertiesType
+    property: T
   ): this[T] {
     const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
     return (charStyle[property] ?? this[property]) as this[T];
@@ -1566,19 +1554,19 @@ export class Text<
       const lineLeftOffset = this._getLineLeftOffset(i);
       let boxStart = 0;
       let boxWidth = 0;
-      let lastDecoration = this.getValueOfPropertyAt<typeof type>(i, 0, type);
-      let lastFill = this.getValueOfPropertyAt<'fill'>(i, 0, 'fill');
+      let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
+      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
       let currentDecoration;
       let currentFill;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
       let size = this.getHeightOfChar(i, 0);
-      let dy = this.getValueOfPropertyAt<'deltaY'>(i, 0, 'deltaY');
+      let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
-        currentDecoration = this.getValueOfPropertyAt<typeof type>(i, j, type);
-        currentFill = this.getValueOfPropertyAt<'fill'>(i, j, 'fill');
+        currentDecoration = this.getValueOfPropertyAt(i, j, type);
+        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
         const currentSize = this.getHeightOfChar(i, j);
-        const currentDy = this.getValueOfPropertyAt<'deltaY'>(i, j, 'deltaY');
+        const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.

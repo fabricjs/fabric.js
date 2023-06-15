@@ -564,11 +564,8 @@ export abstract class ITextBehavior<
       lineIndex = cursorLocation.lineIndex,
       charIndex = cursorLocation.charIndex,
       charHeight =
-        this.getValueOfPropertyAt<'fontSize'>(
-          lineIndex,
-          charIndex,
-          'fontSize'
-        ) * this.lineHeight,
+        this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
+        this.lineHeight,
       leftOffset = boundaries.leftOffset,
       retinaScaling = this.getCanvasRetinaScaling(),
       upperCanvas = this.canvas.upperCanvasEl,
