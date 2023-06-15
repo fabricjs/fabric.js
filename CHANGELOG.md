@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(TS): Allow declaration merging for FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
+- ci(): Added playwright testing [#8616](https://github.com/fabricjs/fabric.js/pull/8616)
 - fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
 - ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
 
