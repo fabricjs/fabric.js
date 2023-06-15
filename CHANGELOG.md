@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
+- ci(): Added playwright testing [#8616](https://github.com/fabricjs/fabric.js/pull/8616)
 - fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
 - ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
 

@@ -129,6 +129,7 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
 
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `test/visual/golden`
+- `UI` tests: testing with playwright
 
 ### Getting Started
 
@@ -170,6 +171,14 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
   ```bash
   npm test -- -h
   ```
+
+## UI tests
+
+Run UI tests with Playwright in parallel in Chrome (headed mode).
+
+```bash
+$ npm run test:e2e
+```
 
 ### Adding Tests
 
