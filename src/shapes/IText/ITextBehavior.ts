@@ -318,17 +318,17 @@ export abstract class ITextBehavior<
     // if we land on a space we move the cursor backwards
     // if we are searching boundary end we move the cursor backwards ONLY if we don't land on a line break
     let index =
-        this._reSpace.test(text[selectionStart]) &&
         selectionStart > 0 &&
-        (direction < 0 || !reNewline.test(text[selectionStart - 1]))
+        this._reSpace.test(text[selectionStart]) &&
+        (direction === -1 || !reNewline.test(text[selectionStart - 1]))
           ? selectionStart - 1
           : selectionStart,
       _char = text[index];
-    while (!reNonWord.test(_char) && index > 0 && index < text.length) {
+    while (index > 0 && index < text.length && !reNonWord.test(_char)) {
       index += direction;
       _char = text[index];
     }
-    if (reNonWord.test(_char) && direction < 0) {
+    if (direction === -1 && reNonWord.test(_char)) {
       index++;
     }
     return index;
