@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
 - fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
 - ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
 
