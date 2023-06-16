@@ -4,7 +4,7 @@
  * @param {HTMLElement} element
  * @param {Object | string} styles
  */
-export function setStyle(element: HTMLElement, styles: Record<string, string>) {
+export function setStyle(element: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
   const elementStyle = element.style;
   if (!elementStyle) {
     return;
