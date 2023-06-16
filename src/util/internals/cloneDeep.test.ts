@@ -11,5 +11,6 @@ describe('cloneDeep', () => {
     };
     const cloned = cloneDeep(testObject);
     expect(cloned).toEqual(testObject);
+    expect(cloned).not.toBe(testObject);
   });
 });
