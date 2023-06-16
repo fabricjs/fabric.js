@@ -3,6 +3,13 @@
 ## [next]
 
 - ci(): Revert "invoke tests after changelog action (#8974)" [#9013](https://github.com/fabricjs/fabric.js/pull/9013)
+- fix(IText): empty line selection [#9019](https://github.com/fabricjs/fabric.js/pull/9019)
+- ci(): Added playwright testing [#8616](https://github.com/fabricjs/fabric.js/pull/8616)
+- fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
+- ci(): prettier after changelog action [#9021](https://github.com/fabricjs/fabric.js/pull/9021)
+
+## [6.0.0-beta9]
+
 - fix(fabric): Fix the serialization and registry dependency from minification [#9009](https://github.com/fabricjs/fabric.js/pull/9009)
 - chore(TS): remove troublesome `AssertKeys` TS construct [#9012](https://github.com/fabricjs/fabric.js/pull/9012)
 - fix(lib): fix aligning_guideline zoom [#8998](https://github.com/fabricjs/fabric.js/pull/8998)
