@@ -2,7 +2,7 @@ import * as fabric from 'fabric';
 import './styles.css';
 
 const el = document.getElementById('canvas');
-const canvas = new fabric.Canvas(el);
+const canvas = (window.canvas = new fabric.Canvas(el));
 
 //  edit from here
 canvas.setDimensions({
