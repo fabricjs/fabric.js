@@ -3,6 +3,7 @@ name: '🩺'
 on:
   pull_request:
     branches: [master]
+    paths-ignore: [CHANGELOG.md]
 
 jobs:
   build:
