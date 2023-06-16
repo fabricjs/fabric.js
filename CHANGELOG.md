@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Revert "invoke tests after changelog action (#8974)" [#9013](https://github.com/fabricjs/fabric.js/pull/9013)
 - fix(IText): empty line selection [#9019](https://github.com/fabricjs/fabric.js/pull/9019)
 - ci(): Added playwright testing [#8616](https://github.com/fabricjs/fabric.js/pull/8616)
 - fix(IText): `exitEditing` should clear contextTop [#9020](https://github.com/fabricjs/fabric.js/pull/9020)
