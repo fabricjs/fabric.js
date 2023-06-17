@@ -52,8 +52,8 @@ jobs:
       - name: Build
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
         if: matrix.node-version != '18.x'
+        run: npm run test -- -c node -s ${{ matrix.suite }}
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.node-version == '18.x' && matrix.suite == 'unit'
         run: npm run test:coverage
@@ -86,3 +86,16 @@ jobs:
       - run: npm ci
       - name: Run Jest unit test
         run: npm run test:jest
+  coverage:
+    needs: [node, jest]
+    name: Coverage reporting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-unit
+          path: coveragefiles
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-visual
+          path: coveragefiles
