@@ -53,6 +53,13 @@ jobs:
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
+        if: matrix.node-version != '18.x'
+      - name: Run ${{ matrix.suite }} tests with coverage
+        run: test:coverage
+        if: matrix.node-version == '18.x' &&  matrix.suite == 'unit'
+      - name: Run ${{ matrix.suite }} tests with coverage
+        run: test:visual:coverage
+        if: matrix.node-version == '18.x' &&  matrix.suite == 'visual'
   jest:
     name: Jest tests
     runs-on: ubuntu-latest
