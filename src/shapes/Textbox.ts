@@ -426,6 +426,9 @@ export class Textbox extends IText {
 
     i && graphemeLines.push(line);
 
+    // TODO: this code is probably not necessary anymore.
+    // it can be moved out of this function since largestWordWidth is now
+    // known in advance
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
     }
