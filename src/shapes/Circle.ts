@@ -64,6 +64,8 @@ export class Circle<
   declare startAngle: number;
   declare endAngle: number;
 
+  static type = 'Circle';
+
   static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
   static ownDefaults: Record<string, any> = circleDefaultValues;

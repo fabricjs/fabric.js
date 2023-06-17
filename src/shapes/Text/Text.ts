@@ -396,6 +396,8 @@ export class Text<
 
   static ownDefaults: Record<string, any> = textDefaultValues;
 
+  static type = 'Text';
+
   static getDefaults() {
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }

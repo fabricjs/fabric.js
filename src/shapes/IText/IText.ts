@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { AssertKeys, TFiller } from '../../typedefs';
+import type { TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -39,7 +39,7 @@ export const iTextDefaultValues = {
   caching: true,
   hiddenTextareaContainer: null,
   _selectionDirection: null,
-  _reSpace: /\s|\n/,
+  _reSpace: /\s|\r?\n/,
   inCompositionMode: false,
   keysMap,
   keysMapRtl,
@@ -201,6 +201,8 @@ export class IText<
   static getDefaults() {
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
+
+  static type = 'IText';
 
   get type() {
     return 'i-text';
@@ -542,11 +544,11 @@ export class IText<
   /**
    * Renders drag start text selection
    */
-  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+  renderDragSourceEffect() {
     const dragStartSelection =
       this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
-      this.canvas.contextTop,
+      this.canvas!.contextTop,
       dragStartSelection,
       this._getCursorBoundaries(dragStartSelection.selectionStart, true)
     );

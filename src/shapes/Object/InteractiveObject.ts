@@ -1,5 +1,5 @@
 import { Point } from '../../Point';
-import type { AssertKeys, TCornerPoint, TDegree } from '../../typedefs';
+import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
@@ -650,7 +650,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
+  renderDragSourceEffect(e: DragEvent) {
     // for subclasses
   }
 
@@ -663,7 +663,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
+  renderDropTargetEffect(e: DragEvent) {
     // for subclasses
   }
 }

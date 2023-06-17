@@ -30,6 +30,8 @@ export class Saturation extends BaseFilter {
    */
   declare saturation: number;
 
+  static type = 'Saturation';
+
   static defaults = saturationDefaultValues;
 
   getFragmentSource() {

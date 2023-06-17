@@ -27,6 +27,8 @@ export class HueRotation extends ColorMatrix {
    */
   declare rotation: number;
 
+  static type = 'HueRotation';
+
   static defaults = hueRotationDefaultValues;
 
   calculateMatrix() {

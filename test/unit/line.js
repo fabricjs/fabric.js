@@ -47,7 +47,7 @@
     assert.ok(line instanceof fabric.Line);
     assert.ok(line instanceof fabric.Object);
 
-    assert.equal(line.constructor.name, 'Line');
+    assert.equal(line.constructor.type, 'Line');
 
     assert.equal(line.get('x1'), 10);
     assert.equal(line.get('y1'), 11);

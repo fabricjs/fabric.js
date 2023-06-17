@@ -13,8 +13,11 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
+  // TODO FIX THIS WITH THE DEFAULTS LOGIC
   multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
     'canvas-stacking';
+
+  static type = 'ActiveSelection';
 
   constructor(
     objects?: FabricObject[],

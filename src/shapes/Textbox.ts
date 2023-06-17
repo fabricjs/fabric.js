@@ -55,6 +55,8 @@ export class Textbox extends IText {
    */
   declare splitByGrapheme: boolean;
 
+  static type = 'Textbox';
+
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
   static ownDefaults: Record<string, any> = textboxDefaultValues;

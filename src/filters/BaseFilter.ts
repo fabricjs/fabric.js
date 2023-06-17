@@ -22,8 +22,17 @@ export class BaseFilter {
    * @default
    */
   get type(): string {
-    return this.constructor.name;
+    return (this.constructor as typeof BaseFilter).type;
   }
+
+  /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'BaseFilter';
 
   declare static defaults: Record<string, any>;
 

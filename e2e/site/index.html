@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <script type="text/javascript" src="/dist/index.js"></script>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+      .canvas-container {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="test-canvas" width="800" height="600"></canvas>
+  </body>
+  <script type="text/javascript">
+    const fabricCanvas = new fabric.Canvas(
+      document.getElementById('test-canvas'),
+      { enableRetinaScaling: false }
+    );
+    window.fabricCanvas = fabricCanvas;
+    window.setupScene = (json) => fabricCanvas.loadFromJSON(json);
+  </script>
+</html>
