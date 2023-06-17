@@ -60,18 +60,18 @@ jobs:
       - name: Upload QUnit unit test coverage
         if: matrix.node-version == '18.x' && matrix.suite == 'unit'
         uses: actions/upload-artifact@v3
-          with:
-            name: coverage-unit
-            path: .nyc_output/*.json
+        with:
+          name: coverage-unit
+          path: .nyc_output/*.json
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.node-version == '18.x' && matrix.suite == 'visual'
         run: npm run test:visual:coverage
       - name: Upload QUnit visual test coverage
         if: matrix.node-version == '18.x' && matrix.suite == 'unit'
         uses: actions/upload-artifact@v3
-          with:
-            name: coverage-visual
-            path: .nyc_output/*.json
+        with:
+          name: coverage-visual
+          path: .nyc_output/*.json
   jest:
     name: Jest tests
     runs-on: ubuntu-latest
