@@ -353,6 +353,71 @@
       'lines match splitByGrapheme charSpacing -100'
     );
   });
+  QUnit.test('Measure words', function(assert) {
+    const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
+    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
+    assert.deepEqual(
+      wordsData[0],
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }, { word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line 0'
+    );
+    assert.deepEqual(
+      wordsData[1],
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line1'
+    );
+    assert.equal(Math.round(largestWordWidth), 82, 'largest word is 82');
+  });
+  QUnit.test('Measure words with styles', function(assert) {
+    const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
+    textbox.styles = {
+      0: {
+        5: {
+          fontSize: 100,
+        },
+        6: {
+          fontSize: 100,
+        },
+        7: {
+          fontSize: 100,
+        },
+        8: {
+          fontSize: 100,
+        }
+      },
+      2: {
+        0: {
+          fontSize: 200,
+        },
+        1: {
+          fontSize: 200,
+        },
+        2: {
+          fontSize: 200,
+        },
+        3: {
+          fontSize: 200,
+        }
+      }
+    };
+    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
+    assert.equal(
+      Math.round(wordsData[0][0].width),
+      82,
+      'unstyle word is 82 wide'
+    );
+    assert.equal(
+      Math.round(wordsData[0][1].width),
+      206,
+      'unstyle word is 206 wide'
+    );
+    assert.deepEqual(
+      wordsData[2],
+      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      'All words have the same length line1'
+    );
+    assert.equal(Math.round(largestWordWidth), 411, 'largest word is 411');
+  });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
       width: 16,
@@ -381,15 +446,16 @@
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 2000,
     });
-    var line1 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 0);
+    const wordsData = textbox.getGraphemeDataForRender(['xa xb xc xd xe ya yb id']);
+    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     var expected1 =  [
       ['x', 'a', ' ', 'x', 'b'],
       ['x', 'c', ' ', 'x', 'd'],
       ['x', 'e', ' ', 'y', 'a'],
       ['y', 'b', ' ', 'i', 'd']];
-    assert.deepEqual(line1, expected1, 'wrapping without reserved');
-    assert.deepEqual(textbox.dynamicMinWidth, 40, 'wrapping without reserved');
-    var line2 = textbox._wrapLine('xa xb xc xd xe ya yb id', 0, 100, 50);
+    assert.deepEqual(line1, expected1, 'line1 match expected');
+    assert.deepEqual(textbox.dynamicMinWidth, 40, 'texbox width is 40');
+    var line2 = textbox._wrapLine(0, 100, wordsData, 50);
     var expected2 =  [
       ['x', 'a'],
       ['x', 'b'],
@@ -399,18 +465,31 @@
       ['y', 'a'],
       ['y', 'b'],
       ['i', 'd']];
-    assert.deepEqual(line2, expected2, 'wrapping without reserved');
-    assert.deepEqual(textbox.dynamicMinWidth, 90, 'wrapping without reserved');
+    assert.deepEqual(line2, expected2, 'line2 match expected');
+    assert.deepEqual(textbox.dynamicMinWidth, 90, 'texbox width is 90');
   });
   QUnit.test('wrapping an empty line', function(assert) {
     var textbox = new fabric.Textbox('', {
       width: 10,
     });
-    var line1 = textbox._wrapLine('', 0, 100, 0);
+    const wordsData = textbox.getGraphemeDataForRender(['']);
+    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
     textbox.splitByGrapheme = true;
-    var line2 = textbox._wrapLine('', 0, 100, 0);
+    var line2 = textbox._wrapLine(0, 100, wordsData, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
+  });
+  QUnit.test('wrapping respects max line width', function (assert) {
+    const a = 'xaxbxc xdxeyaybid xaxbxc';
+    const b = 'xaxbxcxdxeyaybidxaxbxcxdxeyaybid';
+    [true, false].forEach(order => {
+      [true, false].forEach(space => {
+        const ordered = order ? [a, b] : [b, a];
+        const text = ordered.join(space ? ' ' : '\n');
+        const { _textLines: lines } = new fabric.Textbox(text);
+        assert.deepEqual(lines, ordered.map(line => line.split('')), `max line width should be respected for ${text}`);
+      });
+    });
   });
   QUnit.test('texbox will change width from the mr corner', function(assert) {
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
