@@ -11,5 +11,5 @@ runs:
         key: npm-${{ github.event.pull_request.head.sha }}
     - name: Build fabric.js dist folder
       if: steps.build-cache.outputs.cache-hit != 'true'
-      run: npm run build
+      run: npm run build -- -f
       shell: bash
