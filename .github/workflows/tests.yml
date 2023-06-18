@@ -8,7 +8,19 @@ on:
     paths-ignore: [CHANGELOG.md]
 
 jobs:
+  prime-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: true
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
   node-coverage:
+    needs: [prime-build]
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
@@ -25,8 +37,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           install-system-deps: true
-      - name: Build
-        run: npm run build -- -f
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.suite == 'unit'
         run: npm run test:coverage
@@ -39,6 +51,7 @@ jobs:
           name: coverage-${{ matrix.suite }}
           path: .nyc_output/*.json
   browser:
+    needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
     runs-on: ubuntu-latest
     strategy:
@@ -53,12 +66,14 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm run build -- -f
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
         uses: coactions/setup-xvfb@v1
         with:
           run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
+    needs: [prime-build]
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
@@ -75,8 +90,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           install-system-deps: true
-      - name: Build
-        run: npm run build -- -f
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
   jest:
