@@ -105,18 +105,19 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-unit
-          path: coveragefiles
+          path: .nyc_output
       - uses: actions/download-artifact@v3
         with:
           name: coverage-visual
-          path: coveragefiles
+          path: .nyc_output
       - uses: actions/download-artifact@v3
         with:
           name: coverage-jest
-          path: coveragefiles
-      - run: npm run coverage:merge
-      - name: Upload final coverage
+          path: .nyc_output
+      - run: ls -l .nyc_output
+      - run: npm run coverage:report
+      - name: Upload Coverage report
         uses: actions/upload-artifact@v3
         with:
-          name: coverage-merged
-          path: .nyc_output/*.json
+          name: coverage-report
+          path: coverage/*
