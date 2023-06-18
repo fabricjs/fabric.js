@@ -8,48 +8,6 @@ on:
     paths-ignore: [CHANGELOG.md]
 
 jobs:
-  browser:
-    name: ${{ matrix.target }} ${{ matrix.suite }} tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-        target: [chrome, firefox]
-        suite: [unit, visual]
-      fail-fast: false
-    steps:
-      - uses: actions/checkout@v3
-      - name: Unit tests on Chrome
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm run build -- -f
-      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
-  node:
-    runs-on: ubuntu-latest
-    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
-    strategy:
-      fail-fast: false
-      matrix:
-        # For more information see:
-        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [14.x, 16.x, 20.x]
-        suite: [unit, visual]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: ${{ matrix.node-version }}
-          install-system-deps: true
-      - name: Build
-        run: npm run build -- -f
-      - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
   node-coverage:
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
@@ -80,6 +38,47 @@ jobs:
         with:
           name: coverage-${{ matrix.suite }}
           path: .nyc_output/*.json
+  browser:
+    name: ${{ matrix.target }} ${{ matrix.suite }} tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        target: [chrome, firefox]
+        suite: [unit, visual]
+      fail-fast: false
+    steps:
+      - name: Unit tests on browser ${{ matrix.target }}
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm run build -- -f
+      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+  node:
+    runs-on: ubuntu-latest
+    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
+    strategy:
+      fail-fast: false
+      matrix:
+        # For more information see:
+        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
+        node-version: [14.x, 16.x, 20.x]
+        suite: [unit, visual]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: ${{ matrix.node-version }}
+          install-system-deps: true
+      - name: Build
+        run: npm run build -- -f
+      - name: Run ${{ matrix.suite }} tests
+        run: npm run test -- -c node -s ${{ matrix.suite }}
   jest:
     name: Jest tests
     runs-on: ubuntu-latest
@@ -87,7 +86,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18
+          node-version: 18.x
           install-system-deps: true
       - name: Run Jest unit test
         run: npm run test:jest:coverage
@@ -104,7 +103,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18
+          node-version: 18.x
           install-system-deps: false
       - uses: actions/download-artifact@v3
         with:
