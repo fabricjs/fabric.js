@@ -110,14 +110,10 @@ jobs:
         with:
           name: coverage-visual
           path: .nyc_output
-      - uses: actions/download-artifact@v3
-        with:
-          name: coverage-jest
-          path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - name: Upload Coverage report
-        uses: actions/upload-artifact@v3
+      - uses: ShaMan123/lcov-reporter-action@v1.1.1
         with:
-          name: coverage-report
-          path: coverage/*
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+          update-comment: true
