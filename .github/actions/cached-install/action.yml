@@ -23,5 +23,5 @@ runs:
         path: ~/.npm
         key: npm-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
         restore-keys: npm-${{ inputs.node-version }}
-    - run: npm ci
+    - run: npm ci --audit false --fund false
       shell: bash
