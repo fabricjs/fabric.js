@@ -108,4 +108,14 @@ jobs:
         with:
           name: coverage-jest
           path: coveragefiles
-      - run: ls -l coveragefiles
+      - name: Use Node.js v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install nyc
+      - run: nyc merge coveragefiles .nyc_output/merged-coverage.json
+      - name: Upload final coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-merged
+          path: .nyc_output/*.json
