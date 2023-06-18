@@ -96,6 +96,12 @@ jobs:
     name: Coverage reporting
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
       - uses: actions/download-artifact@v3
         with:
           name: coverage-unit
@@ -108,12 +114,7 @@ jobs:
         with:
           name: coverage-jest
           path: coveragefiles
-      - name: Use Node.js v18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm install nyc
-      - run: nyc merge coveragefiles .nyc_output/merged-coverage.json
+      - run: npm run coverage:merge
       - name: Upload final coverage
         uses: actions/upload-artifact@v3
         with:
