@@ -85,7 +85,12 @@ jobs:
           node-version: 18
       - run: npm ci
       - name: Run Jest unit test
-        run: npm run test:jest
+        run: npm run test:jest:coverage
+      - name: Upload QUnit visual test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-jest
+          path: .nyc_output/*.json
   coverage:
     needs: [node, jest]
     name: Coverage reporting
@@ -99,3 +104,8 @@ jobs:
         with:
           name: coverage-visual
           path: coveragefiles
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-jest
+          path: coveragefiles
+      - run: ls -l coveragefiles
