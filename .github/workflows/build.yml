@@ -9,12 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: Uglified build
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
-      - run: npm ci
+          node-version: 18
       - run: npm run build
   stats:
     name: Build stats
@@ -72,20 +71,18 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Linting
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
-      - run: npm ci
+          node-version: 18
       - run: npm run lint
   prettier:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Prettier check
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
-      - run: npm ci
+          node-version: 18
       - run: npm run prettier:check

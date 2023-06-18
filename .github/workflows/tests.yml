@@ -63,13 +63,10 @@ jobs:
         suite: [unit, visual]
     steps:
       - uses: actions/checkout@v3
-      - name: Install node-canvas
-        run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
+          install-system-deps: true
       - name: Build
         run: npm run build -- -f
       - name: Run ${{ matrix.suite }} tests with coverage
@@ -88,13 +85,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install node-canvas
-        run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
-      - name: Use Node.js v18
-        uses: actions/setup-node@v3
+      - uses: ./.github/actions/cached-install
         with:
           node-version: 18
-      - run: npm ci
+          install-system-deps: true
       - name: Run Jest unit test
         run: npm run test:jest:coverage
       - name: Upload test coverage
@@ -108,11 +102,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js v18
-        uses: actions/setup-node@v3
+      - uses: ./.github/actions/cached-install
         with:
           node-version: 18
-      - run: npm ci
+          install-system-deps: false
       - uses: actions/download-artifact@v3
         with:
           name: coverage-unit
