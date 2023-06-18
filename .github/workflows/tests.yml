@@ -90,7 +90,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           install-system-deps: true
       - name: Build fabric.js
-        run: npm run build -- -f
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
   jest:
