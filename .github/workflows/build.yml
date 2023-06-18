@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Uglified build
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
@@ -72,7 +72,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Linting
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prettier check
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
