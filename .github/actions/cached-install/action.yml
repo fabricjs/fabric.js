@@ -21,6 +21,7 @@ runs:
       id: npm-cache-dir
       run: |
         echo "::set-output name=dir::$(npm config get cache)"
+      shell: bash
     - name: Cache dependencies
       uses: actions/cache@v3
       with:
