@@ -49,7 +49,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Unit tests on browser ${{ matrix.target }}
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
