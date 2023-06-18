@@ -42,7 +42,7 @@ jobs:
         suite: [unit, visual]
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/fast-install
+      - uses: ./.github/actions/fast-install.yml
         with:
           node-version: ${{ matrix.node-version }}
           install-system-deps: true
