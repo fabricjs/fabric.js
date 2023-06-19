@@ -17,16 +17,16 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
-    # - name: Get npm cache directory
-    #   id: npm-cache-dir
-    #   run: |
-    #     echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-    #   shell: bash
-    # - name: Cache dependencies
-    #   uses: actions/cache@v3
-    #   with:
-    #     path: ${{ steps.npm-cache-dir.outputs.dir }}
-    #     key: npm-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
-    #     restore-keys: npm-${{ inputs.node-version }}
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      run: |
+        echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: npm-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: npm-${{ inputs.node-version }}
     - run: npm ci --audit false --fund false
       shell: bash
