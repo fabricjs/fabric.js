@@ -1,8 +1,6 @@
 import { getSvgRegex } from './getSvgRegex';
 import { LEFT, TOP } from '../constants';
 
-export const cssRules = {};
-
 export const reNum = String.raw`(?:[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?)`;
 
 export const svgNS = 'http://www.w3.org/2000/svg';
