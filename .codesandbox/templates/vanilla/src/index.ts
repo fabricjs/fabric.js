@@ -15,19 +15,16 @@ const text = new fabric.Textbox(textValue, {
   splitByGrapheme: true,
   width: 200,
   top: 20,
-  styles: fabric.util.stylesFromArray(
-    [
-      {
-        style: {
-          fontWeight: 'bold',
-          fontSize: 64,
-        },
-        start: 0,
-        end: 9,
+  styles: [
+    {
+      style: {
+        fontWeight: 'bold',
+        fontSize: 64,
       },
-    ],
-    textValue
-  ),
+      start: 0,
+      end: 9,
+    },
+  ],
 });
 canvas.add(text);
 canvas.centerObjectH(text);

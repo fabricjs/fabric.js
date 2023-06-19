@@ -48,10 +48,7 @@ export { Polygon } from './src/shapes/Polygon';
 export { Text } from './src/shapes/Text/Text';
 export { IText } from './src/shapes/IText/IText';
 export { Textbox } from './src/shapes/Textbox';
-export type {
-  TextStyleDeclaration,
-  TextStyle,
-} from './src/shapes/Text/StyledText';
+export * from './src/shapes/Text/TextStyles';
 export { Group } from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';

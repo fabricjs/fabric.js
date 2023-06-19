@@ -28,12 +28,6 @@ export {
   multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
-export type { TextStyleArray } from './misc/textStyles';
-export {
-  stylesFromArray,
-  stylesToArray,
-  hasStyleChanged,
-} from './misc/textStyles';
 export {
   createCanvasElement,
   createImage,

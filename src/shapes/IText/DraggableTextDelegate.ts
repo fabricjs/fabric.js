@@ -8,7 +8,7 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import type { TextStyleDeclaration } from '../Text/StyledText';
+import type { TextStyleDeclaration } from '../Text/TextStyles';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { NONE } from '../../constants';
 

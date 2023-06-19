@@ -2,7 +2,6 @@
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { TextStyleDeclaration } from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
@@ -15,7 +14,6 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
-import { hasStyleChanged, stylesFromArray } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
@@ -36,6 +34,8 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
+import type { TextStyleDeclaration } from './TextStyles';
+import { TextStyles, hasStyleChanged } from './TextStyles';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -379,6 +379,8 @@ export class Text<
    */
   declare _textLines: string[][];
 
+  declare _endOfWrapping: boolean[];
+
   declare _unwrappedTextLines: string[][];
   declare _text: string[];
   declare cursorWidth: number;
@@ -396,13 +398,35 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, options: any) {
-    super({ ...options, text, styles: options?.styles || {} });
+  constructor(text: string, { styles, ...options }: any) {
+    super({ ...options, text });
     this.initialized = true;
     if (this.path) {
       this.setPathInfo();
     }
-    this.initDimensions();
+    const {
+      lines,
+      _unwrappedLines,
+      graphemeLines,
+      graphemeText,
+      endOfWrapping,
+    } = this._splitTextIntoLines(this.text);
+    this.textLines = lines;
+    this._textLines = graphemeLines;
+    this._unwrappedTextLines = _unwrappedLines;
+    this._text = graphemeText;
+    this._endOfWrapping = endOfWrapping;
+    this.styleManager = new TextStyles(
+      this,
+      styles || new Array(graphemeText.length).fill({})
+    );
+    this.initText();
+  }
+
+  protected initText() {
+    this._clearCache();
+    this.setDimensionsAfterLayout();
+    // TODO: remove
     this.setCoords();
   }
 
@@ -422,12 +446,7 @@ export class Text<
    * Divides text into lines of text and lines of graphemes.
    */
   _splitText() {
-    const newLines = this._splitTextIntoLines(this.text);
-    this.textLines = newLines.lines;
-    this._textLines = newLines.graphemeLines;
-    this._unwrappedTextLines = newLines._unwrappedLines;
-    this._text = newLines.graphemeText;
-    return newLines;
+    return this._splitTextIntoLines(this.text);
   }
 
   /**
@@ -436,9 +455,24 @@ export class Text<
    * Does not return dimensions.
    */
   initDimensions() {
-    this._splitText();
     this._clearCache();
+    const {
+      lines,
+      _unwrappedLines,
+      graphemeLines,
+      graphemeText,
+      endOfWrapping,
+    } = this._splitText();
+    this.textLines = lines;
+    this._textLines = graphemeLines;
+    this._unwrappedTextLines = _unwrappedLines;
+    this._text = graphemeText;
+    this._endOfWrapping = endOfWrapping;
+    this.setDimensionsAfterLayout();
     this.dirty = true;
+  }
+
+  setDimensionsAfterLayout() {
     if (this.path) {
       this.width = this.path.width;
       this.height = this.path.height;
@@ -520,8 +554,8 @@ export class Text<
    * @param {Number} selectionStart
    * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
    */
-  get2DCursorLocation(selectionStart: number, skipWrapping?: boolean) {
-    const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+  get2DCursorLocation(selectionStart: number) {
+    const lines = this._textLines;
     let i: number;
     for (i = 0; i < lines.length; i++) {
       if (selectionStart <= lines[i].length) {
@@ -1383,18 +1417,20 @@ export class Text<
       baseline: number;
     }
   ) {
-    const loc = this.get2DCursorLocation(start, true),
-      fontSize = this.getValueOfPropertyAt(
-        loc.lineIndex,
-        loc.charIndex,
-        'fontSize'
-      ),
-      dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'),
-      style = {
+    const fontSize = this.styleManager.value({
+        offset: start,
+        key: 'fontSize',
+      }),
+      dy = this.styleManager.value({ offset: start, key: 'deltaY' });
+
+    this.setSelectionStyles(
+      {
         fontSize: fontSize * schema.size,
         deltaY: dy + fontSize * schema.baseline,
-      };
-    this.setSelectionStyles(style, start, end);
+      },
+      start,
+      end
+    );
   }
 
   /**
@@ -1676,9 +1712,10 @@ export class Text<
     newText.pop();
     return {
       _unwrappedLines: newLines,
-      lines: lines,
+      lines,
       graphemeText: newText,
       graphemeLines: newLines,
+      endOfWrapping: new Array(newLines.length).fill(true),
     };
   }
 
@@ -1855,15 +1892,9 @@ export class Text<
    * @returns {Promise<Text>}
    */
   static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
-    return this._fromObject<Text>(
-      {
-        ...object,
-        styles: stylesFromArray(object.styles || {}, object.text),
-      },
-      {
-        extraParam: 'text',
-      }
-    );
+    return this._fromObject<Text>(object, {
+      extraParam: 'text',
+    });
   }
 }
 

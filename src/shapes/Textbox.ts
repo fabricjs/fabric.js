@@ -69,6 +69,16 @@ export class Textbox extends IText {
     };
   }
 
+  protected initText(): void {
+    const { value: graphemeLines, state: endOfWrapping } = this._wrapText(
+      this.textLines,
+      this.width
+    );
+    this._textLines = graphemeLines;
+    this._endOfWrapping = endOfWrapping;
+    super.initText();
+  }
+
   /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
@@ -76,15 +86,16 @@ export class Textbox extends IText {
    * @override
    */
   initDimensions() {
-    if (!this.initialized) {
-      return;
-    }
-    this.isEditing && this.initDelayedCursor();
-    this._clearCache();
     // clear dynamicMinWidth as it will be different after we re-wrap line
     this.dynamicMinWidth = 0;
-    // wrap lines
-    this._styleMap = this._generateStyleMap(this._splitText());
+    // if (!this.initialized) {
+    //   return;
+    // }
+    super.initDimensions();
+    this.isEditing && this.initDelayedCursor();
+  }
+
+  setDimensionsAfterLayout() {
     // if after wrapping, the width is smaller than dynamicMinWidth, change the width and re-wrap
     if (this.dynamicMinWidth > this.width) {
       this._set('width', this.dynamicMinWidth);
@@ -98,43 +109,6 @@ export class Textbox extends IText {
   }
 
   /**
-   * Generate an object that translates the style object so that it is
-   * broken up by visual lines (new lines and automatic wrapping).
-   * The original text styles object is broken up by actual lines (new lines only),
-   * which is only sufficient for Text / IText
-   * @private
-   */
-  _generateStyleMap(textInfo) {
-    let realLineCount = 0,
-      realLineCharCount = 0,
-      charCount = 0;
-    const map = {};
-
-    for (let i = 0; i < textInfo.graphemeLines.length; i++) {
-      if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
-        realLineCharCount = 0;
-        charCount++;
-        realLineCount++;
-      } else if (
-        !this.splitByGrapheme &&
-        this._reSpaceAndTab.test(textInfo.graphemeText[charCount]) &&
-        i > 0
-      ) {
-        // this case deals with space's that are removed from end of lines when wrapping
-        realLineCharCount++;
-        charCount++;
-      }
-
-      map[i] = { line: realLineCount, offset: realLineCharCount };
-
-      charCount += textInfo.graphemeLines[i].length;
-      realLineCharCount += textInfo.graphemeLines[i].length;
-    }
-
-    return map;
-  }
-
-  /**
    * Wraps text using the 'width' property of Textbox. First this function
    * splits text on newlines, so we preserve newlines entered by the user.
    * Then it wraps each line using the width of the Textbox by calling
@@ -143,16 +117,19 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: string[], desiredWidth: number): string[][] {
+  _wrapText(lines: string[], desiredWidth: number) {
     this.isWrapping = true;
     // extract all thewords and the widths to optimally wrap lines.
     const wordsData = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
+    const state: boolean[] = [];
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(i, desiredWidth, wordsData));
+      const wrappedLine = this._wrapLine(i, desiredWidth, wordsData);
+      wrapped.push(...wrappedLine);
+      state.push(...new Array(wrappedLine.length - 1).fill(false), true);
     }
     this.isWrapping = false;
-    return wrapped;
+    return { value: wrapped, state };
   }
 
   /**
@@ -319,15 +296,7 @@ export class Textbox extends IText {
    * @return {Boolean}
    */
   isEndOfWrapping(lineIndex: number): boolean {
-    if (!this._styleMap[lineIndex + 1]) {
-      // is last line, return true;
-      return true;
-    }
-    if (this._styleMap[lineIndex + 1].line !== this._styleMap[lineIndex].line) {
-      // this is last line before a line break, return true;
-      return true;
-    }
-    return false;
+    return this._endOfWrapping[lineIndex];
   }
 
   /**
@@ -349,16 +318,19 @@ export class Textbox extends IText {
    * @returns {Array} Array of lines in the Textbox.
    * @override
    */
-  _splitTextIntoLines(text: string) {
-    const newText = super._splitTextIntoLines(text),
-      graphemeLines = this._wrapText(newText.lines, this.width),
-      lines = new Array(graphemeLines.length);
-    for (let i = 0; i < graphemeLines.length; i++) {
-      lines[i] = graphemeLines[i].join('');
-    }
-    newText.lines = lines;
-    newText.graphemeLines = graphemeLines;
-    return newText;
+  _splitText() {
+    const { lines, ...rest } = super._splitText();
+    const { value: graphemeLines, state: endOfWrapping } = this._wrapText(
+      lines,
+      this.width
+    );
+
+    return {
+      ...rest,
+      graphemeLines,
+      lines: graphemeLines.map((line) => line.join('')),
+      endOfWrapping,
+    };
   }
 
   getMinWidth() {

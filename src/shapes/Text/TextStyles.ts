@@ -1,9 +1,38 @@
-import { hasStyleChanged, pick } from '../../util';
+import { pick } from '../../util';
 import { pickBy } from '../../util/misc/pick';
 import { styleProperties, type StylePropertiesType } from './constants';
 import type { Text } from './Text';
 
 export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
+
+export type LegacyTextStyle = {
+  [line: number | string]: { [char: number | string]: TextStyleDeclaration };
+};
+
+/**
+ * @param {Object} prevStyle first style to compare
+ * @param {Object} thisStyle second style to compare
+ * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
+ * @return {boolean} true if the style changed
+ */
+export const hasStyleChanged = (
+  prevStyle: TextStyleDeclaration,
+  thisStyle: TextStyleDeclaration,
+  forTextSpans = false
+) =>
+  prevStyle.fill !== thisStyle.fill ||
+  prevStyle.stroke !== thisStyle.stroke ||
+  prevStyle.strokeWidth !== thisStyle.strokeWidth ||
+  prevStyle.fontSize !== thisStyle.fontSize ||
+  prevStyle.fontFamily !== thisStyle.fontFamily ||
+  prevStyle.fontWeight !== thisStyle.fontWeight ||
+  prevStyle.fontStyle !== thisStyle.fontStyle ||
+  prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
+  prevStyle.deltaY !== thisStyle.deltaY ||
+  (forTextSpans &&
+    (prevStyle.overline !== thisStyle.overline ||
+      prevStyle.underline !== thisStyle.underline ||
+      prevStyle.linethrough !== thisStyle.linethrough));
 
 export type TextStyleJSON = {
   start: number;
@@ -16,12 +45,42 @@ type PositionOrOffset =
   | { lineIndex?: never; charIndex?: never; offset: number };
 
 export class TextStyles {
-  protected styles: TextStyleDeclaration[] = [];
-
-  constructor(readonly target: Text) {}
+  protected styles: TextStyleDeclaration[];
+  constructor(
+    readonly target: Text,
+    styles?: TextStyleDeclaration[] | TextStyleJSON[] | LegacyTextStyle
+  ) {
+    const len = this.target._text.length;
+    console.log(len, this.target._text);
+    if (Array.isArray(styles) && styles.length === len) {
+      this.styles = styles as TextStyleDeclaration[];
+    } else {
+      // backward compatibility
+      this.styles = new Array(len).fill({});
+      if (Array.isArray(styles)) {
+        // compact style array
+        (styles as TextStyleJSON[]).forEach(({ start, end, style }) => {
+          for (let index = start; index < end; index++) {
+            this.styles[index] = { ...style };
+          }
+        });
+      } else if (typeof styles === 'object') {
+        // legacy styles
+        for (const lineIndex in styles) {
+          for (const charIndex in styles[lineIndex]) {
+            this.set({
+              lineIndex: Number(lineIndex),
+              charIndex: Number(charIndex),
+              style: { ...styles[lineIndex][charIndex] },
+            });
+          }
+        }
+      }
+    }
+  }
 
   protected getLines() {
-    return this.target._unwrappedTextLines;
+    return this.target._textLines;
   }
 
   positionToOffset(lineIndex: number, charIndex = 0) {
@@ -51,7 +110,7 @@ export class TextStyles {
     } = {}
   ) {
     // @ts-expect-error readonly
-    const upstream = complete ? pick(this, styleProperties) : {};
+    const upstream = complete ? pick(this.target, styleProperties) : {};
     return this.styles.slice(start, end).map(
       (style) =>
         ({
@@ -67,12 +126,19 @@ export class TextStyles {
     ...position
   }: PositionOrOffset & { slim?: boolean; complete?: boolean }) {
     // @ts-expect-error readonly
-    const upstream = complete ? pick(this, styleProperties) : {};
+    const upstream = complete ? pick(this.target, styleProperties) : {};
     const style = this.styles[this.getOffsetFromPosition(position)];
     return {
       ...upstream,
       ...(slim ? pickBy(style, (v, k) => this.target[k] !== v) : style),
     } as TextStyleDeclaration;
+  }
+
+  value({
+    key,
+    ...position
+  }: PositionOrOffset & { key: keyof TextStyleDeclaration }) {
+    return this.styles[this.getOffsetFromPosition(position)][key];
   }
 
   set({

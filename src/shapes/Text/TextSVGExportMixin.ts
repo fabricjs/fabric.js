@@ -3,10 +3,10 @@ import { config } from '../../config';
 import type { TSVGReviver } from '../../typedefs';
 import { escapeXml } from '../../util/lang_string';
 import { createSVGRect } from '../../util/misc/svgParsing';
-import { hasStyleChanged } from '../../util/misc/textStyles';
 import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
-import type { TextStyleDeclaration } from './StyledText';
+import { hasStyleChanged } from './TextStyles';
+import type { TextStyleDeclaration } from './TextStyles';
 import { JUSTIFY } from '../Text/constants';
 
 const multipleSpacesRegex = /  +/g;

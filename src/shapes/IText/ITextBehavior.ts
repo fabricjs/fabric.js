@@ -9,7 +9,7 @@ import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
-import type { TextStyleDeclaration } from '../Text/StyledText';
+import type { TextStyleDeclaration } from '../Text/TextStyles';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TProps } from '../Object/types';
 import { getDocumentFromElement } from '../../util/dom_misc';

@@ -7,14 +7,7 @@ import type {
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
-import type { Text } from './Text';
-import { TextStyles } from './TextStyles';
-
-export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
-
-export type TextStyle = {
-  [line: number | string]: { [char: number | string]: TextStyleDeclaration };
-};
+import type { TextStyleDeclaration, TextStyles } from './TextStyles';
 
 export abstract class StyledText<
   Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
@@ -24,12 +17,12 @@ export abstract class StyledText<
   protected declare abstract _textLines: string[][];
   protected declare _forceClearCache: boolean;
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
-  abstract get2DCursorLocation(
-    selectionStart: number,
-    skipWrapping?: boolean
-  ): { charIndex: number; lineIndex: number };
+  abstract get2DCursorLocation(selectionStart: number): {
+    charIndex: number;
+    lineIndex: number;
+  };
 
-  styleManager = new TextStyles(this);
+  styleManager: TextStyles;
 
   /**
    * Returns true if object has no styling or no styling in a line
