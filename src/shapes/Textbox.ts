@@ -4,6 +4,7 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
+import type { TextStyleDeclaration } from 'fabric';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -195,11 +196,14 @@ export class Textbox extends IText {
    * @param {Number} charIndex
    * @private
    */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  _getStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): TextStyleDeclaration {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (!map) {
-        return null;
+        return {};
       }
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -213,7 +217,11 @@ export class Textbox extends IText {
    * @param {Object} style
    * @private
    */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  protected _setStyleDeclaration(
+    lineIndex: number,
+    charIndex: number,
+    style: object
+  ) {
     const map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
@@ -241,7 +249,7 @@ export class Textbox extends IText {
    * @returns {Boolean} if the line exists or not
    * @private
    */
-  _getLineStyle(lineIndex: number): boolean {
+  protected _getLineStyle(lineIndex: number): boolean {
     const map = this._styleMap[lineIndex];
     return !!this.styles[map.line];
   }
@@ -252,7 +260,7 @@ export class Textbox extends IText {
    * @param {Object} style
    * @private
    */
-  _setLineStyle(lineIndex: number) {
+  protected _setLineStyle(lineIndex: number) {
     const map = this._styleMap[lineIndex];
     this.styles[map.line] = {};
   }
