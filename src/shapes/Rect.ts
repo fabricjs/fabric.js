@@ -10,6 +10,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import type { CSSRules } from '../parser/typedefs';
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
   rx: 0,
@@ -195,13 +196,13 @@ export class Rect<
    * Returns {@link Rect} instance from an SVG element
    * @static
    * @memberOf Rect
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: SVGElement,
-    callback: (rect: Rect | null) => void,
-    options = {}
+    element: HTMLElement,
+    options = {},
+    cssRules?: CSSRules
   ) {
     const {
       left = 0,
@@ -210,7 +211,7 @@ export class Rect<
       height = 0,
       visible = true,
       ...restOfparsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
 
     return new this({
       ...options,

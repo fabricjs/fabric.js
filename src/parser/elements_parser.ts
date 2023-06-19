@@ -87,15 +87,10 @@ const ElementsParser = function (
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = Gradient.fromElement(
-        gradientDef,
-        obj,
-        {
-          ...this.options,
-          opacity: opacityAttr,
-        },
-        this.cssRules
-      );
+      const gradient = Gradient.fromElement(gradientDef, obj, {
+        ...this.options,
+        opacity: opacityAttr,
+      });
       obj.set(property, gradient);
     }
   };

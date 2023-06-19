@@ -13,6 +13,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { makeBoundingBoxFromPoints } from '../util';
 import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
@@ -238,18 +239,18 @@ export class Line<
    * Returns Line instance from an SVG element
    * @static
    * @memberOf Line
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
-  static async fromElement(element: SVGElement) {
+  static async fromElement(element: HTMLElement, cssRules?: CSSRules) {
     const {
       x1 = 0,
       y1 = 0,
       x2 = 0,
       y2 = 0,
       ...parsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
     return new this([x1, y1, x2, y2], parsedAttributes);
   }
 
