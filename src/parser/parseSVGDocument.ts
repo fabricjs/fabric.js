@@ -1,20 +1,16 @@
-// @ts-nocheck
 import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import {
-  clipPaths,
   cssRules,
-  gradientDefs,
   svgInvalidAncestorsRegEx,
   svgValidTagNamesRegEx,
 } from './constants';
-import { getCSSRules } from './getCSSRules';
-import { getGradientDefs } from './getGradientDefs';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
 import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
+import { getCSSRules } from './getCSSRules';
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -77,20 +73,18 @@ export async function parseSVGDocument(
       allElements: descendants,
     };
   }
-  const localClipPaths = {};
+  const localClipPaths: Record<string, Element[]> = {};
   descendants
     .filter((el) => el.nodeName.replace('svg:', '') === 'clipPath')
     .forEach((el) => {
-      const id = el.getAttribute('id');
+      const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
         (el) => svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''))
       );
     });
 
-  // thos are like globals we need to fix
-  gradientDefs[svgUid] = getGradientDefs(doc);
+  // those are like globals we need to fix
   cssRules[svgUid] = getCSSRules(doc);
-  clipPaths[svgUid] = localClipPaths;
 
   // Precedence of rules:   style > class > attribute
   const elementParser = new ElementsParser(
@@ -101,13 +95,13 @@ export async function parseSVGDocument(
       crossOrigin,
       signal,
     },
-    doc
+    doc,
+    localClipPaths
   );
+
   const instances = await elementParser.parse();
 
-  delete gradientDefs[svgUid];
   delete cssRules[svgUid];
-  delete clipPaths[svgUid];
 
   return {
     objects: instances,

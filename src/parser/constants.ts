@@ -1,16 +1,7 @@
-//@ts-nocheck
 import { getSvgRegex } from './getSvgRegex';
 import { LEFT, TOP } from '../constants';
 
 export const cssRules = {};
-export const gradientDefs = {};
-export const clipPaths = {};
-
-export const storage = {
-  cssRules,
-  gradientDefs,
-  clipPaths,
-};
 
 export const reNum = String.raw`(?:[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?)`;
 

@@ -8,11 +8,11 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
-import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { CENTER } from '../constants';
+import { getGradientDefs } from './getGradientDefs';
 
 const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
@@ -22,7 +22,8 @@ const ElementsParser = function (
   options,
   reviver,
   parsingOptions,
-  doc
+  doc,
+  clipPaths
 ) {
   this.elements = elements;
   this.options = options;
@@ -31,6 +32,8 @@ const ElementsParser = function (
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
   this.doc = doc;
+  this.clipPaths = clipPaths;
+  this.gradientDefs = getGradientDefs(doc);
 };
 
 (function (proto) {
@@ -61,7 +64,7 @@ const ElementsParser = function (
     return null;
   };
 
-  proto.extractPropertyDefinition = function (obj, property, storageType) {
+  proto.extractPropertyDefinition = function (obj, property, storage) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -71,14 +74,14 @@ const ElementsParser = function (
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
     // @todo fix this
-    return storage[storageType][this.svgUid][id];
+    return storage[id];
   };
 
   proto.resolveGradient = function (obj, el, property) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
-      'gradientDefs'
+      this.gradientDefs
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
@@ -94,7 +97,7 @@ const ElementsParser = function (
     const clipPathElements = this.extractPropertyDefinition(
       obj,
       'clipPath',
-      'clipPaths'
+      this.clipPaths
     );
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());

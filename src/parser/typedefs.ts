@@ -11,3 +11,5 @@ export type TSvgReviverCallback = (
   element: Element,
   fabricObject: FabricObject
 ) => void;
+
+export type CSSRules = Record<string, Record<string, string>>;

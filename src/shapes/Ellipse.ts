@@ -10,6 +10,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import type { CSSRules } from '../parser/typedefs';
 
 export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
@@ -162,8 +163,12 @@ export class Ellipse<
    * @param {SVGElement} element Element to parse
    * @return {Ellipse}
    */
-  static async fromElement(element: SVGElement) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+  static async fromElement(element: HTMLElement, cssRules?: CSSRules) {
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
