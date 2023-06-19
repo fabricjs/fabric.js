@@ -11,6 +11,7 @@ import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { XY } from '../../Point';
 import type {
+  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
