@@ -513,7 +513,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
+      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
