@@ -1,7 +1,7 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -163,7 +163,11 @@ export class Ellipse<
    * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
-  static async fromElement(element: HTMLElement, cssRules?: CSSRules) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
     const parsedAttributes = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,

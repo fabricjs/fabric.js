@@ -6,7 +6,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import type {
   FabricObjectProps,
   SerializedObjectProps,
@@ -207,6 +207,7 @@ export class Circle<
    */
   static async fromElement(
     element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ): Promise<Circle> {
     const {

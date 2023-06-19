@@ -1,6 +1,6 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
@@ -243,7 +243,11 @@ export class Line<
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
-  static async fromElement(element: HTMLElement, cssRules?: CSSRules) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
     const {
       x1 = 0,
       y1 = 0,

@@ -29,7 +29,6 @@ const ElementsParser = function (
   this.elements = elements;
   this.options = options;
   this.reviver = reviver;
-  this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
   this.doc = doc;
@@ -42,7 +41,6 @@ const ElementsParser = function (
   proto.parse = function (): Promise<FabricObject[]> {
     return Promise.all(
       this.elements.map((element: HTMLElement, i) => {
-        element.setAttribute('svgUid', this.svgUid);
         return this.createObject(element);
       })
     );

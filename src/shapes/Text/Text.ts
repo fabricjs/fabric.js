@@ -45,7 +45,8 @@ import {
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
-import type { Gradient, Pattern } from 'fabric';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1807,7 +1808,7 @@ export class Text<
    */
   static async fromElement(
     element: HTMLElement,
-    options: object,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(

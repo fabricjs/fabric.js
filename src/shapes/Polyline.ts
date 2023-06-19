@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
@@ -333,7 +333,7 @@ export class Polyline<
    */
   static async fromElement(
     element: HTMLElement,
-    options: any,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const points = parsePointsAttribute(element.getAttribute('points')),

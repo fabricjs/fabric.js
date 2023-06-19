@@ -1,7 +1,7 @@
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -201,7 +201,7 @@ export class Rect<
    */
   static async fromElement(
     element: HTMLElement,
-    options = {},
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const {

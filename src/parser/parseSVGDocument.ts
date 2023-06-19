@@ -1,4 +1,4 @@
-import { uid } from '../util/internals/uid';
+// @ts-nocheck
 import { applyViewboxTransform } from './applyViewboxTransform';
 import { svgInvalidAncestorsRegEx, svgValidTagNamesRegEx } from './constants';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
@@ -45,12 +45,10 @@ export async function parseSVGDocument(
   }
   parseUseDirectives(doc);
 
-  const svgUid = uid(),
-    descendants = Array.from(doc.getElementsByTagName('*')),
+  const descendants = Array.from(doc.getElementsByTagName('*')),
     options = {
       ...applyViewboxTransform(doc),
       crossOrigin,
-      svgUid,
       signal,
     };
 
