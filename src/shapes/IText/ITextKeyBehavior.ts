@@ -225,18 +225,9 @@ export abstract class ITextKeyBehavior<
         // let's copy some style before deleting.
         // we want to copy the style before the cursor OR the style at the cursor if selection
         // is bigger than 0.
-        copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
-          false
-        );
+        const value = this.styleManager.get({ offset: selectionStart });
         // now duplicate the style one for each inserted text.
-        copiedStyle = insertedText.map(
-          () =>
-            // this return an array of references, but that is fine since we are
-            // copying the style later.
-            copiedStyle[0]
-        );
+        copiedStyle = insertedText.fill(() => ({ ...value }));
       }
       if (selection) {
         removeFrom = selectionStart;
@@ -297,10 +288,10 @@ export abstract class ITextKeyBehavior<
     const { copyPasteData } = getEnv();
     copyPasteData.copiedText = this.getSelectedText();
     if (!config.disableStyleCopyPaste) {
-      copyPasteData.copiedTextStyle = this.getSelectionStyles(
+      copyPasteData.copiedTextStyle = this.styleManager.slice(
         this.selectionStart,
         this.selectionEnd,
-        true
+        { complete: true }
       );
     } else {
       copyPasteData.copiedTextStyle = null;

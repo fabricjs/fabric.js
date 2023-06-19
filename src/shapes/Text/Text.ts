@@ -23,7 +23,6 @@ import type {
   SerializedObjectProps,
   TProps,
 } from '../Object/types';
-import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
@@ -34,7 +33,10 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
-import type { TextStyleDeclaration } from './TextStyles';
+import type {
+  CompleteTextStyleDeclaration,
+  TextStyleDeclaration,
+} from './TextStyles';
 import { TextStyles, hasStyleChanged } from './TextStyles';
 import { isFiller } from '../../util/typeAssertions';
 
@@ -706,7 +708,10 @@ export class Text<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderTextLinesBackground(ctx: CanvasRenderingContext2D) {
-    if (!this.textBackgroundColor && !this.styleHas('textBackgroundColor')) {
+    if (
+      !this.textBackgroundColor &&
+      !this.styleManager.has({ key: 'textBackgroundColor' })
+    ) {
       return;
     }
     const originalFill = ctx.fillStyle,
@@ -717,7 +722,7 @@ export class Text<
       const heightOfLine = this.getHeightOfLine(i);
       if (
         !this.textBackgroundColor &&
-        !this.styleHas('textBackgroundColor', i)
+        !this.styleManager.has({ key: 'textBackgroundColor', lineIndex: i })
       ) {
         lineTopOffset += heightOfLine;
         continue;
@@ -991,9 +996,17 @@ export class Text<
     prevGrapheme?: string,
     skipLeft?: boolean
   ): GraphemeBBox {
-    const style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+    const style = this.styleManager.get({
+        lineIndex,
+        charIndex,
+        complete: true,
+      }),
       prevStyle = prevGrapheme
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
+        ? this.styleManager.get({
+            lineIndex,
+            charIndex: charIndex - 1,
+            complete: true,
+          })
         : {},
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
@@ -1034,7 +1047,7 @@ export class Text<
     // char 0 is measured before the line cycle because it needs to char
     // emptylines
     let maxHeight = this.getHeightOfChar(lineIndex, 0);
-    for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
+    for (let i = 1; i < this._textLines[lineIndex].length; i++) {
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
 
@@ -1106,7 +1119,7 @@ export class Text<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderTextFill(ctx: CanvasRenderingContext2D) {
-    if (!this.fill && !this.styleHas('fill')) {
+    if (!this.fill && !this.styleManager.has({ key: 'fill' })) {
       return;
     }
 
@@ -1118,7 +1131,7 @@ export class Text<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderTextStroke(ctx: CanvasRenderingContext2D) {
-    if ((!this.stroke || this.strokeWidth === 0) && this.isEmptyStyles()) {
+    if ((!this.stroke || this.strokeWidth === 0) && !this.styleManager.has()) {
       return;
     }
 
@@ -1157,7 +1170,7 @@ export class Text<
       shortCut =
         !isJustify &&
         this.charSpacing === 0 &&
-        this.isEmptyStyles(lineIndex) &&
+        !this.styleManager.has({ lineIndex }) &&
         !path,
       isLtr = this.direction === 'ltr',
       sign = this.direction === 'ltr' ? 1 : -1,
@@ -1205,8 +1218,13 @@ export class Text<
       if (!timeToRender) {
         // if we have charSpacing, we render char by char
         actualStyle =
-          actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-        nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+          actualStyle ||
+          this.styleManager.get({ lineIndex, charIndex: i, complete: true });
+        nextStyle = this.styleManager.get({
+          lineIndex,
+          charIndex: i + 1,
+          complete: true,
+        });
         timeToRender = hasStyleChanged(actualStyle, nextStyle, false);
       }
       if (timeToRender) {
@@ -1363,8 +1381,12 @@ export class Text<
     left: number,
     top: number
   ) {
-    const decl = this._getStyleDeclaration(lineIndex, charIndex),
-      fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+    const decl = this.styleManager.get({ lineIndex, charIndex }),
+      fullDecl = this.styleManager.get({
+        lineIndex,
+        charIndex,
+        complete: true,
+      }),
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
         method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
@@ -1440,17 +1462,22 @@ export class Text<
     const fontSize = this.styleManager.value({
         offset: start,
         key: 'fontSize',
+        complete: true,
       }),
-      dy = this.styleManager.value({ offset: start, key: 'deltaY' });
+      dy = this.styleManager.value({
+        offset: start,
+        key: 'deltaY',
+        complete: true,
+      });
 
-    this.setSelectionStyles(
-      {
+    this.styleManager.set({
+      offset: start,
+      repeatCount: end - start,
+      style: {
         fontSize: fontSize * schema.size,
         deltaY: dy + fontSize * schema.baseline,
       },
-      start,
-      end
-    );
+    });
   }
 
   /**
@@ -1542,13 +1569,13 @@ export class Text<
    * @param {String} property the property name
    * @returns the value of 'property'
    */
-  getValueOfPropertyAt<T extends StylePropertiesType>(
-    lineIndex: number,
-    charIndex: number,
-    property: T
-  ): this[T] {
-    const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-    return (charStyle[property] ?? this[property]) as this[T];
+  getValueOfPropertyAt(lineIndex: number, charIndex: number, property: string) {
+    return this.styleManager.value({
+      lineIndex,
+      charIndex,
+      key: property,
+      complete: true,
+    });
   }
 
   /**
@@ -1559,7 +1586,7 @@ export class Text<
     ctx: CanvasRenderingContext2D,
     type: 'underline' | 'linethrough' | 'overline'
   ) {
-    if (!this[type] && !this.styleHas(type)) {
+    if (!this[type] && !this.styleManager.has({ key: type })) {
       return;
     }
     let topOffset = this._getTopOffset();
@@ -1570,7 +1597,7 @@ export class Text<
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i);
-      if (!this[type] && !this.styleHas(type, i)) {
+      if (!this[type] && !this.styleManager.has({ key: type, lineIndex: i })) {
         topOffset += heightOfLine;
         continue;
       }

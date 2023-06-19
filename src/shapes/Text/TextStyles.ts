@@ -3,11 +3,33 @@ import { pickBy } from '../../util/misc/pick';
 import { styleProperties, type StylePropertiesType } from './constants';
 import type { Text } from './Text';
 
-export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
+export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
+
+export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 
 export type LegacyTextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
 };
+
+export type TextStyleJSON = {
+  start: number;
+  end: number;
+  style: TextStyleDeclaration;
+};
+
+type PositionOrOffset =
+  | { lineIndex: number; charIndex: number; offset?: never }
+  | { lineIndex?: never; charIndex?: never; offset: number };
+
+type StyleOptions =
+  | {
+      complete?: boolean;
+      uniq?: never;
+    }
+  | {
+      complete?: never;
+      uniq?: boolean;
+    };
 
 /**
  * @param {Object} prevStyle first style to compare
@@ -34,24 +56,14 @@ export const hasStyleChanged = (
       prevStyle.underline !== thisStyle.underline ||
       prevStyle.linethrough !== thisStyle.linethrough));
 
-export type TextStyleJSON = {
-  start: number;
-  end: number;
-  style: TextStyleDeclaration;
-};
-
-type PositionOrOffset =
-  | { lineIndex: number; charIndex: number; offset?: never }
-  | { lineIndex?: never; charIndex?: never; offset: number };
-
 export class TextStyles {
   protected styles: TextStyleDeclaration[];
+
   constructor(
     readonly target: Text,
     styles?: TextStyleDeclaration[] | TextStyleJSON[] | LegacyTextStyle
   ) {
     const len = this.target._text.length;
-    console.log(len, this.target._text);
     if (Array.isArray(styles) && styles.length === len) {
       this.styles = styles as TextStyleDeclaration[];
     } else {
@@ -87,12 +99,12 @@ export class TextStyles {
     const lines = this.getLines();
     let total = 0;
     for (let index = 0; index < lineIndex; index++) {
-      total += lines[lineIndex].length;
+      total += lines[index].length;
     }
     return total + charIndex;
   }
 
-  getOffsetFromPosition({ lineIndex, charIndex, offset }: PositionOrOffset) {
+  resolveOffset({ lineIndex, charIndex, offset }: PositionOrOffset) {
     return typeof offset === 'number'
       ? offset
       : this.positionToOffset(lineIndex, charIndex);
@@ -101,13 +113,7 @@ export class TextStyles {
   slice(
     start: number,
     end?: number,
-    {
-      slim = false,
-      complete = false,
-    }: {
-      slim?: boolean;
-      complete?: boolean;
-    } = {}
+    { uniq = false, complete = false }: StyleOptions = {}
   ) {
     // @ts-expect-error readonly
     const upstream = complete ? pick(this.target, styleProperties) : {};
@@ -115,37 +121,53 @@ export class TextStyles {
       (style) =>
         ({
           ...upstream,
-          ...(slim ? pickBy(style, (v, k) => this.target[k] !== v) : style),
+          ...(uniq && !complete
+            ? pickBy(style, (v, k) => this.target[k] !== v)
+            : style),
         } as TextStyleDeclaration)
     );
   }
 
   get({
-    slim = false,
+    uniq = false,
     complete = false,
     ...position
-  }: PositionOrOffset & { slim?: boolean; complete?: boolean }) {
+  }: PositionOrOffset & StyleOptions) {
     // @ts-expect-error readonly
     const upstream = complete ? pick(this.target, styleProperties) : {};
-    const style = this.styles[this.getOffsetFromPosition(position)];
+    const style = this.styles[this.resolveOffset(position)];
     return {
       ...upstream,
-      ...(slim ? pickBy(style, (v, k) => this.target[k] !== v) : style),
+      ...(uniq && !complete
+        ? pickBy(style, (v, k) => this.target[k] !== v)
+        : style),
     } as TextStyleDeclaration;
   }
 
   value({
     key,
+    uniq = false,
+    complete = false,
     ...position
-  }: PositionOrOffset & { key: keyof TextStyleDeclaration }) {
-    return this.styles[this.getOffsetFromPosition(position)][key];
+  }: PositionOrOffset & StyleOptions & { key: keyof TextStyleDeclaration }) {
+    const value = this.styles[this.resolveOffset(position)][key];
+    return complete
+      ? value ?? this.target[key]
+      : !uniq || value !== this.target[key]
+      ? value
+      : undefined;
   }
 
   set({
     style,
+    repeatCount,
     ...position
-  }: PositionOrOffset & { style: TextStyleDeclaration }) {
-    this.styles[this.getOffsetFromPosition(position)] = style;
+  }: PositionOrOffset & { repeatCount?: number; style: TextStyleDeclaration }) {
+    const offset = this.resolveOffset(position);
+    this.styles[offset] = style;
+    for (let index = 0; index < offset + (repeatCount || 1); index++) {
+      this.styles[offset] = style;
+    }
   }
 
   clear(position: PositionOrOffset) {
@@ -157,11 +179,7 @@ export class TextStyles {
     deleteCount: number,
     styles: TextStyleDeclaration[] = []
   ) {
-    this.styles.splice(
-      this.getOffsetFromPosition(position),
-      deleteCount,
-      ...styles
-    );
+    this.styles.splice(this.resolveOffset(position), deleteCount, ...styles);
   }
 
   reset(styles: TextStyleDeclaration[] = []) {
@@ -239,7 +257,7 @@ export class TextStyles {
       //loop through each character of the current line
       for (let c = 0; c < textLines[i].length; c++) {
         charIndex++;
-        const thisStyle = this.get({ lineIndex: i, charIndex: c, slim: true });
+        const thisStyle = this.get({ lineIndex: i, charIndex: c, uniq: true });
         //check if style exists for this character
         if (thisStyle && Object.keys(thisStyle).length > 0) {
           if (hasStyleChanged(prevStyle, thisStyle, true)) {

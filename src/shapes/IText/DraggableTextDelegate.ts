@@ -137,8 +137,17 @@ export class DraggableTextDelegate {
       fill: 'transparent',
       textBackgroundColor: 'transparent',
     };
-    target.setSelectionStyles(styleOverride, 0, selectionStart);
-    target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
+    target.styleManager.set({
+      offset: 0,
+      repeatCount: selectionStart,
+      style: styleOverride,
+    });
+    target.styleManager.set({
+      offset: selectionEnd,
+      repeatCount: target._text.length - selectionEnd,
+      style: styleOverride,
+    });
+    target._forceClearCache = true;
     target.dirty = true;
     const dragImage = target.toCanvasElement({
       enableRetinaScaling,
@@ -187,10 +196,10 @@ export class DraggableTextDelegate {
         'application/fabric',
         JSON.stringify({
           value: value,
-          styles: target.getSelectionStyles(
+          styles: target.styleManager.slice(
             selection.selectionStart,
             selection.selectionEnd,
-            true
+            { complete: true }
           ),
         })
       );

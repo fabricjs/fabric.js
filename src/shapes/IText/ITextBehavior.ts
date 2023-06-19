@@ -739,9 +739,6 @@ export abstract class ITextBehavior<
     start: number,
     end: number = start
   ) {
-    if (end > start) {
-      this.removeStyleFromTo(start, end);
-    }
     const graphemes = this.graphemeSplit(text);
     this.styleManager.splice({ offset: start }, end - start, styles);
     this._text = [
