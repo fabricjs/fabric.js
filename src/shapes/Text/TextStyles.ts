@@ -4,6 +4,9 @@ import { styleProperties, type StylePropertiesType } from './constants';
 import type { Text } from './Text';
 
 export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
+type PositionOrOffset =
+  | { lineIndex: number; charIndex: number; offset?: never }
+  | { lineIndex?: never; charIndex?: never; offset: number };
 
 export class TextStyles {
   protected styles: TextStyleDeclaration[] = [];
@@ -12,10 +15,6 @@ export class TextStyles {
 
   protected getLines() {
     return this.target._unwrappedTextLines;
-  }
-
-  protected getLine(index: number) {
-    return this.getLines()[index];
   }
 
   positionToOffset(lineIndex: number, charIndex = 0) {
@@ -27,57 +26,90 @@ export class TextStyles {
     return total + charIndex;
   }
 
-  slice(lineIndex: number) {
-    const lineStartOffset = this.positionToOffset(lineIndex);
-    return this.styles.slice(
-      lineStartOffset,
-      lineStartOffset + this.getLine(lineIndex).length
+  getOffsetFromPosition({ lineIndex, charIndex, offset }: PositionOrOffset) {
+    return typeof offset === 'number'
+      ? offset
+      : this.positionToOffset(lineIndex, charIndex);
+  }
+
+  slice(
+    start: number,
+    end?: number,
+    {
+      slim = false,
+      complete = false,
+    }: {
+      slim?: boolean;
+      complete?: boolean;
+    } = {}
+  ) {
+    // @ts-expect-error readonly
+    const upstream = complete ? pick(this, styleProperties) : {};
+    return this.styles.slice(start, end).map(
+      (style) =>
+        ({
+          ...upstream,
+          ...(slim ? pickBy(style, (v, k) => this.target[k] !== v) : style),
+        } as TextStyleDeclaration)
     );
   }
 
   get(
-    lineIndex: number,
-    charIndex: number,
+    position: PositionOrOffset,
     { slim = false, complete = false }: { slim?: boolean; complete?: boolean }
   ) {
-    const style = this.styles[this.positionToOffset(lineIndex, charIndex)];
+    // @ts-expect-error readonly
+    const upstream = complete ? pick(this, styleProperties) : {};
+    const style = this.styles[this.getOffsetFromPosition(position)];
     return {
-      // @ts-expect-error readonly
-      ...(complete ? pick(this, styleProperties) : {}),
+      ...upstream,
       ...(slim ? pickBy(style, (v, k) => this.target[k] !== v) : style),
     } as TextStyleDeclaration;
   }
 
-  set(lineIndex: number, charIndex: number, style: TextStyleDeclaration) {
-    this.styles[this.positionToOffset(lineIndex, charIndex)] = style;
+  set(position: PositionOrOffset, style: TextStyleDeclaration) {
+    this.styles[this.getOffsetFromPosition(position)] = style;
   }
 
-  clear(lineIndex: number, charIndex: number) {
-    this.styles[this.positionToOffset(lineIndex, charIndex)] = {};
+  clear(position: PositionOrOffset) {
+    this.set(position, {});
   }
 
   has({
     lineIndex,
     charIndex,
+    offset,
     key,
   }:
     | {
         lineIndex?: never;
         charIndex?: never;
+        offset?: number;
         key?: keyof TextStyleDeclaration;
       }
     | {
         lineIndex: number;
         charIndex?: number;
+        offset?: never;
         key?: keyof TextStyleDeclaration;
       } = {}): boolean {
-    const slice =
-      typeof lineIndex === 'number' ? this.slice(lineIndex) : this.styles;
-    return (typeof charIndex === 'number' ? [slice[charIndex]] : slice).some(
-      (value) =>
-        !!value && key
-          ? Object.hasOwn(value, key)
-          : Object.keys(value).length > 0
+    let slice: TextStyleDeclaration[];
+    if (typeof offset === 'number') {
+      slice = [this.styles[offset]];
+    } else if (typeof lineIndex === 'number') {
+      const start = this.positionToOffset(lineIndex, charIndex || 0);
+      slice = this.styles.slice(
+        start,
+        start + typeof charIndex === 'number'
+          ? start + 1
+          : this.getLines()[lineIndex].length
+      );
+    } else {
+      slice = this.styles;
+    }
+
+    return slice.some((value) =>
+      !!value && key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
     );
   }
 
