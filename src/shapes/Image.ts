@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getFabricDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
@@ -26,6 +25,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
+import { getDocumentFromElement } from '../util/dom_misc';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -40,7 +40,6 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  crossOrigin: string | null;
   filters: BaseFilter[];
   resizeFilter?: BaseFilter;
 }
@@ -168,7 +167,7 @@ export class Image<
 
   protected declare _element: ImageSource;
   protected declare _originalElement: ImageSource;
-  protected declare _filteredEl: ImageSource;
+  protected declare _filteredEl: HTMLCanvasElement;
 
   static type = 'Image';
 
@@ -199,7 +198,7 @@ export class Image<
     this.setElement(
       typeof arg0 === 'string'
         ? ((
-            (this.canvas && getElementDocument(this.canvas.getElement())) ||
+            (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
             getFabricDocument()
           ).getElementById(arg0) as ImageSource)
         : arg0,
@@ -357,12 +356,12 @@ export class Image<
    * of the instance
    */
   _toSVG() {
-    const imageMarkup = [],
+    const imageMarkup: string[] = [],
       element = this._element,
       x = -this.width / 2,
       y = -this.height / 2;
-    let svgString = [],
-      strokeSvg,
+    let svgString: string[] = [],
+      strokeSvg: string[] = [],
       clipPath = '',
       imageRendering = '';
     if (!element) {
@@ -386,28 +385,21 @@ export class Image<
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
     if (!this.imageSmoothing) {
-      imageRendering = '" image-rendering="optimizeSpeed';
+      imageRendering = ' image-rendering="optimizeSpeed"';
     }
     imageMarkup.push(
       '\t<image ',
       'COMMON_PARTS',
-      'xlink:href="',
-      this.getSvgSrc(true),
-      '" x="',
-      x - this.cropX,
-      '" y="',
-      y - this.cropY,
-      // we're essentially moving origin of transformation from top/left corner to the center of the shape
-      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-      // so that object's center aligns with container's left/top
-      '" width="',
-      element.width || element.naturalWidth,
-      '" height="',
-      element.height || element.naturalHeight,
-      imageRendering,
-      '"',
-      clipPath,
-      '></image>\n'
+      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${
+        y - this.cropY
+        // we're essentially moving origin of transformation from top/left corner to the center of the shape
+        // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+        // so that object's center aligns with container's left/top
+      }" width="${
+        element.width || (element as HTMLImageElement).naturalWidth
+      }" height="${
+        element.height || (element as HTMLImageElement).naturalHeight
+      }"${imageRendering}${clipPath}></image>\n`
     );
 
     if (this.stroke || this.strokeDashArray) {
@@ -445,14 +437,14 @@ export class Image<
   getSrc(filtered?: boolean): string {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
-      if (element.toDataURL) {
-        return element.toDataURL();
+      if ((element as HTMLCanvasElement).toDataURL) {
+        return (element as HTMLCanvasElement).toDataURL();
       }
 
       if (this.srcFromAttribute) {
-        return element.getAttribute('src');
+        return element.getAttribute('src') || '';
       } else {
-        return element.src;
+        return (element as HTMLImageElement).src;
       }
     } else {
       return this.src || '';
@@ -541,15 +533,17 @@ export class Image<
 
     if (filters.length === 0) {
       this._element = this._originalElement;
-      this._filteredEl = null;
+      this._filteredEl = undefined;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
       return;
     }
 
     const imgElement = this._originalElement,
-      sourceWidth = imgElement.naturalWidth || imgElement.width,
-      sourceHeight = imgElement.naturalHeight || imgElement.height;
+      sourceWidth =
+        (imgElement as HTMLImageElement).naturalWidth || imgElement.width,
+      sourceHeight =
+        (imgElement as HTMLImageElement).naturalHeight || imgElement.height;
 
     if (this._element === this._originalElement) {
       // if the element is the same we need to create a new element
@@ -563,7 +557,7 @@ export class Image<
       // also dereference the eventual resized _element
       this._element = this._filteredEl;
       this._filteredEl
-        .getContext('2d')
+        .getContext('2d')!
         .clearRect(0, 0, sourceWidth, sourceHeight);
       // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
       this._lastScaleX = 1;
@@ -636,8 +630,11 @@ export class Image<
       // crop values cannot be lesser than 0.
       cropX = Math.max(this.cropX, 0),
       cropY = Math.max(this.cropY, 0),
-      elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-      elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+      elWidth =
+        (elementToDraw as HTMLImageElement).naturalWidth || elementToDraw.width,
+      elHeight =
+        (elementToDraw as HTMLImageElement).naturalHeight ||
+        elementToDraw.height,
       sX = cropX * scaleX,
       sY = cropY * scaleY,
       // the width height cannot exceed element width/height, starting from the crop offset.
