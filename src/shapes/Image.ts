@@ -3,7 +3,7 @@ import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TSize } from '../typedefs';
+import type { TClassProperties, TCrossOrigin, TSize } from '../typedefs';
 import type { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
@@ -56,7 +56,7 @@ export const imageDefaultValues: Partial<UniqueImageProps> &
 
 export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
-  crossOrigin: string | null;
+  crossOrigin: TCrossOrigin;
   filters: any[];
   resizeFilter?: any;
   cropX: number;
@@ -167,7 +167,7 @@ export class Image<
 
   protected declare _element: ImageSource;
   protected declare _originalElement: ImageSource;
-  protected declare _filteredEl: HTMLCanvasElement;
+  protected declare _filteredEl?: HTMLCanvasElement;
 
   static type = 'Image';
 
@@ -533,6 +533,7 @@ export class Image<
 
     if (filters.length === 0) {
       this._element = this._originalElement;
+      // this is unsafe and needs to be rethinkend
       this._filteredEl = undefined;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
@@ -790,16 +791,14 @@ export class Image<
     options: Abortable = {}
   ) {
     return Promise.all([
-      loadImage(src, { ...options, crossOrigin }),
-      f && enlivenObjects(f, options),
+      loadImage(src!, { ...options, crossOrigin }),
+      f && enlivenObjects<BaseFilter>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects([rf], options),
+      rf && enlivenObjects<BaseFilter>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
         ...object,
-        src,
-        crossOrigin,
         filters,
         resizeFilter,
         ...hydratedProps,
@@ -814,11 +813,11 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL<T extends TProps<SerializedImageProps>>(
+  static fromURL(
     url: string,
-    options: T & LoadImageOptions = {}
+    { crossOrigin = 'anonymous', signal }: LoadImageOptions = {}
   ): Promise<Image> {
-    return loadImage(url, options).then((img) => new this(img, options));
+    return loadImage(url, { crossOrigin, signal }).then((img) => new this(img));
   }
 
   /**

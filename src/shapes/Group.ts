@@ -1091,7 +1091,7 @@ export class Group extends createCollectionMixin(
     ...options
   }: T) {
     return Promise.all([
-      enlivenObjects(objects),
+      enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
