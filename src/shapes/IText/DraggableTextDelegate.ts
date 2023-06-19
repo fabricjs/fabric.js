@@ -130,7 +130,7 @@ export class DraggableTextDelegate {
     const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = target.backgroundColor;
-    const styles = cloneDeep(target.styles);
+    const styles = cloneDeep(target.styleManager.styles);
     target.backgroundColor = '';
     const styleOverride = {
       stroke: 'transparent',
@@ -146,7 +146,7 @@ export class DraggableTextDelegate {
     });
     // restore values
     target.backgroundColor = bgc;
-    target.styles = styles;
+    target.styleManager.reset(styles);
     target.dirty = true;
     //  position drag image offscreen
     setStyle(dragImage, {

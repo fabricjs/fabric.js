@@ -2,7 +2,7 @@
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { TextStyle, TextStyleDeclaration } from './StyledText';
+import type { TextStyleDeclaration } from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
@@ -15,11 +15,7 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
-import {
-  hasStyleChanged,
-  stylesFromArray,
-  stylesToArray,
-} from '../../util/misc/textStyles';
+import { hasStyleChanged, stylesFromArray } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
@@ -251,8 +247,6 @@ export class Text<
    * @default
    */
   declare textBackgroundColor: string;
-
-  declare styles: TextStyle;
 
   /**
    * Path that the text should follow.
@@ -775,7 +769,7 @@ export class Text<
     _char: string,
     charStyle: TextStyleDeclaration,
     previousChar: string | undefined,
-    prevCharStyle: any
+    prevCharStyle?: TextStyleDeclaration
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
@@ -1699,7 +1693,7 @@ export class Text<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject([...additionalProps, ...propertiesToInclude]),
-      styles: stylesToArray(this.styles, this.text),
+      styles: this.styleManager.toJSON(),
       ...(this.path ? { path: this.path.toObject() } : {}),
     };
   }

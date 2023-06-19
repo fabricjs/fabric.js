@@ -1254,20 +1254,15 @@ export class StaticCanvas<
       if (!isTextObject(obj)) {
         return;
       }
-      const { styles, fontFamily } = obj;
+      const { fontFamily } = obj;
       if (fontList[fontFamily] || !fontPaths[fontFamily]) {
         return;
       }
       fontList[fontFamily] = true;
-      if (!styles) {
-        return;
-      }
-      Object.values(styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
-          if (!fontList[fontFamily] && fontPaths[fontFamily]) {
-            fontList[fontFamily] = true;
-          }
-        });
+      obj.styleManager.styles.forEach(({ fontFamily = '' }) => {
+        if (!fontList[fontFamily] && fontPaths[fontFamily]) {
+          fontList[fontFamily] = true;
+        }
       });
     });
 

@@ -697,291 +697,12 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * @private
-   */
-  _removeExtraneousStyles() {
-    for (const prop in this.styles) {
-      if (!this._textLines[prop as unknown as number]) {
-        delete this.styles[prop];
-      }
-    }
-  }
-
-  /**
    * remove and reflow a style block from start to end.
    * @param {Number} start linear start position for removal (included in removal)
    * @param {Number} end linear end position for removal ( excluded from removal )
    */
   removeStyleFromTo(start: number, end: number) {
-    const { lineIndex: lineStart, charIndex: charStart } =
-        this.get2DCursorLocation(start, true),
-      { lineIndex: lineEnd, charIndex: charEnd } = this.get2DCursorLocation(
-        end,
-        true
-      );
-    if (lineStart !== lineEnd) {
-      // step1 remove the trailing of lineStart
-      if (this.styles[lineStart]) {
-        for (
-          let i = charStart;
-          i < this._unwrappedTextLines[lineStart].length;
-          i++
-        ) {
-          delete this.styles[lineStart][i];
-        }
-      }
-      // step2 move the trailing of lineEnd to lineStart if needed
-      if (this.styles[lineEnd]) {
-        for (
-          let i = charEnd;
-          i < this._unwrappedTextLines[lineEnd].length;
-          i++
-        ) {
-          const styleObj = this.styles[lineEnd][i];
-          if (styleObj) {
-            this.styles[lineStart] || (this.styles[lineStart] = {});
-            this.styles[lineStart][charStart + i - charEnd] = styleObj;
-          }
-        }
-      }
-      // step3 detects lines will be completely removed.
-      for (let i = lineStart + 1; i <= lineEnd; i++) {
-        delete this.styles[i];
-      }
-      // step4 shift remaining lines.
-      this.shiftLineStyles(lineEnd, lineStart - lineEnd);
-    } else {
-      // remove and shift left on the same line
-      if (this.styles[lineStart]) {
-        const styleObj = this.styles[lineStart];
-        const diff = charEnd - charStart;
-        for (let i = charStart; i < charEnd; i++) {
-          delete styleObj[i];
-        }
-        for (const char in this.styles[lineStart]) {
-          const numericChar = parseInt(char, 10);
-          if (numericChar >= charEnd) {
-            styleObj[numericChar - diff] = styleObj[char];
-            delete styleObj[char];
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Shifts line styles up or down
-   * @param {Number} lineIndex Index of a line
-   * @param {Number} offset Can any number?
-   */
-  shiftLineStyles(lineIndex: number, offset: number) {
-    const clonedStyles = Object.assign({}, this.styles);
-    for (const line in this.styles) {
-      const numericLine = parseInt(line, 10);
-      if (numericLine > lineIndex) {
-        this.styles[numericLine + offset] = clonedStyles[numericLine];
-        if (!clonedStyles[numericLine - offset]) {
-          delete this.styles[numericLine];
-        }
-      }
-    }
-  }
-
-  /**
-   * Handle insertion of more consecutive style lines for when one or more
-   * newlines gets added to the text. Since current style needs to be shifted
-   * first we shift the current style of the number lines needed, then we add
-   * new lines from the last to the first.
-   * @param {Number} lineIndex Index of a line
-   * @param {Number} charIndex Index of a char
-   * @param {Number} qty number of lines to add
-   * @param {Array} copiedStyle Array of objects styles
-   */
-  insertNewlineStyleObject(
-    lineIndex: number,
-    charIndex: number,
-    qty: number,
-    copiedStyle?: { [index: number]: TextStyleDeclaration }
-  ) {
-    const newLineStyles: { [index: number]: TextStyleDeclaration } = {};
-    const isEndOfLine =
-      this._unwrappedTextLines[lineIndex].length === charIndex;
-    let somethingAdded = false;
-    qty || (qty = 1);
-    this.shiftLineStyles(lineIndex, qty);
-    const currentCharStyle = this.styles[lineIndex]
-      ? this.styles[lineIndex][charIndex === 0 ? charIndex : charIndex - 1]
-      : undefined;
-
-    // we clone styles of all chars
-    // after cursor onto the current line
-    for (const index in this.styles[lineIndex]) {
-      const numIndex = parseInt(index, 10);
-      if (numIndex >= charIndex) {
-        somethingAdded = true;
-        newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
-        // remove lines from the previous line since they're on a new line now
-        if (!(isEndOfLine && charIndex === 0)) {
-          delete this.styles[lineIndex][index];
-        }
-      }
-    }
-    let styleCarriedOver = false;
-    if (somethingAdded && !isEndOfLine) {
-      // if is end of line, the extra style we copied
-      // is probably not something we want
-      this.styles[lineIndex + qty] = newLineStyles;
-      styleCarriedOver = true;
-    }
-    if (styleCarriedOver) {
-      // skip the last line of since we already prepared it.
-      qty--;
-    }
-    // for the all the lines or all the other lines
-    // we clone current char style onto the next (otherwise empty) line
-    while (qty > 0) {
-      if (copiedStyle && copiedStyle[qty - 1]) {
-        this.styles[lineIndex + qty] = {
-          0: { ...copiedStyle[qty - 1] },
-        };
-      } else if (currentCharStyle) {
-        this.styles[lineIndex + qty] = {
-          0: { ...currentCharStyle },
-        };
-      } else {
-        delete this.styles[lineIndex + qty];
-      }
-      qty--;
-    }
-    this._forceClearCache = true;
-  }
-
-  /**
-   * Inserts style object for a given line/char index
-   * @param {Number} lineIndex Index of a line
-   * @param {Number} charIndex Index of a char
-   * @param {Number} quantity number Style object to insert, if given
-   * @param {Array} copiedStyle array of style objects
-   */
-  insertCharStyleObject(
-    lineIndex: number,
-    charIndex: number,
-    quantity: number,
-    copiedStyle?: TextStyleDeclaration[]
-  ) {
-    if (!this.styles) {
-      this.styles = {};
-    }
-    const currentLineStyles = this.styles[lineIndex],
-      currentLineStylesCloned = currentLineStyles
-        ? { ...currentLineStyles }
-        : {};
-
-    quantity || (quantity = 1);
-    // shift all char styles by quantity forward
-    // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
-    for (const index in currentLineStylesCloned) {
-      const numericIndex = parseInt(index, 10);
-      if (numericIndex >= charIndex) {
-        currentLineStyles[numericIndex + quantity] =
-          currentLineStylesCloned[numericIndex];
-        // only delete the style if there was nothing moved there
-        if (!currentLineStylesCloned[numericIndex - quantity]) {
-          delete currentLineStyles[numericIndex];
-        }
-      }
-    }
-    this._forceClearCache = true;
-    if (copiedStyle) {
-      while (quantity--) {
-        if (!Object.keys(copiedStyle[quantity]).length) {
-          continue;
-        }
-        if (!this.styles[lineIndex]) {
-          this.styles[lineIndex] = {};
-        }
-        this.styles[lineIndex][charIndex + quantity] = {
-          ...copiedStyle[quantity],
-        };
-      }
-      return;
-    }
-    if (!currentLineStyles) {
-      return;
-    }
-    const newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
-    while (newStyle && quantity--) {
-      this.styles[lineIndex][charIndex + quantity] = { ...newStyle };
-    }
-  }
-
-  /**
-   * Inserts style object(s)
-   * @param {Array} insertedText Characters at the location where style is inserted
-   * @param {Number} start cursor index for inserting style
-   * @param {Array} [copiedStyle] array of style objects to insert.
-   */
-  insertNewStyleBlock(
-    insertedText: string[],
-    start: number,
-    copiedStyle?: TextStyleDeclaration[]
-  ) {
-    const cursorLoc = this.get2DCursorLocation(start, true),
-      addedLines = [0];
-    let linesLength = 0;
-    // get an array of how many char per lines are being added.
-    for (let i = 0; i < insertedText.length; i++) {
-      if (insertedText[i] === '\n') {
-        linesLength++;
-        addedLines[linesLength] = 0;
-      } else {
-        addedLines[linesLength]++;
-      }
-    }
-    // for the first line copy the style from the current char position.
-    if (addedLines[0] > 0) {
-      this.insertCharStyleObject(
-        cursorLoc.lineIndex,
-        cursorLoc.charIndex,
-        addedLines[0],
-        copiedStyle
-      );
-      copiedStyle = copiedStyle && copiedStyle.slice(addedLines[0] + 1);
-    }
-    linesLength &&
-      this.insertNewlineStyleObject(
-        cursorLoc.lineIndex,
-        cursorLoc.charIndex + addedLines[0],
-        linesLength
-      );
-    let i;
-    for (i = 1; i < linesLength; i++) {
-      if (addedLines[i] > 0) {
-        this.insertCharStyleObject(
-          cursorLoc.lineIndex + i,
-          0,
-          addedLines[i],
-          copiedStyle
-        );
-      } else if (copiedStyle) {
-        // this test is required in order to close #6841
-        // when a pasted buffer begins with a newline then
-        // this.styles[cursorLoc.lineIndex + i] and copiedStyle[0]
-        // may be undefined for some reason
-        if (this.styles[cursorLoc.lineIndex + i] && copiedStyle[0]) {
-          this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
-        }
-      }
-      copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
-    }
-    if (addedLines[i] > 0) {
-      this.insertCharStyleObject(
-        cursorLoc.lineIndex + i,
-        0,
-        addedLines[i],
-        copiedStyle
-      );
-    }
+    this.styleManager.splice({ offset: start }, end - start);
   }
 
   /**
@@ -998,7 +719,6 @@ export abstract class ITextBehavior<
     this.set('dirty', true);
     this.initDimensions();
     this.setCoords();
-    this._removeExtraneousStyles();
   }
 
   /**
@@ -1015,7 +735,7 @@ export abstract class ITextBehavior<
    */
   insertChars(
     text: string,
-    style: TextStyleDeclaration[] | undefined,
+    styles: TextStyleDeclaration[] | undefined,
     start: number,
     end: number = start
   ) {
@@ -1023,7 +743,7 @@ export abstract class ITextBehavior<
       this.removeStyleFromTo(start, end);
     }
     const graphemes = this.graphemeSplit(text);
-    this.insertNewStyleBlock(graphemes, start, style);
+    this.styleManager.splice({ offset: start }, end - start, styles);
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,
@@ -1033,7 +753,6 @@ export abstract class ITextBehavior<
     this.set('dirty', true);
     this.initDimensions();
     this.setCoords();
-    this._removeExtraneousStyles();
   }
 
   /**

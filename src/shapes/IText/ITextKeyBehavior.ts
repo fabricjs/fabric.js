@@ -177,7 +177,7 @@ export abstract class ITextKeyBehavior<
       }
     };
     if (this.hiddenTextarea.value === '') {
-      this.styles = {};
+      this.styleManager.reset();
       updateAndFire();
       return;
     }
@@ -260,7 +260,7 @@ export abstract class ITextKeyBehavior<
       ) {
         copiedStyle = copyPasteData.copiedTextStyle;
       }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      this.styleManager.splice(selectionStart, 0, copiedStyle);
     }
     updateAndFire();
   }
