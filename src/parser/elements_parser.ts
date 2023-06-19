@@ -13,6 +13,7 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { CENTER } from '../constants';
 import { getGradientDefs } from './getGradientDefs';
+import { getCSSRules } from './getCSSRules';
 
 const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
@@ -34,6 +35,7 @@ const ElementsParser = function (
   this.doc = doc;
   this.clipPaths = clipPaths;
   this.gradientDefs = getGradientDefs(doc);
+  this.cssRules = getCSSRules(doc);
 };
 
 (function (proto) {
@@ -49,7 +51,7 @@ const ElementsParser = function (
   proto.createObject = async function (el: HTMLElement): Promise<FabricObject> {
     const klass = findTag(el);
     if (klass) {
-      const obj = await klass.fromElement(el, this.options);
+      const obj = await klass.fromElement(el, this.options, this.cssRules);
       let _options;
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
@@ -88,6 +90,7 @@ const ElementsParser = function (
       const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
+        this.cssRules,
       });
       obj.set(property, gradient);
     }
@@ -114,7 +117,7 @@ const ElementsParser = function (
       const container = await Promise.all(
         clipPathElements.map((clipPathElement) => {
           return findTag(clipPathElement)
-            .fromElement(clipPathElement, this.options)
+            .fromElement(clipPathElement, this.options, this.cssRules)
             .then((enlivedClippath) => {
               removeTransformMatrixForSvgParsing(enlivedClippath);
               enlivedClippath.fillRule = enlivedClippath.clipRule;

@@ -1,16 +1,11 @@
 import { uid } from '../util/internals/uid';
 import { applyViewboxTransform } from './applyViewboxTransform';
-import {
-  cssRules,
-  svgInvalidAncestorsRegEx,
-  svgValidTagNamesRegEx,
-} from './constants';
+import { svgInvalidAncestorsRegEx, svgValidTagNamesRegEx } from './constants';
 import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
 import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
-import { getCSSRules } from './getCSSRules';
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -83,9 +78,6 @@ export async function parseSVGDocument(
       );
     });
 
-  // those are like globals we need to fix
-  cssRules[svgUid] = getCSSRules(doc);
-
   // Precedence of rules:   style > class > attribute
   const elementParser = new ElementsParser(
     elements,
@@ -100,8 +92,6 @@ export async function parseSVGDocument(
   );
 
   const instances = await elementParser.parse();
-
-  delete cssRules[svgUid];
 
   return {
     objects: instances,
