@@ -1,19 +1,18 @@
-//@ts-nocheck
 import { selectorMatches } from './selectorMatches';
 
-export function doesSomeParentMatch(element, selectors) {
-  let selector,
+export function doesSomeParentMatch(element: HTMLElement, selectors: string[]) {
+  let selector: string,
     parentMatching = true;
   while (
-    element.parentNode &&
-    element.parentNode.nodeType === 1 &&
+    element.parentElement &&
+    element.parentElement.nodeType === 1 &&
     selectors.length
   ) {
     if (parentMatching) {
-      selector = selectors.pop();
+      selector = selectors.pop()!;
     }
-    element = element.parentNode;
-    parentMatching = selectorMatches(element, selector);
+    element = element.parentElement;
+    parentMatching = selectorMatches(element, selector!);
   }
   return selectors.length === 0;
 }

@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 import { svgNS } from './constants';
 import {
   parsePreserveAspectRatioAttribute,
@@ -10,7 +10,7 @@ import { NONE } from '../constants';
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
 
-export function applyViewboxTransform(element) {
+export function applyViewboxTransform(element: HTMLElement) {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
@@ -25,13 +25,12 @@ export function applyViewboxTransform(element) {
   const heightAttr = element.getAttribute('height');
   const x = element.getAttribute('x') || 0;
   const y = element.getAttribute('y') || 0;
-  let preserveAspectRatio = element.getAttribute('preserveAspectRatio') || '';
   const missingViewBox =
     !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
   const missingDimAttr =
     !widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%';
   const toBeParsed = missingViewBox && missingDimAttr;
-  const parsedDim = {};
+  const parsedDim: any = {};
   let translateMatrix = '';
   let widthDiff = 0;
   let heightDiff = 0;
@@ -84,7 +83,9 @@ export function applyViewboxTransform(element) {
   }
 
   // default is to preserve aspect ratio
-  preserveAspectRatio = parsePreserveAspectRatioAttribute(preserveAspectRatio);
+  const preserveAspectRatio = parsePreserveAspectRatioAttribute(
+    element.getAttribute('preserveAspectRatio') || ''
+  );
   if (preserveAspectRatio.alignX !== NONE) {
     //translate all container for the effect of Mid, Min, Max
     if (preserveAspectRatio.meetOrSlice === 'meet') {

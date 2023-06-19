@@ -69,7 +69,7 @@
     minWidth: 20,
     splitByGrapheme: false,
     strokeUniform: false,
-    path: null,
+    path: undefined,
     direction: 'ltr',
     pathStartOffset: 0,
     pathSide: 'left',

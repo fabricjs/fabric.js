@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
 - Fix(Textbox) minimum word width calculation across all lines [#9004](https://github.com/fabricjs/fabric.js/pull/9004)
 - ci(): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)
 - ci(): Revert "invoke tests after changelog action (#8974)" [#9013](https://github.com/fabricjs/fabric.js/pull/9013)
