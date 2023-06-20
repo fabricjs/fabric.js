@@ -1,4 +1,4 @@
-//// @ts-nocheck
+// @ts-nocheck
 import type { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
