@@ -4,7 +4,9 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
-import type { TextStyleDeclaration } from 'fabric';
+import type { GraphemeBBox } from './Text/Text';
+import type { TextStyleDeclaration } from './Text/StyledText';
+
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -18,11 +20,14 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 };
 
 export type GraphemeData = {
-  wordsData: {
-    word: string;
+  data: {
+    value: string | string[];
     width: number;
+    height: number;
+    data: GraphemeBBox[];
+    offset: number;
   }[][];
-  largestWordWidth: number;
+  largestMeasure: number;
 };
 
 /**
@@ -297,32 +302,38 @@ export class Textbox extends IText {
     const splitByGrapheme = this.splitByGrapheme,
       infix = splitByGrapheme ? '' : ' ';
 
-    let largestWordWidth = 0;
+    let largestMeasure = 0;
 
     const data = lines.map((line, lineIndex) => {
       let offset = 0;
-      const words = splitByGrapheme
+      const parts = splitByGrapheme
         ? this.graphemeSplit(line)
         : this.wordSplit(line);
 
       // fix a difference between split and graphemeSplit
-      if (words.length === 0) {
-        words.push([]);
+      if (parts.length === 0) {
+        parts.push([]);
       }
 
-      return words.map((word) => {
+      return parts.map((part) => {
         // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
-        largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + infix.length;
-        return { word, width };
+        const value = splitByGrapheme ? part : this.graphemeSplit(part);
+        const currentOffset = offset;
+        const { width, height, data } = this.measureWord(
+          value,
+          lineIndex,
+          currentOffset
+        );
+        // TODO: support vertical text
+        largestMeasure = Math.max(width, largestMeasure);
+        offset += value.length + infix.length;
+        return { value, width, height, data, offset: currentOffset };
       });
     });
 
     return {
-      wordsData: data,
-      largestWordWidth,
+      data,
+      largestMeasure,
     };
   }
 
@@ -338,27 +349,43 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
     let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
+      height = 0;
+    const data: GraphemeBBox[] = [];
+    for (let i = 0, prevGrapheme: string | undefined; i < word.length; i++) {
       const box = this._getGraphemeBox(
         word[i],
         lineIndex,
         i + charOffset,
         prevGrapheme,
-        skipLeft
+        true
       );
+      // TODO: support vertical text
       width += box.kernedWidth;
+      height = Math.max(height, box.height);
+
+      data.push(box);
       prevGrapheme = word[i];
     }
-    return width;
+
+    return { width, height, data };
+  }
+
+  /**
+   * @deprecated use {@link measureWord} instead
+   */
+  _measureWord(
+    word: string | string[],
+    lineIndex: number,
+    charOffset?: number
+  ) {
+    return this.measureWord(word, lineIndex, charOffset).width;
   }
 
   /**
    * Override this method to customize word splitting
-   * Use with {@link Textbox#_measureWord}
+   * Use with {@link Textbox#measureWord}
    * @param {string} value
    * @returns {string[]} array of words
    */
@@ -380,16 +407,16 @@ export class Textbox extends IText {
   _wrapLine(
     lineIndex: number,
     desiredWidth: number,
-    { largestWordWidth, wordsData }: GraphemeData,
+    { largestMeasure, data }: GraphemeData,
     reservedSpace = 0
-  ): Array<any> {
+  ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
-      line = [],
+      line: string[] = [],
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
@@ -399,22 +426,22 @@ export class Textbox extends IText {
 
     const maxWidth = Math.max(
       desiredWidth,
-      largestWordWidth,
+      largestMeasure,
       this.dynamicMinWidth
     );
     // layout words
-    const data = wordsData[lineIndex];
+    const lineData = data[lineIndex];
     offset = 0;
     let i;
-    for (i = 0; i < data.length; i++) {
-      const { word, width: wordWidth } = data[i];
-      offset += word.length;
+    for (i = 0; i < lineData.length; i++) {
+      const { value, width } = lineData[i];
+      offset += value.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
+      lineWidth += infixWidth + width - additionalSpace;
       if (lineWidth > maxWidth && !lineJustStarted) {
         graphemeLines.push(line);
         line = [];
-        lineWidth = wordWidth;
+        lineWidth = width;
         lineJustStarted = true;
       } else {
         lineWidth += additionalSpace;
@@ -423,11 +450,11 @@ export class Textbox extends IText {
       if (!lineJustStarted && !splitByGrapheme) {
         line.push(infix);
       }
-      line = line.concat(word);
+      line = line.concat(value);
 
       infixWidth = splitByGrapheme
         ? 0
-        : this._measureWord([infix], lineIndex, offset);
+        : this.measureWord([infix], lineIndex, offset).width;
       offset++;
       lineJustStarted = false;
     }
@@ -437,8 +464,8 @@ export class Textbox extends IText {
     // TODO: this code is probably not necessary anymore.
     // it can be moved out of this function since largestWordWidth is now
     // known in advance
-    if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
-      this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
+    if (largestMeasure + reservedSpace > this.dynamicMinWidth) {
+      this.dynamicMinWidth = largestMeasure - additionalSpace + reservedSpace;
     }
     return graphemeLines;
   }
