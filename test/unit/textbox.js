@@ -355,18 +355,24 @@
   });
   QUnit.test('Measure words', function(assert) {
     const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
-    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
+    const { data, largestMeasure } = textbox.getGraphemeDataForRender(textbox.textLines);
     assert.deepEqual(
-      wordsData[0],
-      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }, { word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      data[0],
+      [
+        { value: ['w', 'o', 'r', 'd'], offset: 0, ...textbox.measureWord('word', 1, 0) },
+        { value: ['w', 'o', 'r', 'd'], offset: 5, ...textbox.measureWord('word', 1, 5) },
+      ],
       'All words have the same length line 0'
     );
     assert.deepEqual(
-      wordsData[1],
-      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      data[1],
+      [{ value: ['w', 'o', 'r', 'd'], offset: 0, ...textbox.measureWord('word', 1, 0) }],
       'All words have the same length line1'
     );
-    assert.equal(Math.round(largestWordWidth), 82, 'largest word is 82');
+    assert.equal(Math.round(data[0][0].width), 82, 'largest word is 82');
+    assert.equal(Math.round(data[0][1].width), 82, 'largest word is 82');
+    assert.equal(Math.round(data[1][0].width), 82, 'largest word is 82');
+    assert.equal(Math.round(largestMeasure), 82, 'largest word is 82');
   });
   QUnit.test('Measure words with styles', function(assert) {
     const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
@@ -400,23 +406,24 @@
         }
       }
     };
-    const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
+    const { data, largestMeasure } = textbox.getGraphemeDataForRender(textbox.textLines);
     assert.equal(
-      Math.round(wordsData[0][0].width),
+      Math.round(data[0][0].width),
       82,
       'unstyle word is 82 wide'
     );
     assert.equal(
-      Math.round(wordsData[0][1].width),
+      Math.round(data[0][1].width),
       206,
       'unstyle word is 206 wide'
     );
     assert.deepEqual(
-      wordsData[2],
-      [{ word: ['w', 'o', 'r', 'd'], width: largestWordWidth }],
+      data[2],
+      [{ value: ['w', 'o', 'r', 'd'], offset: 0, ...textbox.measureWord('word', 2, 0) }],
       'All words have the same length line1'
     );
-    assert.equal(Math.round(largestWordWidth), 411, 'largest word is 411');
+    assert.equal(Math.round(data[2][0].width), 411, 'largest word is 411');
+    assert.equal(Math.round(largestMeasure), 411, 'largest word is 411');
   });
   QUnit.test('wrapping with different things', function(assert) {
     var textbox = new fabric.Textbox('xa xb\txc\rxd xe ya yb id', {
@@ -446,8 +453,8 @@
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 2000,
     });
-    const wordsData = textbox.getGraphemeDataForRender(['xa xb xc xd xe ya yb id']);
-    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
+    const data = textbox.getGraphemeDataForRender(['xa xb xc xd xe ya yb id']);
+    var line1 = textbox._wrapLine(0, 100, data, 0);
     var expected1 =  [
       ['x', 'a', ' ', 'x', 'b'],
       ['x', 'c', ' ', 'x', 'd'],
@@ -455,7 +462,7 @@
       ['y', 'b', ' ', 'i', 'd']];
     assert.deepEqual(line1, expected1, 'line1 match expected');
     assert.deepEqual(textbox.dynamicMinWidth, 40, 'texbox width is 40');
-    var line2 = textbox._wrapLine(0, 100, wordsData, 50);
+    var line2 = textbox._wrapLine(0, 100, data, 50);
     var expected2 =  [
       ['x', 'a'],
       ['x', 'b'],
@@ -472,11 +479,11 @@
     var textbox = new fabric.Textbox('', {
       width: 10,
     });
-    const wordsData = textbox.getGraphemeDataForRender(['']);
-    var line1 = textbox._wrapLine(0, 100, wordsData, 0);
+    const data = textbox.getGraphemeDataForRender(['']);
+    var line1 = textbox._wrapLine(0, 100, data, 0);
     assert.deepEqual(line1, [[]], 'wrapping without splitByGrapheme');
     textbox.splitByGrapheme = true;
-    var line2 = textbox._wrapLine(0, 100, wordsData, 0);
+    var line2 = textbox._wrapLine(0, 100, data, 0);
     assert.deepEqual(line2, [[]], 'wrapping with splitByGrapheme');
   });
   QUnit.test('wrapping respects max line width', function (assert) {
