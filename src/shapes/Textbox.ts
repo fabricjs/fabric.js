@@ -25,6 +25,7 @@ export type GraphemeData = {
     width: number;
     height: number;
     data: GraphemeBBox[];
+    offset: number;
   }[][];
   largestMeasure: number;
 };
@@ -317,15 +318,16 @@ export class Textbox extends IText {
       return parts.map((part) => {
         // if using splitByGrapheme words are already in graphemes.
         const value = splitByGrapheme ? part : this.graphemeSplit(part);
+        const currentOffset = offset;
         const { width, height, data } = this._measureWord(
           value,
           lineIndex,
-          offset
+          currentOffset
         );
-        // TODO: support horizontal layout
+        // TODO: support vertical text
         largestMeasure = Math.max(width, largestMeasure);
         offset += value.length + infix.length;
-        return { value, width, height, data };
+        return { value, width, height, data, offset: currentOffset };
       });
     });
 
