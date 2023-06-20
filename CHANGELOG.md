@@ -2,6 +2,8 @@
 
 ## [next]
 
+- patch(Textbox): `_measureWord` return value [#9038](https://github.com/fabricjs/fabric.js/pull/9038)
+
 ## [6.0.0-beta10]
 
 - chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
