@@ -2,6 +2,8 @@
 
 ## [next]
 
+- ci(): install dev deps types [#9039](https://github.com/fabricjs/fabric.js/pull/9039)
+
 ## [6.0.0-beta10]
 
 - chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
