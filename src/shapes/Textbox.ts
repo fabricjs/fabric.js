@@ -313,7 +313,7 @@ export class Textbox extends IText {
       return words.map((word) => {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
+        const { width } = this._measureWord(word, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + infix.length;
         return { word, width };
@@ -338,22 +338,27 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
     let width = 0,
-      prevGrapheme;
-    const skipLeft = true;
-    for (let i = 0, len = word.length; i < len; i++) {
+      height = 0;
+    const data: GraphemeBBox<false>[] = [];
+    for (let i = 0, prevGrapheme: string | undefined; i < word.length; i++) {
       const box = this._getGraphemeBox(
         word[i],
         lineIndex,
         i + charOffset,
         prevGrapheme,
-        skipLeft
+        true
       );
+      // TODO: support vertical text
       width += box.kernedWidth;
+      height = Math.max(height, box.height);
+
+      data.push(box);
       prevGrapheme = word[i];
     }
-    return width;
+
+    return { width, height, data };
   }
 
   /**
@@ -427,7 +432,7 @@ export class Textbox extends IText {
 
       infixWidth = splitByGrapheme
         ? 0
-        : this._measureWord([infix], lineIndex, offset);
+        : this._measureWord([infix], lineIndex, offset).width;
       offset++;
       lineJustStarted = false;
     }
