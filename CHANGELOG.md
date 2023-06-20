@@ -2,7 +2,7 @@
 
 ## [next]
 
-- BREAKING(Textbox): `_measureWord` return value [#9038](https://github.com/fabricjs/fabric.js/pull/9038)
+- patch(Textbox): `_measureWord` return value => `measureWord` [#9038](https://github.com/fabricjs/fabric.js/pull/9038)
 
 ## [6.0.0-beta10]
 
