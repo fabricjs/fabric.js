@@ -4,7 +4,9 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
-import type { TextStyleDeclaration } from 'fabric';
+import type { GraphemeBBox } from './Text/Text';
+import type { TextStyleDeclaration } from './Text/StyledText';
+
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -341,7 +343,10 @@ export class Textbox extends IText {
   _measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
     let width = 0,
       height = 0;
-    const data: GraphemeBBox<false>[] = [];
+    const data: Pick<
+      GraphemeBBox,
+      'width' | 'kernedWidth' | 'height' | 'deltaY' | 'left'
+    >[] = [];
     for (let i = 0, prevGrapheme: string | undefined; i < word.length; i++) {
       const box = this._getGraphemeBox(
         word[i],
