@@ -319,7 +319,7 @@ export class Textbox extends IText {
         // if using splitByGrapheme words are already in graphemes.
         const value = splitByGrapheme ? part : this.graphemeSplit(part);
         const currentOffset = offset;
-        const { width, height, data } = this._measureWord(
+        const { width, height, data } = this.measureWord(
           value,
           lineIndex,
           currentOffset
@@ -349,7 +349,7 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
+  measureWord(word: string | string[], lineIndex: number, charOffset = 0) {
     let width = 0,
       height = 0;
     const data: GraphemeBBox[] = [];
@@ -373,8 +373,19 @@ export class Textbox extends IText {
   }
 
   /**
+   * @deprecated use {@link measureWord} instead
+   */
+  _measureWord(
+    word: string | string[],
+    lineIndex: number,
+    charOffset?: number
+  ) {
+    return this.measureWord(word, lineIndex, charOffset).width;
+  }
+
+  /**
    * Override this method to customize word splitting
-   * Use with {@link Textbox#_measureWord}
+   * Use with {@link Textbox#measureWord}
    * @param {string} value
    * @returns {string[]} array of words
    */
@@ -443,7 +454,7 @@ export class Textbox extends IText {
 
       infixWidth = splitByGrapheme
         ? 0
-        : this._measureWord([infix], lineIndex, offset).width;
+        : this.measureWord([infix], lineIndex, offset).width;
       offset++;
       lineJustStarted = false;
     }
