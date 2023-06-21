@@ -226,11 +226,6 @@ export class IText<
    * @param {*} value
    */
   _set(key: string, value: any) {
-    // if (this.isEditing && this._savedProps && key in this._savedProps) {
-    //   // @ts-expect-error irritating TS
-    //   this._savedProps[key] = value;
-    //   return this;
-    // }
     if (key === 'canvas') {
       this.canvas instanceof Canvas &&
         this.canvas.textEditingManager.remove(this);

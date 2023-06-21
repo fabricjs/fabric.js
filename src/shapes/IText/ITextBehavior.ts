@@ -72,16 +72,6 @@ export abstract class ITextBehavior<
 
   protected declare selected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
-  protected declare _savedProps?: {
-    hasControls: boolean;
-    borderColor: string;
-    lockMovementX: boolean;
-    lockMovementY: boolean;
-    selectable: boolean;
-    hoverCursor: CSSStyleDeclaration['cursor'] | null;
-    defaultCursor?: CSSStyleDeclaration['cursor'];
-    moveCursor?: CSSStyleDeclaration['cursor'];
-  };
   protected declare _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
@@ -390,8 +380,6 @@ export abstract class ITextBehavior<
     this.hiddenTextarea!.focus();
     this.hiddenTextarea!.value = this.text;
     this._updateTextarea();
-    this._saveEditingProps();
-    this._setEditingProps();
     this._textBeforeEdit = this.text;
 
     this._tick();
@@ -642,41 +630,6 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * @private
-   */
-  _saveEditingProps() {
-    // this._savedProps = {
-    //   defaultCursor: this.canvas && this.canvas.defaultCursor,
-    //   moveCursor: this.canvas && this.canvas.moveCursor,
-    // };
-  }
-
-  /**
-   * @private
-   */
-  _setEditingProps() {
-    // if (this.canvas) {
-    //   this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
-    // }
-  }
-
-  /**
-   * @private
-   */
-  _restoreEditingProps() {
-    // if (!this._savedProps) {
-    //   return;
-    // }
-    // if (this.canvas) {
-    //   this.canvas.defaultCursor =
-    //     this._savedProps.defaultCursor || this.canvas.defaultCursor;
-    //   this.canvas.moveCursor =
-    //     this._savedProps.moveCursor || this.canvas.moveCursor;
-    // }
-    // delete this._savedProps;
-  }
-
-  /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
    */
   protected _exitEditing() {
@@ -701,7 +654,6 @@ export abstract class ITextBehavior<
     const isTextChanged = this._textBeforeEdit !== this.text;
     this._exitEditing();
     this.selectionEnd = this.selectionStart;
-    this._restoreEditingProps();
     if (this._forceClearCache) {
       this.initDimensions();
       this.setCoords();
