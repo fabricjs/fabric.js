@@ -4,6 +4,7 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
+import type { TextStyleDeclaration } from 'fabric';
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
@@ -14,6 +15,14 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   noScaleCache: false,
   _wordJoiners: /[ \t\r]/,
   splitByGrapheme: false,
+};
+
+export type GraphemeData = {
+  wordsData: {
+    word: string;
+    width: number;
+  }[][];
+  largestWordWidth: number;
 };
 
 /**
@@ -187,11 +196,14 @@ export class Textbox extends IText {
    * @param {Number} charIndex
    * @private
    */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  _getStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): TextStyleDeclaration {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (!map) {
-        return null;
+        return {};
       }
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
@@ -205,7 +217,11 @@ export class Textbox extends IText {
    * @param {Object} style
    * @private
    */
-  _setStyleDeclaration(lineIndex: number, charIndex: number, style: object) {
+  protected _setStyleDeclaration(
+    lineIndex: number,
+    charIndex: number,
+    style: object
+  ) {
     const map = this._styleMap[lineIndex];
     lineIndex = map.line;
     charIndex = map.offset + charIndex;
@@ -233,7 +249,7 @@ export class Textbox extends IText {
    * @returns {Boolean} if the line exists or not
    * @private
    */
-  _getLineStyle(lineIndex: number): boolean {
+  protected _getLineStyle(lineIndex: number): boolean {
     const map = this._styleMap[lineIndex];
     return !!this.styles[map.line];
   }
@@ -244,7 +260,7 @@ export class Textbox extends IText {
    * @param {Object} style
    * @private
    */
-  _setLineStyle(lineIndex: number) {
+  protected _setLineStyle(lineIndex: number) {
     const map = this._styleMap[lineIndex];
     this.styles[map.line] = {};
   }
@@ -258,14 +274,56 @@ export class Textbox extends IText {
    * @param {Number} desiredWidth width you want to wrap to
    * @returns {Array} Array of lines
    */
-  _wrapText(lines: Array<any>, desiredWidth: number): Array<any> {
-    const wrapped = [];
+  _wrapText(lines: string[], desiredWidth: number): string[][] {
     this.isWrapping = true;
+    // extract all thewords and the widths to optimally wrap lines.
+    const wordsData = this.getGraphemeDataForRender(lines);
+    const wrapped: string[][] = [];
     for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(lines[i], i, desiredWidth));
+      wrapped.push(...this._wrapLine(i, desiredWidth, wordsData));
     }
     this.isWrapping = false;
     return wrapped;
+  }
+
+  /**
+   * For each line of text terminated by an hard line stop,
+   * measure each word width and extract the largest word from all.
+   * The returned words here are the one that at the end will be rendered.
+   * @param {string[]} lines the lines we need to measure
+   *
+   */
+  getGraphemeDataForRender(lines: string[]): GraphemeData {
+    const splitByGrapheme = this.splitByGrapheme,
+      infix = splitByGrapheme ? '' : ' ';
+
+    let largestWordWidth = 0;
+
+    const data = lines.map((line, lineIndex) => {
+      let offset = 0;
+      const words = splitByGrapheme
+        ? this.graphemeSplit(line)
+        : this.wordSplit(line);
+
+      // fix a difference between split and graphemeSplit
+      if (words.length === 0) {
+        words.push([]);
+      }
+
+      return words.map((word) => {
+        // if using splitByGrapheme words are already in graphemes.
+        word = splitByGrapheme ? word : this.graphemeSplit(word);
+        const width = this._measureWord(word, lineIndex, offset);
+        largestWordWidth = Math.max(width, largestWordWidth);
+        offset += word.length + infix.length;
+        return { word, width };
+      });
+    });
+
+    return {
+      wordsData: data,
+      largestWordWidth,
+    };
   }
 
   /**
@@ -309,26 +367,25 @@ export class Textbox extends IText {
   }
 
   /**
-   * Wraps a line of text using the width of the Textbox and a context.
-   * @param {Array} line The grapheme array that represent the line
+   * Wraps a line of text using the width of the Textbox as desiredWidth
+   * and leveraging the known width o words from GraphemeData
+   * @private
    * @param {Number} lineIndex
    * @param {Number} desiredWidth width you want to wrap the line to
+   * @param {GraphemeData} graphemeData an object containing all the lines' words width.
    * @param {Number} reservedSpace space to remove from wrapping for custom functionalities
    * @returns {Array} Array of line(s) into which the given text is wrapped
    * to.
    */
   _wrapLine(
-    _line,
     lineIndex: number,
     desiredWidth: number,
+    { largestWordWidth, wordsData }: GraphemeData,
     reservedSpace = 0
   ): Array<any> {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
-      words = splitByGrapheme
-        ? this.graphemeSplit(_line)
-        : this.wordSplit(_line),
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
@@ -336,22 +393,9 @@ export class Textbox extends IText {
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
-      largestWordWidth = 0,
       lineJustStarted = true;
-    // fix a difference between split and graphemeSplit
-    if (words.length === 0) {
-      words.push([]);
-    }
+
     desiredWidth -= reservedSpace;
-    // measure words
-    const data = words.map((word) => {
-      // if using splitByGrapheme words are already in graphemes.
-      word = splitByGrapheme ? word : this.graphemeSplit(word);
-      const width = this._measureWord(word, lineIndex, offset);
-      largestWordWidth = Math.max(width, largestWordWidth);
-      offset += word.length + infix.length;
-      return { word, width };
-    });
 
     const maxWidth = Math.max(
       desiredWidth,
@@ -359,11 +403,11 @@ export class Textbox extends IText {
       this.dynamicMinWidth
     );
     // layout words
+    const data = wordsData[lineIndex];
     offset = 0;
     let i;
-    for (i = 0; i < words.length; i++) {
-      const word = data[i].word;
-      const wordWidth = data[i].width;
+    for (i = 0; i < data.length; i++) {
+      const { word, width: wordWidth } = data[i];
       offset += word.length;
 
       lineWidth += infixWidth + wordWidth - additionalSpace;
@@ -390,6 +434,9 @@ export class Textbox extends IText {
 
     i && graphemeLines.push(line);
 
+    // TODO: this code is probably not necessary anymore.
+    // it can be moved out of this function since largestWordWidth is now
+    // known in advance
     if (largestWordWidth + reservedSpace > this.dynamicMinWidth) {
       this.dynamicMinWidth = largestWordWidth - additionalSpace + reservedSpace;
     }

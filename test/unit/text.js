@@ -59,7 +59,7 @@
     skewY:                      0,
     charSpacing:                0,
     styles:                     [],
-    path:                       null,
+    path:                       undefined,
     strokeUniform:              false,
     direction:                  'ltr',
     pathStartOffset:            0,

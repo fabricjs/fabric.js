@@ -82,8 +82,8 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
   ) {
     setStyle(element, {
       position: 'absolute',
-      left: 0,
-      top: 0,
+      left: '0',
+      top: '0',
     });
     allowTouchScrolling(element, allow);
     makeElementUnselectable(element);
