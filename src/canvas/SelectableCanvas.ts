@@ -3,11 +3,11 @@ import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
-  ControlActionHandler,
   ModifierKey,
   TOptionalModifierKey,
   TPointerEvent,
   Transform,
+  TransformActionHandler,
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
@@ -31,7 +31,6 @@ import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
-import type { Control } from '../controls/Control';
 
 export const DefaultCanvasProperties = {
   uniformScaling: true,
@@ -798,6 +797,38 @@ export class SelectableCanvas<
   }
 
   /**
+   * Determines the transform action
+   */
+  getTransformAction(
+    e: TPointerEvent,
+    {
+      target,
+      corner,
+      isSelected,
+    }: { target: FabricObject; corner: string; isSelected: boolean }
+  ): {
+    action: string;
+    actionHandler?: TransformActionHandler;
+  } {
+    if (corner && isSelected) {
+      const control = target.controls[corner];
+      return {
+        action: control.getActionName(e, control, target),
+        actionHandler: control.getActionHandler(e, target, control),
+      };
+    } else if ((target as IText).isEditing) {
+      return {
+        action: 'text',
+      };
+    } else {
+      return {
+        action: 'drag',
+        actionHandler: dragHandler,
+      };
+    }
+  }
+
+  /**
    * @private
    * @param {Event} e Event object
    * @param {FaricObject} target
@@ -805,7 +836,7 @@ export class SelectableCanvas<
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
-    shouldActivateControl: boolean
+    isSelected: boolean
   ): void {
     if (!target) {
       return;
@@ -819,30 +850,20 @@ export class SelectableCanvas<
           target.group.calcTransformMatrix()
         )
       : this.getPointer(e);
-
     const corner = target.__corner || '';
-    let control: Control | undefined,
-      actionHandler: ControlActionHandler | undefined,
-      action: string;
-    if (corner && shouldActivateControl) {
-      control = target.controls[corner];
-      action = control.getActionName(e, control, target);
-      actionHandler = control.getActionHandler(e, target, control);
-    } else if ((target as IText).isEditing) {
-      action = 'text';
-    } else {
-      action = 'drag';
-      actionHandler = dragHandler;
-    }
-
-    const altKey = e[this.centeredKey as ModifierKey],
-      { x: originX, y: originY } = this._shouldCenterTransform(
-        target,
-        action,
-        altKey
-      )
-        ? ({ x: CENTER, y: CENTER } as const)
-        : this._getOriginFromCorner(target, corner);
+    const { action, actionHandler } = this.getTransformAction(e, {
+      target,
+      corner,
+      isSelected,
+    });
+    const altKey = e[this.centeredKey as ModifierKey];
+    const { x: originX, y: originY } = this._shouldCenterTransform(
+      target,
+      action,
+      altKey
+    )
+      ? ({ x: CENTER, y: CENTER } as const)
+      : this._getOriginFromCorner(target, corner);
 
     /**
      * relative to target's containing coordinate plane
