@@ -100,22 +100,21 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-    UniqueTextProps {}
+  UniqueTextProps { }
 
-export interface TextProps extends FabricObjectProps, UniqueTextProps {}
+export interface TextProps extends FabricObjectProps, UniqueTextProps { }
 
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-    Props extends TProps<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ObjectEvents = ObjectEvents
-  >
+  Props extends TProps<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+>
   extends StyledText<Props, SProps, EventSpec>
-  implements UniqueTextProps
-{
+  implements UniqueTextProps {
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
@@ -554,9 +553,8 @@ export class Text<
    * @return {String} String representation of text object
    */
   toString(): string {
-    return `#<Text (${this.complexity()}): { "text": "${
-      this.text
-    }", "fontFamily": "${this.fontFamily}" }>`;
+    return `#<Text (${this.complexity()}): { "text": "${this.text
+      }", "fontFamily": "${this.fontFamily}" }>`;
   }
 
   /**
@@ -1640,23 +1638,23 @@ export class Text<
     styleObject?: TextStyleDeclaration,
     forMeasuring?: boolean
   ): string {
-    const style = styleObject || this,
-      family = this.fontFamily,
-      fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-    const fontFamily =
+    const style = styleObject || this;
+    const family = style.fontFamily || this.fontFamily;
+    const fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
+    const formattedFontFamily =
       family === undefined ||
-      family.indexOf("'") > -1 ||
-      family.indexOf(',') > -1 ||
-      family.indexOf('"') > -1 ||
-      fontIsGeneric
-        ? style.fontFamily
+        family.indexOf("'") > -1 ||
+        family.indexOf(",") > -1 ||
+        family.indexOf('"') > -1 ||
+        fontIsGeneric
+        ? this.fontFamily
         : `"${style.fontFamily}"`;
     return [
       style.fontStyle,
       style.fontWeight,
-      forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-      fontFamily,
-    ].join(' ');
+      forMeasuring ? this.CACHE_FONT_SIZE + "px" : style.fontSize + "px",
+      formattedFontFamily,
+    ].join(" ");
   }
 
   /**
@@ -1827,16 +1825,16 @@ export class Text<
     // this can later looked at again and probably removed.
 
     const text = new this(textContent, {
-        left: left + dx,
-        top: top + dy,
-        underline: textDecoration.includes('underline'),
-        overline: textDecoration.includes('overline'),
-        linethrough: textDecoration.includes('line-through'),
-        // we initialize this as 0
-        strokeWidth: 0,
-        fontSize,
-        ...restOfOptions,
-      }),
+      left: left + dx,
+      top: top + dy,
+      underline: textDecoration.includes('underline'),
+      overline: textDecoration.includes('overline'),
+      linethrough: textDecoration.includes('line-through'),
+      // we initialize this as 0
+      strokeWidth: 0,
+      fontSize,
+      ...restOfOptions,
+    }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1860,7 +1858,7 @@ export class Text<
       top:
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
-          text.lineHeight,
+        text.lineHeight,
       strokeWidth,
     });
     return text;
