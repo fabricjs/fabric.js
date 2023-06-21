@@ -1397,7 +1397,7 @@ export class Canvas extends SelectableCanvas {
     }
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
-      this.setCursor(transform.target.moveCursor || this.moveCursor);
+      this.setCursor(transform.target.getCursor('move') || this.moveCursor);
     }
     transform.actionPerformed = transform.actionPerformed || actionPerformed;
   }
@@ -1413,7 +1413,7 @@ export class Canvas extends SelectableCanvas {
       this.setCursor(this.defaultCursor);
       return;
     }
-    let hoverCursor = target.hoverCursor || this.hoverCursor;
+    let hoverCursor = target.getCursor('hover') || this.hoverCursor;
     const activeSelection =
         this._activeObject === this._activeSelection
           ? this._activeObject
@@ -1434,7 +1434,7 @@ export class Canvas extends SelectableCanvas {
           .concat()
           .reverse()
           .map((_target) => {
-            hoverCursor = _target.hoverCursor || hoverCursor;
+            hoverCursor = _target.getCursor('hover') || hoverCursor;
           });
       }
       this.setCursor(hoverCursor);

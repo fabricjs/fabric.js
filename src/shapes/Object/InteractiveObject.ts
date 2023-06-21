@@ -29,7 +29,7 @@ type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
 
-type TStyleOverride = ControlRenderingStyleOverride &
+export type TStyleOverride = ControlRenderingStyleOverride &
   TBorderRenderingStyleOverride &
   Partial<
     Pick<InteractiveFabricObject, 'hasBorders' | 'hasControls'> & {
@@ -173,23 +173,17 @@ export class InteractiveFabricObject<
     return super._updateCacheCanvas();
   }
 
-  /**
-   * Determines which corner is under the mouse cursor, represented by `pointer`.
-   * This function is return a corner only if the object is the active one.
-   * This is done to avoid selecting corner of non active object and activating transformations
-   * rather than drag action. The default behavior of fabricJS is that if you want to transform
-   * an object, first you select it to show the control set
-   * @private
-   * @param {Object} pointer The pointer indicating the mouse position
-   * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
-   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
-   */
-  _findTargetCorner(pointer: Point, forTouch = false): string {
-    if (!this.hasControls || !this.canvas) {
-      return '';
-    }
+  getCursor(cursor: 'hover' | 'move') {
+    return cursor === 'hover' ? this.hoverCursor : this.moveCursor;
+  }
 
-    this.__corner = undefined;
+  /**
+   * Determines which corner is under the mouse cursor, represented by {@link pointer}.
+   * @param {Point} pointer The pointer indicating the mouse position
+   * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
+   * @return {String} corner code (tl, tr, bl, br, etc.), or '' if not found.
+   */
+  findTargetCorner(pointer: Point, forTouch: boolean): string {
     // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
@@ -220,6 +214,17 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
     return '';
+  }
+
+  /**
+   * State and side effect wrapper for {@link findTargetCorner}
+   */
+  protected _findTargetCorner(pointer: Point, forTouch = false): string {
+    if (!this.hasControls || !this.canvas) {
+      return '';
+    }
+    this.__corner = undefined;
+    return this.findTargetCorner(pointer, forTouch);
   }
 
   /**

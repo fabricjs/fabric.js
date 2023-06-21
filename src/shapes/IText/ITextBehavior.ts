@@ -14,6 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TProps } from '../Object/types';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
+import type { TStyleOverride } from '../Object/InteractiveObject';
 
 /**
  *  extend this regex to support non english languages
@@ -404,6 +405,46 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * @override when editing display a text cursor while hovering
+   */
+  getCursor(cursor: 'hover' | 'move') {
+    if (this.isEditing && cursor === 'hover') {
+      return 'text';
+    }
+    return super.getCursor(cursor);
+  }
+
+  /**
+   * @override when editing do not render controls and change {@link borderColor} to {@link editingBorderColor}
+   */
+  _renderControls(
+    ctx: CanvasRenderingContext2D,
+    styleOverride?: TStyleOverride
+  ): void {
+    super._renderControls(
+      ctx,
+      this.isEditing
+        ? {
+            hasControls: false,
+            borderColor: this.editingBorderColor,
+            ...styleOverride,
+          }
+        : styleOverride
+    );
+  }
+
+  /**
+   * @override disable when editing
+   * Override to make controls active
+   */
+  _findTargetCorner(pointer: Point, forTouch?: boolean): string {
+    if (this.isEditing) {
+      return '';
+    }
+    return super._findTargetCorner(pointer, forTouch);
+  }
+
+  /**
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
@@ -440,20 +481,6 @@ export abstract class ITextBehavior<
       this._updateTextarea();
       this.renderCursorOrSelection();
     }
-  }
-
-  /**
-   * @private
-   */
-  _setEditingProps() {
-    this.hoverCursor = 'text';
-
-    if (this.canvas) {
-      this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
-    }
-
-    this.borderColor = this.editingBorderColor;
-    this.hasControls = this.selectable = false;
   }
 
   /**
@@ -618,39 +645,35 @@ export abstract class ITextBehavior<
    * @private
    */
   _saveEditingProps() {
-    this._savedProps = {
-      hasControls: this.hasControls,
-      borderColor: this.borderColor,
-      lockMovementX: this.lockMovementX,
-      lockMovementY: this.lockMovementY,
-      hoverCursor: this.hoverCursor,
-      selectable: this.selectable,
-      defaultCursor: this.canvas && this.canvas.defaultCursor,
-      moveCursor: this.canvas && this.canvas.moveCursor,
-    };
+    // this._savedProps = {
+    //   defaultCursor: this.canvas && this.canvas.defaultCursor,
+    //   moveCursor: this.canvas && this.canvas.moveCursor,
+    // };
+  }
+
+  /**
+   * @private
+   */
+  _setEditingProps() {
+    // if (this.canvas) {
+    //   this.canvas.defaultCursor = this.canvas.moveCursor = 'text';
+    // }
   }
 
   /**
    * @private
    */
   _restoreEditingProps() {
-    if (!this._savedProps) {
-      return;
-    }
-
-    this.hoverCursor = this._savedProps.hoverCursor;
-    this.hasControls = this._savedProps.hasControls;
-    this.borderColor = this._savedProps.borderColor;
-    this.selectable = this._savedProps.selectable;
-
-    if (this.canvas) {
-      this.canvas.defaultCursor =
-        this._savedProps.defaultCursor || this.canvas.defaultCursor;
-      this.canvas.moveCursor =
-        this._savedProps.moveCursor || this.canvas.moveCursor;
-    }
-
-    delete this._savedProps;
+    // if (!this._savedProps) {
+    //   return;
+    // }
+    // if (this.canvas) {
+    //   this.canvas.defaultCursor =
+    //     this._savedProps.defaultCursor || this.canvas.defaultCursor;
+    //   this.canvas.moveCursor =
+    //     this._savedProps.moveCursor || this.canvas.moveCursor;
+    // }
+    // delete this._savedProps;
   }
 
   /**
