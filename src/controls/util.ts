@@ -1,8 +1,7 @@
 import type {
-  TPointerEvent,
   Transform,
   TransformAction,
-  BasicTransformEvent,
+  BasicTransformEvent
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
@@ -17,24 +16,7 @@ import { CENTER } from '../constants';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
-/**
- * @param {Boolean} alreadySelected true if target is already selected
- * @param {String} corner a string representing the corner ml, mr, tl ...
- * @param {Event} e Event object
- * @param {FabricObject} [target] inserted back to help overriding. Unused
- */
-export const getActionFromCorner = (
-  alreadySelected: boolean,
-  corner: string,
-  e: TPointerEvent,
-  target: FabricObject
-) => {
-  if (!corner || !alreadySelected) {
-    return 'drag';
-  }
-  const control = target.controls[corner];
-  return control.getActionName(e, control, target);
-};
+
 
 /**
  * Checks if transform is centered
