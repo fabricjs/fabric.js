@@ -1,7 +1,7 @@
 import type {
   Transform,
   TransformAction,
-  BasicTransformEvent
+  BasicTransformEvent,
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
@@ -15,8 +15,6 @@ import type { Control } from './Control';
 import { CENTER } from '../constants';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
-
-
 
 /**
  * Checks if transform is centered
