@@ -1,5 +1,4 @@
 import { dragHandler } from '../controls/drag';
-import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
@@ -8,6 +7,7 @@ import type {
   TOptionalModifierKey,
   TPointerEvent,
   Transform,
+  TransformActionHandler,
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
@@ -797,6 +797,38 @@ export class SelectableCanvas<
   }
 
   /**
+   * Determines the transform action
+   */
+  getTransformAction(
+    e: TPointerEvent,
+    {
+      target,
+      corner,
+      isSelected,
+    }: { target: FabricObject; corner: string; isSelected: boolean }
+  ): {
+    action: string;
+    actionHandler?: TransformActionHandler;
+  } {
+    if (corner && isSelected) {
+      const control = target.controls[corner];
+      return {
+        action: control.getActionName(e, control, target),
+        actionHandler: control.getActionHandler(e, target, control),
+      };
+    } else if ((target as IText).isEditing) {
+      return {
+        action: 'text',
+      };
+    } else {
+      return {
+        action: 'drag',
+        actionHandler: dragHandler,
+      };
+    }
+  }
+
+  /**
    * @private
    * @param {Event} e Event object
    * @param {FaricObject} target
@@ -804,11 +836,12 @@ export class SelectableCanvas<
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
-    alreadySelected: boolean
+    isSelected: boolean
   ): void {
     if (!target) {
       return;
     }
+
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -817,54 +850,55 @@ export class SelectableCanvas<
           target.group.calcTransformMatrix()
         )
       : this.getPointer(e);
-    const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
-      actionHandler =
-        alreadySelected && control
-          ? control.getActionHandler(e, target, control)
-          : dragHandler,
-      action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
-      altKey = e[this.centeredKey as ModifierKey],
-      /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
-       **/
-      transform: Transform = {
-        target: target,
-        action: action,
-        actionHandler,
-        actionPerformed: false,
-        corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
-        originX: origin.x,
-        originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey: altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
+    const corner = target.__corner || '';
+    const { action, actionHandler } = this.getTransformAction(e, {
+      target,
+      corner,
+      isSelected,
+    });
+    const altKey = e[this.centeredKey as ModifierKey];
+    const { x: originX, y: originY } = this._shouldCenterTransform(
+      target,
+      action,
+      altKey
+    )
+      ? ({ x: CENTER, y: CENTER } as const)
+      : this._getOriginFromCorner(target, corner);
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = CENTER;
-      transform.originY = CENTER;
-    }
-    this._currentTransform = transform;
+    /**
+     * relative to target's containing coordinate plane
+     * both agree on every point
+     **/
+    this._currentTransform = {
+      target,
+      action,
+      actionHandler,
+      actionPerformed: false,
+      corner,
+      scaleX: target.scaleX,
+      scaleY: target.scaleY,
+      skewX: target.skewX,
+      skewY: target.skewY,
+      offsetX: pointer.x - target.left,
+      offsetY: pointer.y - target.top,
+      originX,
+      originY,
+      ex: pointer.x,
+      ey: pointer.y,
+      lastX: pointer.x,
+      lastY: pointer.y,
+      theta: degreesToRadians(target.angle),
+      width: target.width,
+      height: target.height,
+      shiftKey: e.shiftKey,
+      altKey,
+      original: {
+        ...saveObjectTransform(target),
+        originX,
+        originY,
+      },
+    };
+
     // @ts-ignore
     this._beforeTransform(e);
   }
