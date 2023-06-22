@@ -217,9 +217,10 @@ export class InteractiveFabricObject<
   }
 
   /**
+   * @private
    * State and side effect wrapper for {@link findTargetCorner}
    */
-  protected _findTargetCorner(pointer: Point, forTouch = false): string {
+  _findTargetCorner(pointer: Point, forTouch = false): string {
     if (!this.hasControls || !this.canvas) {
       return '';
     }
