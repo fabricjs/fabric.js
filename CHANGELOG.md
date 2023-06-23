@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): fix main export [#9045](https://github.com/fabricjs/fabric.js/pull/9045)
+
 ## [6.0.0-beta10]
 
 - chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
