@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
   QUnit.module('fabric.Text', {
     before() {
@@ -16,58 +16,58 @@
   var CHAR_WIDTH = 20;
 
   var REFERENCE_TEXT_OBJECT = {
-    version:                   fabric.version,
-    type:                      'Text',
-    originX:                   'left',
-    originY:                   'top',
-    left:                      0,
-    top:                       0,
-    width:                     CHAR_WIDTH,
-    height:                    45.2,
-    fill:                      'rgb(0,0,0)',
-    stroke:                    null,
-    strokeWidth:               1,
-    strokeDashArray:           null,
-    strokeLineCap:             'butt',
-    strokeDashOffset:         0,
-    strokeLineJoin:            'miter',
-    strokeMiterLimit:          4,
-    scaleX:                    1,
-    scaleY:                    1,
-    angle:                     0,
-    flipX:                     false,
-    flipY:                     false,
-    opacity:                   1,
-    shadow:                    null,
-    visible:                   true,
-    backgroundColor:           '',
-    text:                      'x',
-    fontSize:                  40,
-    fontWeight:                'normal',
-    fontFamily:                'Times New Roman',
-    fontStyle:                 'normal',
-    lineHeight:                1.16,
-    underline:                 false,
-    overline:                  false,
-    linethrough:               false,
-    textAlign:                 'left',
-    textBackgroundColor:       '',
-    fillRule:                  'nonzero',
-    paintFirst:                'fill',
-    globalCompositeOperation:  'source-over',
-    skewX:                      0,
-    skewY:                      0,
-    charSpacing:                0,
-    styles:                     [],
-    path:                       undefined,
-    strokeUniform:              false,
-    direction:                  'ltr',
-    pathStartOffset:            0,
-    pathSide:                   'left',
-    pathAlign:                  'baseline'
+    version: fabric.version,
+    type: 'Text',
+    originX: 'left',
+    originY: 'top',
+    left: 0,
+    top: 0,
+    width: CHAR_WIDTH,
+    height: 45.2,
+    fill: 'rgb(0,0,0)',
+    stroke: null,
+    strokeWidth: 1,
+    strokeDashArray: null,
+    strokeLineCap: 'butt',
+    strokeDashOffset: 0,
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 4,
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    flipX: false,
+    flipY: false,
+    opacity: 1,
+    shadow: null,
+    visible: true,
+    backgroundColor: '',
+    text: 'x',
+    fontSize: 40,
+    fontWeight: 'normal',
+    fontFamily: 'Times New Roman',
+    fontStyle: 'normal',
+    lineHeight: 1.16,
+    underline: false,
+    overline: false,
+    linethrough: false,
+    textAlign: 'left',
+    textBackgroundColor: '',
+    fillRule: 'nonzero',
+    paintFirst: 'fill',
+    globalCompositeOperation: 'source-over',
+    skewX: 0,
+    skewY: 0,
+    charSpacing: 0,
+    styles: [],
+    path: undefined,
+    strokeUniform: false,
+    direction: 'ltr',
+    pathStartOffset: 0,
+    pathSide: 'left',
+    pathAlign: 'baseline'
   };
 
-  QUnit.test('constructor', function(assert) {
+  QUnit.test('constructor', function (assert) {
     assert.ok(fabric.Text);
     var text = createTextObject();
 
@@ -79,13 +79,13 @@
     assert.equal(text.get('text'), 'x');
   });
 
-  QUnit.test('toString', function(assert) {
+  QUnit.test('toString', function (assert) {
     var text = createTextObject();
     assert.ok(typeof text.toString === 'function');
     assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
-  QUnit.test('_getFontDeclaration', function(assert) {
+  QUnit.test('_getFontDeclaration', function (assert) {
     var text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
     var fontDecl = text._getFontDeclaration();
@@ -99,15 +99,15 @@
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
   });
 
-  QUnit.test('_getFontDeclaration with coma', function(assert) {
+  QUnit.test('_getFontDeclaration with coma', function (assert) {
     var text = createTextObject();
     text.fontFamily = 'Arial, sans-serif';
     var fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
   });
 
-  fabric.Text.genericFonts.forEach(function(fontName) {
-    QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
+  fabric.Text.genericFonts.forEach(function (fontName) {
+    QUnit.test('_getFontDeclaration with genericFonts', function (assert) {
       var text = createTextObject();
       text.fontFamily = fontName;
       var fontDecl = text._getFontDeclaration();
@@ -118,19 +118,19 @@
     });
   });
 
-  QUnit.test('toObject', function(assert) {
+  QUnit.test('toObject', function (assert) {
     var text = createTextObject();
     assert.ok(typeof text.toObject === 'function');
     assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
 
-  QUnit.test('complexity', function(assert) {
+  QUnit.test('complexity', function (assert) {
     var text = createTextObject();
     assert.ok(typeof text.complexity === 'function');
     assert.equal(text.complexity(), 1);
   });
 
-  QUnit.test('set', function(assert) {
+  QUnit.test('set', function (assert) {
     var text = createTextObject();
     assert.ok(typeof text.set === 'function');
     assert.equal(text.set('text', 'bar'), text, 'should be chainable');
@@ -142,7 +142,7 @@
     assert.equal(text.get('angle'), 55);
   });
 
-  QUnit.test('lineHeight with single line', function(assert) {
+  QUnit.test('lineHeight with single line', function (assert) {
     var text = createTextObject();
     text.text = 'text with one line';
     text.lineHeight = 2;
@@ -154,17 +154,17 @@
     assert.equal(height, heightNew, 'text height does not change with one single line');
   });
 
-  QUnit.test('lineHeight with multi line', function(assert) {
+  QUnit.test('lineHeight with multi line', function (assert) {
     var text = createTextObject();
     text.text = 'text with\ntwo lines';
     text.lineHeight = 0.1;
     text.initDimensions();
     var height = text.height,
-        minimumHeight = text.fontSize * text._fontSizeMult;
+      minimumHeight = text.fontSize * text._fontSizeMult;
     assert.equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
   });
 
-  QUnit.test('set with "hash"', function(assert) {
+  QUnit.test('set with "hash"', function (assert) {
     var text = createTextObject();
 
     text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
@@ -174,7 +174,7 @@
     assert.equal(text.fontFamily, 'blah');
   });
 
-  QUnit.test('get bounding rect after init', function(assert) {
+  QUnit.test('get bounding rect after init', function (assert) {
     var string = 'Some long text, the quick brown fox jumps over the lazy dog etc... blah blah blah';
     var text = new fabric.Text(string, {
       left: 30,
@@ -191,22 +191,22 @@
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
   });
 
-  QUnit.test('fabric.Text.fromObject', function(assert) {
+  QUnit.test('fabric.Text.fromObject', function (assert) {
     var done = assert.async();
     assert.ok(typeof fabric.Text.fromObject === 'function');
-    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
+    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function (text) {
       assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
       done();
     });
   });
 
-  QUnit.test('fabric.Text.fromElement', function(assert) {
+  QUnit.test('fabric.Text.fromElement', function (assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
     var elText = fabric.getFabricDocument().createElement('text');
     elText.textContent = 'x';
 
-    fabric.Text.fromElement(elText, function(text) {
+    fabric.Text.fromElement(elText, function (text) {
       assert.ok(text instanceof fabric.Text);
       var expectedObject = {
         ...REFERENCE_TEXT_OBJECT,
@@ -221,7 +221,7 @@
     });
   });
 
-  QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
+  QUnit.test('fabric.Text.fromElement with custom attributes', function (assert) {
     var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
     var elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
@@ -254,32 +254,32 @@
       var expectedObject = {
         ...REFERENCE_TEXT_OBJECT,
         /* left varies slightly due to node-canvas rendering */
-        left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
-        top:              -88.03,
-        width:            CHAR_WIDTH,
-        height:           138.99,
-        fill:             'rgb(255,255,255)',
-        opacity:          0.45,
-        stroke:           'blue',
-        strokeWidth:      3,
-        strokeDashArray:  [5, 2],
-        strokeLineCap:    'round',
-        strokeLineJoin:   'bevel',
+        left: fabric.util.toFixed(textWithAttrs.left + '', 2),
+        top: -88.03,
+        width: CHAR_WIDTH,
+        height: 138.99,
+        fill: 'rgb(255,255,255)',
+        opacity: 0.45,
+        stroke: 'blue',
+        strokeWidth: 3,
+        strokeDashArray: [5, 2],
+        strokeLineCap: 'round',
+        strokeLineJoin: 'bevel',
         strokeMiterLimit: 5,
-        fontFamily:       'Monaco',
-        paintFirst:       'fill',
-        fontStyle:        'italic',
-        charSpacing:      1000,
-        fontWeight:       'bold',
-        fontSize:         123,
-        underline:        true,
+        fontFamily: 'Monaco',
+        paintFirst: 'fill',
+        fontStyle: 'italic',
+        charSpacing: 1000,
+        fontWeight: 'bold',
+        fontSize: 123,
+        underline: true,
       };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
       done();
     });
   });
 
-  QUnit.test('dimensions after text change', function(assert) {
+  QUnit.test('dimensions after text change', function (assert) {
     var text = new fabric.Text('x');
     assert.equal(text.width, CHAR_WIDTH);
 
@@ -287,12 +287,12 @@
     assert.equal(text.width, CHAR_WIDTH * 2);
   });
 
-  QUnit.test('dimensions without text', function(assert) {
+  QUnit.test('dimensions without text', function (assert) {
     var text = new fabric.Text('');
     assert.equal(text.width, 2);
   });
 
-  QUnit.test('setting fontFamily', function(assert) {
+  QUnit.test('setting fontFamily', function (assert) {
     var text = new fabric.Text('x');
     text.path = 'foobar.js';
 
@@ -303,31 +303,31 @@
     assert.equal(text.get('fontFamily'), '"Arial Black", Arial');
   });
 
-  QUnit.test('text styleHas', function(assert) {
+  QUnit.test('text styleHas', function (assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { };
+    text.styles = {};
     assert.ok(typeof text.styleHas === 'function');
     assert.equal(text.styleHas('stroke'), false, 'the text style has no stroke');
-    text.styles = { 1: { 0: { stroke: 'red' }}};
+    text.styles = { 1: { 0: { stroke: 'red' } } };
     assert.equal(text.styleHas('stroke'), true, 'the text style has stroke');
   });
 
-  QUnit.test('text cleanStyle', function(assert) {
+  QUnit.test('text cleanStyle', function (assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { 1: { 0: { stroke: 'red' }}};
+    text.styles = { 1: { 0: { stroke: 'red' } } };
     text.stroke = 'red';
     assert.ok(typeof text.cleanStyle === 'function');
     text.cleanStyle('stroke');
     assert.equal(text.styles[1], undefined, 'the style has been cleaned since stroke was equal to text property');
-    text.styles = { 1: { 0: { stroke: 'blue' }}};
+    text.styles = { 1: { 0: { stroke: 'blue' } } };
     text.stroke = 'red';
     text.cleanStyle('stroke');
     assert.equal(text.styles[1][0].stroke, 'blue', 'nothing to clean, style untouched');
   });
 
-  QUnit.test('text cleanStyle with different sub styles styles', function(assert) {
+  QUnit.test('text cleanStyle with different sub styles styles', function (assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }, 2: { stroke: 'blue' }}};
+    text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }, 2: { stroke: 'blue' } } };
     text.stroke = 'red';
     text.cleanStyle('stroke');
     assert.equal(text.stroke, 'red', 'the stroke stays red');
@@ -337,36 +337,36 @@
     assert.equal(text.styles[1][2].stroke, 'blue', 'the style remains unchanged');
   });
 
-  QUnit.test('text cleanStyle with undefined and set styles', function(assert) {
+  QUnit.test('text cleanStyle with undefined and set styles', function (assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { 1: { 1: { stroke: 'red' }, 3: { stroke: 'red' }}};
+    text.styles = { 1: { 1: { stroke: 'red' }, 3: { stroke: 'red' } } };
     text.stroke = 'red';
     text.cleanStyle('stroke');
     assert.equal(text.stroke, 'red', 'the stroke stays red');
     assert.equal(text.styles[1], undefined, 'the style has been cleaned since stroke was equal to text property');
   });
 
-  QUnit.test('text cleanStyle with empty styles', function(assert) {
+  QUnit.test('text cleanStyle with empty styles', function (assert) {
     var text = new fabric.Text('xxxxxx\nx y');
-    text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
+    text.styles = { 1: { 0: {}, 1: {} }, 2: {}, 3: { 4: {} } };
     text.cleanStyle('any');
     assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
     assert.equal(text.styles[2], undefined, 'the style has been cleaned since there was no useful information');
     assert.equal(text.styles[3], undefined, 'the style has been cleaned since there was no useful information');
   });
 
-  QUnit.test('text cleanStyle with full style', function(assert) {
+  QUnit.test('text cleanStyle with full style', function (assert) {
     var text = new fabric.Text('xxx');
-    text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    text.styles = { 0: { 0: { fill: 'blue' }, 1: { fill: 'blue' }, 2: { fill: 'blue' } } };
     text.fill = 'black';
     text.cleanStyle('fill');
     assert.equal(text.fill, 'blue', 'the fill has been changed to blue');
     assert.equal(text.styles[0], undefined, 'all the style has been removed');
   });
 
-  QUnit.test('text cleanStyle with no relevant style', function(assert) {
+  QUnit.test('text cleanStyle with no relevant style', function (assert) {
     var text = new fabric.Text('xxx');
-    text.styles = { 0: { 0: { other: 'value1' }, 1:  { other: 'value2' }, 2:  { other: 'value3' }}};
+    text.styles = { 0: { 0: { other: 'value1' }, 1: { other: 'value2' }, 2: { other: 'value3' } } };
     text.fill = 'black';
     text.cleanStyle('fill');
     assert.equal(text.fill, 'black', 'the fill remains black');
@@ -378,39 +378,39 @@
     assert.equal(text.styles[0][2].full, undefined, 'style remains undefined');
   });
 
-  QUnit.test('text removeStyle with some style', function(assert) {
+  QUnit.test('text removeStyle with some style', function (assert) {
     var text = new fabric.Text('xxx');
-    text.styles = { 0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    text.styles = { 0: { 0: { stroke: 'black', fill: 'blue' }, 1: { fill: 'blue' }, 2: { fill: 'blue' } } };
     assert.ok(typeof text.removeStyle === 'function');
     text.fill = 'red';
     text.removeStyle('fill');
     assert.equal(text.fill, 'red', 'the fill has not been changed');
     assert.equal(text.styles[0][0].stroke, 'black', 'the non fill part of the style is still there');
     assert.equal(text.styles[0][0].fill, undefined, 'the fill part of the style has been removed');
-    text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
+    text.styles = { 0: { 0: { fill: 'blue' }, 1: { fill: 'blue' }, 2: { fill: 'blue' } } };
     text.removeStyle('fill');
     assert.equal(text.styles[0], undefined, 'the styles got empty and has been removed');
   });
 
-  QUnit.test('text toObject removes empty style object', function(assert) {
+  QUnit.test('text toObject removes empty style object', function (assert) {
     var text = new fabric.Text('xxx');
     text.styles = { 0: { 0: {} } };
     var obj = text.toObject();
     assert.deepEqual(obj.styles, [], 'empty style object has been removed');
   });
 
-  QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function(assert) {
+  QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function (assert) {
     var text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
     var obj = text.toObject();
     assert.deepEqual(
       obj.styles,
-      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
+      [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' } }],
       'styles with only a textBackgroundColor property do not throw an error'
     );
   });
 
-  QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
+  QUnit.test('getFontCache works with fontWeight numbers', function (assert) {
     var text = new fabric.Text('xxx', { fontWeight: 400 });
     text.initDimensions();
     var cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
@@ -418,7 +418,7 @@
     assert.equal(cacheProp in cache, true, '400 is converted to string');
   });
 
-  QUnit.test('getFontCache is case insensitive', function(assert) {
+  QUnit.test('getFontCache is case insensitive', function (assert) {
     var text = new fabric.Text('xxx', { fontWeight: 'BOld', fontStyle: 'NormaL' });
     text.initDimensions();
     var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
@@ -428,7 +428,7 @@
     assert.equal(cache, cache2, 'you get the same cache');
   });
   // moved
-  QUnit.test('getSelectionStyles with no arguments', function(assert) {
+  QUnit.test('getSelectionStyles with no arguments', function (assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -450,7 +450,7 @@
 
   });
 
-  QUnit.test('getSelectionStyles with 2 args', function(assert) {
+  QUnit.test('getSelectionStyles with 2 args', function (assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -478,7 +478,7 @@
     ]);
   });
 
-  QUnit.test('setSelectionStyles', function(assert) {
+  QUnit.test('setSelectionStyles', function (assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -520,7 +520,7 @@
     });
   });
 
-  QUnit.test('getStyleAtPosition', function(assert) {
+  QUnit.test('getStyleAtPosition', function (assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -540,21 +540,21 @@
 
     assert.deepEqual(iText.getStyleAtPosition(2), { textDecoration: 'overline' });
 
-    assert.deepEqual(iText.getStyleAtPosition(1), { });
+    assert.deepEqual(iText.getStyleAtPosition(1), {});
 
     assert.deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
   });
 
-  QUnit.test('_splitText', function(assert) {
+  QUnit.test('_splitText', function (assert) {
     var text = new fabric.Text('test foo bar-baz\nqux', {});
     var test = text._splitText();
     assert.equal(test.lines[0], 'test foo bar-baz', 'first line is correct');
     assert.equal(test.lines[1], 'qux', 'second line is correct');
-    assert.deepEqual(test.graphemeLines[0], ['t','e','s','t',' ','f','o','o',' ','b','a','r','-','b','a','z'], 'first line is correct');
-    assert.deepEqual(test.graphemeLines[1], ['q','u','x'], 'second line is correct');
+    assert.deepEqual(test.graphemeLines[0], ['t', 'e', 's', 't', ' ', 'f', 'o', 'o', ' ', 'b', 'a', 'r', '-', 'b', 'a', 'z'], 'first line is correct');
+    assert.deepEqual(test.graphemeLines[1], ['q', 'u', 'x'], 'second line is correct');
   });
 
-  QUnit.test('getStyleAtPosition complete', function(assert) {
+  QUnit.test('getStyleAtPosition complete', function (assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
@@ -607,7 +607,7 @@
     assert.deepEqual(iText.getStyleAtPosition(2, true), expectedStyle2, 'styles do match at 2');
   });
 
-  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
+  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function (assert) {
     var iText = new fabric.IText('test foo bar-baz', {
       // makes weird numbers
       styles: {
@@ -643,7 +643,7 @@
     fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
   });
 
-  QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
+  QUnit.test('getSvgSpanStyles produces correct output', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       fill: 'red',
@@ -655,7 +655,7 @@
     var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); ';
     assert.equal(styleString, expected, 'style is as expected');
   });
-  QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function(assert) {
+  QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       fill: 'red',
@@ -667,7 +667,7 @@
     var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
     assert.equal(styleString, expected, 'style is as expected');
   });
-  QUnit.test('getSvgTextDecoration with overline true produces correct output', function(assert){
+  QUnit.test('getSvgTextDecoration with overline true produces correct output', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       overline: true,
@@ -676,7 +676,7 @@
     var expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
-  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       overline: true,
@@ -686,7 +686,7 @@
     var expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
-  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       overline: true,
@@ -698,7 +698,7 @@
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
-  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
+  QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function (assert) {
     var iText = new fabric.IText('test foo bar-baz');
     var styleObject = {
       overline: true,
@@ -710,10 +710,12 @@
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
-  QUnit.test('text superscript', function(assert) {
-    var text = new fabric.Text('xxx', { styles: {
-      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
-    } });
+  QUnit.test('text superscript', function (assert) {
+    var text = new fabric.Text('xxx', {
+      styles: {
+        0: { 0: { stroke: 'black', fill: 'blue' }, 1: { fill: 'blue' }, 2: { fontSize: 4, deltaY: 20 } }
+      }
+    });
     assert.ok(typeof text.setSuperscript === 'function');
 
     var size = text.fontSize;
@@ -733,10 +735,12 @@
     assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been decreased');
   });
 
-  QUnit.test('text subscript', function(assert) {
-    var text = new fabric.Text('xxx', { styles: {
-      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
-    } });
+  QUnit.test('text subscript', function (assert) {
+    var text = new fabric.Text('xxx', {
+      styles: {
+        0: { 0: { stroke: 'black', fill: 'blue' }, 1: { fill: 'blue' }, 2: { fontSize: 4, deltaY: 20 } }
+      }
+    });
     assert.ok(typeof text.setSubscript === 'function');
 
     var size = text.fontSize;
@@ -756,7 +760,7 @@
     assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
 
-  QUnit.test('getHeightOfLine measures height of aline', function(assert) {
+  QUnit.test('getHeightOfLine measures height of aline', function (assert) {
     var text = new fabric.Text('xxx\n');
     var height1 = text.getHeightOfLine(0);
     var height2 = text.getHeightOfLine(1);
@@ -765,9 +769,9 @@
     assert.equal(height1, height2, 'should have same height');
   });
 
-  QUnit.test('_measureChar handles 0 width chars', function(assert) {
+  QUnit.test('_measureChar handles 0 width chars', function (assert) {
     fabric.cache.clearFontCache();
-    var zwc =  '\u200b';
+    var zwc = '\u200b';
     var text = new fabric.Text('');
     var style = text.getCompleteStyleDeclaration(0, 0);
     var box = text._measureChar('a', style, zwc, style);
@@ -776,7 +780,7 @@
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 
-  QUnit.test('_deleteStyleDeclaration', function(assert) {
+  QUnit.test('_deleteStyleDeclaration', function (assert) {
     var text = new fabric.Text('aaa aaq ggg gg oee eee', {
       styles: {
         0: {
@@ -805,7 +809,7 @@
     assert.equal(text.styles[0][10], undefined, 'style has been removed');
   });
 
-  QUnit.test('_setStyleDeclaration', function(assert) {
+  QUnit.test('_setStyleDeclaration', function (assert) {
     var text = new fabric.Text('aaa aaq ggg gg oee eee', {
       styles: {
         0: {
@@ -836,7 +840,7 @@
     assert.equal(text.styles[0][10], newStyle, 'style has been changed');
   });
 
-  QUnit.test('styleHas', function(assert) {
+  QUnit.test('styleHas', function (assert) {
     var textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
       styles: {
         0: {
@@ -860,7 +864,7 @@
     assert.equal(textbox.styleHas('fontFamily', 1), true, 'style has fontFamily on line 1');
   });
 
-  QUnit.test('text with a path', function(assert) {
+  QUnit.test('text with a path', function (assert) {
     var text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
@@ -870,7 +874,7 @@
     assert.equal(text.height, 100, 'text is big as the path height');
   });
 
-  QUnit.test('text with a path toObject', function(assert) {
+  QUnit.test('text with a path toObject', function (assert) {
     var text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
@@ -878,13 +882,13 @@
     assert.ok(toObject.path, 'export has a path');
   });
 
-  QUnit.test('text with a path fromObject', function(assert) {
+  QUnit.test('text with a path fromObject', function (assert) {
     var done = assert.async();
     var text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
     var toObject = text.toObject();
-    fabric.Text.fromObject(toObject).then(function(text) {
+    fabric.Text.fromObject(toObject).then(function (text) {
       assert.equal(text.path.constructor.type, 'Path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
       assert.ok(toObject.path, 'the input has still a path property');
@@ -892,12 +896,12 @@
     });
   });
 
-  QUnit.test('cacheProperties for text', function(assert) {
+  QUnit.test('cacheProperties for text', function (assert) {
     var text = new fabric.Text('a');
     assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction');
   });
 
-  QUnit.test('_getLineLeftOffset', function(assert) {
+  QUnit.test('_getLineLeftOffset', function (assert) {
     var text = new fabric.Text('long line of text\nshort');
     assert.equal(text._getLineLeftOffset(1), 0, 'with align left is 0');
     text.textAlign = 'right';
@@ -917,7 +921,7 @@
     assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'like align right');
   });
 
-  QUnit.test('_getLineLeftOffset with direction rtl', function(assert) {
+  QUnit.test('_getLineLeftOffset with direction rtl', function (assert) {
     var text = new fabric.Text('long line of text\nshort');
     text.direction = 'rtl';
     assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
@@ -937,5 +941,22 @@
     assert.equal(text._getLineLeftOffset(0), 0, 'is zero for any line but not the last right');
     assert.equal(text._getLineLeftOffset(1), 0, 'like align right with rtl');
   });
+
+  QUnit.test('getFontDeclaration', function (assert) {
+    var text = new fabric.Text('Hello, World!');
+    var styleObject = {
+      fontStyle: 'italic',
+      fontWeight: 'bold',
+      fontSize: 14,
+      fontFamily: 'Arial',
+    };
+    var expectedDeclaration =
+      'italic bold 14px "Arial"';
+
+    var actualDeclaration = text._getFontDeclaration(styleObject);
+
+    assert.equal(actualDeclaration, expectedDeclaration, 'Font declaration is correct');
+  });
+
 
 })();
