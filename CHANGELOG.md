@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci() Refactor GHA actions for caching and reuse [#9029](https://github.com/fabricjs/fabric.js/pull/9029)
 - ci(): install dev deps types [#9039](https://github.com/fabricjs/fabric.js/pull/9039)
 
 ## [6.0.0-beta10]

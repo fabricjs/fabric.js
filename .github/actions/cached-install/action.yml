@@ -1,0 +1,32 @@
+name: 'Install fabric'
+description: 'Install dependencies from cache between different node versions'
+inputs:
+  node-version:
+    required: true
+    description: 'the node version'
+  install-system-deps:
+    description: 'install node-canvas deps with apt-get'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install system deps for node canvas
+      if: inputs.install-system-deps == 'true'
+      run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
+      shell: bash
+    - name: Use Node.js v${{ inputs.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Get npm cache directory
+      id: npm-cache-dir
+      run: |
+        echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      shell: bash
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: npm-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: npm-${{ inputs.node-version }}
+    - run: npm ci --audit false --fund false
+      shell: bash
