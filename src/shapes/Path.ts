@@ -27,6 +27,7 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -410,13 +411,18 @@ export class Path<
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {SVGElement} element to parse
+   * @param {HTMLElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
-  static async fromElement(element: SVGElement, options: Partial<PathProps>) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Partial<PathProps>,
+    cssRules?: CSSRules
+  ) {
     const { d, ...parsedAttributes } = parseAttributes(
       element,
-      this.ATTRIBUTE_NAMES
+      this.ATTRIBUTE_NAMES,
+      cssRules
     );
     return new this(d, {
       ...parsedAttributes,
