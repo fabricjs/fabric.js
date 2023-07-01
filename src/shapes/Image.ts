@@ -27,6 +27,7 @@ import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
+import type { Resize } from '../filters/Resize';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -42,7 +43,7 @@ interface UniqueImageProps {
   cropY: number;
   imageSmoothing: boolean;
   filters: BaseFilter[];
-  resizeFilter?: BaseFilter;
+  resizeFilter?: Resize;
 }
 
 export const imageDefaultValues: Partial<UniqueImageProps> &
@@ -164,7 +165,7 @@ export class Image<
   protected declare src: string;
 
   declare filters: BaseFilter[];
-  declare resizeFilter: BaseFilter;
+  declare resizeFilter: Resize;
 
   protected declare _element: ImageSource;
   protected declare _originalElement: ImageSource;
@@ -407,18 +408,9 @@ export class Image<
       const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
-        '\t<rect ',
-        'x="',
-        x,
-        '" y="',
-        y,
-        '" width="',
-        this.width,
-        '" height="',
-        this.height,
-        '" style="',
-        this.getSvgStyles(),
-        '"/>\n',
+        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
+          this.height
+        }" styles="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
@@ -509,7 +501,7 @@ export class Image<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter],
+      [filter as BaseFilter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
@@ -558,7 +550,7 @@ export class Image<
       // clear the existing element to get new filter data
       // also dereference the eventual resized _element
       this._element = this._filteredEl;
-      this._filteredEl
+      (this._filteredEl as HTMLCanvasElement)
         .getContext('2d')!
         .clearRect(0, 0, sourceWidth, sourceHeight);
       // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
