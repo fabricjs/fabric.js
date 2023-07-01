@@ -1,7 +1,7 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
@@ -10,6 +10,7 @@ import type {
   TProps,
 } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import type { CSSRules } from '../parser/typedefs';
 
 export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
@@ -159,11 +160,19 @@ export class Ellipse<
    * Returns {@link Ellipse} instance from an SVG element
    * @static
    * @memberOf Ellipse
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
-  static async fromElement(element: SVGElement) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;

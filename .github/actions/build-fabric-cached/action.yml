@@ -1,0 +1,15 @@
+name: 'Build fabric'
+description: 'Build fabric and cache result per commit'
+runs:
+  using: 'composite'
+  steps:
+    - name: Get cache build
+      id: build-cache
+      uses: actions/cache@v3
+      with:
+        path: ./dist
+        key: npm-${{ github.event.pull_request.head.sha }}
+    - name: Build fabric.js dist folder
+      if: steps.build-cache.outputs.cache-hit != 'true'
+      run: npm run build -- -f
+      shell: bash
