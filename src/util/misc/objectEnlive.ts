@@ -4,8 +4,8 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
-import { BaseFilter } from '../../filters/BaseFilter';
-import { BaseFabricObject } from 'fabric/node';
+import type { BaseFilter } from '../../filters/BaseFilter';
+import type { BaseFabricObject } from '../../EventTypeDefs';
 
 export type LoadImageOptions = Abortable & {
   /**
@@ -102,8 +102,9 @@ export const enlivenObjects = <
       .then(resolve)
       .catch((error) => {
         // cleanup
-        instances.forEach(function (instance) {
-          instance.dispose && instance.dispose();
+        instances.forEach((instance) => {
+          (instance as FabricObject).dispose &&
+            (instance as FabricObject).dispose();
         });
         reject(error);
       })

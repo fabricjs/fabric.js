@@ -28,6 +28,7 @@ import { NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
+import type { TCachedFabricObject } from './Object/Object';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -168,8 +169,8 @@ export class Image<
   declare resizeFilter: Resize;
 
   protected declare _element: ImageSource;
-  protected declare _originalElement: ImageSource;
   protected declare _filteredEl?: HTMLCanvasElement;
+  protected declare _originalElement: ImageSource;
 
   static type = 'Image';
 
@@ -540,17 +541,20 @@ export class Image<
         (imgElement as HTMLImageElement).naturalHeight || imgElement.height;
 
     if (this._element === this._originalElement) {
-      // if the element is the same we need to create a new element
+      // if the _element a reference to _originalElement
+      // we need to create a new element to host the filtered pixels
       const canvasEl = createCanvasElement();
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
       this._filteredEl = canvasEl;
-    } else {
-      // clear the existing element to get new filter data
-      // also dereference the eventual resized _element
+    } else if (this._filteredEl) {
+      // if the _element is it own element,
+      // and we also have a _filteredEl, then we clean up _filteredEl
+      // and we assign it to _element.
+      // in this way we invalidate the eventual old resize filtered element
       this._element = this._filteredEl;
-      (this._filteredEl as HTMLCanvasElement)
+      this._filteredEl
         .getContext('2d')!
         .clearRect(0, 0, sourceWidth, sourceHeight);
       // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
@@ -562,7 +566,7 @@ export class Image<
       this._originalElement,
       sourceWidth,
       sourceHeight,
-      this._element
+      this._element as HTMLCanvasElement
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -592,8 +596,14 @@ export class Image<
    * it will set the imageSmoothing for the draw operation
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
+  drawCacheOnCanvas(
+    this: TCachedFabricObject<Props, SProps, EventSpec> & {
+      imageSmoothing: boolean;
+    },
+    ctx: CanvasRenderingContext2D
+  ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
+    // @ts-ignore ( expect-error) this line is not error free.
     super.drawCacheOnCanvas(ctx);
   }
 
