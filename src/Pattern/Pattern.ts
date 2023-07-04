@@ -177,10 +177,13 @@ export class Pattern {
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN((patternSource.height as number) / height, 0);
+          : ifNaN((patternSource.height as number) / height, 0),
+      patternTransformMatrix = Array.isArray(this.patternTransform)
+          ? this.patternTransform.join(' ')
+          : '1 0 0 1 0 0';
 
     return [
-      `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
+      `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}" patternTransform="matrix(${patternTransformMatrix})">`,
       `<image x="0" y="0" width="${patternSource.width}" height="${
         patternSource.height
       }" xlink:href="${this.sourceToString()}"></image>`,
