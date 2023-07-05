@@ -2,7 +2,8 @@
 
 ## [next]
 
-- refactor(svImport): remove the css/gradient/clipPath global definitions [#9030](https://github.com/fabricjs/fabric.js/pull/9030)
+- chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
+- refactor(svgImport): remove the css/gradient/clipPath global definitions [#9030](https://github.com/fabricjs/fabric.js/pull/9030)
 - fix(): tweaks to type getter [#9022](https://github.com/fabricjs/fabric.js/pull/9022)
 - ci() Refactor GHA actions for caching and reuse [#9029](https://github.com/fabricjs/fabric.js/pull/9029)
 - ci(): install dev deps types [#9039](https://github.com/fabricjs/fabric.js/pull/9039)
