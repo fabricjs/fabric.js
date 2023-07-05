@@ -205,7 +205,9 @@ export class IText<
   static type = 'IText';
 
   get type() {
-    return 'i-text';
+    const type = super.type;
+    // backward compatibility
+    return type === 'itext' ? 'i-text' : type;
   }
 
   /**
@@ -514,7 +516,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
+      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -668,7 +670,7 @@ export class IText<
    * Unused by the library, is for the end user
    * @return {String | TFiller} Character color (fill)
    */
-  getCurrentCharColor(): string | TFiller {
+  getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }

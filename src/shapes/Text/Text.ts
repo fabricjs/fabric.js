@@ -1,13 +1,17 @@
-// @ts-nocheck
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { TextStyle, TextStyleDeclaration } from './StyledText';
+import type {
+  CompleteTextStyleDeclaration,
+  TextStyle,
+  TextStyleDeclaration,
+} from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
-import type { Point } from '../../Point';
+import type { XY } from '../../Point';
 import type {
+  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
@@ -30,6 +34,7 @@ import type {
   SerializedObjectProps,
   TProps,
 } from '../Object/types';
+import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
@@ -40,6 +45,10 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
+import { isFiller } from '../../util/typeAssertions';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
+import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -63,20 +72,16 @@ type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
  * needs the the info of previous graphemes already filled
  * Override to customize measuring
  */
-export type GraphemeBBox<onPath = false> = {
+export type GraphemeBBox = {
   width: number;
   height: number;
   kernedWidth: number;
   left: number;
   deltaY: number;
-} & (onPath extends true
-  ? {
-      // on path
-      renderLeft: number;
-      renderTop: number;
-      angle: number;
-    }
-  : Record<string, never>);
+  renderLeft?: number;
+  renderTop?: number;
+  angle?: number;
+};
 
 // @TODO this is not complete
 interface UniqueTextProps {
@@ -276,7 +281,7 @@ export class Text<
    * });
    * @default
    */
-  declare path: Path | null;
+  declare path?: Path;
 
   /**
    * Offset amount for text path starting position
@@ -705,7 +710,8 @@ export class Text<
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
       for (let j = 0; j < jlen; j++) {
-        const charBox = this.__charBounds[i][j];
+        // at this point charbox are either standard or full with pathInfo if there is a path.
+        const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
         if (this.path) {
           ctx.save();
@@ -773,9 +779,9 @@ export class Text<
    */
   _measureChar(
     _char: string,
-    charStyle: TextStyleDeclaration,
+    charStyle: CompleteTextStyleDeclaration,
     previousChar: string | undefined,
-    prevCharStyle: any
+    prevCharStyle: CompleteTextStyleDeclaration | Record<string, never>
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
@@ -818,12 +824,13 @@ export class Text<
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth;
-        kernedWidth = coupleWidth - previousWidth;
+        // safe to use the non-null since if undefined we defined it before.
+        kernedWidth = coupleWidth - previousWidth!;
       }
     }
     return {
       width: width * fontMultiplier,
-      kernedWidth: kernedWidth * fontMultiplier,
+      kernedWidth: kernedWidth! * fontMultiplier,
     };
   }
 
@@ -884,12 +891,13 @@ export class Text<
       width: 0,
       kernedWidth: 0,
       height: this.fontSize,
-    };
+      deltaY: 0,
+    } as GraphemeBBox;
     if (path && path.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
+      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo)!;
       startingPoint.x += path.pathOffset.x;
       startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
@@ -918,7 +926,7 @@ export class Text<
         }
         // it would probably much faster to send all the grapheme position for a line
         // and calculate path position/angle at once.
-        this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+        this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint!);
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
@@ -935,14 +943,14 @@ export class Text<
    */
   _setGraphemeOnPath(
     positionInPath: number,
-    graphemeInfo: GraphemeBBox<true>,
-    startingPoint: Point
+    graphemeInfo: GraphemeBBox,
+    startingPoint: XY
   ) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
-      path = this.path;
+      path = this.path!;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
-    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
+    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo)!;
     graphemeInfo.renderLeft = info.x - startingPoint.x;
     graphemeInfo.renderTop = info.y - startingPoint.y;
     graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
@@ -1162,7 +1170,7 @@ export class Text<
     for (let i = 0, len = line.length - 1; i <= len; i++) {
       timeToRender = i === len || this.charSpacing || path;
       charsToRender += line[i];
-      charBox = this.__charBounds[lineIndex][i];
+      charBox = this.__charBounds[lineIndex][i] as Required<GraphemeBBox>;
       if (boxWidth === 0) {
         left += sign * (charBox.kernedWidth - charBox.width);
         boxWidth += charBox.width;
@@ -1253,13 +1261,13 @@ export class Text<
     ctx: CanvasRenderingContext2D,
     property: `${T}Style`,
     filler: TFiller | string
-  ) {
-    let offsetX, offsetY;
-    if (filler.toLive) {
+  ): { offsetX: number; offsetY: number } {
+    let offsetX: number, offsetY: number;
+    if (isFiller(filler)) {
       if (
-        filler.gradientUnits === 'percentage' ||
-        filler.gradientTransform ||
-        filler.patternTransform
+        (filler as Gradient<'linear'>).gradientUnits === 'percentage' ||
+        (filler as Gradient<'linear'>).gradientTransform ||
+        (filler as Pattern).patternTransform
       ) {
         // need to transform gradient in a pattern.
         // this is a slow process. If you are hitting this codepath, and the object
@@ -1269,10 +1277,10 @@ export class Text<
         offsetY = -this.height / 2;
         ctx.translate(offsetX, offsetY);
         ctx[property] = this._applyPatternGradientTransformText(filler);
-        return { offsetX: offsetX, offsetY: offsetY };
+        return { offsetX, offsetY };
       } else {
         // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx, this)!;
+        ctx[property] = filler.toLive(ctx)!;
         return this._applyPatternGradientTransform(ctx, filler);
       }
     } else {
@@ -1282,20 +1290,37 @@ export class Text<
     return { offsetX: 0, offsetY: 0 };
   }
 
+  /**
+   * This function prepare the canvas for a stroke style, and stroke and strokeWidth
+   * need to be sent in as defined
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {CompleteTextStyleDeclaration} style with stroke and strokeWidth defined
+   * @returns
+   */
   _setStrokeStyles(
     ctx: CanvasRenderingContext2D,
-    { stroke, strokeWidth }: Pick<this, 'stroke' | 'strokeWidth'>
+    {
+      stroke,
+      strokeWidth,
+    }: Pick<CompleteTextStyleDeclaration, 'stroke' | 'strokeWidth'>
   ) {
     ctx.lineWidth = strokeWidth;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineDashOffset = this.strokeDashOffset;
     ctx.lineJoin = this.strokeLineJoin;
     ctx.miterLimit = this.strokeMiterLimit;
-    return this.handleFiller(ctx, 'strokeStyle', stroke);
+    return this.handleFiller(ctx, 'strokeStyle', stroke!);
   }
 
+  /**
+   * This function prepare the canvas for a ill style, and fill
+   * need to be sent in as defined
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {CompleteTextStyleDeclaration} style with ill defined
+   * @returns
+   */
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
-    return this.handleFiller(ctx, 'fillStyle', fill);
+    return this.handleFiller(ctx, 'fillStyle', fill!);
   }
 
   /**
@@ -1323,36 +1348,39 @@ export class Text<
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
         method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
-    let fillOffsets, strokeOffsets;
 
     if (!shouldStroke && !shouldFill) {
       return;
     }
     ctx.save();
 
-    shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-    shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
-
     ctx.font = this._getFontDeclaration(fullDecl);
 
-    if (decl && decl.textBackgroundColor) {
+    if (decl.textBackgroundColor) {
       this._removeShadow(ctx);
     }
-    if (decl && decl.deltaY) {
+    if (decl.deltaY) {
       top += decl.deltaY;
     }
-    shouldFill &&
+
+    if (shouldFill) {
+      const fillOffsets = this._setFillStyles(ctx, fullDecl);
       ctx.fillText(
         _char,
         left - fillOffsets.offsetX,
         top - fillOffsets.offsetY
       );
-    shouldStroke &&
+    }
+
+    if (shouldStroke) {
+      const strokeOffsets = this._setStrokeStyles(ctx, fullDecl);
       ctx.strokeText(
         _char,
         left - strokeOffsets.offsetX,
         top - strokeOffsets.offsetY
       );
+    }
+
     ctx.restore();
   }
 
@@ -1492,12 +1520,13 @@ export class Text<
    * @param {String} property the property name
    * @returns the value of 'property'
    */
-  getValueOfPropertyAt(lineIndex: number, charIndex: number, property: string) {
+  getValueOfPropertyAt<T extends StylePropertiesType>(
+    lineIndex: number,
+    charIndex: number,
+    property: T
+  ): this[T] {
     const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-    if (charStyle && typeof charStyle[property] !== 'undefined') {
-      return charStyle[property];
-    }
-    return this[property];
+    return (charStyle[property] ?? this[property]) as this[T];
   }
 
   /**
@@ -1536,14 +1565,15 @@ export class Text<
       let size = this.getHeightOfChar(i, 0);
       let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
-        const charBox = this.__charBounds[i][j];
+        const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
         currentFill = this.getValueOfPropertyAt(i, j, 'fill');
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
           ctx.save();
-          ctx.fillStyle = lastFill;
+          // bug? verify lastFill is a valid fill here.
+          ctx.fillStyle = lastFill as string;
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
           ctx.fillRect(
@@ -1565,7 +1595,8 @@ export class Text<
             drawStart = this.width - drawStart - boxWidth;
           }
           if (lastDecoration && lastFill) {
-            ctx.fillStyle = lastFill;
+            // bug? verify lastFill is a valid fill here.
+            ctx.fillStyle = lastFill as string;
             ctx.fillRect(
               drawStart,
               top + offsetY * size + dy,
@@ -1587,7 +1618,7 @@ export class Text<
       if (this.direction === 'rtl') {
         drawStart = this.width - drawStart - boxWidth;
       }
-      ctx.fillStyle = currentFill;
+      ctx.fillStyle = currentFill as string;
       currentDecoration &&
         currentFill &&
         ctx.fillRect(
@@ -1773,14 +1804,22 @@ export class Text<
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
-  static async fromElement(element: SVGElement, options: object) {
-    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
+    const parsedAttributes = parseAttributes(
+      element,
+      Text.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     const {
-      textAnchor = LEFT,
+      textAnchor = LEFT as typeof LEFT | typeof CENTER | typeof RIGHT,
       textDecoration = '',
       dx = 0,
       dy = 0,
@@ -1791,22 +1830,7 @@ export class Text<
       ...restOfOptions
     } = { ...options, ...parsedAttributes };
 
-    let textContent = '';
-
-    // The XML is not properly parsed in IE9 so a workaround to get
-    // textContent is through firstChild.data. Another workaround would be
-    // to convert XML loaded from a file to be converted using DOMParser (same way loadSVGFromString() does)
-    if (!('textContent' in element)) {
-      if ('firstChild' in element && element.firstChild !== null) {
-        if ('data' in element.firstChild && element.firstChild.data !== null) {
-          textContent = element.firstChild.data;
-        }
-      }
-    } else {
-      textContent = element.textContent;
-    }
-
-    textContent = textContent
+    const textContent = (element.textContent || '')
       .replace(/^\s+|\s+$|\n+/g, '')
       .replace(/\s+/g, ' ');
 

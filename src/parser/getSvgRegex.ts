@@ -1,5 +1,3 @@
-//@ts-nocheck
-
-export function getSvgRegex(arr) {
+export function getSvgRegex(arr: string[]) {
   return new RegExp('^(' + arr.join('|') + ')\\b', 'i');
 }

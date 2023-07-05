@@ -26,6 +26,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -827,13 +828,21 @@ export class Image<
   /**
    * Returns {@link Image} instance from an SVG element
    * @static
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static async fromElement(element: SVGElement, options: Abortable = {}) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable = {},
+    cssRules?: CSSRules
+  ) {
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
     return this.fromURL(parsedAttributes['xlink:href'], {
       ...options,
       ...parsedAttributes,
