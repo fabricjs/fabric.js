@@ -11,6 +11,7 @@ import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type { XY } from '../../Point';
 import type {
+  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
@@ -45,7 +46,9 @@ import {
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
-import type { Gradient, Pattern } from 'fabric';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
+import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1801,11 +1804,19 @@ export class Text<
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
-  static async fromElement(element: SVGElement, options: object) {
-    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES);
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
+    const parsedAttributes = parseAttributes(
+      element,
+      Text.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     const {
       textAnchor = LEFT as typeof LEFT | typeof CENTER | typeof RIGHT,
