@@ -134,13 +134,15 @@
   "typesVersions": {
     ">=4.2": {
       "*": [
-        "dist/index.d.ts"
+        "dist/index.d.ts",
+        "./dist/src/*"
       ],
       "node": [
-        "dist/index.node.d.ts"
+        "dist/index.node.d.ts",
+        "./dist/src/*"
       ],
-      "src/*": [
-        "src/*"
+      "types/*": [
+        "./dist/src/*"
       ]
     }
   },
@@ -150,14 +152,20 @@
       "require": "./dist/index.js",
       "default": "./dist/index.js",
       "node": null,
-      "types": "./dist/index.d.ts"
+      "types": [
+        "./dist/index.d.ts",
+        "./dist/src/*"
+      ]
     },
     "./node": {
       "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.cjs",
       "default": "./dist/index.node.cjs",
       "node": "./dist/index.node.cjs",
-      "types": "./dist/index.node.d.ts"
+      "types": [
+        "./dist/index.node.d.ts",
+        "./dist/src/*"
+      ]
     }
   }
 }
