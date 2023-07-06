@@ -131,7 +131,7 @@
     "node": ">=16.20.0"
   },
   "module": "./dist/index.mjs",
-  "main": "./dist/index.node.cjs",
+  "main": null,
   "types": "./dist/index.d.ts",
   "typesVersions": {
     ">=4.2": {
