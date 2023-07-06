@@ -10,9 +10,14 @@ let isTouchSupported: boolean;
 
 export const getEnv = (): TFabricEnv => {
   if (!initialized) {
-    config.configure({
-      devicePixelRatio: window.devicePixelRatio || 1,
-    });
+    try {
+      config.configure({
+        devicePixelRatio: window.devicePixelRatio || 1,
+      });
+    } catch (error) {
+      console.error(error);
+      throw new Error('Did you mean to import `fabric/node`?');
+    }
     isTouchSupported =
       'ontouchstart' in window ||
       'ontouchstart' in document ||
