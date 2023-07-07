@@ -10,7 +10,7 @@ export type PathAnimationOptions = TAnimationOptions<
   TPointAngle & { distance: number; progress: number },
   number
 > & {
-  path: TSimplePathData;
+  path: string | TSimplePathData;
 };
 
 const wrapPathCallback = <R>(
