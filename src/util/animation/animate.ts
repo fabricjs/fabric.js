@@ -114,9 +114,3 @@ export function animateColor(options: ColorAnimationOptions) {
   animation.start();
   return animation;
 }
-
-export function animatePath(options: PathAnimationOptions) {
-  const animation = new PathAnimation(options);
-  animation.start();
-  return animation;
-}
