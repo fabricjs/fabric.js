@@ -80,6 +80,7 @@ export * from './path/typedefs';
 export {
   joinPath,
   parsePath,
+  parsePathForIteration,
   makePathSimpler,
   getSmoothPathFromPoints,
   getPathSegmentsInfo,

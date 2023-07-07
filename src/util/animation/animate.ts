@@ -5,8 +5,10 @@ import type {
   ValueAnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
+  PathAnimationOptions,
 } from './types';
 import type { TColorArg } from '../../color/typedefs';
+import { PathAnimation } from './PathAnimation';
 
 export type TAnimation<T extends number | number[] | TColorArg> =
   T extends TColorArg
@@ -69,6 +71,12 @@ export function animate<
 
 export function animateColor(options: ColorAnimationOptions) {
   const animation = new ColorAnimation(options);
+  animation.start();
+  return animation;
+}
+
+export function animatePath(options: PathAnimationOptions) {
+  const animation = new PathAnimation(options);
   animation.start();
   return animation;
 }

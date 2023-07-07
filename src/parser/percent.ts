@@ -3,8 +3,8 @@ import { capValue } from '../util/misc/capValue';
 
 const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
 
-export function isPercent(value: string | null) {
-  return value && RE_PERCENT.test(value);
+export function isPercent(value: string) {
+  return RE_PERCENT.test(value);
 }
 
 /**

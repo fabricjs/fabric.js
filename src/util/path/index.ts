@@ -704,8 +704,8 @@ export const getPathSegmentsInfo = (
     ) {
       case 'M':
         tempInfo = <TPathSegmentInfoCommon<'M'>>basicInfo;
-        x2 = x1 = current[1];
-        y2 = y1 = current[2];
+        tempInfo.x = x2 = x1 = current[1];
+        tempInfo.y = y2 = y1 = current[2];
         break;
       case 'L':
         tempInfo = <TPathSegmentInfoCommon<'L'>>basicInfo;
@@ -893,6 +893,20 @@ export const parsePath = (pathString: string): TComplexPathData => {
     });
   }
   return res;
+};
+
+export const parsePathForIteration = (path: string | TSimplePathData) => {
+  const pathData = makePathSimpler(
+    Array.isArray(path) ? path : parsePath(path)
+  );
+  const data = getPathSegmentsInfo(pathData);
+  return {
+    path: pathData,
+    data,
+    length: data[data.length - 1]!.length,
+    getPointOnPath: (distance: number) =>
+      getPointOnPath(pathData, distance, data)!,
+  };
 };
 
 /**
