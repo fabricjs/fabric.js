@@ -1,8 +1,17 @@
 import { parsePercent } from '../../parser/percent';
+import type { Percent } from '../../typedefs';
 import { parsePathForIteration } from '../path';
-import type { TPointAngle } from '../path/typedefs';
+import type { TPointAngle, TSimplePathData } from '../path/typedefs';
 import { ValueAnimation } from './ValueAnimation';
-import type { PathAnimationOptions, TOnAnimationChangeCallback } from './types';
+import type { TAnimationOptions, TOnAnimationChangeCallback } from './types';
+
+export type PathAnimationOptions = TAnimationOptions<
+  number | Percent,
+  TPointAngle & { distance: number; progress: number },
+  number
+> & {
+  path: TSimplePathData;
+};
 
 const wrapPathCallback = <R>(
   callback:

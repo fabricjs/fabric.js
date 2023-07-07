@@ -1,7 +1,3 @@
-import type { TColorArg } from '../../color/typedefs';
-import type { Percent } from '../../typedefs';
-import type { TPointAngle, TSimplePathData } from '../path/typedefs';
-
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 
 /**
@@ -119,28 +115,3 @@ export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
       endValue: T;
     }
 >;
-
-export type ValueAnimationOptions = TAnimationOptions<number>;
-
-export type ArrayAnimationOptions = TAnimationOptions<number[]>;
-
-export type ColorAnimationOptions = TAnimationOptions<
-  TColorArg,
-  string,
-  number[]
->;
-
-export type PathAnimationOptions = TAnimationOptions<
-  number | Percent,
-  TPointAngle & { distance: number; progress: number },
-  number
-> & {
-  path: TSimplePathData;
-};
-
-export type AnimationOptions<T extends number | number[] | TColorArg> =
-  T extends TColorArg
-    ? ColorAnimationOptions
-    : T extends number[]
-    ? ArrayAnimationOptions
-    : ValueAnimationOptions;

@@ -1,5 +1,7 @@
 import { AnimationBase } from './AnimationBase';
-import type { ArrayAnimationOptions } from './types';
+import type { TAnimationOptions } from './types';
+
+export type ArrayAnimationOptions = TAnimationOptions<number[]>;
 
 export class ArrayAnimation extends AnimationBase<number[]> {
   constructor({
