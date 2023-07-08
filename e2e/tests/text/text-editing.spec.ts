@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { TestUtil } from '../../utils/objects';
 
 test('text typing itext vs textbox', async ({ page }) => {
@@ -10,20 +10,15 @@ test('text typing itext vs textbox', async ({ page }) => {
   });
   const textCenter = await util.getObjectCenter(textboxID);
 
-  const state = {
-    isEditing: false,
-    text: 'initial text',
-    width: 200,
-  };
-  await util.expectObjectToMatch(textboxID, state);
+  expect(await page.screenshot()).toMatchSnapshot({ name: 'initial.png' });
 
   await util.clickCanvas({
     position: textCenter,
     clickCount: 2,
     delay: 200,
   });
-  state.isEditing = true;
-  await util.expectObjectToMatch(textboxID, state);
+
+  expect(await page.screenshot()).toMatchSnapshot({ name: 'start.png' });
 
   await page
     .locator('textarea')
@@ -33,9 +28,8 @@ test('text typing itext vs textbox', async ({ page }) => {
         delay: 160,
       }
     );
-  state.text =
-    'initial insert text in a textbox from the keyboard will wrap text on current textbox width';
-  await util.expectObjectToMatch(textboxID, state);
+
+  expect(await page.screenshot()).toMatchSnapshot({ name: 'typed.png' });
 
   const mrControlPoint = await util.getObjectControlPoint(textboxID, 'mr');
 
@@ -48,8 +42,7 @@ test('text typing itext vs textbox', async ({ page }) => {
     clickCount: 1,
     delay: 200,
   });
-  state.isEditing = false;
-  await util.expectObjectToMatch(textboxID, state);
+  expect(await page.screenshot()).toMatchSnapshot({ name: 'exit_editing.png' });
 
   // click the object to select it
   await util.clickCanvas({
@@ -62,15 +55,17 @@ test('text typing itext vs textbox', async ({ page }) => {
   await page.mouse.move(mrControlPoint.x + 300, mrControlPoint.y, {
     steps: 40,
   });
-  state.width = 500;
-  await util.expectObjectToMatch(textboxID, state);
+  expect(await page.screenshot()).toMatchSnapshot({
+    name: 'increase_width_mr.png',
+  });
   // drag in the opposite direction
   await page.mouse.move(mrControlPoint.x - 300, mrControlPoint.y, {
     steps: 60,
   });
-  state.width = 148.828125;
-  await util.expectObjectToMatch(textboxID, state);
   await page.mouse.up();
+  expect(await page.screenshot()).toMatchSnapshot({
+    name: 'decrease_width_mr.png',
+  });
 
   // drag the ml control
   const mlControlPoint = await util.getObjectControlPoint(textboxID, 'ml');
@@ -79,13 +74,15 @@ test('text typing itext vs textbox', async ({ page }) => {
   await page.mouse.move(mlControlPoint.x - 300, mlControlPoint.y, {
     steps: 40,
   });
-  state.width = 450;
-  await util.expectObjectToMatch(textboxID, state);
+  expect(await page.screenshot()).toMatchSnapshot({
+    name: 'increase_width_ml.png',
+  });
   // drag in the opposite direction
   await page.mouse.move(mlControlPoint.x + 300, mlControlPoint.y, {
     steps: 60,
   });
-  state.width = 148.828125;
-  await util.expectObjectToMatch(textboxID, state);
   await page.mouse.up();
+  expect(await page.screenshot()).toMatchSnapshot({
+    name: 'decrease_width_ml.png',
+  });
 });

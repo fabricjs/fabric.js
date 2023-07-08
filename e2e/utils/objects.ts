@@ -1,10 +1,15 @@
 import { Page, expect } from '@playwright/test';
+import { Canvas, Object as FabricObject } from '../..';
 
 let ID = 0;
 const uuid = () => `test${ID++}`;
 
 export class TestUtil {
   constructor(readonly page: Page) {}
+
+  clickCanvas(clickProperties: Parameters<Page['click']>[1]) {
+    return this.page.click('canvas.upper-canvas', clickProperties);
+  }
 
   async addTextbox(text: string, properties) {
     const objectId = uuid();
@@ -21,30 +26,38 @@ export class TestUtil {
     return objectId;
   }
 
-  getObjectCenter(objectId: string) {
+  executeInBrowser<C extends { objectId?: string }, R>(
+    runInBrowser: (
+      context: Omit<C, 'objectId'> & {
+        object: C extends { objectId: string } ? FabricObject : never;
+        canvas: Canvas;
+      }
+    ) => R,
+    context?: C
+  ): Promise<R> {
     return this.page.evaluate(
-      ({ objectId }) => {
-        const obj = fabricCanvas
-          .getObjects()
-          .find((obj) => obj.id === objectId);
-        return obj.getCenterPoint();
+      ({ objectId, runInBrowser, ...context }) => {
+        return eval(runInBrowser)({
+          object:
+            objectId &&
+            fabricCanvas.getObjects().find((obj) => obj.id === objectId),
+          canvas: fabricCanvas,
+          ...context,
+        });
       },
-      { objectId }
+      { ...context, runInBrowser: runInBrowser.toString() }
     );
   }
 
-  clickCanvas(clickProperties: Parameters<Page['click']>[1]) {
-    return this.page.click('canvas.upper-canvas', clickProperties);
+  getObjectCenter(objectId: string) {
+    return this.executeInBrowser(({ object }) => object.getCenterPoint(), {
+      objectId,
+    });
   }
 
   getObjectControlPoint(objectId: string, controlName: string) {
-    return this.page.evaluate(
-      ({ objectId, controlName }) => {
-        const obj = fabricCanvas
-          .getObjects()
-          .find((obj) => obj.id === objectId);
-        return obj.oCoords[controlName];
-      },
+    return this.executeInBrowser(
+      ({ object, controlName }) => object.oCoords[controlName],
       { objectId, controlName }
     );
   }
@@ -53,12 +66,9 @@ export class TestUtil {
     objectId: string,
     expected: T
   ) {
-    const snapshot = await this.page.evaluate(
-      ({ objectId }) => {
-        return fabricCanvas.getObjects().find((obj) => obj.id === objectId);
-      },
-      { objectId }
-    );
+    const snapshot = await this.executeInBrowser(({ object }) => object, {
+      objectId,
+    });
     expect(snapshot).toMatchObject(expected);
   }
 }
