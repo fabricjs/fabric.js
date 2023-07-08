@@ -109,6 +109,16 @@ jobs:
         with:
           name: coverage-jest
           path: .nyc_output/*.json
+  e2e:
+    needs: [prime-build]
+    name: Playwright tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
+      - run: npm run test:e2e
   coverage:
     needs: [node-coverage]
     name: Coverage reporting
