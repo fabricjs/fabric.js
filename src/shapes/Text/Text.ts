@@ -1640,25 +1640,26 @@ export class Text<
    * @returns {String} font declaration formatted for canvas context.
    */
   _getFontDeclaration(
-    styleObject?: TextStyleDeclaration,
+    {
+      fontFamily = this.fontFamily,
+      fontStyle = this.fontStyle,
+      fontWeight = this.fontWeight,
+      fontSize = this.fontSize,
+    }: TextStyleDeclaration = {},
     forMeasuring?: boolean
   ): string {
-    const style = styleObject || this,
-      family = this.fontFamily,
-      fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-    const fontFamily =
-      family === undefined ||
-      family.indexOf("'") > -1 ||
-      family.indexOf(',') > -1 ||
-      family.indexOf('"') > -1 ||
-      fontIsGeneric
-        ? style.fontFamily
-        : `"${style.fontFamily}"`;
+    const parsedFontFamily =
+      fontFamily.includes("'") ||
+      fontFamily.includes('"') ||
+      fontFamily.includes(',') ||
+      Text.genericFonts.includes(fontFamily.toLowerCase())
+        ? fontFamily
+        : `"${fontFamily}"`;
     return [
-      style.fontStyle,
-      style.fontWeight,
-      forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-      fontFamily,
+      fontStyle,
+      fontWeight,
+      `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
+      parsedFontFamily,
     ].join(' ');
   }
 
