@@ -9,7 +9,6 @@ import type {
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
-import type { XY } from '../../Point';
 import type {
   Abortable,
   TCacheCanvasDimensions,
@@ -923,7 +922,7 @@ export class Text<
         }
         // it would probably much faster to send all the grapheme position for a line
         // and calculate path position/angle at once.
-        this._setGraphemeOnPath(positionInPath, graphemeInfo, path.pathOffset);
+        this._setGraphemeOnPath(positionInPath, graphemeInfo);
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
@@ -938,18 +937,14 @@ export class Text<
    * @param {GraphemeBBox} graphemeInfo current grapheme box information
    * @param {Object} startingPoint position of the point
    */
-  _setGraphemeOnPath(
-    positionInPath: number,
-    graphemeInfo: GraphemeBBox,
-    startingPoint: XY
-  ) {
+  _setGraphemeOnPath(positionInPath: number, graphemeInfo: GraphemeBBox) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
       path = this.path!;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
     const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo)!;
-    graphemeInfo.renderLeft = info.x - startingPoint.x;
-    graphemeInfo.renderTop = info.y - startingPoint.y;
+    graphemeInfo.renderLeft = info.x - path.pathOffset.x;
+    graphemeInfo.renderTop = info.y - path.pathOffset.y;
     graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
   }
 
