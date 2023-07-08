@@ -1,14 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { TestUtil } from '../../utils/objects';
+import { TestUtil } from '../../utils/TestUtil';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
   await page.goto('http://127.0.0.1:8080/e2e/site');
-  const textboxID = await util.addTextbox('initial text', {
+  const textboxUtil = await util.addTextbox('initial text', {
     width: 200,
     left: 50,
   });
-  const textCenter = await util.getObjectCenter(textboxID);
+  const textCenter = await textboxUtil.getObjectCenter();
 
   expect(await page.screenshot()).toMatchSnapshot({ name: 'initial.png' });
 
@@ -31,7 +31,7 @@ test('textbox typing and resizing', async ({ page }) => {
 
   expect(await page.screenshot()).toMatchSnapshot({ name: 'typed.png' });
 
-  const mrControlPoint = await util.getObjectControlPoint(textboxID, 'mr');
+  const mrControlPoint = await textboxUtil.getObjectControlPoint('mr');
 
   // click outside to stop editing
   await util.clickCanvas({
@@ -68,7 +68,7 @@ test('textbox typing and resizing', async ({ page }) => {
   });
 
   // drag the ml control
-  const mlControlPoint = await util.getObjectControlPoint(textboxID, 'ml');
+  const mlControlPoint = await textboxUtil.getObjectControlPoint('ml');
   await page.mouse.move(mlControlPoint.x, mlControlPoint.y);
   await page.mouse.down();
   await page.mouse.move(mlControlPoint.x - 300, mlControlPoint.y, {
