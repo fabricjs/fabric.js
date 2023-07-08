@@ -68,9 +68,7 @@ jobs:
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     needs: [prime-build]
     runs-on: ubuntu-latest
