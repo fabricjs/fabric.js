@@ -1643,7 +1643,7 @@ export class Text<
     {
       fontFamily = this.fontFamily,
       fontStyle = this.fontStyle,
-      fontWeight = this.fontWeight,
+      fontWeight = '',
       fontSize = this.fontSize,
     }: TextStyleDeclaration = {},
     forMeasuring?: boolean
