@@ -6,6 +6,7 @@ import {
   getObjectControlPoint,
   expectObjectToMatch,
 } from '../../utils/objects';
+
 test('text typing itext vs textbox', async ({ page }) => {
   await page.goto('http://127.0.0.1:8080/e2e/site');
   const textboxID = 'text1';
@@ -14,6 +15,11 @@ test('text typing itext vs textbox', async ({ page }) => {
     left: 50,
   });
   const textCenter = await getObjectCenter(page, textboxID);
+  const state = {
+    isEditing: false,
+    text: 'initial text',
+    width: 200,
+  };
 
   await clickCanvas(page, {
     position: textCenter,
