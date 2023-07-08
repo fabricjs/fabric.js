@@ -116,10 +116,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
-      - run: npx playwright install
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - run: npm run test:e2e
+      - run: |
+          npx playwright install
+          xvfb-run npm run test:e2e
   coverage:
     needs: [node-coverage]
     name: Coverage reporting
