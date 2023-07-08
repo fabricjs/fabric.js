@@ -1,9 +1,10 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import {
   addTextbox,
   getObjectCenter,
   clickCanvas,
   getObjectControlPoint,
+  expectObjectToMatch,
 } from '../../utils/objects';
 test('text typing itext vs textbox', async ({ page }) => {
   await page.goto('http://127.0.0.1:8080/e2e/site');
@@ -13,6 +14,7 @@ test('text typing itext vs textbox', async ({ page }) => {
     left: 50,
   });
   const textCenter = await getObjectCenter(page, textboxID);
+
   await clickCanvas(page, {
     position: textCenter,
     clickCount: 2,
@@ -28,6 +30,13 @@ test('text typing itext vs textbox', async ({ page }) => {
       }
     );
 
+  await expectObjectToMatch(page, textboxID, {
+    isEditing: true,
+    width: 200,
+    text: 'initial insert text in a textbox from the keyboard will wrap text on current textbox width',
+  });
+  expect(page).toMatchSnapshot();
+
   const controlPoint = await getObjectControlPoint(page, textboxID, 'mr');
 
   // click outside to stop editing
@@ -38,6 +47,11 @@ test('text typing itext vs textbox', async ({ page }) => {
     },
     clickCount: 1,
     delay: 200,
+  });
+  await expectObjectToMatch(page, textboxID, {
+    isEditing: false,
+    width: 200,
+    text: 'initial insert text in a textbox from the keyboard will wrap text on current textbox width',
   });
 
   // click the object to select it
