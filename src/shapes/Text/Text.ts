@@ -897,9 +897,6 @@ export class Text<
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo)!;
-      startingPoint.x += path.pathOffset.x;
-      startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
         case LEFT:
           positionInPath = reverse ? totalPathLength - width : 0;
@@ -926,7 +923,7 @@ export class Text<
         }
         // it would probably much faster to send all the grapheme position for a line
         // and calculate path position/angle at once.
-        this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint!);
+        this._setGraphemeOnPath(positionInPath, graphemeInfo, path.pathOffset);
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
