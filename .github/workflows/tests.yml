@@ -118,7 +118,8 @@ jobs:
       - uses: ./.github/actions/cached-install
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - run: |
+      - name: Run playwright tests
+        run: |
           npx playwright install
           xvfb-run npm run test:e2e
   coverage:
