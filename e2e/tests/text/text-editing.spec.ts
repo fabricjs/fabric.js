@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { TestUtil } from '../../utils/objects';
 
-test('text typing itext vs textbox', async ({ page }) => {
+test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
   await page.goto('http://127.0.0.1:8080/e2e/site');
   const textboxID = await util.addTextbox('initial text', {

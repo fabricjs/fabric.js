@@ -11,19 +11,18 @@ export class TestUtil {
     return this.page.click('canvas.upper-canvas', clickProperties);
   }
 
-  async addTextbox(text: string, properties) {
-    const objectId = uuid();
-    await this.page.evaluate(
-      ({ objectId, text, properties }) => {
+  addTextbox(text: string, properties) {
+    return this.executeInBrowser(
+      ({ canvas, id, text, ...properties }) => {
         const textbox = new fabric.Textbox(text, {
           ...properties,
-          id: objectId,
+          id,
         });
-        fabricCanvas.add(textbox);
+        canvas.add(textbox);
+        return id;
       },
-      { objectId, text, properties }
+      { id: uuid(), text, ...properties }
     );
-    return objectId;
   }
 
   executeInBrowser<C extends { objectId?: string }, R>(
