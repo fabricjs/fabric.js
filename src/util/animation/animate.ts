@@ -33,16 +33,6 @@ export type AnimationTypeFromOptions<
 
 export type AnimateTypes = 'path' | 'array' | 'value';
 
-const isPathAnimation = (
-  options: AnimationOptionsRegistry[AnimateTypes]
-): options is PathAnimationOptions => !!(options as PathAnimationOptions).path;
-
-const isArrayAnimation = (
-  options: ArrayAnimationOptions | ValueAnimationOptions
-): options is ArrayAnimationOptions => {
-  return Array.isArray(options.startValue) || Array.isArray(options.endValue);
-};
-
 /**
  * Animates through a given path
  *
@@ -99,11 +89,11 @@ export function animate<T extends AnimateTypes, R extends AnimationRegistry[T]>(
   options: AnimationOptionsRegistry[T]
 ): R {
   const animation = (
-    isPathAnimation(options)
-      ? new PathAnimation(options)
-      : isArrayAnimation(options)
-      ? new ArrayAnimation(options)
-      : new ValueAnimation(options)
+    (options as PathAnimationOptions).path
+      ? new PathAnimation(options as PathAnimationOptions)
+      : Array.isArray(options.startValue) || Array.isArray(options.endValue)
+      ? new ArrayAnimation(options as ArrayAnimationOptions)
+      : new ValueAnimation(options as ValueAnimationOptions)
   ) as R;
   animation.start();
   return animation;
