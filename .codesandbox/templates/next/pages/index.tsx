@@ -14,19 +14,16 @@ const IndexPage: NextPage = () => {
       originX: 'center',
       top: 20,
       textAlign: 'center',
-      styles: fabric.util.stylesFromArray(
-        [
-          {
-            style: {
-              fontWeight: 'bold',
-              fontSize: 64,
-            },
-            start: 0,
-            end: 9,
+      styles: [
+        {
+          style: {
+            fontWeight: 'bold',
+            fontSize: 64,
           },
-        ],
-        textValue
-      ),
+          start: 0,
+          end: 9,
+        },
+      ],
     });
     canvas.add(text);
     canvas.centerObjectH(text);

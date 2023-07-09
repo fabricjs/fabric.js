@@ -132,19 +132,16 @@
     const textbox = new fabric.Textbox(value, {
       width: 190,
       splitByGrapheme: true,
-      styles: fabric.util.stylesFromArray(
-        [
-          {
-            style: {
-              fontWeight: 'bold',
-              fontSize: 64,
-            },
-            start: 0,
-            end: 9,
+      styles: [
+        {
+          style: {
+            fontWeight: 'bold',
+            fontSize: 64,
           },
-        ],
-        value
-      ),
+          start: 0,
+          end: 9,
+        },
+      ],
     });
     assert.deepEqual(
       textbox.textLines,
