@@ -16,6 +16,7 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
+import { TextStyleDeclaration } from '../Text/TextStyles';
 
 type CursorBoundaries = {
   left: number;
@@ -215,7 +216,7 @@ export class IText<
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
-  constructor(text: string, options: object) {
+  constructor(text: string, options?: Props) {
     super(text, options);
     this.initBehavior();
   }
@@ -313,12 +314,12 @@ export class IText<
 
   /**
    * Sets style of a current selection, if no selection exist, do not set anything.
-   * @param {Object} [styles] Styles object
+   * @param {Object} [style] Styles object
    * @param {Number} [startIndex] Start index to get styles at
    * @param {Number} [endIndex] End index to get styles at, if not specified selectionEnd or startIndex + 1
    */
   setSelectionStyles(
-    styles: object,
+    style: TextStyleDeclaration,
     startIndex: number = this.selectionStart || 0,
     endIndex: number = this.selectionEnd
   ) {

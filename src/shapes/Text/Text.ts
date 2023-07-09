@@ -409,7 +409,7 @@ export class Text<
   }
 
   constructor(text: string, { styles, ...options }: Props = {} as Props) {
-    super({ ...options, text });
+    super({ ...options, text } as unknown as Props);
     this.initialized = true;
     if (this.path) {
       this.setPathInfo();
