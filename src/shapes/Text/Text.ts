@@ -1163,7 +1163,7 @@ export class Text<
   _renderChars(
     method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
-    line: Array<any>,
+    line: string[],
     left: number,
     top: number,
     lineIndex: number
@@ -1182,15 +1182,13 @@ export class Text<
       // currentDirection = ctx.canvas.getAttribute('dir');
       currentDirection = ctx.direction;
 
-    let actualStyle,
-      nextStyle,
-      charsToRender = '',
-      charBox,
-      boxWidth = 0,
-      timeToRender,
-      drawingLeft;
+    const offset = this.styleManager.positionToOffset(lineIndex);
+    const styles = this.styleManager.slice(offset, offset + line.length, {
+      complete: true,
+    });
 
     ctx.save();
+
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
@@ -1204,32 +1202,29 @@ export class Text<
       ctx.restore();
       return;
     }
-    for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing || path;
+
+    for (
+      let i = 0,
+        len = line.length - 1,
+        charsToRender = '',
+        boxWidth = 0,
+        timeToRender = false;
+      i <= len;
+      i++
+    ) {
+      timeToRender =
+        i === len ||
+        !!this.charSpacing ||
+        !!path ||
+        hasStyleChanged(styles[i], styles[i + 1], false) ||
+        (isJustify && this._reSpaceAndTab.test(line[i]));
       charsToRender += line[i];
-      charBox = this.__charBounds[lineIndex][i] as Required<GraphemeBBox>;
+      const charBox = this.__charBounds[lineIndex][i] as Required<GraphemeBBox>;
       if (boxWidth === 0) {
         left += sign * (charBox.kernedWidth - charBox.width);
         boxWidth += charBox.width;
       } else {
         boxWidth += charBox.kernedWidth;
-      }
-      if (isJustify && !timeToRender) {
-        if (this._reSpaceAndTab.test(line[i])) {
-          timeToRender = true;
-        }
-      }
-      if (!timeToRender) {
-        // if we have charSpacing, we render char by char
-        actualStyle =
-          actualStyle ||
-          this.styleManager.get({ lineIndex, charIndex: i, complete: true });
-        nextStyle = this.styleManager.get({
-          lineIndex,
-          charIndex: i + 1,
-          complete: true,
-        });
-        timeToRender = hasStyleChanged(actualStyle, nextStyle, false);
       }
       if (timeToRender) {
         if (path) {
@@ -1247,19 +1242,9 @@ export class Text<
           );
           ctx.restore();
         } else {
-          drawingLeft = left;
-          this._renderChar(
-            method,
-            ctx,
-            lineIndex,
-            i,
-            charsToRender,
-            drawingLeft,
-            top
-          );
+          this._renderChar(method, ctx, lineIndex, i, charsToRender, left, top);
         }
         charsToRender = '';
-        actualStyle = nextStyle;
         left += sign * boxWidth;
         boxWidth = 0;
       }
@@ -1385,6 +1370,7 @@ export class Text<
     left: number,
     top: number
   ) {
+    // accept change from #9079
     const decl = this.styleManager.get({ lineIndex, charIndex }),
       fullDecl = this.styleManager.get({
         lineIndex,
@@ -1763,6 +1749,7 @@ export class Text<
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
     let newText: string[] = [];
+    const offsetToPosition = [];
     for (let i = 0; i < lines.length; i++) {
       newLines[i] = this.graphemeSplit(lines[i]);
       newText = newText.concat(newLines[i], newLine);
@@ -1773,7 +1760,7 @@ export class Text<
       lines,
       graphemeText: newText,
       graphemeLines: newLines,
-      endOfWrapping: new Array(newLines.length).fill(true),
+      endOfWrapping: new Array<boolean>(newLines.length).fill(true),
     };
   }
 

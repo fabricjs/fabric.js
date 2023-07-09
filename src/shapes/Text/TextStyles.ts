@@ -99,7 +99,7 @@ export class TextStyles {
     const lines = this.getLines();
     let total = 0;
     for (let index = 0; index < lineIndex; index++) {
-      total += lines[index].length;
+      total += lines[index].length + Number(this.target._endOfWrapping[index]);
     }
     return total + charIndex;
   }
@@ -220,16 +220,17 @@ export class TextStyles {
       const start = this.positionToOffset(lineIndex, charIndex || 0);
       slice = this.styles.slice(
         start,
-        start + typeof charIndex === 'number'
-          ? start + 1
-          : this.getLines()[lineIndex].length
+        start +
+          (typeof charIndex === 'number'
+            ? start + 1
+            : this.getLines()[lineIndex].length)
       );
     } else {
       slice = this.styles;
     }
 
     return slice.some((value) =>
-      !!value && key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
+      key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
     );
   }
 
