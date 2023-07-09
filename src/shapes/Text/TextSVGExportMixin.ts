@@ -163,8 +163,15 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.includes(JUSTIFY),
       line = this._textLines[lineIndex];
+
+    const offset = this.styleManager.positionToOffset(lineIndex);
+    const styles = this.styleManager.slice(offset, offset + line.length, {
+      complete: true,
+    });
+
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
+
     for (
       let i = 0, len = line.length - 1, charsToRender = '', boxWidth = 0;
       i <= len;

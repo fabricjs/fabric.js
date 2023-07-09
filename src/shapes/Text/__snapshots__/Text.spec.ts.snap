@@ -1,10 +1,141 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Text measuring measuring 1`] = `
+exports[`Text measuring, splitting measuring 1`] = `
 {
   "kernedWidth": 17.8,
   "width": 17.8,
 }
+`;
+
+exports[`Text measuring, splitting splits into lines 1`] = `
+{
+  "_unwrappedLines": [
+    [
+      "t",
+      "e",
+      "s",
+      "t",
+      " ",
+      "f",
+      "o",
+      "o",
+      " ",
+      "b",
+      "a",
+      "r",
+      "-",
+      "b",
+      "a",
+      "z",
+    ],
+    [
+      "q",
+      "u",
+      "x",
+    ],
+  ],
+  "endOfWrapping": [
+    true,
+    true,
+  ],
+  "graphemeLines": [
+    [
+      "t",
+      "e",
+      "s",
+      "t",
+      " ",
+      "f",
+      "o",
+      "o",
+      " ",
+      "b",
+      "a",
+      "r",
+      "-",
+      "b",
+      "a",
+      "z",
+    ],
+    [
+      "q",
+      "u",
+      "x",
+    ],
+  ],
+  "graphemeText": [
+    "t",
+    "e",
+    "s",
+    "t",
+    " ",
+    "f",
+    "o",
+    "o",
+    " ",
+    "b",
+    "a",
+    "r",
+    "-",
+    "b",
+    "a",
+    "z",
+    "
+",
+    "q",
+    "u",
+    "x",
+  ],
+  "lines": [
+    "test foo bar-baz",
+    "qux",
+  ],
+}
+`;
+
+exports[`Text subscript/superscript 1`] = `
+[
+  {
+    "end": 1,
+    "start": 0,
+    "style": {
+      "fill": "blue",
+      "stroke": "black",
+    },
+  },
+  {
+    "end": 2,
+    "start": 1,
+    "style": {
+      "deltaY": -14,
+      "fontSize": 24,
+    },
+  },
+  {
+    "end": 3,
+    "start": 2,
+    "style": {
+      "deltaY": 18.6,
+      "fontSize": 2.4,
+    },
+  },
+  {
+    "end": 5,
+    "start": 3,
+    "style": {
+      "deltaY": 4.4,
+      "fontSize": 24,
+    },
+  },
+  {
+    "end": 6,
+    "start": 5,
+    "style": {
+      "deltaY": 20,
+      "fontSize": 4,
+    },
+  },
+]
 `;
 
 exports[`Text toObject 1`] = `
@@ -59,4 +190,18 @@ exports[`Text toObject 1`] = `
   "visible": true,
   "width": 60,
 }
+`;
+
+exports[`Text toSVG with NUM_FRACTION_DIGITS 1`] = `
+"<g transform="matrix(1 0 0 1 124.6 23.1)" style=""  >
+		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124.1" y="12.6" >test foo bar-baz</tspan></text>
+</g>
+"
+`;
+
+exports[`Text toSVG with NUM_FRACTION_DIGITS 2`] = `
+"<g transform="matrix(1 0 0 1 124.55 23.1)" style=""  >
+		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124.05" y="12.566" >test foo bar-baz</tspan></text>
+</g>
+"
 `;

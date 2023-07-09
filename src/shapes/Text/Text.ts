@@ -4,6 +4,8 @@ import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
   FontStyleDeclaration,
+  LegacyTextStyle,
+  TextStyleJSON,
 } from './TextStyles';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
@@ -98,9 +100,13 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-    UniqueTextProps {}
+    UniqueTextProps {
+  styles: TextStyleDeclaration[];
+}
 
-export interface TextProps extends FabricObjectProps, UniqueTextProps {}
+export interface TextProps extends FabricObjectProps, UniqueTextProps {
+  styles?: TextStyleDeclaration[] | TextStyleJSON[] | LegacyTextStyle;
+}
 
 /**
  * Text class
@@ -402,7 +408,7 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, { styles, ...options }: any = {}) {
+  constructor(text: string, { styles, ...options }: Props = {} as Props) {
     super({ ...options, text });
     this.initialized = true;
     if (this.path) {
@@ -1754,7 +1760,6 @@ export class Text<
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
     let newText: string[] = [];
-    const offsetToPosition = [];
     for (let i = 0; i < lines.length; i++) {
       newLines[i] = this.graphemeSplit(lines[i]);
       newText = newText.concat(newLines[i], newLine);
