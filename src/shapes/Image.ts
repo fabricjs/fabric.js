@@ -818,7 +818,7 @@ export class Image<
    */
   static fromURL<T extends TProps<ImageProps>>(
     url: string,
-    { crossOrigin = 'anonymous', signal }: LoadImageOptions = {},
+    { crossOrigin = null, signal }: LoadImageOptions = {},
     imageOptions: T
   ): Promise<Image> {
     return loadImage(url, { crossOrigin, signal }).then(

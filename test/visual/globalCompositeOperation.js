@@ -133,10 +133,10 @@ function createPreview(operation) {
 
 
 QUnit.module('globalCompositeOperation', hooks => {
-    let bg = createExisting();
+    let bg;
     hooks.beforeEach(async () => {
         // clone to avoid using a disposed image
-        bg = await bg.clone();
+        bg = createExisting();
         // inform test to wait
         return;
     });
