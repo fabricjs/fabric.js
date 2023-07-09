@@ -286,14 +286,4 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   getSvgStyles(skipShadow?: boolean) {
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
-
-  getSVGFontList(): Record<string, boolean> {
-    return this.styleManager.styles.reduce(
-      ({ fontList, fontFamily }) => {
-        fontFamily && (fontList[fontFamily] = true);
-        return fontList;
-      },
-      { [this.fontFamily]: true } as Record<string, boolean>
-    );
-  }
 }

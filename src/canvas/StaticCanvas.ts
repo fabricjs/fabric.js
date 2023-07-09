@@ -35,11 +35,15 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isPattern } from '../util/typeAssertions';
+import {
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TextSVGExportMixin } from '../shapes/Text/TextSVGExportMixin';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1239,12 +1243,8 @@ export class StaticCanvas<
       fontList = {} as Record<string, boolean>;
 
     this._objects.forEach(function listFonts(object) {
-      typeof (object as unknown as TextSVGExportMixin).getSVGFontList ===
-        'function' &&
-        Object.assign(
-          fontList,
-          (object as unknown as TextSVGExportMixin).getSVGFontList() || {}
-        );
+      isTextObject(object) &&
+        Object.assign(fontList, object.styleManager.getFontFamilyList());
       if (isCollection(object)) {
         object._objects.forEach(listFonts);
       }

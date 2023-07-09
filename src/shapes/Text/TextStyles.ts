@@ -289,4 +289,14 @@ export class TextStyles {
     }
     return stylesArray;
   }
+
+  getFontFamilyList(): Record<string, boolean> {
+    return this.styles.reduce(
+      (fontList, { fontFamily }) => {
+        fontFamily && (fontList[fontFamily] = true);
+        return fontList;
+      },
+      { [this.target.fontFamily]: true } as Record<string, boolean>
+    );
+  }
 }
