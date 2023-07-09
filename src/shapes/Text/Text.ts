@@ -785,9 +785,10 @@ export class Text<
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
       couple = previousChar + _char,
-      stylesAreEqual = fontDeclaration === previousFontDeclaration,
+      stylesAreEqual =
+        previousChar &&
+        fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width: number | undefined,
       coupleWidth: number | undefined,
@@ -1640,25 +1641,31 @@ export class Text<
    * @returns {String} font declaration formatted for canvas context.
    */
   _getFontDeclaration(
-    styleObject?: TextStyleDeclaration,
+    {
+      fontFamily = this.fontFamily,
+      fontStyle = this.fontStyle,
+      fontWeight = this.fontWeight,
+      fontSize = this.fontSize,
+    }: Partial<
+      Pick<
+        TextStyleDeclaration,
+        'fontFamily' | 'fontStyle' | 'fontWeight' | 'fontSize'
+      >
+    > = {},
     forMeasuring?: boolean
   ): string {
-    const style = styleObject || this,
-      family = this.fontFamily,
-      fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-    const fontFamily =
-      family === undefined ||
-      family.indexOf("'") > -1 ||
-      family.indexOf(',') > -1 ||
-      family.indexOf('"') > -1 ||
-      fontIsGeneric
-        ? style.fontFamily
-        : `"${style.fontFamily}"`;
+    const parsedFontFamily =
+      fontFamily.includes("'") ||
+      fontFamily.includes('"') ||
+      fontFamily.includes(',') ||
+      Text.genericFonts.includes(fontFamily.toLowerCase())
+        ? fontFamily
+        : `"${fontFamily}"`;
     return [
-      style.fontStyle,
-      style.fontWeight,
-      forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-      fontFamily,
+      fontStyle,
+      fontWeight,
+      `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
+      parsedFontFamily,
     ].join(' ');
   }
 
