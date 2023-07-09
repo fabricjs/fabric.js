@@ -1175,6 +1175,7 @@ export class Text<
         !isJustify &&
         this.charSpacing === 0 &&
         !this.styleManager.has({ lineIndex }) &&
+        false &&
         !path,
       isLtr = this.direction === 'ltr',
       sign = this.direction === 'ltr' ? 1 : -1,
