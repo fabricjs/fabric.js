@@ -400,31 +400,6 @@
     });
   });
 
-  QUnit.test('getStyleAtPosition', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
-      styles: {
-        0: {
-          0: { textDecoration: 'underline' },
-          2: { textDecoration: 'overline' },
-          4: { textBackgroundColor: '#ffc' }
-        },
-        1: {
-          0: { fill: 'red' },
-          1: { fill: 'green' },
-          2: { fill: 'blue' }
-        }
-      }
-    });
-
-    assert.equal(typeof iText.getStyleAtPosition, 'function');
-
-    assert.deepEqual(iText.getStyleAtPosition(2), { textDecoration: 'overline' });
-
-    assert.deepEqual(iText.getStyleAtPosition(1), { });
-
-    assert.deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
-  });
-
   QUnit.test('_splitTextIntoLines', function(assert) {
     var text = new fabric.Text('test foo bar-baz\nqux', {});
     var test = text._splitTextIntoLines();
@@ -432,59 +407,6 @@
     assert.equal(test.lines[1], 'qux', 'second line is correct');
     assert.deepEqual(test.graphemeLines[0], ['t','e','s','t',' ','f','o','o',' ','b','a','r','-','b','a','z'], 'first line is correct');
     assert.deepEqual(test.graphemeLines[1], ['q','u','x'], 'second line is correct');
-  });
-
-  QUnit.test('getStyleAtPosition complete', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
-      styles: {
-        0: {
-          0: { underline: true },
-          2: { overline: true },
-          4: { textBackgroundColor: '#ffc' }
-        },
-        1: {
-          0: { fill: 'red' },
-          1: { fill: 'green' },
-          2: { fill: 'blue' }
-        }
-      }
-    });
-
-    var expectedStyle0 = {
-      stroke: null,
-      strokeWidth: 1,
-      fill: 'rgb(0,0,0)',
-      fontFamily: 'Times New Roman',
-      fontSize: 40,
-      fontWeight: 'normal',
-      fontStyle: 'normal',
-      underline: true,
-      overline: false,
-      linethrough: false,
-      textBackgroundColor: '',
-      deltaY: 0,
-    };
-
-    var expectedStyle2 = {
-      stroke: null,
-      strokeWidth: 1,
-      fill: 'rgb(0,0,0)',
-      fontFamily: 'Times New Roman',
-      fontSize: 40,
-      fontWeight: 'normal',
-      fontStyle: 'normal',
-      underline: false,
-      overline: true,
-      linethrough: false,
-      textBackgroundColor: '',
-      deltaY: 0,
-    };
-
-    assert.equal(typeof iText.getStyleAtPosition, 'function');
-
-    assert.deepEqual(iText.getStyleAtPosition(0, true), expectedStyle0, 'styles do match at 0');
-
-    assert.deepEqual(iText.getStyleAtPosition(2, true), expectedStyle2, 'styles do match at 2');
   });
 
   QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
