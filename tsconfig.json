@@ -101,6 +101,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["dist", "**/**.spec.ts", "**/**.test.ts"],
+  "exclude": ["dist"],
   "include": ["src", "fabric.ts", "index.ts", "index.node.ts"]
 }
