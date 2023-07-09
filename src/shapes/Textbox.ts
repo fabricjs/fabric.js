@@ -517,7 +517,7 @@ export class Textbox extends IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: Array<any>): object {
+  toObject(propertiesToInclude?: Array<any>): object {
     return super.toObject(
       ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
     );

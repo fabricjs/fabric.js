@@ -1,6 +1,15 @@
 import { Textbox } from './Textbox';
 
-describe('textbox styles', () => {
+describe('Textbox', () => {
+  it('fromObject', async () => {
+    const textbox = await Textbox.fromObject({
+      text: 'The quick \nbrown \nfox',
+    });
+    expect(textbox).toMatchSnapshot();
+    textbox.includeDefaultValues = false;
+    expect(textbox).toMatchSnapshot();
+  });
+
   it('toObject with styles', () => {
     const ref = { fill: 'red' };
     const textbox = new Textbox('The quick \nbrown \nfox', {
@@ -23,7 +32,7 @@ describe('textbox styles', () => {
         },
       },
     });
-    expect(textbox.styleManager.styles[5] !== ref).toBe(true);
+    expect(textbox.styles[0][5] !== ref).toBeTruthy();
     expect(textbox.toObject()).toMatchSnapshot();
   });
 
@@ -68,8 +77,14 @@ describe('textbox styles', () => {
         },
       },
     });
-    expect(await Textbox.fromObject(textbox.toObject())).toEqual(
-      textbox.toObject()
-    );
+    const textbox2 = await Textbox.fromObject(textbox.toObject());
+    expect(textbox2).toEqual(textbox.toObject());
+    expect(textbox2.styles !== textbox.styles).toBeTruthy();
+    for (const a in textbox2.styles) {
+      for (const b in textbox2.styles[a]) {
+        expect(textbox2.styles[a][b] !== textbox.styles[a][b]).toBeTruthy();
+        expect(textbox2.styles[a][b]).toEqual(textbox.styles[a][b]);
+      }
+    }
   });
 });
