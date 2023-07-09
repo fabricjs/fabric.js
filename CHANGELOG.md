@@ -2,6 +2,16 @@
 
 ## [next]
 
+- chore(TS): Fix ITextBehaviour enterEditing type [#9075](https://github.com/fabricjs/fabric.js/pull/9075)
+- chore(TS): export FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
+- chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
+- refactor(svgImport): remove the css/gradient/clipPath global definitions [#9030](https://github.com/fabricjs/fabric.js/pull/9030)
+- fix(): tweaks to type getter [#9022](https://github.com/fabricjs/fabric.js/pull/9022)
+- ci() Refactor GHA actions for caching and reuse [#9029](https://github.com/fabricjs/fabric.js/pull/9029)
+- ci(): install dev deps types [#9039](https://github.com/fabricjs/fabric.js/pull/9039)
+
+## [6.0.0-beta10]
+
 - chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
 - Fix(Textbox) minimum word width calculation across all lines [#9004](https://github.com/fabricjs/fabric.js/pull/9004)
 - ci(): add Jest for the unit tests [#8919](https://github.com/fabricjs/fabric.js/pull/8919)

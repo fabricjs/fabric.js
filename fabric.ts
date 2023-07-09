@@ -36,7 +36,12 @@ export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
 export { FabricObject as Object } from './src/shapes/Object/FabricObject';
-export type { TProps } from './src/shapes/Object/types';
+export type {
+  TProps,
+  TFabricObjectProps,
+  FabricObjectProps,
+  SerializedObjectProps,
+} from './src/shapes/Object/types';
 export { Line } from './src/shapes/Line';
 export { Circle } from './src/shapes/Circle';
 export { Triangle } from './src/shapes/Triangle';
@@ -50,6 +55,11 @@ export { IText } from './src/shapes/IText/IText';
 export { Textbox } from './src/shapes/Textbox';
 export * from './src/shapes/Text/TextStyles';
 export { Group } from './src/shapes/Group';
+export type {
+  GroupProps,
+  GroupEvents,
+  SerializedGroupProps,
+} from './src/shapes/Group';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
 export type {

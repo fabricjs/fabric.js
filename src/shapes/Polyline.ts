@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
@@ -19,6 +19,7 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -327,16 +328,21 @@ export class Polyline<
    * Returns Polyline instance from an SVG element
    * @static
    * @memberOf Polyline
-   * @param {SVGElement} element Element to parser
+   * @param {HTMLElement} element Element to parser
    * @param {Object} [options] Options object
    */
-  static async fromElement(element: SVGElement, options?: any) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       { left, top, ...parsedAttributes } = parseAttributes(
         element,
-        this.ATTRIBUTE_NAMES
+        this.ATTRIBUTE_NAMES,
+        cssRules
       );
     return new this(points || [], {
       ...parsedAttributes,

@@ -8,11 +8,12 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
-import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { CENTER } from '../constants';
+import { getGradientDefs } from './getGradientDefs';
+import { getCSSRules } from './getCSSRules';
 
 const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
@@ -22,22 +23,24 @@ const ElementsParser = function (
   options,
   reviver,
   parsingOptions,
-  doc
+  doc,
+  clipPaths
 ) {
   this.elements = elements;
   this.options = options;
   this.reviver = reviver;
-  this.svgUid = (options && options.svgUid) || 0;
   this.parsingOptions = parsingOptions;
   this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
   this.doc = doc;
+  this.clipPaths = clipPaths;
+  this.gradientDefs = getGradientDefs(doc);
+  this.cssRules = getCSSRules(doc);
 };
 
 (function (proto) {
   proto.parse = function (): Promise<FabricObject[]> {
     return Promise.all(
       this.elements.map((element: HTMLElement, i) => {
-        element.setAttribute('svgUid', this.svgUid);
         return this.createObject(element);
       })
     );
@@ -46,7 +49,7 @@ const ElementsParser = function (
   proto.createObject = async function (el: HTMLElement): Promise<FabricObject> {
     const klass = findTag(el);
     if (klass) {
-      const obj = await klass.fromElement(el, this.options);
+      const obj = await klass.fromElement(el, this.options, this.cssRules);
       let _options;
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
@@ -61,7 +64,7 @@ const ElementsParser = function (
     return null;
   };
 
-  proto.extractPropertyDefinition = function (obj, property, storageType) {
+  proto.extractPropertyDefinition = function (obj, property, storage) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -71,14 +74,14 @@ const ElementsParser = function (
     const id = regex.exec(value)[1];
     regex.lastIndex = 0;
     // @todo fix this
-    return storage[storageType][this.svgUid][id];
+    return storage[id];
   };
 
   proto.resolveGradient = function (obj, el, property) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
-      'gradientDefs'
+      this.gradientDefs
     );
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
@@ -94,7 +97,7 @@ const ElementsParser = function (
     const clipPathElements = this.extractPropertyDefinition(
       obj,
       'clipPath',
-      'clipPaths'
+      this.clipPaths
     );
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
@@ -111,7 +114,7 @@ const ElementsParser = function (
       const container = await Promise.all(
         clipPathElements.map((clipPathElement) => {
           return findTag(clipPathElement)
-            .fromElement(clipPathElement, this.options)
+            .fromElement(clipPathElement, this.options, this.cssRules)
             .then((enlivedClippath) => {
               removeTransformMatrixForSvgParsing(enlivedClippath);
               enlivedClippath.fillRule = enlivedClippath.clipRule;
