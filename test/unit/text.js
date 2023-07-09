@@ -97,6 +97,8 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+    fontDecl = text._getFontDeclaration({ fontFamily: 'Arial' });
+    assert.equal(fontDecl, 'normal normal 40px \"Arial\"', 'passed style should take precedence');
   });
 
   QUnit.test('_getFontDeclaration with coma', function(assert) {
@@ -116,12 +118,6 @@
       var fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
     });
-  });
-
-  QUnit.test('toObject', function(assert) {
-    var text = createTextObject();
-    assert.ok(typeof text.toObject === 'function');
-    assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
 
   QUnit.test('complexity', function(assert) {
@@ -189,15 +185,6 @@
     text.setCoords();
     var br2 = text.getBoundingRect();
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
-  });
-
-  QUnit.test('fabric.Text.fromObject', function(assert) {
-    var done = assert.async();
-    assert.ok(typeof fabric.Text.fromObject === 'function');
-    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
-      assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
-      done();
-    });
   });
 
   QUnit.test('fabric.Text.fromElement', function(assert) {

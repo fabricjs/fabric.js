@@ -1,6 +1,10 @@
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
+import type {
+  CompleteTextStyleDeclaration,
+  FontStyleDeclaration,
+} from './TextStyles';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
@@ -34,10 +38,7 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
-import type {
-  CompleteTextStyleDeclaration,
-  TextStyleDeclaration,
-} from './TextStyles';
+import type { TextStyleDeclaration } from './TextStyles';
 import { TextStyles, hasStyleChanged } from './TextStyles';
 import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
@@ -401,7 +402,7 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, { styles, ...options }: any) {
+  constructor(text: string, { styles, ...options }: any = {}) {
     super({ ...options, text });
     this.initialized = true;
     if (this.path) {
@@ -640,7 +641,7 @@ export class Text<
    * Set the font parameter of the context with the object properties or with charStyle
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [charStyle] object with font style properties
+   * @param {Object} [fontProps] object with font style properties
    * @param {String} [charStyle.fontFamily] Font Family
    * @param {Number} [charStyle.fontSize] Font size in pixels. ( without px suffix )
    * @param {String} [charStyle.fontWeight] Font weight
@@ -648,7 +649,7 @@ export class Text<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle?: any,
+    fontProps?: Partial<FontStyleDeclaration>,
     forMeasuring?: boolean
   ) {
     ctx.textBaseline = 'alphabetic';
@@ -665,7 +666,7 @@ export class Text<
           break;
       }
     }
-    ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
+    ctx.font = this._getFontDeclaration(fontProps, forMeasuring);
   }
 
   /**
@@ -801,33 +802,34 @@ export class Text<
    * possibly overridden to accommodate different measure logic or
    * to hook some external lib for character measurement
    * @private
-   * @param {String} _char, char to be measured
+   * @param {String} char, char to be measured
    * @param {Object} charStyle style of char to be measured
-   * @param {String} [previousChar] previous char
+   * @param {String} [prevChar] previous char
    * @param {Object} [prevCharStyle] style of previous char
    */
-  _measureChar(
-    _char: string,
-    charStyle: CompleteTextStyleDeclaration,
-    previousChar: string | undefined,
-    prevCharStyle: CompleteTextStyleDeclaration | Record<string, never>
+  _measureChar<T extends string | undefined>(
+    char: string,
+    charStyle: FontStyleDeclaration,
+    prevChar: T,
+    prevCharStyle: T extends string ? FontStyleDeclaration : undefined
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
-      couple = previousChar + _char,
-      stylesAreEqual = fontDeclaration === previousFontDeclaration,
+      couple = prevChar + char,
+      stylesAreEqual =
+        prevChar &&
+        fontDeclaration === this._getFontDeclaration(prevCharStyle!),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width: number | undefined,
       coupleWidth: number | undefined,
       previousWidth: number | undefined,
       kernedWidth: number | undefined;
 
-    if (previousChar && fontCache[previousChar] !== undefined) {
-      previousWidth = fontCache[previousChar];
+    if (prevChar && fontCache[prevChar] !== undefined) {
+      previousWidth = fontCache[prevChar];
     }
-    if (fontCache[_char] !== undefined) {
-      kernedWidth = width = fontCache[_char];
+    if (fontCache[char] !== undefined) {
+      kernedWidth = width = fontCache[char];
     }
     if (stylesAreEqual && fontCache[couple] !== undefined) {
       coupleWidth = fontCache[couple];
@@ -842,12 +844,12 @@ export class Text<
       // send a TRUE to specify measuring font size CACHE_FONT_SIZE
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
-        kernedWidth = width = ctx.measureText(_char).width;
-        fontCache[_char] = width;
+        kernedWidth = width = ctx.measureText(char).width;
+        fontCache[char] = width;
       }
-      if (previousWidth === undefined && stylesAreEqual && previousChar) {
-        previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth;
+      if (previousWidth === undefined && stylesAreEqual && prevChar) {
+        previousWidth = ctx.measureText(prevChar).width;
+        fontCache[prevChar] = previousWidth;
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
@@ -1000,18 +1002,22 @@ export class Text<
     prevGrapheme?: string,
     skipLeft?: boolean
   ): GraphemeBBox {
-    const style = this.styleManager.get({
-        lineIndex,
-        charIndex,
-        complete: true,
-      }),
+    const fontStyle = {
+      fontFamily: this.fontFamily,
+      fontStyle: this.fontStyle,
+      fontWeight: this.fontWeight,
+      fontSize: this.fontSize,
+    };
+    const style = {
+        ...fontStyle,
+        ...this._getStyleDeclaration(lineIndex, charIndex),
+      },
       prevStyle = prevGrapheme
-        ? this.styleManager.get({
-            lineIndex,
-            charIndex: charIndex - 1,
-            complete: true,
-          })
-        : {},
+        ? {
+            ...fontStyle,
+            ...this._getStyleDeclaration(lineIndex, charIndex - 1),
+          }
+        : undefined,
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
       width = info.width,
@@ -1028,7 +1034,7 @@ export class Text<
       left: 0,
       height: style.fontSize,
       kernedWidth,
-      deltaY: style.deltaY,
+      deltaY: style.deltaY ?? this.deltaY,
     };
     if (charIndex > 0 && !skipLeft) {
       const previousBox = this.__charBounds[lineIndex][charIndex - 1];
@@ -1684,25 +1690,26 @@ export class Text<
    * @returns {String} font declaration formatted for canvas context.
    */
   _getFontDeclaration(
-    styleObject?: TextStyleDeclaration,
+    {
+      fontFamily = this.fontFamily,
+      fontStyle = this.fontStyle,
+      fontWeight = this.fontWeight,
+      fontSize = this.fontSize,
+    }: Partial<FontStyleDeclaration> = {},
     forMeasuring?: boolean
   ): string {
-    const style = styleObject || this,
-      family = this.fontFamily,
-      fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-    const fontFamily =
-      family === undefined ||
-      family.indexOf("'") > -1 ||
-      family.indexOf(',') > -1 ||
-      family.indexOf('"') > -1 ||
-      fontIsGeneric
-        ? style.fontFamily
-        : `"${style.fontFamily}"`;
+    const parsedFontFamily =
+      fontFamily.includes("'") ||
+      fontFamily.includes('"') ||
+      fontFamily.includes(',') ||
+      Text.genericFonts.includes(fontFamily.toLowerCase())
+        ? fontFamily
+        : `"${fontFamily}"`;
     return [
-      style.fontStyle,
-      style.fontWeight,
-      forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-      fontFamily,
+      fontStyle,
+      fontWeight,
+      `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
+      parsedFontFamily,
     ].join(' ');
   }
 

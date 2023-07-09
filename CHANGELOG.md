@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(text): styles [#9081](https://github.com/fabricjs/fabric.js/pull/9081)
+- fix(Text): `_getFontDeclaration` [#9079](https://github.com/fabricjs/fabric.js/pull/9079)
 - chore(TS): Fix ITextBehaviour enterEditing type [#9075](https://github.com/fabricjs/fabric.js/pull/9075)
 - chore(TS): export FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
 - chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)

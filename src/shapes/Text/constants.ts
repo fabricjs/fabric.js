@@ -35,6 +35,8 @@ export const additionalProps = [
   'direction',
 ] as const;
 
+export type FontProps = 'fontFamily' | 'fontStyle' | 'fontWeight' | 'fontSize';
+
 export type StylePropertiesType =
   | 'fill'
   | 'stroke'
