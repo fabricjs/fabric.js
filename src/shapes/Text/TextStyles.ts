@@ -35,29 +35,29 @@ type StyleOptions =
     };
 
 /**
- * @param {Object} prevStyle first style to compare
- * @param {Object} thisStyle second style to compare
- * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
+ * @param {Object} a first style to compare
+ * @param {Object} b second style to compare
+ * @param {boolean} includeLineDecoration whether to check overline, underline, and line-through properties
  * @return {boolean} true if the style changed
  */
 export const hasStyleChanged = (
-  prevStyle: TextStyleDeclaration,
-  thisStyle: TextStyleDeclaration,
-  forTextSpans = false
+  a: TextStyleDeclaration,
+  b: TextStyleDeclaration,
+  includeLineDecoration = false
 ) =>
-  prevStyle.fill !== thisStyle.fill ||
-  prevStyle.stroke !== thisStyle.stroke ||
-  prevStyle.strokeWidth !== thisStyle.strokeWidth ||
-  prevStyle.fontSize !== thisStyle.fontSize ||
-  prevStyle.fontFamily !== thisStyle.fontFamily ||
-  prevStyle.fontWeight !== thisStyle.fontWeight ||
-  prevStyle.fontStyle !== thisStyle.fontStyle ||
-  prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
-  prevStyle.deltaY !== thisStyle.deltaY ||
-  (forTextSpans &&
-    (prevStyle.overline !== thisStyle.overline ||
-      prevStyle.underline !== thisStyle.underline ||
-      prevStyle.linethrough !== thisStyle.linethrough));
+  a.fill !== b.fill ||
+  a.stroke !== b.stroke ||
+  a.strokeWidth !== b.strokeWidth ||
+  a.fontSize !== b.fontSize ||
+  a.fontFamily !== b.fontFamily ||
+  a.fontWeight !== b.fontWeight ||
+  a.fontStyle !== b.fontStyle ||
+  a.textBackgroundColor !== b.textBackgroundColor ||
+  a.deltaY !== b.deltaY ||
+  (includeLineDecoration &&
+    (a.overline !== b.overline ||
+      a.underline !== b.underline ||
+      a.linethrough !== b.linethrough));
 
 export class TextStyles {
   protected styles: TextStyleDeclaration[];
@@ -160,7 +160,7 @@ export class TextStyles {
     complete = false,
     ...position
   }: PositionOrOffset & T & { key: K }): R[K] {
-    const value = this.styles[this.resolveOffset(position)][key];
+    const value = this.styles[this.resolveOffset(position)]?.[key];
     return (
       complete
         ? value ?? this.target[key]

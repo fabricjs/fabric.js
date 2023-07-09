@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Text measuring measuring 1`] = `
+{
+  "kernedWidth": 17.8,
+  "width": 17.8,
+}
+`;
+
 exports[`Text toObject 1`] = `
 {
   "angle": 0,
