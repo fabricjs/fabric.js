@@ -1,0 +1,609 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`text imperative changes insertChars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 6.9375,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 12.5,
+        "left": 18.0625,
+        "width": 12.5,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 30.5625,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 9.75,
+        "left": 41.6875,
+        "width": 9.75,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 51.4375,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 58.375,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "a",
+    "b",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [],
+  "text": "tabest",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 58.375,
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 6.9375,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 12.5,
+        "left": 18.0625,
+        "width": 12.5,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 9.75,
+        "left": 30.5625,
+        "width": 9.75,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 40.3125,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 47.25,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": [
+    {},
+    {},
+    {},
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "a",
+    "b",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [],
+  "text": "tabst",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 47.25,
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 3`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 6.9375,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 12.5,
+        "left": 18.0625,
+        "width": 12.5,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 30.5625,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+  ],
+  "styles": [
+    {},
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "a",
+    "b",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 4`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [],
+  "text": "tab",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 30.5625,
+}
+`;
+
+exports[`text imperative changes insertChars can accept some style for the new text 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 6.9375,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 12.5,
+        "left": 18.0625,
+        "width": 12.5,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 30.5625,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 0,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 0,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 11.125,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 9.75,
+        "left": 22.25,
+        "width": 9.75,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 32,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 38.9375,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+    [],
+    [
+      "a",
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": [
+    {},
+    {
+      "fill": "col1",
+    },
+    {
+      "fill": "col2",
+    },
+    {
+      "fill": "col3",
+    },
+    {
+      "fill": "col4",
+    },
+    {
+      "fill": "col5",
+    },
+    {},
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "a",
+    "b",
+    "
+",
+    "
+",
+    "a",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars can accept some style for the new text 2`] = `
+{
+  "fontSize": 25,
+  "height": 93.79,
+  "left": 0,
+  "styles": [
+    {
+      "end": 2,
+      "start": 1,
+      "style": {
+        "fill": "col1",
+      },
+    },
+    {
+      "end": 3,
+      "start": 2,
+      "style": {
+        "fill": "col2",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "col5",
+      },
+    },
+  ],
+  "text": "tab
+
+aest",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 38.9375,
+}
+`;
+
+exports[`text imperative changes insertChars handles new lines correctly 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 6.9375,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 12.5,
+        "left": 18.0625,
+        "width": 12.5,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 30.5625,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 0,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11.125,
+        "left": 0,
+        "width": 11.125,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 9.75,
+        "left": 11.125,
+        "width": 9.75,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 20.875,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 27.8125,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+    [],
+    [
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "a",
+    "b",
+    "
+",
+    "
+",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars handles new lines correctly 2`] = `
+{
+  "fontSize": 25,
+  "height": 93.79,
+  "left": 0,
+  "styles": [],
+  "text": "tab
+
+est",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 30.5625,
+}
+`;
+
+exports[`text imperative changes removeChars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 0,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 6.9375,
+        "left": 6.9375,
+        "width": 6.9375,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 13.875,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "t",
+    ],
+  ],
+  "styles": [
+    {},
+    {},
+  ],
+  "text": [
+    "t",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes removeChars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [],
+  "text": "tt",
+  "top": 0,
+  "type": "IText",
+  "version": "6.0.0-beta10",
+  "width": 13.875,
+}
+`;

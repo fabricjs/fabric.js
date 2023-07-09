@@ -64,4 +64,13 @@ export abstract class StyledText<
   getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
     return this.styleManager.get({ lineIndex, charIndex, complete: true });
   }
+
+  /**
+   * remove and reflow a style block from start to end.
+   * @param {Number} start linear start position for removal (included in removal)
+   * @param {Number} end linear end position for removal ( excluded from removal )
+   */
+  removeStyleFromTo(start: number, end: number) {
+    this.styleManager.splice({ offset: start }, end - start);
+  }
 }

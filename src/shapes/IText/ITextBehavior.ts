@@ -697,15 +697,6 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * remove and reflow a style block from start to end.
-   * @param {Number} start linear start position for removal (included in removal)
-   * @param {Number} end linear end position for removal ( excluded from removal )
-   */
-  removeStyleFromTo(start: number, end: number) {
-    this.styleManager.splice({ offset: start }, end - start);
-  }
-
-  /**
    * Removes characters from start/end
    * start/end ar per grapheme position in _text array.
    *
@@ -713,7 +704,7 @@ export abstract class ITextBehavior<
    * @param {Number} end default to start + 1
    */
   removeChars(start: number, end: number = start + 1) {
-    this.removeStyleFromTo(start, end);
+    this.styleManager.splice({ offset: start }, end - start);
     this._text.splice(start, end - start);
     this.text = this._text.join('');
     this.set('dirty', true);
@@ -740,7 +731,13 @@ export abstract class ITextBehavior<
     end: number = start
   ) {
     const graphemes = this.graphemeSplit(text);
-    this.styleManager.splice({ offset: start }, end - start, ...(styles || []));
+    this.styleManager.splice(
+      { offset: start },
+      end - start,
+      ...new Array(graphemes.length)
+        .fill({})
+        .map((_, index) => (styles ? { ...styles[index] } : {}))
+    );
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,
