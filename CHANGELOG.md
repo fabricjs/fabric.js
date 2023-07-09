@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): properly checkout head for stats [#9080](https://github.com/fabricjs/fabric.js/pull/9080)
 - chore(TS): Fix ITextBehaviour enterEditing type [#9075](https://github.com/fabricjs/fabric.js/pull/9075)
 - chore(TS): export FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
 - chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
