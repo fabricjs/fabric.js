@@ -2,6 +2,8 @@
 // based on https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations
 // source https://github.com/mdn/content/blob/main/files/en-us/web/api/canvas_api/tutorial/compositing/example/index.md
 
+const { create } = require("lodash");
+
 /**
  * @type GlobalCompositeOperation
  */
@@ -133,10 +135,10 @@ function createPreview(operation) {
 
 
 QUnit.module('globalCompositeOperation', hooks => {
-    let bg;
+    let bg = createExisting();
     hooks.beforeEach(async () => {
         // clone to avoid using a disposed image
-        bg = createExisting();
+        bg = await bg.clone();
         // inform test to wait
         return;
     });
