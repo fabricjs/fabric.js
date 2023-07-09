@@ -3,8 +3,8 @@ import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
+  FontStyleDeclaration,
   TextStyle,
-  TextStyleDeclaration,
 } from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
@@ -614,7 +614,7 @@ export class Text<
    * Set the font parameter of the context with the object properties or with charStyle
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Object} [charStyle] object with font style properties
+   * @param {Object} [fontProps] object with font style properties
    * @param {String} [charStyle.fontFamily] Font Family
    * @param {Number} [charStyle.fontSize] Font size in pixels. ( without px suffix )
    * @param {String} [charStyle.fontWeight] Font weight
@@ -622,7 +622,7 @@ export class Text<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle?: any,
+    fontProps?: Partial<FontStyleDeclaration>,
     forMeasuring?: boolean
   ) {
     ctx.textBaseline = 'alphabetic';
@@ -639,7 +639,7 @@ export class Text<
           break;
       }
     }
-    ctx.font = this._getFontDeclaration(charStyle, forMeasuring);
+    ctx.font = this._getFontDeclaration(fontProps, forMeasuring);
   }
 
   /**
@@ -779,9 +779,9 @@ export class Text<
    */
   _measureChar(
     _char: string,
-    charStyle: CompleteTextStyleDeclaration,
+    charStyle: FontStyleDeclaration,
     previousChar: string | undefined,
-    prevCharStyle: CompleteTextStyleDeclaration | Record<string, never>
+    prevCharStyle: FontStyleDeclaration
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
@@ -971,10 +971,22 @@ export class Text<
     prevGrapheme?: string,
     skipLeft?: boolean
   ): GraphemeBBox {
-    const style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
-      prevStyle = prevGrapheme
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
-        : {},
+    const fontStyle = {
+      fontFamily: this.fontFamily,
+      fontStyle: this.fontStyle,
+      fontWeight: this.fontWeight,
+      fontSize: this.fontSize,
+    };
+    const style = {
+        ...fontStyle,
+        ...this._getStyleDeclaration(lineIndex, charIndex),
+      },
+      prevStyle = {
+        ...fontStyle,
+        ...(prevGrapheme
+          ? this._getStyleDeclaration(lineIndex, charIndex - 1)
+          : {}),
+      },
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
       width = info.width,
@@ -991,7 +1003,7 @@ export class Text<
       left: 0,
       height: style.fontSize,
       kernedWidth,
-      deltaY: style.deltaY,
+      deltaY: style.deltaY ?? this.deltaY,
     };
     if (charIndex > 0 && !skipLeft) {
       const previousBox = this.__charBounds[lineIndex][charIndex - 1];
@@ -1645,7 +1657,7 @@ export class Text<
       fontStyle = this.fontStyle,
       fontWeight = this.fontWeight,
       fontSize = this.fontSize,
-    }: TextStyleDeclaration = {},
+    }: Partial<FontStyleDeclaration> = {},
     forMeasuring?: boolean
   ): string {
     const parsedFontFamily =
@@ -1656,8 +1668,8 @@ export class Text<
         ? fontFamily
         : `"${fontFamily}"`;
     return [
-      fontStyle || 'normal',
-      fontWeight || 'normal',
+      fontStyle,
+      fontWeight,
       `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
       parsedFontFamily,
     ].join(' ');

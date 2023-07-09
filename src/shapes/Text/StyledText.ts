@@ -6,9 +6,11 @@ import type {
 } from '../Object/types';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
-import type { StylePropertiesType } from './constants';
+import type { FontProps, StylePropertiesType } from './constants';
 import type { Text } from './Text';
 import { pick } from '../../util';
+
+export type FontStyleDeclaration = Pick<Text, FontProps>;
 
 export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
 
