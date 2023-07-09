@@ -330,11 +330,8 @@ export class IText<
    * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
    * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
    */
-  get2DCursorLocation(
-    selectionStart = this.selectionStart,
-    skipWrapping?: boolean
-  ) {
-    return super.get2DCursorLocation(selectionStart, skipWrapping);
+  get2DCursorLocation(selectionStart = this.selectionStart) {
+    return super.get2DCursorLocation(selectionStart);
   }
 
   /**
