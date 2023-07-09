@@ -1,6 +1,6 @@
 import { IText } from './IText';
 
-function matchTextStateSnapshot(text: IText) {
+export function matchTextStateSnapshot(text: IText) {
   const {
     styleManager,
     _text: t,
