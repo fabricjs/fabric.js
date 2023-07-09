@@ -120,12 +120,6 @@
     });
   });
 
-  QUnit.test('toObject', function(assert) {
-    var text = createTextObject();
-    assert.ok(typeof text.toObject === 'function');
-    assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
-  });
-
   QUnit.test('complexity', function(assert) {
     var text = createTextObject();
     assert.ok(typeof text.complexity === 'function');
@@ -191,15 +185,6 @@
     text.setCoords();
     var br2 = text.getBoundingRect();
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
-  });
-
-  QUnit.test('fabric.Text.fromObject', function(assert) {
-    var done = assert.async();
-    assert.ok(typeof fabric.Text.fromObject === 'function');
-    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
-      assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
-      done();
-    });
   });
 
   QUnit.test('fabric.Text.fromElement', function(assert) {

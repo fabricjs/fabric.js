@@ -407,7 +407,7 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, options: any) {
+  constructor(text: string, options: any = {}) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
@@ -1656,8 +1656,8 @@ export class Text<
         ? fontFamily
         : `"${fontFamily}"`;
     return [
-      fontStyle,
-      fontWeight,
+      fontStyle || 'normal',
+      fontWeight || 'normal',
       `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
       parsedFontFamily,
     ].join(' ');
