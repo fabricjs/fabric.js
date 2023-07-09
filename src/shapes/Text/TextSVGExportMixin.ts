@@ -166,19 +166,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
     for (
-      let i = 0,
-        len = line.length - 1,
-        charsToRender = '',
-        boxWidth = 0,
-        timeToRender = false;
+      let i = 0, len = line.length - 1, charsToRender = '', boxWidth = 0;
       i <= len;
       i++
     ) {
-      timeToRender =
-        i === len ||
-        !!this.charSpacing ||
-        hasStyleChanged(styles[i], styles[i + 1], false) ||
-        (isJustify && this._reSpaceAndTab.test(line[i]));
       charsToRender += line[i];
       const charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -187,7 +178,12 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       } else {
         boxWidth += charBox.kernedWidth;
       }
-      if (timeToRender) {
+      if (
+        i === len ||
+        !!this.charSpacing ||
+        hasStyleChanged(styles[i], styles[i + 1], false) ||
+        (isJustify && this._reSpaceAndTab.test(line[i]))
+      ) {
         textSpans.push(
           this._createTextCharSpan(
             charsToRender,

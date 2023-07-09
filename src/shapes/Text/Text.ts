@@ -1177,12 +1177,6 @@ export class Text<
     const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
-      shortCut =
-        !isJustify &&
-        this.charSpacing === 0 &&
-        !this.styleManager.has({ lineIndex }) &&
-        false &&
-        !path,
       isLtr = this.direction === 'ltr',
       sign = this.direction === 'ltr' ? 1 : -1,
       // this was changed in the PR #7674
@@ -1194,6 +1188,8 @@ export class Text<
       complete: true,
     });
 
+    top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
+
     ctx.save();
 
     if (currentDirection !== this.direction) {
@@ -1201,8 +1197,13 @@ export class Text<
       ctx.direction = isLtr ? 'ltr' : 'rtl';
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
-    top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
-    if (shortCut) {
+
+    if (
+      !isJustify &&
+      this.charSpacing === 0 &&
+      !this.styleManager.has({ lineIndex }) &&
+      !path
+    ) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
       this._renderChar(method, ctx, lineIndex, 0, line.join(''), left, top);
@@ -1211,20 +1212,10 @@ export class Text<
     }
 
     for (
-      let i = 0,
-        len = line.length - 1,
-        charsToRender = '',
-        boxWidth = 0,
-        timeToRender = false;
+      let i = 0, len = line.length - 1, charsToRender = '', boxWidth = 0;
       i <= len;
       i++
     ) {
-      timeToRender =
-        i === len ||
-        !!this.charSpacing ||
-        !!path ||
-        hasStyleChanged(styles[i], styles[i + 1], false) ||
-        (isJustify && this._reSpaceAndTab.test(line[i]));
       charsToRender += line[i];
       const charBox = this.__charBounds[lineIndex][i] as Required<GraphemeBBox>;
       if (boxWidth === 0) {
@@ -1233,7 +1224,13 @@ export class Text<
       } else {
         boxWidth += charBox.kernedWidth;
       }
-      if (timeToRender) {
+      if (
+        i === len ||
+        !!this.charSpacing ||
+        !!path ||
+        hasStyleChanged(styles[i], styles[i + 1], false) ||
+        (isJustify && this._reSpaceAndTab.test(line[i]))
+      ) {
         if (path) {
           ctx.save();
           ctx.translate(charBox.renderLeft, charBox.renderTop);

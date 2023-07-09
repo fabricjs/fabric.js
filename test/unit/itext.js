@@ -203,35 +203,6 @@
       assert.equal(loc.charIndex, 5);
     });
 
-    QUnit.test('isEmptyStyles', function(assert) {
-      var iText = new fabric.IText('test');
-      assert.ok(iText.isEmptyStyles());
-
-      iText = new fabric.IText('test', {
-        styles: {
-          0: {
-            0: { }
-          },
-          1: {
-            0: { }, 1: { }
-          }
-        }
-      });
-      assert.ok(iText.isEmptyStyles());
-
-      iText = new fabric.IText('test', {
-        styles: {
-          0: {
-            0: { }
-          },
-          1: {
-            0: { fill: 'red' }, 1: { }
-          }
-        }
-      });
-      assert.ok(!iText.isEmptyStyles());
-    });
-
     QUnit.test('selectAll', function(assert) {
       var iText = new fabric.IText('test');
 
