@@ -220,16 +220,17 @@ export class TextStyles {
       const start = this.positionToOffset(lineIndex, charIndex || 0);
       slice = this.styles.slice(
         start,
-        start + typeof charIndex === 'number'
-          ? start + 1
-          : this.getLines()[lineIndex].length
+        start +
+          (typeof charIndex === 'number'
+            ? start + 1
+            : this.getLines()[lineIndex].length)
       );
     } else {
       slice = this.styles;
     }
 
     return slice.some((value) =>
-      !!value && key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
+      key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
     );
   }
 

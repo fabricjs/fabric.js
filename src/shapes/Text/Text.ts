@@ -1371,6 +1371,7 @@ export class Text<
     left: number,
     top: number
   ) {
+    // accept change from #9079
     const decl = this.styleManager.get({ lineIndex, charIndex }),
       fullDecl = this.styleManager.get({
         lineIndex,
