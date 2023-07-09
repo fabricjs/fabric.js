@@ -192,37 +192,38 @@
     assert.equal(Math.round(largestWordWidth), 82, 'largest word is 82');
   });
   QUnit.test('Measure words with styles', function(assert) {
-    const textbox = new fabric.Textbox('word word\nword\nword', { width: 300 });
-    textbox.styles = {
-      0: {
-        5: {
-          fontSize: 100,
-        },
-        6: {
-          fontSize: 100,
-        },
-        7: {
-          fontSize: 100,
-        },
-        8: {
-          fontSize: 100,
-        }
-      },
-      2: {
+    const textbox = new fabric.Textbox('word word\nword\nword', {
+      width: 300, styles: {
         0: {
-          fontSize: 200,
-        },
-        1: {
-          fontSize: 200,
+          5: {
+            fontSize: 100,
+          },
+          6: {
+            fontSize: 100,
+          },
+          7: {
+            fontSize: 100,
+          },
+          8: {
+            fontSize: 100,
+          }
         },
         2: {
-          fontSize: 200,
-        },
-        3: {
-          fontSize: 200,
+          0: {
+            fontSize: 200,
+          },
+          1: {
+            fontSize: 200,
+          },
+          2: {
+            fontSize: 200,
+          },
+          3: {
+            fontSize: 200,
+          }
         }
       }
-    };
+    });
     const { wordsData, largestWordWidth } = textbox.getGraphemeDataForRender(textbox.textLines);
     assert.equal(
       Math.round(wordsData[0][0].width),
