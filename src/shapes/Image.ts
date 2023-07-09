@@ -816,11 +816,14 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL(
+  static fromURL<T extends TProps<ImageProps>>(
     url: string,
-    { crossOrigin = 'anonymous', signal }: LoadImageOptions = {}
+    { crossOrigin = 'anonymous', signal }: LoadImageOptions = {},
+    imageOptions: T
   ): Promise<Image> {
-    return loadImage(url, { crossOrigin, signal }).then((img) => new this(img));
+    return loadImage(url, { crossOrigin, signal }).then(
+      (img) => new this(img, imageOptions)
+    );
   }
 
   /**
@@ -841,10 +844,11 @@ export class Image<
       this.ATTRIBUTE_NAMES,
       cssRules
     );
-    return this.fromURL(parsedAttributes['xlink:href'], {
-      ...options,
-      ...parsedAttributes,
-    }).catch((err) => {
+    return this.fromURL(
+      parsedAttributes['xlink:href'],
+      options,
+      parsedAttributes
+    ).catch((err) => {
       console.log(err);
       return null;
     });

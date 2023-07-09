@@ -5,7 +5,7 @@ import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 import type { BaseFilter } from '../../filters/BaseFilter';
-import type { BaseFabricObject } from '../../EventTypeDefs';
+import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 
 export type LoadImageOptions = Abortable & {
   /**

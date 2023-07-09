@@ -1,10 +1,6 @@
 import { config } from '../config';
 import { CENTER, iMatrix, VERSION } from '../constants';
-import type {
-  BaseFabricObject,
-  CanvasEvents,
-  StaticCanvasEvents,
-} from '../EventTypeDefs';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
@@ -1418,7 +1414,7 @@ export class StaticCanvas<
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      enlivenObjects<BaseFabricObject>(objects, {
+      enlivenObjects<FabricObject>(objects, {
         reviver,
         signal,
       }),
