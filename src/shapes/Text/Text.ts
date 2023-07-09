@@ -1010,12 +1010,12 @@ export class Text<
     };
     const style = {
         ...fontStyle,
-        ...this._getStyleDeclaration(lineIndex, charIndex),
+        ...this.styleManager.get({ lineIndex, charIndex }),
       },
       prevStyle = prevGrapheme
         ? {
             ...fontStyle,
-            ...this._getStyleDeclaration(lineIndex, charIndex - 1),
+            ...this.styleManager.get({ lineIndex, charIndex: charIndex - 1 }),
           }
         : undefined,
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
