@@ -426,10 +426,7 @@ export class Text<
     this._unwrappedTextLines = _unwrappedLines;
     this._text = graphemeText;
     this._endOfWrapping = endOfWrapping;
-    this.styleManager = new TextStyles(
-      this,
-      styles || new Array(graphemeText.length).fill({})
-    );
+    this.styleManager = new TextStyles(this, styles);
     this.initText();
   }
 
@@ -905,7 +902,8 @@ export class Text<
   _measureLine(lineIndex: number) {
     let width = 0,
       prevGrapheme: string | undefined,
-      graphemeInfo: GraphemeBBox | undefined;
+      graphemeInfo: GraphemeBBox | undefined,
+      prevGraphemeInfo: GraphemeBBox | undefined;
 
     const reverse = this.pathSide === RIGHT,
       path = this.path,
@@ -916,15 +914,26 @@ export class Text<
     this.__charBounds[lineIndex] = lineBounds;
     for (let i = 0; i < llength; i++) {
       const grapheme = line[i];
-      graphemeInfo = this._getGraphemeBox(grapheme, lineIndex, i, prevGrapheme);
+      prevGraphemeInfo = graphemeInfo;
+      graphemeInfo = this._getGraphemeBox(
+        grapheme,
+        this.styleManager.resolveOffset({ lineIndex, charIndex: i }),
+        prevGrapheme
+      );
       lineBounds[i] = graphemeInfo;
       width += graphemeInfo.kernedWidth;
       prevGrapheme = grapheme;
     }
+
     // this latest bound box represent the last character of the line
     // to simplify cursor handling in interactive mode.
     lineBounds[llength] = {
-      left: graphemeInfo ? graphemeInfo.left + graphemeInfo.width : 0,
+      left:
+        graphemeInfo && prevGraphemeInfo
+          ? prevGraphemeInfo.left +
+            prevGraphemeInfo.width +
+            graphemeInfo.kernedWidth
+          : 0,
       width: 0,
       kernedWidth: 0,
       height: this.fontSize,
@@ -1003,10 +1012,8 @@ export class Text<
    */
   _getGraphemeBox(
     grapheme: string,
-    lineIndex: number,
-    charIndex: number,
-    prevGrapheme?: string,
-    skipLeft?: boolean
+    offset: number,
+    prevGrapheme?: string
   ): GraphemeBBox {
     const fontStyle = {
       fontFamily: this.fontFamily,
@@ -1016,38 +1023,31 @@ export class Text<
     };
     const style = {
         ...fontStyle,
-        ...this.styleManager.get({ lineIndex, charIndex }),
+        ...this.styleManager.get({ offset }),
       },
       prevStyle = prevGrapheme
         ? {
             ...fontStyle,
-            ...this.styleManager.get({ lineIndex, charIndex: charIndex - 1 }),
+            ...this.styleManager.get({ offset: offset - 1 }),
           }
         : undefined,
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
-      width = info.width,
-      charSpacing;
+      width = info.width;
 
     if (this.charSpacing !== 0) {
-      charSpacing = this._getWidthOfCharSpacing();
+      const charSpacing = this._getWidthOfCharSpacing();
       width += charSpacing;
       kernedWidth += charSpacing;
     }
 
-    const box: GraphemeBBox = {
+    return {
       width,
       left: 0,
       height: style.fontSize,
       kernedWidth,
       deltaY: style.deltaY ?? this.deltaY,
     };
-    if (charIndex > 0 && !skipLeft) {
-      const previousBox = this.__charBounds[lineIndex][charIndex - 1];
-      box.left =
-        previousBox.left + previousBox.width + info.kernedWidth - info.width;
-    }
-    return box;
   }
 
   /**
@@ -1756,6 +1756,10 @@ export class Text<
    * @returns  Lines in the text
    */
   _splitTextIntoLines(text: string) {
+    return this.__splitTextIntoLines(text);
+  }
+
+  __splitTextIntoLines(text: string) {
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
@@ -1766,8 +1770,8 @@ export class Text<
     }
     newText.pop();
     return {
-      _unwrappedLines: newLines,
       lines,
+      _unwrappedLines: newLines,
       graphemeText: newText,
       graphemeLines: newLines,
       endOfWrapping: new Array<boolean>(newLines.length).fill(true),

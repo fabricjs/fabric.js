@@ -143,7 +143,7 @@ export class Textbox extends IText {
 
     let largestWordWidth = 0;
 
-    const data = lines.map((line, lineIndex) => {
+    const data = lines.map((line) => {
       let offset = 0;
       const words = splitByGrapheme
         ? this.graphemeSplit(line)
@@ -157,7 +157,7 @@ export class Textbox extends IText {
       return words.map((word) => {
         // if using splitByGrapheme words are already in graphemes.
         word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
+        const width = this._measureWord(word, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + infix.length;
         return { word, width };
@@ -179,18 +179,17 @@ export class Textbox extends IText {
    * @param {CanvasRenderingContext2D} ctx
    * @param {String} text
    * @param {number} lineIndex
-   * @param {number} charOffset
+   * @param {number} offset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word, offset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
     for (let i = 0, len = word.length; i < len; i++) {
       const box = this._getGraphemeBox(
         word[i],
-        lineIndex,
-        i + charOffset,
+        offset + i,
         prevGrapheme,
         skipLeft
       );
@@ -232,25 +231,22 @@ export class Textbox extends IText {
       graphemeLines = [],
       infix = splitByGrapheme ? '' : ' ';
 
-    let lineWidth = 0,
-      line = [],
-      // spaces in different languages?
-      offset = 0,
-      infixWidth = 0,
-      lineJustStarted = true;
-
-    desiredWidth -= reservedSpace;
+    let line = [];
 
     const maxWidth = Math.max(
-      desiredWidth,
+      desiredWidth - reservedSpace,
       largestWordWidth,
       this.dynamicMinWidth
     );
     // layout words
     const data = wordsData[lineIndex];
-    offset = 0;
-    let i;
-    for (i = 0; i < data.length; i++) {
+    let i = 0,
+      lineWidth = 0,
+      offset = 0,
+      // spaces in different languages?
+      infixWidth = 0,
+      lineJustStarted = true;
+    for (; i < data.length; i++) {
       const { word, width: wordWidth } = data[i];
       offset += word.length;
 
@@ -269,9 +265,7 @@ export class Textbox extends IText {
       }
       line = line.concat(word);
 
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
+      infixWidth = splitByGrapheme ? 0 : this._measureWord([infix], offset);
       offset++;
       lineJustStarted = false;
     }
