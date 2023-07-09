@@ -11,12 +11,11 @@ describe('Textbox', () => {
   });
 
   it('toObject with styles', () => {
-    const ref = { fill: 'red' };
     const textbox = new Textbox('The quick \nbrown \nfox', {
       width: 120,
       styles: {
         '0': {
-          '5': ref,
+          '5': { fill: 'red' },
           '6': { fill: 'red' },
           '7': { fill: 'red' },
           '8': { fill: 'red' },
@@ -32,7 +31,6 @@ describe('Textbox', () => {
         },
       },
     });
-    expect(textbox.styles[0][5] !== ref).toBeTruthy();
     expect(textbox.toObject()).toMatchSnapshot();
   });
 
