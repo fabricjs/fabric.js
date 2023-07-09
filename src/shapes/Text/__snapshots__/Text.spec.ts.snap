@@ -50,6 +50,6 @@ exports[`Text toObject 1`] = `
   "underline": false,
   "version": "6.0.0-beta10",
   "visible": true,
-  "width": 2,
+  "width": 60,
 }
 `;

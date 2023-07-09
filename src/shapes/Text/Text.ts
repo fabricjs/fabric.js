@@ -785,9 +785,10 @@ export class Text<
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
       couple = previousChar + _char,
-      stylesAreEqual = fontDeclaration === previousFontDeclaration,
+      stylesAreEqual =
+        previousChar &&
+        fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width: number | undefined,
       coupleWidth: number | undefined,
