@@ -233,7 +233,7 @@ export class TextStyles {
     }
 
     return slice.some((value) =>
-      key ? Object.hasOwn(value, key) : Object.keys(value).length > 0
+      key ? key in value : Object.keys(value).length > 0
     );
   }
 
