@@ -1,7 +1,11 @@
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { CompleteTextStyleDeclaration, TextStyle } from './StyledText';
+import type {
+  CompleteTextStyleDeclaration,
+  TextStyle,
+  TextStyleDeclaration,
+} from './StyledText';
 import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
@@ -1642,7 +1646,12 @@ export class Text<
       fontStyle = this.fontStyle,
       fontWeight = this.fontWeight,
       fontSize = this.fontSize,
-    }: Partial<FontStyleDeclaration> = {},
+    }: Partial<
+      Pick<
+        TextStyleDeclaration,
+        'fontFamily' | 'fontStyle' | 'fontWeight' | 'fontSize'
+      >
+    > = {},
     forMeasuring?: boolean
   ): string {
     const parsedFontFamily =
