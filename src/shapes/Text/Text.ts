@@ -772,34 +772,34 @@ export class Text<
    * possibly overridden to accommodate different measure logic or
    * to hook some external lib for character measurement
    * @private
-   * @param {String} _char, char to be measured
+   * @param {String} char, char to be measured
    * @param {Object} charStyle style of char to be measured
-   * @param {String} [previousChar] previous char
+   * @param {String} [prevChar] previous char
    * @param {Object} [prevCharStyle] style of previous char
    */
   _measureChar<T extends string | undefined>(
-    _char: string,
+    char: string,
     charStyle: FontStyleDeclaration,
-    previousChar: T,
+    prevChar: T,
     prevCharStyle: T extends string ? FontStyleDeclaration : undefined
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      couple = previousChar + _char,
+      couple = prevChar + char,
       stylesAreEqual =
-        previousChar &&
-        fontDeclaration === this._getFontDeclaration(prevCharStyle),
+        prevChar &&
+        fontDeclaration === this._getFontDeclaration(prevCharStyle!),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width: number | undefined,
       coupleWidth: number | undefined,
       previousWidth: number | undefined,
       kernedWidth: number | undefined;
 
-    if (previousChar && fontCache[previousChar] !== undefined) {
-      previousWidth = fontCache[previousChar];
+    if (prevChar && fontCache[prevChar] !== undefined) {
+      previousWidth = fontCache[prevChar];
     }
-    if (fontCache[_char] !== undefined) {
-      kernedWidth = width = fontCache[_char];
+    if (fontCache[char] !== undefined) {
+      kernedWidth = width = fontCache[char];
     }
     if (stylesAreEqual && fontCache[couple] !== undefined) {
       coupleWidth = fontCache[couple];
@@ -814,12 +814,12 @@ export class Text<
       // send a TRUE to specify measuring font size CACHE_FONT_SIZE
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
-        kernedWidth = width = ctx.measureText(_char).width;
-        fontCache[_char] = width;
+        kernedWidth = width = ctx.measureText(char).width;
+        fontCache[char] = width;
       }
-      if (previousWidth === undefined && stylesAreEqual && previousChar) {
-        previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth;
+      if (previousWidth === undefined && stylesAreEqual && prevChar) {
+        previousWidth = ctx.measureText(prevChar).width;
+        fontCache[prevChar] = previousWidth;
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
