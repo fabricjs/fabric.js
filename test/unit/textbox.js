@@ -253,42 +253,6 @@
     assert.equal(textbox.styles[5], undefined, 'style line 5 has been removed');
   });
 
-  QUnit.test('isEmptyStyles', function(assert) {
-    var textbox = new fabric.Textbox('x x', { width: 5, styles: { 0: { 0: { fill: 'red' } } } });
-    assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
-    assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
-    assert.equal(textbox.isEmptyStyles(), false, 'style is not empty');
-    assert.equal(textbox.isEmptyStyles(0), false, 'style is not empty at line 0');
-    assert.equal(textbox.isEmptyStyles(1), true, 'style is empty at line 1');
-  });
-
-  QUnit.test('isEmptyStyles does not crash on null styles', function(assert) {
-    var textbox = new fabric.Textbox('x x', { width: 5 });
-    textbox.styles = null;
-    assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
-    assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
-    assert.equal(textbox.isEmptyStyles(1), true, 'style is empty');
-  });
-
-  QUnit.test('isEmptyStyles alternate lines', function(assert) {
-    var textbox = new fabric.Textbox('xa xb xc xd xe\nya yb', {
-      width: 5,
-      styles: {
-        0: { 0: { fill: 'red' }, 1: { fill: 'blue' }, 9: { fill: 'red' }, 10: { fill: 'blue' } },
-        1: { 3: { fill: 'red' }, 4: { fill: 'blue' } },
-      }
-    });
-    assert.equal(textbox._textLines.length, 7, 'lines are wrapped');
-    assert.equal(textbox._unwrappedTextLines.length, 2, 'there is only one text line');
-    assert.equal(textbox.isEmptyStyles(), false, 'style is not empty');
-    assert.equal(textbox.isEmptyStyles(0), false, 'style is not empty at line 0');
-    assert.equal(textbox.isEmptyStyles(1), true, 'style is empty at line 1');
-    assert.equal(textbox.isEmptyStyles(2), true, 'style is empty at line 2');
-    assert.equal(textbox.isEmptyStyles(3), false, 'style is empty at line 3');
-    assert.equal(textbox.isEmptyStyles(4), true, 'style is empty at line 4');
-    assert.equal(textbox.isEmptyStyles(5), true, 'style is empty at line 5');
-    assert.equal(textbox.isEmptyStyles(6), false, 'style is empty at line 6');
-  });
   QUnit.test('wrapping with charspacing', function(assert) {
     var textbox = new fabric.Textbox('xa xb xc xd xe ya yb id', {
       width: 190,

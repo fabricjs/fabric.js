@@ -308,7 +308,7 @@ export class IText<
     endIndex: number = this.selectionEnd,
     complete?: boolean
   ) {
-    return super.getSelectionStyles(startIndex, endIndex, complete);
+    return this.styleManager.slice(startIndex, endIndex, { complete });
   }
 
   /**
@@ -322,7 +322,11 @@ export class IText<
     startIndex: number = this.selectionStart || 0,
     endIndex: number = this.selectionEnd
   ) {
-    return super.setSelectionStyles(styles, startIndex, endIndex);
+    for (let i = startIndex; i < (endIndex || startIndex); i++) {
+      this.styleManager.set({ offset: i, style: { ...style } });
+    }
+    /* not included in _extendStyles to avoid clearing cache more than once */
+    this._forceClearCache = true;
   }
 
   /**

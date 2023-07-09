@@ -105,7 +105,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       if (this.direction === 'rtl') {
         lineOffset += this.width;
       }
-      if (this.textBackgroundColor || this.styleHas('textBackgroundColor', i)) {
+      if (
+        this.textBackgroundColor ||
+        this.styleManager.has({ key: 'textBackgroundColor', lineIndex: i })
+      ) {
         this._setSVGTextLineBg(
           textBgRects,
           i,
@@ -160,50 +163,40 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.includes(JUSTIFY),
       line = this._textLines[lineIndex];
-    let actualStyle,
-      nextStyle,
-      charsToRender = '',
-      charBox,
-      style,
-      boxWidth = 0,
-      timeToRender;
-
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
-    for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+    for (
+      let i = 0,
+        len = line.length - 1,
+        charsToRender = '',
+        boxWidth = 0,
+        timeToRender = false;
+      i <= len;
+      i++
+    ) {
+      timeToRender =
+        i === len ||
+        !!this.charSpacing ||
+        hasStyleChanged(styles[i], styles[i + 1], false) ||
+        (isJustify && this._reSpaceAndTab.test(line[i]));
       charsToRender += line[i];
-      charBox = this.__charBounds[lineIndex][i];
+      const charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
         textLeftOffset += charBox.kernedWidth - charBox.width;
         boxWidth += charBox.width;
       } else {
         boxWidth += charBox.kernedWidth;
       }
-      if (isJustify && !timeToRender) {
-        if (this._reSpaceAndTab.test(line[i])) {
-          timeToRender = true;
-        }
-      }
-      if (!timeToRender) {
-        // if we have charSpacing, we render char by char
-        actualStyle =
-          actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-        nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
-        timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
-      }
       if (timeToRender) {
-        style = this._getStyleDeclaration(lineIndex, i);
         textSpans.push(
           this._createTextCharSpan(
             charsToRender,
-            style,
+            this.styleManager.get({ lineIndex, charIndex: i }),
             textLeftOffset,
             textTopOffset
           )
         );
         charsToRender = '';
-        actualStyle = nextStyle;
         if (this.direction === 'rtl') {
           textLeftOffset -= boxWidth;
         } else {

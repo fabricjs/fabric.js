@@ -45,39 +45,6 @@ export abstract class StyledText<
   }
 
   /**
-   * Gets style of a current selection/cursor (at the start position)
-   * @param {Number} startIndex Start index to get styles at
-   * @param {Number} endIndex End index to get styles at, if not specified startIndex + 1
-   * @param {Boolean} [complete] get full style or not
-   * @return {Array} styles an array with one, zero or more Style objects
-   */
-  getSelectionStyles(
-    startIndex: number,
-    endIndex = startIndex,
-    complete?: boolean
-  ) {
-    return this.styleManager.slice(startIndex, endIndex, { complete });
-  }
-
-  /**
-   * Sets style of a current selection, if no selection exist, do not set anything.
-   * @param {Object} style Styles object
-   * @param {Number} startIndex Start index to get styles at
-   * @param {Number} [endIndex] End index to get styles at, if not specified startIndex + 1
-   */
-  setSelectionStyles(
-    style: TextStyleDeclaration,
-    startIndex: number,
-    endIndex?: number
-  ) {
-    for (let i = startIndex; i < (endIndex || startIndex); i++) {
-      this.styleManager.set({ offset: i, style: { ...style } });
-    }
-    /* not included in _extendStyles to avoid clearing cache more than once */
-    this._forceClearCache = true;
-  }
-
-  /**
    * get the reference, not a clone, of the style object for a given character
    * @param {Number} lineIndex
    * @param {Number} charIndex
