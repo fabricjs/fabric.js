@@ -21,7 +21,7 @@ describe('Text', () => {
       cache.clearFontCache();
       const zwc = '\u200b';
       const text = new Text('');
-      const style = text.styleManager.get({ offset: 0, complete: true });
+      const style = text.getCompleteStyleDeclaration(0, 0);
       expect(text._measureChar('a', style, zwc, style)).toMatchSnapshot();
       expect(text._measureChar('a', style, zwc, style)).toEqual(
         text._measureChar('a', style, zwc, style)
@@ -34,25 +34,16 @@ describe('Text', () => {
     });
   });
 
-  it('toSVG with NUM_FRACTION_DIGITS', () => {
-    const text = new Text('test foo bar-baz', {
+  it('toSVG with NUM_FRACTION_DIGITS', async () => {
+    const text = await Text.fromObject({
+      text: 'xxxxxx',
       styles: [
-        {
-          fill: 'red',
-        },
-        {
-          fill: 'blue',
-        },
-        {
-          fill: 'green',
-        },
-        {
-          fill: 'yellow',
-        },
-        {
-          fill: 'pink',
-        },
-      ],
+        { fill: 'red' },
+        { fill: 'blue' },
+        { fill: 'green' },
+        { fill: 'yellow' },
+        { fill: 'pink' },
+      ].map((style, index) => ({ style, start: index, end: index + 1 })),
     });
     config.configure({ NUM_FRACTION_DIGITS: 1 });
     expect(text.toSVG()).toMatchSnapshot();
@@ -60,8 +51,9 @@ describe('Text', () => {
     expect(text.toSVG()).toMatchSnapshot();
   });
 
-  it('subscript/superscript', () => {
-    const text = new Text('xxxxxx', {
+  it('subscript/superscript', async () => {
+    const text = await Text.fromObject({
+      text: 'xxxxxx',
       styles: [
         { stroke: 'black', fill: 'blue' },
         { fill: 'blue' },
@@ -69,7 +61,7 @@ describe('Text', () => {
         { stroke: 'black', fill: 'blue' },
         { fill: 'blue' },
         { fontSize: 4, deltaY: 20 },
-      ],
+      ].map((style, index) => ({ style, start: index, end: index + 1 })),
     });
     text.setSuperscript(1, 2);
     text.setSuperscript(2, 3);
