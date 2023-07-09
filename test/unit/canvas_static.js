@@ -1310,7 +1310,7 @@
 
   QUnit.test('loadFromJSON with text', function(assert) {
     var done = assert.async();
-    var json = '{"objects":[{"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json).then(function() {
 
       canvas.renderAll();
@@ -1327,7 +1327,7 @@
   QUnit.test('loadFromJSON with clipPath', function(assert) {
     var done = assert.async();
     var canvas3 = new fabric.StaticCanvas();
-    var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
+    var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
     canvas3.loadFromJSON(json).then(function() {
       assert.ok(canvas3.clipPath instanceof fabric.Text);
       assert.equal(canvas3.clipPath.constructor.type, 'Text');
