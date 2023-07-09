@@ -128,11 +128,12 @@ export class TextStyles {
     );
   }
 
-  get({
-    uniq = false,
-    complete = false,
-    ...position
-  }: PositionOrOffset & StyleOptions) {
+  get<
+    T extends StyleOptions,
+    R extends T['complete'] extends true
+      ? CompleteTextStyleDeclaration
+      : TextStyleDeclaration
+  >({ uniq = false, complete = false, ...position }: PositionOrOffset & T): R {
     // @ts-expect-error readonly
     const upstream = complete ? pick(this.target, styleProperties) : {};
     const style = this.styles[this.resolveOffset(position)];
@@ -141,21 +142,29 @@ export class TextStyles {
       ...(uniq && !complete
         ? pickBy(style, (v, k) => this.target[k] !== v)
         : style),
-    } as TextStyleDeclaration;
+    } as R;
   }
 
-  value({
+  value<
+    K extends keyof TextStyleDeclaration,
+    T extends StyleOptions,
+    R extends T['complete'] extends true
+      ? CompleteTextStyleDeclaration
+      : TextStyleDeclaration
+  >({
     key,
     uniq = false,
     complete = false,
     ...position
-  }: PositionOrOffset & StyleOptions & { key: keyof TextStyleDeclaration }) {
+  }: PositionOrOffset & T & { key: K }): R[K] {
     const value = this.styles[this.resolveOffset(position)][key];
-    return complete
-      ? value ?? this.target[key]
-      : !uniq || value !== this.target[key]
-      ? value
-      : undefined;
+    return (
+      complete
+        ? value ?? this.target[key]
+        : !uniq || value !== this.target[key]
+        ? value
+        : undefined
+    ) as R[K];
   }
 
   set({
@@ -177,7 +186,7 @@ export class TextStyles {
   splice(
     position: PositionOrOffset,
     deleteCount: number,
-    styles: TextStyleDeclaration[] = []
+    ...styles: TextStyleDeclaration[]
   ) {
     this.styles.splice(this.resolveOffset(position), deleteCount, ...styles);
   }

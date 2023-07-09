@@ -124,10 +124,12 @@ export class Textbox extends IText {
     const wordsData = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
     const state: boolean[] = [];
+    // const map: { lineIndex: number; charIndex: number }[] = [];
     for (let i = 0; i < lines.length; i++) {
       const wrappedLine = this._wrapLine(i, desiredWidth, wordsData);
       wrapped.push(...wrappedLine);
       state.push(...new Array(wrappedLine.length - 1).fill(false), true);
+      // wrappedLine.forEach((c,j)=>map.push({lineIndex:i+j}))
     }
     this.isWrapping = false;
     return { value: wrapped, state };

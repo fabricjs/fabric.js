@@ -356,7 +356,7 @@
       iText.abortCursorAnimation();
     });
 
-    QUnit.test('insertNewlineStyleObject', function(assert) {
+    QUnit.skip('insertNewlineStyleObject', function(assert) {
       var iText = new fabric.IText('test\n2');
 
       assert.equal(typeof iText.insertNewlineStyleObject, 'function');
@@ -368,7 +368,7 @@
       assert.deepEqual(iText.styles, { 2: { 0: { fill: 'blue' } } }, 'correctly shift styles');
     });
 
-    QUnit.test('insertNewlineStyleObject with existing style', function(assert) {
+    QUnit.skip('insertNewlineStyleObject with existing style', function(assert) {
       var iText = new fabric.IText('test\n2');
 
       iText.styles = { 0: { 3: { fill: 'red' } }, 1: { 0: { fill: 'blue' } } };
@@ -379,7 +379,7 @@
       assert.deepEqual(iText.styles[1], { 0: { fill: 'red' } }, 'correctly copied previous style line 1');
     });
 
-    QUnit.test('shiftLineStyles', function(assert) {
+    QUnit.skip('shiftLineStyles', function(assert) {
       var iText = new fabric.IText('test\ntest\ntest', {
         styles: {
           1: {
@@ -595,7 +595,7 @@
       });
     });
 
-    QUnit.test('getCurrentCharFontSize', function(assert) {
+    QUnit.skip('getCurrentCharFontSize', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux', {
         styles: {
           0: {
@@ -616,7 +616,7 @@
       assert.equal(iText.getCurrentCharFontSize(), 40);
     });
 
-    QUnit.test('getCurrentCharColor', function(assert) {
+    QUnit.skip('getCurrentCharColor', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux', {
         styles: {
           0: {

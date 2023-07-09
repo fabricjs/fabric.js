@@ -740,7 +740,7 @@ export abstract class ITextBehavior<
     end: number = start
   ) {
     const graphemes = this.graphemeSplit(text);
-    this.styleManager.splice({ offset: start }, end - start, styles);
+    this.styleManager.splice({ offset: start }, end - start, ...(styles || []));
     this._text = [
       ...this._text.slice(0, start),
       ...graphemes,

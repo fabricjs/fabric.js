@@ -1570,14 +1570,18 @@ export class Text<
    * Retrieves the value of property at given character position
    * @param {Number} lineIndex the line number
    * @param {Number} charIndex the character number
-   * @param {String} property the property name
+   * @param {String} key the property name
    * @returns the value of 'property'
    */
-  getValueOfPropertyAt(lineIndex: number, charIndex: number, property: string) {
+  getValueOfPropertyAt<K extends keyof TextStyleDeclaration>(
+    lineIndex: number,
+    charIndex: number,
+    key: K
+  ) {
     return this.styleManager.value({
       lineIndex,
       charIndex,
-      key: property,
+      key,
       complete: true,
     });
   }
