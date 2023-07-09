@@ -146,6 +146,7 @@ export class DraggableTextDelegate {
       repeatCount: target._text.length - selectionEnd,
       style: styleOverride,
     });
+    // @ts-expect-error protected
     target._forceClearCache = true;
     target.dirty = true;
     const dragImage = target.toCanvasElement({
