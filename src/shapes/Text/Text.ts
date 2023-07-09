@@ -777,11 +777,11 @@ export class Text<
    * @param {String} [previousChar] previous char
    * @param {Object} [prevCharStyle] style of previous char
    */
-  _measureChar(
+  _measureChar<T extends string | undefined>(
     _char: string,
     charStyle: FontStyleDeclaration,
-    previousChar: string | undefined,
-    prevCharStyle: FontStyleDeclaration
+    previousChar: T,
+    prevCharStyle: T extends string ? FontStyleDeclaration : undefined
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
@@ -982,12 +982,12 @@ export class Text<
         ...fontStyle,
         ...this._getStyleDeclaration(lineIndex, charIndex),
       },
-      prevStyle = {
-        ...fontStyle,
-        ...(prevGrapheme
-          ? this._getStyleDeclaration(lineIndex, charIndex - 1)
-          : {}),
-      },
+      prevStyle = prevGrapheme
+        ? {
+            ...fontStyle,
+            ...this._getStyleDeclaration(lineIndex, charIndex - 1),
+          }
+        : undefined,
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
       width = info.width,
