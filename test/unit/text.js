@@ -97,6 +97,8 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+    fontDecl = text._getFontDeclaration({ fontFamily: 'Arial' });
+    assert.equal(fontDecl, 'normal normal 40px \"Arial\"', 'passed style should take precedence');
   });
 
   QUnit.test('_getFontDeclaration with coma', function(assert) {
