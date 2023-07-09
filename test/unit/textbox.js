@@ -97,8 +97,7 @@
     var textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
     assert.equal(textbox.constructor.type, 'Textbox');
-    assert.deepEqual(textbox.styles, { });
-    assert.ok(fabric.Textbox.cacheProperties.indexOf('width') > -1, 'width is in cacheProperties');
+    assert.ok(fabric.Textbox.cacheProperties.includes('width'), 'width is in cacheProperties');
   });
 
   QUnit.test('toObject with styles', function(assert) {
@@ -229,28 +228,6 @@
     assert.equal(textbox.isEndOfWrapping(3), false, 'line 3 is not end of wrapping');
     assert.equal(textbox.isEndOfWrapping(4), false, 'line 4 is not end of wrapping');
     assert.equal(textbox.isEndOfWrapping(5), true, 'last line is end of wrapping');
-  });
-
-  QUnit.skip('_removeExtraneousStyles', function(assert) {
-    var textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
-      width: 40,
-      styles: {
-        0: { 0: { fontSize: 4 } },
-        1: { 0: { fontSize: 4 } },
-        2: { 0: { fontSize: 4 } },
-        3: { 0: { fontSize: 4 } },
-        4: { 0: { fontSize: 4 } },
-        5: { 0: { fontSize: 4 } },
-      }
-    });
-    assert.deepEqual(textbox.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
-    assert.deepEqual(textbox.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
-    assert.deepEqual(textbox.styles[5], { 0: { fontSize: 4 } }, 'style line 5 exists');
-    textbox._removeExtraneousStyles();
-    assert.equal(textbox.styles[2], undefined, 'style line 2 has been removed');
-    assert.equal(textbox.styles[3], undefined, 'style line 3 has been removed');
-    assert.equal(textbox.styles[4], undefined, 'style line 4 has been removed');
-    assert.equal(textbox.styles[5], undefined, 'style line 5 has been removed');
   });
 
   QUnit.test('wrapping with charspacing', function(assert) {

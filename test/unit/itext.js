@@ -74,7 +74,6 @@
 
       assert.equal(iText.text, 'test');
       assert.equal(iText.constructor.type, 'IText');
-      assert.deepEqual(iText.styles, { });
     });
 
     QUnit.test('fromObject', function(assert) {
@@ -519,53 +518,6 @@
       ]);
     });
 
-    QUnit.test('setSelectionStyles', function(assert) {
-      var iText = new fabric.IText('test foo bar-baz\nqux', {
-        styles: {
-          0: {
-            0: { fill: '#112233' },
-            2: { stroke: '#223344' }
-          }
-        }
-      });
-
-      assert.equal(typeof iText.setSelectionStyles, 'function');
-
-      iText.setSelectionStyles({
-        fill: 'red',
-        stroke: 'yellow'
-      });
-
-      assert.deepEqual(iText.styles[0][0], {
-        fill: '#112233'
-      });
-
-      iText.selectionEnd = 0;
-      iText.selectionEnd = 1;
-      iText.setSelectionStyles({
-        fill: 'red',
-        stroke: 'yellow'
-      });
-
-      assert.deepEqual(iText.styles[0][0], {
-        fill: 'red',
-        stroke: 'yellow'
-      });
-
-      iText.selectionStart = 2;
-      iText.selectionEnd = 3;
-
-      iText.setSelectionStyles({
-        fill: '#998877',
-        stroke: 'yellow'
-      });
-
-      assert.deepEqual(iText.styles[0][2], {
-        fill: '#998877',
-        stroke: 'yellow'
-      });
-    });
-
     QUnit.skip('getCurrentCharFontSize', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux', {
         styles: {
@@ -680,21 +632,6 @@
       iText.enterEditing();
       assert.equal(iText.hiddenTextarea.wrap, 'off', 'HiddenTextarea needs wrap off attribute');
       iText.abortCursorAnimation();
-    });
-
-    QUnit.test('_removeExtraneousStyles', function(assert) {
-      var iText = new fabric.IText('a\nq\qo', { styles: {
-        0: { 0: { fontSize: 4 } },
-        1: { 0: { fontSize: 4 } },
-        2: { 0: { fontSize: 4 } },
-        3: { 0: { fontSize: 4 } },
-        4: { 0: { fontSize: 4 } },
-      } });
-      assert.deepEqual(iText.styles[3], { 0: { fontSize: 4 } }, 'style line 3 exists');
-      assert.deepEqual(iText.styles[4], { 0: { fontSize: 4 } }, 'style line 4 exists');
-      iText._removeExtraneousStyles();
-      assert.equal(iText.styles[3], undefined, 'style line 3 has been removed');
-      assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
     });
 
     QUnit.test('dispose', function (assert) {
