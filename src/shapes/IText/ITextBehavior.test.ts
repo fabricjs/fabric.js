@@ -2,108 +2,72 @@ import { IText } from './IText';
 
 export function matchTextStateSnapshot(text: IText) {
   const {
-    styleManager,
+    styles,
     _text: t,
     _textLines: lines,
     __charBounds: charBounds,
   } = text;
 
   expect({
-    styles: styleManager.slice(),
+    styles,
     text: t,
     lines,
     charBounds,
   }).toMatchSnapshot();
-  expect(styleManager.slice()).toHaveLength(t.length);
   text.includeDefaultValues = false;
   expect(text.toObject()).toMatchSnapshot();
 }
 
+function create() {
+  return IText.fromObject<any, IText>({
+    text: 'test',
+    fontSize: 25,
+    styles: [
+      { fill: 'red' },
+      { fill: 'yellow' },
+      { fill: 'blue' },
+      { fill: 'green' },
+    ].map((style, index) => ({ style, start: index, end: index + 1 })),
+  });
+}
+
 describe('text imperative changes', () => {
-  it('removeChars', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('removeChars', async () => {
+    const iText = await create();
     iText.removeChars(1, 3);
     expect(iText.text).toBe('tt');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('insertChars', async () => {
+    const iText = await create();
     iText.insertChars('ab', undefined, 1);
     expect(iText.text).toBe('tabest');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('insertChars and removes chars', async () => {
+    const iText = await create();
     iText.insertChars('ab', undefined, 1, 2);
     expect(iText.text).toBe('tabst');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('insertChars and removes chars', async () => {
+    const iText = await create();
     iText.insertChars('ab', undefined, 1, 4);
     expect(iText.text).toBe('tab');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars handles new lines correctly', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('insertChars handles new lines correctly', async () => {
+    const iText = await create();
     iText.insertChars('ab\n\n', undefined, 1);
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars can accept some style for the new text', () => {
-    const iText = new IText('test', {
-      fontSize: 25,
-      styles: [
-        { fill: 'red' },
-        { fill: 'yellow' },
-        { fill: 'blue' },
-        { fill: 'green' },
-      ],
-    });
+  it('insertChars can accept some style for the new text', async () => {
+    const iText = await create();
     iText.insertChars(
       'ab\n\na',
       [

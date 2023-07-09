@@ -5,9 +5,9 @@ describe('Textbox', () => {
     const textbox = await Textbox.fromObject({
       text: 'The quick \nbrown \nfox',
     });
-    expect(textbox).toMatchSnapshot();
+    expect(textbox.toObject()).toMatchSnapshot();
     textbox.includeDefaultValues = false;
-    expect(textbox).toMatchSnapshot();
+    expect(textbox.toObject()).toMatchSnapshot();
   });
 
   it('toObject with styles', () => {
@@ -78,7 +78,7 @@ describe('Textbox', () => {
       },
     });
     const textbox2 = await Textbox.fromObject(textbox.toObject());
-    expect(textbox2).toEqual(textbox.toObject());
+    expect(textbox2.toObject()).toEqual(textbox.toObject());
     expect(textbox2.styles !== textbox.styles).toBeTruthy();
     for (const a in textbox2.styles) {
       for (const b in textbox2.styles[a]) {
