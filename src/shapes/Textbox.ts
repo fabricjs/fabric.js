@@ -76,6 +76,7 @@ export class Textbox extends IText {
       this.width
     );
     this._textLines = graphemeLines;
+    this.textLines = graphemeLines.map((line) => line.join(''));
     this._endOfWrapping = endOfWrapping;
     super.initText();
   }
