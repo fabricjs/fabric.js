@@ -10,7 +10,7 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
-import { TextStyleDeclaration } from '../Text/TextStyles';
+import type { TextStyleDeclaration } from '../Text/TextStyles';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
