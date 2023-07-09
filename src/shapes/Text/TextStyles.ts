@@ -1,7 +1,10 @@
 import { pick } from '../../util';
 import { pickBy } from '../../util/misc/pick';
+import type { FontProps } from './constants';
 import { styleProperties, type StylePropertiesType } from './constants';
 import type { Text } from './Text';
+
+export type FontStyleDeclaration = Pick<Text, FontProps>;
 
 export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
 
