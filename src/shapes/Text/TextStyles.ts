@@ -81,15 +81,9 @@ export class TextStyles {
         });
       } else if (typeof styles === 'object') {
         // legacy styles
-        for (const lineIndex in styles) {
-          for (const charIndex in styles[lineIndex]) {
-            this.set({
-              lineIndex: Number(lineIndex),
-              charIndex: Number(charIndex),
-              style: { ...styles[lineIndex][charIndex] },
-            });
-          }
-        }
+        throw new Error(
+          'Sorry, Object Text Styles are not supported any more, see migration notes'
+        );
       }
     }
   }
