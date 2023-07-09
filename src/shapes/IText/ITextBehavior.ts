@@ -4,7 +4,7 @@ import type {
   TPointerEventInfo,
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
-import type { FabricObject } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
 import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
@@ -374,7 +374,7 @@ export abstract class ITextBehavior<
   /**
    * Enters editing state
    */
-  enterEditing(e: TPointerEvent) {
+  enterEditing(e?: TPointerEvent) {
     if (this.isEditing || !this.editable) {
       return;
     }
@@ -394,7 +394,7 @@ export abstract class ITextBehavior<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered', { e });
+    this.fire('editing:entered', e ? { e } : undefined);
     this._fireSelectionChanged();
     if (this.canvas) {
       // @ts-expect-error in reality it is an IText instance

@@ -45,14 +45,13 @@ export type LayoutContext = {
   [key: string]: any;
 };
 
-export type GroupEvents = ObjectEvents &
-  CollectionEvents & {
-    layout: {
-      context: LayoutContext;
-      result: LayoutResult;
-      diff: Point;
-    };
+export interface GroupEvents extends ObjectEvents, CollectionEvents {
+  layout: {
+    context: LayoutContext;
+    result: LayoutResult;
+    diff: Point;
   };
+}
 
 export type LayoutStrategy =
   | 'fit-content'
