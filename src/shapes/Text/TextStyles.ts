@@ -114,7 +114,7 @@ export class TextStyles {
   }
 
   slice(
-    start: number,
+    start = 0,
     end?: number,
     { uniq = false, complete = false }: StyleOptions = {}
   ) {
