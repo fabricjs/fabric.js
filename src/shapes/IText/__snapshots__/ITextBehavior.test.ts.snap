@@ -66,12 +66,20 @@ exports[`text imperative changes insertChars 1`] = `
     ],
   ],
   "styles": [
+    {
+      "fill": "red",
+    },
     {},
     {},
-    {},
-    {},
-    {},
-    {},
+    {
+      "fill": "yellow",
+    },
+    {
+      "fill": "blue",
+    },
+    {
+      "fill": "green",
+    },
   ],
   "text": [
     "t",
@@ -89,7 +97,36 @@ exports[`text imperative changes insertChars 2`] = `
   "fontSize": 25,
   "height": 28.25,
   "left": 0,
-  "styles": [],
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
   "text": "tabest",
   "top": 0,
   "type": "IText",
@@ -156,11 +193,17 @@ exports[`text imperative changes insertChars and removes chars 1`] = `
     ],
   ],
   "styles": [
+    {
+      "fill": "red",
+    },
     {},
     {},
-    {},
-    {},
-    {},
+    {
+      "fill": "blue",
+    },
+    {
+      "fill": "green",
+    },
   ],
   "text": [
     "t",
@@ -177,7 +220,29 @@ exports[`text imperative changes insertChars and removes chars 2`] = `
   "fontSize": 25,
   "height": 28.25,
   "left": 0,
-  "styles": [],
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
   "text": "tabst",
   "top": 0,
   "type": "IText",
@@ -228,7 +293,9 @@ exports[`text imperative changes insertChars and removes chars 3`] = `
     ],
   ],
   "styles": [
-    {},
+    {
+      "fill": "red",
+    },
     {},
     {},
   ],
@@ -245,7 +312,15 @@ exports[`text imperative changes insertChars and removes chars 4`] = `
   "fontSize": 25,
   "height": 28.25,
   "left": 0,
-  "styles": [],
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+  ],
   "text": "tab",
   "top": 0,
   "type": "IText",
@@ -349,7 +424,9 @@ exports[`text imperative changes insertChars can accept some style for the new t
     ],
   ],
   "styles": [
-    {},
+    {
+      "fill": "red",
+    },
     {
       "fill": "col1",
     },
@@ -365,9 +442,15 @@ exports[`text imperative changes insertChars can accept some style for the new t
     {
       "fill": "col5",
     },
-    {},
-    {},
-    {},
+    {
+      "fill": "yellow",
+    },
+    {
+      "fill": "blue",
+    },
+    {
+      "fill": "green",
+    },
   ],
   "text": [
     "t",
@@ -392,6 +475,13 @@ exports[`text imperative changes insertChars can accept some style for the new t
   "left": 0,
   "styles": [
     {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
       "end": 2,
       "start": 1,
       "style": {
@@ -410,6 +500,27 @@ exports[`text imperative changes insertChars can accept some style for the new t
       "start": 3,
       "style": {
         "fill": "col5",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 7,
+      "start": 6,
+      "style": {
+        "fill": "green",
       },
     },
   ],
@@ -510,14 +621,22 @@ exports[`text imperative changes insertChars handles new lines correctly 1`] = `
     ],
   ],
   "styles": [
+    {
+      "fill": "red",
+    },
     {},
     {},
     {},
     {},
-    {},
-    {},
-    {},
-    {},
+    {
+      "fill": "yellow",
+    },
+    {
+      "fill": "blue",
+    },
+    {
+      "fill": "green",
+    },
   ],
   "text": [
     "t",
@@ -539,7 +658,36 @@ exports[`text imperative changes insertChars handles new lines correctly 2`] = `
   "fontSize": 25,
   "height": 93.79,
   "left": 0,
-  "styles": [],
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
   "text": "tab
 
 est",
@@ -584,8 +732,12 @@ exports[`text imperative changes removeChars 1`] = `
     ],
   ],
   "styles": [
-    {},
-    {},
+    {
+      "fill": "red",
+    },
+    {
+      "fill": "green",
+    },
   ],
   "text": [
     "t",
@@ -599,7 +751,22 @@ exports[`text imperative changes removeChars 2`] = `
   "fontSize": 25,
   "height": 28.25,
   "left": 0,
-  "styles": [],
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 2,
+      "start": 1,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
   "text": "tt",
   "top": 0,
   "type": "IText",

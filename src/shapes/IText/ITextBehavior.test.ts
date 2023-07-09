@@ -23,7 +23,12 @@ describe('text imperative changes', () => {
   it('removeChars', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.removeChars(1, 3);
     expect(iText.text).toBe('tt');
@@ -33,7 +38,12 @@ describe('text imperative changes', () => {
   it('insertChars', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.insertChars('ab', undefined, 1);
     expect(iText.text).toBe('tabest');
@@ -43,7 +53,12 @@ describe('text imperative changes', () => {
   it('insertChars and removes chars', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.insertChars('ab', undefined, 1, 2);
     expect(iText.text).toBe('tabst');
@@ -53,7 +68,12 @@ describe('text imperative changes', () => {
   it('insertChars and removes chars', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.insertChars('ab', undefined, 1, 4);
     expect(iText.text).toBe('tab');
@@ -63,7 +83,12 @@ describe('text imperative changes', () => {
   it('insertChars handles new lines correctly', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.insertChars('ab\n\n', undefined, 1);
     matchTextStateSnapshot(iText);
@@ -72,7 +97,12 @@ describe('text imperative changes', () => {
   it('insertChars can accept some style for the new text', () => {
     const iText = new IText('test', {
       fontSize: 25,
-      styles: [{ fill: 'red' }, { fill: 'blue' }],
+      styles: [
+        { fill: 'red' },
+        { fill: 'yellow' },
+        { fill: 'blue' },
+        { fill: 'green' },
+      ],
     });
     iText.insertChars(
       'ab\n\na',
