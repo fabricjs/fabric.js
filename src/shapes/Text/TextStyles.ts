@@ -99,7 +99,7 @@ export class TextStyles {
     const lines = this.getLines();
     let total = 0;
     for (let index = 0; index < lineIndex; index++) {
-      total += lines[index].length;
+      total += lines[index].length + Number(this.target._endOfWrapping[index]);
     }
     return total + charIndex;
   }
