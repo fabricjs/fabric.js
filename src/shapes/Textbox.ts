@@ -89,11 +89,7 @@ export class Textbox extends IText {
   initDimensions() {
     // clear dynamicMinWidth as it will be different after we re-wrap line
     this.dynamicMinWidth = 0;
-    // if (!this.initialized) {
-    //   return;
-    // }
     super.initDimensions();
-    this.isEditing && this.initDelayedCursor();
   }
 
   setDimensionsAfterLayout() {
@@ -120,16 +116,14 @@ export class Textbox extends IText {
    */
   _wrapText(lines: string[], desiredWidth: number) {
     this.isWrapping = true;
-    // extract all thewords and the widths to optimally wrap lines.
+    // extract all the words and the widths to optimally wrap lines.
     const wordsData = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
     const state: boolean[] = [];
-    // const map: { lineIndex: number; charIndex: number }[] = [];
     for (let i = 0; i < lines.length; i++) {
       const wrappedLine = this._wrapLine(i, desiredWidth, wordsData);
       wrapped.push(...wrappedLine);
       state.push(...new Array(wrappedLine.length - 1).fill(false), true);
-      // wrappedLine.forEach((c,j)=>map.push({lineIndex:i+j}))
     }
     this.isWrapping = false;
     return { value: wrapped, state };
