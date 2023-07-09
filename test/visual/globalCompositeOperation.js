@@ -2,8 +2,6 @@
 // based on https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations
 // source https://github.com/mdn/content/blob/main/files/en-us/web/api/canvas_api/tutorial/compositing/example/index.md
 
-const { create } = require("lodash");
-
 /**
  * @type GlobalCompositeOperation
  */
