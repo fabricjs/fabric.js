@@ -42,7 +42,7 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
-import { FabricObject } from '../shapes/Object/Object';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1218,11 +1218,13 @@ export class StaticCanvas<
         if (isFiller(fill)) {
           const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
-            object = new FabricObject({
+            object = {
+              // otherwise circular dependency
+              isType: () => false,
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
-            });
-          return fill.toSVG(object, {
+            };
+          return fill.toSVG(object as FabricObject, {
             additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
           });
         }
