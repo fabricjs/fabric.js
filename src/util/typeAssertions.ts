@@ -10,7 +10,7 @@ import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
-import { Path } from 'fabric/node';
+import type { Path } from '../shapes/Path';
 
 export const isFiller = (
   filler: TFiller | string | null
