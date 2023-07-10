@@ -1414,7 +1414,7 @@ export class StaticCanvas<
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      enlivenObjects(objects, {
+      enlivenObjects<FabricObject>(objects, {
         reviver,
         signal,
       }),
