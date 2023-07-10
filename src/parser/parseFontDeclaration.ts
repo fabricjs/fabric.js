@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { parseUnit } from '../util/misc/svgParsing';
 import { reFontDeclaration } from './constants';
 
@@ -10,7 +9,10 @@ import { reFontDeclaration } from './constants';
  * @param {String} value font declaration
  * @param {Object} oStyle definition
  */
-export function parseFontDeclaration(value, oStyle) {
+export function parseFontDeclaration(
+  value: string,
+  oStyle: Record<string, any>
+): void {
   const match = value.match(reFontDeclaration);
 
   if (!match) {

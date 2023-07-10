@@ -1,4 +1,7 @@
-export function getMultipleNodes(doc: HTMLElement, nodeNames: string[]) {
+export function getMultipleNodes(
+  doc: Document,
+  nodeNames: string[]
+): Element[] {
   let nodeName,
     nodeArray: Element[] = [],
     nodeList,

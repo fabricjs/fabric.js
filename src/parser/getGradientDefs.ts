@@ -13,13 +13,12 @@ const tagArray = [
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
-export function getGradientDefs(doc: HTMLElement): Record<string, Element> {
+export function getGradientDefs(doc: Document): Record<string, Element> {
   const elList = getMultipleNodes(doc, tagArray);
-  let el;
   const gradientDefs: Record<string, Element> = {};
   let j = elList.length;
   while (j--) {
-    el = elList[j];
+    const el = elList[j];
     if (el.getAttribute('xlink:href')) {
       recursivelyParseGradientsXlink(doc, el);
     }
