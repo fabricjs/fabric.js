@@ -7,7 +7,6 @@ import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
-import type { Rect } from '../shapes/Rect';
 import type {
   Abortable,
   Constructor,
@@ -43,7 +42,7 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import { FabricObject } from '../shapes/Object/Object';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -1219,11 +1218,11 @@ export class StaticCanvas<
         if (isFiller(fill)) {
           const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
-            object = {
+            object = new FabricObject({
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
-            };
-          return fill.toSVG(object as Rect, {
+            });
+          return fill.toSVG(object, {
             additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
           });
         }
