@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 import { getMultipleNodes } from './getMultipleNodes';
 import { recursivelyParseGradientsXlink } from './recursivelyParseGradientsXlink';
 
@@ -15,17 +13,20 @@ const tagArray = [
  * @param {SVGDocument} doc SVG document to parse
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
-export function getGradientDefs(doc) {
+export function getGradientDefs(doc: HTMLElement): Record<string, Element> {
   const elList = getMultipleNodes(doc, tagArray);
   let el;
-  const gradientDefs = {};
+  const gradientDefs: Record<string, Element> = {};
   let j = elList.length;
   while (j--) {
     el = elList[j];
     if (el.getAttribute('xlink:href')) {
       recursivelyParseGradientsXlink(doc, el);
     }
-    gradientDefs[el.getAttribute('id')] = el;
+    const id = el.getAttribute('id');
+    if (id) {
+      gradientDefs[id] = el;
+    }
   }
   return gradientDefs;
 }

@@ -1,15 +1,16 @@
-//@ts-nocheck
-
-export function getMultipleNodes(doc, nodeNames) {
+export function getMultipleNodes(doc: HTMLElement, nodeNames: string[]) {
   let nodeName,
-    nodeArray = [],
+    nodeArray: Element[] = [],
     nodeList,
     i,
     len;
   for (i = 0, len = nodeNames.length; i < len; i++) {
     nodeName = nodeNames[i];
-    nodeList = doc.getElementsByTagName(nodeName);
-    nodeArray = nodeArray.concat(Array.prototype.slice.call(nodeList));
+    nodeList = doc.getElementsByTagNameNS(
+      'http://www.w3.org/2000/svg',
+      nodeName
+    );
+    nodeArray = nodeArray.concat(Array.from(nodeList));
   }
   return nodeArray;
 }
