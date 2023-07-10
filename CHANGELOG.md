@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(TS) remove more ts-nocheck, low hanging fruits [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
+- chore(TS) Add more type-checking to excluded files [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)
 - chore(TS): Image class type checks, BREAKING change to FromURL static method [#9036](https://github.com/fabricjs/fabric.js/pull/9036)
 - ci(): properly checkout head for stats [#9080](https://github.com/fabricjs/fabric.js/pull/9080)
