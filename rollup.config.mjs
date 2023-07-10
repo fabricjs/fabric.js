@@ -18,6 +18,7 @@ const plugins = [
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig.json',
+    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
     extensions: ['.ts', '.js'],
