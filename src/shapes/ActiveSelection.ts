@@ -136,8 +136,9 @@ export class ActiveSelection extends Group {
 
   _applyLayoutStrategy(context: LayoutContext): void {
     super._applyLayoutStrategy(context);
-    // in this case layout was skipped
     if (this._objects.length === 0) {
+      // in this case layout was skipped
+      // we reset transform for the next selection
       Object.assign(this, {
         left: 0,
         top: 0,
