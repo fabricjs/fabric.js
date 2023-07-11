@@ -10,15 +10,23 @@ describe('ActiveSelection', () => {
       height: 100,
     });
     const selection = new ActiveSelection([obj], {
-      left: 1,
-      top: 1,
+      left: 200,
+      top: 200,
       angle: 45,
+      skewX: 0.5,
+      skewY: -0.5,
     });
     expect(selection.removeAll()).toEqual([obj]);
     expect(selection).toMatchObject({
       left: 0,
       top: 0,
       angle: 0,
+      scaleX: 0,
+      scaleY: 0,
+      skewX: 0,
+      skewY: 0,
+      flipX: false,
+      flipY: false,
     });
   });
 

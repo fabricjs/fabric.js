@@ -126,7 +126,17 @@ export class ActiveSelection extends Group {
 
   removeAll() {
     const removed = super.removeAll();
-    this.set({ left: 0, top: 0, angle: 0 });
+    this.set({
+      left: 0,
+      top: 0,
+      angle: 0,
+      scaleX: 0,
+      scaleY: 0,
+      skewX: 0,
+      skewY: 0,
+      flipX: false,
+      flipY: false,
+    });
     return removed;
   }
 
