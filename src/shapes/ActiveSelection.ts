@@ -124,6 +124,12 @@ export class ActiveSelection extends Group {
     }
   }
 
+  removeAll() {
+    const removed = super.removeAll();
+    this.set({ left: 0, top: 0, angle: 0 });
+    return removed;
+  }
+
   /**
    * If returns true, deselection is cancelled.
    * @since 2.0.0
