@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(ActiveSelection): reset positioning on `removeAll` [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
+- fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
 - fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)
 - chore(TS): Image class type checks, BREAKING change to FromURL static method [#9036](https://github.com/fabricjs/fabric.js/pull/9036)
