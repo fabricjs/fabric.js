@@ -1,6 +1,6 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import { Group } from './Group';
+import { Group, LayoutContext } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
@@ -124,22 +124,6 @@ export class ActiveSelection extends Group {
     }
   }
 
-  removeAll() {
-    const removed = super.removeAll();
-    this.set({
-      left: 0,
-      top: 0,
-      angle: 0,
-      scaleX: 0,
-      scaleY: 0,
-      skewX: 0,
-      skewY: 0,
-      flipX: false,
-      flipY: false,
-    });
-    return removed;
-  }
-
   /**
    * If returns true, deselection is cancelled.
    * @since 2.0.0
@@ -148,6 +132,24 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
+  }
+
+  _applyLayoutStrategy(context: LayoutContext): void {
+    super._applyLayoutStrategy(context);
+    // in this case layout was skipped
+    if (this._objects.length === 0) {
+      Object.assign(this, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        flipX: false,
+        flipY: false,
+      });
+    }
   }
 
   /**
