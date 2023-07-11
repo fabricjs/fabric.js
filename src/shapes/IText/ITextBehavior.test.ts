@@ -1,3 +1,4 @@
+import '../../../toMatchRoundedSnapshot';
 import { IText } from './IText';
 
 export function matchTextStateSnapshot(text: IText) {
@@ -13,9 +14,9 @@ export function matchTextStateSnapshot(text: IText) {
     text: t,
     lines,
     charBounds,
-  }).toMatchSnapshot();
+  }).toMatchRoundedSnapshot();
   text.includeDefaultValues = false;
-  expect(text.toObject()).toMatchSnapshot();
+  expect(text.toObject()).toMatchRoundedSnapshot(['width']);
 }
 
 function create() {

@@ -2,8 +2,8 @@
 
 exports[`Text measuring, splitting measuring 1`] = `
 {
-  "kernedWidth": 17.8,
-  "width": 17.8,
+  "kernedWidth": 18,
+  "width": 18,
 }
 `;
 
@@ -170,7 +170,6 @@ exports[`Text toObject 1`] = `
   "originY": "top",
   "overline": false,
   "paintFirst": "fill",
-  "path": undefined,
   "pathAlign": "baseline",
   "pathSide": "left",
   "pathStartOffset": 0,

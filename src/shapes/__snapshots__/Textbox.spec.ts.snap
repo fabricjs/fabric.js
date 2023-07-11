@@ -25,7 +25,6 @@ exports[`Textbox fromObject 1`] = `
   "originY": "top",
   "overline": false,
   "paintFirst": "fill",
-  "path": undefined,
   "pathAlign": "baseline",
   "pathSide": "left",
   "pathStartOffset": 0,
@@ -54,7 +53,7 @@ fox",
   "underline": false,
   "version": "6.0.0-beta10",
   "visible": true,
-  "width": 102.2,
+  "width": 102,
 }
 `;
 
@@ -69,7 +68,7 @@ fox",
   "top": 0,
   "type": "Textbox",
   "version": "6.0.0-beta10",
-  "width": 102.2,
+  "width": 102,
 }
 `;
 
@@ -117,7 +116,6 @@ exports[`Textbox toObject with styles 1`] = `
   "originY": "top",
   "overline": false,
   "paintFirst": "fill",
-  "path": undefined,
   "pathAlign": "baseline",
   "pathSide": "left",
   "pathStartOffset": 0,

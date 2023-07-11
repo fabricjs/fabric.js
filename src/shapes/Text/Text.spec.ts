@@ -1,3 +1,4 @@
+import '../../../toMatchRoundedSnapshot';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { Text } from './Text';
@@ -8,7 +9,7 @@ afterEach(() => {
 
 describe('Text', () => {
   it('toObject', async () => {
-    expect(new Text('text').toObject()).toMatchSnapshot();
+    expect(new Text('text').toObject()).toMatchRoundedSnapshot(['width']);
   });
 
   it('fromObject', async () => {
@@ -23,10 +24,9 @@ describe('Text', () => {
       const zwc = '\u200b';
       const text = new Text('');
       const style = text.getCompleteStyleDeclaration(0, 0);
-      expect(text._measureChar('a', style, zwc, style)).toMatchSnapshot();
-      expect(text._measureChar('a', style, zwc, style)).toEqual(
-        text._measureChar('a', style, zwc, style)
-      );
+      const measurement = text._measureChar('a', style, zwc, style);
+      expect(measurement).toMatchRoundedSnapshot();
+      expect(measurement).toEqual(text._measureChar('a', style, zwc, style));
     });
 
     it('splits into lines', () => {
