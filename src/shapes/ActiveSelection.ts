@@ -1,6 +1,7 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import { Group, LayoutContext } from './Group';
+import type { GroupProps, LayoutContext } from './Group';
+import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
 export class ActiveSelection extends Group {
@@ -21,7 +22,7 @@ export class ActiveSelection extends Group {
 
   constructor(
     objects?: FabricObject[],
-    options?: any,
+    options?: Partial<GroupProps>,
     objectsRelativeToGroup?: boolean
   ) {
     super(objects, options, objectsRelativeToGroup);
