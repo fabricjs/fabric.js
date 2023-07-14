@@ -11,8 +11,10 @@ export class TestUtil {
     return this.page.click('canvas.upper-canvas', clickProperties);
   }
 
-  screenshot(options?: LocatorScreenshotOptions) {
-    return this.page.locator('canvas.upper-canvas').screenshot(options);
+  screenshot(options: LocatorScreenshotOptions = {}) {
+    return this.page
+      .locator('[data-fabric="wrapper"]')
+      .screenshot({ omitBackground: true, ...options });
   }
 
   async addTextbox(text: string, properties) {
