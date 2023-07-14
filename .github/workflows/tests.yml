@@ -132,7 +132,7 @@ jobs:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
   coverage:
-    needs: [node-coverage]
+    needs: [node-coverage, e2e]
     name: Coverage reporting
     runs-on: ubuntu-latest
     steps:
