@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { TestUtil } from '../../utils/TestUtil';
-import '../../utils/coverageReporter';
+import '../../utils/setupTest';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
