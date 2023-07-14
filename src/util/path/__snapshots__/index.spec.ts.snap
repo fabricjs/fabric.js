@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Path Utils getPathSegmentsInfo operates as expected 1`] = `
+[
+  {
+    "command": "M",
+    "length": 0,
+    "x": 50,
+    "y": 50,
+  },
+  {
+    "angleFinder": [Function],
+    "command": "Q",
+    "iterator": [Function],
+    "length": 35.35533905932738,
+    "x": 50,
+    "y": 50,
+  },
+  {
+    "angleFinder": [Function],
+    "command": "Q",
+    "iterator": [Function],
+    "length": 80.4908603478418,
+    "x": 75,
+    "y": 75,
+  },
+  {
+    "angleFinder": [Function],
+    "command": "Q",
+    "iterator": [Function],
+    "length": 174.94631067949948,
+    "x": 75,
+    "y": 150,
+  },
+  {
+    "angleFinder": [Function],
+    "command": "Q",
+    "iterator": [Function],
+    "length": 301.55412388505005,
+    "x": 225,
+    "y": 175,
+  },
+  {
+    "command": "L",
+    "length": 182.00274723201295,
+    "x": 450,
+    "y": 325,
+  },
+  {
+    "length": 774.3493812037316,
+    "x": 500,
+    "y": 500,
+  },
+]
+`;

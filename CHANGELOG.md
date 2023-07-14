@@ -3,6 +3,11 @@
 ## [next]
 
 - test(playwright): add snapshots, refactor utils [#9078](https://github.com/fabricjs/fabric.js/pull/9078)
+- ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
+- fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)
+- chore(TS): Image class type checks, BREAKING change to FromURL static method [#9036](https://github.com/fabricjs/fabric.js/pull/9036)
+- ci(): properly checkout head for stats [#9080](https://github.com/fabricjs/fabric.js/pull/9080)
+- fix(Text): `_getFontDeclaration` wasn't considering fontFamily from the style object [#9082](https://github.com/fabricjs/fabric.js/pull/9082)
 - chore(TS): Fix ITextBehaviour enterEditing type [#9075](https://github.com/fabricjs/fabric.js/pull/9075)
 - chore(TS): export FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
 - chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)

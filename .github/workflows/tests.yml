@@ -16,7 +16,7 @@ jobs:
         uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
   node-coverage:
@@ -35,7 +35,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests with coverage
@@ -86,7 +86,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-          install-system-deps: true
+          install-system-deps: ${{ matrix.node-version }} == '20.x'
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
@@ -99,7 +99,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 18.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Jest unit test
         run: npm run test:jest:coverage
       - name: Upload test coverage
