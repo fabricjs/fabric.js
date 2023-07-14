@@ -116,10 +116,16 @@ jobs:
       - uses: ./.github/actions/cached-install
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - name: Run playwright tests
-        run: |
-          npx playwright install
-          xvfb-run npm run test:e2e
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
   coverage:
     needs: [node-coverage]
     name: Coverage reporting
