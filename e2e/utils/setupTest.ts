@@ -7,8 +7,12 @@ import v8toIstanbul from 'v8-to-istanbul';
 
 const coverageStore: CoverageMapData[] = [];
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   await page.coverage.startJSCoverage({ reportAnonymousScripts: false });
+  // fix snapshot names so they are cross platform
+  // https://github.com/microsoft/playwright/issues/7575#issuecomment-1240566545
+  testInfo.snapshotPath = (name: string) =>
+    `${testInfo.file}-snapshots/${path.basename(name, '.png')}.png`;
 });
 
 test.afterEach(async ({ page }, { outputDir }) => {

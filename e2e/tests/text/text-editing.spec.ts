@@ -11,7 +11,7 @@ test('textbox typing and resizing', async ({ page }) => {
   });
   const textCenter = await textboxUtil.getObjectCenter();
 
-  expect(await page.screenshot()).toMatchSnapshot({ name: 'initial.png' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'initial' });
 
   await util.clickCanvas({
     position: textCenter,
@@ -19,7 +19,7 @@ test('textbox typing and resizing', async ({ page }) => {
     delay: 200,
   });
 
-  expect(await page.screenshot()).toMatchSnapshot({ name: 'start.png' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'start' });
 
   await page
     .locator('textarea')
@@ -30,7 +30,7 @@ test('textbox typing and resizing', async ({ page }) => {
       }
     );
 
-  expect(await page.screenshot()).toMatchSnapshot({ name: 'typed.png' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'typed' });
 
   const mrControlPoint = await textboxUtil.getObjectControlPoint('mr');
 
@@ -43,7 +43,7 @@ test('textbox typing and resizing', async ({ page }) => {
     clickCount: 1,
     delay: 200,
   });
-  expect(await page.screenshot()).toMatchSnapshot({ name: 'exit_editing.png' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'exit_editing' });
 
   // click the object to select it
   await util.clickCanvas({
@@ -56,16 +56,16 @@ test('textbox typing and resizing', async ({ page }) => {
   await page.mouse.move(mrControlPoint.x + 300, mrControlPoint.y, {
     steps: 40,
   });
-  expect(await page.screenshot()).toMatchSnapshot({
-    name: 'increase_width_mr.png',
+  expect(await util.screenshot()).toMatchSnapshot({
+    name: 'increase_width_mr',
   });
   // drag in the opposite direction
   await page.mouse.move(mrControlPoint.x - 300, mrControlPoint.y, {
     steps: 60,
   });
   await page.mouse.up();
-  expect(await page.screenshot()).toMatchSnapshot({
-    name: 'decrease_width_mr.png',
+  expect(await util.screenshot()).toMatchSnapshot({
+    name: 'decrease_width_mr',
   });
 
   // drag the ml control
@@ -75,15 +75,15 @@ test('textbox typing and resizing', async ({ page }) => {
   await page.mouse.move(mlControlPoint.x - 300, mlControlPoint.y, {
     steps: 40,
   });
-  expect(await page.screenshot()).toMatchSnapshot({
-    name: 'increase_width_ml.png',
+  expect(await util.screenshot()).toMatchSnapshot({
+    name: 'increase_width_ml',
   });
   // drag in the opposite direction
   await page.mouse.move(mlControlPoint.x + 300, mlControlPoint.y, {
     steps: 60,
   });
   await page.mouse.up();
-  expect(await page.screenshot()).toMatchSnapshot({
-    name: 'decrease_width_ml.png',
+  expect(await util.screenshot()).toMatchSnapshot({
+    name: 'decrease_width_ml',
   });
 });

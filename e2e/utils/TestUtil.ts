@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { LocatorScreenshotOptions, Page } from '@playwright/test';
 import { ObjectUtil } from './ObjectUtil';
 
 let ID = 0;
@@ -9,6 +9,10 @@ export class TestUtil {
 
   clickCanvas(clickProperties: Parameters<Page['click']>[1]) {
     return this.page.click('canvas.upper-canvas', clickProperties);
+  }
+
+  screenshot(options?: LocatorScreenshotOptions) {
+    return this.page.locator('canvas.upper-canvas').screenshot(options);
   }
 
   async addTextbox(text: string, properties) {
