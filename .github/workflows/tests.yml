@@ -116,6 +116,12 @@ jobs:
       - uses: ./.github/actions/cached-install
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: playwright
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
