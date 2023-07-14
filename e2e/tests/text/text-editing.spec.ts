@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { TestUtil } from '../../utils/TestUtil';
+import '../../utils/coverageReporter';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
@@ -25,7 +26,7 @@ test('textbox typing and resizing', async ({ page }) => {
     .type(
       'insert text in a textbox from the keyboard will wrap text on current textbox width',
       {
-        delay: 160,
+        // delay: 160,
       }
     );
 

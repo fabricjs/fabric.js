@@ -126,6 +126,11 @@ jobs:
         with:
           name: e2e-report
           path: ./e2e/test-report/
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-e2e
+          path: ./e2e/test-results/**/coverage.json
   coverage:
     needs: [node-coverage]
     name: Coverage reporting
@@ -143,6 +148,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-visual
+          path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-e2e
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
