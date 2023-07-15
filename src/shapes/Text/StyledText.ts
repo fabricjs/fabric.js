@@ -23,6 +23,9 @@ export abstract class StyledText<
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
+  /**
+   * correlates to unwrapped lines
+   */
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
   protected declare _forceClearCache: boolean;
