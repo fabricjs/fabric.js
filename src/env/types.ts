@@ -3,7 +3,7 @@ import type { DOMWindow } from 'jsdom';
 
 export type TCopyPasteData = {
   copiedText?: string;
-  copiedStyle?: Record<string, string>;
+  copiedTextStyle?: Record<string, string>;
 };
 export type TFabricEnv = {
   document: Document;

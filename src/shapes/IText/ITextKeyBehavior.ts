@@ -157,112 +157,145 @@ export abstract class ITextKeyBehavior<
     this.canvas && this.canvas.requestRenderAll();
   }
 
-  /**
-   * Handles onInput event
-   * @param {Event} e Event object
-   */
-  onInput(e: Event) {
-    const fromPaste = this.fromPaste;
-    this.fromPaste = false;
-    e && e.stopPropagation();
-    if (!this.isEditing) {
-      return;
-    }
-    const updateAndFire = () => {
-      this.updateFromTextArea();
-      this.fire('changed');
-      if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
-        this.canvas.requestRenderAll();
-      }
-    };
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-      updateAndFire();
-      return;
-    }
-    // decisions about style changes.
-    const nextText = this._splitTextIntoLines(
-        this.hiddenTextarea.value
-      ).graphemeText,
-      charCount = this._text.length,
-      nextCharCount = nextText.length,
-      selectionStart = this.selectionStart,
-      selectionEnd = this.selectionEnd,
-      selection = selectionStart !== selectionEnd;
-    let copiedStyle,
-      removedText,
-      charDiff = nextCharCount - charCount,
-      removeFrom,
-      removeTo;
-
-    const textareaSelection = this.fromStringToGraphemeSelection(
+  getDiffFromInputEvent({ inputType }: InputEvent) {
+    // selection diff
+    const {
+      selectionStart: prevSelectionStart,
+      selectionEnd: prevSelectionEnd,
+    } = this;
+    const {
+      selectionStart: nextSelectionStart,
+      selectionEnd: nextSelectionEnd,
+    } = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
       this.hiddenTextarea.selectionEnd,
       this.hiddenTextarea.value
     );
-    const backDelete = selectionStart > textareaSelection.selectionStart;
-
-    if (selection) {
-      removedText = this._text.slice(selectionStart, selectionEnd);
-      charDiff += selectionEnd - selectionStart;
-    } else if (nextCharCount < charCount) {
-      if (backDelete) {
-        removedText = this._text.slice(selectionEnd + charDiff, selectionEnd);
-      } else {
-        removedText = this._text.slice(
-          selectionStart,
-          selectionStart - charDiff
-        );
-      }
+    let removedFrom: number, removedTo: number;
+    if (prevSelectionStart === prevSelectionEnd) {
+      const delta =
+        inputType === 'deleteContentBackward'
+          ? -1
+          : inputType === 'deleteContentForward'
+          ? 1
+          : 0;
+      removedFrom = Math.min(prevSelectionStart, prevSelectionStart + delta);
+      removedTo = Math.max(prevSelectionStart, prevSelectionStart + delta);
+    } else {
+      removedFrom = prevSelectionStart;
+      removedTo = prevSelectionEnd;
     }
+    // text diff
+    const prevText = this._text.slice(),
+      { graphemeText: nextText } = this._splitTextIntoLines(
+        this.hiddenTextarea.value
+      );
+    const charDiff =
+      nextText.length -
+      prevText.length +
+      (prevSelectionEnd - prevSelectionStart);
+    const removedText = prevText.slice(removedFrom, removedTo);
     const insertedText = nextText.slice(
-      textareaSelection.selectionEnd - charDiff,
-      textareaSelection.selectionEnd
+      nextSelectionEnd - charDiff,
+      nextSelectionEnd
     );
-    if (removedText && removedText.length) {
-      if (insertedText.length) {
-        // let's copy some style before deleting.
-        // we want to copy the style before the cursor OR the style at the cursor if selection
-        // is bigger than 0.
-        copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
-          false
-        );
-        // now duplicate the style one for each inserted text.
-        copiedStyle = insertedText.map(
-          () =>
-            // this return an array of references, but that is fine since we are
-            // copying the style later.
-            copiedStyle[0]
-        );
-      }
-      if (selection) {
-        removeFrom = selectionStart;
-        removeTo = selectionEnd;
-      } else if (backDelete) {
-        // detect differences between forwardDelete and backDelete
-        removeFrom = selectionEnd - removedText.length;
-        removeTo = selectionEnd;
-      } else {
-        removeFrom = selectionEnd;
-        removeTo = selectionEnd + removedText.length;
-      }
-      this.removeStyleFromTo(removeFrom, removeTo);
+    // get styles from event
+    let stylesToAdd: TextStyleDeclaration[] = [];
+    const { copyPasteData } = getEnv();
+    if (
+      this.fromPaste &&
+      !config.disableStyleCopyPaste &&
+      copyPasteData.copiedTextStyle &&
+      insertedText.join('') === copyPasteData.copiedText
+    ) {
+      stylesToAdd = copyPasteData.copiedTextStyle;
+    } else if (
+      inputType !== 'deleteContentBackward' &&
+      inputType !== 'deleteContentForward'
+    ) {
+      const selectionStartStyle = this.getStyleAtPosition(
+        Math.max(0, prevSelectionStart - 1)
+      );
+      stylesToAdd = new Array(insertedText.length).fill().map(() => ({
+        ...selectionStartStyle,
+      }));
     }
-    if (insertedText.length) {
-      const { copyPasteData } = getEnv();
-      if (
-        fromPaste &&
-        insertedText.join('') === copyPasteData.copiedText &&
-        !config.disableStyleCopyPaste
+    // diff
+    return {
+      before: {
+        selectionStart: prevSelectionStart,
+        selectionEnd: prevSelectionEnd,
+        value: prevText,
+      },
+      after: {
+        selectionStart: nextSelectionStart,
+        selectionEnd: nextSelectionEnd,
+        value: nextText,
+      },
+      diff: {
+        index: removedFrom,
+        removed: removedText,
+        added: insertedText,
+        styles: stylesToAdd,
+      },
+    };
+  }
+
+  /**
+   * Handles onInput event
+   * @param {Event} e Event object
+   */
+  onInput(e: InputEvent) {
+    e && e.stopPropagation();
+    if (!this.isEditing) {
+      this.fromPaste = false;
+      return;
+    }
+    if (this.hiddenTextarea.value === '') {
+      this.styles = {};
+    } else {
+      const {
+        diff: { index, removed, added, styles },
+      } = this.getDiffFromInputEvent(e);
+      console.log(this.text.slice(0, index), index, index + removed.length, {
+        index,
+        removed,
+        added,
+        styles,
+      });
+      // this.removeStyleFromTo(index, index + removed.length);
+
+      const removeStyleFrom = this.getStyleCursorPosition(index);
+      const styleCursor = this.getStyleCursorPosition(
+        Math.max(index, index + removed.length - 1)
+      );
+      while (
+        removed.length &&
+        (styleCursor.lineIndex > removeStyleFrom.lineIndex ||
+          (styleCursor.lineIndex === removeStyleFrom.lineIndex &&
+            styleCursor.charIndex >= removeStyleFrom.charIndex))
       ) {
-        copiedStyle = copyPasteData.copiedTextStyle;
+        console.log(styleCursor);
+        delete this.styles[styleCursor.lineIndex]?.[styleCursor.charIndex];
+        if (styleCursor.charIndex > 0) {
+          styleCursor.charIndex--;
+        } else if (styleCursor.lineIndex > 0) {
+          styleCursor.lineIndex--;
+          styleCursor.charIndex =
+            this._unwrappedTextLines[styleCursor.lineIndex].length;
+        } else {
+          break;
+        }
       }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      this.insertNewStyleBlock(added, index, styles);
     }
-    updateAndFire();
+    this.updateFromTextArea();
+    this.fire('changed');
+    if (this.canvas) {
+      this.canvas.fire('text:changed', { target: this });
+      this.canvas.requestRenderAll();
+    }
+    this.fromPaste = false;
   }
 
   /**
