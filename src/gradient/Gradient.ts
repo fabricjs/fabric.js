@@ -1,9 +1,7 @@
-//@ts-nocheck
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { FabricObject as BaseFabricObject } from '../shapes/Object/Object';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
@@ -24,6 +22,7 @@ import type {
   SVGOptions,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { isPath } from '../util/typeAssertions';
 
 /**
  * Gradient class
@@ -56,7 +55,7 @@ export class Gradient<
    * @type Number[]
    * @default null
    */
-  declare gradientTransform: TMat2D | null;
+  declare gradientTransform?: TMat2D;
 
   /**
    * coordinates units for coords.
@@ -110,7 +109,7 @@ export class Gradient<
     colorStops = [],
     offsetX = 0,
     offsetY = 0,
-    gradientTransform = null,
+    gradientTransform,
     id,
   }: GradientOptions<T>) {
     this.id = id ? `${id}_${uid()}` : uid();
@@ -154,7 +153,7 @@ export class Gradient<
    */
   toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -162,8 +161,8 @@ export class Gradient<
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform
-        ? this.gradientTransform.concat()
-        : this.gradientTransform,
+        ? [...this.gradientTransform]
+        : undefined,
     };
   }
 
@@ -203,11 +202,8 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    if (
-      object instanceof BaseFabricObject &&
-      object.isType('Path') &&
-      this.gradientUnits !== 'percentage'
-    ) {
+    // todo what about polygon/polyline?
+    if (isPath(object) && this.gradientUnits !== 'percentage') {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }

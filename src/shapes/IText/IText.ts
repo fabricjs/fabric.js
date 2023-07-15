@@ -16,6 +16,7 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
+import type { TProps } from '../Object/types';
 
 type CursorBoundaries = {
   left: number;
@@ -102,7 +103,7 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * ```
  */
 export class IText<
-    Props extends ITextProps = ITextProps,
+    Props extends TProps<ITextProps> = Partial<ITextProps>,
     SProps extends SerializedITextProps = SerializedITextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
@@ -215,7 +216,7 @@ export class IText<
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
-  constructor(text: string, options: object) {
+  constructor(text: string, options?: Props) {
     super(text, options);
     this.initBehavior();
   }
