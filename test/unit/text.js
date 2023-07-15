@@ -771,7 +771,7 @@
     fabric.cache.clearFontCache();
     var zwc =  '\u200b';
     var text = new fabric.Text('');
-    var style = text.getCompleteStyleDeclaration(0, 0);
+    var style = text.getStyleDeclaration(0, 0,true);
     var box = text._measureChar('a', style, zwc, style);
     var box2 = text._measureChar('a', style, zwc, style);
     assert.equal(fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');

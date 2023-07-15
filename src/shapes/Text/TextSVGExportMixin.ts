@@ -188,8 +188,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       if (!timeToRender) {
         // if we have charSpacing, we render char by char
         actualStyle =
-          actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-        nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+          actualStyle || this.getStyleDeclaration(lineIndex, i, true);
+        nextStyle = this.getStyleDeclaration(lineIndex, i + 1, true);
         timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
       }
       if (timeToRender) {
