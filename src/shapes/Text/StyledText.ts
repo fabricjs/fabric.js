@@ -30,7 +30,10 @@ export abstract class StyledText<
   protected declare abstract _textLines: string[][];
   protected declare _forceClearCache: boolean;
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
-  abstract getStyleCursorPosition(index: number): {
+  abstract getStyleCursorPosition(
+    index: number,
+    text?: string[]
+  ): {
     charIndex: number;
     lineIndex: number;
   };
