@@ -1582,12 +1582,13 @@ export class Text<
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         const {
           [type]: decoration,
-          fill: fill,
+          fill,
           fontSize: currentSize,
           deltaY: currentDy,
         } = this.getStyleDeclaration(i, j, true);
         currentDecoration = decoration;
-        currentFill = fill || '';
+        // bug? verify fill is a valid fill here.
+        currentFill = (fill as string) || '';
         if (path && decoration && fill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.
