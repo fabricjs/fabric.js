@@ -40,7 +40,7 @@ export abstract class StyledText<
 
   /**
    * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
+   * @param {Number} lineIndex of wrapped lines.
    * @return {Boolean}
    */
   isEmptyStyles(lineIndex?: number): boolean {
@@ -69,7 +69,7 @@ export abstract class StyledText<
    * Returns true if object has a style property or has it ina specified line
    * This function is used to detect if a text will use a particular property or not.
    * @param {String} property to check for
-   * @param {Number} lineIndex to check the style on
+   * @param {Number} lineIndex of wrapped lines to check the style on
    * @return {Boolean}
    */
   styleHas(property: keyof TextStyleDeclaration, lineIndex?: number): boolean {
@@ -93,6 +93,28 @@ export abstract class StyledText<
       }
     }
     return false;
+  }
+
+  /**
+   * return a new object that contains all the style property for a character
+   * the object returned is newly created
+   * @param {Number} lineIndex of the wrapped line where the character is
+   * @param {Number} charIndex position of the character on the wrapped line
+   * @return {Object} style object
+   */
+  getStyleDeclaration<
+    T extends boolean = false,
+    R = T extends true
+      ? CompleteTextStyleDeclaration
+      : Partial<CompleteTextStyleDeclaration>
+  >(lineIndex: number, charIndex: number, complete?: T): R {
+    return {
+      ...(complete
+        ? // @ts-expect-error readonly
+          pick(this, (this.constructor as typeof StyledText)._styleProperties)
+        : {}),
+      ...(this.styles[lineIndex]?.[charIndex] || {}),
+    } as R;
   }
 
   /**
@@ -154,27 +176,5 @@ export abstract class StyledText<
     }
     /* not included in _extendStyles to avoid clearing cache more than once */
     this._forceClearCache = true;
-  }
-
-  /**
-   * return a new object that contains all the style property for a character
-   * the object returned is newly created
-   * @param {Number} lineIndex of the wrapped line where the character is
-   * @param {Number} charIndex position of the character on the wrapped line
-   * @return {Object} style object
-   */
-  getStyleDeclaration<
-    T extends boolean = false,
-    R = T extends true
-      ? CompleteTextStyleDeclaration
-      : Partial<CompleteTextStyleDeclaration>
-  >(lineIndex: number, charIndex: number, complete?: T): R {
-    return {
-      ...(complete
-        ? // @ts-expect-error readonly
-          pick(this, (this.constructor as typeof StyledText)._styleProperties)
-        : {}),
-      ...(this.styles[lineIndex]?.[charIndex] || {}),
-    } as R;
   }
 }
