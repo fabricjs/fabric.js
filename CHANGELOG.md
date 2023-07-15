@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(): text styles offsetting [#9096](https://github.com/fabricjs/fabric.js/pull/9096)
+- patch(): text styles offsetting [#9096](https://github.com/fabricjs/fabric.js/pull/9096)
   **BERAKING**: `get2DCursorLocation` => `getCursorPosition`, `getStyleCursorPosition`
   **BREAKING**: rm `getCurrentCharFontSize`, `getCurrentCharColor`, `_getCurrentCharIndex`
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
