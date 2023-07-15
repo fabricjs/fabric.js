@@ -5,6 +5,8 @@
 - fix(Text): onInput styles [#9096](https://github.com/fabricjs/fabric.js/pull/9096)
   **BERAKING**: `get2DCursorLocation` => `getCursorPosition`, `getStyleCursorPosition`
   **BREAKING**: rm `getCurrentCharFontSize`, `getCurrentCharColor`, `_getCurrentCharIndex`
+  **BREAKING**: rm `cleanStyle`, `removeStyle`, `_extendStyles`, `_setStyleDeclaration`, `_deleteStyleDeclaration`, `_getLineStyle`, `_setLineStyle`, `_deleteLineStyle`
+  **BREAKING**: rm `_getStyleDeclaration`, `getCompleteStyleDeclaration` => `getStyleDeclaration`
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
 - fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)
 - chore(TS): Image class type checks, BREAKING change to FromURL static method [#9036](https://github.com/fabricjs/fabric.js/pull/9036)

@@ -1354,7 +1354,7 @@ export class Text<
         // @ts-expect-error readonly
         ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
         ...decl,
-      },
+      } as CompleteTextStyleDeclaration,
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
         method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
