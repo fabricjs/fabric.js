@@ -1575,18 +1575,20 @@ export class Text<
         fontSize: size,
         deltaY: dy,
       } = this.getStyleDeclaration(i, 0, true);
-      let currentDecoration;
-      let currentFill;
+      let currentDecoration = false,
+        currentFill = '';
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         const {
-          [type]: currentDecoration,
-          fill: currentFill,
+          [type]: decoration,
+          fill: fill,
           fontSize: currentSize,
           deltaY: currentDy,
         } = this.getStyleDeclaration(i, j, true);
-        if (path && currentDecoration && currentFill) {
+        currentDecoration = decoration;
+        currentFill = fill || '';
+        if (path && decoration && fill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.
           ctx.fillStyle = lastFill as string;
@@ -1600,8 +1602,8 @@ export class Text<
           );
           ctx.restore();
         } else if (
-          (currentDecoration !== lastDecoration ||
-            currentFill !== lastFill ||
+          (decoration !== lastDecoration ||
+            fill !== lastFill ||
             currentSize !== size ||
             currentDy !== dy) &&
           boxWidth > 0
@@ -1622,8 +1624,8 @@ export class Text<
           }
           boxStart = charBox.left;
           boxWidth = charBox.width;
-          lastDecoration = currentDecoration;
-          lastFill = currentFill;
+          lastDecoration = decoration;
+          lastFill = fill;
           size = currentSize;
           dy = currentDy;
         } else {
@@ -1634,7 +1636,7 @@ export class Text<
       if (this.direction === 'rtl') {
         drawStart = this.width - drawStart - boxWidth;
       }
-      ctx.fillStyle = currentFill as string;
+      ctx.fillStyle = currentFill;
       currentDecoration &&
         currentFill &&
         ctx.fillRect(
