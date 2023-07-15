@@ -225,10 +225,8 @@ export abstract class StyledText<
    * @private
    */
   getStyleAtPosition<
-    T extends boolean,
-    R extends T extends true
-      ? CompleteTextStyleDeclaration
-      : TextStyleDeclaration
+    T extends boolean = false,
+    R = T extends true ? CompleteTextStyleDeclaration : TextStyleDeclaration
   >(position: number, complete?: T): R {
     const { lineIndex, charIndex } = this.getStyleCursorPosition(position);
     return (
