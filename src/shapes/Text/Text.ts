@@ -547,12 +547,39 @@ export class Text<
     };
   }
 
-  getCursorPosition(index: number) {
-    return this.findCursorPosition(index, this._textLines);
+  getCursorPosition(index: number, lines = this._textLines) {
+    let i: number;
+    for (i = 0; i < lines.length; i++) {
+      if (index <= lines[i].length) {
+        return {
+          lineIndex: i,
+          charIndex: index,
+        };
+      }
+      index -= lines[i].length + this.missingNewlineOffset(i);
+    }
+    const lineIndex = lines.length - 1;
+    return {
+      lineIndex,
+      charIndex: Math.min(index, lines[lineIndex].length),
+    };
   }
 
-  getStyleCursorPosition(index: number) {
-    return this.findCursorPosition(index, this._unwrappedTextLines);
+  getStyleCursorPosition(index: number, lines = this._unwrappedTextLines) {
+    for (let i = 0; i < lines.length; i++) {
+      if (index < lines[i].length) {
+        return {
+          lineIndex: i,
+          charIndex: index,
+        };
+      }
+      index -= lines[i].length;
+    }
+    const lineIndex = lines.length - 1;
+    return {
+      lineIndex,
+      charIndex: Math.min(index, lines[lineIndex].length - 1),
+    };
   }
 
   /**
@@ -1706,19 +1733,19 @@ export class Text<
    */
   _splitTextIntoLines(text: string) {
     const lines = text.split(this._reNewline),
-      newLines = new Array<string[]>(lines.length),
+      graphemeLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
-    let newText: string[] = [];
+    let graphemeText: string[] = [];
     for (let i = 0; i < lines.length; i++) {
-      newLines[i] = this.graphemeSplit(lines[i]);
-      newText = newText.concat(newLines[i], newLine);
+      graphemeLines[i] = this.graphemeSplit(lines[i]);
+      graphemeText = graphemeText.concat(graphemeLines[i], newLine);
     }
-    newText.pop();
+    graphemeText.pop();
     return {
-      _unwrappedLines: newLines,
-      lines: lines,
-      graphemeText: newText,
-      graphemeLines: newLines,
+      _unwrappedLines: graphemeLines,
+      lines,
+      graphemeText,
+      graphemeLines,
     };
   }
 

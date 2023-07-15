@@ -10,6 +10,7 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
+import { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -187,7 +188,7 @@ export abstract class ITextKeyBehavior<
     }
     // text diff
     const prevText = this._text.slice(),
-      { graphemeText: nextText } = this._splitTextIntoLines(
+      { graphemeText: nextText, _unwrappedLines } = this._splitTextIntoLines(
         this.hiddenTextarea.value
       );
     const charDiff =
@@ -199,6 +200,7 @@ export abstract class ITextKeyBehavior<
       nextSelectionEnd - charDiff,
       nextSelectionEnd
     );
+    console.log(insertedText);
     // get styles from event
     let stylesToAdd: TextStyleDeclaration[] = [];
     const { copyPasteData } = getEnv();
@@ -211,7 +213,8 @@ export abstract class ITextKeyBehavior<
       stylesToAdd = copyPasteData.copiedTextStyle;
     } else if (
       inputType !== 'deleteContentBackward' &&
-      inputType !== 'deleteContentForward'
+      inputType !== 'deleteContentForward' &&
+      inputType !== 'insertLineBreak'
     ) {
       const selectionStartStyle = this.getStyleAtPosition(
         Math.max(0, prevSelectionStart - 1)
@@ -220,23 +223,53 @@ export abstract class ITextKeyBehavior<
         ...selectionStartStyle,
       }));
     }
+    const stylesArr: TextStyleDeclaration[] = [];
+    this._unwrappedTextLines.forEach((line, lineIndex) =>
+      line.forEach((char, charIndex) =>
+        stylesArr.push(this.styles[lineIndex]?.[charIndex])
+      )
+    );
+    const removedStyles = stylesArr.splice(
+      removedFrom,
+      removedText.filter((g) => g !== '\n').length,
+      ...stylesToAdd
+    );
+    const nextStyles = {};
+    stylesArr.forEach((style, index) => {
+      if (!style) {
+        return;
+      }
+      const { lineIndex, charIndex } = this.getStyleCursorPosition(
+        index,
+        _unwrappedLines
+      );
+      (nextStyles[lineIndex] || (nextStyles[lineIndex] = {}))[charIndex] =
+        style;
+    });
+
+    console.log(stylesArr.slice(), removedStyles, nextStyles, _unwrappedLines);
     // diff
     return {
       before: {
         selectionStart: prevSelectionStart,
         selectionEnd: prevSelectionEnd,
         value: prevText,
+        styles: this.styles,
       },
       after: {
         selectionStart: nextSelectionStart,
         selectionEnd: nextSelectionEnd,
         value: nextText,
+        styles: nextStyles,
       },
       diff: {
         index: removedFrom,
         removed: removedText,
         added: insertedText,
-        styles: stylesToAdd,
+        styles: {
+          added: stylesToAdd,
+          removed: removedStyles,
+        },
       },
     };
   }
@@ -251,44 +284,10 @@ export abstract class ITextKeyBehavior<
       this.fromPaste = false;
       return;
     }
-    if (this.hiddenTextarea.value === '') {
-      this.styles = {};
-    } else {
-      const {
-        diff: { index, removed, added, styles },
-      } = this.getDiffFromInputEvent(e);
-      console.log(this.text.slice(0, index), index, index + removed.length, {
-        index,
-        removed,
-        added,
-        styles,
-      });
-      // this.removeStyleFromTo(index, index + removed.length);
-
-      const removeStyleFrom = this.getStyleCursorPosition(index);
-      const styleCursor = this.getStyleCursorPosition(
-        Math.max(index, index + removed.length - 1)
-      );
-      while (
-        removed.length &&
-        (styleCursor.lineIndex > removeStyleFrom.lineIndex ||
-          (styleCursor.lineIndex === removeStyleFrom.lineIndex &&
-            styleCursor.charIndex >= removeStyleFrom.charIndex))
-      ) {
-        console.log(styleCursor);
-        delete this.styles[styleCursor.lineIndex]?.[styleCursor.charIndex];
-        if (styleCursor.charIndex > 0) {
-          styleCursor.charIndex--;
-        } else if (styleCursor.lineIndex > 0) {
-          styleCursor.lineIndex--;
-          styleCursor.charIndex =
-            this._unwrappedTextLines[styleCursor.lineIndex].length;
-        } else {
-          break;
-        }
-      }
-      this.insertNewStyleBlock(added, index, styles);
-    }
+    const {
+      after: { styles },
+    } = this.getDiffFromInputEvent(e);
+    this.styles = styles;
     this.updateFromTextArea();
     this.fire('changed');
     if (this.canvas) {
