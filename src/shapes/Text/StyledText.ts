@@ -171,6 +171,7 @@ export abstract class StyledText<
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       const { lineIndex, charIndex } = this.getStyleCursorPosition(i);
       (this.styles[lineIndex] || (this.styles[lineIndex] = {}))[charIndex] = {
+        ...(this.styles[lineIndex][charIndex] || {}),
         ...style,
       };
     }
