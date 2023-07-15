@@ -10,7 +10,7 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
-import type { TextStyle, TextStyleDeclaration } from '../Text/StyledText';
+import { InputEventDiff } from './InputEventDiff';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -158,141 +158,6 @@ export abstract class ITextKeyBehavior<
     this.canvas && this.canvas.requestRenderAll();
   }
 
-  getDiffFromInputEvent({ inputType }: InputEvent) {
-    // selection diff
-    const {
-      selectionStart: prevSelectionStart,
-      selectionEnd: prevSelectionEnd,
-    } = this;
-    const {
-      selectionStart: nextSelectionStart,
-      selectionEnd: nextSelectionEnd,
-    } = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
-    );
-    // text diff
-    const prevText = this._text.slice(),
-      // TODO: optimize this call
-      { graphemeText: nextText } = this._splitTextIntoLines(
-        this.hiddenTextarea.value
-      );
-    const charDiff =
-      nextText.length -
-      prevText.length +
-      (prevSelectionEnd - prevSelectionStart);
-    const insertedText = nextText.slice(
-      nextSelectionEnd - charDiff,
-      nextSelectionEnd
-    );
-    let removedText: string[], removeFrom: number;
-    if (prevSelectionStart === prevSelectionEnd) {
-      const delta =
-        inputType === 'deleteContentBackward'
-          ? -1
-          : inputType === 'deleteContentForward'
-          ? 1
-          : 0;
-      removeFrom = Math.min(prevSelectionStart, prevSelectionStart + delta);
-      removedText = prevText.slice(
-        removeFrom,
-        Math.max(prevSelectionStart, prevSelectionStart + delta)
-      );
-    } else {
-      removeFrom = prevSelectionStart;
-      removedText = prevText.slice(removeFrom, prevSelectionEnd);
-    }
-    // styles diff
-    // styles is poorly designed
-    // it correlates to the unwrapped lines instead of to the split text
-    // this causes too many problems, input diff being one of them
-    // this code it an attempt to workaround the poor design without refactoring text
-    // TODO: revisit once styles are refactored
-    let stylesToAdd: TextStyleDeclaration[] = [];
-    const { copyPasteData } = getEnv();
-    if (
-      this.fromPaste &&
-      !config.disableStyleCopyPaste &&
-      copyPasteData.copiedTextStyle &&
-      insertedText.join('') === copyPasteData.copiedText
-    ) {
-      stylesToAdd = copyPasteData.copiedTextStyle;
-    } else if (
-      inputType !== 'deleteContentBackward' &&
-      inputType !== 'deleteContentForward'
-    ) {
-      const selectionStartStyle = this.getStyleAtPosition(prevSelectionStart);
-      stylesToAdd = new Array(insertedText.length).fill().map(() => ({
-        ...selectionStartStyle,
-      }));
-    }
-    const stylesArr: (TextStyleDeclaration | undefined | false)[] = [];
-    this._unwrappedTextLines.forEach((line, lineIndex) => {
-      line.forEach((char, charIndex) =>
-        stylesArr.push(this.styles[lineIndex]?.[charIndex])
-      );
-      stylesArr.push(false);
-    });
-    const removedStyles = stylesArr.splice(
-      removeFrom,
-      removedText.length,
-      ...stylesToAdd
-    );
-    const { styles: nextStyles } = nextText.reduce(
-      ({ lineIndex, charIndex, styles }, char, index) => {
-        if (char === '\n') {
-          return {
-            lineIndex: lineIndex + 1,
-            charIndex: 0,
-            styles,
-          };
-        } else {
-          const style = stylesArr[index];
-          if (style && Object.keys(style).length > 0) {
-            (styles[lineIndex] || (styles[lineIndex] = {}))[charIndex] = {
-              ...style,
-            };
-          }
-          return {
-            lineIndex,
-            charIndex: charIndex + 1,
-            styles,
-          };
-        }
-      },
-      {
-        lineIndex: 0,
-        charIndex: 0,
-        styles: {} as TextStyle,
-      }
-    );
-    // diff
-    return {
-      before: {
-        selectionStart: prevSelectionStart,
-        selectionEnd: prevSelectionEnd,
-        value: prevText,
-        styles: this.styles,
-      },
-      after: {
-        selectionStart: nextSelectionStart,
-        selectionEnd: nextSelectionEnd,
-        value: nextText,
-        styles: nextStyles,
-      },
-      diff: {
-        index: prevSelectionStart,
-        removed: removedText,
-        added: insertedText,
-        styles: {
-          added: stylesToAdd,
-          removed: removedStyles,
-        },
-      },
-    };
-  }
-
   /**
    * Handles onInput event
    * @param {Event} e Event object
@@ -305,7 +170,7 @@ export abstract class ITextKeyBehavior<
     }
     const {
       after: { styles },
-    } = this.getDiffFromInputEvent(e);
+    } = InputEventDiff.build(this, e);
     this.styles = styles;
     this.updateFromTextArea();
     this.fire('changed');
