@@ -164,7 +164,7 @@ export abstract class ITextKeyBehavior<
         selectionStart: prevSelectionStart,
         selectionEnd: prevSelectionEnd,
       } = this,
-      wasSelected = prevSelectionStart !== prevSelectionEnd,
+      hadTextSelection = prevSelectionStart !== prevSelectionEnd,
       { selectionStart: nextSelectionStart, selectionEnd: nextSelectionEnd } =
         this.fromStringToGraphemeSelection(
           this.hiddenTextarea.selectionStart,
@@ -182,9 +182,9 @@ export abstract class ITextKeyBehavior<
       charDiff =
         nextCharCount -
         prevCharCount +
-        (wasSelected ? prevSelectionEnd - prevSelectionStart : 0);
+        (hadTextSelection ? prevSelectionEnd - prevSelectionStart : 0);
     // state diff
-    const removedText = wasSelected
+    const removedText = hadTextSelection
       ? prevText.slice(prevSelectionStart, prevSelectionEnd)
       : nextCharCount < prevCharCount
       ? backDelete
@@ -192,7 +192,7 @@ export abstract class ITextKeyBehavior<
         : prevText.slice(prevSelectionStart, prevSelectionStart - charDiff)
       : [];
     const removeFrom =
-      removedText.length && !wasSelected
+      removedText.length && !hadTextSelection
         ? backDelete
           ? prevSelectionEnd - removedText.length
           : prevSelectionEnd
@@ -213,14 +213,30 @@ export abstract class ITextKeyBehavior<
     ) {
       stylesToAdd = copiedStyle;
     } else {
-      const selectionStartStyle = this.styleManager.get({
-        offset: prevSelectionStart,
-      });
+      const selectionStartStyle = this.getSelectionStyles(prevSelectionStart);
       stylesToAdd = new Array(insertedText.length).fill().map(() => ({
         ...selectionStartStyle,
       }));
     }
     // style diff
+    const removeStyleFrom = this.get2DCursorLocation(removeFrom, true);
+    const removeStyleTo = this.get2DCursorLocation(
+      removeFrom + removedText.length,
+      true
+    );
+    const styleCursor = { ...removeStyleTo };
+    while (
+      styleCursor.lineIndex >= removeStyleFrom.lineIndex &&
+      styleCursor.charIndex >= removeStyleFrom.charIndex
+    ) {
+      delete this.styles[styleCursor.lineIndex][styleCursor.charIndex];
+      if (styleCursor.charIndex > 0) {
+        styleCursor.charIndex--;
+      } else {
+        styleCursor.lineIndex--;
+      }
+    }
+    stylesToAdd.forEach((style) => {});
     const prevStyles = [...this.styleManager.styles];
     const nextStyles = [...this.styleManager.styles];
     const stylesToRemove = nextStyles.splice(
