@@ -174,7 +174,6 @@ export abstract class StyledText<
         ...style,
       };
     }
-    /* not included in _extendStyles to avoid clearing cache more than once */
     this._forceClearCache = true;
   }
 }
