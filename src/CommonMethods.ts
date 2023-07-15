@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { Observable } from './Observable';
 
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
@@ -37,7 +36,7 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   }
 
   _set(key: string, value: any) {
-    this[key] = value;
+    this[key as keyof this] = value;
   }
 
   /**
@@ -58,6 +57,6 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @return {*} value of a property
    */
   get(property: string) {
-    return this[property];
+    return this[property as keyof this];
   }
 }

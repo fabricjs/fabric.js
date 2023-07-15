@@ -1,5 +1,3 @@
-//@ts-nocheck
-
 /**
  * Parses "points" attribute, returning an array of values
  * @static
@@ -7,22 +5,21 @@
  * @param {String} points points attribute string
  * @return {Array} array of points
  */
-export function parsePointsAttribute(points) {
+export function parsePointsAttribute(points: string) {
   // points attribute is required and must not be empty
   if (!points) {
     return null;
   }
 
   // replace commas with whitespace and remove bookending whitespace
-  points = points.replace(/,/g, ' ').trim();
+  const pointsSplit: string[] = points.replace(/,/g, ' ').trim().split(/\s+/);
 
-  points = points.split(/\s+/);
   const parsedPoints = [];
 
-  for (let i = 0; i < points.length; i += 2) {
+  for (let i = 0; i < pointsSplit.length; i += 2) {
     parsedPoints.push({
-      x: parseFloat(points[i]),
-      y: parseFloat(points[i + 1]),
+      x: parseFloat(pointsSplit[i]),
+      y: parseFloat(pointsSplit[i + 1]),
     });
   }
 

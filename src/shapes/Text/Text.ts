@@ -360,8 +360,11 @@ export class Text<
 
   /**
    * contains characters bounding boxes
+   * This variable is considered to be protected.
+   * But for how mixins are implemented right now, we can't leave it private
+   * @protected
    */
-  protected __charBounds: GraphemeBBox[][] = [];
+  __charBounds: GraphemeBBox[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors

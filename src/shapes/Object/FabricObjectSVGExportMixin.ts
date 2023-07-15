@@ -1,8 +1,8 @@
-// @ts-nocheck
 import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
 import { NONE } from '../../constants';
+import type { FabricObject } from './FabricObject';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -17,7 +17,10 @@ export class FabricObjectSVGExportMixin {
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
-  getSvgStyles(skipShadow?: boolean) {
+  getSvgStyles(
+    this: FabricObjectSVGExportMixin & FabricObject,
+    skipShadow?: boolean
+  ) {
     const fillRule = this.fillRule ? this.fillRule : 'nonzero',
       strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
       strokeDashArray = this.strokeDashArray
@@ -63,64 +66,6 @@ export class FabricObjectSVGExportMixin {
       filter,
       visibility,
     ].join('');
-  }
-
-  /**
-   * Returns styles-string for svg-export
-   * @param {Object} style the object from which to retrieve style properties
-   * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
-   * @return {String}
-   */
-  getSvgSpanStyles(style, useWhiteSpace?: boolean) {
-    const term = '; ',
-      fontFamily = style.fontFamily
-        ? `font-family: ${
-            style.fontFamily.indexOf("'") === -1 &&
-            style.fontFamily.indexOf('"') === -1
-              ? `'${style.fontFamily}'`
-              : style.fontFamily
-          }${term}`
-        : '',
-      strokeWidth = style.strokeWidth
-        ? `stroke-width: ${style.strokeWidth}${term}`
-        : '',
-      fontSize = style.fontSize ? `font-size: ${style.fontSize}px${term}` : '',
-      fontStyle = style.fontStyle
-        ? `font-style: ${style.fontStyle}${term}`
-        : '',
-      fontWeight = style.fontWeight
-        ? `font-weight: ${style.fontWeight}${term}`
-        : '',
-      fill = style.fill ? colorPropToSVG('fill', style.fill) : '',
-      stroke = style.stroke ? colorPropToSVG('stroke', style.stroke) : '',
-      textDecoration = this.getSvgTextDecoration(style),
-      deltaY = style.deltaY ? `baseline-shift: ${-style.deltaY}; ` : '';
-
-    return [
-      stroke,
-      strokeWidth,
-      fontFamily,
-      fontSize,
-      fontStyle,
-      fontWeight,
-      textDecoration
-        ? `text-decoration: ${textDecoration}${term}`
-        : textDecoration,
-      fill,
-      deltaY,
-      useWhiteSpace ? 'white-space: pre; ' : '',
-    ].join('');
-  }
-
-  /**
-   * Returns text-decoration property for svg-export
-   * @param {Object} style the object from which to retrieve style properties
-   * @return {String}
-   */
-  getSvgTextDecoration(style) {
-    return ['overline', 'underline', 'line-through']
-      .filter((decoration) => style[decoration.replace('-', '')])
-      .join(' ');
   }
 
   /**
