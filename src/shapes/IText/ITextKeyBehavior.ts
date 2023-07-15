@@ -186,7 +186,7 @@ export abstract class ITextKeyBehavior<
       nextSelectionEnd - charDiff,
       nextSelectionEnd
     );
-    let removedText: string[];
+    let removedText: string[], removeFrom: number;
     if (prevSelectionStart === prevSelectionEnd) {
       const delta =
         inputType === 'deleteContentBackward'
@@ -194,12 +194,14 @@ export abstract class ITextKeyBehavior<
           : inputType === 'deleteContentForward'
           ? 1
           : 0;
+      removeFrom = Math.min(prevSelectionStart, prevSelectionStart + delta);
       removedText = prevText.slice(
-        Math.min(prevSelectionStart, prevSelectionStart + delta),
+        removeFrom,
         Math.max(prevSelectionStart, prevSelectionStart + delta)
       );
     } else {
-      removedText = prevText.slice(prevSelectionStart, prevSelectionEnd);
+      removeFrom = prevSelectionStart;
+      removedText = prevText.slice(removeFrom, prevSelectionEnd);
     }
     // get styles from event
     let stylesToAdd: TextStyleDeclaration[] = [];
@@ -230,7 +232,7 @@ export abstract class ITextKeyBehavior<
       stylesArr.push(false);
     });
     const removedStyles = stylesArr.splice(
-      prevSelectionStart,
+      removeFrom,
       removedText.length,
       ...stylesToAdd
     );
