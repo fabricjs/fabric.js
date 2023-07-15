@@ -13,7 +13,7 @@ export function normalizeValue(
   let parsed: number | number[];
   let ouputValue: string | null | boolean | number[] | number = value;
   if ((attr === 'fill' || attr === 'stroke') && value === NONE) {
-    value = '';
+    ouputValue = '';
   } else if (attr === 'strokeUniform') {
     return value === 'non-scaling-stroke';
   } else if (attr === 'strokeDashArray') {
