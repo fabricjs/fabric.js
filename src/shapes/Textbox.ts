@@ -4,7 +4,6 @@ import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
-import type { TextStyleDeclaration } from './Text/StyledText';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -197,10 +196,11 @@ export class Textbox extends IText {
    * @param {Number} charIndex
    * @private
    */
-  _getStyleDeclaration(
+  getStyleDeclaration<T extends boolean = false>(
     lineIndex: number,
-    charIndex: number
-  ): TextStyleDeclaration {
+    charIndex: number,
+    complete?: T
+  ) {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (!map) {
@@ -209,7 +209,7 @@ export class Textbox extends IText {
       lineIndex = map.line;
       charIndex = map.offset + charIndex;
     }
-    return super._getStyleDeclaration(lineIndex, charIndex);
+    return super.getStyleDeclaration<T>(lineIndex, charIndex, complete);
   }
 
   /**

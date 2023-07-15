@@ -157,35 +157,24 @@ export abstract class StyledText<
   }
 
   /**
-   * get the reference, not a clone, of the style object for a given character,
-   * if not style is set for a pre det
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @return {Object} style object a REFERENCE to the existing one or a new empty object
-   */
-  _getStyleDeclaration(
-    lineIndex: number,
-    charIndex: number
-  ): TextStyleDeclaration {
-    const lineStyle = this.styles && this.styles[lineIndex];
-    return lineStyle ? lineStyle[charIndex] ?? {} : {};
-  }
-
-  /**
    * return a new object that contains all the style property for a character
    * the object returned is newly created
-   * @param {Number} lineIndex of the line where the character is
-   * @param {Number} charIndex position of the character on the line
+   * @param {Number} lineIndex of the wrapped line where the character is
+   * @param {Number} charIndex position of the character on the wrapped line
    * @return {Object} style object
    */
-  getCompleteStyleDeclaration(
-    lineIndex: number,
-    charIndex: number
-  ): CompleteTextStyleDeclaration {
+  getStyleDeclaration<
+    T extends boolean = false,
+    R = T extends true
+      ? CompleteTextStyleDeclaration
+      : Partial<CompleteTextStyleDeclaration>
+  >(lineIndex: number, charIndex: number, complete?: T): R {
     return {
-      // @ts-expect-error readonly
-      ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
-      ...this._getStyleDeclaration(lineIndex, charIndex),
-    } as CompleteTextStyleDeclaration;
+      ...(complete
+        ? // @ts-expect-error readonly
+          pick(this, (this.constructor as typeof StyledText)._styleProperties)
+        : {}),
+      ...(this.styles[lineIndex]?.[charIndex] || {}),
+    } as R;
   }
 }

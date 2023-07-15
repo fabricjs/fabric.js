@@ -490,7 +490,7 @@ export class IText<
         fontSize: charHeight,
         deltaY: dy,
         fill,
-      } = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+      } = this.getStyleDeclaration(lineIndex, charIndex, true),
       multiplier = this.scaleX * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       topOffset =

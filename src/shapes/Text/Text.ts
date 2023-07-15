@@ -977,9 +977,9 @@ export class Text<
     prevGrapheme?: string,
     skipLeft?: boolean
   ): GraphemeBBox {
-    const style = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+    const style = this.getStyleDeclaration(lineIndex, charIndex, true),
       prevStyle = prevGrapheme
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex - 1)
+        ? this.getStyleDeclaration(lineIndex, charIndex - 1, true)
         : {},
       info = this._measureChar(grapheme, style, prevGrapheme, prevStyle);
     let kernedWidth = info.kernedWidth,
@@ -1191,8 +1191,8 @@ export class Text<
       if (!timeToRender) {
         // if we have charSpacing, we render char by char
         actualStyle =
-          actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
-        nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
+          actualStyle || this.getStyleDeclaration(lineIndex, i, true);
+        nextStyle = this.getStyleDeclaration(lineIndex, i + 1, true);
         timeToRender = hasStyleChanged(actualStyle, nextStyle, false);
       }
       if (timeToRender) {
@@ -1349,7 +1349,7 @@ export class Text<
     left: number,
     top: number
   ) {
-    const decl = this._getStyleDeclaration(lineIndex, charIndex),
+    const decl = this.getStyleDeclaration(lineIndex, charIndex),
       fullDecl = {
         // @ts-expect-error readonly
         ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
@@ -1531,9 +1531,9 @@ export class Text<
     lineIndex: number,
     charIndex: number,
     property: T
-  ): this[T] {
-    const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-    return (charStyle[property] ?? this[property]) as this[T];
+  ) {
+    const charStyle = this.getStyleDeclaration(lineIndex, charIndex);
+    return charStyle[property] ?? this[property];
   }
 
   getStyleValue<T extends StylePropertiesType>(index: number, key: T): this[T] {
@@ -1574,7 +1574,7 @@ export class Text<
         fill: lastFill,
         fontSize: size,
         deltaY: dy,
-      } = this.getCompleteStyleDeclaration(i, 0);
+      } = this.getStyleDeclaration(i, 0, true);
       let currentDecoration;
       let currentFill;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
@@ -1585,7 +1585,7 @@ export class Text<
           fill: currentFill,
           fontSize: currentSize,
           deltaY: currentDy,
-        } = this.getCompleteStyleDeclaration(i, j);
+        } = this.getStyleDeclaration(i, j, true);
         if (path && currentDecoration && currentFill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.
