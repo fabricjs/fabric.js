@@ -48,6 +48,7 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
+import { pick } from '../../util';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1131,7 +1132,7 @@ export class Text<
   _renderChars(
     method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
-    line: Array<any>,
+    line: string[],
     left: number,
     top: number,
     lineIndex: number
@@ -1349,7 +1350,11 @@ export class Text<
     top: number
   ) {
     const decl = this._getStyleDeclaration(lineIndex, charIndex),
-      fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
+      fullDecl = {
+        // @ts-expect-error readonly
+        ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
+        ...decl,
+      },
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
         method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
@@ -1422,18 +1427,15 @@ export class Text<
       baseline: number;
     }
   ) {
-    const loc = this.getStyleCursorPosition(start),
-      fontSize = this.getValueOfPropertyAt(
-        loc.lineIndex,
-        loc.charIndex,
-        'fontSize'
-      ),
-      dy = this.getValueOfPropertyAt(loc.lineIndex, loc.charIndex, 'deltaY'),
-      style = {
+    const { fontSize, deltaY: dy } = this.getStyleAtPosition(start, true);
+    this.setSelectionStyles(
+      {
         fontSize: fontSize * schema.size,
         deltaY: dy + fontSize * schema.baseline,
-      };
-    this.setSelectionStyles(style, start, end);
+      },
+      start,
+      end
+    );
   }
 
   /**
@@ -1534,6 +1536,11 @@ export class Text<
     return (charStyle[property] ?? this[property]) as this[T];
   }
 
+  getStyleValue<T extends StylePropertiesType>(index: number, key: T): this[T] {
+    const { lineIndex, charIndex } = this.getStyleCursorPosition(index);
+    return (this.styles[lineIndex]?.[charIndex]?.[key] ?? this[key]) as this[T];
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -1551,7 +1558,7 @@ export class Text<
       charSpacing = this._getWidthOfCharSpacing(),
       offsetY = this.offsets[type];
 
-    for (let i = 0, len = this._textLines.length; i < len; i++) {
+    for (let i = 0; i < this._textLines.length; i++) {
       const heightOfLine = this.getHeightOfLine(i);
       if (!this[type] && !this.styleHas(type, i)) {
         topOffset += heightOfLine;
@@ -1562,19 +1569,23 @@ export class Text<
       const lineLeftOffset = this._getLineLeftOffset(i);
       let boxStart = 0;
       let boxWidth = 0;
-      let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+      let {
+        [type]: lastDecoration,
+        fill: lastFill,
+        fontSize: size,
+        deltaY: dy,
+      } = this.getCompleteStyleDeclaration(i, 0);
       let currentDecoration;
       let currentFill;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
-      let size = this.getHeightOfChar(i, 0);
-      let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
-        currentDecoration = this.getValueOfPropertyAt(i, j, type);
-        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-        const currentSize = this.getHeightOfChar(i, j);
-        const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
+        const {
+          [type]: currentDecoration,
+          fill: currentFill,
+          fontSize: currentSize,
+          deltaY: currentDy,
+        } = this.getCompleteStyleDeclaration(i, j);
         if (path && currentDecoration && currentFill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.

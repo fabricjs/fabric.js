@@ -213,60 +213,6 @@ export class Textbox extends IText {
   }
 
   /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @param {Object} style
-   * @private
-   */
-  protected _setStyleDeclaration(
-    lineIndex: number,
-    charIndex: number,
-    style: object
-  ) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-
-    this.styles[lineIndex][charIndex] = style;
-  }
-
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
-  }
-
-  /**
-   * probably broken need a fix
-   * Returns the real style line that correspond to the wrapped lineIndex line
-   * Used just to verify if the line does exist or not.
-   * @param {Number} lineIndex
-   * @returns {Boolean} if the line exists or not
-   * @private
-   */
-  protected _getLineStyle(lineIndex: number): boolean {
-    const map = this._styleMap[lineIndex];
-    return !!this.styles[map.line];
-  }
-
-  /**
-   * Set the line style to an empty object so that is initialized
-   * @param {Number} lineIndex
-   * @param {Object} style
-   * @private
-   */
-  protected _setLineStyle(lineIndex: number) {
-    const map = this._styleMap[lineIndex];
-    this.styles[map.line] = {};
-  }
-
-  /**
    * Wraps text using the 'width' property of Textbox. First this function
    * splits text on newlines, so we preserve newlines entered by the user.
    * Then it wraps each line using the width of the Textbox by calling

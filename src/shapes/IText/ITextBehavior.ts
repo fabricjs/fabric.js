@@ -563,12 +563,8 @@ export abstract class ITextBehavior<
         ? this.compositionStart
         : this.selectionStart,
       boundaries = this._getCursorBoundaries(desiredPosition),
-      cursorLocation = this.getCursorPosition(desiredPosition),
-      lineIndex = cursorLocation.lineIndex,
-      charIndex = cursorLocation.charIndex,
       charHeight =
-        this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
-        this.lineHeight,
+        this.getStyleValue(desiredPosition, 'fontSize') * this.lineHeight,
       leftOffset = boundaries.leftOffset,
       retinaScaling = this.getCanvasRetinaScaling(),
       upperCanvas = this.canvas.upperCanvasEl,

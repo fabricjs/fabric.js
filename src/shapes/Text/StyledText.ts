@@ -96,112 +96,6 @@ export abstract class StyledText<
   }
 
   /**
-   * Check if characters in a text have a value for a property
-   * whose value matches the textbox's value for that property.  If so,
-   * the character-level property is deleted.  If the character
-   * has no other properties, then it is also deleted.  Finally,
-   * if the line containing that character has no other characters
-   * then it also is deleted.
-   *
-   * @param {string} property The property to compare between characters and text.
-   */
-  cleanStyle(property: keyof TextStyleDeclaration) {
-    if (!this.styles) {
-      return false;
-    }
-    const obj = this.styles;
-    let stylesCount = 0,
-      letterCount,
-      stylePropertyValue,
-      allStyleObjectPropertiesMatch = true,
-      graphemeCount = 0;
-    for (const p1 in obj) {
-      letterCount = 0;
-      for (const p2 in obj[p1]) {
-        const styleObject = obj[p1][p2] || {},
-          stylePropertyHasBeenSet = styleObject[property] !== undefined;
-
-        stylesCount++;
-
-        if (stylePropertyHasBeenSet) {
-          if (!stylePropertyValue) {
-            stylePropertyValue = styleObject[property];
-          } else if (styleObject[property] !== stylePropertyValue) {
-            allStyleObjectPropertiesMatch = false;
-          }
-
-          if (styleObject[property] === this[property as keyof this]) {
-            delete styleObject[property];
-          }
-        } else {
-          allStyleObjectPropertiesMatch = false;
-        }
-
-        if (Object.keys(styleObject).length !== 0) {
-          letterCount++;
-        } else {
-          delete obj[p1][p2];
-        }
-      }
-
-      if (letterCount === 0) {
-        delete obj[p1];
-      }
-    }
-    // if every grapheme has the same style set then
-    // delete those styles and set it on the parent
-    for (let i = 0; i < this._textLines.length; i++) {
-      graphemeCount += this._textLines[i].length;
-    }
-    if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-      // @ts-expect-error conspiracy theory of TS
-      this[property as keyof this] = stylePropertyValue;
-      this.removeStyle(property);
-    }
-  }
-
-  /**
-   * Remove a style property or properties from all individual character styles
-   * in a text object.  Deletes the character style object if it contains no other style
-   * props.  Deletes a line style object if it contains no other character styles.
-   *
-   * @param {String} props The property to remove from character styles.
-   */
-  removeStyle(property: keyof TextStyleDeclaration) {
-    if (!this.styles) {
-      return;
-    }
-    const obj = this.styles;
-    let line, lineNum, charNum;
-    for (lineNum in obj) {
-      line = obj[lineNum];
-      for (charNum in line) {
-        delete line[charNum][property];
-        if (Object.keys(line[charNum]).length === 0) {
-          delete line[charNum];
-        }
-      }
-      if (Object.keys(line).length === 0) {
-        delete obj[lineNum];
-      }
-    }
-  }
-
-  private _extendStyles(index: number, styles: TextStyleDeclaration): void {
-    const { lineIndex, charIndex } = this.getStyleCursorPosition(index);
-
-    if (!this._getLineStyle(lineIndex)) {
-      this._setLineStyle(lineIndex);
-    }
-
-    if (!Object.keys(this._getStyleDeclaration(lineIndex, charIndex)).length) {
-      this._setStyleDeclaration(lineIndex, charIndex, {});
-    }
-
-    Object.assign(this._getStyleDeclaration(lineIndex, charIndex), styles);
-  }
-
-  /**
    * Gets style of a current selection/cursor (at the start position)
    * @param {Number} startIndex Start index to get styles at
    * @param {Number} endIndex End index to get styles at, if not specified startIndex + 1
@@ -232,11 +126,13 @@ export abstract class StyledText<
     R = T extends true ? CompleteTextStyleDeclaration : TextStyleDeclaration
   >(position: number, complete?: T): R {
     const { lineIndex, charIndex } = this.getStyleCursorPosition(position);
-    return (
-      complete
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
-        : this._getStyleDeclaration(lineIndex, charIndex)
-    ) as R;
+    return {
+      ...(complete
+        ? // @ts-expect-error readonly
+          pick(this, (this.constructor as typeof StyledText)._styleProperties)
+        : {}),
+      ...(this.styles[lineIndex]?.[charIndex] || {}),
+    } as R;
   }
 
   /**
@@ -245,9 +141,16 @@ export abstract class StyledText<
    * @param {Number} startIndex Start index to get styles at
    * @param {Number} [endIndex] End index to get styles at, if not specified startIndex + 1
    */
-  setSelectionStyles(styles: object, startIndex: number, endIndex?: number) {
+  setSelectionStyles(
+    style: TextStyleDeclaration,
+    startIndex: number,
+    endIndex?: number
+  ) {
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
-      this._extendStyles(i, styles);
+      const { lineIndex, charIndex } = this.getStyleCursorPosition(i);
+      (this.styles[lineIndex] || (this.styles[lineIndex] = {}))[charIndex] = {
+        ...style,
+      };
     }
     /* not included in _extendStyles to avoid clearing cache more than once */
     this._forceClearCache = true;
@@ -284,51 +187,5 @@ export abstract class StyledText<
       ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
       ...this._getStyleDeclaration(lineIndex, charIndex),
     } as CompleteTextStyleDeclaration;
-  }
-
-  /**
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @param {Object} style
-   * @private
-   */
-  protected _setStyleDeclaration(
-    lineIndex: number,
-    charIndex: number,
-    style: object
-  ) {
-    this.styles[lineIndex][charIndex] = style;
-  }
-
-  /**
-   *
-   * @param {Number} lineIndex
-   * @param {Number} charIndex
-   * @private
-   */
-  protected _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    delete this.styles[lineIndex][charIndex];
-  }
-
-  /**
-   * @param {Number} lineIndex
-   * @return {Boolean} if the line exists or not
-   * @private
-   */
-  protected _getLineStyle(lineIndex: number): boolean {
-    return !!this.styles[lineIndex];
-  }
-
-  /**
-   * Set the line style to an empty object so that is initialized
-   * @param {Number} lineIndex
-   * @private
-   */
-  protected _setLineStyle(lineIndex: number) {
-    this.styles[lineIndex] = {};
-  }
-
-  protected _deleteLineStyle(lineIndex: number) {
-    delete this.styles[lineIndex];
   }
 }
