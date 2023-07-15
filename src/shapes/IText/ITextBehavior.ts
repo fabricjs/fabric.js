@@ -563,7 +563,7 @@ export abstract class ITextBehavior<
         ? this.compositionStart
         : this.selectionStart,
       boundaries = this._getCursorBoundaries(desiredPosition),
-      cursorLocation = this.get2DCursorLocation(desiredPosition),
+      cursorLocation = this.getCursorPosition(desiredPosition),
       lineIndex = cursorLocation.lineIndex,
       charIndex = cursorLocation.charIndex,
       charHeight =
@@ -714,11 +714,9 @@ export abstract class ITextBehavior<
    */
   removeStyleFromTo(start: number, end: number) {
     const { lineIndex: lineStart, charIndex: charStart } =
-        this.get2DCursorLocation(start, true),
-      { lineIndex: lineEnd, charIndex: charEnd } = this.get2DCursorLocation(
-        end,
-        true
-      );
+        this.getStyleCursorPosition(start),
+      { lineIndex: lineEnd, charIndex: charEnd } =
+        this.getStyleCursorPosition(end);
     if (lineStart !== lineEnd) {
       // step1 remove the trailing of lineStart
       if (this.styles[lineStart]) {
@@ -926,7 +924,7 @@ export abstract class ITextBehavior<
     start: number,
     copiedStyle?: TextStyleDeclaration[]
   ) {
-    const cursorLoc = this.get2DCursorLocation(start, true),
+    const cursorLoc = this.getStyleCursorPosition(start),
       addedLines = [0];
     let linesLength = 0;
     // get an array of how many char per lines are being added.

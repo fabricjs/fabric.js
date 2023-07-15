@@ -560,10 +560,10 @@
     assert.equal(iText.styles[4], undefined, 'style line 4 has been removed');
   });
 
-  QUnit.test('get2DCursorLocation with splitByGrapheme', function(assert) {
+  QUnit.test('getCursorPosition with splitByGrapheme', function(assert) {
     var iText = new fabric.Textbox('aaaaaaaaaaaaaaaaaaaaaaaa',
       { width: 60, splitByGrapheme: true });
-    var loc = iText.get2DCursorLocation();
+    var loc = iText.getCursorPosition(0);
 
     // [ [ '由', '石', '墨' ],
     //   [ '分', '裂', '的' ],
@@ -579,21 +579,15 @@
     assert.equal(loc.charIndex, 0);
 
     // '由石墨|分裂的石墨分裂由石墨分裂由石墨分裂的石墨分裂'
-    iText.selectionStart = iText.selectionEnd = 4;
-    loc = iText.get2DCursorLocation();
-
+    loc = iText.getCursorPosition(4);
     assert.equal(loc.lineIndex, 1, 'selection end 4 line 1');
     assert.equal(loc.charIndex, 1, 'selection end 4 char 1');
 
-    iText.selectionStart = iText.selectionEnd = 7;
-    loc = iText.get2DCursorLocation();
-
+    loc = iText.getCursorPosition(7);
     assert.equal(loc.lineIndex, 2, 'selection end 7 line 2');
     assert.equal(loc.charIndex, 1, 'selection end 7 char 1');
 
-    iText.selectionStart = iText.selectionEnd = 14;
-    loc = iText.get2DCursorLocation();
-
+    loc = iText.getCursorPosition(14);
     assert.equal(loc.lineIndex, 4, 'selection end 14 line 4');
     assert.equal(loc.charIndex, 2, 'selection end 14 char 2');
   });

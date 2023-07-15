@@ -171,34 +171,28 @@
       assert.equal(iText.selectionStart, 0);
     });
 
-    QUnit.test('get2DCursorLocation', function(assert) {
+    QUnit.test('getCursorPosition', function(assert) {
       var iText = new fabric.IText('test\nfoo\nbarbaz');
-      var loc = iText.get2DCursorLocation();
+      var loc = iText.getCursorPosition(0);
 
       assert.equal(loc.lineIndex, 0);
       assert.equal(loc.charIndex, 0);
 
       // 'tes|t'
-      iText.selectionStart = iText.selectionEnd = 3;
-      loc = iText.get2DCursorLocation();
-
+      loc = iText.getCursorPosition(3);
       assert.equal(loc.lineIndex, 0);
       assert.equal(loc.charIndex, 3);
 
       // test
       // fo|o
-      iText.selectionStart = iText.selectionEnd = 7;
-      loc = iText.get2DCursorLocation();
-
+      loc = iText.getCursorPosition(7);
       assert.equal(loc.lineIndex, 1);
       assert.equal(loc.charIndex, 2);
 
       // test
       // foo
       // barba|z
-      iText.selectionStart = iText.selectionEnd = 14;
-      loc = iText.get2DCursorLocation();
-
+      loc = iText.getCursorPosition(14);
       assert.equal(loc.lineIndex, 2);
       assert.equal(loc.charIndex, 5);
     });

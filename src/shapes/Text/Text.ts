@@ -526,29 +526,33 @@ export class Text<
   }
 
   /**
-   * Returns 2d representation (lineIndex and charIndex) of cursor
-   * @param {Number} selectionStart
-   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
+   * Returns lineIndex and charIndex of cursor offset from start
+   * @param {Number} index
+   * @param {string[][]} [lines] find within these lines
    */
-  get2DCursorLocation(selectionStart: number, skipWrapping?: boolean) {
-    const lines = skipWrapping ? this._unwrappedTextLines : this._textLines;
+  private findCursorPosition(index: number, lines: string[][]) {
     let i: number;
     for (i = 0; i < lines.length; i++) {
-      if (selectionStart <= lines[i].length) {
+      if (index <= lines[i].length) {
         return {
           lineIndex: i,
-          charIndex: selectionStart,
+          charIndex: index,
         };
       }
-      selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+      index -= lines[i].length + this.missingNewlineOffset(i);
     }
     return {
       lineIndex: i - 1,
-      charIndex:
-        lines[i - 1].length < selectionStart
-          ? lines[i - 1].length
-          : selectionStart,
+      charIndex: lines[i - 1].length < index ? lines[i - 1].length : index,
     };
+  }
+
+  getCursorPosition(index: number) {
+    return this.findCursorPosition(index, this._textLines);
+  }
+
+  getStyleCursorPosition(index: number) {
+    return this.findCursorPosition(index, this._unwrappedTextLines);
   }
 
   /**
@@ -1410,7 +1414,7 @@ export class Text<
       baseline: number;
     }
   ) {
-    const loc = this.get2DCursorLocation(start, true),
+    const loc = this.getStyleCursorPosition(start),
       fontSize = this.getValueOfPropertyAt(
         loc.lineIndex,
         loc.charIndex,

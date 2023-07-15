@@ -10,7 +10,6 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
-import type { TextStyleDeclaration } from '../Text/TextStyles';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -158,118 +157,6 @@ export abstract class ITextKeyBehavior<
     this.canvas && this.canvas.requestRenderAll();
   }
 
-  getDiffFromInput() {
-    // selection diff
-    const {
-        selectionStart: prevSelectionStart,
-        selectionEnd: prevSelectionEnd,
-      } = this,
-      hadTextSelection = prevSelectionStart !== prevSelectionEnd,
-      { selectionStart: nextSelectionStart, selectionEnd: nextSelectionEnd } =
-        this.fromStringToGraphemeSelection(
-          this.hiddenTextarea.selectionStart,
-          this.hiddenTextarea.selectionEnd,
-          this.hiddenTextarea.value
-        ),
-      backDelete = prevSelectionStart > nextSelectionStart;
-    // text diff
-    const prevText = this._text,
-      { graphemeText: nextText } = this._splitTextIntoLines(
-        this.hiddenTextarea.value
-      ),
-      prevCharCount = prevText.length,
-      nextCharCount = nextText.length,
-      charDiff =
-        nextCharCount -
-        prevCharCount +
-        (hadTextSelection ? prevSelectionEnd - prevSelectionStart : 0);
-    // state diff
-    const removedText = hadTextSelection
-      ? prevText.slice(prevSelectionStart, prevSelectionEnd)
-      : nextCharCount < prevCharCount
-      ? backDelete
-        ? prevText.slice(prevSelectionEnd + charDiff, prevSelectionEnd)
-        : prevText.slice(prevSelectionStart, prevSelectionStart - charDiff)
-      : [];
-    const removeFrom =
-      removedText.length && !hadTextSelection
-        ? backDelete
-          ? prevSelectionEnd - removedText.length
-          : prevSelectionEnd
-        : prevSelectionStart;
-    const insertedText = nextText.slice(
-      nextSelectionEnd - charDiff,
-      nextSelectionEnd
-    );
-    // get styles from event
-    let stylesToAdd: TextStyleDeclaration[] = [];
-    const {
-      copyPasteData: { copiedText, copiedStyle },
-    } = getEnv();
-    if (
-      this.fromPaste &&
-      insertedText.join('') === copiedText &&
-      !config.disableStyleCopyPaste
-    ) {
-      stylesToAdd = copiedStyle;
-    } else {
-      const selectionStartStyle = this.getSelectionStyles(prevSelectionStart);
-      stylesToAdd = new Array(insertedText.length).fill().map(() => ({
-        ...selectionStartStyle,
-      }));
-    }
-    // style diff
-    const removeStyleFrom = this.get2DCursorLocation(removeFrom, true);
-    const removeStyleTo = this.get2DCursorLocation(
-      removeFrom + removedText.length,
-      true
-    );
-    const styleCursor = { ...removeStyleTo };
-    while (
-      styleCursor.lineIndex >= removeStyleFrom.lineIndex &&
-      styleCursor.charIndex >= removeStyleFrom.charIndex
-    ) {
-      delete this.styles[styleCursor.lineIndex][styleCursor.charIndex];
-      if (styleCursor.charIndex > 0) {
-        styleCursor.charIndex--;
-      } else {
-        styleCursor.lineIndex--;
-      }
-    }
-    stylesToAdd.forEach((style) => {});
-    const prevStyles = [...this.styleManager.styles];
-    const nextStyles = [...this.styleManager.styles];
-    const stylesToRemove = nextStyles.splice(
-      removeFrom,
-      removedText.length,
-      ...stylesToAdd
-    );
-    // diff
-    return {
-      before: {
-        selectionStart: prevSelectionStart,
-        selectionEnd: prevSelectionEnd,
-        value: prevText,
-        styles: prevStyles,
-      },
-      after: {
-        selectionStart: nextSelectionStart,
-        selectionEnd: nextSelectionEnd,
-        value: nextText,
-        styles: nextStyles,
-      },
-      diff: {
-        index: removeFrom,
-        removed: removedText,
-        added: insertedText,
-        styles: {
-          removed: stylesToRemove,
-          added: stylesToAdd,
-        },
-      },
-    };
-  }
-
   /**
    * Handles onInput event
    * @param {Event} e Event object
@@ -373,7 +260,7 @@ export abstract class ITextKeyBehavior<
    */
   getDownCursorOffset(e: KeyboardEvent, isRight: boolean): number {
     const selectionProp = this._getSelectionForOffset(e, isRight),
-      cursorLocation = this.get2DCursorLocation(selectionProp),
+      cursorLocation = this.getCursorPosition(selectionProp),
       lineIndex = cursorLocation.lineIndex;
     // if on last line, down cursor goes to end of line
     if (
@@ -418,7 +305,7 @@ export abstract class ITextKeyBehavior<
    */
   getUpCursorOffset(e: KeyboardEvent, isRight: boolean): number {
     const selectionProp = this._getSelectionForOffset(e, isRight),
-      cursorLocation = this.get2DCursorLocation(selectionProp),
+      cursorLocation = this.getCursorPosition(selectionProp),
       lineIndex = cursorLocation.lineIndex;
     if (lineIndex === 0 || e.metaKey || e.keyCode === 33) {
       // if on first line, up cursor goes to start of line

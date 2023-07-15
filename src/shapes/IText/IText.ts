@@ -327,18 +327,6 @@ export class IText<
   }
 
   /**
-   * Returns 2d representation (lineIndex and charIndex) of cursor (or selection start)
-   * @param {Number} [selectionStart] Optional index. When not given, current selectionStart is used.
-   * @param {Boolean} [skipWrapping] consider the location for unwrapped lines. useful to manage styles.
-   */
-  get2DCursorLocation(
-    selectionStart = this.selectionStart,
-    skipWrapping?: boolean
-  ) {
-    return super.get2DCursorLocation(selectionStart, skipWrapping);
-  }
-
-  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
@@ -434,7 +422,7 @@ export class IText<
   __getCursorBoundariesOffsets(index: number) {
     let topOffset = 0,
       leftOffset = 0;
-    const { charIndex, lineIndex } = this.get2DCursorLocation(index);
+    const { charIndex, lineIndex } = this.getCursorPosition(index);
 
     for (let i = 0; i < lineIndex; i++) {
       topOffset += this.getHeightOfLine(i);
@@ -495,7 +483,7 @@ export class IText<
     boundaries: CursorBoundaries,
     selectionStart: number
   ) {
-    const cursorLocation = this.get2DCursorLocation(selectionStart),
+    const cursorLocation = this.getCursorPosition(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
@@ -576,8 +564,8 @@ export class IText<
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
       isJustify = this.textAlign.includes(JUSTIFY),
-      start = this.get2DCursorLocation(selectionStart),
-      end = this.get2DCursorLocation(selectionEnd),
+      start = this.getCursorPosition(selectionStart),
+      end = this.getCursorPosition(selectionEnd),
       startLine = start.lineIndex,
       endLine = end.lineIndex,
       startChar = start.charIndex < 0 ? 0 : start.charIndex,
@@ -680,7 +668,7 @@ export class IText<
    * @private
    */
   _getCurrentCharIndex() {
-    const cursorPosition = this.get2DCursorLocation(this.selectionStart, true),
+    const cursorPosition = this.getStyleCursorPosition(this.selectionStart),
       charIndex =
         cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
     return { l: cursorPosition.lineIndex, c: charIndex };

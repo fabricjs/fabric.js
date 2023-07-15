@@ -30,10 +30,10 @@ export abstract class StyledText<
   protected declare abstract _textLines: string[][];
   protected declare _forceClearCache: boolean;
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
-  abstract get2DCursorLocation(
-    selectionStart: number,
-    skipWrapping?: boolean
-  ): { charIndex: number; lineIndex: number };
+  abstract getStyleCursorPosition(index: number): {
+    charIndex: number;
+    lineIndex: number;
+  };
 
   /**
    * Returns true if object has no styling or no styling in a line
@@ -185,7 +185,7 @@ export abstract class StyledText<
   }
 
   private _extendStyles(index: number, styles: TextStyleDeclaration): void {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(index, true);
+    const { lineIndex, charIndex } = this.getStyleCursorPosition(index);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
@@ -224,11 +224,18 @@ export abstract class StyledText<
    * @return {Object} style Style object at a specified index
    * @private
    */
-  getStyleAtPosition(position: number, complete?: boolean) {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(position, true);
-    return complete
-      ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
-      : this._getStyleDeclaration(lineIndex, charIndex);
+  getStyleAtPosition<
+    T extends boolean,
+    R extends T extends true
+      ? CompleteTextStyleDeclaration
+      : TextStyleDeclaration
+  >(position: number, complete?: T): R {
+    const { lineIndex, charIndex } = this.getStyleCursorPosition(position);
+    return (
+      complete
+        ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
+        : this._getStyleDeclaration(lineIndex, charIndex)
+    ) as R;
   }
 
   /**
