@@ -589,49 +589,6 @@
       });
     });
 
-    QUnit.test('getCurrentCharFontSize', function(assert) {
-      var iText = new fabric.IText('test foo bar-baz\nqux', {
-        styles: {
-          0: {
-            0: { fontSize: 20 },
-            1: { fontSize: 60 }
-          }
-        }
-      });
-
-      assert.equal(typeof iText.getCurrentCharFontSize, 'function');
-      iText.selectionStart = 0;
-      assert.equal(iText.getCurrentCharFontSize(), 20);
-      iText.selectionStart = 1;
-      assert.equal(iText.getCurrentCharFontSize(), 20);
-      iText.selectionStart = 2;
-      assert.equal(iText.getCurrentCharFontSize(), 60);
-      iText.selectionStart = 3;
-      assert.equal(iText.getCurrentCharFontSize(), 40);
-    });
-
-    QUnit.test('getCurrentCharColor', function(assert) {
-      var iText = new fabric.IText('test foo bar-baz\nqux', {
-        styles: {
-          0: {
-            0: { fill: 'red' },
-            1: { fill: 'green' }
-          }
-        },
-        fill: '#333',
-      });
-
-      assert.equal(typeof iText.getCurrentCharColor, 'function');
-      iText.selectionStart = 0;
-      assert.equal(iText.getCurrentCharColor(), 'red');
-      iText.selectionStart = 1;
-      assert.equal(iText.getCurrentCharColor(), 'red');
-      iText.selectionStart = 2;
-      assert.equal(iText.getCurrentCharColor(), 'green');
-      iText.selectionStart = 3;
-      assert.equal(iText.getCurrentCharColor(), '#333');
-    });
-
     QUnit.test('toSVGWithFonts', function(assert) {
       var iText = new fabric.IText('test foo bar-baz\nqux', {
         styles: {

@@ -7,7 +7,6 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -636,42 +635,6 @@ export class IText<
       );
       boundaries.topOffset += realLineHeight;
     }
-  }
-
-  /**
-   * High level function to know the height of the cursor.
-   * the currentChar is the one that precedes the cursor
-   * Returns fontSize of char at the current cursor
-   * Unused from the library, is for the end user
-   * @return {Number} Character font size
-   */
-  getCurrentCharFontSize(): number {
-    const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fontSize');
-  }
-
-  /**
-   * High level function to know the color of the cursor.
-   * the currentChar is the one that precedes the cursor
-   * Returns color (fill) of char at the current cursor
-   * if the text object has a pattern or gradient for filler, it will return that.
-   * Unused by the library, is for the end user
-   * @return {String | TFiller} Character color (fill)
-   */
-  getCurrentCharColor(): string | TFiller | null {
-    const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
-  }
-
-  /**
-   * Returns the cursor position for the getCurrent.. functions
-   * @private
-   */
-  _getCurrentCharIndex() {
-    const cursorPosition = this.getStyleCursorPosition(this.selectionStart),
-      charIndex =
-        cursorPosition.charIndex > 0 ? cursorPosition.charIndex - 1 : 0;
-    return { l: cursorPosition.lineIndex, c: charIndex };
   }
 
   dispose() {
