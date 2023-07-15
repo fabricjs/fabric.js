@@ -573,12 +573,12 @@ export class Text<
           charIndex: index,
         };
       }
-      index -= lines[i].length;
+      index -= lines[i].length + 1;
     }
     const lineIndex = lines.length - 1;
     return {
       lineIndex,
-      charIndex: Math.min(index, lines[lineIndex].length - 1),
+      charIndex: Math.min(index, lines[lineIndex].length),
     };
   }
 
