@@ -240,7 +240,6 @@ export class InputEventDiff {
         styles: styleDiff.after,
       },
       diff: {
-        index: selectionDiff.before.selectionStart,
         ...textDiff.diff,
         styles: styleDiff.diff,
       },
