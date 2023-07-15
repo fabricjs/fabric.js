@@ -203,7 +203,12 @@ export abstract class ITextKeyBehavior<
       removeFrom = prevSelectionStart;
       removedText = prevText.slice(removeFrom, prevSelectionEnd);
     }
-    // get styles from event
+    // styles diff
+    // styles is poorly designed
+    // it correlates to the unwrapped lines instead of to the split text
+    // this causes too many problems, input diff being one of them
+    // this code it an attempt to workaround the poor design without refactoring text
+    // TODO: revisit once styles are refactored
     let stylesToAdd: TextStyleDeclaration[] = [];
     const { copyPasteData } = getEnv();
     if (
