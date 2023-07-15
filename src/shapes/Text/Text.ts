@@ -525,28 +525,6 @@ export class Text<
     return 1;
   }
 
-  /**
-   * Returns lineIndex and charIndex of cursor offset from start
-   * @param {Number} index
-   * @param {string[][]} [lines] find within these lines
-   */
-  private findCursorPosition(index: number, lines: string[][]) {
-    let i: number;
-    for (i = 0; i < lines.length; i++) {
-      if (index <= lines[i].length) {
-        return {
-          lineIndex: i,
-          charIndex: index,
-        };
-      }
-      index -= lines[i].length + this.missingNewlineOffset(i);
-    }
-    return {
-      lineIndex: i - 1,
-      charIndex: lines[i - 1].length < index ? lines[i - 1].length : index,
-    };
-  }
-
   getCursorPosition(index: number, lines = this._textLines) {
     let i: number;
     for (i = 0; i < lines.length; i++) {
