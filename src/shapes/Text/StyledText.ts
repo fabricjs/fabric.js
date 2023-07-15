@@ -185,7 +185,7 @@ export abstract class StyledText<
   }
 
   private _extendStyles(index: number, styles: TextStyleDeclaration): void {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(index);
+    const { lineIndex, charIndex } = this.get2DCursorLocation(index, true);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
@@ -225,7 +225,7 @@ export abstract class StyledText<
    * @private
    */
   getStyleAtPosition(position: number, complete?: boolean) {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(position);
+    const { lineIndex, charIndex } = this.get2DCursorLocation(position, true);
     return complete
       ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
       : this._getStyleDeclaration(lineIndex, charIndex);
