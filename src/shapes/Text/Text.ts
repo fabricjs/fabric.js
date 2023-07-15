@@ -551,7 +551,6 @@ export class Text<
       if (char === '\n') {
         lineIndex++;
         charIndex = 0;
-        offset++;
       } else if (offset === index) {
         return {
           lineIndex,

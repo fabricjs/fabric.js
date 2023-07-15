@@ -217,9 +217,7 @@ export abstract class ITextKeyBehavior<
       inputType !== 'deleteContentBackward' &&
       inputType !== 'deleteContentForward'
     ) {
-      const selectionStartStyle = this.getStyleAtPosition(
-        Math.max(0, prevSelectionStart - 1)
-      );
+      const selectionStartStyle = this.getStyleAtPosition(prevSelectionStart);
       stylesToAdd = new Array(insertedText.length).fill().map(() => ({
         ...selectionStartStyle,
       }));
@@ -236,7 +234,6 @@ export abstract class ITextKeyBehavior<
       removedText.length,
       ...stylesToAdd
     );
-    console.log(stylesArr, nextText);
     const { styles: nextStyles } = nextText.reduce(
       ({ lineIndex, charIndex, styles }, char, index) => {
         if (char === '\n') {
