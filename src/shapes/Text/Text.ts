@@ -543,21 +543,25 @@ export class Text<
     };
   }
 
-  getStyleCursorPosition(index: number, lines = this._unwrappedTextLines) {
-    for (let i = 0; i < lines.length; i++) {
-      if (index < lines[i].length) {
+  getStyleCursorPosition(offset: number, text = this._text) {
+    let lineIndex = 0,
+      charIndex = 0;
+    for (let index = 0; index < text.length; index++) {
+      const char = text[index];
+      if (char === '\n') {
+        lineIndex++;
+        charIndex = 0;
+        offset++;
+      } else if (offset === index) {
         return {
-          lineIndex: i,
-          charIndex: index,
+          lineIndex,
+          charIndex,
         };
+      } else {
+        charIndex++;
       }
-      index -= lines[i].length + 1;
     }
-    const lineIndex = lines.length - 1;
-    return {
-      lineIndex,
-      charIndex: Math.min(index, lines[lineIndex].length),
-    };
+    return { lineIndex, charIndex };
   }
 
   /**
