@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import './setupCoverage';
-import './setupApp';
 import path from 'path';
+import './setupApp';
+import './setupCoverage';
 
 test.beforeEach(async ({ page }, testInfo) => {
   // fix snapshot names so they are cross platform
