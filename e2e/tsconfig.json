@@ -1,11 +1,11 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "./dist",
+    "allowSyntheticDefaultImports": true,
     "paths": { "fabric": ["../dist"], "init": ["./site/init.ts"] }
   }
 }
