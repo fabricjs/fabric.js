@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(Text): onInput styles [#9096](https://github.com/fabricjs/fabric.js/pull/9096)
+- BREAKING fix(Text): styles `onInput` [#9096](https://github.com/fabricjs/fabric.js/pull/9096)
   **BERAKING**: `get2DCursorLocation` => `getCursorPosition`, `getStyleCursorPosition`
   **BREAKING**: rm `getCurrentCharFontSize`, `getCurrentCharColor`, `_getCurrentCharIndex`
   **BREAKING**: rm `cleanStyle`, `removeStyle`, `_extendStyles`, `_setStyleDeclaration`, `_deleteStyleDeclaration`, `_getLineStyle`, `_setLineStyle`, `_deleteLineStyle`
