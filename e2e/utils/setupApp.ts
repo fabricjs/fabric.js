@@ -8,12 +8,15 @@ import {
 } from 'fs-extra';
 import path from 'path';
 
-test.beforeEach(async ({ page }, { file, outputDir }) => {
-  // install the app
-  const templateDir = path.resolve('.codesandbox', 'templates', 'vanilla');
+test.beforeEach(async ({ page }, { file, outputDir, config }) => {
   const testDir = path.resolve(file, '..');
-  const destination = path.resolve(outputDir, 'app');
-  ensureDirSync(destination);
+  const pathToApp = path.resolve(testDir, 'index.ts');
+  if (!existsSync(pathToApp)) {
+    return;
+  }
+  config.metadata.app = true;
+  page.evaluate(() => document.body.append('Loading App...'));
+  const templateDir = path.resolve('.codesandbox', 'templates', 'vanilla');
   // install deps
   if (!existsSync(path.resolve(templateDir, 'node_modules'))) {
     execSync('npm link', { cwd: process.cwd(), stdio: 'inherit' });
@@ -27,6 +30,8 @@ test.beforeEach(async ({ page }, { file, outputDir }) => {
     });
   }
   // create index.html
+  const destination = path.resolve(outputDir, 'app');
+  ensureDirSync(destination);
   const pathToIndex = path.resolve(destination, 'index.html');
   writeFileSync(
     pathToIndex,
@@ -34,13 +39,13 @@ test.beforeEach(async ({ page }, { file, outputDir }) => {
       .toString()
       .replace(
         /src="([^"]+)"/,
-        `src="${path.relative(destination, path.resolve(testDir, 'index.ts'))}"`
+        `src="${path.relative(destination, pathToApp)}"`
       )
   );
   // build
   const pathToBuild = path.resolve(destination, 'dist');
   execSync(
-    `npx parcel build ${pathToIndex} ${
+    `npx parcel build ${pathToIndex} --trace --no-optimize --no-content-hash ${
       process.env.CI
         ? '--no-cache'
         : `--cache-dir ${path.resolve(testDir, '.parcel-cache')}`
