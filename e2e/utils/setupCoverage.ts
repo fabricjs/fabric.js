@@ -16,13 +16,14 @@ test.afterEach(async ({ page }, { outputDir }) => {
   const nyc = _.fromPairs(
     await Promise.all(
       coverage.map(async ({ url, source, functions }) => {
-        const { pathname } = new URL(url);
-        const pathTo = path.resolve(process.cwd(), pathname.slice(1));
-        const converter = v8toIstanbul('', 0, {
-          source: source!.replace(
-            'sourceMappingURL=',
-            `sourceMappingURL=${path.dirname(pathTo)}/`
-          ),
+        let pathname = url;
+        try {
+          // remove url origin
+          pathname = pathname.slice(new URL(url).origin.length + 1);
+        } catch (error) {}
+        const pathTo = path.resolve(process.cwd(), pathname);
+        const converter = v8toIstanbul(pathTo, 0, {
+          source: source!,
         });
         await converter.load();
         converter.applyCoverage(functions);
