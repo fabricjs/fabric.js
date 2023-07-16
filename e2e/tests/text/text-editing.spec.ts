@@ -4,7 +4,7 @@ import '../../utils/setupTest';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
-  await page.goto('http://127.0.0.1:8080/e2e/site');
+  await page.goto('/e2e/site');
   const textboxUtil = await util.addTextbox('initial text', {
     width: 200,
     left: 50,
