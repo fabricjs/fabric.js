@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { writeFileSync } from 'fs';
+import { ensureDirSync, writeFileSync } from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
 import { URL } from 'url';
@@ -30,6 +30,7 @@ test.afterEach(async ({ page }, { outputDir }) => {
       })
     )
   );
+  ensureDirSync(outputDir);
   writeFileSync(
     path.resolve(outputDir, 'coverage-v8.json'),
     JSON.stringify(coverage, null, 2)
