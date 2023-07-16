@@ -8,7 +8,7 @@ test('textbox typing and resizing', async ({ page }) => {
   const textboxUtil = new ObjectUtil('textbox', page);
   const textCenter = await textboxUtil.getObjectCenter();
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'initial' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'initial.png' });
 
   await util.clickCanvas({
     position: textCenter,
@@ -16,7 +16,7 @@ test('textbox typing and resizing', async ({ page }) => {
     delay: 200,
   });
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'start' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'start.png' });
 
   await page
     .locator('textarea')
@@ -27,7 +27,7 @@ test('textbox typing and resizing', async ({ page }) => {
       }
     );
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'typed' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'typed.png' });
 
   const mrControlPoint = await textboxUtil.getObjectControlPoint('mr');
 
@@ -40,7 +40,7 @@ test('textbox typing and resizing', async ({ page }) => {
     clickCount: 1,
     delay: 200,
   });
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'exit_editing' });
+  expect(await util.screenshot()).toMatchSnapshot({ name: 'exit_editing.png' });
 
   // click the object to select it
   await util.clickCanvas({
@@ -54,7 +54,7 @@ test('textbox typing and resizing', async ({ page }) => {
     steps: 40,
   });
   expect(await util.screenshot()).toMatchSnapshot({
-    name: 'increase_width_mr',
+    name: 'increase_width_mr.png',
   });
   // drag in the opposite direction
   await page.mouse.move(mrControlPoint.x - 300, mrControlPoint.y, {
@@ -62,7 +62,7 @@ test('textbox typing and resizing', async ({ page }) => {
   });
   await page.mouse.up();
   expect(await util.screenshot()).toMatchSnapshot({
-    name: 'decrease_width_mr',
+    name: 'decrease_width_mr.png',
   });
 
   // drag the ml control
@@ -73,7 +73,7 @@ test('textbox typing and resizing', async ({ page }) => {
     steps: 40,
   });
   expect(await util.screenshot()).toMatchSnapshot({
-    name: 'increase_width_ml',
+    name: 'increase_width_ml.png',
   });
   // drag in the opposite direction
   await page.mouse.move(mlControlPoint.x + 300, mlControlPoint.y, {
@@ -81,6 +81,6 @@ test('textbox typing and resizing', async ({ page }) => {
   });
   await page.mouse.up();
   expect(await util.screenshot()).toMatchSnapshot({
-    name: 'decrease_width_ml',
+    name: 'decrease_width_ml.png',
   });
 });

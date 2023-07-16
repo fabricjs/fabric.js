@@ -52,7 +52,6 @@
     "build-tests": "rollup -c ./rollup.test.config.js",
     "test:jest": "jest",
     "test": "npm run cli -- test",
-    "pretest": "tsc --incremental -p e2e/tsconfig.json",
     "sandbox": "npm run sandboxscript -- sandbox",
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c chrome firefox",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
@@ -76,10 +75,10 @@
     "jsdom": "^20.0.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.20.7",
-    "@babel/core": "^7.20.12",
-    "@babel/preset-env": "^7.21.5",
-    "@babel/preset-typescript": "^7.21.5",
+    "@babel/cli": "^7.22.9",
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "@babel/preset-typescript": "^7.22.5",
     "@playwright/test": "^1.31.2",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-json": "^6.0.0",

@@ -20,17 +20,22 @@ test.beforeEach(async ({ page }, { file }) => {
   const pathToApp = path.resolve(
     process.cwd(),
     'e2e',
-    'dist',
     'tests',
+    testDir,
+    'index.ts'
+  );
+  const pathToBuiltApp = path.resolve(
+    process.cwd(),
+    'e2e',
+    'dist',
     testDir,
     'index.js'
   );
-  const exists = existsSync(pathToApp);
-  if (
-    !exists &&
-    existsSync(path.resolve(process.cwd(), 'e2e', 'tests', testDir, 'index.ts'))
-  ) {
-    throw new Error('pretest script did not run');
+  const exists = existsSync(pathToBuiltApp);
+  if (!exists && existsSync(pathToApp)) {
+    throw new Error(
+      `test script '${pathToBuiltApp}' not found: global setup script probably did not run`
+    );
   } else if (exists) {
     const trigger = page.evaluate(
       () =>
