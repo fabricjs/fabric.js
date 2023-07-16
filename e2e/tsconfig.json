@@ -6,6 +6,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
-    "paths": { "fabric": ["../dist"], "init": ["./site/init.ts"] }
+    /**  */
+    "paths": { "fabric": ["../dist"], "test": ["./site/test.ts"] }
   }
 }

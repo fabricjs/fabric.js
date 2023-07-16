@@ -7,11 +7,11 @@ import v8toIstanbul from 'v8-to-istanbul';
 
 // https://playwright.dev/docs/api/class-coverage
 
-test.beforeEach(async ({ page }, testInfo) => {
+test.beforeEach(async ({ page }) => {
   await page.coverage.startJSCoverage({ reportAnonymousScripts: false });
 });
 
-test.afterEach(async ({ page }, { outputDir, config }) => {
+test.afterEach(async ({ page }, { outputDir }) => {
   const coverage = await page.coverage.stopJSCoverage();
   const nyc = _.fromPairs(
     await Promise.all(
