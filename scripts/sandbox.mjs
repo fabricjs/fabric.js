@@ -4,7 +4,8 @@ import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import path from 'node:path';
 import process from 'node:process';
-import { createCodeSandbox, ignore } from '../.codesandbox/deploy.mjs';
+import { createCodeSandbox } from '../.codesandbox/deploy.mjs';
+import { ignore } from '../.codesandbox/utils.mjs';
 import { startSandbox } from '../.codesandbox/start.mjs';
 import { wd } from './dirname.mjs';
 
