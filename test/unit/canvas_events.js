@@ -26,9 +26,7 @@
     }
   });
 
-  QUnit.test('_beforeTransform', function (assert) {
-    assert.ok(typeof canvas._beforeTransform === 'function');
-
+  QUnit.test('_setupCurrentTransform', function (assert) {
     var canvasOffset = canvas.calcOffset();
     var rect = new fabric.Rect({ left: 50, top: 50, width: 50, height: 50 });
     canvas.add(rect);
@@ -67,7 +65,6 @@
         which: 1,
         target: canvas.upperCanvasEl
       };
-      canvas._beforeTransform(e, rect);
     }
     assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
     assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');

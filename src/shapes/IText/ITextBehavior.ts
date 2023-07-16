@@ -34,7 +34,7 @@ export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never | { index: number; action: string };
   tripleclick: TPointerEventInfo;
-  'editing:entered': never | { e: TPointerEvent };
+  'editing:entered': { e?: TPointerEvent };
   'editing:exited': never;
 };
 
@@ -394,7 +394,7 @@ export abstract class ITextBehavior<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered', e ? { e } : undefined);
+    this.fire('editing:entered', { e });
     this._fireSelectionChanged();
     if (this.canvas) {
       // @ts-expect-error in reality it is an IText instance

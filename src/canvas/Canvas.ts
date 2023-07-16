@@ -844,7 +844,7 @@ export class Canvas extends SelectableCanvas {
         target !== this._activeObject &&
         target.activeOn === 'up'
       ) {
-        this.setActiveObject(target, e);
+        this.setActiveObject(target, { e });
         shouldRender = true;
       } else {
         const control = target.controls[corner as string];
@@ -1119,7 +1119,7 @@ export class Canvas extends SelectableCanvas {
     if (target) {
       const alreadySelected = target === this._activeObject;
       if (target.selectable && target.activeOn === 'down') {
-        this.setActiveObject(target, e);
+        this.setActiveObject(target, { e });
       }
       const corner = target._findTargetCorner(
         this.getPointer(e, true),
@@ -1167,17 +1167,6 @@ export class Canvas extends SelectableCanvas {
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
-  }
-
-  /**
-   * @private
-   */
-  _beforeTransform(e: TPointerEvent) {
-    const t = this._currentTransform!;
-    this.fire('before:transform', {
-      e,
-      transform: t,
-    });
   }
 
   /**
@@ -1502,7 +1491,9 @@ export class Canvas extends SelectableCanvas {
           this._hoveredTargets = [...this.targets];
           if (activeSelection.size() === 1) {
             // activate last remaining object
-            this._setActiveObject(activeSelection.item(0) as FabricObject, e);
+            this._setActiveObject(activeSelection.item(0) as FabricObject, {
+              e,
+            });
           }
         } else {
           //  `target` isn't part of active selection => add it
@@ -1519,7 +1510,7 @@ export class Canvas extends SelectableCanvas {
         // ISSUE 4115: should we consider subTargets here?
         // this._hoveredTargets = [];
         // this._hoveredTargets = this.targets.concat();
-        this._setActiveObject(activeSelection, e);
+        this._setActiveObject(activeSelection, { e });
         this._fireSelectionEvents([activeObject], e);
       }
       return true;
@@ -1567,11 +1558,11 @@ export class Canvas extends SelectableCanvas {
     // set active object
     if (objects.length === 1) {
       // set as active object
-      this.setActiveObject(objects[0], e);
+      this.setActiveObject(objects[0], { e });
     } else if (objects.length > 1) {
       // add to active selection and make it the active object
       this._activeSelection.add(...objects);
-      this.setActiveObject(this._activeSelection, e);
+      this.setActiveObject(this._activeSelection, { e });
     }
 
     // cleanup
