@@ -1,35 +1,35 @@
 import { test } from '@playwright/test';
 import { execSync } from 'child_process';
-import { copySync, existsSync, readFileSync, writeFileSync } from 'fs-extra';
+import {
+  ensureDirSync,
+  existsSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs-extra';
 import path from 'path';
-import { ignore } from '../../.codesandbox/utils.mjs';
 
 test.beforeEach(async ({ page }, { file, outputDir }) => {
   // install the app
+  const templateDir = path.resolve('.codesandbox', 'templates', 'vanilla');
   const destination = path.resolve(outputDir, 'app');
-  if (!existsSync(destination)) {
-    const templateDir = path.resolve('.codesandbox', 'templates', 'vanilla');
-    copySync(templateDir, destination, {
-      filter: (src) => !ignore(templateDir, path.relative(templateDir, src)),
-    });
-  }
+  ensureDirSync(destination);
   // install deps
-  if (!existsSync(path.resolve(destination, 'node_modules'))) {
+  if (!existsSync(path.resolve(templateDir, 'node_modules'))) {
     execSync('npm link', { cwd: process.cwd(), stdio: 'inherit' });
     execSync('npm link fabric --include=dev --save', {
-      cwd: destination,
+      cwd: templateDir,
       stdio: 'inherit',
     });
     execSync('npm i --include=dev', {
-      cwd: destination,
+      cwd: templateDir,
       stdio: 'inherit',
     });
   }
-  // change the app
-  const pathTo = path.resolve(destination, 'index.html');
+  // create index.html
+  const pathToIndex = path.resolve(destination, 'index.html');
   writeFileSync(
-    pathTo,
-    readFileSync(pathTo)
+    pathToIndex,
+    readFileSync(path.resolve(templateDir, 'index.html'))
       .toString()
       .replace(
         /src="([^"]+)"/,
@@ -40,14 +40,13 @@ test.beforeEach(async ({ page }, { file, outputDir }) => {
       )
   );
   // build
+  const pathToBuild = path.resolve(destination, 'dist');
   execSync(
-    `npm run build -- --public-url . ${process.env.CI ? '--no-cache' : ''}`,
-    { cwd: destination }
-  );
-  const pathToBuild = path.relative(
-    process.cwd(),
-    path.resolve(destination, 'dist')
+    `npx parcel build ${pathToIndex} --no-cache --public-url . --dist-dir ${pathToBuild}`,
+    {
+      cwd: templateDir,
+    }
   );
   // navigate
-  await page.goto(`/${pathToBuild}`);
+  await page.goto(`/${path.relative(process.cwd(), pathToBuild)}`);
 });
