@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { ObjectUtil } from '../../utils/ObjectUtil';
-import { TestUtil } from '../../utils/TestUtil';
-import '../../utils/setupTest';
+import { ObjectUtil } from '../../../utils/ObjectUtil';
+import { TestUtil } from '../../../utils/TestUtil';
+import '../../../utils/setupTest';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
