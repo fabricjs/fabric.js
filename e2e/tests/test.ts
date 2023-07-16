@@ -11,6 +11,9 @@ type Targets = Record<string, FabricObject>;
  * Call this method **once**
  */
 export async function beforeAll(
+  /**
+   * @returns a map of {@link FabricObject} for playwright to access during tests
+   */
   cb: (canvas: Canvas) => Targets | Promise<Targets> | void,
   options?
 ) {
