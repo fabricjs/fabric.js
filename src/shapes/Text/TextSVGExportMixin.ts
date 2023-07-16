@@ -304,7 +304,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
    * @return {String}
    */
-  getSvgSpanStyles(style, useWhiteSpace?: boolean) {
+  getSvgSpanStyles(style: TextStyleDeclaration, useWhiteSpace?: boolean) {
     const term = '; ',
       fontFamily = style.fontFamily
         ? `font-family: ${
@@ -350,9 +350,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Object} style the object from which to retrieve style properties
    * @return {String}
    */
-  getSvgTextDecoration(style) {
-    return ['overline', 'underline', 'line-through']
-      .filter((decoration) => style[decoration.replace('-', '')])
+  getSvgTextDecoration(style: TextStyleDeclaration) {
+    return (['overline', 'underline', 'linethrough'] as const)
+      .filter((decoration) => style[decoration])
       .join(' ');
   }
 }
