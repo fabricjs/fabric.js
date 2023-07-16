@@ -52,6 +52,7 @@
     "build-tests": "rollup -c ./rollup.test.config.js",
     "test:jest": "jest",
     "test": "npm run cli -- test",
+    "pretest": "tsc --incremental -p e2e/tsconfig.json",
     "sandbox": "npm run sandboxscript -- sandbox",
     "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c chrome firefox",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",

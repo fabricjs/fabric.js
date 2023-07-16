@@ -1,14 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { ObjectUtil } from '../../utils/ObjectUtil';
 import { TestUtil } from '../../utils/TestUtil';
 import '../../utils/setupTest';
 
 test('textbox typing and resizing', async ({ page }) => {
   const util = new TestUtil(page);
-  await page.goto('/e2e/site');
-  const textboxUtil = await util.addTextbox('initial text', {
-    width: 200,
-    left: 50,
-  });
+  const textboxUtil = new ObjectUtil('textbox', page);
   const textCenter = await textboxUtil.getObjectCenter();
 
   expect(await util.screenshot()).toMatchSnapshot({ name: 'initial' });

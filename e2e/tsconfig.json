@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "paths": { "fabric": ["../dist"], "init": ["./site/init.ts"] }
+  }
+}

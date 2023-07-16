@@ -1,4 +1,5 @@
-import { Page, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 import type { Canvas, Object as FabricObject } from '../..';
 
 export class ObjectUtil {
@@ -16,10 +17,8 @@ export class ObjectUtil {
     return this.page.evaluate(
       ({ objectId, runInBrowser, ...context }) => {
         return eval(runInBrowser)({
-          object:
-            objectId &&
-            fabricCanvas.getObjects().find((obj) => obj.id === objectId),
-          canvas: fabricCanvas,
+          object: targets[objectId],
+          canvas,
           ...context,
         });
       },
