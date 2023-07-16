@@ -23,7 +23,7 @@ describe('Text', () => {
       cache.clearFontCache();
       const zwc = '\u200b';
       const text = new Text('');
-      const style = text.getCompleteStyleDeclaration(0, 0);
+      const style = text.getStyleDeclaration(0, 0, true);
       const measurement = text._measureChar('a', style, zwc, style);
       expect(measurement).toMatchRoundedSnapshot();
       expect(measurement).toEqual(text._measureChar('a', style, zwc, style));
