@@ -17,9 +17,16 @@ test.beforeEach(async ({ page }, { file }) => {
     'index.js'
   );
   if (existsSync(pathToApp)) {
+    const trigger = page.evaluate(
+      () =>
+        new Promise((resolve) =>
+          window.addEventListener('setup:completed', resolve, { once: true })
+        )
+    );
     await page.addScriptTag({
       type: 'module',
       path: path.relative(process.cwd(), pathToApp),
     });
+    await trigger;
   }
 });
