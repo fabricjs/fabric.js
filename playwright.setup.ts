@@ -1,10 +1,16 @@
 import { PlaywrightTestConfig } from '@playwright/test';
-import { execSync } from 'child_process';
+import { spawn } from 'child_process';
 
 export default (config: PlaywrightTestConfig) => {
-  execSync(
-    `babel --no-babelrc e2e/tests --extensions '.ts' --ignore '**/*.spec.ts' --out-dir e2e/dist --config-file ./.babelrcAlt`,
-    // 'tsc --incremental -p e2e/tsconfig.json',
-    { cwd: process.cwd(), stdio: 'inherit' }
-  );
+  const watch = process.argv.includes('--ui');
+  return new Promise((resolve) => {
+    const p = spawn(
+      `babel --no-babelrc e2e/tests --extensions '.ts' --ignore '**/*.spec.ts' --out-dir e2e/dist --config-file ./.babelrcAlt ${
+        watch ? '-w' : ''
+      }`,
+      { shell: true, detached: false }
+    );
+    p.stdout.pipe(process.stdout);
+    p.stdout.on('data', resolve);
+  });
 };
