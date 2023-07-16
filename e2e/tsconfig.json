@@ -6,6 +6,6 @@
     "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "./dist",
-    "paths": { "fabric": ["../dist"], "init": ["./site/index.ts"] }
+    "paths": { "fabric": ["../dist"], "init": ["./site/init.ts"] }
   }
 }
