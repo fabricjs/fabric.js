@@ -11,6 +11,7 @@ import path from 'path';
 test.beforeEach(async ({ page }, { file, outputDir }) => {
   // install the app
   const templateDir = path.resolve('.codesandbox', 'templates', 'vanilla');
+  const testDir = path.resolve(file, '..');
   const destination = path.resolve(outputDir, 'app');
   ensureDirSync(destination);
   // install deps
@@ -33,16 +34,17 @@ test.beforeEach(async ({ page }, { file, outputDir }) => {
       .toString()
       .replace(
         /src="([^"]+)"/,
-        `src="${path.relative(
-          destination,
-          path.resolve(file, '..', 'index.ts')
-        )}"`
+        `src="${path.relative(destination, path.resolve(testDir, 'index.ts'))}"`
       )
   );
   // build
   const pathToBuild = path.resolve(destination, 'dist');
   execSync(
-    `npx parcel build ${pathToIndex} --no-cache --public-url . --dist-dir ${pathToBuild}`,
+    `npx parcel build ${pathToIndex} ${
+      process.env.CI
+        ? '--no-cache'
+        : `--cache-dir ${path.resolve(testDir, '.parcel-cache')}`
+    } --public-url . --dist-dir ${pathToBuild}`,
     {
       cwd: templateDir,
     }
