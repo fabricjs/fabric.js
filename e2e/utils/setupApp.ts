@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { existsSync } from 'fs';
-import { readJSONSync } from 'fs-extra';
 import path from 'path';
+import imports from '../imports';
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
@@ -9,10 +9,7 @@ test.beforeEach(async ({ page }, { file }) => {
   page.addScriptTag({
     type: 'importmap',
     content: JSON.stringify({
-      imports: {
-        fabric: readJSONSync('./package.json').module.slice(1),
-        test: '../dist/site/test.js',
-      },
+      imports,
     }),
   });
   // add test script
