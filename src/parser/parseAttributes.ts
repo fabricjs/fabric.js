@@ -25,9 +25,8 @@ export function parseAttributes(
     return {};
   }
 
-  let value,
-    parentAttributes: Record<string, string> = {},
-    fontSize,
+  let parentAttributes: Record<string, string> = {},
+    fontSize: number,
     parentFontSize = DEFAULT_SVG_FONT_SIZE;
 
   // if there's a parent container (`g` or `a` or `symbol` node), parse its attributes recursively upwards
@@ -47,7 +46,7 @@ export function parseAttributes(
 
   const ownAttributes: Record<string, string> = {
     ...attributes.reduce<Record<string, string>>((memo, attr) => {
-      value = element.getAttribute(attr);
+      const value = element.getAttribute(attr);
       if (value) {
         memo[attr] = value;
       }
@@ -68,19 +67,23 @@ export function parseAttributes(
     ownAttributes[fSize] = `${fontSize}`;
   }
 
-  const normalizedStyle: Record<string, string> = {};
+  // this should have its own complex type
+  const normalizedStyle: Record<
+    string,
+    string | boolean | number | number[] | null
+  > = {};
   for (const attr in ownAttributes) {
     const normalizedAttr = normalizeAttr(attr);
     const normalizedValue = normalizeValue(
       normalizedAttr,
       ownAttributes[attr],
       parentAttributes,
-      fontSize
+      fontSize!
     );
     normalizedStyle[normalizedAttr] = normalizedValue;
   }
   if (normalizedStyle && normalizedStyle.font) {
-    parseFontDeclaration(normalizedStyle.font, normalizedStyle);
+    parseFontDeclaration(normalizedStyle.font as string, normalizedStyle);
   }
   const mergedAttrs = { ...parentAttributes, ...normalizedStyle };
   return svgValidParentsRegEx.test(element.nodeName)

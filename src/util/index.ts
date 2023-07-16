@@ -100,7 +100,7 @@ export {
 } from './animation/AnimationFrameProvider';
 export { removeFromArray } from './internals/removeFromArray';
 export { getRandomInt } from './internals/getRandomInt';
-export { request } from './dom_request';
+export { request } from './internals/dom_request';
 
 // for test compatibility. We don't want to export it
 export { removeTransformMatrixForSvgParsing } from './transform_matrix_removal';

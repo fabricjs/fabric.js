@@ -81,8 +81,6 @@ export const svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
 
 export const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
 
-export const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
-
 export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute

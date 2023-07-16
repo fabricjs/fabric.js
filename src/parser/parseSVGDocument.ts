@@ -1,11 +1,21 @@
 // @ts-nocheck
 import { applyViewboxTransform } from './applyViewboxTransform';
-import { svgInvalidAncestorsRegEx, svgValidTagNamesRegEx } from './constants';
-import { hasAncestorWithNodeName } from './hasAncestorWithNodeName';
+import { svgValidTagNamesRegEx } from './constants';
+import { hasInvalidAncestor } from './hasInvalidAncestor';
 import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
+
+const isValidSvgTag = (el: HTMLElement) =>
+  svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
+
+export const createEmptyResponse = (): SVGParsingOutput => ({
+  objects: [],
+  elements: [],
+  options: {},
+  allElements: [],
+});
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
@@ -23,16 +33,7 @@ import { ElementsParser } from './elements_parser';
  * @return {SVGParsingOutput}
  * {@link SVGParsingOutput} also receives `allElements` array as the last argument. This is the full list of svg nodes available in the document.
  * You may want to use it if you are trying to regroup the objects as they were originally grouped in the SVG. ( This was the reason why it was added )
-
  */
-
-export const createEmptyResponse = (): SVGParsingOutput => ({
-  objects: [],
-  elements: [],
-  options: {},
-  allElements: [],
-});
-
 export async function parseSVGDocument(
   doc: HTMLElement,
   reviver?: TSvgReviverCallback,
@@ -54,10 +55,7 @@ export async function parseSVGDocument(
 
   const elements = descendants.filter(function (el) {
     applyViewboxTransform(el);
-    return (
-      svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', '')) &&
-      !hasAncestorWithNodeName(el, svgInvalidAncestorsRegEx)
-    ); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+    return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
   if (!elements || (elements && !elements.length)) {
     return {
@@ -72,7 +70,7 @@ export async function parseSVGDocument(
     .forEach((el) => {
       const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
-        (el) => svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''))
+        (el) => isValidSvgTag(el)
       );
     });
 
