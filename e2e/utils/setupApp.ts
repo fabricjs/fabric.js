@@ -25,7 +25,13 @@ test.beforeEach(async ({ page }, { file }) => {
     testDir,
     'index.js'
   );
-  if (existsSync(pathToApp)) {
+  const exists = existsSync(pathToApp);
+  if (
+    !exists &&
+    existsSync(path.resolve(process.cwd(), 'e2e', 'tests', testDir, 'index.ts'))
+  ) {
+    throw new Error('pretest script did not run');
+  } else if (exists) {
     const trigger = page.evaluate(
       () =>
         new Promise<void>((resolve) => {
