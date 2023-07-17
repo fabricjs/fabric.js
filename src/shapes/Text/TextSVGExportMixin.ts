@@ -23,13 +23,13 @@ function createSVGInlineRect(
 }
 
 export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
-  _toSVG(this: TextSVGExportMixin & Text) {
+  _toSVG(this: TextSVGExportMixin & Text): string[] {
     const offsets = this._getSVGLeftTopOffsets(),
       textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(this: TextSVGExportMixin & Text, reviver: TSVGReviver) {
+  toSVG(this: TextSVGExportMixin & Text, reviver: TSVGReviver): string {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
@@ -294,7 +294,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
-  getSvgStyles(skipShadow?: boolean) {
+  getSvgStyles(this: TextSVGExportMixin & Text, skipShadow?: boolean) {
+    // @ts-ignore this line is not error free. ( super is not the same type as this )
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 
@@ -304,7 +305,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
    * @return {String}
    */
-  getSvgSpanStyles(style: TextStyleDeclaration, useWhiteSpace?: boolean) {
+  getSvgSpanStyles(
+    this: TextSVGExportMixin & Text,
+    style: TextStyleDeclaration,
+    useWhiteSpace?: boolean
+  ) {
     const term = '; ',
       fontFamily = style.fontFamily
         ? `font-family: ${
@@ -350,7 +355,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Object} style the object from which to retrieve style properties
    * @return {String}
    */
-  getSvgTextDecoration(style: TextStyleDeclaration) {
+  getSvgTextDecoration(
+    this: TextSVGExportMixin & Text,
+    style: TextStyleDeclaration
+  ) {
     return (['overline', 'underline', 'linethrough'] as const)
       .filter((decoration) => style[decoration])
       .join(' ');

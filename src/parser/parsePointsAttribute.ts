@@ -1,3 +1,5 @@
+import type { XY } from '../Point';
+
 /**
  * Parses "points" attribute, returning an array of values
  * @static
@@ -5,10 +7,10 @@
  * @param {String} points points attribute string
  * @return {Array} array of points
  */
-export function parsePointsAttribute(points: string) {
+export function parsePointsAttribute(points: string | null): XY[] {
   // points attribute is required and must not be empty
   if (!points) {
-    return null;
+    return [];
   }
 
   // replace commas with whitespace and remove bookending whitespace

@@ -153,7 +153,7 @@ export class Circle<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(): (string | number)[] {
+  _toSVG(): string[] {
     const angle = (this.endAngle - this.startAngle) % 360;
 
     if (angle === 0) {
@@ -162,7 +162,7 @@ export class Circle<
         'COMMON_PARTS',
         'cx="0" cy="0" ',
         'r="',
-        this.radius,
+        `${this.radius}`,
         '" />\n',
       ];
     } else {

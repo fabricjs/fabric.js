@@ -3,6 +3,7 @@ import { uid } from '../../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
 import { NONE } from '../../constants';
 import type { FabricObject } from './FabricObject';
+import { isFiller } from '../../util/typeAssertions';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -72,7 +73,7 @@ export class FabricObjectSVGExportMixin {
    * Returns filter for svg shadow
    * @return {String}
    */
-  getSvgFilter() {
+  getSvgFilter(this: FabricObjectSVGExportMixin & FabricObject) {
     return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
   }
 
@@ -80,10 +81,17 @@ export class FabricObjectSVGExportMixin {
    * Returns id attribute for svg output
    * @return {String}
    */
-  getSvgCommons() {
+  getSvgCommons(
+    this: FabricObjectSVGExportMixin & FabricObject & { id?: string }
+  ) {
     return [
       this.id ? `id="${this.id}" ` : '',
-      this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : '',
+      this.clipPath
+        ? `clip-path="url(#${
+            (this.clipPath as FabricObjectSVGExportMixin & FabricObject)
+              .clipPathId
+          })" `
+        : '',
     ].join('');
   }
 
@@ -92,7 +100,11 @@ export class FabricObjectSVGExportMixin {
    * @param {Boolean} use the full transform or the single object one.
    * @return {String}
    */
-  getSvgTransform(full?: boolean, additionalTransform = '') {
+  getSvgTransform(
+    this: FabricObjectSVGExportMixin & FabricObject,
+    full?: boolean,
+    additionalTransform = ''
+  ) {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
       svgTransform = `transform="${matrixToSVG(transform)}`;
     return `${svgTransform}${additionalTransform}" `;
@@ -100,10 +112,24 @@ export class FabricObjectSVGExportMixin {
 
   /**
    * Returns svg representation of an instance
+   * This function is implemented in each subclass
+   * This is just because typescript otherwise cryies all the time
+   * @return {Array} an array of strings with the specific svg representation
+   * of the instance
+   */
+  _toSVG(reviver?: TSVGReviver): string[] {
+    return [''];
+  }
+
+  /**
+   * Returns svg representation of an instance
    * @param {TSVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toSVG(reviver?: TSVGReviver) {
+  toSVG(
+    this: FabricObjectSVGExportMixin & FabricObject,
+    reviver?: TSVGReviver
+  ) {
     return this._createBaseSVGMarkup(this._toSVG(reviver), {
       reviver,
     });
@@ -114,7 +140,10 @@ export class FabricObjectSVGExportMixin {
    * @param {TSVGReviver} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: TSVGReviver) {
+  toClipPathSVG(
+    this: FabricObjectSVGExportMixin & FabricObject,
+    reviver?: TSVGReviver
+  ) {
     return (
       '\t' +
       this._createBaseClipPathSVGMarkup(this._toSVG(reviver), {
@@ -127,6 +156,7 @@ export class FabricObjectSVGExportMixin {
    * @private
    */
   _createBaseClipPathSVGMarkup(
+    this: FabricObjectSVGExportMixin & FabricObject,
     objectMarkup: string[],
     {
       reviver,
@@ -147,6 +177,7 @@ export class FabricObjectSVGExportMixin {
    * @private
    */
   _createBaseSVGMarkup(
+    this: FabricObjectSVGExportMixin & FabricObject,
     objectMarkup: string[],
     {
       noStyle,
@@ -159,10 +190,10 @@ export class FabricObjectSVGExportMixin {
       withShadow?: boolean;
       additionalTransform?: string;
     } = {}
-  ) {
+  ): string {
     const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
       shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
-      clipPath = this.clipPath,
+      clipPath = this.clipPath as FabricObjectSVGExportMixin & FabricObject,
       vectorEffect = this.strokeUniform
         ? 'vector-effect="non-scaling-stroke" '
         : '',
@@ -197,10 +228,10 @@ export class FabricObjectSVGExportMixin {
       additionalTransform ? `transform="${additionalTransform}" ` : '',
     ].join('');
     objectMarkup[index] = commonPieces;
-    if (fill && fill.toLive) {
+    if (isFiller(fill)) {
       markup.push(fill.toSVG(this));
     }
-    if (stroke && stroke.toLive) {
+    if (isFiller(stroke)) {
       markup.push(stroke.toSVG(this));
     }
     if (shadow) {
@@ -215,7 +246,7 @@ export class FabricObjectSVGExportMixin {
     return reviver ? reviver(markup.join('')) : markup.join('');
   }
 
-  addPaintOrder() {
+  addPaintOrder(this: FabricObjectSVGExportMixin & FabricObject) {
     return this.paintFirst !== 'fill'
       ? ` paint-order="${this.paintFirst}" `
       : '';
