@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
-import { TestUtil } from '../../utils/TestUtil';
+import { CanvasUtil } from '../../utils/CanvasUtil';
 import '../../utils/setupTest';
 
 test('TEST NAME', async ({ page }) => {
-  const util = new TestUtil(page);
+  const util = new CanvasUtil(page);
   // write the test
 });

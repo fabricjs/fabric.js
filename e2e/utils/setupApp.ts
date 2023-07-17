@@ -51,42 +51,26 @@ test.beforeEach(async ({ page }, { file }) => {
       `test script '${pathToBuiltApp}' not found: global setup script probably did not run`
     );
   } else if (exists) {
+    // used to avoid a race condition that occurs because of script loading
     const trigger = page.evaluate(
       () =>
-        new Promise<void>((resolve) => {
-          const text = document.createElement('span');
-          text.textContent = 'Waiting for setup to complete...';
-          text.style.position = 'absolute';
-          text.style.left = '0px';
-          text.style.top = '0px';
-          text.style.fontSize = '48px';
-          text.style.color = 'blue';
-          document.body.append(text);
-          window.addEventListener(
-            'setup:completed',
-            () => {
-              text.remove();
-              resolve();
-            },
-            { once: true }
-          );
+        new Promise((resolve) => {
+          window.addEventListener('fabric:setup', resolve, { once: true });
         })
     );
     await page.addScriptTag({
       type: 'module',
-      path: path.relative(process.cwd(), pathToApp),
+      content: `${readFileSync(
+        path.relative(process.cwd(), pathToApp)
+      ).toString()}
+       window.dispatchEvent(new CustomEvent('fabric:setup'));
+       `,
     });
     await trigger;
+    await page.evaluate(() => window.__setupFabricHook());
   }
 });
 
 test.afterEach(async ({ page }) => {
-  await page.evaluate(
-    () =>
-      !window.__teardown ||
-      new Promise((resolve) => {
-        window.addEventListener('teardown:completed', resolve, { once: true });
-        window.__teardown();
-      })
-  );
+  await page.evaluate(() => window.__teardownFabricHook());
 });

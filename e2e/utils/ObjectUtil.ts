@@ -18,7 +18,7 @@ export class ObjectUtil {
   ): Promise<R> {
     return this.page.evaluate(
       ([objectId, runInBrowser, context]) => {
-        return eval(runInBrowser)(targets[objectId], context);
+        return eval(runInBrowser)(objectMap.get(objectId), context);
       },
       [this.objectId, runInBrowser.toString(), context] as const
     );

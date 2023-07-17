@@ -20,7 +20,10 @@ export class CanvasUtil {
   ): Promise<R> {
     return this.page.evaluate(
       ([selector, runInBrowser, context]) => {
-        return eval(runInBrowser)(canvas, context);
+        return eval(runInBrowser)(
+          canvasMap.get(document.querySelector(selector)),
+          context
+        );
       },
       [this.selector, runInBrowser.toString(), context] as const
     );
