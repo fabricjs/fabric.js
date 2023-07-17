@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
+
 import '../../../setup';
 
 test('textbox typing and resizing', async ({ page }) => {
