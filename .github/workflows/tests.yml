@@ -120,7 +120,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
-        run: npx playwright test
+        run: xvfb-run npm run test:e2e
       - name: Upload Test Output
         uses: actions/upload-artifact@v3
         if: failure()
