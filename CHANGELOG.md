@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(sandbox): bump next.js [#9100](https://github.com/fabricjs/fabric.js/pull/9100)
 - test(playwright): add snapshots, refactor utils, coverage [#9078](https://github.com/fabricjs/fabric.js/pull/9078)
 - chore(TS) Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - test(Text): Add some tests for text in Jest [#9083](https://github.com/fabricjs/fabric.js/pull/9083)
