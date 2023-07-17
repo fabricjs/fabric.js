@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): expose `__corner` => `getActiveControl()` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
 - chore(TS) Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - test(Text): Add some tests for text in Jest [#9083](https://github.com/fabricjs/fabric.js/pull/9083)
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
