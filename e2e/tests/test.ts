@@ -15,10 +15,16 @@ window.__setupFabricHook = () => Promise.all(setupTasks);
 window.__teardownFabricHook = () =>
   Promise.all(teardownTasks.map((cb) => cb()));
 
+/**
+ *
+ * @param selector canvas selector
+ * @param cb **IMPORTANT** return a map of objects for playwright to access during tests
+ * @param options canvas options
+ */
 export function before(
   selector: string,
   /**
-   * @returns a map for playwright to access during tests
+   * @returns a map of objects for playwright to access during tests
    */
   cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
   options?
@@ -41,6 +47,9 @@ export function before(
 
 /**
  * Call this method **once** to initialize the default canvas
+ *
+ * @param cb **IMPORTANT** return a map of objects for playwright to access during tests
+ * @param options canvas options
  */
 export function beforeAll(
   cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
@@ -49,10 +58,7 @@ export function beforeAll(
   before('#canvas', cb, options);
 }
 
-export async function after(
-  selector: string,
-  cb: Awaited<(canvas: Canvas) => void>
-) {
+export function after(selector: string, cb: Awaited<(canvas: Canvas) => void>) {
   teardownTasks.push(() => {
     const el = document.querySelector<HTMLCanvasElement>(selector);
     const canvas = canvasMap.get(el);
@@ -60,6 +66,6 @@ export async function after(
   });
 }
 
-export async function afterAll(cb: (canvas: Canvas) => void | Promise<void>) {
+export function afterAll(cb: Awaited<(canvas: Canvas) => void>) {
   after('#canvas', cb);
 }

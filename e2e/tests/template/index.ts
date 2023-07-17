@@ -1,6 +1,6 @@
 /**
  * Runs in the **BROWSER**
- * Use absolute imports defined in '../imports.ts'
+ * Use absolute imports defined in 'e2e/imports.ts'
  */
 
 import * as fabric from 'fabric';
