@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Filters) Removing type from the options passed in the constructor [#9089](https://github.com/fabricjs/fabric.js/pull/9089)
 - feat(InteractiveObject): add `getActiveControl()` to expose `__corner` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
 - ci(sandbox): bump next.js [#9100](https://github.com/fabricjs/fabric.js/pull/9100)
 - test(playwright): add snapshots, refactor utils, coverage [#9078](https://github.com/fabricjs/fabric.js/pull/9078)
