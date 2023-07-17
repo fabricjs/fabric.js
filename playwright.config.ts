@@ -6,6 +6,7 @@ import { devices } from '@playwright/test';
  */
 const config: PlaywrightTestConfig = {
   testDir: './e2e/tests',
+  /* Transpiles app files */
   globalSetup: './playwright.setup.ts',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
@@ -28,7 +29,9 @@ const config: PlaywrightTestConfig = {
   retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
+  /* Do not update snapshot on CI */
   updateSnapshots: process.env.CI ? 'none' : 'missing',
+  /* Configure snapshot names to be the same across platforms for CI */
   snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
