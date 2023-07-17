@@ -1,12 +1,12 @@
 import type { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
+import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
 import type { TextStyleDeclaration } from './Text/StyledText';
 import type { TProps } from './Object/types';
 import type { SerializedITextProps, ITextProps } from './IText/IText';
 import type { ITextEvents } from './IText/ITextBehavior';
-import { classRegistry } from '../ClassRegistry';
 import type { TextLinesInfo } from './Text/Text';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
