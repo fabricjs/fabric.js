@@ -174,7 +174,7 @@ export class InteractiveFabricObject<
   }
 
   getActiveControl() {
-    return this.__corner
+    return this.__corner;
   }
 
   /**
