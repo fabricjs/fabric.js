@@ -339,8 +339,13 @@ export class Textbox<
         : this.wordSplit(line);
 
       // fix a difference between split and graphemeSplit
+      // why are we doing this? what difference?
+      // wouldn't it be better return data for empty words?
       if (wordsOrGraphemes.length === 0) {
-        wordsOrGraphemes.push([] as string[]);
+        return {
+          word: '',
+          width: 0,
+        };
       }
 
       return wordsOrGraphemes.map((word: string) => {
