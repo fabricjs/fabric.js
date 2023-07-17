@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(): expose `__corner` => `getActiveControl()` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
+- feat(InteractiveObject): add `getActiveControl()` to expose `__corner` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
 - ci(sandbox): bump next.js [#9100](https://github.com/fabricjs/fabric.js/pull/9100)
 - test(playwright): add snapshots, refactor utils, coverage [#9078](https://github.com/fabricjs/fabric.js/pull/9078)
 - chore(TS) Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
