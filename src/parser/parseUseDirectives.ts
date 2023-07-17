@@ -1,10 +1,9 @@
-//@ts-nocheck
 import { svgNS } from './constants';
 import { elementById } from './elementById';
 import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
-export function parseUseDirectives(doc) {
+export function parseUseDirectives(doc: Document) {
   const nodelist = getMultipleNodes(doc, ['use', 'svg:use']);
   let i = 0;
   while (nodelist.length && i < nodelist.length) {
@@ -18,7 +17,7 @@ export function parseUseDirectives(doc) {
     const xlink = xlinkAttribute.slice(1);
     const x = el.getAttribute('x') || 0;
     const y = el.getAttribute('y') || 0;
-    let el2 = elementById(doc, xlink).cloneNode(true);
+    let el2 = elementById(doc, xlink)!.cloneNode(true) as Element;
     let currentTrans =
       (el2.getAttribute('transform') || '') +
       ' translate(' +

@@ -359,8 +359,16 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     this: TextSVGExportMixin & Text,
     style: TextStyleDeclaration
   ) {
-    return (['overline', 'underline', 'linethrough'] as const)
-      .filter((decoration) => style[decoration])
+    return (['overline', 'underline', 'line-through'] as const)
+      .filter(
+        (decoration) =>
+          style[
+            decoration.replace('-', '') as
+              | 'overline'
+              | 'underline'
+              | 'linethrough'
+          ]
+      )
       .join(' ');
   }
 }
