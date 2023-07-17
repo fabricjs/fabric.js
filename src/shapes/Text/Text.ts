@@ -18,6 +18,7 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
+import type { TextStyleArray } from '../../util/misc/textStyles';
 import {
   hasStyleChanged,
   stylesFromArray,
@@ -102,9 +103,13 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-    UniqueTextProps {}
+    UniqueTextProps {
+  styles: TextStyleArray | TextStyle;
+}
 
-export interface TextProps extends FabricObjectProps, UniqueTextProps {}
+export interface TextProps extends FabricObjectProps, UniqueTextProps {
+  styles: TextStyle;
+}
 
 /**
  * Text class
@@ -406,7 +411,7 @@ export class Text<
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, options: any) {
+  constructor(text: string, options: Props = {} as Props) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
@@ -1883,8 +1888,10 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
-    return this._fromObject<Text>(
+  static fromObject<T extends TProps<SerializedTextProps>, S extends Text>(
+    object: T
+  ) {
+    return this._fromObject<S>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),
