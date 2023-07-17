@@ -1,10 +1,13 @@
-// @ts-nocheck
 import type { TClassProperties } from '../typedefs';
 import { IText } from './IText/IText';
-import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
 import type { TextStyleDeclaration } from './Text/StyledText';
+import type { TProps } from './Object/types';
+import type { SerializedITextProps, ITextProps } from './IText/IText';
+import type { ITextEvents } from './IText/ITextBehavior';
+import { classRegistry } from '../ClassRegistry';
+import type { TextLinesInfo } from './Text/Text';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -26,13 +29,36 @@ export type GraphemeData = {
   largestWordWidth: number;
 };
 
+export type StyleMap = Record<string, { line: number; offset: number }>;
+
+// @TODO this is not complete
+interface UniqueTextboxProps {
+  minWidth: number;
+  splitByGrapheme: boolean;
+  dynamicMinWidth: number;
+  _wordJoiners: RegExp;
+}
+
+export interface SerializedTextboxProps
+  extends SerializedITextProps,
+    Pick<UniqueTextboxProps, 'minWidth' | 'splitByGrapheme'> {}
+
+export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
+
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class Textbox extends IText {
+export class Textbox<
+    Props extends TProps<TextboxProps> = Partial<TextboxProps>,
+    SProps extends SerializedTextboxProps = SerializedTextboxProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends IText<Props, SProps, EventSpec>
+  implements UniqueTextboxProps
+{
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -56,6 +82,12 @@ export class Textbox extends IText {
    * @since 2.6.0
    */
   declare splitByGrapheme: boolean;
+
+  declare _wordJoiners: RegExp;
+
+  declare _styleMap: StyleMap;
+
+  declare isWrapping: boolean;
 
   static type = 'Textbox';
 
@@ -106,11 +138,11 @@ export class Textbox extends IText {
    * which is only sufficient for Text / IText
    * @private
    */
-  _generateStyleMap(textInfo) {
+  _generateStyleMap(textInfo: TextLinesInfo): StyleMap {
     let realLineCount = 0,
       realLineCharCount = 0,
       charCount = 0;
-    const map = {};
+    const map: StyleMap = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -141,7 +173,7 @@ export class Textbox extends IText {
    * @param {Number} lineIndex
    * @return {Boolean}
    */
-  styleHas(property, lineIndex: number): boolean {
+  styleHas(property: keyof TextStyleDeclaration, lineIndex: number): boolean {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (map) {
@@ -302,22 +334,24 @@ export class Textbox extends IText {
 
     const data = lines.map((line, lineIndex) => {
       let offset = 0;
-      const words = splitByGrapheme
+      const wordsOrGraphemes = splitByGrapheme
         ? this.graphemeSplit(line)
         : this.wordSplit(line);
 
       // fix a difference between split and graphemeSplit
-      if (words.length === 0) {
-        words.push([]);
+      if (wordsOrGraphemes.length === 0) {
+        wordsOrGraphemes.push([] as string[]);
       }
 
-      return words.map((word) => {
+      return wordsOrGraphemes.map((word: string) => {
         // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
+        const graphemeArray = splitByGrapheme
+          ? [word]
+          : this.graphemeSplit(word);
+        const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += word.length + infix.length;
-        return { word, width };
+        return { word: graphemeArray, width };
       });
     });
 
@@ -339,7 +373,7 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word: string[], lineIndex: number, charOffset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
@@ -383,14 +417,14 @@ export class Textbox extends IText {
     desiredWidth: number,
     { largestWordWidth, wordsData }: GraphemeData,
     reservedSpace = 0
-  ): Array<any> {
+  ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
-      line = [],
+      line: string[] = [],
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
@@ -467,7 +501,7 @@ export class Textbox extends IText {
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex) {
+  missingNewlineOffset(lineIndex: number) {
     if (this.splitByGrapheme) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
@@ -517,9 +551,12 @@ export class Textbox extends IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude?: Array<any>) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
+      (['minWidth', 'splitByGrapheme'] as K[]).concat(propertiesToInclude)
     );
   }
 }

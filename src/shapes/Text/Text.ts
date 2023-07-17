@@ -63,9 +63,16 @@ function getMeasuringContext() {
   return measuringContext;
 }
 
-type TPathSide = 'left' | 'right';
+export type TPathSide = 'left' | 'right';
 
-type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+export type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+
+export type TextLinesInfo = {
+  lines: string[];
+  graphemeLines: string[][];
+  graphemeText: string;
+  _unwrappedLines: string[][];
+};
 
 /**
  * Measure and return the info of a single grapheme.
@@ -439,7 +446,7 @@ export class Text<
    * @private
    * Divides text into lines of text and lines of graphemes.
    */
-  _splitText() {
+  _splitText(): TextLinesInfo {
     const newLines = this._splitTextIntoLines(this.text);
     this.textLines = newLines.lines;
     this._textLines = newLines.graphemeLines;
