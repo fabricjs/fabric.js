@@ -14,7 +14,7 @@ beforeAll((canvas) => {
   canvas.add(textbox);
   canvas.centerObjectH(textbox);
 
-  // playwright will be able access the passed objects by their keys
+  // playwright will be able to access the passed objects by their keys
   // make sure to pass unique keys across the entire app
   return { textbox };
 });
