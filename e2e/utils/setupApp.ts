@@ -1,7 +1,8 @@
 import { test } from '@playwright/test';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import imports from '../imports';
+import { JSDOM } from 'jsdom';
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
@@ -17,6 +18,19 @@ test.beforeEach(async ({ page }, { file }) => {
     path.resolve(process.cwd(), 'e2e', 'tests'),
     path.resolve(file, '..')
   );
+  const pathToHTML = path.resolve(
+    process.cwd(),
+    'e2e',
+    'tests',
+    testDir,
+    'index.html'
+  );
+  if (existsSync(pathToHTML)) {
+    const doc = new JSDOM(readFileSync(pathToHTML).toString()).window.document;
+    await page.evaluate((html) => {
+      document.body.innerHTML = `${html}`;
+    }, doc.body.innerHTML);
+  }
   const pathToApp = path.resolve(
     process.cwd(),
     'e2e',
