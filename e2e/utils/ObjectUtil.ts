@@ -1,48 +1,42 @@
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
-import type { Canvas, Object as FabricObject } from '../..';
+import type { Object as FabricObject } from 'fabric';
+import type { before, beforeAll } from 'test';
 
 export class ObjectUtil {
-  constructor(readonly objectId: string, readonly page: Page) {}
+  constructor(
+    readonly page: Page,
+    /**
+     * the key matching the a key returned from the {@link beforeAll} or {@link before} callback
+     */
+    readonly objectId: string
+  ) {}
 
   executeInBrowser<C, R>(
-    runInBrowser: (
-      context: Omit<C, 'objectId'> & {
-        object: FabricObject;
-        canvas: Canvas;
-      }
-    ) => R,
+    runInBrowser: (object: FabricObject, context: C) => R,
     context?: C
   ): Promise<R> {
     return this.page.evaluate(
-      ({ objectId, runInBrowser, ...context }) => {
-        return eval(runInBrowser)({
-          object: targets[objectId],
-          canvas,
-          ...context,
-        });
+      ([objectId, runInBrowser, context]) => {
+        return eval(runInBrowser)(targets[objectId], context);
       },
-      {
-        ...context,
-        objectId: this.objectId,
-        runInBrowser: runInBrowser.toString(),
-      }
+      [this.objectId, runInBrowser.toString(), context] as const
     );
   }
 
   getObjectCenter() {
-    return this.executeInBrowser(({ object }) => object.getCenterPoint());
+    return this.executeInBrowser((object) => object.getCenterPoint());
   }
 
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
-      ({ object, controlName }) => object.oCoords[controlName],
+      (object, { controlName }) => object.oCoords[controlName],
       { controlName }
     );
   }
 
   async expectObjectToMatch<T extends Record<string, unknown>>(expected: T) {
-    const snapshot = await this.executeInBrowser(({ object }) => object);
+    const snapshot = await this.executeInBrowser((object) => object);
     expect(snapshot).toMatchObject(expected);
   }
 }

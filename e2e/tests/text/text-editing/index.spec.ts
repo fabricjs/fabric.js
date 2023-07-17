@@ -1,22 +1,24 @@
 import { expect, test } from '@playwright/test';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
-import { TestUtil } from '../../../utils/TestUtil';
 import '../../../utils/setupTest';
 
 test('textbox typing and resizing', async ({ page }) => {
-  const util = new TestUtil(page);
-  const textboxUtil = new ObjectUtil('textbox', page);
+  const canvasUtil = new CanvasUtil(page);
+  const textboxUtil = new ObjectUtil(page, 'textbox');
   const textCenter = await textboxUtil.getObjectCenter();
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'initial.png' });
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'initial.png',
+  });
 
-  await util.clickCanvas({
+  await canvasUtil.click({
     position: textCenter,
     clickCount: 2,
     delay: 200,
   });
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'start.png' });
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({ name: 'start.png' });
 
   await page
     .locator('textarea')
@@ -27,12 +29,12 @@ test('textbox typing and resizing', async ({ page }) => {
       }
     );
 
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'typed.png' });
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({ name: 'typed.png' });
 
   const mrControlPoint = await textboxUtil.getObjectControlPoint('mr');
 
   // click outside to stop editing
-  await util.clickCanvas({
+  await canvasUtil.click({
     position: {
       x: mrControlPoint.x + 20,
       y: mrControlPoint.y,
@@ -40,10 +42,12 @@ test('textbox typing and resizing', async ({ page }) => {
     clickCount: 1,
     delay: 200,
   });
-  expect(await util.screenshot()).toMatchSnapshot({ name: 'exit_editing.png' });
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'exit_editing.png',
+  });
 
   // click the object to select it
-  await util.clickCanvas({
+  await canvasUtil.click({
     position: textCenter,
   });
 
@@ -53,7 +57,7 @@ test('textbox typing and resizing', async ({ page }) => {
   await page.mouse.move(mrControlPoint.x + 300, mrControlPoint.y, {
     steps: 40,
   });
-  expect(await util.screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'increase_width_mr.png',
   });
   // drag in the opposite direction
@@ -61,7 +65,7 @@ test('textbox typing and resizing', async ({ page }) => {
     steps: 60,
   });
   await page.mouse.up();
-  expect(await util.screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'decrease_width_mr.png',
   });
 
@@ -72,7 +76,7 @@ test('textbox typing and resizing', async ({ page }) => {
   await page.mouse.move(mlControlPoint.x - 300, mlControlPoint.y, {
     steps: 40,
   });
-  expect(await util.screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'increase_width_ml.png',
   });
   // drag in the opposite direction
@@ -80,7 +84,7 @@ test('textbox typing and resizing', async ({ page }) => {
     steps: 60,
   });
   await page.mouse.up();
-  expect(await util.screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'decrease_width_ml.png',
   });
 });
