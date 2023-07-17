@@ -2,8 +2,8 @@
 
 ## [next]
 
-- chore(TS): this is harder [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
-- chore(TS) Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
+- chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
+- chore(TS): Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - test(Text): Add some tests for text in Jest [#9083](https://github.com/fabricjs/fabric.js/pull/9083)
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
 - fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)
