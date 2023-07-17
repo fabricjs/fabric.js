@@ -10,7 +10,7 @@ import { NONE } from '../constants';
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
 
-export function applyViewboxTransform(element: HTMLElement) {
+export function applyViewboxTransform(element: Element) {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
