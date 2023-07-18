@@ -310,11 +310,11 @@ export class Textbox<
   _wrapText(lines: string[], desiredWidth: number): string[][] {
     this.isWrapping = true;
     // extract all thewords and the widths to optimally wrap lines.
-    const wordsData = this.getGraphemeDataForRender(lines);
+    const data = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
-    for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(i, desiredWidth, wordsData));
-    }
+    data.wordsData.forEach((line, index) =>
+      wrapped.push(...this._wrapLine(index, desiredWidth, data))
+    );
     this.isWrapping = false;
     return wrapped;
   }
@@ -338,17 +338,8 @@ export class Textbox<
         ? this.graphemeSplit(line)
         : this.wordSplit(line);
 
-      // fix a difference between split and graphemeSplit
-      // why are we doing this? what difference?
-      // wouldn't it be better return data for empty words?
-      // it should return an empty array - anything else means that methods consuming this data need adjustment also
       if (wordsOrGraphemes.length === 0) {
-        return [
-          {
-            word: [] as string[],
-            width: 0,
-          },
-        ];
+        return [];
       }
 
       return wordsOrGraphemes.map((word: string) => {
