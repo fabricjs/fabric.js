@@ -62,12 +62,12 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 - [Issues][issues]
 - [Discussions][discussions]
 
-### 🎮 Adding a DEMO
+### 🎮 Adding a DEMO (currently not possible)
 
 Take a look at an existing [demo file][demo_file].\
 Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
 
-### ~~`fabricjs.com`~~ (_deprecated_)
+### ~~`fabricjs.com`~~ (currently not possible)
 
 To develop fabric's site you need to clone [`fabricjs.com`][website_repo] in the same parent folder of [`fabric.js`][repo], so that `fabric.js` and `fabricjs.com` are siblings.
 
@@ -91,17 +91,19 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 - Read this section through.
 - Take a look at [**GOTCHAS**][gotchas]
-- Follow [Developing](#-developing-) and read [Testing](#-testing).
+- Follow [Developing](#-developing-) and [Testing](#-testing).
 
 ### ✅ Guidelines
 
+- **Be patient** \
+  Sometimes it takes time to get back to you. Someone eventually will. Having a small, concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
   Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
-- **⛔ `dist`** \
-  Commit changes to [source files](src). Don't commit the generated [distribution files](dist).
+  If that doesn't work, once the PR is ready run `npm run prettier:write` and commit the changes.
+  Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
 - **Tests** \
-  PRs must be backed with relevant tests, follow [TESTING](#-testing).
+  PRs must be backed with relevant tests, follow [TESTING](#-testing). If you never wrote a test or you find our tests unclear to extend, just ask for help.
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
@@ -110,6 +112,7 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 - **1️⃣ PR per feature/bug** \
   Create a new branch for every pull request.\
   If you want to do more than one thing, create multiple pull requests 💪.
+  If your bug fix or feature requires a refactor, don't refactor. Commit the bugfix or the feature with the current code structure, let it sink, give some time to surface issues with the change, then when the bug or the feature seem solid, a refactor or code improvement can be tried
 - **And there you go!** \
   If you still have questions we're always happy to help.
 
@@ -122,108 +125,106 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving
+Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests
 
 - `unit` tests: test logic and state
-- `visual` tests: test visual outcome against image refs located at `/test/visual/golden`
+- `visual` tests: test visual outcome against image refs located at `test/visual/golden`
+- `UI` tests: testing with playwright
 
 ### Getting Started
 
-- build and watch for changes:
+- Build and watch for changes
+  ```bash
+  npm run build -- -f -w
+  ```
+- Run the entire test suite on `chrome` (many tests are skipped on `node`)
+  ```bash
+  npm test -- -a -c chrome
+  ```
+- Handle failing tests
+  - Fix logic
+  - If needed, alter tests with **caution**
+  - Rerun failing tests
+    - Save time by rerunning failing tests only
+      - Select failing test files
+        ```bash
+        npm test -- -c chrome
+        ```
+      - **OR** launch the browser test suite in _dev mode_ to watch for test changes
+        ```bash
+        npm test -- -c chrome --dev -l
+        ```
+    - In case of failing visual tests, there are 2 options to view visual diffs (in order to understand what is wrong)
+      - Testing in _visual debug mode_ is comfortable when using with `Github Desktop` to view the diffs since refs will be overwritten (rerunning tests will use the overwritten refs so be cautious)
+        ```bash
+        npm test -- -d -c chrome
+        ```
+      - Launching the browser test suite
+        ```bash
+        npm test -- -c chrome --dev -l
+        ```
+      - Take into account that different environments produce different outputs so it is advised to run both in `chrome` and `node`.
+      - Committing refs is done **ONLY** with `chrome` output.
+    - When you are done, rerun the entire test suit to verify all tests pass.
+    - If you are submitting a PR, visit the PR page on github to see all checks have passed (different platforms and config are covered by the checks).
+- Refer to the command docs
+  ```bash
+  npm test -- -h
+  ```
+
+## UI tests
+
+Run UI tests with Playwright in parallel in Chrome (headed mode).
 
 ```bash
-
-npm run build -- -f -w
-
+$ npm run test:e2e
 ```
 
-- run tests:
+### Adding Tests
 
-```bash
+Backing a PR with tests that cover the changes that were made is a **MUST**. Aim to cover 100% of the cases.
 
-npm test -- -a -d
-> Running all tests in debug mode (read more in the help section)
+Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
 
-npm test -- -s visual --dev -l -c chrome
-> Running live visual tests on chrome (navigate to see)
+- [`unit` test example][unit_test]
+- [`visual` test example][visual_test]
 
-npm test -- --help
-
-> Usage: fabric.js test [options]
-
-> run test suite
-
-Options:
-  -s, --suite <suite...>      test suite to run (choices: "unit", "visual")
-  -f, --file <file>           run a specific test file
-  --filter <filter>           filter tests by name
-  -a, --all                   run all tests (default: false)
-  -d, --debug                 debug visual tests by overriding refs (golden images) in case of visual changes (default:
-                              false)
-  -r, --recreate              recreate visual refs (golden images) (default: false)
-  -v, --verbose               log passing tests (default: false)
-  -l, --launch                launch tests in the browser (default: false)
-  --dev                       runs testem in `dev` mode, without a `ci` flag (default: false)
-  -c, --context <context...>  context to test in (choices: "chrome", "firefox", "node", default: "node")
-  -p, --port
-  -o, --out <out>             path to report test results to
-  --clear-cache               clear CLI test cache (default: false)
-  -h, --help                  display help for command
-
-```
+If you need to change test config ask for guidance.
 
 ---
 
 ## 🚧🎢 Developing 💡✨
 
-### Setting Up Locally
+### Getting Started
 
-1. 🍴 Fork the repository
-1. 💾 Clone your 🍴 to your 💻
+1. 🍴 Fork and clone 💾 the repository
 1. Install dependencies 🕹️ `npm i --include=dev`
-1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
-#### Online
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
-
-Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints.
-`A service is available on port ...` popups will show up.
-
-### 🧭 Prototyping
-
-[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping **👍 Try it out**
+### Starting an App
 
 ```bash
-
-npm run sandbox build next [/path/to/sandbox]
-> building next app at /path/to/sandbox
-
-npm run sandbox start </path/to/sandbox>
-> starting dev server
-
-npm run sandbox deploy </path/to/sandbox>
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox deploy -- --template node
-> created codesandbox https://codesandbox.io/s/fgh476
-
-npm run sandbox -- --help
-
-> Usage: fabric.js sandbox [options] [command]
-
-> sandbox commands
-
-Options:
-  -h, --help                      display help for command
-
-Commands:
-  deploy [options] [path]         deploy a sandbox to codesandbox
-  build <template> [destination]  build and start a sandbox
-  start <path>                    start a sandbox
-  help [command]                  display help for command
-
+npm start <template>
+npm start -- --help
 ```
+
+You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
+
+```bash
+npm run sandbox deploy <path/to/app>
+npm run sandbox build <template> <path/to/app>
+npm run sandbox -- --help
+```
+
+Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information.
+
+### Online
+
+You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
+
+- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
+  `A service is available on port ...` popups will show up.
+- Codesandbox: _available soon_.
 
 ### 🔮 Symlinking
 
@@ -231,6 +232,7 @@ Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
+1. Consider flagging `--save` to avoid confusion regarding what version of fabric is being used by the project.
 
 See [npm link][npm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
@@ -256,5 +258,9 @@ Don't forget to unlink the package once you're done.
 [jsdoc]: https://jsdoc.app/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
+[unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
+[visual_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67
+[github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
+[gitpod]: https://gitpod.io/from-referrer/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
 [yarn_link]: https://yarnpkg.com/cli/link

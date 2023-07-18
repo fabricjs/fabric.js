@@ -1,18 +1,23 @@
-import { fabric } from '../../../HEADER';
-import { ImageFormat } from '../../typedefs';
+import { getFabricDocument } from '../../env';
+import type { ImageFormat } from '../../typedefs';
 /**
  * Creates canvas element
  * @return {CanvasElement} initialized canvas element
  */
-export const createCanvasElement = (): HTMLCanvasElement =>
-  fabric.document.createElement('canvas');
+export const createCanvasElement = (): HTMLCanvasElement => {
+  const element = getFabricDocument().createElement('canvas');
+  if (!element || typeof element.getContext === 'undefined') {
+    throw new Error('Failed to create `canvas` element');
+  }
+  return element;
+};
 
 /**
  * Creates image element (works on client and node)
  * @return {HTMLImageElement} HTML image element
  */
 export const createImage = (): HTMLImageElement =>
-  fabric.document.createElement('img');
+  getFabricDocument().createElement('img');
 
 /**
  * Creates a canvas element that is a copy of another and is also painted

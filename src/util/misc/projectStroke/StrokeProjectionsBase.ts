@@ -1,16 +1,17 @@
-import { IPoint, Point } from '../../../point.class';
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import { createVector } from '../vectors';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 /**
  * @see https://github.com/fabricjs/fabric.js/pull/8344
  */
 export abstract class StrokeProjectionsBase {
-  options: TProjectStrokeOnPointsOptions;
-  scale: Point;
-  strokeUniformScalar: Point;
-  strokeProjectionMagnitude: number;
+  declare options: TProjectStrokeOnPointsOptions;
+  declare scale: Point;
+  declare strokeUniformScalar: Point;
+  declare strokeProjectionMagnitude: number;
 
   constructor(options: TProjectStrokeOnPointsOptions) {
     this.options = options;
@@ -24,7 +25,7 @@ export abstract class StrokeProjectionsBase {
   /**
    * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
    */
-  protected createSideVector(from: IPoint, to: IPoint) {
+  protected createSideVector(from: XY, to: XY) {
     const v = createVector(from, to);
     return this.options.strokeUniform ? v.multiply(this.scale) : v;
   }

@@ -1,4 +1,4 @@
-import {
+import type {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';

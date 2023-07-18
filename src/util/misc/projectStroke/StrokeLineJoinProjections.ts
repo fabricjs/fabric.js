@@ -1,6 +1,7 @@
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
 import { halfPI, twoMathPi } from '../../../constants';
-import { IPoint, Point } from '../../../point.class';
-import { TRadian } from '../../../typedefs';
+import type { TRadian } from '../../../typedefs';
 import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
@@ -13,7 +14,7 @@ import {
   rotateVector,
 } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 const zeroVector = new Point();
 
@@ -33,15 +34,15 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
   /**
    * The point being projected (the angle ∠BAC)
    */
-  A: Point;
+  declare A: Point;
   /**
    * The point before A
    */
-  B: Point;
+  declare B: Point;
   /**
    * The point after A
    */
-  C: Point;
+  declare C: Point;
   /**
    * The AB vector
    */
@@ -66,12 +67,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     return Math.abs(angle) < halfPI ? -1 : 1;
   }
 
-  constructor(
-    A: IPoint,
-    B: IPoint,
-    C: IPoint,
-    options: TProjectStrokeOnPointsOptions
-  ) {
+  constructor(A: XY, B: XY, C: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.B = new Point(B);

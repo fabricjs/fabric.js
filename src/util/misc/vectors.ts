@@ -1,5 +1,6 @@
-import { IPoint, Point } from '../../point.class';
-import { TRadian } from '../../typedefs';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
+import type { TRadian } from '../../typedefs';
 
 const unitVectorX = new Point(1, 0);
 const zero = new Point();
@@ -20,7 +21,7 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: IPoint, to: IPoint): Point =>
+export const createVector = (from: XY, to: XY): Point =>
   new Point(to).subtract(from);
 
 /**

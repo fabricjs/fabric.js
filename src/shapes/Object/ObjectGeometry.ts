@@ -7,12 +7,13 @@ import type {
   TOriginY,
 } from '../../typedefs';
 import { iMatrix } from '../../constants';
-import { Intersection } from '../../intersection.class';
-import { Point } from '../../point.class';
+import { Intersection } from '../../Intersection';
+import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
@@ -21,10 +22,11 @@ import {
 } from '../../util/misc/matrix';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { sin } from '../../util/misc/sin';
-import type { Canvas } from '../../canvas/canvas_events';
-import type { StaticCanvas } from '../../canvas/static_canvas.class';
+import type { Canvas } from '../../canvas/Canvas';
+import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { ControlProps } from './types/ControlProps';
 
 type TLineDescriptor = {
   o: Point;
@@ -45,29 +47,11 @@ type TMatrixCache = {
 
 type TACoords = TCornerPoint;
 
-export class ObjectGeometry<
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends ObjectOrigin<EventSpec> {
-  /**
-   * When true, an object is rendered as flipped horizontally
-   * @type Boolean
-   * @default false
-   */
-  flipX: boolean;
-
-  /**
-   * When true, an object is rendered as flipped vertically
-   * @type Boolean
-   * @default false
-   */
-  flipY: boolean;
-
-  /**
-   * Padding between object and its controlling borders (in pixels)
-   * @type Number
-   * @default 0
-   */
-  padding: number;
+export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
+  extends ObjectOrigin<EventSpec>
+  implements Pick<ControlProps, 'padding'>
+{
+  declare padding: number;
 
   /**
    * Describe object's corner position in canvas object absolute coordinates
@@ -80,7 +64,7 @@ export class ObjectGeometry<
    * The coordinates get updated with @method setCoords.
    * You can calculate them without updating with @method calcACoords();
    */
-  aCoords: TACoords;
+  declare aCoords: TACoords;
 
   /**
    * Describe object's corner position in canvas element coordinates.
@@ -89,17 +73,17 @@ export class ObjectGeometry<
    * Those could go away
    * @todo investigate how to get rid of those
    */
-  lineCoords: TCornerPoint;
+  declare lineCoords: TCornerPoint;
 
   /**
    * storage cache for object transform matrix
    */
-  ownMatrixCache?: TMatrixCache;
+  declare ownMatrixCache?: TMatrixCache;
 
   /**
    * storage cache for object full transform matrix
    */
-  matrixCache?: TMatrixCache;
+  declare matrixCache?: TMatrixCache;
 
   /**
    * A Reference of the Canvas where the object is actually added
@@ -107,7 +91,7 @@ export class ObjectGeometry<
    * @default undefined
    * @private
    */
-  canvas?: StaticCanvas | Canvas;
+  declare canvas?: StaticCanvas | Canvas;
 
   /**
    * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
@@ -678,10 +662,10 @@ export class ObjectGeometry<
    * @return {TCornerPoint}
    */
   calcACoords(): TCornerPoint {
-    const rotateMatrix = calcRotateMatrix({ angle: this.angle }),
-      center = this.getRelativeCenterPoint(),
-      translateMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      finalMatrix = multiplyTransformMatrices(translateMatrix, rotateMatrix),
+    const rotateMatrix = createRotateMatrix({ angle: this.angle }),
+      { x, y } = this.getRelativeCenterPoint(),
+      tMatrix = createTranslateMatrix(x, y),
+      finalMatrix = multiplyTransformMatrices(tMatrix, rotateMatrix),
       dim = this._getTransformedDimensions(),
       w = dim.x / 2,
       h = dim.y / 2;

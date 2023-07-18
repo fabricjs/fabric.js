@@ -1,4 +1,15 @@
-import { clone } from '../lang_object';
+import { reNewline } from '../../constants';
+import type {
+  TextStyle,
+  TextStyleDeclaration,
+} from '../../shapes/Text/StyledText';
+import { cloneDeep } from '../internals/cloneDeep';
+
+export type TextStyleArray = {
+  start: number;
+  end: number;
+  style: TextStyleDeclaration;
+}[];
 
 /**
  * @param {Object} prevStyle first style to compare
@@ -7,8 +18,8 @@ import { clone } from '../lang_object';
  * @return {boolean} true if the style changed
  */
 export const hasStyleChanged = (
-  prevStyle: any,
-  thisStyle: any,
+  prevStyle: TextStyleDeclaration,
+  thisStyle: TextStyleDeclaration,
   forTextSpans = false
 ) =>
   prevStyle.fill !== thisStyle.fill ||
@@ -33,19 +44,23 @@ export const hasStyleChanged = (
  * @param {String} text the text string that the styles are applied to
  * @return {{start: number, end: number, style: object}[]}
  */
-export const stylesToArray = (styles: any, text: string) => {
+export const stylesToArray = (
+  styles: TextStyle,
+  text: string
+): TextStyleArray => {
   const textLines = text.split('\n'),
     stylesArray = [];
   let charIndex = -1,
     prevStyle = {};
   // clone style structure to prevent mutation
-  styles = clone(styles, true);
+  styles = cloneDeep(styles);
 
   //loop through each textLine
   for (let i = 0; i < textLines.length; i++) {
     if (!styles[i]) {
-      //no styles exist for this line, so add the line's length to the charIndex total
+      //no styles exist for this line, so add the line's length to the charIndex total and reset prevStyle
       charIndex += textLines[i].length;
+      prevStyle = {};
       continue;
     }
     //loop through each character of the current line
@@ -79,16 +94,16 @@ export const stylesToArray = (styles: any, text: string) => {
  * @param {String} text the text string that the styles are applied to
  * @return {Object}
  */
-export const stylesFromArray = (styles: any, text: string) => {
+export const stylesFromArray = (
+  styles: TextStyleArray | TextStyle,
+  text: string
+): TextStyle => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
-    return clone(styles, true);
+    return cloneDeep(styles);
   }
-  const textLines = text.split('\n'),
-    stylesObject = {} as Record<
-      string | number,
-      Record<string | number, Record<string, string>>
-    >;
+  const textLines = text.split(reNewline),
+    stylesObject: TextStyle = {};
   let charIndex = -1,
     styleIndex = 0;
   //loop through each textLine

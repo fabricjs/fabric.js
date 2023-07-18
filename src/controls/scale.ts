@@ -1,12 +1,12 @@
-import {
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TAxis } from '../typedefs';
-import type { Canvas } from '../canvas/canvas_events';
+import type { TAxis } from '../typedefs';
+import type { Canvas } from '../canvas/Canvas';
 import {
   findCornerQuadrant,
   getLocalPoint,

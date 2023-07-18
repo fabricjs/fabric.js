@@ -1,5 +1,5 @@
-import { Point } from '../../../point.class';
-import { TDegree, TRadian } from '../../../typedefs';
+import type { Point } from '../../../Point';
+import type { TDegree, TRadian } from '../../../typedefs';
 
 export type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;

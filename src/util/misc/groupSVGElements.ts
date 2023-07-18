@@ -1,5 +1,5 @@
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { Group } from '../../shapes/group.class';
+import { Group } from '../../shapes/Group';
 
 /**
  * Groups SVG elements (usually those retrieved from SVG document)

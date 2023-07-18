@@ -32,13 +32,6 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
       MINIFY: Number(!fast),
       BUILD_INPUT: Array.isArray(input) ? input.join(' ') : input,
       BUILD_OUTPUT: output,
-      BUILD_MIN_OUTPUT:
-        output && !fast
-          ? path.resolve(
-              path.dirname(output),
-              `${path.basename(output, '.js')}.min.js`
-            )
-          : undefined,
       BUILD_STATS: Number(stats),
     },
   };

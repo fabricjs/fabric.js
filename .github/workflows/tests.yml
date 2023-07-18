@@ -2,32 +2,75 @@ name: '🧪'
 on:
   push:
     branches: [master]
+    paths-ignore: [CHANGELOG.md]
   pull_request:
     branches: [master]
+    paths-ignore: [CHANGELOG.md]
 
 jobs:
+  prime-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: false
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
+  node-coverage:
+    needs: [prime-build]
+    runs-on: ubuntu-latest
+    name: Node 18.x ${{ matrix.suite }} tests
+    strategy:
+      fail-fast: false
+      matrix:
+        # For more information see:
+        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
+        suite: [unit, visual]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: false
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
+      - name: Run ${{ matrix.suite }} tests with coverage
+        if: matrix.suite == 'unit'
+        run: npm run test:coverage
+      - name: Run ${{ matrix.suite }} tests with coverage
+        if: matrix.suite == 'visual'
+        run: npm run test:visual:coverage
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-${{ matrix.suite }}
+          path: .nyc_output/*.json
   browser:
+    needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
         target: [chrome, firefox]
         suite: [unit, visual]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2
-      - name: Unit tests on Chrome
-        uses: actions/setup-node@v1
+      - name: Unit tests on browser ${{ matrix.target }}
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm run build -- -f
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
+    needs: [prime-build]
     runs-on: ubuntu-latest
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
@@ -36,18 +79,85 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [14.x, 16.x, 20.x]
         suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v2
-      - name: Install node-canvas
-        run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - name: Build
-        run: npm run build -- -f
+          install-system-deps: ${{ matrix.node-version }} == '20.x'
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
+  jest:
+    name: Jest tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: false
+      - name: Run Jest unit test
+        run: npm run test:jest:coverage
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-jest
+          path: .nyc_output/*.json
+  e2e:
+    needs: [prime-build]
+    name: Playwright tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
+        # Playwright suggests against caching the browser install
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        run: xvfb-run npm run test:e2e
+      - name: Upload Test Output
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: e2e-report
+          path: ./e2e/test-report/
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-e2e
+          path: ./e2e/test-results/**/coverage.json
+  coverage:
+    needs: [node-coverage, e2e]
+    name: Coverage reporting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: false
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-unit
+          path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-visual
+          path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-e2e
+          path: .nyc_output
+      - run: ls -l .nyc_output
+      - run: npm run coverage:report
+      - uses: ShaMan123/lcov-reporter-action@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true
+          update-comment: true
