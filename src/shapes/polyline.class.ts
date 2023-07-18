@@ -14,18 +14,6 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
-const strokeProjectionOptions: (keyof TProjectStrokeOnPointsOptions)[] = [
-  'scaleX',
-  'scaleY',
-  'skewX',
-  'skewY',
-  'strokeLineCap',
-  'strokeLineJoin',
-  'strokeMiterLimit',
-  'strokeUniform',
-  'strokeWidth',
-];
-
 export class Polyline extends FabricObject {
   /**
    * Points array
@@ -191,11 +179,17 @@ export class Polyline extends FabricObject {
   _getTransformedDimensions(options: any = {}) {
     if (this.exactBoundingBox) {
       let size: Point;
+      /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because 
+        the stroke projections are affected. 
+        When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on 
+        projections follows a linear function (e.g. scaleX of 2 just multiply width by 2)*/
       if (
-        Object.keys(options).some((key) =>
-          strokeProjectionOptions.includes(
-            key as keyof TProjectStrokeOnPointsOptions
-          )
+        Object.keys(options).some(
+          (key) =>
+            this.strokeUniform ||
+            this.strokeBBoxAffectingProperties.includes(
+              key as keyof TProjectStrokeOnPointsOptions
+            )
         )
       ) {
         const { width, height } = this._calcDimensions(options);
