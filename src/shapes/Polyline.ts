@@ -1,47 +1,26 @@
+import { fabric } from '../../HEADER';
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import type { XY } from '../Point';
-import { Point } from '../Point';
-import type { Abortable, TClassProperties } from '../typedefs';
-import { classRegistry } from '../ClassRegistry';
+import { IPoint, Point } from '../point.class';
+import { TClassProperties } from '../typedefs';
+import { classRegistry } from '../util/class_registry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
-import type { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
+import { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
-import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
-import type { ObjectEvents } from '../EventTypeDefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
-import type { CSSRules } from '../parser/typedefs';
+import { FabricObject, fabricObjectDefaultValues } from './Object/FabricObject';
 
-export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
-  exactBoundingBox: false,
-};
-
-export interface SerializedPolylineProps extends SerializedObjectProps {
-  points: XY[];
-}
-
-export class Polyline<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
-  SProps extends SerializedPolylineProps = SerializedPolylineProps,
-  EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObject<Props, SProps, EventSpec> {
+export class Polyline extends FabricObject {
   /**
    * Points array
    * @type Array
    * @default
    */
-  declare points: XY[];
+  points: IPoint[];
 
   /**
    * WARNING: Feature in progress
@@ -51,41 +30,23 @@ export class Polyline<
    * @deprecated
    * @type Boolean
    * @default false
+   * @todo set default to true and remove flag and related logic
    */
-  declare exactBoundingBox: boolean;
+  exactBoundingBox: boolean;
 
-  private declare initialized: true | undefined;
+  private initialized: true | undefined;
 
-  static ownDefaults: Record<string, any> = polylineDefaultValues;
-
-  static type = 'Polyline';
-
-  static getDefaults() {
-    return {
-      ...super.getDefaults(),
-      ...Polyline.ownDefaults,
-    };
-  }
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
-  static layoutProperties: (keyof Polyline)[] = [
-    'skewX',
-    'skewY',
-    'strokeLineCap',
-    'strokeLineJoin',
-    'strokeMiterLimit',
-    'strokeWidth',
-    'strokeUniform',
-    'points',
-  ];
+  strokeBBoxAffectingProperties: (keyof this)[];
 
-  declare pathOffset: Point;
+  fromSVG: boolean;
 
-  declare strokeOffset: Point;
+  pathOffset: Point;
 
-  static cacheProperties = [...cacheProperties, 'points'];
+  strokeOffset: Point;
 
   strokeDiff: Point;
 
@@ -108,13 +69,12 @@ export class Polyline<
    *   top: 100
    * });
    */
-  constructor(points: XY[] = [], options: Props = {} as Props) {
+  constructor(points: IPoint[] = [], { left, top, ...options }: any = {}) {
     super({ points, ...options });
-    const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
-    typeof left === 'number' && this.set(LEFT, left);
-    typeof top === 'number' && this.set(TOP, top);
+    typeof left === 'number' && this.set('left', left);
+    typeof top === 'number' && this.set('top', top);
   }
 
   protected isOpen() {
@@ -169,9 +129,14 @@ export class Polyline<
       pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
       pathOffsetY =
         offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
-      scale = new Point(this.scaleX, this.scaleY);
+      scale = new Point(this.scaleX, this.scaleY),
+      // TODO: remove next line
+      legacyCorrection =
+        !this.fromSVG && !this.exactBoundingBox ? this.strokeWidth / 2 : 0;
     return {
       ...bbox,
+      left: bbox.left - legacyCorrection,
+      top: bbox.top - legacyCorrection,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
         .subtract(new Point(bbox.left, bbox.top))
@@ -180,17 +145,6 @@ export class Polyline<
         .subtract(new Point(bboxNoStroke.width, bboxNoStroke.height))
         .multiply(scale),
     };
-  }
-
-  /**
-   * This function is an helper for svg import. it returns the center of the object in the svg
-   * untransformed coordinates, by look at the polyline/polygon points.
-   * @private
-   * @return {Point} center point from element coordinates
-   */
-  _findCenterFromElement(): Point {
-    const bbox = makeBoundingBoxFromPoints(this.points);
-    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   setDimensions() {
@@ -202,11 +156,7 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
-      this.setPositionByOrigin(
-        new Point(left + width / 2, top + height / 2),
-        CENTER,
-        CENTER
-      );
+      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
   }
 
   /**
@@ -237,7 +187,7 @@ export class Polyline<
         Object.keys(options).some(
           (key) =>
             this.strokeUniform ||
-            (this.constructor as typeof Polyline).layoutProperties.includes(
+            this.strokeBBoxAffectingProperties.includes(
               key as keyof TProjectStrokeOnPointsOptions
             )
         )
@@ -270,13 +220,8 @@ export class Polyline<
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
-        (this.constructor as typeof Polyline).layoutProperties.includes(
-          'strokeUniform'
-        ) &&
-        this.strokeLineJoin !== 'round') ||
-        (this.constructor as typeof Polyline).layoutProperties.includes(
-          key as keyof Polyline
-        ))
+        this.strokeBBoxAffectingProperties.includes('strokeUniform')) ||
+        this.strokeBBoxAffectingProperties.includes(key as keyof this))
     ) {
       this.setDimensions();
     }
@@ -288,13 +233,10 @@ export class Polyline<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  toObject<
-    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+  toObject(propertiesToInclude?: (keyof this)[]): object {
     return {
       ...super.toObject(propertiesToInclude),
-      points: cloneDeep(this.points),
+      points: this.points.concat(),
     };
   }
 
@@ -318,11 +260,7 @@ export class Polyline<
       );
     }
     return [
-      `<${
-        (this.constructor as typeof Polyline).type.toLowerCase() as
-          | 'polyline'
-          | 'polygon'
-      } `,
+      `<${this.type} `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];
@@ -374,26 +312,32 @@ export class Polyline<
    * Returns Polyline instance from an SVG element
    * @static
    * @memberOf Polyline
-   * @param {HTMLElement} element Element to parser
+   * @param {SVGElement} element Element to parser
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
    */
-  static async fromElement(
-    element: HTMLElement,
-    options: Abortable,
-    cssRules?: CSSRules
+  static fromElement(
+    element: SVGElement,
+    callback: (poly: Polyline | null) => any,
+    options?: any
   ) {
+    if (!element) {
+      return callback(null);
+    }
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       { left, top, ...parsedAttributes } = parseAttributes(
         element,
-        this.ATTRIBUTE_NAMES,
-        cssRules
+        this.ATTRIBUTE_NAMES
       );
-    return new this(points || [], {
-      ...parsedAttributes,
-      ...options,
-    });
+    callback(
+      new this(points || [], {
+        ...parsedAttributes,
+        ...options,
+        fromSVG: true,
+      })
+    );
   }
 
   /* _FROM_SVG_END_ */
@@ -405,12 +349,33 @@ export class Polyline<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
-    return this._fromObject<Polyline>(object, {
+  static fromObject(object: Record<string, unknown>) {
+    return this._fromObject(object, {
       extraParam: 'points',
     });
   }
 }
 
+export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
+  type: 'polyline',
+  exactBoundingBox: false,
+  cacheProperties: fabricObjectDefaultValues.cacheProperties.concat('points'),
+  strokeBBoxAffectingProperties: [
+    'skewX',
+    'skewY',
+    'strokeLineCap',
+    'strokeLineJoin',
+    'strokeMiterLimit',
+    'strokeWidth',
+    'strokeUniform',
+    'points',
+  ],
+};
+
+Object.assign(Polyline.prototype, polylineDefaultValues);
+
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);
+
+/** @todo TODO_JS_MIGRATION remove next line after refactoring build */
+fabric.Polyline = Polyline;
