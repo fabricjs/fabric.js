@@ -237,7 +237,7 @@ export class Polyline<
         Object.keys(options).some(
           (key) =>
             this.strokeUniform ||
-            this.strokeBBoxAffectingProperties.includes(
+            (this.constructor as typeof Polyline).layoutProperties.includes(
               key as keyof TProjectStrokeOnPointsOptions
             )
         )
