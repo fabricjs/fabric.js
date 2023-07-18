@@ -23,7 +23,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 export type GraphemeData = {
   wordsData: {
-    word: string;
+    word: string[];
     width: number;
   }[][];
   largestWordWidth: number;
@@ -341,11 +341,14 @@ export class Textbox<
       // fix a difference between split and graphemeSplit
       // why are we doing this? what difference?
       // wouldn't it be better return data for empty words?
+      // it should return an empty array - anything else means that methods consuming this data need adjustment also
       if (wordsOrGraphemes.length === 0) {
-        return {
-          word: '',
-          width: 0,
-        };
+        return [
+          {
+            word: [] as string[],
+            width: 0,
+          },
+        ];
       }
 
       return wordsOrGraphemes.map((word: string) => {
