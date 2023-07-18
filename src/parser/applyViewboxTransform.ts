@@ -6,11 +6,22 @@ import {
 } from '../util/misc/svgParsing';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 import { NONE } from '../constants';
+
+export type ParsedViewboxTransform = Partial<{
+  width: number;
+  height: number;
+  minX: number;
+  minY: number;
+  viewBoxWidth: number;
+  viewBoxHeight: number;
+}>;
+
 /**
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
-
-export function applyViewboxTransform(element: Element) {
+export function applyViewboxTransform(
+  element: Element
+): ParsedViewboxTransform {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
@@ -29,15 +40,10 @@ export function applyViewboxTransform(element: Element) {
     !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
   const missingDimAttr =
     !widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%';
-  const toBeParsed = missingViewBox && missingDimAttr;
-  const parsedDim: any = {};
+
   let translateMatrix = '';
   let widthDiff = 0;
   let heightDiff = 0;
-
-  parsedDim.width = 0;
-  parsedDim.height = 0;
-  parsedDim.toBeParsed = toBeParsed;
 
   if (missingViewBox) {
     if (
@@ -54,9 +60,17 @@ export function applyViewboxTransform(element: Element) {
     }
   }
 
-  if (toBeParsed) {
-    return parsedDim;
+  if (missingViewBox && missingDimAttr) {
+    return {
+      width: 0,
+      height: 0,
+    };
   }
+
+  const parsedDim: ParsedViewboxTransform = {
+    width: 0,
+    height: 0,
+  };
 
   if (missingViewBox) {
     parsedDim.width = parseUnit(widthAttr);

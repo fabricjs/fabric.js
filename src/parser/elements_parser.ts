@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-check
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
@@ -14,23 +14,33 @@ import { Point } from '../Point';
 import { CENTER } from '../constants';
 import { getGradientDefs } from './getGradientDefs';
 import { getCSSRules } from './getCSSRules';
+import type { LoadImageOptions } from '../util';
+import type { CSSRules, TSvgReviverCallback } from './typedefs';
+import type { ParsedViewboxTransform } from './applyViewboxTransform';
 
-const findTag = (el: HTMLElement) =>
+const findTag = (el: Element) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
 
 export class ElementsParser {
+  elements: Element[];
+  options: LoadImageOptions & ParsedViewboxTransform;
+  reviver: TSvgReviverCallback | undefined;
+  regexUrl: RegExp;
+  doc: Document;
+  clipPaths: Record<string, Element[]>;
+  gradientDefs: Record<string, Element>;
+  cssRules: CSSRules;
+
   constructor(
     elements: Element[],
-    options,
-    reviver,
-    parsingOptions,
-    doc,
-    clipPaths
+    options: LoadImageOptions & ParsedViewboxTransform,
+    reviver: TSvgReviverCallback | undefined,
+    doc: Document,
+    clipPaths: Record<string, Element[]>
   ) {
     this.elements = elements;
     this.options = options;
     this.reviver = reviver;
-    this.parsingOptions = parsingOptions;
     this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
     this.doc = doc;
     this.clipPaths = clipPaths;
@@ -38,15 +48,15 @@ export class ElementsParser {
     this.cssRules = getCSSRules(doc);
   }
 
-  parse(): Promise<FabricObject[]> {
+  parse() {
     return Promise.all(
-      this.elements.map((element: HTMLElement, i) => {
+      this.elements.map((element) => {
         return this.createObject(element);
       })
     );
   }
 
-  async createObject(el: HTMLElement): Promise<FabricObject> {
+  async createObject(el: Element): Promise<FabricObject | null> {
     const klass = findTag(el);
     if (klass) {
       const obj = await klass.fromElement(el, this.options, this.cssRules);

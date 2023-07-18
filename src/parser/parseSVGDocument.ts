@@ -78,10 +78,6 @@ export async function parseSVGDocument(
     elements,
     options,
     reviver,
-    {
-      crossOrigin,
-      signal,
-    },
     doc,
     localClipPaths
   );
