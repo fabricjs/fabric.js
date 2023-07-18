@@ -18,35 +18,35 @@ import { getCSSRules } from './getCSSRules';
 const findTag = (el: HTMLElement) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
 
-const ElementsParser = function (
-  elements: HTMLElement[],
-  options,
-  reviver,
-  parsingOptions,
-  doc,
-  clipPaths
-) {
-  this.elements = elements;
-  this.options = options;
-  this.reviver = reviver;
-  this.parsingOptions = parsingOptions;
-  this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
-  this.doc = doc;
-  this.clipPaths = clipPaths;
-  this.gradientDefs = getGradientDefs(doc);
-  this.cssRules = getCSSRules(doc);
-};
+export class ElementsParser {
+  constructor(
+    elements: Element[],
+    options,
+    reviver,
+    parsingOptions,
+    doc,
+    clipPaths
+  ) {
+    this.elements = elements;
+    this.options = options;
+    this.reviver = reviver;
+    this.parsingOptions = parsingOptions;
+    this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
+    this.doc = doc;
+    this.clipPaths = clipPaths;
+    this.gradientDefs = getGradientDefs(doc);
+    this.cssRules = getCSSRules(doc);
+  }
 
-(function (proto) {
-  proto.parse = function (): Promise<FabricObject[]> {
+  parse(): Promise<FabricObject[]> {
     return Promise.all(
       this.elements.map((element: HTMLElement, i) => {
         return this.createObject(element);
       })
     );
-  };
+  }
 
-  proto.createObject = async function (el: HTMLElement): Promise<FabricObject> {
+  async createObject(el: HTMLElement): Promise<FabricObject> {
     const klass = findTag(el);
     if (klass) {
       const obj = await klass.fromElement(el, this.options, this.cssRules);
@@ -62,9 +62,9 @@ const ElementsParser = function (
       return obj;
     }
     return null;
-  };
+  }
 
-  proto.extractPropertyDefinition = function (obj, property, storage) {
+  extractPropertyDefinition(obj, property, storage) {
     const value = obj[property],
       regex = this.regexUrl;
     if (!regex.test(value)) {
@@ -75,9 +75,9 @@ const ElementsParser = function (
     regex.lastIndex = 0;
     // @todo fix this
     return storage[id];
-  };
+  }
 
-  proto.resolveGradient = function (obj, el, property) {
+  resolveGradient(obj, el, property) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
@@ -91,9 +91,9 @@ const ElementsParser = function (
       });
       obj.set(property, gradient);
     }
-  };
+  }
 
-  proto.resolveClipPath = async function (obj, usingElement) {
+  async resolveClipPath(obj, usingElement) {
     const clipPathElements = this.extractPropertyDefinition(
       obj,
       'clipPath',
@@ -155,7 +155,5 @@ const ElementsParser = function (
       delete obj.clipPath;
       return;
     }
-  };
-})(ElementsParser.prototype);
-
-export { ElementsParser };
+  }
+}
