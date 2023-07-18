@@ -9,7 +9,7 @@ import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
-import { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
+import type { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
