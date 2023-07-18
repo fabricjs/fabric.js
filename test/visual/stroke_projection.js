@@ -164,8 +164,8 @@ QUnit.module('stroke projection', (hooks) => {
       0,
       0,
     ]);
-    bg.viewportCenter();
-    target.viewportCenter();
+    canvas.viewportCenterObject(bg);
+    canvas.viewportCenterObject(target);
     canvas.backgroundColor = 'white';
     canvas.renderAll();
   }
