@@ -37,7 +37,7 @@ const config: PlaywrightTestConfig = {
   reporter: [
     ['list'],
     ['html', { outputFolder: './e2e/test-report', open: 'on-failure' }],
-    ['json', './e2e/test-results/test-results.json'],
+    ['json', { outputFile: './e2e/test-results/test-results.json' }],
   ],
   outputDir: './e2e/test-results',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

@@ -32,6 +32,26 @@ import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 
+export type SelectObjectOptions =
+  | {
+      /**
+       * passed along when firing "object:selected"
+       */
+      e?: TPointerEvent;
+      startImmediatePropagation?: never;
+    }
+  | {
+      /**
+       * passed along when firing "object:selected"
+       */
+      e: TPointerEvent;
+      /**
+       * start a transform interaction on {@link object} immediately,
+       * useful when selecting an object while a user interaction is in progress
+       */
+      startImmediatePropagation?: boolean;
+    };
+
 export const DefaultCanvasProperties = {
   uniformScaling: true,
   uniScaleKey: 'shiftKey',
@@ -865,8 +885,10 @@ export class SelectableCanvas<
       transform.originY = CENTER;
     }
     this._currentTransform = transform;
-    // @ts-ignore
-    this._beforeTransform(e);
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
   }
 
   /**
@@ -1289,14 +1311,13 @@ export class SelectableCanvas<
   /**
    * Sets given object as the only active object on canvas
    * @param {FabricObject} object Object to set as an active one
-   * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  setActiveObject(object: FabricObject, options?: SelectObjectOptions) {
     // we can't inline this, since _setActiveObject will change what getActiveObjects returns
     const currentActives = this.getActiveObjects();
-    const selected = this._setActiveObject(object, e);
-    this._fireSelectionEvents(currentActives, e);
+    const selected = this._setActiveObject(object, options);
+    this._fireSelectionEvents(currentActives, options?.e);
     return selected;
   }
 
@@ -1305,10 +1326,12 @@ export class SelectableCanvas<
    * any event. There is commitment to have this stay this way.
    * This is the functional part of setActiveObject.
    * @param {Object} object to set as active
-   * @param {Event} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
+  _setActiveObject(
+    object: FabricObject,
+    { e, startImmediatePropagation }: SelectObjectOptions = {}
+  ) {
     if (this._activeObject === object) {
       return false;
     }
@@ -1320,7 +1343,9 @@ export class SelectableCanvas<
       return false;
     }
     this._activeObject = object;
-
+    e &&
+      startImmediatePropagation &&
+      this._setupCurrentTransform(e, object, true);
     return true;
   }
 

@@ -5,7 +5,7 @@ export default (config: PlaywrightTestConfig) => {
   const watch = process.argv.includes('--ui');
   return new Promise((resolve) => {
     const p = spawn(
-      `babel --no-babelrc e2e/tests --extensions '.ts' --ignore '**/*.spec.ts' --out-dir e2e/dist --config-file ./.babelrcAlt ${
+      `babel --no-babelrc e2e/tests --extensions '.ts' --ignore '**/*.spec.ts' --out-dir e2e/dist --config-file ./e2e/.babelrc.js ${
         watch ? '-w' : ''
       }`,
       { shell: true, detached: false }

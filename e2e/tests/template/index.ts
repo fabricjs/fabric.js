@@ -1,10 +1,10 @@
 /**
  * Runs in the **BROWSER**
- * Use absolute imports defined in 'e2e/imports.ts'
+ * Imports are defined in 'e2e/imports.ts'
  */
 
 import * as fabric from 'fabric';
-import { beforeAll } from 'test';
+import { beforeAll } from '../test';
 
 beforeAll((canvas) => {
   const textbox = new fabric.Textbox('fabric.js test', {
