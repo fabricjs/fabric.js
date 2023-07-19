@@ -96,7 +96,7 @@
     "auto-changelog": "^2.3.0",
     "axios": "^0.27.2",
     "babel-plugin-import-json-value": "^0.1.2",
-    "babel-plugin-transform-imports": "github:ShaMan123/babel-plugin-transform-imports",
+    "babel-plugin-transform-imports": "git+https://git@github.com/ShaMan123/babel-plugin-transform-imports.git",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
