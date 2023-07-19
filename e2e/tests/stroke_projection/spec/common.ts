@@ -21,7 +21,6 @@ for (const [test, casePoints] of Object.entries(cases)) {
     strokeLineTypes.forEach((strokeLineTypeCase) => {
       [true, false].forEach((strokeUniform) => {
         [false, true].forEach((group) => {
-          if (group) return; // TODO: remove this line when fix group
           [
             [0, 0],
             [0, 30],

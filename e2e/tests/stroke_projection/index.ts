@@ -34,7 +34,10 @@ beforeAll(
         });
         let target: fabric.Polyline | fabric.Group = poly;
         if (group) {
-          target = new fabric.Group([poly]);
+          target = new fabric.Group([poly], {
+            objectCaching: false,
+            subTargetCheck: true,
+          });
           targets[toGroupKey({ type, test, points, group, options })] = target;
         }
         target.scaleX = 2;
