@@ -5,7 +5,12 @@ export {
   createVector,
   calcAngleBetweenVectors,
   getUnitVector,
-  getBisector,
+  calcVectorRotation,
+  crossProduct,
+  dotProduct,
+  getOrthonormalVector,
+  isBetweenVectors,
+  magnitude,
 } from './misc/vectors';
 export {
   degreesToRadians,
