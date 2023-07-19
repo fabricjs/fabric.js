@@ -272,8 +272,7 @@ export class Polyline<
         this.strokeUniform &&
         (this.constructor as typeof Polyline).layoutProperties.includes(
           'strokeUniform'
-        ) &&
-        this.strokeLineJoin !== 'round') ||
+        )) ||
         (this.constructor as typeof Polyline).layoutProperties.includes(
           key as keyof Polyline
         ))
