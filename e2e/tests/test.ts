@@ -26,7 +26,7 @@ export function before(
   /**
    * @returns a map of objects for playwright to access during tests
    */
-  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
+  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject> | void>,
   options?
 ) {
   const task = Promise.resolve().then(async () => {
@@ -52,7 +52,7 @@ export function before(
  * @param options canvas options
  */
 export function beforeAll(
-  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
+  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject> | void>,
   options?
 ) {
   before('#canvas', cb, options);

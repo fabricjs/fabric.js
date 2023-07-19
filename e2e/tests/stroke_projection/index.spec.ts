@@ -6,6 +6,7 @@ import miterLimit from './spec/miterLimit';
 import singlePoint from './spec/singlePoint';
 import type { TestSpec } from './spec/util';
 import { toGroupKey, toKey, toTestName } from './spec/util';
+import { promiseSequence } from '../../../src/util/internals';
 
 import '../../setup';
 
@@ -90,17 +91,17 @@ function runStep(page: Page, testInfo: TestInfo, spec: TestSpec) {
 test.describe('Stroke Projection', () => {
   test('BBox is correct', async ({ page }, testInfo) => {
     testInfo.setTimeout(120 * 1000);
-    await Promise.all(
-      [...common, ...miterLimit, ...singlePoint].map((spec) =>
-        runStep(page, testInfo, spec)
+    await promiseSequence(
+      [...common, ...miterLimit, ...singlePoint].map(
+        (spec) => () => runStep(page, testInfo, spec)
       )
     );
   });
   test.fixme('BBox is correct for group', async ({ page }, testInfo) => {
     testInfo.setTimeout(120 * 1000);
-    await Promise.all(
-      [...common, ...miterLimit, ...singlePoint].map((spec) =>
-        runStep(page, testInfo, { ...spec, group: true })
+    await promiseSequence(
+      [...common, ...miterLimit, ...singlePoint].map(
+        (spec) => () => runStep(page, testInfo, { ...spec, group: true })
       )
     );
   });

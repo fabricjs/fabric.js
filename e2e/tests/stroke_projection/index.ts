@@ -27,6 +27,10 @@ function sampleBorders(
 
 beforeAll(
   (canvas) => {
+    const ctx = canvas
+      .getElement()
+      .getContext('2d', { willReadFrequently: true });
+
     window.testProjection = ({
       type,
       points,
@@ -60,9 +64,6 @@ beforeAll(
 
       canvas.clear();
 
-      const ctx = canvas
-        .getElement()
-        .getContext('2d', { willReadFrequently: true });
       target.controls = {};
       canvas.add(target);
       canvas.viewportCenterObject(target);
