@@ -128,7 +128,7 @@ jobs:
         if: failure()
         with:
           name: e2e-report
-          path: ./e2e/test-report
+          path: ./e2e/test-report/**/*
       - name: Upload Test Coverage
         uses: actions/upload-artifact@v3
         with:
