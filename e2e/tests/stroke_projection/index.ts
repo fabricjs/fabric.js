@@ -76,8 +76,14 @@ beforeAll(
       // this is for us humans to see what is going on
       // sampling is done without the borders
       canvas.setActiveObject(target);
+      canvas.renderAll();
       return samples;
     };
   },
-  { enableRetinaScaling: false, width: 600, height: 900 }
+  {
+    enableRetinaScaling: false,
+    imageSmoothingEnabled: false,
+    width: 600,
+    height: 900,
+  }
 );
