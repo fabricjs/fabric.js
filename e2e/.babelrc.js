@@ -6,23 +6,7 @@ const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
 
 module.exports = {
-  presets: [
-    [
-      '@babel/env',
-      {
-        modules: false,
-        useBuiltIns: false,
-        loose: true,
-        targets: 'chrome > 100',
-      },
-    ],
-    [
-      '@babel/typescript',
-      {
-        allowDeclareFields: true,
-      },
-    ],
-  ],
+  extends: '../.babelrcAlt',
   plugins: [
     [
       'transform-imports',
