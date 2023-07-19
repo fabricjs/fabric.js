@@ -1,23 +1,23 @@
 import cases from './cases';
 import type { TestSpec } from './util';
 
-const tests: TestSpec[] = [];
-
 const spec = [
   {
     type: 'polyline',
     strokeLineType: 'strokeLineCap',
     strokeLineTypes: ['butt', 'square', 'round'],
+    tests: [] as TestSpec[],
   },
   {
     type: 'polygon',
     strokeLineType: 'strokeLineJoin',
     strokeLineTypes: ['miter', 'round', 'bevel'],
+    tests: [] as TestSpec[],
   },
 ] as const;
 
 for (const [test, casePoints] of Object.entries(cases)) {
-  spec.forEach(({ type, strokeLineType, strokeLineTypes }) => {
+  spec.forEach(({ type, strokeLineType, strokeLineTypes, tests }) => {
     strokeLineTypes.forEach((strokeLineTypeCase) => {
       [true, false].forEach((strokeUniform) => {
         [false, true].forEach((group) => {
@@ -46,4 +46,4 @@ for (const [test, casePoints] of Object.entries(cases)) {
   });
 }
 
-export default tests;
+export default spec;

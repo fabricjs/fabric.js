@@ -35,7 +35,7 @@ export const toTestName = ({
     strokeUniform ? 'strokeUniform ' : ''
   }${strokeLineCap ? `strokeLineCap='${strokeLineCap}' ` : ''}${
     strokeLineJoin ? `strokeLineJoin='${strokeLineJoin}' ` : ''
-  }${strokeMiterLimit ? `strokeMiterLimit='${strokeMiterLimit}' ` : ''}${
+  }${strokeMiterLimit ? `strokeMiterLimit=${strokeMiterLimit} ` : ''}${
     skewX || skewY ? `skew(${skewX}, ${skewY})` : ''
   }`;
 
