@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 import common from './spec/common';
+import miterLimit from './spec/miterLimit';
+import singlePoint from './spec/singlePoint';
 import { toGroupKey, toKey, toTestName } from './spec/util';
 import { executeInBrowser } from '../../utils/executeInBrowser';
 
@@ -12,7 +14,7 @@ const blankPixel = [0, 0, 0, 0] as Pixel;
 test.describe('Stroke Projection', () => {
   test('BBox is correct', async ({ page }) => {
     test.setTimeout(60 * 1000);
-    common.forEach((spec) => {
+    [...common, ...miterLimit, ...singlePoint].forEach((spec) => {
       test.step(toTestName(spec), async () => {
         const { width, height, ...borders } = await executeInBrowser(
           page,
