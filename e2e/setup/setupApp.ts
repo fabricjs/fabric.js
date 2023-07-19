@@ -61,7 +61,7 @@ test.beforeEach(async ({ page }, { file }) => {
     await page.addScriptTag({
       type: 'module',
       content: `${readFileSync(
-        path.relative(process.cwd(), pathToApp)
+        path.relative(process.cwd(), pathToBuiltApp)
       ).toString()}
        window.dispatchEvent(new CustomEvent('fabric:setup'));
        `,
