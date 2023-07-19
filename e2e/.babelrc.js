@@ -5,7 +5,7 @@ const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
 
 function resolve(file) {
-  const found = ['', '.js', '/index.js']
+  const found = ['', '.ts', '/index.ts']
     .map((resolution) => `${file}${resolution}`)
     .find((file) => {
       try {
@@ -15,9 +15,10 @@ function resolve(file) {
       }
     });
   if (!found) {
-    throw new Error(`Failed to resolve ${file}`);
+    console.error(`Failed to resolve ${file}`);
+    process.exit(1);
   }
-  return require.resolve(file);
+  return require.resolve(found).replace(/\.ts$/, '.js');
 }
 
 module.exports = {
@@ -29,15 +30,15 @@ module.exports = {
         '\\..*': {
           skipDefaultConversion: true,
           transform: function (importName, matches, filename) {
-            const file = path.resolve(path.dirname(filename), `${matches[0]}`);
+            const file = resolve(
+              path.resolve(path.dirname(filename), `${matches[0]}`)
+            );
             return `/${path
               .relative(
                 process.cwd(),
-                resolve(
-                  file.startsWith(testsDir)
-                    ? path.resolve(testsBuiltDir, path.relative(testsDir, file))
-                    : file
-                )
+                file.startsWith(testsDir)
+                  ? path.resolve(testsBuiltDir, path.relative(testsDir, file))
+                  : file
               )
               .replaceAll('\\', '/')}`;
           },
