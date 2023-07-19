@@ -40,6 +40,8 @@ export const toTestName = ({
   }`;
 
 export const toKey = (spec: TestSpec) =>
-  toTestName(spec).replaceAll(/\s|'|=/g, '');
+  toTestName(spec)
+    .replaceAll(/\s/g, '')
+    .replaceAll(/\s|'|=/g, '-');
 
-export const toGroupKey = (spec: TestSpec) => `group_${toKey(spec)}`;
+export const toGroupKey = (spec: TestSpec) => `group-${toKey(spec)}`;

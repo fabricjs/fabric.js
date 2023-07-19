@@ -6,19 +6,24 @@ import { toGroupKey, toKey, toTestName } from './spec/util';
 import { executeInBrowser } from '../../utils/executeInBrowser';
 
 import '../../setup';
+import { CanvasUtil } from '../../utils/CanvasUtil';
 
 type Pixel = [number, number, number, number];
 
 const blankPixel = [0, 0, 0, 0] as Pixel;
 
+const distanceFromEdge = 2;
+
 test.describe('Stroke Projection', () => {
-  test('BBox is correct', async ({ page }) => {
-    test.setTimeout(60 * 1000);
+  test('BBox is correct', async ({ page }, testInfo) => {
+    test.setTimeout(120 * 1000);
     [...common, ...miterLimit, ...singlePoint].forEach((spec) => {
-      test.step(toTestName(spec), async () => {
+      const name = toTestName(spec);
+      const key = spec.group ? toGroupKey(spec) : toKey(spec);
+      test.step(name, async () => {
         const { width, height, ...borders } = await executeInBrowser(
           page,
-          ({ key }, { getCanvas, getObject }) => {
+          ({ key, distanceFromEdge: d }, { getCanvas, getObject }) => {
             const canvas = getCanvas();
             canvas.clear();
             const target = getObject(key);
@@ -29,7 +34,6 @@ test.describe('Stroke Projection', () => {
             target.setCoords();
             canvas.renderAll();
             const { tl: _tl, br: _br } = target.aCoords;
-            const d = 2;
             const tl = _tl.min(_br);
             const br = _tl.max(_br);
             const w = Math.ceil(br.x - tl.x) + d * 2;
@@ -50,7 +54,7 @@ test.describe('Stroke Projection', () => {
               height: h,
             };
           },
-          { key: spec.group ? toGroupKey(spec) : toKey(spec) }
+          { key, distanceFromEdge }
         );
 
         const pixels = Object.entries(borders).reduce(
@@ -65,12 +69,20 @@ test.describe('Stroke Projection', () => {
           {} as Record<keyof typeof borders, Pixel>
         );
 
-        expect(pixels).toMatchObject({
-          left: new Array(height).fill(blankPixel),
-          top: new Array(width).fill(blankPixel),
-          right: new Array(height).fill(blankPixel),
-          bottom: new Array(width).fill(blankPixel),
-        });
+        try {
+          expect(pixels).toMatchObject({
+            left: new Array(height).fill(blankPixel),
+            top: new Array(width).fill(blankPixel),
+            right: new Array(height).fill(blankPixel),
+            bottom: new Array(width).fill(blankPixel),
+          });
+        } catch (error) {
+          await testInfo.attach(key, {
+            body: await new CanvasUtil(page).screenshot(),
+            contentType: 'image/png',
+          });
+          throw error;
+        }
       });
     });
   });
