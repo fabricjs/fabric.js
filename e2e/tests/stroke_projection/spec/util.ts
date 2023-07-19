@@ -39,5 +39,7 @@ export const toTestName = ({
     skewX || skewY ? `skew(${skewX}, ${skewY})` : ''
   }`;
 
-export const toKeyName = (spec: TestSpec) =>
+export const toKey = (spec: TestSpec) =>
   toTestName(spec).replaceAll(/\s|'|=/g, '');
+
+export const toGroupKey = (spec: TestSpec) => `group_${toKey(spec)}`;

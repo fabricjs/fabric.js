@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import common from './spec/common';
-import { toKeyName, toTestName } from './spec/util';
+import { toGroupKey, toKey, toTestName } from './spec/util';
 import { executeInBrowser } from '../../utils/executeInBrowser';
 
 import '../../setup';
@@ -48,7 +48,7 @@ test.describe('Stroke Projection', () => {
               height: h,
             };
           },
-          { key: toKeyName(spec) }
+          { key: spec.group ? toGroupKey(spec) : toKey(spec) }
         );
 
         const pixels = Object.entries(borders).reduce(

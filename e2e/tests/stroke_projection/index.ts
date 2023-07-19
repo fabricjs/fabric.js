@@ -5,7 +5,7 @@
 
 import * as fabric from 'fabric';
 import { beforeAll } from '../test';
-import { toKeyName } from './spec/util';
+import { toGroupKey, toKey } from './spec/util';
 import common from './spec/common';
 import miterLimit from './spec/miterLimit';
 import singlePoint from './spec/singlePoint';
@@ -14,7 +14,7 @@ beforeAll(
   () => {
     return [...common, ...miterLimit, ...singlePoint].reduce(
       (targets, { type, test, points, group, options }) => {
-        const key = toKeyName({
+        const key = toKey({
           type,
           test,
           points,
@@ -35,7 +35,7 @@ beforeAll(
         let target: fabric.Polyline | fabric.Group = poly;
         if (group) {
           target = new fabric.Group([poly]);
-          targets[`group_${key}`] = target;
+          targets[toGroupKey({ type, test, points, group, options })] = target;
         }
         target.scaleX = 2;
         target.scaleY = 3;
