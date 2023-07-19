@@ -6,6 +6,8 @@ import type { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 /**
  * @see https://github.com/fabricjs/fabric.js/pull/8344
+ * @todo consider removing skewing from points before calculating stroke projection,
+ * see https://github.com/fabricjs/fabric.js/commit/494a10ee2f8c2278ae9a55b20bf50cf6ee25b064#commitcomment-94751537
  */
 export abstract class StrokeProjectionsBase {
   declare options: TProjectStrokeOnPointsOptions;
