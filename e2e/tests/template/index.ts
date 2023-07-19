@@ -4,7 +4,7 @@
  */
 
 import * as fabric from 'fabric';
-import { beforeAll } from 'test';
+import { beforeAll } from '../test';
 
 beforeAll((canvas) => {
   const textbox = new fabric.Textbox('fabric.js test', {
