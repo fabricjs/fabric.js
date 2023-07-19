@@ -97,7 +97,7 @@ test.describe('Stroke Projection', () => {
       )
     );
   });
-  test.fixme('BBox is correct for group', async ({ page }, testInfo) => {
+  test.only('BBox is correct for group', async ({ page }, testInfo) => {
     testInfo.setTimeout(120 * 1000);
     await promiseSequence(
       [...common, ...miterLimit, ...singlePoint].map(
