@@ -1,5 +1,5 @@
 import * as fabric from 'fabric';
-import { beforeAll } from 'test';
+import { beforeAll } from '../../test';
 
 beforeAll((canvas) => {
   const textValue = 'fabric.js sandbox';
