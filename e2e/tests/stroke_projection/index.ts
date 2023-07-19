@@ -2,6 +2,28 @@ import * as fabric from 'fabric';
 import { beforeAll } from '../test';
 import type { TestSpec } from './spec/util';
 
+function sampleBorders([a, b]: [fabric.Point, fabric.Point], d: number) {
+  const tl = a.min(b);
+  const br = a.max(b);
+  const w = Math.ceil(br.x - tl.x) + d * 2;
+  const h = Math.ceil(br.y - tl.y) + d * 2;
+  const ctx = canvas
+    .getElement()
+    .getContext('2d', { willReadFrequently: true });
+  const left = ctx.getImageData(tl.x - d, tl.y - d, 1, h);
+  const top = ctx.getImageData(tl.x - d, tl.y - d, w, 1);
+  const right = ctx.getImageData(br.x + d, tl.y - d, 1, h);
+  const bottom = ctx.getImageData(tl.x - d, br.y + d, w, 1);
+  return {
+    left: Array.from(left.data),
+    top: Array.from(top.data),
+    right: Array.from(right.data),
+    bottom: Array.from(bottom.data),
+    width: w,
+    height: h,
+  };
+}
+
 beforeAll(
   (canvas) => {
     window.testProjection = ({
@@ -43,26 +65,10 @@ beforeAll(
       canvas.viewportCenterObject(target);
       target.setCoords();
       canvas.renderAll();
-
-      const { tl: _tl, br: _br } = target.aCoords;
-      const tl = _tl.min(_br);
-      const br = _tl.max(_br);
-      const w = Math.ceil(br.x - tl.x) + d * 2;
-      const h = Math.ceil(br.y - tl.y) + d * 2;
-      const ctx = canvas
-        .getElement()
-        .getContext('2d', { willReadFrequently: true });
-      const left = ctx.getImageData(tl.x - d, tl.y - d, 1, h);
-      const top = ctx.getImageData(tl.x - d, tl.y - d, w, 1);
-      const right = ctx.getImageData(br.x + d, tl.y - d, 1, h);
-      const bottom = ctx.getImageData(tl.x - d, br.y + d, w, 1);
+      const { tl: a, br: b } = target.aCoords;
       return {
-        left: Array.from(left.data),
-        top: Array.from(top.data),
-        right: Array.from(right.data),
-        bottom: Array.from(bottom.data),
-        width: w,
-        height: h,
+        outer: sampleBorders([a, b], d),
+        inner: sampleBorders([a, b], -d),
       };
     };
   },
