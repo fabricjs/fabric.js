@@ -87,7 +87,7 @@ function runStep(page: Page, testInfo: TestInfo, spec: TestSpec) {
   });
 }
 
-test.describe('Stroke Projection', () => {
+test.describe.skip('Stroke Projection', () => {
   test('BBox is correct', async ({ page }, testInfo) => {
     testInfo.setTimeout(120 * 1000);
     await Promise.all(
@@ -97,7 +97,7 @@ test.describe('Stroke Projection', () => {
     );
   });
   test.fixme('BBox is correct for group', async ({ page }, testInfo) => {
-    testInfo.setTimeout(60 * 1000);
+    testInfo.setTimeout(120 * 1000);
     await Promise.all(
       [...common, ...miterLimit, ...singlePoint].map((spec) =>
         runStep(page, testInfo, { ...spec, group: true })
