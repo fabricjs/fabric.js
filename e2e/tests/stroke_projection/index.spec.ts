@@ -87,7 +87,7 @@ function runStep(page: Page, testInfo: TestInfo, spec: TestSpec) {
   });
 }
 
-test.describe.skip('Stroke Projection', () => {
+test.describe('Stroke Projection', () => {
   test('BBox is correct', async ({ page }, testInfo) => {
     testInfo.setTimeout(120 * 1000);
     await Promise.all(
