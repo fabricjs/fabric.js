@@ -32,19 +32,13 @@ test.describe('Stroke Projection', () => {
             const br = _tl.max(_br);
             const w = Math.ceil(br.x - tl.x) + d * 2;
             const h = Math.ceil(br.y - tl.y) + d * 2;
-            const left = canvas
-              .getContext()
-              .getImageData(tl.x - d, tl.y - d, 1, h);
-            const top = canvas
-              .getContext()
-              .getImageData(tl.x - d, tl.y - d, w, 1);
-            const right = canvas
-              .getContext()
-              .getImageData(br.x + d, tl.y - d, 1, h);
-            const bottom = canvas
-              .getContext()
-              .getImageData(tl.x - d, br.y + d, w, 1);
-
+            const ctx = canvas
+              .getElement()
+              .getContext('2d', { willReadFrequently: true });
+            const left = ctx.getImageData(tl.x - d, tl.y - d, 1, h);
+            const top = ctx.getImageData(tl.x - d, tl.y - d, w, 1);
+            const right = ctx.getImageData(br.x + d, tl.y - d, 1, h);
+            const bottom = ctx.getImageData(tl.x - d, br.y + d, w, 1);
             return {
               left: Array.from(left.data),
               top: Array.from(top.data),
