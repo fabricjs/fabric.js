@@ -1,7 +1,8 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+
+import '../../../setup';
 
 test('test', async ({ page }) => {
-  await page.goto('http://localhost:1234/');
   const canvas = page.locator('canvas.upper-canvas');
   await canvas.click({
     position: {
@@ -131,6 +132,7 @@ test('test', async ({ page }) => {
       y: 265,
     },
   });
+  await expect(await canvas.screenshot()).toMatchSnapshot();
   await canvas.press('Enter');
   await canvas.press('Enter');
   await canvas.press('#');
@@ -150,4 +152,5 @@ test('test', async ({ page }) => {
   await canvas.press('Backspace');
   await canvas.press('ArrowUp');
   await canvas.press('Delete');
+  await expect(await canvas.screenshot()).toMatchSnapshot();
 });
