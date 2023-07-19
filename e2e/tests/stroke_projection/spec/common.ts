@@ -43,4 +43,4 @@ for (const [test, casePoints] of Object.entries(cases)) {
   });
 }
 
-export default spec;
+export default spec.flatMap(({ tests }) => tests);

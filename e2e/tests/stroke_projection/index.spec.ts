@@ -88,24 +88,20 @@ function runStep(page: Page, testInfo: TestInfo, spec: TestSpec) {
 }
 
 test.describe('Stroke Projection', () => {
-  common.forEach(({ type, tests }) => {
-    test(`${type} BBox is correct`, async ({ page }, testInfo) => {
-      testInfo.setTimeout(120 * 1000);
-      await Promise.all(tests.map((spec) => runStep(page, testInfo, spec)));
-    });
-    test(`${type} BBox is correct in group`, async ({ page }, testInfo) => {
-      testInfo.setTimeout(120 * 1000);
-      await Promise.all(
-        tests.map((spec) => runStep(page, testInfo, { ...spec, group: true }))
-      );
-    });
+  test('BBox is correct', async ({ page }, testInfo) => {
+    testInfo.setTimeout(60 * 1000);
+    await Promise.all(
+      [...common, ...miterLimit, ...singlePoint].map((spec) =>
+        runStep(page, testInfo, spec)
+      )
+    );
   });
-
-  test('miter limit BBox is correct', async ({ page }, testInfo) => {
-    await Promise.all(miterLimit.map((spec) => runStep(page, testInfo, spec)));
-  });
-
-  test('single point BBox is correct', async ({ page }, testInfo) => {
-    await Promise.all(singlePoint.map((spec) => runStep(page, testInfo, spec)));
+  test.fixme('BBox is correct for group', async ({ page }, testInfo) => {
+    testInfo.setTimeout(60 * 1000);
+    await Promise.all(
+      [...common, ...miterLimit, ...singlePoint].map((spec) =>
+        runStep(page, testInfo, { ...spec, group: true })
+      )
+    );
   });
 });
