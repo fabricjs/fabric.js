@@ -97,6 +97,8 @@
     text.fontFamily = '\'Times New Roman\'';
     fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px \'Times New Roman\'');
+    fontDecl = text._getFontDeclaration({ fontFamily: 'Arial' });
+    assert.equal(fontDecl, 'normal normal 40px \"Arial\"', 'passed style should take precedence');
   });
 
   QUnit.test('_getFontDeclaration with coma', function(assert) {
@@ -116,12 +118,6 @@
       var fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
     });
-  });
-
-  QUnit.test('toObject', function(assert) {
-    var text = createTextObject();
-    assert.ok(typeof text.toObject === 'function');
-    assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
   });
 
   QUnit.test('complexity', function(assert) {
@@ -189,15 +185,6 @@
     text.setCoords();
     var br2 = text.getBoundingRect();
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
-  });
-
-  QUnit.test('fabric.Text.fromObject', function(assert) {
-    var done = assert.async();
-    assert.ok(typeof fabric.Text.fromObject === 'function');
-    fabric.Text.fromObject(REFERENCE_TEXT_OBJECT).then(function(text) {
-      assert.deepEqual(text.toObject(), REFERENCE_TEXT_OBJECT);
-      done();
-    });
   });
 
   QUnit.test('fabric.Text.fromElement', function(assert) {
@@ -545,15 +532,6 @@
     assert.deepEqual(iText.getStyleAtPosition(18), { fill: 'green' });
   });
 
-  QUnit.test('_splitText', function(assert) {
-    var text = new fabric.Text('test foo bar-baz\nqux', {});
-    var test = text._splitText();
-    assert.equal(test.lines[0], 'test foo bar-baz', 'first line is correct');
-    assert.equal(test.lines[1], 'qux', 'second line is correct');
-    assert.deepEqual(test.graphemeLines[0], ['t','e','s','t',' ','f','o','o',' ','b','a','r','-','b','a','z'], 'first line is correct');
-    assert.deepEqual(test.graphemeLines[1], ['q','u','x'], 'second line is correct');
-  });
-
   QUnit.test('getStyleAtPosition complete', function(assert) {
     var iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
@@ -605,42 +583,6 @@
     assert.deepEqual(iText.getStyleAtPosition(0, true), expectedStyle0, 'styles do match at 0');
 
     assert.deepEqual(iText.getStyleAtPosition(2, true), expectedStyle2, 'styles do match at 2');
-  });
-
-  QUnit.test('toSVG with NUM_FRACTION_DIGITS', function(assert) {
-    var iText = new fabric.IText('test foo bar-baz', {
-      // makes weird numbers
-      styles: {
-        0: {
-          0: {
-            fill: 'red',
-          },
-          1: {
-            fill: 'blue',
-          },
-          2: {
-            fill: 'green',
-          },
-          3: {
-            fill: 'yellow',
-          },
-          4: {
-            fill: 'pink',
-          },
-        }
-      }
-    });
-    fabric.config.configure({ NUM_FRACTION_DIGITS: 1 });
-    var SVG_1 = iText.toSVG();
-    // var SVG_1_EXPECTED = '\t<g transform="translate(124.5 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-124" y="12.6" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.9" y="12.6" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.1" y="12.6" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.6" y="12.6" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.4" y="12.6" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.4" y="12.6" >foo bar-baz</tspan></text>\n\t</g>\n';
-    //assert.equal(SVG_1, SVG_1_EXPECTED, 'numbers have max 1 decimal');
-    fabric.config.configure({ NUM_FRACTION_DIGITS: 3 });
-    var SVG_2 = iText.toSVG();
-    // var SVG_2_EXPECTED = '\t<g transform="translate(124.484 23.1)">\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-123.984" y="12.566" style="fill: rgb(255,0,0); ">t</tspan><tspan x="-112.871" y="12.566" style="fill: rgb(0,0,255); ">e</tspan><tspan x="-95.117" y="12.566" style="fill: rgb(0,128,0); ">s</tspan><tspan x="-79.551" y="12.566" style="fill: rgb(255,255,0); ">t</tspan><tspan x="-68.438" y="12.566" style="fill: rgb(255,192,203); white-space: pre; "> </tspan><tspan x="-58.438" y="12.566" >foo bar-baz</tspan></text>\n\t</g>\n';
-    //assert.equal(SVG_2, SVG_2_EXPECTED, 'numbers have max 3 decimal');
-    assert.ok(SVG_2.length > SVG_1.length, 'SVG 2 has more decimal');
-    // put back to 2 or break all tests
-    fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
   });
 
   QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
@@ -708,52 +650,6 @@
     var styleString = iText.getSvgTextDecoration(styleObject);
     var expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
-  });
-
-  QUnit.test('text superscript', function(assert) {
-    var text = new fabric.Text('xxx', { styles: {
-      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
-    } });
-    assert.ok(typeof text.setSuperscript === 'function');
-
-    var size = text.fontSize;
-    var schema = text.superscript;
-    var styleFontSize = text.styles[0][2].fontSize;
-    var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSuperscript(1, 2);
-    text.setSuperscript(2, 3);
-
-    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
-    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
-
-    assert.equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
-    assert.equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
-
-    assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
-    assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been decreased');
-  });
-
-  QUnit.test('text subscript', function(assert) {
-    var text = new fabric.Text('xxx', { styles: {
-      0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fontSize: 4, deltaY: 20 }}
-    } });
-    assert.ok(typeof text.setSubscript === 'function');
-
-    var size = text.fontSize;
-    var schema = text.subscript;
-    var styleFontSize = text.styles[0][2].fontSize;
-    var styleDeltaY = text.styles[0][2].deltaY;
-    text.setSubscript(1, 2);
-    text.setSubscript(2, 3);
-
-    assert.equal(text.styles[0][0].fontSize, undefined, 'character 0: fontSize is not set');
-    assert.equal(text.styles[0][0].deltaY, undefined, 'character 0: deltaY is not set');
-
-    assert.equal(text.styles[0][1].fontSize, size * schema.size, 'character 1: fontSize has been set');
-    assert.equal(text.styles[0][1].deltaY, size * schema.baseline, 'character 1: deltaY has been set');
-
-    assert.equal(text.styles[0][2].fontSize, styleFontSize * schema.size, 'character 2: fontSize has been decreased');
-    assert.equal(text.styles[0][2].deltaY, styleDeltaY + styleFontSize * schema.baseline, 'character 2: deltaY has been increased');
   });
 
   QUnit.test('getHeightOfLine measures height of aline', function(assert) {

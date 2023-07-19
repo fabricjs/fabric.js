@@ -7,6 +7,7 @@ import type {
   TTextureCache,
   TPipelineResources,
 } from './typedefs';
+import type { BaseFilter } from './BaseFilter';
 
 export class WebGLFilterBackend {
   declare tileSize: number;
@@ -150,7 +151,7 @@ export class WebGLFilterBackend {
    * omitted, caching will be skipped.
    */
   applyFilters(
-    filters: any[],
+    filters: BaseFilter[],
     source: TexImageSource,
     width: number,
     height: number,

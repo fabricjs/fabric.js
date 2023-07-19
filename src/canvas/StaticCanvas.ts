@@ -7,7 +7,6 @@ import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
-import type { Rect } from '../shapes/Rect';
 import type {
   Abortable,
   Constructor,
@@ -1220,10 +1219,12 @@ export class StaticCanvas<
           const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
+              // otherwise circular dependency
+              isType: () => false,
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
             };
-          return fill.toSVG(object as Rect, {
+          return fill.toSVG(object as FabricObject, {
             additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
           });
         }
@@ -1414,7 +1415,7 @@ export class StaticCanvas<
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      enlivenObjects(objects, {
+      enlivenObjects<FabricObject>(objects, {
         reviver,
         signal,
       }),

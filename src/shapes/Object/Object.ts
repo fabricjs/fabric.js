@@ -54,10 +54,14 @@ import type { ObjectProps } from './types/ObjectProps';
 import type { TProps } from './types';
 import { getEnv } from '../../env';
 
-export type TCachedFabricObject = FabricObject &
+export type TCachedFabricObject<
+  Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> = FabricObject<Props, SProps, EventSpec> &
   Required<
     Pick<
-      FabricObject,
+      FabricObject<Props, SProps, EventSpec>,
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'

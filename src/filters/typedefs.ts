@@ -9,6 +9,7 @@ export type TPipelineResources = {
   blendImage?: HTMLCanvasElement;
   blurLayer1?: HTMLCanvasElement;
   blurLayer2?: HTMLCanvasElement;
+  sliceByTwo?: HTMLCanvasElement;
 } & Record<string, unknown>;
 
 export type TWebGLPipelineState = {

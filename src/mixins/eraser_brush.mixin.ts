@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Point } from '../Point';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { uid } from '../util/internals/uid';
 
 (function (global) {
@@ -293,7 +294,7 @@ import { uid } from '../util/internals/uid';
       options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
-      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjects<FabricObject>(objects),
       fabric.util.enlivenObjectEnlivables(options),
     ]).then(function (enlivedProps) {
       return new fabric.Eraser(

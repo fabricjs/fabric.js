@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { getFabricDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TSize } from '../typedefs';
+import type { TClassProperties, TCrossOrigin, TSize } from '../typedefs';
 import type { Abortable } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
@@ -26,7 +25,10 @@ import type {
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
+import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
+import type { Resize } from '../filters/Resize';
+import type { TCachedFabricObject } from './Object/Object';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -41,9 +43,8 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  crossOrigin: string | null;
   filters: BaseFilter[];
-  resizeFilter?: BaseFilter;
+  resizeFilter?: Resize;
 }
 
 export const imageDefaultValues: Partial<UniqueImageProps> &
@@ -58,7 +59,7 @@ export const imageDefaultValues: Partial<UniqueImageProps> &
 
 export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
-  crossOrigin: string | null;
+  crossOrigin: TCrossOrigin;
   filters: any[];
   resizeFilter?: any;
   cropX: number;
@@ -165,11 +166,11 @@ export class Image<
   protected declare src: string;
 
   declare filters: BaseFilter[];
-  declare resizeFilter: BaseFilter;
+  declare resizeFilter: Resize;
 
   protected declare _element: ImageSource;
+  protected declare _filteredEl?: HTMLCanvasElement;
   protected declare _originalElement: ImageSource;
-  protected declare _filteredEl: ImageSource;
 
   static type = 'Image';
 
@@ -200,7 +201,7 @@ export class Image<
     this.setElement(
       typeof arg0 === 'string'
         ? ((
-            (this.canvas && getElementDocument(this.canvas.getElement())) ||
+            (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
             getFabricDocument()
           ).getElementById(arg0) as ImageSource)
         : arg0,
@@ -358,12 +359,12 @@ export class Image<
    * of the instance
    */
   _toSVG() {
-    const imageMarkup = [],
+    const imageMarkup: string[] = [],
       element = this._element,
       x = -this.width / 2,
       y = -this.height / 2;
-    let svgString = [],
-      strokeSvg,
+    let svgString: string[] = [],
+      strokeSvg: string[] = [],
       clipPath = '',
       imageRendering = '';
     if (!element) {
@@ -387,46 +388,30 @@ export class Image<
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
     if (!this.imageSmoothing) {
-      imageRendering = '" image-rendering="optimizeSpeed';
+      imageRendering = ' image-rendering="optimizeSpeed"';
     }
     imageMarkup.push(
       '\t<image ',
       'COMMON_PARTS',
-      'xlink:href="',
-      this.getSvgSrc(true),
-      '" x="',
-      x - this.cropX,
-      '" y="',
-      y - this.cropY,
-      // we're essentially moving origin of transformation from top/left corner to the center of the shape
-      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-      // so that object's center aligns with container's left/top
-      '" width="',
-      element.width || element.naturalWidth,
-      '" height="',
-      element.height || element.naturalHeight,
-      imageRendering,
-      '"',
-      clipPath,
-      '></image>\n'
+      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${
+        y - this.cropY
+        // we're essentially moving origin of transformation from top/left corner to the center of the shape
+        // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+        // so that object's center aligns with container's left/top
+      }" width="${
+        element.width || (element as HTMLImageElement).naturalWidth
+      }" height="${
+        element.height || (element as HTMLImageElement).naturalHeight
+      }"${imageRendering}${clipPath}></image>\n`
     );
 
     if (this.stroke || this.strokeDashArray) {
       const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
-        '\t<rect ',
-        'x="',
-        x,
-        '" y="',
-        y,
-        '" width="',
-        this.width,
-        '" height="',
-        this.height,
-        '" style="',
-        this.getSvgStyles(),
-        '"/>\n',
+        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
+          this.height
+        }" styles="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
@@ -446,14 +431,14 @@ export class Image<
   getSrc(filtered?: boolean): string {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
-      if (element.toDataURL) {
-        return element.toDataURL();
+      if ((element as HTMLCanvasElement).toDataURL) {
+        return (element as HTMLCanvasElement).toDataURL();
       }
 
       if (this.srcFromAttribute) {
-        return element.getAttribute('src');
+        return element.getAttribute('src') || '';
       } else {
-        return element.src;
+        return (element as HTMLImageElement).src;
       }
     } else {
       return this.src || '';
@@ -517,7 +502,7 @@ export class Image<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter],
+      [filter as BaseFilter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
@@ -542,29 +527,35 @@ export class Image<
 
     if (filters.length === 0) {
       this._element = this._originalElement;
-      this._filteredEl = null;
+      // this is unsafe and needs to be rethinkend
+      this._filteredEl = undefined;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
       return;
     }
 
     const imgElement = this._originalElement,
-      sourceWidth = imgElement.naturalWidth || imgElement.width,
-      sourceHeight = imgElement.naturalHeight || imgElement.height;
+      sourceWidth =
+        (imgElement as HTMLImageElement).naturalWidth || imgElement.width,
+      sourceHeight =
+        (imgElement as HTMLImageElement).naturalHeight || imgElement.height;
 
     if (this._element === this._originalElement) {
-      // if the element is the same we need to create a new element
+      // if the _element a reference to _originalElement
+      // we need to create a new element to host the filtered pixels
       const canvasEl = createCanvasElement();
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
       this._filteredEl = canvasEl;
-    } else {
-      // clear the existing element to get new filter data
-      // also dereference the eventual resized _element
+    } else if (this._filteredEl) {
+      // if the _element is it own element,
+      // and we also have a _filteredEl, then we clean up _filteredEl
+      // and we assign it to _element.
+      // in this way we invalidate the eventual old resize filtered element
       this._element = this._filteredEl;
       this._filteredEl
-        .getContext('2d')
+        .getContext('2d')!
         .clearRect(0, 0, sourceWidth, sourceHeight);
       // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
       this._lastScaleX = 1;
@@ -575,7 +566,7 @@ export class Image<
       this._originalElement,
       sourceWidth,
       sourceHeight,
-      this._element
+      this._element as HTMLCanvasElement
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -605,8 +596,14 @@ export class Image<
    * it will set the imageSmoothing for the draw operation
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
+  drawCacheOnCanvas(
+    this: TCachedFabricObject<Props, SProps, EventSpec> & {
+      imageSmoothing: boolean;
+    },
+    ctx: CanvasRenderingContext2D
+  ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
+    // @ts-ignore ( expect-error) this line is not error free.
     super.drawCacheOnCanvas(ctx);
   }
 
@@ -637,8 +634,11 @@ export class Image<
       // crop values cannot be lesser than 0.
       cropX = Math.max(this.cropX, 0),
       cropY = Math.max(this.cropY, 0),
-      elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-      elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+      elWidth =
+        (elementToDraw as HTMLImageElement).naturalWidth || elementToDraw.width,
+      elHeight =
+        (elementToDraw as HTMLImageElement).naturalHeight ||
+        elementToDraw.height,
       sX = cropX * scaleX,
       sY = cropY * scaleY,
       // the width height cannot exceed element width/height, starting from the crop offset.
@@ -794,16 +794,16 @@ export class Image<
     options: Abortable = {}
   ) {
     return Promise.all([
-      loadImage(src, { ...options, crossOrigin }),
-      f && enlivenObjects(f, options),
+      loadImage(src!, { ...options, crossOrigin }),
+      f && enlivenObjects<BaseFilter>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects([rf], options),
+      rf && enlivenObjects<BaseFilter>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
         ...object,
+        // TODO: this creates a difference between image creation and restoring from JSON
         src,
-        crossOrigin,
         filters,
         resizeFilter,
         ...hydratedProps,
@@ -818,11 +818,14 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL<T extends TProps<SerializedImageProps>>(
+  static fromURL<T extends TProps<ImageProps>>(
     url: string,
-    options: T & LoadImageOptions = {}
+    { crossOrigin = null, signal }: LoadImageOptions = {},
+    imageOptions: T
   ): Promise<Image> {
-    return loadImage(url, options).then((img) => new this(img, options));
+    return loadImage(url, { crossOrigin, signal }).then(
+      (img) => new this(img, imageOptions)
+    );
   }
 
   /**
@@ -843,10 +846,11 @@ export class Image<
       this.ATTRIBUTE_NAMES,
       cssRules
     );
-    return this.fromURL(parsedAttributes['xlink:href'], {
-      ...options,
-      ...parsedAttributes,
-    }).catch((err) => {
+    return this.fromURL(
+      parsedAttributes['xlink:href'],
+      options,
+      parsedAttributes
+    ).catch((err) => {
       console.log(err);
       return null;
     });

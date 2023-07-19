@@ -374,7 +374,7 @@ export abstract class ITextBehavior<
   /**
    * Enters editing state
    */
-  enterEditing(e: TPointerEvent) {
+  enterEditing(e?: TPointerEvent) {
     if (this.isEditing || !this.editable) {
       return;
     }
@@ -394,7 +394,7 @@ export abstract class ITextBehavior<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered', { e });
+    this.fire('editing:entered', e ? { e } : undefined);
     this._fireSelectionChanged();
     if (this.canvas) {
       // @ts-expect-error in reality it is an IText instance
@@ -407,7 +407,7 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
-    if (this.__corner) {
+    if (this.getActiveControl()) {
       return;
     }
 

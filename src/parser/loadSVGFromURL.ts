@@ -1,4 +1,4 @@
-import { request } from '../util/dom_request';
+import { request } from '../util/internals/dom_request';
 import { parseSVGDocument, createEmptyResponse } from './parseSVGDocument';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
@@ -34,7 +34,6 @@ export function loadSVGFromURL(
     };
 
     request(url.replace(/^\n\s*/, '').trim(), {
-      method: 'get',
       onComplete,
       signal: options.signal,
     });

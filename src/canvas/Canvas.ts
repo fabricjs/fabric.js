@@ -1479,7 +1479,7 @@ export class Canvas extends SelectableCanvas {
       //  target accepts selection
       !target.onSelect({ e }) &&
       // make sure we are not on top of a control
-      !activeObject.__corner
+      !activeObject.getActiveControl()
     ) {
       if (isAS) {
         const prevActiveObjects =
