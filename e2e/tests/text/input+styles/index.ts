@@ -26,5 +26,5 @@ beforeAll(
     canvas.add(text);
     canvas.centerObjectH(text);
   },
-  { width: 500, height: 700 }
+  { width: 300, height: 700 }
 );
