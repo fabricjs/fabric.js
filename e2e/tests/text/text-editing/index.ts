@@ -1,8 +1,3 @@
-/**
- * Runs in the **BROWSER**
- * Use absolute imports defined in 'e2e/imports.ts'
- */
-
 import { Textbox } from 'fabric';
 import { beforeAll } from '../../test';
 
