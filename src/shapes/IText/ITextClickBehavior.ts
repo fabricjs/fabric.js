@@ -135,7 +135,7 @@ export abstract class ITextClickBehavior<
       !this.canvas ||
       !this.editable ||
       notALeftClick(e as MouseEvent) ||
-      this.__corner
+      this.getActiveControl()
     ) {
       return;
     }
@@ -201,7 +201,7 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (this.__lastSelected && !this.__corner) {
+    if (this.__lastSelected && !this.getActiveControl()) {
       this.selected = false;
       this.__lastSelected = false;
       this.enterEditing(e);

@@ -54,7 +54,7 @@ export class BaseFilter {
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ ...options }: Record<string, any> = {}) {
+  constructor({ type, ...options }: Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
