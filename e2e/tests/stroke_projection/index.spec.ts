@@ -63,15 +63,21 @@ test.describe('Stroke Projection', () => {
   common.forEach(({ type, tests }) => {
     test(`${type} BBox is correct`, async ({ page }, testInfo) => {
       testInfo.setTimeout(60 * 1000);
-      tests.forEach((spec) => runStep(page, testInfo, spec));
+      await Promise.all(tests.map((spec) => runStep(page, testInfo, spec)));
+    });
+    test(`${type} BBox is correct in group`, async ({ page }, testInfo) => {
+      testInfo.setTimeout(60 * 1000);
+      await Promise.all(
+        tests.map((spec) => runStep(page, testInfo, { ...spec, group: true }))
+      );
     });
   });
 
   test('miter limit BBox is correct', async ({ page }, testInfo) => {
-    miterLimit.forEach((spec) => runStep(page, testInfo, spec));
+    await Promise.all(miterLimit.map((spec) => runStep(page, testInfo, spec)));
   });
 
   test('single point BBox is correct', async ({ page }, testInfo) => {
-    singlePoint.forEach((spec) => runStep(page, testInfo, spec));
+    await Promise.all(singlePoint.map((spec) => runStep(page, testInfo, spec)));
   });
 });
