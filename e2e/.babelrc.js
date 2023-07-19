@@ -4,6 +4,22 @@ const path = require('path');
 const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
 
+function resolve(file) {
+  const found = ['', '.js', '/index.js']
+    .map((resolution) => `${file}${resolution}`)
+    .find((file) => {
+      try {
+        return require.resolve(file);
+      } catch (error) {
+        return false;
+      }
+    });
+  if (!found) {
+    throw new Error(`Failed to resolve ${file}`);
+  }
+  return require.resolve(file);
+}
+
 module.exports = {
   extends: '../.babelrcAlt',
   plugins: [
