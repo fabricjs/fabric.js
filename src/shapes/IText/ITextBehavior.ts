@@ -407,7 +407,7 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
-    if (this.__corner) {
+    if (this.getActiveControl()) {
       return;
     }
 

@@ -173,6 +173,10 @@ export class InteractiveFabricObject<
     return super._updateCacheCanvas();
   }
 
+  getActiveControl() {
+    return this.__corner;
+  }
+
   /**
    * Determines which corner is under the mouse cursor, represented by `pointer`.
    * This function is return a corner only if the object is the active one.

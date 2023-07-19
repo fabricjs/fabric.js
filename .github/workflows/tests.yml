@@ -68,9 +68,7 @@ jobs:
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     needs: [prime-build]
     runs-on: ubuntu-latest
@@ -109,8 +107,33 @@ jobs:
         with:
           name: coverage-jest
           path: .nyc_output/*.json
+  e2e:
+    needs: [prime-build]
+    name: Playwright tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+      - name: Build fabric.js
+        uses: ./.github/actions/build-fabric-cached
+        # Playwright suggests against caching the browser install
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        run: xvfb-run npm run test:e2e
+      - name: Upload Test Output
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: e2e-report
+          path: ./e2e/test-report/
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-e2e
+          path: ./e2e/test-results/**/coverage.json
   coverage:
-    needs: [node-coverage]
+    needs: [node-coverage, e2e]
     name: Coverage reporting
     runs-on: ubuntu-latest
     steps:
@@ -126,6 +149,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-visual
+          path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-e2e
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report

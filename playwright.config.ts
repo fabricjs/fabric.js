@@ -6,6 +6,8 @@ import { devices } from '@playwright/test';
  */
 const config: PlaywrightTestConfig = {
   testDir: './e2e/tests',
+  /* Transpiles app files */
+  globalSetup: './playwright.setup.ts',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {
@@ -14,7 +16,11 @@ const config: PlaywrightTestConfig = {
      * For example in `await expect(locator).toHaveText();`
      */
     timeout: 5 * 1000,
+    toMatchSnapshot: {
+      maxDiffPixelRatio: 0.02,
+    },
   },
+  testMatch: '*.spec.ts',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -23,6 +29,10 @@ const config: PlaywrightTestConfig = {
   retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
+  /* Do not update snapshot on CI */
+  updateSnapshots: process.env.CI ? 'none' : 'missing',
+  /* Configure snapshot names to be the same across platforms for CI */
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],
@@ -35,7 +45,7 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
+    baseURL: 'http://localhost:8080',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
@@ -50,6 +60,7 @@ const config: PlaywrightTestConfig = {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        browserName: 'chromium',
       },
     },
   ],
@@ -59,10 +70,6 @@ const config: PlaywrightTestConfig = {
     {
       command: 'npm run local-server',
       port: 8080,
-    },
-    {
-      command: 'npm start vanilla -- --no-watch',
-      port: 1234,
     },
   ],
 };
