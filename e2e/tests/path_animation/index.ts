@@ -6,32 +6,6 @@ import * as fabric from 'fabric';
 import { beforeAll } from 'test';
 
 beforeAll((canvas) => {
-  canvas.setDimensions({
-    width: window.innerWidth,
-    height: 500,
-  });
-  const textValue = 'fabric.js sandbox';
-  const text = new fabric.Textbox(textValue, {
-    originX: 'center',
-    top: 20,
-    textAlign: 'center',
-    styles: fabric.util.stylesFromArray(
-      [
-        {
-          style: {
-            fontWeight: 'bold',
-            fontSize: 64,
-          },
-          start: 0,
-          end: 9,
-        },
-      ],
-      textValue
-    ),
-  });
-  canvas.add(text);
-  canvas.centerObjectH(text);
-
   const path = fabric.util.getSmoothPathFromPoints([
     new fabric.Point(50, 50),
     new fabric.Point(100, 100),
@@ -53,7 +27,7 @@ beforeAll((canvas) => {
   );
 
   let i = 0;
-  function animatePath() {
+  const animatePath = () => {
     const dir = i % 2 === 0;
     fabric.util.animate({
       path,
@@ -76,7 +50,7 @@ beforeAll((canvas) => {
         canvas.renderAll();
       },
       onComplete() {
-        if (i === 0) {
+        if (i < 2) {
           i++;
           animatePath();
         } else {
@@ -84,7 +58,7 @@ beforeAll((canvas) => {
         }
       },
     });
-  }
+  };
 
-  animatePath();
+  window.addEventListener('animation:start', animatePath, { once: true });
 });
