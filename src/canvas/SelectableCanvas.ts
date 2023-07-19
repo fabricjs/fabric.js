@@ -837,7 +837,7 @@ export class SelectableCanvas<
           target.group.calcTransformMatrix()
         )
       : this.getPointer(e);
-    const corner = target.__corner || '',
+    const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
         alreadySelected && control
