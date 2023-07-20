@@ -19,11 +19,20 @@ import {
 import { CENTER, LEFT, RIGHT } from '../../constants';
 import type { TProps } from '../Object/types';
 
-type CursorBoundaries = {
+export type CursorBoundaries = {
   left: number;
   top: number;
   leftOffset: number;
   topOffset: number;
+};
+
+export type CursorRenderingData = {
+  color: string;
+  opacity: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 };
 
 export const iTextDefaultValues = {
@@ -376,7 +385,7 @@ export class IText<
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    if (this.selectionStart === this.selectionEnd) {
+    if (this.selectionStart === this.selectionEnd || this.inCompositionMode) {
       this.renderCursor(ctx, boundaries);
     } else {
       this.renderSelection(ctx, boundaries);
@@ -478,8 +487,13 @@ export class IText<
    * If contextTop is not available, do nothing.
    */
   renderCursorAt(selectionStart: number) {
-    const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas!.contextTop, boundaries, selectionStart);
+    this._renderCursor(
+      this.canvas!.contextTop,
+      this.getCursorRenderingData(
+        selectionStart,
+        this._getCursorBoundaries(selectionStart, true)
+      )
+    );
   }
 
   /**
@@ -488,19 +502,25 @@ export class IText<
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
   renderCursor(ctx: CanvasRenderingContext2D, boundaries: CursorBoundaries) {
-    this._renderCursor(ctx, boundaries, this.selectionStart);
+    this._renderCursor(
+      ctx,
+      this.getCursorRenderingData(this.selectionStart, boundaries)
+    );
   }
 
-  _renderCursor(
-    ctx: CanvasRenderingContext2D,
-    boundaries: CursorBoundaries,
-    selectionStart: number
-  ) {
+  getCursorRenderingData(
+    selectionStart: number,
+    boundaries: CursorBoundaries
+  ): CursorRenderingData {
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
-      charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
+      charHeight = this.getValueOfPropertyAt(
+        lineIndex,
+        charIndex,
+        'fontSize'
+      ) as number,
       multiplier = this.scaleX * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
@@ -510,21 +530,25 @@ export class IText<
           this.lineHeight -
         charHeight * (1 - this._fontSizeFraction);
 
-    if (this.inCompositionMode) {
-      // TODO: investigate why there isn't a return inside the if,
-      // and why can't happen at the top of the function
-      this.renderSelection(ctx, boundaries);
-    }
-    ctx.fillStyle =
-      this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
-    ctx.globalAlpha = this._currentCursorOpacity;
-    ctx.fillRect(
-      boundaries.left + boundaries.leftOffset - cursorWidth / 2,
-      topOffset + boundaries.top + dy,
-      cursorWidth,
-      charHeight
-    );
+    return {
+      color:
+        this.cursorColor ||
+        (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string),
+      opacity: this._currentCursorOpacity,
+      left: boundaries.left + boundaries.leftOffset - cursorWidth / 2,
+      top: topOffset + boundaries.top + dy,
+      width: cursorWidth,
+      height: charHeight,
+    };
+  }
+
+  _renderCursor(
+    ctx: CanvasRenderingContext2D,
+    { color, opacity, left, top, width, height }: CursorRenderingData
+  ) {
+    ctx.fillStyle = color;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(left, top, width, height);
   }
 
   /**
