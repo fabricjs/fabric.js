@@ -125,19 +125,52 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests
-
-- `unit` tests: test logic and state
-- `visual` tests: test visual outcome against image refs located at `test/visual/golden`
-- `UI` tests: testing with playwright
+- `e2e`: tests running in the browser using [`playwright`][playwright]
+- `unit`: tests running on node using [`jest`][jest]
 
 ### Getting Started
+
+#### e2e
 
 - Build and watch for changes
   ```bash
   npm run build -- -f -w
   ```
-- Run the entire test suite on `chrome` (many tests are skipped on `node`)
+- Test
+
+  ```bash
+  npm run test:e2e -- [path filter] [--ui]
+  ```
+
+  In some machines babel is flaky and doesn't build the files.
+  If that is the case try running the command using `npx` directly, see [`./playwright.setup.ts`](./playwright.setup.ts).
+
+- Write Tests
+  - Start a dev server
+    ```bash
+    npm start vanilla
+    ```
+  - Start codegen
+    ```bash
+    npx playwright codegen http://localhost:1234
+    ```
+
+### Legacy
+
+The test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests.
+We discourage writing new tests in the legacy suite and encourage migrating failing tests to the new suite.
+However, it is not carved in stone.
+
+- `unit` tests: test logic and state
+- `visual` tests: test visual outcome against image refs located at `test/visual/golden`
+
+#### Getting Started
+
+- Build and watch for changes
+  ```bash
+  npm run build -- -f -w
+  ```
+- Run the _legacy_ test suite on `chrome` (many tests are skipped on `node`)
   ```bash
   npm test -- -a -c chrome
   ```
@@ -174,7 +207,7 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
 
 ## UI tests
 
-Run UI tests with Playwright in parallel in Chrome (headed mode).
+UI/e2e tests are using [`Playwright`][playwright].
 
 ```bash
 $ npm run test:e2e
@@ -256,6 +289,8 @@ Don't forget to unlink the package once you're done.
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
 [eslint]: https://eslint.org/
 [jsdoc]: https://jsdoc.app/
+[playwright]: https://playwright.dev/
+[jest]: https://jestjs.io/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
 [unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
