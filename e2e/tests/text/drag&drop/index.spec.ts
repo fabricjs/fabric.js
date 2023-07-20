@@ -4,7 +4,7 @@ import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 
 import '../../../setup';
 
-test.only('Drag & Drop', async ({ page }) => {
+test('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
   await test.step('select "fabric" in A', async () => {
     await canvas.click({
@@ -30,7 +30,6 @@ test.only('Drag & Drop', async ({ page }) => {
     });
     // await
     await page.mouse.move(240, 140, { steps: 40 });
-    // await renderCursorSpotLight(page, 'a');
     expect(await canvas.screenshot()).toMatchSnapshot({
       name: 'drop_before_a.png',
     });
@@ -138,7 +137,7 @@ test('Drag Image A', async ({ page }) => {
     await page.mouse.dblclick(130, 50);
   });
 
-  await test.step('Drag Image', async () => {
+  await test.step('start dragging', async () => {
     const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
       x: 130,
       y: 40,
@@ -170,7 +169,7 @@ test('Drag Image B', async ({ page }) => {
     await page.mouse.up();
   });
 
-  await test.step('Drag Image', async () => {
+  await test.step('start dragging', async () => {
     const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
       x: 500,
       y: 280,
