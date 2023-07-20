@@ -96,7 +96,7 @@ test.only('Drag Image', async ({ page }) => {
     expect(image).toMatchImageSnapshot({
       name: 'drag_image.png',
     });
-    expect(position).toMatchDataSnapshot({
+    expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
       name: 'drag_image.json',
     });
   });
