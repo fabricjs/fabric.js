@@ -1,6 +1,9 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+// extend `expect`
+import './e2e/matchers';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
