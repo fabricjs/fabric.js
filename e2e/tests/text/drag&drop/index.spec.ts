@@ -1,8 +1,11 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('test', async ({ page }) => {
-  await page.goto('http://localhost:1234/');
+import '../../../setup';
+
+test('Drag & Drop', async ({ page, browser }) => {
+  // await page.goto('http://localhost:1234/');
   const canvas = page.locator('canvas').nth(1);
+  console.log(await canvas.getAttribute('style'));
   await canvas.click({
     position: {
       x: 227,
@@ -10,17 +13,40 @@ test('test', async ({ page }) => {
     },
   });
   await page.mouse.dblclick(227, 50);
-  await canvas.dragTo(canvas, {
-    sourcePosition: {
+  await canvas.hover({
+    position: {
       x: 227,
-      y: 50,
-    },
-    targetPosition: {
-      x: 340,
-      y: 140,
+      y: 40,
     },
   });
+  await page.mouse.down();
+  // await canvas.hover({
+  //   position: {
+  //     x: 230,
+  //     y: 60,
+  //   },
+  // });
+  await page.mouse.move(340, 140, { steps: 40 });
+  expect(await page.screenshot()).toMatchSnapshot();
+  // await canvas.hover({
+  //   position: {
+  //     x: 340,
+  //     y: 140,
+  //   },
+  // });
+  await page.mouse.up();
+  // await canvas.dragTo(canvas, {
+  //   sourcePosition: {
+  //     x: 227,
+  //     y: 50,
+  //   },
+  //   targetPosition: {
+  //     x: 340,
+  //     y: 140,
+  //   },
+  // });
   expect(await canvas.screenshot()).toMatchSnapshot();
+  await page.waitForTimeout(20000);
 });
 
 /**
