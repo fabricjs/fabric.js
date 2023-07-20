@@ -9,12 +9,12 @@ class Canvas extends fabric.Canvas {
 }
 
 before('#canvas', (el) => {
-  const canvas = new Canvas(el, { width: 500, height: 500 });
+  const canvas = new Canvas(el, { width: 300, height: 200 });
   const textValue = 'fabric.js sandbox';
   const text = new fabric.Textbox(textValue, {
     originX: 'center',
     width: 200,
-    left: 250,
+    left: 150,
     top: 20,
     splitByGrapheme: true,
     styles: fabric.util.stylesFromArray(
