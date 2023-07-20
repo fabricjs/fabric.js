@@ -30,21 +30,29 @@ test('Drag & Drop', async ({ page }) => {
 
 test.only('Drag Image', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
-  const trigger = page.evaluate(
-    () =>
-      new Promise<{ image: string; x: number; y: number }>((resolve) =>
-        window.addEventListener(
-          'drag:image',
-          ({ detail: { image, x, y } }) =>
-            resolve({
-              image: image.toDataURL(`image/png`, 1),
-              x,
-              y,
-            }),
-          { once: true }
+  const trigger = page
+    .evaluate(
+      () =>
+        new Promise<{ image: string; x: number; y: number }>((resolve) =>
+          window.addEventListener(
+            'drag:image',
+            ({ detail: { image, x, y } }) =>
+              resolve({
+                image: image.toDataURL(`image/png`, 1),
+                x,
+                y,
+              }),
+            { once: true }
+          )
         )
-      )
-  );
+    )
+    .then(({ x, y, image }) => {
+      const [type, content] = image
+        .replace(/^data:image\/([^;]+);([^,]+),(.+)/, '$2 $3')
+        .split(' ') as [BufferEncoding, string];
+      const data = new Uint8Array(Buffer.from(content, type).buffer);
+      return [data, { x, y }] as const;
+    });
   const dataTransfer = await page.evaluateHandle(() =>
     Object.defineProperty(new DataTransfer(), 'setDragImage', {
       value: (image, x, y) =>
@@ -69,11 +77,11 @@ test.only('Drag Image', async ({ page }) => {
   });
   await page.mouse.down();
   await canvas.dispatchEvent('dragstart', { dataTransfer });
-  const { x, y, image } = await trigger;
-  expect(image).toMatchImageSnapshot({
+  const [image, position] = await trigger;
+  expect(image).toMatchSnapshot({
     name: 'drag_image.png',
   });
-  expect({ x, y }).toMatchDataSnapshot({
+  expect(position).toMatchDataSnapshot({
     name: 'drag_image.json',
   });
 });
