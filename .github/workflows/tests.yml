@@ -114,6 +114,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
@@ -127,7 +129,7 @@ jobs:
         with:
           name: e2e-report
           path: ./e2e/test-report/
-      - name: Upload test coverage
+      - name: Upload Test Coverage
         uses: actions/upload-artifact@v3
         with:
           name: coverage-e2e
