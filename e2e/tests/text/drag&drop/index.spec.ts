@@ -1,32 +1,82 @@
-import { Locator, Page, expect, test } from '@playwright/test';
-
-import '../../../setup';
+import type { Locator, Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 
-test('Drag & Drop', async ({ page }) => {
+import '../../../setup';
+
+test.only('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
-  await canvas.click({
-    position: {
-      x: 130,
-      y: 50,
-    },
+  await test.step('select "fabric" in A', async () => {
+    await canvas.click({
+      position: {
+        x: 130,
+        y: 50,
+      },
+    });
+    await page.mouse.dblclick(130, 50);
+    await canvas.hover({
+      position: {
+        x: 130,
+        y: 40,
+      },
+    });
   });
-  await page.mouse.dblclick(130, 50);
-  await canvas.hover({
-    position: {
-      x: 130,
-      y: 40,
-    },
+  await test.step('drag & drop to end', async () => {
+    await page.mouse.down();
+    await page.mouse.move(0, 140, { steps: 40 });
+    await page.mouse.move(435, 55, { steps: 40 });
+    expect(await canvas.screenshot()).toMatchSnapshot({
+      name: 'drag_a_over_b.png',
+    });
+    // await
+    await page.mouse.move(240, 140, { steps: 40 });
+    // await renderCursorSpotLight(page, 'a');
+    expect(await canvas.screenshot()).toMatchSnapshot({
+      name: 'drop_before_a.png',
+    });
+    await page.mouse.up();
+    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop.png' });
   });
-  await page.mouse.down();
-  await page.mouse.move(0, 140, { steps: 40 });
-  await page.mouse.move(240, 140, { steps: 40 });
-  expect(await canvas.screenshot()).toMatchSnapshot({
-    name: 'drop:before.png',
+
+  await test.step('drag & drop to B(3) = "lor|fabric|em"', async () => {
+    await canvas.dragTo(canvas, {
+      sourcePosition: {
+        x: 230,
+        y: 140,
+      },
+      targetPosition: {
+        x: 435,
+        y: 55,
+      },
+    });
+    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop_a_b.png' });
   });
-  await page.mouse.up();
-  expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop.png' });
-  await page.waitForTimeout(50000);
+
+  await test.step('select B', async () => {
+    await canvas.click({
+      position: {
+        x: 598,
+        y: 59,
+      },
+    });
+    await page.mouse.down();
+    await page.mouse.move(580, 300, { steps: 40 });
+    await page.mouse.up();
+  });
+
+  await test.step('drag & drop to A(4) = ".js |em ip"', async () => {
+    await canvas.dragTo(canvas, {
+      sourcePosition: {
+        x: 580,
+        y: 280,
+      },
+      targetPosition: {
+        x: 130,
+        y: 55,
+      },
+    });
+    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop_b_a.png' });
+  });
 });
 
 async function waitForDragImage(
@@ -75,7 +125,7 @@ async function waitForDragImage(
   });
 }
 
-test('Drag Image 1', async ({ page }) => {
+test('Drag Image A', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
 
   await test.step('select word', async () => {
@@ -96,15 +146,15 @@ test('Drag Image 1', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image1.png',
+      name: 'drag_image_a.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image1.json',
+      name: 'drag_image_a.json',
     });
   });
 });
 
-test('Drag Image 2', async ({ page }) => {
+test('Drag Image B', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
 
   await test.step('select word', async () => {
@@ -128,10 +178,10 @@ test('Drag Image 2', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image2.png',
+      name: 'drag_image_b.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image2.json',
+      name: 'drag_image_b.json',
     });
   });
 });
