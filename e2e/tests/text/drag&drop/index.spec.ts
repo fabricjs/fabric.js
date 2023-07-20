@@ -75,49 +75,63 @@ async function waitForDragImage(
   });
 }
 
-test.only('Drag Image', async ({ page }) => {
+test('Drag Image 1', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
-  await canvas.click({
-    position: {
-      x: 130,
-      y: 50,
-    },
+
+  await test.step('select word', async () => {
+    await canvas.click({
+      position: {
+        x: 130,
+        y: 50,
+      },
+    });
+    await page.mouse.dblclick(130, 50);
   });
 
-  await test.step('select word', () => page.mouse.dblclick(130, 50));
-
-  await test.step('Drag Image A', async () => {
+  await test.step('Drag Image', async () => {
     const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
       x: 130,
       y: 40,
     });
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
-    expect(image).toMatchImageSnapshot({
-      name: 'drag_image.png',
+    expect(image).toMatchSnapshot({
+      name: 'drag_image1.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image.json',
+      name: 'drag_image1.json',
     });
   });
+});
 
-  // await test.step('Drag Image B', async () => {
-  //   await page.mouse.dblclick(130, 50);
-  //   await canvas.hover({
-  //     position: {
-  //       x: 130,
-  //       y: 40,
-  //     },
-  //   });
-  //   await page.mouse.down();
-  //   const [dragEvent, trigger] = await waitForDragImage(page);
-  //   await canvas.dispatchEvent('dragstart', dragEvent);
-  //   const { x, y, image } = await trigger;
-  //   expect(image).toMatchImageSnapshot({
-  //     name: 'drag_image.png',
-  //   });
-  //   expect({ x, y }).toMatchDataSnapshot({
-  //     name: 'drag_image.json',
-  //   });
-  // });
+test('Drag Image 2', async ({ page }) => {
+  const canvas = page.locator('canvas').nth(1);
+
+  await test.step('select word', async () => {
+    await page.mouse.dblclick(435, 55);
+    await canvas.click({
+      position: {
+        x: 435,
+        y: 55,
+      },
+    });
+    await page.mouse.down();
+    await page.mouse.move(580, 300, { steps: 40 });
+    await page.mouse.up();
+  });
+
+  await test.step('Drag Image', async () => {
+    const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
+      x: 500,
+      y: 280,
+    });
+    await canvas.dispatchEvent('dragstart', dragEvent);
+    const [image, position] = await trigger;
+    expect(image).toMatchSnapshot({
+      name: 'drag_image2.png',
+    });
+    expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
+      name: 'drag_image2.json',
+    });
+  });
 });
