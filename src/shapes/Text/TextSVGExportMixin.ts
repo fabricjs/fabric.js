@@ -327,7 +327,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
       fontFamily
         ? `font-family: ${
-            !fontFamily.includes("'") && fontFamily.includes('"')
+            !fontFamily.includes("'") && !fontFamily.includes('"')
               ? `'${fontFamily}'`
               : fontFamily
           }; `
