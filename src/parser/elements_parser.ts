@@ -34,14 +34,14 @@ type NotParsedFabricObject = FabricObject & {
 };
 
 export class ElementsParser {
-  elements: Element[];
-  options: LoadImageOptions & ParsedViewboxTransform;
-  reviver: TSvgReviverCallback | undefined;
-  regexUrl: RegExp;
-  doc: Document;
-  clipPaths: Record<string, Element[]>;
-  gradientDefs: Record<string, SVGGradientElement>;
-  cssRules: CSSRules;
+  declare elements: Element[];
+  declare options: LoadImageOptions & ParsedViewboxTransform;
+  declare reviver: TSvgReviverCallback | undefined;
+  declare regexUrl: RegExp;
+  declare doc: Document;
+  declare clipPaths: Record<string, Element[]>;
+  declare gradientDefs: Record<string, SVGGradientElement>;
+  declare cssRules: CSSRules;
 
   constructor(
     elements: Element[],
