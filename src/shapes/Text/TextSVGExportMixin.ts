@@ -275,12 +275,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    */
   _getSVGLineTopOffset(this: TextSVGExportMixin & Text, lineIndex: number) {
     let lineTopOffset = 0,
-      lastHeight = 0,
       j;
     for (j = 0; j < lineIndex; j++) {
       lineTopOffset += this.getHeightOfLine(j);
     }
-    lastHeight = this.getHeightOfLine(j);
+    const lastHeight = this.getHeightOfLine(j);
     return {
       lineTop: lineTopOffset,
       offset:
@@ -310,42 +309,35 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     style: TextStyleDeclaration,
     useWhiteSpace?: boolean
   ) {
-    const term = '; ',
-      fontFamily = style.fontFamily
-        ? `font-family: ${
-            style.fontFamily.indexOf("'") === -1 &&
-            style.fontFamily.indexOf('"') === -1
-              ? `'${style.fontFamily}'`
-              : style.fontFamily
-          }${term}`
-        : '',
-      strokeWidth = style.strokeWidth
-        ? `stroke-width: ${style.strokeWidth}${term}`
-        : '',
-      fontSize = style.fontSize ? `font-size: ${style.fontSize}px${term}` : '',
-      fontStyle = style.fontStyle
-        ? `font-style: ${style.fontStyle}${term}`
-        : '',
-      fontWeight = style.fontWeight
-        ? `font-weight: ${style.fontWeight}${term}`
-        : '',
-      fill = style.fill ? colorPropToSVG('fill', style.fill) : '',
-      stroke = style.stroke ? colorPropToSVG('stroke', style.stroke) : '',
-      textDecoration = this.getSvgTextDecoration(style),
-      deltaY = style.deltaY ? `baseline-shift: ${-style.deltaY}; ` : '';
-
-    return [
-      stroke,
-      strokeWidth,
+    const {
       fontFamily,
+      strokeWidth,
+      stroke,
+      fill,
       fontSize,
       fontStyle,
       fontWeight,
-      textDecoration
-        ? `text-decoration: ${textDecoration}${term}`
-        : textDecoration,
-      fill,
       deltaY,
+    } = style;
+
+    const textDecoration = this.getSvgTextDecoration(style);
+
+    return [
+      stroke ? colorPropToSVG('stroke', stroke) : '',
+      strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
+      fontFamily
+        ? `font-family: ${
+            !fontFamily.includes("'") && fontFamily.includes('"')
+              ? `'${fontFamily}'`
+              : fontFamily
+          }; `
+        : '',
+      fontSize ? `font-size: ${fontSize}px; ` : '',
+      fontStyle ? `font-style: ${fontStyle}; ` : '',
+      fontWeight ? `font-weight: ${fontWeight}; ` : '',
+      textDecoration ? `text-decoration: ${textDecoration}; ` : textDecoration,
+      fill ? colorPropToSVG('fill', fill) : '',
+      deltaY ? `baseline-shift: ${-deltaY}; ` : '',
       useWhiteSpace ? 'white-space: pre; ' : '',
     ].join('');
   }
