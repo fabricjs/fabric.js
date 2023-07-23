@@ -43,11 +43,12 @@ export async function parseSVGDocument(
     // this is an unhappy path, we dont care about speed
     return createEmptyResponse();
   }
+  const documentElement = doc.documentElement;
   parseUseDirectives(doc);
 
-  const descendants = Array.from(doc.getElementsByTagName('*')),
+  const descendants = Array.from(documentElement.getElementsByTagName('*')),
     options = {
-      ...applyViewboxTransform(doc.documentElement),
+      ...applyViewboxTransform(documentElement),
       crossOrigin,
       signal,
     };
