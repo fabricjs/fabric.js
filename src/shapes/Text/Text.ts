@@ -1743,7 +1743,7 @@ export class Text<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      ...super.toObject([...additionalProps, ...propertiesToInclude] as K[]),
       styles: stylesToArray(this.styles, this.text),
       ...(this.path ? { path: this.path.toObject() } : {}),
     };
