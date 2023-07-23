@@ -83,8 +83,9 @@ export class ElementsParser {
           obj,
           obj.parsePreserveAspectRatioAttribute()
         );
+      } else {
+        removeTransformMatrixForSvgParsing(obj);
       }
-      removeTransformMatrixForSvgParsing(obj);
       await this.resolveClipPath(obj, el);
       this.reviver && this.reviver(el, obj);
       return obj;
