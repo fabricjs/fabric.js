@@ -4,6 +4,8 @@
 
 - chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
 - chore(TS): Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
+- docs(): revise test section [#9114](https://github.com/fabricjs/fabric.js/pull/9114)
+- fix(): #8344 stroke projection [#8374](https://github.com/fabricjs/fabric.js/pull/8374)
 - fix(Filters) Removing type from the options passed in the constructor [#9089](https://github.com/fabricjs/fabric.js/pull/9089)
 - feat(InteractiveObject): add `getActiveControl()` to expose `__corner` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
 - ci(sandbox): bump next.js [#9100](https://github.com/fabricjs/fabric.js/pull/9100)
