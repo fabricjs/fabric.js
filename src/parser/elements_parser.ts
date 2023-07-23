@@ -16,6 +16,7 @@ import { getCSSRules } from './getCSSRules';
 import type { LoadImageOptions } from '../util';
 import type { CSSRules, TSvgReviverCallback } from './typedefs';
 import type { ParsedViewboxTransform } from './applyViewboxTransform';
+import type { SVGOptions } from '../gradient';
 
 const findTag = (el: Element) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
@@ -121,20 +122,11 @@ export class ElementsParser {
       this.gradientDefs
     ) as SVGGradientElement;
     if (gradientDef) {
-      const {
-        width = 0,
-        height = 0,
-        viewBoxWidth = 0,
-        viewBoxHeight = 0,
-      } = this.options;
       const opacityAttr = el.getAttribute(property + '-opacity');
       const gradient = Gradient.fromElement(gradientDef, obj, {
-        viewBoxWidth,
-        viewBoxHeight,
-        width,
-        height,
+        ...this.options,
         opacity: opacityAttr,
-      });
+      } as SVGOptions);
       obj.set(property, gradient);
     }
   }

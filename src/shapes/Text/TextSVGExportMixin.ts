@@ -234,11 +234,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       heightOfLine = this.getHeightOfLine(i) / this.lineHeight;
     let boxWidth = 0,
       boxStart = 0,
-      charBox,
       currentColor,
       lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
     for (let j = 0; j < line.length; j++) {
-      charBox = this.__charBounds[i][j];
+      const { left, width, kernedWidth } = this.__charBounds[i][j];
       currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
       if (currentColor !== lastColor) {
         lastColor &&
@@ -251,11 +250,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
               heightOfLine
             )
           );
-        boxStart = charBox.left;
-        boxWidth = charBox.width;
+        boxStart = left;
+        boxWidth = width;
         lastColor = currentColor;
       } else {
-        boxWidth += charBox.kernedWidth;
+        boxWidth += kernedWidth;
       }
     }
     currentColor &&
