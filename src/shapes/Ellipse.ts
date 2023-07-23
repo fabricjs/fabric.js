@@ -120,16 +120,11 @@ export class Ellipse<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG() {
+  _toSVG(): string[] {
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      'cx="0" cy="0" ',
-      'rx="',
-      this.rx,
-      '" ry="',
-      this.ry,
-      '" />\n',
+      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
     ];
   }
 
