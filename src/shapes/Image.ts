@@ -168,9 +168,9 @@ export class Image<
   declare filters: BaseFilter[];
   declare resizeFilter: Resize;
 
-  protected declare _element: ImageSource;
-  protected declare _filteredEl?: HTMLCanvasElement;
-  protected declare _originalElement: ImageSource;
+  declare _element: ImageSource;
+  declare _filteredEl?: HTMLCanvasElement;
+  declare _originalElement: ImageSource;
 
   static type = 'Image';
 

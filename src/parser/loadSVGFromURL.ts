@@ -24,11 +24,11 @@ export function loadSVGFromURL(
   options: LoadImageOptions = {}
 ): Promise<SVGParsingOutput> {
   // need to handle error properly
-  return new Promise<HTMLElement>((resolve, reject) => {
+  return new Promise<Document>((resolve, reject) => {
     const onComplete = (r: XMLHttpRequest) => {
       const xml = r.responseXML;
-      if (xml && xml.documentElement) {
-        resolve(xml.documentElement);
+      if (xml) {
+        resolve(xml);
       }
       reject();
     };

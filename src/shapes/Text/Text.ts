@@ -70,7 +70,7 @@ export type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
 export type TextLinesInfo = {
   lines: string[];
   graphemeLines: string[][];
-  graphemeText: string;
+  graphemeText: string[];
   _unwrappedLines: string[][];
 };
 
@@ -1715,7 +1715,7 @@ export class Text<
    * @param {String} text text to split
    * @returns  Lines in the text
    */
-  _splitTextIntoLines(text: string) {
+  _splitTextIntoLines(text: string): TextLinesInfo {
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];

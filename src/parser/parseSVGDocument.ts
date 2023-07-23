@@ -5,6 +5,7 @@ import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
@@ -47,7 +48,7 @@ export async function parseSVGDocument(
 
   const descendants = Array.from(doc.getElementsByTagName('*')),
     options = {
-      ...applyViewboxTransform(doc),
+      ...applyViewboxTransform(doc.documentElement),
       crossOrigin,
       signal,
     };
@@ -82,7 +83,9 @@ export async function parseSVGDocument(
     localClipPaths
   );
 
-  const instances = await elementParser.parse();
+  const instances = (await elementParser.parse()).filter(
+    (el) => !!el
+  ) as FabricObject[];
 
   return {
     objects: instances,

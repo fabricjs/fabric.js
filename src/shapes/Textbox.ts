@@ -194,7 +194,7 @@ export class Textbox<
     }
     let offset = 0,
       nextLineIndex = lineIndex + 1,
-      nextOffset,
+      nextOffset: number,
       shouldLimit = false;
     const map = this._styleMap[lineIndex],
       mapNextLine = this._styleMap[lineIndex + 1];
@@ -213,7 +213,8 @@ export class Textbox<
         : { line: this.styles[lineIndex] };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
-        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+        const p2Number = parseInt(p2, 10);
+        if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
           // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
@@ -312,9 +313,9 @@ export class Textbox<
     // extract all thewords and the widths to optimally wrap lines.
     const data = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
-    data.wordsData.forEach((line, index) =>
-      wrapped.push(...this._wrapLine(index, desiredWidth, data))
-    );
+    for (let i = 0; i < data.wordsData.length; i++) {
+      wrapped.push(...this._wrapLine(i, desiredWidth, data));
+    }
     this.isWrapping = false;
     return wrapped;
   }
@@ -531,14 +532,16 @@ export class Textbox<
   }
 
   _removeExtraneousStyles() {
-    const linesToKeep = {};
+    const linesToKeep = new Map();
     for (const prop in this._styleMap) {
-      if (this._textLines[prop]) {
-        linesToKeep[this._styleMap[prop].line] = 1;
+      const propNumber = parseInt(prop, 10);
+      if (this._textLines[propNumber]) {
+        const lineIndex = this._styleMap[prop].line;
+        linesToKeep.set(`${lineIndex}`, true);
       }
     }
     for (const prop in this.styles) {
-      if (!linesToKeep[prop]) {
+      if (!linesToKeep.has(prop)) {
         delete this.styles[prop];
       }
     }
