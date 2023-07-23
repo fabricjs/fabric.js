@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { config } from '../../config';
 import { getFabricDocument, getEnv } from '../../env';
 import type { TPointerEvent } from '../../EventTypeDefs';
