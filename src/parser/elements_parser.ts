@@ -60,11 +60,9 @@ export class ElementsParser {
     this.cssRules = getCSSRules(doc);
   }
 
-  parse() {
+  parse(): Promise<Array<FabricObject | null>> {
     return Promise.all(
-      this.elements.map((element) => {
-        return this.createObject(element);
-      })
+      this.elements.map((element) => this.createObject(element))
     );
   }
 
