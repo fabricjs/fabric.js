@@ -4,7 +4,7 @@ import type { TextStyleDeclaration } from '../shapes/Text/StyledText';
 
 export type TCopyPasteData = {
   copiedText?: string;
-  copiedStyle?: TextStyleDeclaration[];
+  copiedTextStyle?: TextStyleDeclaration[];
 };
 export type TFabricEnv = {
   document: Document;

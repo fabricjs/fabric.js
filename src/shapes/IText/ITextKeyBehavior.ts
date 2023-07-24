@@ -261,7 +261,7 @@ export abstract class ITextKeyBehavior<
         insertedText.join('') === copyPasteData.copiedText &&
         !config.disableStyleCopyPaste
       ) {
-        copiedStyle = copyPasteData.copiedStyle;
+        copiedStyle = copyPasteData.copiedTextStyle;
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
@@ -300,13 +300,13 @@ export abstract class ITextKeyBehavior<
     const { copyPasteData } = getEnv();
     copyPasteData.copiedText = this.getSelectedText();
     if (!config.disableStyleCopyPaste) {
-      copyPasteData.copiedStyle = this.getSelectionStyles(
+      copyPasteData.copiedTextStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
         true
       );
     } else {
-      copyPasteData.copiedStyle = undefined;
+      copyPasteData.copiedTextStyle = undefined;
     }
     this._copyDone = true;
   }
