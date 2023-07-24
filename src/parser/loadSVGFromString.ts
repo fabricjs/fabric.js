@@ -25,5 +25,5 @@ export function loadSVGFromString(
   const parser = new (getFabricWindow().DOMParser)(),
     // should we use `image/svg+xml` here?
     doc = parser.parseFromString(string.trim(), 'text/xml');
-  return parseSVGDocument(doc.documentElement, reviver, options);
+  return parseSVGDocument(doc, reviver, options);
 }

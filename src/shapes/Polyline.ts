@@ -389,7 +389,7 @@ export class Polyline<
         this.ATTRIBUTE_NAMES,
         cssRules
       );
-    return new this(points || [], {
+    return new this(points, {
       ...parsedAttributes,
       ...options,
     });

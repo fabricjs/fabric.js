@@ -206,7 +206,7 @@ export abstract class StyledText<
     startIndex: number,
     endIndex?: number,
     complete?: boolean
-  ) {
+  ): TextStyleDeclaration[] {
     const styles: TextStyleDeclaration[] = [];
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       styles.push(this.getStyleAtPosition(i, complete));

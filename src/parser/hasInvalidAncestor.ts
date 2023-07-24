@@ -3,8 +3,8 @@ import { getSvgRegex } from './getSvgRegex';
 
 const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
 
-export function hasInvalidAncestor(element: HTMLElement) {
-  let _element: HTMLElement | null = element;
+export function hasInvalidAncestor(element: Element) {
+  let _element: Element | null = element;
   while (_element && (_element = _element.parentElement)) {
     if (
       _element &&
