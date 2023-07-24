@@ -7,12 +7,9 @@ import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
-import {
-  parseColorStops,
-  parseCoords,
-  parseGradientUnits,
-  parseType,
-} from './parser';
+import { parseColorStops } from './parser/parseColorStops';
+import { parseCoords } from './parser/parseCoords';
+import { parseType, parseGradientUnits } from './parser/misc';
 import type {
   ColorStop,
   GradientCoords,

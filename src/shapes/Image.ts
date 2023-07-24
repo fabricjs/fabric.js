@@ -168,9 +168,9 @@ export class Image<
   declare filters: BaseFilter[];
   declare resizeFilter: Resize;
 
-  protected declare _element: ImageSource;
-  protected declare _filteredEl?: HTMLCanvasElement;
-  protected declare _originalElement: ImageSource;
+  declare _element: ImageSource;
+  declare _filteredEl?: HTMLCanvasElement;
+  declare _originalElement: ImageSource;
 
   static type = 'Image';
 
@@ -597,13 +597,11 @@ export class Image<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   drawCacheOnCanvas(
-    this: TCachedFabricObject<Props, SProps, EventSpec> & {
-      imageSmoothing: boolean;
-    },
+    this: TCachedFabricObject<Image>,
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-ignore ( expect-error) this line is not error free.
+    // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 

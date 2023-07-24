@@ -1,9 +1,10 @@
 import type { GLProbe } from '../filters/GLProbes/GLProbe';
 import type { DOMWindow } from 'jsdom';
+import type { TextStyleDeclaration } from '../shapes/Text/StyledText';
 
 export type TCopyPasteData = {
   copiedText?: string;
-  copiedStyle?: Record<string, string>;
+  copiedTextStyle?: TextStyleDeclaration[];
 };
 export type TFabricEnv = {
   document: Document;

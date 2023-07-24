@@ -1,40 +1,41 @@
-//@ts-nocheck
 import { Color } from '../color/Color';
 import { toFixed } from '../util/misc/toFixed';
-import { colorAttributes } from './constants';
 import { FabricObject } from '../shapes/Object/FabricObject';
+
+const colorAttributesMap = {
+  stroke: 'strokeOpacity',
+  fill: 'fillOpacity',
+};
 
 /**
  * @private
  * @param {Object} attributes Array of attributes to parse
  */
 
-export function setStrokeFillOpacity(attributes) {
-  for (const attr in colorAttributes) {
+export function setStrokeFillOpacity(
+  attributes: Record<string, any>
+): Record<string, any> {
+  const defaults = FabricObject.getDefaults();
+  Object.entries(colorAttributesMap).forEach(([attr, colorAttr]) => {
     if (
-      typeof attributes[colorAttributes[attr]] === 'undefined' ||
+      typeof attributes[colorAttr] === 'undefined' ||
       attributes[attr] === ''
     ) {
-      continue;
+      return;
     }
-    const defaults = FabricObject.getDefaults();
     if (typeof attributes[attr] === 'undefined') {
       if (!defaults[attr]) {
-        continue;
+        return;
       }
       attributes[attr] = defaults[attr];
     }
-
     if (attributes[attr].indexOf('url(') === 0) {
-      continue;
+      return;
     }
-
     const color = new Color(attributes[attr]);
     attributes[attr] = color
-      .setAlpha(
-        toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)
-      )
+      .setAlpha(toFixed(color.getAlpha() * attributes[colorAttr], 2))
       .toRgba();
-  }
+  });
   return attributes;
 }
