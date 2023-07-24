@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): complete type check [#9119](https://github.com/fabricjs/fabric.js/pull/9119)
 - chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
 - chore(TS): Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - docs(): revise test section [#9114](https://github.com/fabricjs/fabric.js/pull/9114)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -81,6 +80,7 @@ export type LayoutResult = {
   correctionY?: number;
   width: number;
   height: number;
+  prevLayout?: LayoutStrategy;
 };
 
 export interface GroupOwnProps {
@@ -318,7 +318,7 @@ export class Group extends createCollectionMixin(
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const prev = this[key];
+    const prev = this[key as keyof this];
     super._set(key, value);
     if (key === 'canvas' && prev !== value) {
       this.forEachObject((object) => {
@@ -389,12 +389,16 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject} object
    */
   _watchObject(watch: boolean, object: FabricObject) {
-    const directive = watch ? 'on' : 'off';
+    const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
+    // @ts-expect-error TS limitations
     object[directive]('changed', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('modified', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('selected', this.__objectSelectionTracker);
+    // @ts-expect-error TS limitations
     object[directive]('deselected', this.__objectSelectionDisposer);
   }
 
@@ -639,7 +643,7 @@ export class Group extends createCollectionMixin(
         this.layout !== 'clip-path' &&
         this.clipPath &&
         !this.clipPath.absolutePositioned &&
-        this._adjustObjectPosition(this.clipPath, diff);
+        this._adjustObjectPosition(this.clipPath as FabricObject, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
         this.setPositionByOrigin(newCenter, CENTER, CENTER);
@@ -976,7 +980,7 @@ export class Group extends createCollectionMixin(
         obj.includeDefaultValues = _includeDefaultValues;
         const data = obj[method || 'toObject'](propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
-        //delete data.version;
+        // delete data.version;
         return data;
       });
   }
@@ -1000,7 +1004,10 @@ export class Group extends createCollectionMixin(
         'interactive',
         ...propertiesToInclude,
       ]),
-      objects: this.__serializeObjects('toObject', propertiesToInclude),
+      objects: this.__serializeObjects(
+        'toObject',
+        propertiesToInclude as string[]
+      ),
     };
   }
 
@@ -1051,7 +1058,7 @@ export class Group extends createCollectionMixin(
    * Returns styles-string for svg-export, specific version for group
    * @return {String}
    */
-  getSvgStyles() {
+  getSvgStyles(): string {
     const opacity =
         typeof this.opacity !== 'undefined' && this.opacity !== 1
           ? `opacity: ${this.opacity};`
@@ -1065,7 +1072,7 @@ export class Group extends createCollectionMixin(
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: TSVGReviver) {
+  toClipPathSVG(reviver?: TSVGReviver): string {
     const svgString = [];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t', bg);
