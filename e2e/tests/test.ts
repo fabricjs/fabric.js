@@ -8,6 +8,8 @@ import { Canvas } from 'fabric';
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
 
+type AsyncReturnValue<T> = T | Promise<T>;
+
 const setupTasks: Promise<void>[] = [];
 const teardownTasks: Awaited<VoidFunction>[] = [];
 
@@ -26,14 +28,16 @@ export function before(
   /**
    * @returns a map of objects for playwright to access during tests
    */
-  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
-  options?
+  cb: (canvas: HTMLCanvasElement) => AsyncReturnValue<{
+    canvas: Canvas;
+    objects?: Record<string, FabricObject>;
+  }>
 ) {
   const task = Promise.resolve().then(async () => {
     const el = document.querySelector<HTMLCanvasElement>(selector);
-    const canvas = new Canvas(el, options);
+    const { canvas, objects = {} } = await cb(el);
     canvasMap.set(el, canvas);
-    Object.entries((await cb(canvas)) || {}).forEach(([key, value]) => {
+    Object.entries(objects).forEach(([key, value]) => {
       if (objectMap.has(key)) {
         throw new Error(
           `Object identifiers must be unique: ${key} is already defined`
@@ -52,13 +56,20 @@ export function before(
  * @param options canvas options
  */
 export function beforeAll(
-  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject>>,
+  cb: (canvas: Canvas) => AsyncReturnValue<Record<string, FabricObject>>,
   options?
 ) {
-  before('#canvas', cb, options);
+  before('#canvas', async (el) => {
+    const canvas = new Canvas(el, options);
+    const objects = await cb(canvas);
+    return { canvas, objects };
+  });
 }
 
-export function after(selector: string, cb: Awaited<(canvas: Canvas) => void>) {
+export function after(
+  selector: string,
+  cb: (canvas: Canvas) => AsyncReturnValue<void>
+) {
   teardownTasks.push(() => {
     const el = document.querySelector<HTMLCanvasElement>(selector);
     const canvas = canvasMap.get(el);
@@ -66,6 +77,6 @@ export function after(selector: string, cb: Awaited<(canvas: Canvas) => void>) {
   });
 }
 
-export function afterAll(cb: Awaited<(canvas: Canvas) => void>) {
+export function afterAll(cb: (canvas: Canvas) => AsyncReturnValue<void>) {
   after('#canvas', cb);
 }
