@@ -865,7 +865,7 @@ export class SelectableCanvas<
       transform.originY = CENTER;
     }
     this._currentTransform = transform;
-    // @ts-ignore
+    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
     this._beforeTransform(e);
   }
 
@@ -1154,7 +1154,7 @@ export class SelectableCanvas<
     dimensions: TSize,
     options?: TCanvasSizeOptions
   ) {
-    // @ts-ignore
+    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
     this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
@@ -1348,7 +1348,7 @@ export class SelectableCanvas<
         resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-ignore
+        // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;

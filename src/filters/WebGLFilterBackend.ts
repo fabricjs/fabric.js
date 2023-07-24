@@ -168,10 +168,16 @@ export class WebGLFilterBackend {
       cachedTexture = this.getCachedTexture(cacheKey, source);
     }
     const pipelineState: TWebGLPipelineState = {
-      // @ts-ignore
-      originalWidth: source.width || source.originalWidth || 0,
-      // @ts-ignore
-      originalHeight: source.height || source.originalHeight || 0,
+      originalWidth:
+        (source as HTMLImageElement).width ||
+        // @ts-expect-error is this a bug? should this be naturalWidth? or is this the pipeline state?
+        (source as HTMLImageElement).originalWidth ||
+        0,
+      originalHeight:
+        (source as HTMLImageElement).height ||
+        // @ts-expect-error is this a bug? should this be naturalHeight? or is this the pipeline state?
+        (source as HTMLImageElement).originalHeight ||
+        0,
       sourceWidth: width,
       sourceHeight: height,
       destinationWidth: width,
@@ -222,9 +228,9 @@ export class WebGLFilterBackend {
     if (this.canvas) {
       // we are disposing, we don't care about the fact
       // that the canvas shouldn't be null.
-      // @ts-ignore
+      // @ts-expect-error disposing
       this.canvas = null;
-      // @ts-ignore
+      // @ts-expect-error disposing
       this.gl = null;
     }
     this.clearWebGLCaches();

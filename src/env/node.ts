@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
-// @ts-ignore
+// @ts-expect-error internal import
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
