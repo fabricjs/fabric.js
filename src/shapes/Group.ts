@@ -1072,7 +1072,7 @@ export class Group extends createCollectionMixin(
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: TSVGReviver) {
+  toClipPathSVG(reviver?: TSVGReviver): string {
     const svgString = [];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t', bg);

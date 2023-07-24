@@ -597,12 +597,11 @@ export class Image<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   drawCacheOnCanvas(
-    this: TCachedFabricObject<Props, SProps, EventSpec> & {
-      imageSmoothing: boolean;
-    },
+    this: TCachedFabricObject<Image>,
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
+    // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 

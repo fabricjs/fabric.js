@@ -170,10 +170,12 @@ export class WebGLFilterBackend {
     const pipelineState: TWebGLPipelineState = {
       originalWidth:
         (source as HTMLImageElement).width ||
+        // @ts-expect-error is this a bug? should this be naturalWidth? or is this the pipeline state?
         (source as HTMLImageElement).originalWidth ||
         0,
       originalHeight:
         (source as HTMLImageElement).height ||
+        // @ts-expect-error is this a bug? should this be naturalHeight? or is this the pipeline state?
         (source as HTMLImageElement).originalHeight ||
         0,
       sourceWidth: width,
