@@ -53,7 +53,7 @@ export const keysMapRtl: TKeyMapIText = {
  */
 export const ctrlKeysMapUp: TKeyMapIText = {
   67: 'copy',
-  // @ts-ignore there was a reason this wasn't deleted. for now leave it here
+  // there was a reason this wasn't deleted. for now leave it here
   88: 'cut',
 };
 

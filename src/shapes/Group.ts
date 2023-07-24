@@ -392,13 +392,13 @@ export class Group extends createCollectionMixin(
     const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
-    // @ts-ignore
+    // @ts-expect-error TS limitations
     object[directive]('changed', this.__objectMonitor);
-    // @ts-ignore
+    // @ts-expect-error TS limitations
     object[directive]('modified', this.__objectMonitor);
-    // @ts-ignore
+    // @ts-expect-error TS limitations
     object[directive]('selected', this.__objectSelectionTracker);
-    // @ts-ignore
+    // @ts-expect-error TS limitations
     object[directive]('deselected', this.__objectSelectionDisposer);
   }
 

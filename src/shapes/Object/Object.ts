@@ -1417,7 +1417,7 @@ export class FabricObject<
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
-    // @ts-ignore this needs to be fixed somehow, or ignored globally
+    // @ts-expect-error this needs to be fixed somehow, or ignored globally
     canvas._objects = [this];
     this.set('canvas', canvas);
     this.setCoords();

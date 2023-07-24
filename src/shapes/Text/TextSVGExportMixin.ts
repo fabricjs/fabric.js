@@ -293,7 +293,6 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & Text, skipShadow?: boolean) {
-    // @ts-ignore this line is not error free. ( super is not the same type as this )
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 

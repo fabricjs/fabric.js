@@ -603,7 +603,6 @@ export class Image<
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-ignore ( expect-error) this line is not error free.
     super.drawCacheOnCanvas(ctx);
   }
 
