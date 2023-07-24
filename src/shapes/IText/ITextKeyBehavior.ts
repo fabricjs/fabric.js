@@ -9,6 +9,8 @@ import type { TProps } from '../Object/types';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
+import type { IText } from './IText';
+import type { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
   Props extends TProps<TextProps> = Partial<TextProps>,
@@ -160,7 +162,7 @@ export abstract class ITextKeyBehavior<
    * Handles onInput event
    * @param {Event} e Event object
    */
-  onInput(e: Event) {
+  onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: Event) {
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
@@ -171,7 +173,7 @@ export abstract class ITextKeyBehavior<
       this.updateFromTextArea();
       this.fire('changed');
       if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
+        this.canvas.fire('text:changed', { target: this as unknown as IText });
         this.canvas.requestRenderAll();
       }
     };
@@ -189,7 +191,7 @@ export abstract class ITextKeyBehavior<
       selectionStart = this.selectionStart,
       selectionEnd = this.selectionEnd,
       selection = selectionStart !== selectionEnd;
-    let copiedStyle,
+    let copiedStyle: TextStyleDeclaration[] | undefined,
       removedText,
       charDiff = nextCharCount - charCount,
       removeFrom,
@@ -234,7 +236,7 @@ export abstract class ITextKeyBehavior<
           () =>
             // this return an array of references, but that is fine since we are
             // copying the style later.
-            copiedStyle[0]
+            copiedStyle![0]
         );
       }
       if (selection) {
@@ -257,7 +259,7 @@ export abstract class ITextKeyBehavior<
         insertedText.join('') === copyPasteData.copiedText &&
         !config.disableStyleCopyPaste
       ) {
-        copiedStyle = copyPasteData.copiedTextStyle;
+        copiedStyle = copyPasteData.copiedStyle;
       }
       this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
     }
@@ -279,7 +281,7 @@ export abstract class ITextKeyBehavior<
   }
 
   //  */
-  onCompositionUpdate(e) {
+  onCompositionUpdate(e: ) {
     this.compositionStart = e.target.selectionStart;
     this.compositionEnd = e.target.selectionEnd;
     this.updateTextareaPosition();
@@ -296,13 +298,13 @@ export abstract class ITextKeyBehavior<
     const { copyPasteData } = getEnv();
     copyPasteData.copiedText = this.getSelectedText();
     if (!config.disableStyleCopyPaste) {
-      copyPasteData.copiedTextStyle = this.getSelectionStyles(
+      copyPasteData.copiedStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
         true
       );
     } else {
-      copyPasteData.copiedTextStyle = null;
+      copyPasteData.copiedStyle = undefined;
     }
     this._copyDone = true;
   }

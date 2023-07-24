@@ -1,11 +1,23 @@
-import type { IText } from './IText';
-export type TKeyMapIText = Record<KeyboardEvent['keyCode'], keyof IText>;
+export type TKeyMapIText = Record<
+  KeyboardEvent['keyCode'],
+  CursorHandlingMethods
+>;
 
-const MOVE_CURSOR_UP = 'moveCursorUp';
-const MOVE_CURSOR_DOWN = 'moveCursorDown';
-const MOVE_CURSOR_LEFT = 'moveCursorLeft';
-const MOVE_CURSOR_RIGHT = 'moveCursorRight';
-const EXIT_EDITING = 'exitEditing';
+export type CursorHandlingMethods =
+  | 'moveCursorUp'
+  | 'moveCursorDown'
+  | 'moveCursorLeft'
+  | 'moveCursorRight'
+  | 'exitEditing'
+  | 'copy'
+  | 'cut'
+  | 'selectAll';
+
+const MOVE_CURSOR_UP: CursorHandlingMethods = 'moveCursorUp';
+const MOVE_CURSOR_DOWN: CursorHandlingMethods = 'moveCursorDown';
+const MOVE_CURSOR_LEFT: CursorHandlingMethods = 'moveCursorLeft';
+const MOVE_CURSOR_RIGHT: CursorHandlingMethods = 'moveCursorRight';
+const EXIT_EDITING: CursorHandlingMethods = 'exitEditing';
 
 // @TODO look into import { Key } from 'ts-key-enum';
 // and transition from keyCode to Key
