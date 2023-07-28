@@ -18,6 +18,13 @@ export {
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
 export * from './misc/projectStroke';
+export type {
+  TComposeMatrixArgs,
+  TQrDecomposeOut,
+  TRotateMatrixArgs,
+  TScaleMatrixArgs,
+  TTranslateMatrixArgs,
+} from './misc/matrix';
 export {
   transformPoint,
   invertTransform,
@@ -32,6 +39,8 @@ export {
   multiplyTransformMatrices,
   multiplyTransformMatrixArray,
   isIdentityMatrix,
+  angleToSkew,
+  skewToAngle,
 } from './misc/matrix';
 export type { TextStyleArray } from './misc/textStyles';
 export {
