@@ -2,17 +2,30 @@ import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import imports from '../imports';
+import webFontConfig from '../webFontConfig';
 import { JSDOM } from 'jsdom';
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
   // expose imports for consumption
-  page.addScriptTag({
+  await page.addScriptTag({
     type: 'importmap',
     content: JSON.stringify({
       imports,
     }),
   });
+  // load fonts
+  await page.addScriptTag({
+    type: 'module',
+    content: `import 'webfontloader';`,
+  });
+  await page.evaluate(
+    (config) =>
+      new Promise((resolve) =>
+        window.WebFont.load({ ...config, active: resolve })
+      ),
+    webFontConfig
+  );
   // add test script
   const testDir = path.relative(
     path.resolve(process.cwd(), 'e2e', 'tests'),

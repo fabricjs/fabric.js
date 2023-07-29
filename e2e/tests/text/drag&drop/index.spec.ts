@@ -28,7 +28,6 @@ test('Drag & Drop', async ({ page }) => {
     expect(await canvas.screenshot()).toMatchSnapshot({
       name: 'drag_a_over_b.png',
     });
-    // await
     await page.mouse.move(240, 140, { steps: 40 });
     expect(await canvas.screenshot()).toMatchSnapshot({
       name: 'drop_before_a.png',
@@ -70,7 +69,7 @@ test('Drag & Drop', async ({ page }) => {
         y: 280,
       },
       targetPosition: {
-        x: 130,
+        x: 120,
         y: 55,
       },
     });

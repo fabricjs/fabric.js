@@ -87,7 +87,7 @@ beforeAll(
     const textValue = 'fabric.js sandbox';
     const a = new fabric.Textbox(textValue, {
       originX: 'center',
-      width: 200,
+      width: 210,
       left: 150,
       top: 20,
       splitByGrapheme: true,
