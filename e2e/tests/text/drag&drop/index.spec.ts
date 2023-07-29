@@ -26,15 +26,15 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.move(0, 140, { steps: 40 });
     await page.mouse.move(435, 55, { steps: 40 });
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: '1.drag_fabric_over_lor|em.png',
+      name: '1.drag-fabric-over-lor|em.png',
     });
     await page.mouse.move(240, 140, { steps: 40 });
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: '2.before_drop_fabric_after_sandbox.png',
+      name: '2.before-drop-fabric-after-sandbox.png',
     });
     await page.mouse.up();
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: '3.drop_fabric_after_sandbox.png',
+      name: '3.drop-fabric-after-sandbox.png',
     });
   });
 
@@ -50,7 +50,7 @@ test('Drag & Drop', async ({ page }) => {
       },
     });
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: '4.drop_lor|fabric|em.png',
+      name: '4.drop--lor|fabric|em.png',
     });
   });
 
@@ -150,10 +150,10 @@ test('Drag Image A', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image_fabric.png',
+      name: 'drag-image-fabric.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image_fabric.json',
+      name: 'drag-image-fabric.json',
     });
   });
 });
@@ -182,10 +182,10 @@ test('Drag Image B', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image_em...tge.png',
+      name: 'drag-image-em---tge.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image_em...tge.json',
+      name: 'drag-image-em---tge.json',
     });
   });
 });
