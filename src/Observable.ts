@@ -1,6 +1,6 @@
 export type TEventCallback<T = any> = (options: T) => any;
 
-type EventRegistryObject<E = any> = {
+type EventRegistryObject<E> = {
   [K in keyof E]?: TEventCallback<E[K]>;
 };
 
@@ -38,11 +38,9 @@ export class Observable<EventSpec> {
     }
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
-      for (const eventName in arg0) {
-        const event = eventName as string as K; // Technically eventName can be also a number or symbol
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        this.on<K, EventSpec[K]>(event, arg0[event]!);
-      }
+      Object.entries(arg0).forEach(([eventName, handler]) => {
+        this.on(eventName, handler as TEventCallback);
+      });
       return () => this.off(arg0);
     } else if (handler) {
       const eventName = arg0;
@@ -81,16 +79,14 @@ export class Observable<EventSpec> {
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
       const disposers: VoidFunction[] = [];
-      for (const eventName in arg0) {
-        const event = eventName as string as K; // Technically eventName can be also a number or symbol
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        disposers.push(this.once(event, arg0[event]!));
-      }
+      Object.entries(arg0).forEach(([eventName, handler]) => {
+        disposers.push(this.once(eventName, handler as TEventCallback));
+      });
       return () => disposers.forEach((d) => d());
     } else if (handler) {
       const disposer = this.on<K, E>(
         arg0,
-        function (this: Observable<EventSpec>, ...args) {
+        function onceHandler(this: Observable<EventSpec>, ...args) {
           handler.call(this, ...args);
           disposer();
         }
@@ -155,10 +151,9 @@ export class Observable<EventSpec> {
     }
     // one object with key/value pairs was passed
     else if (typeof arg0 === 'object') {
-      for (const eventName in arg0) {
-        const event = eventName as string as K; // Technically eventName can be also a number or symbol
-        this._removeEventListener(event, arg0[event]);
-      }
+      Object.entries(arg0).forEach(([eventName, handler]) => {
+        this._removeEventListener(eventName as K, handler as TEventCallback);
+      });
     } else {
       this._removeEventListener(arg0, handler);
     }
