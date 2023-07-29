@@ -1,24 +1,11 @@
 // https://github.com/viruscamp/babel-plugin-transform-imports#using-a-function-as-the-transformer
 
-const path = require('path');
+import path from 'path';
+import { createRequire } from 'module';
+
 const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
-const { readJSONSync } = require('fs-extra');
-
-function resolvePath(pathToFile) {
-  return `/${path
-    .relative(
-      process.cwd(),
-      path.isAbsolute(pathToFile)
-        ? pathToFile
-        : path.resolve(process.cwd(), pathToFile)
-    )
-    .replaceAll(/\\/g, '/')}`;
-}
-
-function resolveModule(name) {
-  return resolvePath(require.resolve(name));
-}
+const require = createRequire(process.cwd());
 
 function resolve(file) {
   const found = ['', '.ts', '/index.ts']
@@ -37,7 +24,7 @@ function resolve(file) {
   return require.resolve(found).replace(/\.ts$/, '.js');
 }
 
-module.exports = {
+export default {
   extends: '../.babelrcAlt',
   plugins: [
     [
@@ -57,18 +44,6 @@ module.exports = {
                   : file
               )
               .replaceAll('\\', '/')}`;
-          },
-        },
-        fabric: {
-          skipDefaultConversion: true,
-          transform: function () {
-            return resolvePath(readJSONSync('./package.json').module);
-          },
-        },
-        '.+': {
-          skipDefaultConversion: true,
-          transform: function (importName, [module], filename) {
-            return resolveModule(module);
           },
         },
       },

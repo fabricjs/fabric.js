@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
-import path from 'path';
-import imports from '../imports';
 import { JSDOM } from 'jsdom';
+import path from 'path';
+import * as pkg from '../../package.json';
 
 const fonts = [
   // 'Arial',
@@ -16,13 +16,40 @@ const fonts = [
   'Ubuntu',
 ];
 
+export function resolvePath(pathToFile: string) {
+  return `/${path
+    .relative(
+      process.cwd(),
+      path.isAbsolute(pathToFile)
+        ? pathToFile
+        : path.resolve(process.cwd(), pathToFile)
+    )
+    .replaceAll(/\\/g, '/')}`;
+}
+
+export function resolveModule(name: string) {
+  return resolvePath(require.resolve(name));
+}
+
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
   // expose imports for consumption
   await page.addScriptTag({
     type: 'importmap',
     content: JSON.stringify({
-      imports,
+      imports: Object.keys({
+        ...(pkg.dependencies || {}),
+        ...(pkg.devDependencies || {}),
+        ...(pkg.optionalDependencies || {}),
+      }).reduce(
+        (importmap, key) => {
+          try {
+            importmap[key] = resolveModule(key);
+          } catch (error) {}
+          return importmap;
+        },
+        { fabric: resolvePath(pkg.module) }
+      ),
     }),
   });
   // load fonts
@@ -44,7 +71,7 @@ test.beforeEach(async ({ page }, { file }) => {
     Promise.all([${fonts
       .map(
         (font) =>
-          `new FontFaceObserver('${font}').load(null, 5000).catch(err => console.log('Error loading font ${font}', err))`
+          `new FontFaceObserver('${font}').load().catch(err => console.log('Error loading font ${font}', err))`
       )
       .join(
         ','
