@@ -3,6 +3,22 @@
 const path = require('path');
 const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
+const { readJSONSync } = require('fs-extra');
+
+function resolvePath(pathToFile) {
+  return `/${path
+    .relative(
+      process.cwd(),
+      path.isAbsolute(pathToFile)
+        ? pathToFile
+        : path.resolve(process.cwd(), pathToFile)
+    )
+    .replaceAll(/\\/g, '/')}`;
+}
+
+function resolveModule(name) {
+  return resolvePath(require.resolve(name));
+}
 
 function resolve(file) {
   const found = ['', '.ts', '/index.ts']
@@ -41,6 +57,18 @@ module.exports = {
                   : file
               )
               .replaceAll('\\', '/')}`;
+          },
+        },
+        fabric: {
+          skipDefaultConversion: true,
+          transform: function () {
+            return resolvePath(readJSONSync('./package.json').module);
+          },
+        },
+        '.+': {
+          skipDefaultConversion: true,
+          transform: function (importName, [module], filename) {
+            return resolveModule(module);
           },
         },
       },
