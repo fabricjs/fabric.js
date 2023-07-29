@@ -118,5 +118,5 @@ beforeAll(
     canvas.add(a, b);
     return { a, b };
   },
-  { width: 800, height: 500, enableRetinaScaling: false }
+  { width: 800, height: 500 }
 );
