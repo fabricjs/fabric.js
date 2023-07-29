@@ -26,14 +26,16 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.move(0, 140, { steps: 40 });
     await page.mouse.move(435, 55, { steps: 40 });
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: 'drag_a_over_b.png',
+      name: '1.drag_fabric_over_lor|em.png',
     });
     await page.mouse.move(240, 140, { steps: 40 });
     expect(await canvas.screenshot()).toMatchSnapshot({
-      name: 'drop_before_a.png',
+      name: '2.before_drop_fabric_after_sandbox.png',
     });
     await page.mouse.up();
-    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop.png' });
+    expect(await canvas.screenshot()).toMatchSnapshot({
+      name: '3.drop_fabric_after_sandbox.png',
+    });
   });
 
   await test.step('drag & drop to B(3) = "lor|fabric|em"', async () => {
@@ -47,7 +49,9 @@ test('Drag & Drop', async ({ page }) => {
         y: 55,
       },
     });
-    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop_a_b.png' });
+    expect(await canvas.screenshot()).toMatchSnapshot({
+      name: '4.drop_lor|fabric|em.png',
+    });
   });
 
   await test.step('select B', async () => {
@@ -73,7 +77,9 @@ test('Drag & Drop', async ({ page }) => {
         y: 55,
       },
     });
-    expect(await canvas.screenshot()).toMatchSnapshot({ name: 'drop_b_a.png' });
+    expect(await canvas.screenshot()).toMatchSnapshot({
+      name: '5..js |em ips.png',
+    });
   });
 });
 
@@ -144,10 +150,10 @@ test('Drag Image A', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image_a.png',
+      name: 'drag_image_fabric.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image_a.json',
+      name: 'drag_image_fabric.json',
     });
   });
 });
@@ -176,10 +182,10 @@ test('Drag Image B', async ({ page }) => {
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
-      name: 'drag_image_b.png',
+      name: 'drag_image_em...tge.png',
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
-      name: 'drag_image_b.json',
+      name: 'drag_image_em...tge.json',
     });
   });
 });
