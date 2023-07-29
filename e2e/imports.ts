@@ -26,4 +26,5 @@ function resolveModule(name: string) {
 export default {
   fabric: resolvePath(readJSONSync('./package.json').module),
   webfontloader: resolveModule('webfontloader'),
+  fontfaceobserver: resolveModule('fontfaceobserver'),
 };

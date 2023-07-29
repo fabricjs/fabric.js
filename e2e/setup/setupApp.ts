@@ -2,8 +2,19 @@ import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import imports from '../imports';
-import webFontConfig from '../webFontConfig';
 import { JSDOM } from 'jsdom';
+
+const fonts = [
+  // 'Arial',
+  'Courier',
+  'Times New Roman',
+  'Engagement',
+  'Lacquer',
+  'Poppins',
+  'Plaster',
+  // 'Monaco',
+  'Ubuntu',
+];
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
@@ -15,17 +26,31 @@ test.beforeEach(async ({ page }, { file }) => {
     }),
   });
   // load fonts
+  const fontURL = `https://fonts.googleapis.com/css?family=${fonts
+    .map((name) => `${name.replaceAll(' ', '+')}`)
+    .join('|')}`;
+  await page.addStyleTag({
+    url: fontURL,
+  });
+  const trigger = page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        window.addEventListener('fonts:loaded', resolve, { once: true })
+      )
+  );
   await page.addScriptTag({
     type: 'module',
-    content: `import 'webfontloader';`,
+    content: `import 'fontfaceobserver';
+    Promise.all([${fonts
+      .map(
+        (font) =>
+          `new FontFaceObserver('${font}').load(null, 5000).catch(err => console.log('Error loading font ${font}', err))`
+      )
+      .join(
+        ','
+      )}]).then(() => window.dispatchEvent(new CustomEvent('fonts:loaded')))`,
   });
-  await page.evaluate(
-    (config) =>
-      new Promise((resolve) =>
-        window.WebFont.load({ ...config, active: resolve })
-      ),
-    webFontConfig
-  );
+  await trigger;
   // add test script
   const testDir = path.relative(
     path.resolve(process.cwd(), 'e2e', 'tests'),
