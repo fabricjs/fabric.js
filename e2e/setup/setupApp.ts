@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import { JSDOM } from 'jsdom';
+import { createRequire } from 'module';
 import path from 'path';
 import * as pkg from '../../package.json';
 
@@ -16,7 +17,7 @@ const fonts = [
   'Ubuntu',
 ];
 
-export function resolvePath(pathToFile: string) {
+function resolvePath(pathToFile: string) {
   return `/${path
     .relative(
       process.cwd(),
@@ -27,7 +28,9 @@ export function resolvePath(pathToFile: string) {
     .replaceAll(/\\/g, '/')}`;
 }
 
-export function resolveModule(name: string) {
+const require = createRequire(path.resolve(process.cwd(), 'node_modules'));
+
+function resolveModule(name: string) {
   return resolvePath(require.resolve(name));
 }
 
