@@ -29,7 +29,7 @@ test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
         'node snapshot should match browser snapshot'
       ).toMatchSnapshot({ name: 'textbox.png' });
     } else {
-      test.step('Run the test again after updating snapshots', () => {
+      test.step('Run the test again after updating snapshots to ensure node snapshots pass', () => {
         test.fail();
       });
     }
