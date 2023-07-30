@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { CanvasUtil } from '../../utils/CanvasUtil';
 import { createNodeSnapshot } from '../../utils/createNodeSnapshot';
+import { render } from './common';
 
 import '../../setup';
-import { render } from './common';
 
 /**
  * **CAUTION**:
