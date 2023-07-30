@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import { createRequire } from 'module';
 import path from 'path';
 import * as pkg from '../../package.json';
+import { setupFonts } from './setupFonts';
 
 const fonts = [
   // 'Arial',
@@ -55,32 +56,7 @@ test.beforeEach(async ({ page }, { file }) => {
       ),
     }),
   });
-  // load fonts
-  const fontURL = `https://fonts.googleapis.com/css?family=${fonts
-    .map((name) => `${name.replaceAll(' ', '+')}`)
-    .join('|')}`;
-  await page.addStyleTag({
-    url: fontURL,
-  });
-  const trigger = page.evaluate(
-    () =>
-      new Promise((resolve) =>
-        window.addEventListener('fonts:loaded', resolve, { once: true })
-      )
-  );
-  await page.addScriptTag({
-    type: 'module',
-    content: `import 'fontfaceobserver';
-    Promise.all([${fonts
-      .map(
-        (font) =>
-          `new FontFaceObserver('${font}').load().catch(err => console.log('Error loading font ${font}', err))`
-      )
-      .join(
-        ','
-      )}]).then(() => window.dispatchEvent(new CustomEvent('fonts:loaded')))`,
-  });
-  await trigger;
+  await setupFonts(page);
   // add test script
   const testDir = path.relative(
     path.resolve(process.cwd(), 'e2e', 'tests'),
