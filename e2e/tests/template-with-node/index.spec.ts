@@ -18,10 +18,7 @@ test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
   // node
   !updateSnapshots &&
     expect(
-      await createNodeSnapshot(render, {
-        width: 300,
-        height: 100,
-      }),
+      await createNodeSnapshot(render),
       'node snapshot should match browser snapshot'
     ).toMatchSnapshot({ name: 'textbox.png' });
 });
