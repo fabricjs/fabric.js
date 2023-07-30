@@ -8,6 +8,8 @@ import { render } from './common';
 /**
  * **CAUTION**:
  * When updating snapshots we want the browser snapshot to be committed and not the node snapshot
+ * so we disable the node test.
+ * This means that you should run tests once again after updating snapshots to ensure node snapshots pass.
  */
 test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
   const canvasUtil = new CanvasUtil(page);
