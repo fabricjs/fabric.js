@@ -56,7 +56,9 @@ export function before(
  * @param options canvas options
  */
 export function beforeAll(
-  cb: (canvas: Canvas) => AsyncReturnValue<Record<string, FabricObject>>,
+  cb: (
+    canvas: Canvas
+  ) => AsyncReturnValue<Record<string, FabricObject> | undefined>,
   options?
 ) {
   before('#canvas', async (el) => {
