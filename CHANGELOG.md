@@ -2,6 +2,7 @@
 
 ## [next]
 
+- docs(): rm `canvas2pdf` [#9135](https://github.com/fabricjs/fabric.js/pull/9135)
 - ci(e2e): support relative imports [#9108](https://github.com/fabricjs/fabric.js/pull/9108)
 - chore(TS): complete type check [#9119](https://github.com/fabricjs/fabric.js/pull/9119)
 - chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
