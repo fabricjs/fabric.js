@@ -24,7 +24,7 @@ export class ObjectUtil {
     ).evaluate(runInBrowser, context);
   }
 
-  async getObjectCenter() {
+  getObjectCenter() {
     return this.executeInBrowser((object) => object.getCenterPoint());
   }
 
