@@ -24,10 +24,6 @@ export class Observable<EventSpec> {
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  on<K extends string, E>(
-    eventName: K,
-    handler: TEventCallback<E>
-  ): VoidFunction;
   on(handlers: EventRegistryObject<EventSpec>): VoidFunction;
   on<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<EventSpec>,
@@ -39,7 +35,7 @@ export class Observable<EventSpec> {
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
       Object.entries(arg0).forEach(([eventName, handler]) => {
-        this.on(eventName, handler as TEventCallback);
+        this.on(eventName as K, handler as TEventCallback);
       });
       return () => this.off(arg0);
     } else if (handler) {
@@ -67,10 +63,6 @@ export class Observable<EventSpec> {
     eventName: K,
     handler: TEventCallback<E>
   ): VoidFunction;
-  once<K extends string, E>(
-    eventName: K,
-    handler: TEventCallback<E>
-  ): VoidFunction;
   once(handlers: EventRegistryObject<EventSpec>): VoidFunction;
   once<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<EventSpec>,
@@ -80,7 +72,7 @@ export class Observable<EventSpec> {
       // one object with key/value pairs was passed
       const disposers: VoidFunction[] = [];
       Object.entries(arg0).forEach(([eventName, handler]) => {
-        disposers.push(this.once(eventName, handler as TEventCallback));
+        disposers.push(this.once(eventName as K, handler as TEventCallback));
       });
       return () => disposers.forEach((d) => d());
     } else if (handler) {
