@@ -9,7 +9,7 @@ before_commit
 .idea/
 /cli_output/
 /scripts/cli_cache.json
-**/dist
+**/dist/
 /lib/
 /test/
 .next/
