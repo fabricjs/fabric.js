@@ -39,8 +39,6 @@ export {
   multiplyTransformMatrices,
   multiplyTransformMatrixArray,
   isIdentityMatrix,
-  angleToSkew,
-  skewToAngle,
 } from './misc/matrix';
 export type { TextStyleArray } from './misc/textStyles';
 export {
