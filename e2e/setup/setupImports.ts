@@ -13,10 +13,13 @@ function resolvePath(pathToFile: string) {
     )
     .replaceAll(/\\/g, '/')}`;
 }
+
 const require = createRequire(path.resolve(process.cwd(), 'node_modules'));
+
 function resolveModule(name: string) {
   return resolvePath(require.resolve(name));
 }
+
 /**
  * Exposes imports on {@link Page} for consumption by module scripts
  */
