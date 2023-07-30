@@ -7,20 +7,31 @@ import { render } from './common';
 
 /**
  * **CAUTION**:
- * When updating snapshots we want the browser snapshot to be committed and not the node snapshot
+ * When updating snapshots we want the browser snapshot of a test to be committed and not the node snapshot
  * so we disable the node test.
  * This means that you should run tests once again after updating snapshots to ensure node snapshots pass.
+ * In order to enforce that the test will fail.
  */
 test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
-  const canvasUtil = new CanvasUtil(page);
-  // browser
-  expect(await canvasUtil.screenshot(), 'browser snapshot').toMatchSnapshot({
-    name: 'textbox.png',
-  });
-  // node
-  !updateSnapshots &&
+  await test.step('browser', async () => {
     expect(
-      await createNodeSnapshot(render),
-      'node snapshot should match browser snapshot'
-    ).toMatchSnapshot({ name: 'textbox.png' });
+      await new CanvasUtil(page).screenshot(),
+      'browser snapshot'
+    ).toMatchSnapshot({
+      name: 'textbox.png',
+    });
+  });
+
+  await test.step('node', async () => {
+    if (!updateSnapshots) {
+      expect(
+        await createNodeSnapshot(render),
+        'node snapshot should match browser snapshot'
+      ).toMatchSnapshot({ name: 'textbox.png' });
+    } else {
+      test.step('Run the test again after updating snapshots', () => {
+        test.fail();
+      });
+    }
+  });
 });
