@@ -1,61 +1,13 @@
 import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import { JSDOM } from 'jsdom';
-import { createRequire } from 'module';
 import path from 'path';
-import * as pkg from '../../package.json';
 import { setupFonts } from './setupFonts';
-
-const fonts = [
-  // 'Arial',
-  'Courier',
-  'Times New Roman',
-  'Engagement',
-  'Lacquer',
-  'Poppins',
-  'Plaster',
-  // 'Monaco',
-  'Ubuntu',
-];
-
-function resolvePath(pathToFile: string) {
-  return `/${path
-    .relative(
-      process.cwd(),
-      path.isAbsolute(pathToFile)
-        ? pathToFile
-        : path.resolve(process.cwd(), pathToFile)
-    )
-    .replaceAll(/\\/g, '/')}`;
-}
-
-const require = createRequire(path.resolve(process.cwd(), 'node_modules'));
-
-function resolveModule(name: string) {
-  return resolvePath(require.resolve(name));
-}
+import { setupImports } from './setupImports';
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
-  // expose imports for consumption
-  await page.addScriptTag({
-    type: 'importmap',
-    content: JSON.stringify({
-      imports: Object.keys({
-        ...(pkg.dependencies || {}),
-        ...(pkg.devDependencies || {}),
-        ...(pkg.optionalDependencies || {}),
-      }).reduce(
-        (importmap, key) => {
-          try {
-            importmap[key] = resolveModule(key);
-          } catch (error) {}
-          return importmap;
-        },
-        { fabric: resolvePath(pkg.module) }
-      ),
-    }),
-  });
+  await setupImports(page);
   await setupFonts(page);
   // add test script
   const testDir = path.relative(
