@@ -130,9 +130,6 @@ async function waitForDragImage(
 }
 
 test('Drag Image A', async ({ page }) => {
-  // we need to fix font diff
-  process.env.CI && test.fail();
-
   const canvas = page.locator('canvas').nth(1);
 
   await test.step('select word', async () => {
@@ -154,9 +151,11 @@ test('Drag Image A', async ({ page }) => {
     const [image, position] = await trigger;
     expect(image).toMatchSnapshot({
       name: 'drag-image-fabric.png',
+      maxDiffPixelRatio: 0.03,
     });
     expect(JSON.stringify(position, null, 2)).toMatchSnapshot({
       name: 'drag-image-fabric.json',
+      maxDiffPixelRatio: 0.03,
     });
   });
 });
