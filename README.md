@@ -202,7 +202,6 @@ See our ready to use [templates](./.codesandbox/templates/).
 | [Three.js][three.js]           | 3D graphics          |
 | [PixiJS][pixijs]               | WebGL renderer       |
 | [Konva][konva]                 | Similar features     |  ❌  |
-| [Canvas2PDF][canvas2pdf]       | PDF renderer         |
 | [html-to-image][html-to-image] | HTML to image/canvas |
 
 ## More Resources
@@ -230,7 +229,6 @@ See our ready to use [templates](./.codesandbox/templates/).
 
 [asturur]: https://github.com/asturur
 [asturur_twitter]: https://twitter.com/AndreaBogazzi
-[canvas2pdf]: https://github.com/joshua-gould/canvas2pdf
 [cdnjs]: https://cdnjs.com/libraries/fabric.js
 [code_triage]: https://www.codetriage.com/kangax/fabric.js
 [codepens]: https://codepen.io/tag/fabricjs
