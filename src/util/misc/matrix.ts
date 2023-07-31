@@ -6,11 +6,11 @@ import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
 
-type TRotateMatrixArgs = {
+export type TRotateMatrixArgs = {
   angle?: TDegree;
 };
 
-type TTranslateMatrixArgs = {
+export type TTranslateMatrixArgs = {
   translateX?: number;
   translateY?: number;
 };
@@ -37,6 +37,7 @@ export const isIdentityMatrix = (mat: TMat2D) =>
 
 /**
  * Apply transform t to point p
+ * @deprecated use {@link Point#transform}
  * @param  {Point | XY} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied

@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(TS): Fix event types and .once this binding [#9119](https://github.com/fabricjs/fabric.js/pull/9130)
+- chore(TS): export types [#9129](https://github.com/fabricjs/fabric.js/pull/9129)
 - ci(e2e): support relative imports [#9108](https://github.com/fabricjs/fabric.js/pull/9108)
 - chore(TS): complete type check [#9119](https://github.com/fabricjs/fabric.js/pull/9119)
 - chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
