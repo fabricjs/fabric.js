@@ -2,7 +2,11 @@
 
 ## [next]
 
-- ci(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
+- test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
+- test(playwright): Use embedded eval from playwright [#9133](https://github.com/fabricjs/fabric.js/pull/9133)
+- chore(TS): Fix event types and .once this binding [#9119](https://github.com/fabricjs/fabric.js/pull/9130)
+- docs(): rm `canvas2pdf` [#9135](https://github.com/fabricjs/fabric.js/pull/9135)
+- chore(TS): export types [#9129](https://github.com/fabricjs/fabric.js/pull/9129)
 - ci(e2e): support relative imports [#9108](https://github.com/fabricjs/fabric.js/pull/9108)
 - chore(TS): complete type check [#9119](https://github.com/fabricjs/fabric.js/pull/9119)
 - chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
