@@ -14,18 +14,15 @@ export class CanvasUtil {
       .screenshot({ omitBackground: true, ...options });
   }
 
-  executeInBrowser<C, R>(
+  async executeInBrowser<C, R>(
     runInBrowser: (canvas: Canvas, context: C) => R,
     context: C
   ): Promise<R> {
-    return this.page.evaluate(
-      ([selector, runInBrowser, context]) => {
-        return eval(runInBrowser)(
-          canvasMap.get(document.querySelector(selector)),
-          context
-        );
-      },
-      [this.selector, runInBrowser.toString(), context] as const
-    );
+    return (
+      await this.page.evaluateHandle<Canvas>(
+        ([selector]) => canvasMap.get(document.querySelector(selector)),
+        [this.selector]
+      )
+    ).evaluate(runInBrowser, context);
   }
 }
