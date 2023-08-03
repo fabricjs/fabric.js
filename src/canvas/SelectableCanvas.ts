@@ -147,13 +147,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare centeredKey: TOptionalModifierKey;
   declare altActionKey: TOptionalModifierKey;
 
-  /**
-   * Indicates that canvas is interactive. This property should not be changed.
-   * @type Boolean
-   * @default
-   */
-  interactive = true;
-
   declare selection: boolean;
   declare selectionKey: TOptionalModifierKey | ModifierKey[];
   declare altSelectionKey: TOptionalModifierKey;

@@ -182,11 +182,6 @@
     assert.equal(canvas.altActionKey, 'shiftKey', 'default is shift');
   });
 
-  QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive === 'boolean');
-    assert.ok(canvas.interactive, 'default is true');
-  });
-
   QUnit.test('selection', function(assert) {
     assert.ok(typeof canvas.selection === 'boolean');
     assert.ok(canvas.selection, 'default is true');
