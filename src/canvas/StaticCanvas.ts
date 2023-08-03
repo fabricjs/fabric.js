@@ -1068,13 +1068,9 @@ export class StaticCanvas<
     const clipPath = this.clipPath;
     if (clipPath) {
       clipPath.clipPathId = `CLIPPATH_${uid()}`;
-      return (
-        '<clipPath id="' +
-        clipPath.clipPathId +
-        '" >\n' +
-        this.clipPath.toClipPathSVG(options.reviver) +
-        '</clipPath>\n'
-      );
+      return `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(
+        options.reviver
+      )}</clipPath>\n`;
     }
     return '';
   }
