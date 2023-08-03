@@ -11,7 +11,7 @@ import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
 
@@ -39,7 +39,7 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends Text<Props, SProps, EventSpec> {
