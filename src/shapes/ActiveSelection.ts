@@ -43,7 +43,7 @@ export class ActiveSelection extends Group {
     //  noop
   }
 
-  select(...targets: FabricObject[]) {
+  selectAll(...targets: FabricObject[]) {
     this.add(...targets);
   }
 
