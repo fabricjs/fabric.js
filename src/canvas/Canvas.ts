@@ -1570,7 +1570,7 @@ export class Canvas extends SelectableCanvas {
       this.setActiveObject(objects[0], e);
     } else if (objects.length > 1) {
       // add to active selection and make it the active object
-      this._activeSelection.add(...objects);
+      this._activeSelection.batchSelectAdd(...objects);
       this.setActiveObject(this._activeSelection, e);
     }
 
