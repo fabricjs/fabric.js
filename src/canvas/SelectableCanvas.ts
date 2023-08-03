@@ -136,7 +136,7 @@ import { canvasDefaults } from './CanvasOptions';
  */
 export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   extends StaticCanvas<EventSpec>
-  implements CanvasOptions
+  implements Omit<CanvasOptions, 'enablePointerEvents'>
 {
   declare _objects: FabricObject[];
   /**
