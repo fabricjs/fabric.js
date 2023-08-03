@@ -1,10 +1,9 @@
-import type { TClassProperties } from '../typedefs';
+import type { TClassProperties, TProps } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
 import type { TextStyleDeclaration } from './Text/StyledText';
-import type { TProps } from './Object/types';
 import type { SerializedITextProps, ITextProps } from './IText/IText';
 import type { ITextEvents } from './IText/ITextBehavior';
 import type { TextLinesInfo } from './Text/Text';

@@ -4,7 +4,7 @@ import { capValue } from '../../util/misc/capValue';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextBehavior } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
-import type { TProps } from '../Object/types';
+import type { TProps } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';

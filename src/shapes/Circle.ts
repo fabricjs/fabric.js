@@ -6,12 +6,8 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { Abortable, TClassProperties } from '../typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { Abortable, TClassProperties, TProps } from '../typedefs';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
 
 interface UniqueCircleProps {

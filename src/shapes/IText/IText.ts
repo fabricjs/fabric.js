@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller } from '../../typedefs';
+import type { TFiller, TProps } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -17,7 +17,6 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
-import type { TProps } from '../Object/types';
 
 type CursorBoundaries = {
   left: number;

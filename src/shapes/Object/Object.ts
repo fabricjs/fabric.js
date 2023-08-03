@@ -18,6 +18,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   Abortable,
+  TProps,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -51,7 +52,6 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import type { TProps } from './types';
 import { getEnv } from '../../env';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &

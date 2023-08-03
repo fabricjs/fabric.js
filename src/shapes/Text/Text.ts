@@ -14,6 +14,7 @@ import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
+  TProps,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
@@ -29,11 +30,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { StylePropertiesType } from './constants';
 import {
   additionalProps,

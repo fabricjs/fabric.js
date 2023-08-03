@@ -7,7 +7,7 @@ import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
-import type { TProps } from '../Object/types';
+import type { TProps } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 
 // TODO: this code seems wrong.

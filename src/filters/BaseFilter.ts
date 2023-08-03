@@ -6,6 +6,7 @@ import type {
   TWebGLPipelineState,
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
+  Abortable,
 } from './typedefs';
 import { isWebGLPipelineState } from './utils';
 import {
@@ -13,7 +14,6 @@ import {
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
-import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**

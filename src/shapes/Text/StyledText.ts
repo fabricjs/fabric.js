@@ -1,9 +1,6 @@
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
+import type { TProps } from '../../typedefs';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';

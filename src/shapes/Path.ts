@@ -18,13 +18,9 @@ import type {
   TPathSegmentInfo,
   TSimplePathData,
 } from '../util/path/typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type { TBBox, TClassProperties, TSVGReviver, TProps } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
