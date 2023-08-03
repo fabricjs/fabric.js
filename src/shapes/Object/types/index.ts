@@ -1,5 +1,5 @@
 import type { FabricObjectProps } from './FabricObjectProps';
-import { TOptions } from '../../../typedefs';
+import type { TOptions } from '../../../typedefs';
 
 export type { SerializedObjectProps } from './SerializedObjectProps';
 export type { FabricObjectProps };
