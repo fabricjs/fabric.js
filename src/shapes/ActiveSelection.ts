@@ -43,7 +43,7 @@ export class ActiveSelection extends Group {
     //  noop
   }
 
-  batchSelectAdd(...targets: FabricObject[]) {
+  select(...targets: FabricObject[]) {
     this.add(...targets);
   }
 
@@ -51,7 +51,7 @@ export class ActiveSelection extends Group {
    * Adds objects with respect to {@link multiSelectionStacking}
    * @param targets object to add to selection
    */
-  multiSelectAdd(...targets: FabricObject[]) {
+  multiSelect(...targets: FabricObject[]) {
     if (this.multiSelectionStacking === 'selection-order') {
       this.add(...targets);
     } else {
