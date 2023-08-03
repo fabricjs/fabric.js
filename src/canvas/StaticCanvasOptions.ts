@@ -31,7 +31,7 @@ interface CanvasDrawableOptions {
   backgroundImage?: FabricObject;
 
   /**
-   * if set to false overlya image is not affected by viewport transform
+   * if set to false overlay image is not affected by viewport transform
    * @since 1.6.3
    * @type Boolean
    * @todo we should really find a different way to do this

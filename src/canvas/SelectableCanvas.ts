@@ -140,6 +140,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 {
   declare _objects: FabricObject[];
 
+  // transform config
   declare uniformScaling: boolean;
   declare uniScaleKey: TOptionalModifierKey;
   declare centeredScaling: boolean;
@@ -147,6 +148,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare centeredKey: TOptionalModifierKey;
   declare altActionKey: TOptionalModifierKey;
 
+  // selection config
   declare selection: boolean;
   declare selectionKey: TOptionalModifierKey | ModifierKey[];
   declare altSelectionKey: TOptionalModifierKey;
@@ -156,6 +158,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare selectionLineWidth: number;
   declare selectionFullyContained: boolean;
 
+  // cursors
   declare hoverCursor: CSSStyleDeclaration['cursor'];
   declare moveCursor: CSSStyleDeclaration['cursor'];
   declare defaultCursor: CSSStyleDeclaration['cursor'];
@@ -164,6 +167,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   declare containerClass: string;
 
+  // target find config
   declare perPixelTargetFind: boolean;
   declare targetFindTolerance: number;
   declare skipTargetFind: boolean;
@@ -180,6 +184,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   declare preserveObjectStacking: boolean;
 
+  // event config
   declare stopContextMenu: boolean;
   declare fireRightClick: boolean;
   declare fireMiddleClick: boolean;
