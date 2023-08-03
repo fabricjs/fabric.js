@@ -41,7 +41,6 @@ export { PatternBrush } from './src/brushes/PatternBrush';
 
 export { FabricObject as Object } from './src/shapes/Object/FabricObject';
 export type {
-  TProps,
   TFabricObjectProps,
   FabricObjectProps,
   SerializedObjectProps,
