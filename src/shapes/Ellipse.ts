@@ -1,7 +1,7 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { Abortable, TClassProperties, TProps } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
@@ -27,7 +27,7 @@ export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
-    Props extends TProps<EllipseProps> = Partial<EllipseProps>,
+    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >

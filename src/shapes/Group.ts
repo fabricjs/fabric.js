@@ -3,7 +3,7 @@ import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
-import type { TClassProperties, TSVGReviver, TProps } from '../typedefs';
+import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -1088,7 +1088,7 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TProps<SerializedGroupProps>>({
+  static fromObject<T extends TOptions<SerializedGroupProps>>({
     objects = [],
     ...options
   }: T) {

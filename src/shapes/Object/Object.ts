@@ -18,7 +18,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   Abortable,
-  TProps,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -98,7 +98,7 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -1577,7 +1577,7 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends TProps<SerializedObjectProps>>(
+  static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
     options?: Abortable
   ) {

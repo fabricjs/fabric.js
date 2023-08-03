@@ -4,7 +4,7 @@ import { capValue } from '../../util/misc/capValue';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextBehavior } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
-import type { TProps } from '../../typedefs';
+import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
@@ -12,7 +12,7 @@ import type { IText } from './IText';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextBehavior<Props, SProps, EventSpec> {

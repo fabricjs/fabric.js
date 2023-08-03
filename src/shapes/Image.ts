@@ -8,7 +8,7 @@ import type {
   TCrossOrigin,
   TSize,
   Abortable,
-  TProps,
+  TOptions,
 } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
@@ -75,7 +75,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 export class Image<
-    Props extends TProps<ImageProps> = Partial<ImageProps>,
+    Props extends TOptions<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -788,7 +788,7 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject<T extends TProps<SerializedImageProps>>(
+  static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
     options: Abortable = {}
   ) {
@@ -817,7 +817,7 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL<T extends TProps<ImageProps>>(
+  static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
     imageOptions: T

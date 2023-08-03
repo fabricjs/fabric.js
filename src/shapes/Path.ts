@@ -20,7 +20,12 @@ import type {
 } from '../util/path/typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import type { TBBox, TClassProperties, TSVGReviver, TProps } from '../typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+} from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
@@ -43,7 +48,7 @@ export interface IPathBBox extends TBBox {
 }
 
 export class Path<
-  Props extends TProps<PathProps> = Partial<PathProps>,
+  Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -397,7 +402,7 @@ export class Path<
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
     return this._fromObject<Path>(object, {
       extraParam: 'path',
     });

@@ -1,6 +1,6 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { Abortable, TClassProperties, TProps } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
@@ -27,7 +27,7 @@ export interface SerializedLineProps
     UniqueLineProps {}
 
 export class Line<
-    Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedLineProps = SerializedLineProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -263,7 +263,7 @@ export class Line<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
-  static fromObject<T extends TProps<SerializedLineProps>>({
+  static fromObject<T extends TOptions<SerializedLineProps>>({
     x1,
     y1,
     x2,

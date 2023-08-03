@@ -1,4 +1,4 @@
-import type { TClassProperties, TProps } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
@@ -51,7 +51,7 @@ export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
  * wrapping of lines.
  */
 export class Textbox<
-    Props extends TProps<TextboxProps> = Partial<TextboxProps>,
+    Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
     SProps extends SerializedTextboxProps = SerializedTextboxProps,
     EventSpec extends ITextEvents = ITextEvents
   >

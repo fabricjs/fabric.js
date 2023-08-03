@@ -1,6 +1,6 @@
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
-import type { TProps } from '../../typedefs';
+import type { TOptions } from '../../typedefs';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
@@ -16,7 +16,7 @@ export type TextStyle = {
 };
 
 export abstract class StyledText<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
