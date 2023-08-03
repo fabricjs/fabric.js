@@ -14,8 +14,10 @@ export type {
   TCanvasSizeOptions,
   TSVGExportOptions,
 } from './src/canvas/StaticCanvas';
+export type { StaticCanvasOptions } from './src/canvas/StaticCanvasOptions';
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
+export type { CanvasOptions } from './src/canvas/CanvasOptions';
 export { CanvasDOMManager } from './src/canvas/DOMManagers/CanvasDOMManager';
 export { StaticCanvasDOMManager } from './src/canvas/DOMManagers/StaticCanvasDOMManager';
 

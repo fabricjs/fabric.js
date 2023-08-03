@@ -352,7 +352,6 @@ export class InteractiveFabricObject<
   drawSelectionBackground(ctx: CanvasRenderingContext2D): void {
     if (
       !this.selectionBackgroundColor ||
-      (this.canvas && !this.canvas.interactive) ||
       (this.canvas && (this.canvas._activeObject as unknown as this) !== this)
     ) {
       return;
