@@ -19,48 +19,26 @@ import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
-import type { TMat2D, TOriginX, TOriginY, TSize } from '../typedefs';
+import type {
+  TMat2D,
+  TOriginX,
+  TOriginY,
+  TSize,
+  TSVGReviver,
+  TOptions,
+} from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
-import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
-
-export const DefaultCanvasProperties = {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-};
+import type { CanvasOptions } from './CanvasOptions';
+import { canvasDefaults } from './CanvasOptions';
 
 /**
  * Canvas class
@@ -156,9 +134,10 @@ export const DefaultCanvasProperties = {
  * });
  *
  */
-export class SelectableCanvas<
-  EventSpec extends CanvasEvents = CanvasEvents
-> extends StaticCanvas<EventSpec> {
+export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
+  extends StaticCanvas<EventSpec>
+  implements CanvasOptions
+{
   declare _objects: FabricObject[];
   /**
    * When true, objects can be transformed by one side (unproportionally)
@@ -492,7 +471,7 @@ export class SelectableCanvas<
    */
   protected declare _target?: FabricObject;
 
-  static ownDefaults: Record<string, any> = DefaultCanvasProperties;
+  static ownDefaults: Record<string, any> = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
@@ -516,7 +495,10 @@ export class SelectableCanvas<
   declare _activeObject?: FabricObject;
   protected readonly _activeSelection: ActiveSelection;
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<CanvasOptions> = {}
+  ) {
     super(el, options);
     this._activeSelection = new ActiveSelection([], { canvas: this });
   }

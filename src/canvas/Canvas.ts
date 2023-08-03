@@ -12,6 +12,7 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { TOptions } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -19,6 +20,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/typeAssertions';
+import type { CanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -117,7 +119,10 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<CanvasOptions> = {}
+  ) {
     super(el, options);
     // bind event handlers
     (

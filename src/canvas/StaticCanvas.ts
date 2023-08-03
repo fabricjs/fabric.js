@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { CENTER, iMatrix, VERSION } from '../constants';
+import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
@@ -18,6 +18,7 @@ import type {
   TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
+  TOptions,
 } from '../typedefs';
 import {
   cancelAnimFrame,
@@ -43,6 +44,8 @@ import {
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { StaticCanvasOptions } from './staticCanvasOptions';
+import { staticCanvasDefaults } from './staticCanvasOptions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -63,25 +66,6 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-export const StaticCanvasDefaults = {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-};
-
 /**
  * Static canvas class
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
@@ -93,8 +77,11 @@ export const StaticCanvasDefaults = {
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
-  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
+    EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+  >
+  extends createCollectionMixin(CommonMethods<CanvasEvents>)
+  implements StaticCanvasOptions
+{
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
@@ -110,7 +97,7 @@ export class StaticCanvas<
    * @type FabricObject
    * @default
    */
-  declare backgroundImage: FabricObject | null;
+  declare backgroundImage?: FabricObject;
 
   /**
    * Overlay color of canvas instance.
@@ -128,7 +115,7 @@ export class StaticCanvas<
    * @type FabricObject
    * @default
    */
-  declare overlayImage: FabricObject | null;
+  declare overlayImage?: FabricObject;
 
   /**
    * Indicates whether toObject/toDatalessObject should include default values
@@ -284,7 +271,7 @@ export class StaticCanvas<
 
   declare elements: StaticCanvasDOMManager;
 
-  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+  static ownDefaults = staticCanvasDefaults;
 
   // reference to
   protected declare __cleanupTask?: {
@@ -296,7 +283,10 @@ export class StaticCanvas<
     return StaticCanvas.ownDefaults;
   }
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<StaticCanvasOptions> = {}
+  ) {
     super();
     Object.assign(
       this,
@@ -585,8 +575,8 @@ export class StaticCanvas<
    */
   clear() {
     this.remove(...this.getObjects());
-    this.backgroundImage = null;
-    this.overlayImage = null;
+    this.backgroundImage = undefined;
+    this.overlayImage = undefined;
     this.backgroundColor = '';
     this.overlayColor = '';
     this.clearContext(this.getContext());
@@ -1615,11 +1605,11 @@ export class StaticCanvas<
     if (this.backgroundImage) {
       this.backgroundImage.dispose();
     }
-    this.backgroundImage = null;
+    this.backgroundImage = undefined;
     if (this.overlayImage) {
       this.overlayImage.dispose();
     }
-    this.overlayImage = null;
+    this.overlayImage = undefined;
     this.elements.dispose();
   }
 
