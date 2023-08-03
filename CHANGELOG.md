@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(ActiveSelection): expose `select` [#9141](https://github.com/fabricjs/fabric.js/pull/9141)
 - test(playwright): Use embedded eval from playwright [#9133](https://github.com/fabricjs/fabric.js/pull/9133)
 - chore(TS): Fix event types and .once this binding [#9119](https://github.com/fabricjs/fabric.js/pull/9130)
 - docs(): rm `canvas2pdf` [#9135](https://github.com/fabricjs/fabric.js/pull/9135)
