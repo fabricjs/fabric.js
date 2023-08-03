@@ -192,6 +192,7 @@
     var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
     assert.ok('overlayColor' in canvas);
+    assert.ok(canvas.hasOwnProperty('backgroundImage'));
     assert.ok('includeDefaultValues' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
