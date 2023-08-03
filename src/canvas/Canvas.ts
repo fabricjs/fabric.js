@@ -74,11 +74,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
