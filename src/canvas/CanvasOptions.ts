@@ -1,7 +1,7 @@
 import type { ModifierKey, TOptionalModifierKey } from '../EventTypeDefs';
 import type { TColorArg } from '../color/typedefs';
 import type { TOptions } from '../typedefs';
-import type { StaticCanvasOptions } from './staticCanvasOptions';
+import type { StaticCanvasOptions } from './StaticCanvasOptions';
 
 export interface CanvasOptions extends StaticCanvasOptions {
   uniformScaling: boolean;

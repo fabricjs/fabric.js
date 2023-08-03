@@ -44,8 +44,8 @@ import {
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { StaticCanvasOptions } from './staticCanvasOptions';
-import { staticCanvasDefaults } from './staticCanvasOptions';
+import type { StaticCanvasOptions } from './StaticCanvasOptions';
+import { staticCanvasDefaults } from './StaticCanvasOptions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
