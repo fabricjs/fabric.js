@@ -133,7 +133,6 @@ export class ElementsParser {
     const gradient = await classRegistry
       .getSVGClass('gradient')
       .fromElement(gradientDef, this.options, {
-        ...this.options,
         opacity: opacityAttr,
         gradientUnits,
         ...(gradientUnits === 'pixels'
