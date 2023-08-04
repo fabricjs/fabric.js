@@ -10,22 +10,26 @@
  * different sources you will need to import all fabric because you may need all classes.
  */
 
+import type { ParsedViewboxTransform } from './parser/applyViewboxTransform';
 import type { CSSRules } from './parser/typedefs';
-import type { Abortable, Constructor } from './typedefs';
+import type { Constructor } from './typedefs';
+import type { LoadImageOptions } from './util';
 
 export const JSON = 'json';
 export const SVG = 'svg';
 
-export type TJSONResolver<T extends object = any> = Constructor<T> & {
+type ConstructorWithType<T extends object> = Constructor<T> & {
   type: string;
+};
+
+export type TJSONResolver<T extends object = any> = ConstructorWithType<T> & {
   fromObject(data: unknown, options?: unknown): T | Promise<T>;
 };
 
-export type TSVGResolver<T extends object = any> = Constructor<T> & {
-  type: string;
+export type TSVGResolver<T extends object = any> = ConstructorWithType<T> & {
   fromElement(
-    element: SVGElement,
-    options: Abortable,
+    element: Element,
+    options: LoadImageOptions & ParsedViewboxTransform & Record<string, any>,
     cssRules?: CSSRules
   ): T | null | Promise<T | null>;
 };
@@ -84,16 +88,22 @@ export class ClassRegistry {
   }
 
   setClass<T extends object>(
-    classConstructor: TJSONResolver<T>,
+    classConstructor: ConstructorWithType<T>,
     classType?: string
   ) {
     if (classType) {
-      this[JSON].set(classType, classConstructor);
+      this[JSON].set(classType, classConstructor as TJSONResolver<T>);
     } else {
-      this[JSON].set(classConstructor.type, classConstructor);
+      this[JSON].set(
+        classConstructor.type,
+        classConstructor as TJSONResolver<T>
+      );
       // legacy
       // @TODO: needs to be removed in fabric 7 or 8
-      this[JSON].set(classConstructor.type.toLowerCase(), classConstructor);
+      this[JSON].set(
+        classConstructor.type.toLowerCase(),
+        classConstructor as TJSONResolver<T>
+      );
     }
   }
 
@@ -109,12 +119,12 @@ export class ClassRegistry {
   }
 
   setSVGClass<T extends object>(
-    classConstructor: TSVGResolver<T>,
+    classConstructor: ConstructorWithType<T>,
     SVGTagName?: string
   ) {
     this[SVG].set(
       SVGTagName ?? classConstructor.type.toLowerCase(),
-      classConstructor
+      classConstructor as TSVGResolver<T>
     );
   }
 }

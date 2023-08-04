@@ -377,15 +377,23 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
-    { viewBoxWidth, viewBoxHeight, width, height }: SVGParsingOptions,
-    { gradientUnits, opacity, offsetX, offsetY }: SVGOptions
+    {
+      viewBoxWidth,
+      viewBoxHeight,
+      width,
+      height,
+      gradientUnits,
+      opacity,
+      offsetX,
+      offsetY,
+    }: SVGParsingOptions & SVGOptions
   ): Gradient<GradientType> {
     return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
-        width: viewBoxWidth || width,
-        height: viewBoxHeight || height,
+        width: viewBoxWidth || width || 0,
+        height: viewBoxHeight || height || 0,
       }),
       colorStops: parseColorStops(el, opacity),
       gradientUnits,
