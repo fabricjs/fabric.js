@@ -408,3 +408,4 @@ export class Gradient<
 }
 
 classRegistry.setClass(Gradient, 'gradient');
+classRegistry.setSVGClass(Gradient, 'gradient');
