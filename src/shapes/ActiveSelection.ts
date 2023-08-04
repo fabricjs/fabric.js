@@ -1,7 +1,15 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
+import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import type { TOptions } from '../typedefs';
+
+export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
+
+export interface ActiveSelectionOptions extends GroupProps {
+  multiSelectionStacking: MultiSelectionStacking;
+}
 
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
@@ -14,14 +22,13 @@ export class ActiveSelection extends Group {
    * @default `canvas-stacking`
    */
   // TODO FIX THIS WITH THE DEFAULTS LOGIC
-  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
-    'canvas-stacking';
+  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
 
   constructor(
     objects?: FabricObject[],
-    options?: any,
+    options?: TOptions<ActiveSelectionOptions>,
     objectsRelativeToGroup?: boolean
   ) {
     super(objects, options, objectsRelativeToGroup);

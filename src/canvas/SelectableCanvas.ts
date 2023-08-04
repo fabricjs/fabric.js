@@ -25,7 +25,6 @@ import type {
   TOriginY,
   TSize,
   TSVGReviver,
-  TOptions,
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
@@ -37,7 +36,7 @@ import { ActiveSelection } from '../shapes/ActiveSelection';
 import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
-import type { CanvasOptions } from './CanvasOptions';
+import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 
 /**
@@ -298,10 +297,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   constructor(
     el: string | HTMLCanvasElement,
-    options: TOptions<CanvasOptions> = {}
+    { activeSelection = new ActiveSelection(), ...options }: TCanvasOptions = {}
   ) {
     super(el, options);
-    this._activeSelection = new ActiveSelection([], { canvas: this });
+    this._activeSelection = activeSelection;
+    this._activeSelection.set('canvas', this);
   }
 
   protected initElements(el: string | HTMLCanvasElement) {

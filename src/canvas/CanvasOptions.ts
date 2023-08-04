@@ -1,4 +1,5 @@
 import type { ModifierKey, TOptionalModifierKey } from '../EventTypeDefs';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TOptions } from '../typedefs';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 
@@ -258,6 +259,10 @@ export interface CanvasOptions
    */
   preserveObjectStacking: boolean;
 }
+
+export type TCanvasOptions = TOptions<
+  CanvasOptions & { activeSelection: ActiveSelection }
+>;
 
 export const canvasDefaults: TOptions<CanvasOptions> = {
   uniformScaling: true,
