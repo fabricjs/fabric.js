@@ -1,6 +1,6 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { Abortable, TClassProperties, TOptions } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
@@ -10,6 +10,7 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import { makeBoundingBoxFromPoints } from '../util';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
+import type { SVGParsingOptions } from '../parser/elements_parser';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
@@ -241,7 +242,7 @@ export class Line<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {
     const {

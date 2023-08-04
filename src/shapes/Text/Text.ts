@@ -10,7 +10,6 @@ import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type {
-  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
@@ -46,6 +45,7 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
+import type { SVGParsingOptions } from '../../parser/elements_parser';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1820,7 +1820,7 @@ export class Text<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(

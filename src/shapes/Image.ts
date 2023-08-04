@@ -30,6 +30,7 @@ import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
+import type { SVGParsingOptions } from '../parser/elements_parser';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -837,7 +838,7 @@ export class Image<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable = {},
+    options: SVGParsingOptions = {},
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(

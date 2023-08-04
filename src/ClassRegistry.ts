@@ -24,7 +24,7 @@ export type TJSONResolver<T extends object = any> = Constructor<T> & {
 export type TSVGResolver<T extends object = any> = Constructor<T> & {
   type: string;
   fromElement(
-    element: HTMLElement,
+    element: SVGElement,
     options: Abortable,
     cssRules?: CSSRules
   ): T | null | Promise<T | null>;

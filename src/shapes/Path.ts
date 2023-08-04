@@ -29,6 +29,7 @@ import type {
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
+import type { SVGParsingOptions } from '../parser/elements_parser';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -417,7 +418,7 @@ export class Path<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Partial<PathProps>,
+    options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {
     const { d, ...parsedAttributes } = parseAttributes(

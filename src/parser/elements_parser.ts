@@ -33,9 +33,11 @@ type NotParsedFabricObject = FabricObject & {
   clipRule?: CanvasFillRule;
 };
 
+export type SVGParsingOptions = LoadImageOptions & ParsedViewboxTransform;
+
 export class ElementsParser {
   declare elements: Element[];
-  declare options: LoadImageOptions & ParsedViewboxTransform;
+  declare options: SVGParsingOptions;
   declare reviver: TSvgReviverCallback | undefined;
   declare regexUrl: RegExp;
   declare doc: Document;

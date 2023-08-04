@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { Abortable, TClassProperties, TOptions } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
@@ -18,6 +18,7 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
+import type { SVGParsingOptions } from '../parser/elements_parser';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -374,7 +375,7 @@ export class Polyline<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {
     const points = parsePointsAttribute(element.getAttribute('points')),

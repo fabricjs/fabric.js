@@ -6,9 +6,10 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { Abortable, TClassProperties, TOptions } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
+import type { SVGParsingOptions } from '../parser/elements_parser';
 
 interface UniqueCircleProps {
   /**
@@ -203,7 +204,7 @@ export class Circle<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options: SVGParsingOptions,
     cssRules?: CSSRules
   ): Promise<Circle> {
     const {
