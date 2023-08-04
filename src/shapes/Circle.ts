@@ -238,4 +238,3 @@ export class Circle<
 }
 
 classRegistry.setClass(Circle);
-classRegistry.setSVGClass(Circle);

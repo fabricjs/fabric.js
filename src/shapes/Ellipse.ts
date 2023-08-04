@@ -174,4 +174,3 @@ export class Ellipse<
 }
 
 classRegistry.setClass(Ellipse);
-classRegistry.setSVGClass(Ellipse);

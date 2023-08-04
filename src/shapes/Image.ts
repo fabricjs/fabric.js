@@ -857,4 +857,3 @@ export class Image<
 }
 
 classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);
