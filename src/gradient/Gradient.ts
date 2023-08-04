@@ -321,6 +321,14 @@ export class Gradient<
     return gradient;
   }
 
+  static fromObject(options: GradientOptions<'linear'>): Gradient<'linear'>;
+  static fromObject(options: GradientOptions<'radial'>): Gradient<'radial'>;
+  static fromObject(
+    options: GradientOptions<'linear'> | GradientOptions<'radial'>
+  ) {
+    return new this(options);
+  }
+
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
