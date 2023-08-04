@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals';
 import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
@@ -223,7 +224,7 @@ test('fromElement without stop', () => {
   expect(gradient.colorStops[1].offset).toEqual(0);
 });
 
-test('fromElement with x1,x2,y1,2 linear', () => {
+describe('fromElement with x1,x2,y1,2 linear', () => {
   const namespace = 'http://www.w3.org/2000/svg';
   const element = getFabricDocument().createElementNS(
     namespace,
@@ -235,29 +236,29 @@ test('fromElement with x1,x2,y1,2 linear', () => {
   element.setAttributeNS(namespace, 'y1', '0.1');
   element.setAttributeNS(namespace, 'y2', 'Infinity');
 
-  let object = new FabricObject({ width: 200, height: 200 });
-  let gradient = fromElement(element, object, { opacity: '' });
+  const object = new FabricObject({ width: 200, height: 200 });
+  const gradient = fromElement(element, object, { opacity: '' });
   expect(gradient.coords.x1).toEqual(0.3);
   expect(gradient.coords.y1).toEqual(0.1);
   expect(gradient.coords.x2).toEqual(0.2);
   expect(gradient.coords.y2).toEqual(1);
-  object = new FabricObject({ width: 200, height: 200, top: 50, left: 10 });
-  gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'top and left do not change the output').toEqual(
-    0.3
-  );
-  expect(gradient.coords.y1, 'top and left do not change the output').toEqual(
-    0.1
-  );
-  expect(gradient.coords.x2, 'top and left do not change the output').toEqual(
-    0.2
-  );
-  expect(gradient.coords.y2, 'top and left do not change the output').toEqual(
-    1
-  );
+
+  it('top and left do not change the output', () => {
+    const object = new FabricObject({
+      width: 200,
+      height: 200,
+      top: 50,
+      left: 10,
+    });
+    const gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(0.3);
+    expect(gradient.coords.y1).toEqual(0.1);
+    expect(gradient.coords.x2).toEqual(0.2);
+    expect(gradient.coords.y2).toEqual(1);
+  });
 });
 
-test('fromElement with x1,x2,y1,2 radial', () => {
+describe('fromElement with x1,x2,y1,2 radial', () => {
   const namespace = 'http://www.w3.org/2000/svg';
   const element = getFabricDocument().createElementNS(
     namespace,
@@ -272,30 +273,28 @@ test('fromElement with x1,x2,y1,2 radial', () => {
 
   let object = new FabricObject({ width: 200, height: 200 });
   let gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with width height').toEqual(
-    0.3
-  );
-  expect(gradient.coords.y1, 'should not change with width height').toEqual(
-    0.2
-  );
-  expect(gradient.coords.x2, 'should not change with width height').toEqual(
-    0.1
-  );
-  expect(gradient.coords.y2, 'should not change with width height').toEqual(1);
-  expect(gradient.coords.r1, 'should not change with width height').toEqual(0);
-  expect(gradient.coords.r2, 'should not change with width height').toEqual(1);
+  it('should not change with width height', () => {
+    expect(gradient.coords.x1).toEqual(0.3);
+    expect(gradient.coords.y1).toEqual(0.2);
+    expect(gradient.coords.x2).toEqual(0.1);
+    expect(gradient.coords.y2).toEqual(1);
+    expect(gradient.coords.r1).toEqual(0);
+    expect(gradient.coords.r2).toEqual(1);
+  });
 
-  object = new FabricObject({ width: 200, height: 200, top: 10, left: 10 });
-  gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with top left').toEqual(0.3);
-  expect(gradient.coords.y1, 'should not change with top left').toEqual(0.2);
-  expect(gradient.coords.x2, 'should not change with top left').toEqual(0.1);
-  expect(gradient.coords.y2, 'should not change with top left').toEqual(1);
-  expect(gradient.coords.r1, 'should not change with top left').toEqual(0);
-  expect(gradient.coords.r2, 'should not change with top left').toEqual(1);
+  it('should not change with top left', () => {
+    object = new FabricObject({ width: 200, height: 200, top: 10, left: 10 });
+    gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(0.3);
+    expect(gradient.coords.y1).toEqual(0.2);
+    expect(gradient.coords.x2).toEqual(0.1);
+    expect(gradient.coords.y2).toEqual(1);
+    expect(gradient.coords.r1).toEqual(0);
+    expect(gradient.coords.r2).toEqual(1);
+  });
 });
 
-test('fromElement with x1,x2,y1,2 radial userSpaceOnUse', () => {
+describe('fromElement with x1,x2,y1,2 radial userSpaceOnUse', () => {
   const namespace = 'http://www.w3.org/2000/svg';
   const element = getFabricDocument().createElementNS(
     namespace,
@@ -309,33 +308,35 @@ test('fromElement with x1,x2,y1,2 radial userSpaceOnUse', () => {
   element.setAttributeNS(namespace, 'r', '100');
   element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
 
-  let object = new FabricObject({ width: 200, height: 200 });
-  let gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with width height').toEqual(30);
-  expect(gradient.coords.y1, 'should not change with width height').toEqual(20);
-  expect(gradient.coords.x2, 'should not change with width height').toEqual(15);
-  expect(gradient.coords.y2, 'should not change with width height').toEqual(18);
-  expect(gradient.coords.r1, 'should not change with width height').toEqual(0);
-  expect(gradient.coords.r2, 'should not change with width height').toEqual(
-    100
-  );
-
-  object = new FabricObject({
-    width: 200,
-    height: 200,
-    top: 50,
-    left: 60,
+  it('should not change with width height', () => {
+    const object = new FabricObject({ width: 200, height: 200 });
+    const gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(30);
+    expect(gradient.coords.y1).toEqual(20);
+    expect(gradient.coords.x2).toEqual(15);
+    expect(gradient.coords.y2).toEqual(18);
+    expect(gradient.coords.r1).toEqual(0);
+    expect(gradient.coords.r2).toEqual(100);
   });
-  gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with top left').toEqual(30);
-  expect(gradient.coords.y1, 'should not change with top left').toEqual(20);
-  expect(gradient.coords.x2, 'should not change with top left').toEqual(15);
-  expect(gradient.coords.y2, 'should not change with top left').toEqual(18);
-  expect(gradient.coords.r1, 'should not change with top left').toEqual(0);
-  expect(gradient.coords.r2, 'should not change with top left').toEqual(100);
+
+  it('should not change with top left', () => {
+    const object = new FabricObject({
+      width: 200,
+      height: 200,
+      top: 50,
+      left: 60,
+    });
+    const gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(30);
+    expect(gradient.coords.y1).toEqual(20);
+    expect(gradient.coords.x2).toEqual(15);
+    expect(gradient.coords.y2).toEqual(18);
+    expect(gradient.coords.r1).toEqual(0);
+    expect(gradient.coords.r2).toEqual(100);
+  });
 });
 
-test('fromElement with x1,x2,y1,2 linear userSpaceOnUse', () => {
+describe('fromElement with x1,x2,y1,2 linear userSpaceOnUse', () => {
   const namespace = 'http://www.w3.org/2000/svg';
   const element = getFabricDocument().createElementNS(
     namespace,
@@ -348,24 +349,28 @@ test('fromElement with x1,x2,y1,2 linear userSpaceOnUse', () => {
   element.setAttributeNS(namespace, 'y2', '18');
   element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
 
-  let object = new FabricObject({ width: 200, height: 200 });
-  let gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with width height').toEqual(30);
-  expect(gradient.coords.y1, 'should not change with width height').toEqual(20);
-  expect(gradient.coords.x2, 'should not change with width height').toEqual(15);
-  expect(gradient.coords.y2, 'should not change with width height').toEqual(18);
-
-  object = new FabricObject({
-    width: 200,
-    height: 200,
-    top: 40,
-    left: 40,
+  it('should not change with width height', () => {
+    const object = new FabricObject({ width: 200, height: 200 });
+    const gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(30);
+    expect(gradient.coords.y1).toEqual(20);
+    expect(gradient.coords.x2).toEqual(15);
+    expect(gradient.coords.y2).toEqual(18);
   });
-  gradient = fromElement(element, object, { opacity: '' });
-  expect(gradient.coords.x1, 'should not change with top left').toEqual(30);
-  expect(gradient.coords.y1, 'should not change with top left').toEqual(20);
-  expect(gradient.coords.x2, 'should not change with top left').toEqual(15);
-  expect(gradient.coords.y2, 'should not change with top left').toEqual(18);
+
+  it('should not change with top left', () => {
+    const object = new FabricObject({
+      width: 200,
+      height: 200,
+      top: 40,
+      left: 40,
+    });
+    const gradient = fromElement(element, object, { opacity: '' });
+    expect(gradient.coords.x1).toEqual(30);
+    expect(gradient.coords.y1).toEqual(20);
+    expect(gradient.coords.x2).toEqual(15);
+    expect(gradient.coords.y2).toEqual(18);
+  });
 });
 
 test('fromElement radialGradient defaults', () => {
