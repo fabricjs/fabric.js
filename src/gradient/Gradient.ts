@@ -9,7 +9,7 @@ import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import { parseColorStops } from './parser/parseColorStops';
 import { parseCoords } from './parser/parseCoords';
-import { parseType, parseGradientUnits } from './parser/misc';
+import { parseType } from './parser/misc';
 import type {
   ColorStop,
   GradientCoords,
@@ -376,32 +376,31 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
-    instance: FabricObject,
-    svgOptions: SVGOptions
+    {
+      gradientUnits,
+      viewBoxWidth,
+      viewBoxHeight,
+      width,
+      height,
+      opacity,
+      offsetX,
+      offsetY,
+    }: SVGOptions
   ): Gradient<GradientType> {
-    const gradientUnits = parseGradientUnits(el);
-    const center = instance._findCenterFromElement();
     return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
-        width: svgOptions.viewBoxWidth || svgOptions.width,
-        height: svgOptions.viewBoxHeight || svgOptions.height,
+        width: viewBoxWidth || width,
+        height: viewBoxHeight || height,
       }),
-      colorStops: parseColorStops(el, svgOptions.opacity),
+      colorStops: parseColorStops(el, opacity),
       gradientUnits,
       gradientTransform: parseTransformAttribute(
         el.getAttribute('gradientTransform') || ''
       ),
-      ...(gradientUnits === 'pixels'
-        ? {
-            offsetX: instance.width / 2 - center.x,
-            offsetY: instance.height / 2 - center.y,
-          }
-        : {
-            offsetX: 0,
-            offsetY: 0,
-          }),
+      offsetX,
+      offsetY,
     });
   }
   /* _FROM_SVG_END_ */

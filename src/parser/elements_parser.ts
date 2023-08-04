@@ -15,6 +15,7 @@ import { getCSSRules } from './getCSSRules';
 import type { LoadImageOptions } from '../util';
 import type { CSSRules, TSvgReviverCallback } from './typedefs';
 import type { ParsedViewboxTransform } from './applyViewboxTransform';
+import { parseGradientUnits } from '../gradient/parser/misc';
 
 const findTag = (el: Element) =>
   classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
@@ -73,8 +74,10 @@ export class ElementsParser {
         this.options,
         this.cssRules
       );
-      this.resolveGradient(obj, el, 'fill');
-      this.resolveGradient(obj, el, 'stroke');
+      await Promise.all([
+        this.resolveGradient(obj, el, 'fill'),
+        this.resolveGradient(obj, el, 'stroke'),
+      ]);
       if (obj instanceof Image && obj._originalElement) {
         removeTransformMatrixForSvgParsing(
           obj,
@@ -109,7 +112,7 @@ export class ElementsParser {
     return storage[id];
   }
 
-  resolveGradient(
+  async resolveGradient(
     obj: NotParsedFabricObject,
     el: Element,
     property: 'fill' | 'stroke'
@@ -119,16 +122,29 @@ export class ElementsParser {
       property,
       this.gradientDefs
     ) as SVGGradientElement;
-    if (gradientDef) {
-      const opacityAttr = el.getAttribute(property + '-opacity');
-      classRegistry
-        .getSVGClass('gradient')
-        .fromElement(gradientDef, (gradient) => obj.set(property, gradient), {
-          ...this.options,
-          opacity: opacityAttr,
-          object: obj,
-        });
+    if (!gradientDef) {
+      return;
     }
+    const opacityAttr = el.getAttribute(property + '-opacity');
+    const gradientUnits = parseGradientUnits(gradientDef);
+    const center = obj._findCenterFromElement();
+    const gradient = await classRegistry
+      .getSVGClass('gradient')
+      .fromElement(gradientDef, {
+        ...this.options,
+        opacity: opacityAttr,
+        gradientUnits,
+        ...(gradientUnits === 'pixels'
+          ? {
+              offsetX: obj.width / 2 - center.x,
+              offsetY: obj.height / 2 - center.y,
+            }
+          : {
+              offsetX: 0,
+              offsetY: 0,
+            }),
+      });
+    obj.set(property, gradient);
   }
 
   async resolveClipPath(obj: NotParsedFabricObject, usingElement: Element) {
