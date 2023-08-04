@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(ActiveSelection): expose `select` [#9141](https://github.com/fabricjs/fabric.js/pull/9141)
+- fix(ActiveSelection): consolidate `multiSelectAdd` + `add` usage => `addToSelection` [#9142](https://github.com/fabricjs/fabric.js/pull/9142)
 - chore(TS): BREAKING remove canvas.interactive, added typings for canvas options [#9140](https://github.com/fabricjs/fabric.js/pull/9140)
 - chore(TS): BREAKING PREVIOUS BETA mv + rename `TProps` => `TOptions` [#9139](https://github.com/fabricjs/fabric.js/pull/9139)
 - test(playwright): Use embedded eval from playwright [#9133](https://github.com/fabricjs/fabric.js/pull/9133)
