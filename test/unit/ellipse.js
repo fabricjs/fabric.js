@@ -12,7 +12,7 @@
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
 
-    assert.equal(ellipse.constructor.name, 'Ellipse');
+    assert.equal(ellipse.constructor.type, 'Ellipse');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -128,10 +128,11 @@
   });
 
   QUnit.test('fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Ellipse.fromElement === 'function');
 
     var namespace        = 'http://www.w3.org/2000/svg';
-    var elEllipse        = fabric.getDocument().createElementNS(namespace, 'ellipse'),
+    var elEllipse        = fabric.getFabricDocument().createElementNS(namespace, 'ellipse'),
         rx               = 5,
         ry               = 7,
         left             = 12,
@@ -156,7 +157,7 @@
     elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
     elEllipse.setAttributeNS(namespace, 'stroke-miterlimit', strokeMiterLimit);
 
-    fabric.Ellipse.fromElement(elEllipse, function(oEllipse) {
+    fabric.Ellipse.fromElement(elEllipse).then((oEllipse) => {
       assert.ok(oEllipse instanceof fabric.Ellipse);
       assert.equal(oEllipse.get('rx'), rx);
       assert.equal(oEllipse.get('ry'), ry);
@@ -169,6 +170,7 @@
       assert.equal(oEllipse.get('strokeLineCap'), strokeLineCap);
       assert.equal(oEllipse.get('strokeLineJoin'), strokeLineJoin);
       assert.equal(oEllipse.get('strokeMiterLimit'), strokeMiterLimit);
+      done();
     });
   });
 

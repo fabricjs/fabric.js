@@ -1,16 +1,39 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import type { ObjectEvents } from '../EventTypeDefs';
+import type { CSSRules } from '../parser/typedefs';
 
-export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
+export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
   ry: 0,
 };
 
-export class Ellipse extends FabricObject {
+interface UniqueEllipseProps {
+  rx: number;
+  ry: number;
+}
+
+export interface SerializedEllipseProps
+  extends SerializedObjectProps,
+    UniqueEllipseProps {}
+
+export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
+
+const ELLIPSE_PROPS = ['rx', 'ry'] as const;
+
+export class Ellipse<
+    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
+    SProps extends SerializedEllipseProps = SerializedEllipseProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements EllipseProps
+{
   /**
    * Horizontal radius
    * @type Number
@@ -25,7 +48,9 @@ export class Ellipse extends FabricObject {
    */
   declare ry: number;
 
-  static cacheProperties = [...cacheProperties, 'rx', 'ry'];
+  static type = 'Ellipse';
+
+  static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
   static ownDefaults: Record<string, any> = ellipseDefaultValues;
 
@@ -34,15 +59,6 @@ export class Ellipse extends FabricObject {
       ...super.getDefaults(),
       ...Ellipse.ownDefaults,
     };
-  }
-
-  /**
-   * Constructor
-   * @param {Object} [options] Options object
-   * @return {Ellipse} thisArg
-   */
-  constructor(options: Record<string, unknown>) {
-    super(options);
   }
 
   /**
@@ -88,8 +104,11 @@ export class Ellipse extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: string[] = []) {
-    return super.toObject(['rx', 'ry', ...propertiesToInclude]);
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
 
   /**
@@ -97,16 +116,11 @@ export class Ellipse extends FabricObject {
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG() {
+  _toSVG(): string[] {
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      'cx="0" cy="0" ',
-      'rx="',
-      this.rx,
-      '" ry="',
-      this.ry,
-      '" />\n',
+      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
     ];
   }
 
@@ -137,19 +151,23 @@ export class Ellipse extends FabricObject {
    * Returns {@link Ellipse} instance from an SVG element
    * @static
    * @memberOf Ellipse
-   * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (ellipse: Ellipse) => void
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
   ) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    callback(new this(parsedAttributes));
+    return new this(parsedAttributes);
   }
 
   /* _FROM_SVG_END_ */

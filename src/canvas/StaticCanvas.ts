@@ -1,18 +1,15 @@
-import { getDocument, getEnv } from '../env';
 import { config } from '../config';
-import { iMatrix, VERSION } from '../constants';
+import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
-import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
-import type { Rect } from '../shapes/Rect';
-import {
+import type {
+  Abortable,
   Constructor,
-  ImageFormat,
   TCornerPoint,
   TDataUrlOptions,
   TFiller,
@@ -21,26 +18,34 @@ import {
   TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
+  TOptions,
 } from '../typedefs';
 import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
-import { getElementOffset } from '../util/dom_misc';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, isHTMLCanvas, toDataURL } from '../util/misc/dom';
+import { createCanvasElement, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
+import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
-  EnlivenObjectOptions,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import { isCollection, isFiller, isPattern, isTextObject } from '../util/types';
-
-const CANVAS_INIT_ERROR = 'Could not initialize `canvas` element';
+import {
+  isCollection,
+  isFiller,
+  isPattern,
+  isTextObject,
+} from '../util/typeAssertions';
+import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
+import type { CSSDimensions } from './DOMManagers/util';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { StaticCanvasOptions } from './StaticCanvasOptions';
+import { staticCanvasDefaults } from './StaticCanvasOptions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -61,29 +66,6 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-type TCanvasHydrationOption = {
-  signal?: AbortSignal;
-};
-
-export const StaticCanvasDefaults = {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-};
-
 /**
  * Static canvas class
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
@@ -95,120 +77,44 @@ export const StaticCanvasDefaults = {
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
-  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
-  /**
-   * Background color of canvas instance.
-   * @type {(String|TFiller)}
-   * @default
-   */
+    EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+  >
+  extends createCollectionMixin(CommonMethods<CanvasEvents>)
+  implements StaticCanvasOptions
+{
+  declare width: number;
+  declare height: number;
+
+  // background
+  declare backgroundVpt: boolean;
   declare backgroundColor: TFiller | string;
-
-  /**
-   * Background image of canvas instance.
-   * since 2.4.0 image caching is active, please when putting an image as background, add to the
-   * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
-   * vale. As an alternative you can disable image objectCaching
-   * @type FabricObject
-   * @default
-   */
-  declare backgroundImage: FabricObject | null;
-
-  /**
-   * Overlay color of canvas instance.
-   * @since 1.3.9
-   * @type {(String|TFiller)}
-   * @default
-   */
+  declare backgroundImage?: FabricObject;
+  // overlay
+  declare overlayVpt: boolean;
   declare overlayColor: TFiller | string;
+  declare overlayImage?: FabricObject;
 
-  /**
-   * Overlay image of canvas instance.
-   * since 2.4.0 image caching is active, please when putting an image as overlay, add to the
-   * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
-   * vale. As an alternative you can disable image objectCaching
-   * @type FabricObject
-   * @default
-   */
-  declare overlayImage: FabricObject | null;
+  declare clipPath?: FabricObject;
 
-  /**
-   * Indicates whether toObject/toDatalessObject should include default values
-   * if set to false, takes precedence over the object value.
-   * @type Boolean
-   * @default
-   */
   declare includeDefaultValues: boolean;
 
-  /**
-   * Indicates whether {@link add}, {@link insertAt} and {@link remove},
-   * {@link moveTo}, {@link clear} and many more, should also re-render canvas.
-   * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
-   * since the renders are queued and executed one per frame.
-   * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
-   * Left default to true to do not break documentation and old app, fiddles.
-   * @type Boolean
-   * @default
-   */
+  // rendering config
   declare renderOnAddRemove: boolean;
+  declare skipOffscreen: boolean;
+  declare enableRetinaScaling: boolean;
+  declare imageSmoothingEnabled: boolean;
 
   /**
-   * Indicates whether object controls (borders/controls) are rendered above overlay image
-   * @type Boolean
-   * @default
+   * @todo move to Canvas
    */
   declare controlsAboveOverlay: boolean;
 
   /**
-   * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
-   * @type Boolean
-   * @default
+   * @todo move to Canvas
    */
   declare allowTouchScrolling: boolean;
 
-  /**
-   * Indicates whether this canvas will use image smoothing, this is on by default in browsers
-   * @type Boolean
-   * @default
-   */
-  declare imageSmoothingEnabled: boolean;
-
-  /**
-   * The transformation (a Canvas 2D API transform matrix) which focuses the viewport
-   * @type Array
-   * @example <caption>Default transform</caption>
-   * canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-   * @example <caption>Scale by 70% and translate toward bottom-right by 50, without skewing</caption>
-   * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
-   * @default
-   */
   declare viewportTransform: TMat2D;
-
-  /**
-   * if set to false background image is not affected by viewport transform
-   * @since 1.6.3
-   * @type Boolean
-   * @todo we should really find a different way to do this
-   * @default
-   */
-  declare backgroundVpt: boolean;
-
-  /**
-   * if set to false overlya image is not affected by viewport transform
-   * @since 1.6.3
-   * @type Boolean
-   * @todo we should really find a different way to do this
-   * @default
-   */
-  declare overlayVpt: boolean;
-
-  /**
-   * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
-   * @type Boolean
-   * @default
-   */
-  declare enableRetinaScaling: boolean;
-
   /**
    * Describe canvas element extension over design
    * properties are tl,tr,bl,br.
@@ -220,47 +126,17 @@ export class StaticCanvas<
   declare vptCoords: TCornerPoint;
 
   /**
-   * Based on vptCoords and object.aCoords, skip rendering of objects that
-   * are not included in current viewport.
-   * May greatly help in applications with crowded canvas and use of zoom/pan
-   * If One of the corner of the bounding box of the object is on the canvas
-   * the objects get rendered.
-   * @type Boolean
-   * @default
-   */
-  declare skipOffscreen: boolean;
-
-  /**
-   * a fabricObject that, without stroke define a clipping area with their shape. filled in black
-   * the clipPath object gets used when the canvas has rendered, and the context is placed in the
-   * top left corner of the canvas.
-   * clipPath will clip away controls, if you do not want this to happen use controlsAboveOverlay = true
-   * @type FabricObject
-   */
-  declare clipPath: FabricObject;
-
-  /**
    * A reference to the canvas actual HTMLCanvasElement.
    * Can be use to read the raw pixels, but never write or manipulate
    * @type HTMLCanvasElement
    */
-  declare lowerCanvasEl: HTMLCanvasElement;
+  get lowerCanvasEl() {
+    return this.elements.lower?.el;
+  }
 
-  declare contextContainer: CanvasRenderingContext2D;
-
-  /**
-   * Width in virtual/logical pixels of the canvas.
-   * The canvas can be larger than width if retina scaling is active
-   * @type number
-   */
-  declare width: number;
-
-  /**
-   * Height in virtual/logical pixels of the canvas.
-   * The canvas can be taller than width if retina scaling is active
-   * @type height
-   */
-  declare height: number;
+  get contextContainer() {
+    return this.elements.lower?.ctx;
+  }
 
   /**
    * If true the Canvas is in the process or has been disposed/destroyed.
@@ -276,18 +152,13 @@ export class StaticCanvas<
    */
   declare disposed?: boolean;
 
-  /**
-   * Keeps a copy of the canvas style before setting retina scaling and other potions
-   * in order to return it to original state on dispose
-   * @type string
-   */
-  declare _originalCanvasStyle?: string;
-
   declare _offset: { left: number; top: number };
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
-  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+  declare elements: StaticCanvasDOMManager;
+
+  static ownDefaults = staticCanvasDefaults;
 
   // reference to
   protected declare __cleanupTask?: {
@@ -299,7 +170,10 @@ export class StaticCanvas<
     return StaticCanvas.ownDefaults;
   }
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<StaticCanvasOptions> = {}
+  ) {
     super();
     Object.assign(
       this,
@@ -308,16 +182,15 @@ export class StaticCanvas<
     this.set(options);
     this.initElements(el);
     this._setDimensionsImpl({
-      width: this.width || this.lowerCanvasEl.width || 0,
-      height: this.height || this.lowerCanvasEl.height || 0,
+      width: this.width || this.elements.lower.el.width || 0,
+      height: this.height || this.elements.lower.el.height || 0,
     });
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
 
   protected initElements(el: string | HTMLCanvasElement) {
-    this._createLowerCanvas(el);
-    this._originalCanvasStyle = this.lowerCanvasEl.style.cssText;
+    this.elements = new StaticCanvasDOMManager(el);
   }
 
   add(...objects: FabricObject[]) {
@@ -339,7 +212,7 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    if (obj.canvas && obj.canvas !== this) {
+    if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
         'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
@@ -379,66 +252,12 @@ export class StaticCanvas<
     return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
   }
 
-  protected _initRetinaScaling() {
-    this.__initRetinaScaling(this.lowerCanvasEl, this.contextContainer);
-  }
-
-  protected __initRetinaScaling(
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D
-  ) {
-    const scaleRatio = config.devicePixelRatio;
-    canvas.setAttribute('width', (this.width * scaleRatio).toString());
-    canvas.setAttribute('height', (this.height * scaleRatio).toString());
-    context.scale(scaleRatio, scaleRatio);
-  }
-
   /**
    * Calculates canvas element offset relative to the document
    * This method is also attached as "resize" event handler of window
    */
   calcOffset() {
-    return (this._offset = getElementOffset(this.lowerCanvasEl));
-  }
-
-  /**
-   * @private
-   */
-  protected _createCanvasElement() {
-    const element = createCanvasElement();
-    if (!element) {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    if (typeof element.getContext === 'undefined') {
-      throw new Error(CANVAS_INIT_ERROR);
-    }
-    return element;
-  }
-
-  /**
-   * Creates a bottom canvas
-   * @private
-   * @param {HTMLElement} [canvasEl]
-   */
-  protected _createLowerCanvas(canvasEl: HTMLCanvasElement | string) {
-    // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
-    if (isHTMLCanvas(canvasEl)) {
-      this.lowerCanvasEl = canvasEl;
-    } else {
-      this.lowerCanvasEl =
-        (getDocument().getElementById(canvasEl) as HTMLCanvasElement) ||
-        this._createCanvasElement();
-    }
-    if (this.lowerCanvasEl.hasAttribute('data-fabric')) {
-      /* _DEV_MODE_START_ */
-      throw new Error(
-        'fabric.js: trying to initialize a canvas that has already been initialized'
-      );
-      /* _DEV_MODE_END_ */
-    }
-    this.lowerCanvasEl.classList.add('lower-canvas');
-    this.lowerCanvasEl.setAttribute('data-fabric', 'main');
-    this.contextContainer = this.lowerCanvasEl.getContext('2d')!;
+    return (this._offset = this.elements.calcOffset());
   }
 
   /**
@@ -465,7 +284,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions) {
+  setWidth(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ width: value }, options);
   }
 
@@ -477,7 +296,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions) {
+  setHeight(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ height: value }, options);
   }
 
@@ -486,24 +305,24 @@ export class StaticCanvas<
    * @protected
    */
   protected _setDimensionsImpl(
-    dimensions: Partial<TSize>,
+    dimensions: Partial<TSize | CSSDimensions>,
     { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
   ) {
-    Object.entries(dimensions).forEach(([prop, value]) => {
-      let cssValue = `${value}`;
+    if (!cssOnly) {
+      const size = {
+        width: this.width,
+        height: this.height,
+        ...(dimensions as Partial<TSize>),
+      };
+      this.elements.setDimensions(size, this.getRetinaScaling());
+      this.hasLostContext = true;
+      this.width = size.width;
+      this.height = size.height;
+    }
+    if (!backstoreOnly) {
+      this.elements.setCSSDimensions(dimensions);
+    }
 
-      if (!cssOnly) {
-        this._setBackstoreDimension(prop as keyof TSize, value);
-        cssValue += 'px';
-        this.hasLostContext = true;
-      }
-
-      if (!backstoreOnly) {
-        this._setCssDimension(prop as keyof TSize, cssValue);
-      }
-    });
-
-    this._isRetinaScaling() && this._initRetinaScaling();
     this.calcOffset();
   }
 
@@ -527,29 +346,6 @@ export class StaticCanvas<
     if (!cssOnly) {
       this.requestRenderAll();
     }
-  }
-
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   * @todo subclass in canvas and handle upperCanvasEl there.
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    this.lowerCanvasEl[prop] = value;
-    this[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   * @todo subclass in canvas and handle upperCanvasEl there.
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    this.lowerCanvasEl.style[prop] = value;
   }
 
   /**
@@ -642,7 +438,7 @@ export class StaticCanvas<
    * @return {HTMLCanvasElement}
    */
   getElement(): HTMLCanvasElement {
-    return this.lowerCanvasEl;
+    return this.elements.lower.el;
   }
 
   /**
@@ -658,7 +454,7 @@ export class StaticCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getContext(): CanvasRenderingContext2D {
-    return this.contextContainer;
+    return this.elements.lower.ctx;
   }
 
   /**
@@ -666,11 +462,11 @@ export class StaticCanvas<
    */
   clear() {
     this.remove(...this.getObjects());
-    this.backgroundImage = null;
-    this.overlayImage = null;
+    this.backgroundImage = undefined;
+    this.overlayImage = undefined;
     this.backgroundColor = '';
     this.overlayColor = '';
-    this.clearContext(this.contextContainer);
+    this.clearContext(this.getContext());
     this.fire('canvas:cleared');
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -683,7 +479,7 @@ export class StaticCanvas<
     if (this.destroyed) {
       return;
     }
-    this.renderCanvas(this.contextContainer, this._objects);
+    this.renderCanvas(this.getContext(), this._objects);
   }
 
   /**
@@ -761,7 +557,7 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    // @ts-ignore node-canvas stuff
+    // @ts-expect-error node-canvas stuff
     ctx.patternQuality = 'best';
     this.fire('before:render', { ctx });
     this._renderBackground(ctx);
@@ -869,10 +665,15 @@ export class StaticCanvas<
     }
     if (object) {
       ctx.save();
+      const { skipOffscreen } = this;
+      // if the object doesn't move with the viewport,
+      // the offscreen concept does not apply;
+      this.skipOffscreen = needsVpt;
       if (needsVpt) {
         ctx.transform(...v);
       }
       object.render(ctx);
+      this.skipOffscreen = skipOffscreen;
       ctx.restore();
     }
   }
@@ -990,7 +791,7 @@ export class StaticCanvas<
    * @param {Point} center Center point
    */
   _centerObject(object: FabricObject, center: Point) {
-    object.setXY(center, 'center', 'center');
+    object.setXY(center, CENTER, CENTER);
     object.setCoords();
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -1136,12 +937,7 @@ export class StaticCanvas<
   }
 
   /* _TO_SVG_START_ */
-  /**
-   * When true, getSvgTransform() will apply the StaticCanvas.viewportTransform to the SVG transformation. When true,
-   * a zoomed canvas will then produce zoomed SVG output.
-   * @type Boolean
-   * @default
-   */
+
   declare svgViewportTransformation: boolean;
 
   /**
@@ -1272,13 +1068,9 @@ export class StaticCanvas<
     const clipPath = this.clipPath;
     if (clipPath) {
       clipPath.clipPathId = `CLIPPATH_${uid()}`;
-      return (
-        '<clipPath id="' +
-        clipPath.clipPathId +
-        '" >\n' +
-        this.clipPath.toClipPathSVG(options.reviver) +
-        '</clipPath>\n'
-      );
+      return `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(
+        options.reviver
+      )}</clipPath>\n`;
     }
     return '';
   }
@@ -1295,10 +1087,12 @@ export class StaticCanvas<
           const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
+              // otherwise circular dependency
+              isType: () => false,
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
             };
-          return fill.toSVG(object as Rect, {
+          return fill.toSVG(object as FabricObject, {
             additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
           });
         }
@@ -1329,17 +1123,16 @@ export class StaticCanvas<
       if (!isTextObject(obj)) {
         return;
       }
-      let fontFamily = obj.fontFamily;
+      const { styles, fontFamily } = obj;
       if (fontList[fontFamily] || !fontPaths[fontFamily]) {
         return;
       }
       fontList[fontFamily] = true;
-      if (!obj.styles) {
+      if (!styles) {
         return;
       }
-      Object.values(obj.styles).forEach((styleRow) => {
-        Object.values(styleRow).forEach((textCharStyle) => {
-          fontFamily = textCharStyle.fontFamily;
+      Object.values(styles).forEach((styleRow) => {
+        Object.values(styleRow).forEach(({ fontFamily = '' }) => {
           if (!fontList[fontFamily] && fontPaths[fontFamily]) {
             fontList[fontFamily] = true;
           }
@@ -1470,7 +1263,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: TCanvasHydrationOption = {}
+    { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new Error('fabric.js: `json` is undefined'));
@@ -1490,7 +1283,7 @@ export class StaticCanvas<
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      enlivenObjects(objects, {
+      enlivenObjects<FabricObject>(objects, {
         reviver,
         signal,
       }),
@@ -1575,7 +1368,7 @@ export class StaticCanvas<
    */
   toDataURL(options = {} as TDataUrlOptions): string {
     const {
-      format = ImageFormat.png,
+      format = 'png',
       quality = 1,
       multiplier = 1,
       enableRetinaScaling = false,
@@ -1645,6 +1438,8 @@ export class StaticCanvas<
    * @throws if aborted by a consequent call
    */
   dispose() {
+    !this.disposed &&
+      this.elements.cleanupDOM({ width: this.width, height: this.height });
     this.disposed = true;
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
@@ -1667,7 +1462,9 @@ export class StaticCanvas<
   }
 
   /**
-   * Clears the canvas element, disposes objects and frees resources
+   * Clears the canvas element, disposes objects and frees resources.
+   *
+   * Invoked as part of the **async** operation of {@link dispose}.
    *
    * **CAUTION**:
    *
@@ -1686,25 +1483,12 @@ export class StaticCanvas<
     if (this.backgroundImage) {
       this.backgroundImage.dispose();
     }
-    this.backgroundImage = null;
+    this.backgroundImage = undefined;
     if (this.overlayImage) {
       this.overlayImage.dispose();
     }
-    this.overlayImage = null;
-    // @ts-expect-error disposing
-    this.contextContainer = null;
-    const canvasElement = this.lowerCanvasEl;
-    // @ts-expect-error disposing
-    this.lowerCanvasEl = undefined;
-    // restore canvas style and attributes
-    canvasElement.classList.remove('lower-canvas');
-    canvasElement.removeAttribute('data-fabric');
-    // restore canvas size to original size in case retina scaling was applied
-    canvasElement.setAttribute('width', `${this.width}`);
-    canvasElement.setAttribute('height', `${this.height}`);
-    canvasElement.style.cssText = this._originalCanvasStyle || '';
-    this._originalCanvasStyle = undefined;
-    getEnv().dispose(canvasElement);
+    this.overlayImage = undefined;
+    this.elements.dispose();
   }
 
   /**

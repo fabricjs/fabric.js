@@ -1,16 +1,18 @@
-//@ts-nocheck
-
-export function parseStyleString(style, oStyle) {
-  let attr, value;
+/**
+ * Takes a style string and parses it in one that has only defined values
+ * and lowercases properties
+ * @param style
+ * @param oStyle
+ */
+export function parseStyleString(
+  style: string,
+  oStyle: Record<string, any>
+): void {
   style
     .replace(/;\s*$/, '')
     .split(';')
-    .forEach(function (chunk) {
-      const pair = chunk.split(':');
-
-      attr = pair[0].trim().toLowerCase();
-      value = pair[1].trim();
-
-      oStyle[attr] = value;
+    .forEach((chunk) => {
+      const [attr, value] = chunk.split(':');
+      oStyle[attr.trim().toLowerCase()] = value.trim();
     });
 }

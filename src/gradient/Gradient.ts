@@ -1,21 +1,16 @@
-import { classRegistry } from '../ClassRegistry';
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
-import { isPathObject } from '../util/types';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
-import {
-  parseColorStops,
-  parseCoords,
-  parseGradientUnits,
-  parseType,
-} from './parser';
-import {
+import { parseColorStops } from './parser/parseColorStops';
+import { parseCoords } from './parser/parseCoords';
+import { parseType, parseGradientUnits } from './parser/misc';
+import type {
   ColorStop,
   GradientCoords,
   GradientOptions,
@@ -23,6 +18,8 @@ import {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
+import { classRegistry } from '../ClassRegistry';
+import { isPath } from '../util/typeAssertions';
 
 /**
  * Gradient class
@@ -55,7 +52,7 @@ export class Gradient<
    * @type Number[]
    * @default null
    */
-  declare gradientTransform: TMat2D | null;
+  declare gradientTransform?: TMat2D;
 
   /**
    * coordinates units for coords.
@@ -100,6 +97,8 @@ export class Gradient<
    */
   declare readonly id: string | number;
 
+  static type = 'Gradient';
+
   constructor({
     type = 'linear' as T,
     gradientUnits = 'pixels',
@@ -107,7 +106,7 @@ export class Gradient<
     colorStops = [],
     offsetX = 0,
     offsetY = 0,
-    gradientTransform = null,
+    gradientTransform,
     id,
   }: GradientOptions<T>) {
     this.id = id ? `${id}_${uid()}` : uid();
@@ -149,9 +148,9 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this)[]) {
+  toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -159,8 +158,8 @@ export class Gradient<
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform
-        ? this.gradientTransform.concat()
-        : this.gradientTransform,
+        ? [...this.gradientTransform]
+        : undefined,
     };
   }
 
@@ -200,7 +199,8 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    if (isPathObject(object) && this.gradientUnits !== 'percentage') {
+    // todo what about polygon/polyline?
+    if (isPath(object) && this.gradientUnits !== 'percentage') {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }
@@ -321,14 +321,6 @@ export class Gradient<
     return gradient;
   }
 
-  static fromObject(options: GradientOptions<'linear'>): Gradient<'linear'>;
-  static fromObject(options: GradientOptions<'radial'>): Gradient<'radial'>;
-  static fromObject(
-    options: GradientOptions<'linear'> | GradientOptions<'radial'>
-  ) {
-    return new this(options);
-  }
-
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
@@ -376,42 +368,35 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
-    callback: (instance: Gradient<'linear' | 'radial'>) => any,
-    {
-      object: { left, top },
-      width,
-      height,
-      viewBoxWidth,
-      viewBoxHeight,
-      opacity,
-    }: SVGOptions & { object: FabricObject }
-  ) {
+    instance: FabricObject,
+    svgOptions: SVGOptions
+  ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
-    const gradient = new this({
+    const center = instance._findCenterFromElement();
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
-        width: viewBoxWidth || width,
-        height: viewBoxHeight || height,
+        width: svgOptions.viewBoxWidth || svgOptions.width,
+        height: svgOptions.viewBoxHeight || svgOptions.height,
       }),
-      colorStops: parseColorStops(el, opacity),
+      colorStops: parseColorStops(el, svgOptions.opacity),
       gradientUnits,
       gradientTransform: parseTransformAttribute(
         el.getAttribute('gradientTransform') || ''
       ),
       ...(gradientUnits === 'pixels'
         ? {
-            offsetX: -left,
-            offsetY: -top,
+            offsetX: instance.width / 2 - center.x,
+            offsetY: instance.height / 2 - center.y,
           }
         : {
             offsetX: 0,
             offsetY: 0,
           }),
     });
-    callback(gradient);
   }
   /* _FROM_SVG_END_ */
 }
 
-classRegistry.setClass(Gradient<'linear' | 'radial'>, 'gradient');
+classRegistry.setClass(Gradient, 'gradient');

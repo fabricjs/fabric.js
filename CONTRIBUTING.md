@@ -64,6 +64,8 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 
 ### 🎮 Adding a DEMO (currently not possible)
 
+**New website is under construction. Contributions are welcome.**
+
 Take a look at an existing [demo file][demo_file].\
 Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
 
@@ -104,11 +106,12 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
   Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
 - **Tests** \
   PRs must be backed with relevant tests, follow [TESTING](#-testing). If you never wrote a test or you find our tests unclear to extend, just ask for help.
+  Aim to cover 100% of the changes.
 - **Docs** \
   Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
 - **Changelog**\
-  Add a concise listing to the [**CHANGELOG**](CHANGELOG.md) describing what has changed.
+  Add a concise listing to the [**CHANGELOG**](CHANGELOG.md) describing what has changed or let github actions add the PR title for you.
 - **1️⃣ PR per feature/bug** \
   Create a new branch for every pull request.\
   If you want to do more than one thing, create multiple pull requests 💪.
@@ -125,18 +128,33 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests
+| Suite                                                                        | unit (node)                                                                                              | e2e (browser)                                                                                                                                                                                                                               |
+| ---------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework                                                                    | [`jest`][jest]                                                                                           | [`playwright`][playwright]                                                                                                                                                                                                                  |
+| Setup                                                                        |                                                                                                          | <pre>npm run build -- -f -w</pre>                                                                                                                                                                                                           |
+| Running Tests<br><br><br><br><br><pre>\<test cmd\> -- [filter] [watch]</pre> | <pre>npm run test:jest -- [filters] [-w]</pre><br><br><br>It is advised to use filters to save time.<br> | <pre>npm run test:e2e -- [filters] [--ui]</pre><br>In some machines babel is flaky and doesn't build the test files. In that is the case, try running the command using `npx` directly, see [`playwright.setup.ts`](./playwright.setup.ts). |
+| Writing Tests                                                                | Add/update `src/*.(spec\|test).ts` files                                                                 | - Update tests in `e2e/tests`<br>- Create a new test based on `e2e/template`                                                                                                                                                                |
+| Test Gen                                                                     |                                                                                                          | <pre>npm start vanilla<br>npx playwright codegen http://localhost:1234</pre>                                                                                                                                                                |
+| Test Spec                                                                    |                                                                                                          | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br>                                                                                                                                                        |
+| Outputs                                                                      | Snapshots next to the test file                                                                          | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`                                                                                                                                                           |
+
+### Legacy Test Suite
+
+We **discourage** writing new tests in the legacy suite and **encourage** migrating failing tests to the new suite.
+However, it is not carved in stone.
+
+The test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests.
 
 - `unit` tests: test logic and state
 - `visual` tests: test visual outcome against image refs located at `test/visual/golden`
 
-### Getting Started
+#### Getting Started
 
 - Build and watch for changes
   ```bash
   npm run build -- -f -w
   ```
-- Run the entire test suite on `chrome` (many tests are skipped on `node`)
+- Run the _legacy_ test suite on `chrome` (many tests are skipped on `node`)
   ```bash
   npm test -- -a -c chrome
   ```
@@ -171,14 +189,12 @@ Test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for servi
   npm test -- -h
   ```
 
-### Adding Tests
-
-Backing a PR with tests that cover the changes that were made is a **MUST**. Aim to cover 100% of the cases.
+#### Adding Tests
 
 Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
 
-- [`unit` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237)
-- [`visual` test example](https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67)
+- [`unit` test example][unit_test]
+- [`visual` test example][visual_test]
 
 If you need to change test config ask for guidance.
 
@@ -186,24 +202,36 @@ If you need to change test config ask for guidance.
 
 ## 🚧🎢 Developing 💡✨
 
-### Setting Up Locally
+### Getting Started
 
-1. 🍴 Fork the repository
-1. 💾 Clone your 🍴 to your 💻
+1. 🍴 Fork and clone 💾 the repository
 1. Install dependencies 🕹️ `npm i --include=dev`
-1. Next Up [Prototyping](#-prototyping) & [Testing](#-testing)
 
-#### Online
+### Starting an App
 
-You can actively develop fabric online using [Github Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530), [Gitpod](https://gitpod.io/from-referrer/) or CodeSandbox:
+```bash
+npm start <template>
+npm start -- --help
+```
 
-- After the Github Codespace has started run `npm start <template>` to start a [prototyping](#-prototyping) app.
-- Gitpod will start the [prototyping](#-prototyping) apps and expose them as endpoints available on forwarded ports.
+You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
+
+```bash
+npm run sandbox deploy <path/to/app>
+npm run sandbox build <template> <path/to/app>
+npm run sandbox -- --help
+```
+
+Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information.
+
+### Online
+
+You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
+
+- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
   `A service is available on port ...` popups will show up.
-
-### 🧭 Prototyping
-
-[`.codesandbox/templates`](.codesandbox/templates) contains templates for **INSTANT** out-of-the-box prototyping [**👍 Try it out**](.codesandbox/README.md)
+- Codesandbox: _available soon_.
 
 ### 🔮 Symlinking
 
@@ -211,6 +239,7 @@ Establish symlinking to work with a local version on separate projects.
 
 1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
 1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
+1. Consider flagging `--save` to avoid confusion regarding what version of fabric is being used by the project.
 
 See [npm link][npm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
@@ -234,7 +263,13 @@ Don't forget to unlink the package once you're done.
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
 [eslint]: https://eslint.org/
 [jsdoc]: https://jsdoc.app/
+[playwright]: https://playwright.dev/
+[jest]: https://jestjs.io/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
+[unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
+[visual_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67
+[github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
+[gitpod]: https://gitpod.io/from-referrer/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
 [yarn_link]: https://yarnpkg.com/cli/link

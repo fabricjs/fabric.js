@@ -1,8 +1,9 @@
-import { IPoint, Point } from '../../../Point';
-import { createVector, getOrthonormalVector, getUnitVector } from '../vectors';
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
+import { getOrthonormalVector, getUnitVector } from '../vectors';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
 /**
  * class in charge of finding projections for each type of line cap for start/end of an open path
@@ -26,7 +27,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    */
   declare T: Point;
 
-  constructor(A: IPoint, T: IPoint, options: TProjectStrokeOnPointsOptions) {
+  constructor(A: XY, T: XY, options: TProjectStrokeOnPointsOptions) {
     super(options);
     this.A = new Point(A);
     this.T = new Point(T);
@@ -61,12 +62,32 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-2-round
    */
   projectRound() {
-    return new StrokeLineJoinProjections(
-      this.A,
-      this.T,
-      this.T,
-      this.options
-    ).projectRound();
+    const projections: Point[] = [];
+
+    if (!this.isSkewed() && this.A.eq(this.T)) {
+      /* 1 point case without `skew`
+        When `strokeUniform` is true, scaling has no effect.
+        So we divide by scale, to remove its effect.
+      */
+      const projection = new Point(1, 1)
+        .scalarMultiply(this.strokeProjectionMagnitude)
+        .multiply(this.strokeUniformScalar);
+      projections.push(
+        this.applySkew(this.A.add(projection)),
+        this.applySkew(this.A.subtract(projection))
+      );
+    } else {
+      projections.push(
+        ...new StrokeLineJoinProjections(
+          this.A,
+          this.T,
+          this.T,
+          this.options
+        ).projectRound()
+      );
+    }
+
+    return projections;
   }
 
   /**
@@ -76,20 +97,35 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
    * @see https://github.com/fabricjs/fabric.js/pull/8344#1-3-square
    */
   projectSquare() {
-    const orthogonalProjection = this.calcOrthogonalProjection(
-      this.A,
-      this.T,
-      this.strokeProjectionMagnitude
-    );
-    const strokePointingOut = this.scaleUnitVector(
-      getUnitVector(createVector(this.A, this.T)),
-      -this.strokeProjectionMagnitude
-    );
-    const projectedA = this.A.add(strokePointingOut);
-    return [
-      projectedA.add(orthogonalProjection),
-      projectedA.subtract(orthogonalProjection),
-    ].map((p) => this.applySkew(p));
+    const projections: Point[] = [];
+
+    if (this.A.eq(this.T)) {
+      /* 1 point case without `skew`
+        When `strokeUniform` is true, scaling has no effect.
+        So we divide by scale, to remove its effect.
+      */
+      const projection = new Point(1, 1)
+        .scalarMultiply(this.strokeProjectionMagnitude)
+        .multiply(this.strokeUniformScalar);
+      projections.push(this.A.add(projection), this.A.subtract(projection));
+    } else {
+      const orthogonalProjection = this.calcOrthogonalProjection(
+        this.A,
+        this.T,
+        this.strokeProjectionMagnitude
+      );
+      const strokePointingOut = this.scaleUnitVector(
+        getUnitVector(this.createSideVector(this.A, this.T)),
+        -this.strokeProjectionMagnitude
+      );
+      const projectedA = this.A.add(strokePointingOut);
+      projections.push(
+        projectedA.add(orthogonalProjection),
+        projectedA.subtract(orthogonalProjection)
+      );
+    }
+
+    return projections.map((p) => this.applySkew(p));
   }
 
   protected projectPoints() {

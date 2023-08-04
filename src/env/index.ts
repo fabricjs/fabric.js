@@ -7,18 +7,32 @@
  * since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
  */
 
-import { TFabricEnv } from './types';
+import type { TFabricEnv } from './types';
 import { getEnv as getBrowserEnv } from './browser';
 import type { DOMWindow } from 'jsdom';
 
 let env: TFabricEnv;
 
+/**
+ * Sets the environment variables used by fabric.\
+ * This is exposed for special cases, such as configuring a test environment, and should be used with care.
+ *
+ * **CAUTION**: Must be called before using the package.
+ *
+ * @example
+ * <caption>Passing `window` and `document` objects to fabric (in case they are mocked or something)</caption>
+ * import { getEnv, setEnv } from 'fabric';
+ * // we want fabric to use the `window` and `document` objects exposed by the environment we are running in.
+ * setEnv({ ...getEnv(), window, document });
+ * // done with setup, using fabric is now safe
+ */
 export const setEnv = (value: TFabricEnv) => {
   env = value;
 };
 
 export const getEnv = () => env || getBrowserEnv();
 
-export const getDocument = (): Document => getEnv().document;
+export const getFabricDocument = (): Document => getEnv().document;
 
-export const getWindow = (): Window | DOMWindow => getEnv().window;
+export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
+  getEnv().window;

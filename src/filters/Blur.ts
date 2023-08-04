@@ -6,7 +6,7 @@ import type {
   T2DPipelineState,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blur';
 
@@ -37,6 +37,8 @@ export class Blur extends BaseFilter {
 
   declare horizontal: boolean;
   declare aspectRatio: number;
+
+  static type = 'Blur';
 
   static defaults = blurDefaultValues;
 

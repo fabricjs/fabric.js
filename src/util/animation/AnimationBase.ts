@@ -2,7 +2,7 @@ import { noop } from '../../constants';
 import { requestAnimFrame } from './AnimationFrameProvider';
 import { runningAnimations } from './AnimationRegistry';
 import { defaultEasing } from './easing';
-import {
+import type {
   AnimationState,
   TAbortCallback,
   TBaseAnimationOptions,

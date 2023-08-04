@@ -449,7 +449,7 @@
 
   function text12(canvas, callback) {
     fabric.Text.fromObject(
-      JSON.parse('{"type":"IText","version":"4.4.0","left":1.28,"top":0.19,"width":740.57,"height":150.06,"fill":"#e38644","scaleX":0.48,"scaleY":0.48,"angle":0.2,"text":"השועל החום והזריז קופץ מעל הכלב העצלן\\nהשועל החום והזר33יז  קופץ מעל הכל העצלן\\nשלום עולם","fontWeight":"","fontFamily":"Arial","textAlign":"right","textBackgroundColor":"#d72323","direction":"rtl","styles":{"0":{"6":{"fill":"red"},"7":{"fill":"red"},"8":{"fill":"red","linethrough":true},"9":{"fill":"red","linethrough":true},"10":{"linethrough":true,"textBackgroundColor":"red"},"11":{"linethrough":true,"textBackgroundColor":"green"},"12":{"linethrough":true},"13":{"linethrough":true}},"1":{"8":{"underline":true},"9":{"underline":true},"10":{"underline":true},"11":{"underline":true},"12":{"underline":true},"13":{"underline":true,"fontSize":22},"14":{"underline":true,"fontSize":22},"15":{"underline":true,"fontSize":22},"16":{"underline":true,"fontSize":22},"17":{"fontSize":22},"18":{"fontSize":22},"19":{"fontSize":22},"20":{"fontSize":22},"21":{"fontSize":22},"22":{"fontSize":22,"textBackgroundColor":"blue"}}},"path":null}')
+      JSON.parse('{"type":"IText","version":"4.4.0","left":1.28,"top":0.19,"width":740.57,"height":150.06,"fill":"#e38644","scaleX":0.48,"scaleY":0.48,"angle":0.2,"text":"השועל החום והזריז קופץ מעל הכלב העצלן\\nהשועל החום והזר33יז  קופץ מעל הכל העצלן\\nשלום עולם","fontWeight":"normal","fontFamily":"Arial","textAlign":"right","textBackgroundColor":"#d72323","direction":"rtl","styles":{"0":{"6":{"fill":"red"},"7":{"fill":"red"},"8":{"fill":"red","linethrough":true},"9":{"fill":"red","linethrough":true},"10":{"linethrough":true,"textBackgroundColor":"red"},"11":{"linethrough":true,"textBackgroundColor":"green"},"12":{"linethrough":true},"13":{"linethrough":true}},"1":{"8":{"underline":true},"9":{"underline":true},"10":{"underline":true},"11":{"underline":true},"12":{"underline":true},"13":{"underline":true,"fontSize":22},"14":{"underline":true,"fontSize":22},"15":{"underline":true,"fontSize":22},"16":{"underline":true,"fontSize":22},"17":{"fontSize":22},"18":{"fontSize":22},"19":{"fontSize":22},"20":{"fontSize":22},"21":{"fontSize":22},"22":{"fontSize":22,"textBackgroundColor":"blue"}}},"path":null}')
     ).then(function(text) {
       canvas.add(text);
       canvas.renderAll();
@@ -503,7 +503,8 @@
           canvas.getContext().drawImage(imageSource, 0, 0);
           callback(canvas.lowerCanvasEl);
         }
-      }
+      },
+      target: canvas.upperCanvasEl
     };
     text.draggableTextDelegate.setDragImage(dragEventStub, {
       selectionStart: 3,
@@ -565,10 +566,12 @@
     canvas._onMouseDown({
       clientX: 5,
       clientY: 5,
+      target: canvas.upperCanvasEl
     });
     canvas._onDragStart({
       clientX: 5,
       clientY: 5,
+      target: canvas.upperCanvasEl,
       preventDefault() {
 
       },
@@ -587,6 +590,7 @@
     canvas._onDragOver({
       clientX: 25,
       clientY: 25,
+      target: canvas.upperCanvasEl,
       preventDefault() {
 
       },

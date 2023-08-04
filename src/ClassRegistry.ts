@@ -100,10 +100,10 @@ export class ClassRegistry {
     if (classType) {
       this[JSON].set(classType, classConstructor);
     } else {
-      this[JSON].set(classConstructor.name, classConstructor);
+      this[JSON].set(classConstructor.type, classConstructor);
       // legacy
       // @TODO: needs to be removed in fabric 7 or 8
-      this[JSON].set(classConstructor.name.toLowerCase(), classConstructor);
+      this[JSON].set(classConstructor.type.toLowerCase(), classConstructor);
     }
   }
 
@@ -123,7 +123,7 @@ export class ClassRegistry {
     SVGTagName?: string
   ) {
     this[SVG].set(
-      SVGTagName ?? classConstructor.name.toLowerCase(),
+      SVGTagName ?? classConstructor.type.toLowerCase(),
       classConstructor
     );
   }

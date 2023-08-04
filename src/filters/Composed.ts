@@ -1,6 +1,6 @@
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
+import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 
 /**
@@ -11,6 +11,8 @@ export class Composed extends BaseFilter {
    * A non sparse array of filters to apply
    */
   declare subFilters: BaseFilter[];
+
+  static type = 'Composed';
 
   constructor({
     subFilters = [],
@@ -67,7 +69,9 @@ export class Composed extends BaseFilter {
       ((object.subFilters || []) as BaseFilter[]).map((filter) =>
         classRegistry.getJSONClass(filter.type).fromObject(filter, options)
       )
-    ).then((enlivedFilters) => new Composed({ subFilters: enlivedFilters }));
+    ).then(
+      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as BaseFilter
+    );
   }
 }
 

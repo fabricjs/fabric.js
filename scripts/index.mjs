@@ -35,36 +35,6 @@ const program = new commander.Command()
 
 const websiteDir = path.resolve(wd, '../fabricjs.com');
 
-function execGitCommand(cmd) {
-  return cp
-    .execSync(cmd, { cwd: wd })
-    .toString()
-    .replace(/\n/g, ',')
-    .split(',')
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0);
-}
-
-function getGitInfo(branchRef) {
-  const branch = execGitCommand('git branch --show-current')[0];
-  const tag = execGitCommand('git describe --tags')[0];
-  const uncommittedChanges = execGitCommand('git status --porcelain').map(
-    (value) => {
-      const [type, path] = value.split(' ');
-      return { type, path };
-    }
-  );
-  const changes = execGitCommand(`git diff ${branchRef} --name-only`);
-  const userName = execGitCommand('git config user.name')[0];
-  return {
-    branch,
-    tag,
-    uncommittedChanges,
-    changes,
-    user: userName,
-  };
-}
-
 class ICheckbox extends Checkbox {
   constructor(questions, rl, answers) {
     super(questions, rl, answers);

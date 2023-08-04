@@ -1,4 +1,4 @@
-import {
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
@@ -6,7 +6,7 @@ import {
 } from '../EventTypeDefs';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
-import { TAxis, TAxisKey } from '../typedefs';
+import type { TAxis, TAxisKey } from '../typedefs';
 import {
   degreesToRadians,
   radiansToDegrees,
@@ -19,6 +19,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { CENTER } from '../constants';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -177,7 +178,7 @@ function skewHandler(
     skewingDirection =
       ((target[skewKey] === 0 &&
         // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
-        getLocalPoint(transform, 'center', 'center', x, y)[axis] > 0) ||
+        getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
       // in case target has skewing we use that as the direction
       target[skewKey] > 0
         ? 1

@@ -1,6 +1,5 @@
-import { LEFT_CLICK, MIDDLE_CLICK, RIGHT_CLICK } from '../constants';
-import { getDocument, getWindow } from '../env';
-import {
+import { LEFT_CLICK, MIDDLE_CLICK, NONE, RIGHT_CLICK } from '../constants';
+import type {
   CanvasEvents,
   DragEventData,
   ObjectEvents,
@@ -10,16 +9,19 @@ import {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { Group } from '../shapes/Group';
+import type { Group } from '../shapes/Group';
+import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { AssertKeys } from '../typedefs';
+import type { TOptions } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
+import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
-} from '../util/types';
-import { SelectableCanvas, TDestroyedCanvas } from './SelectableCanvas';
+} from '../util/typeAssertions';
+import type { CanvasOptions } from './CanvasOptions';
+import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
@@ -64,7 +66,7 @@ type TSyntheticEventContext = {
   drag: DragEventData;
 };
 
-export class Canvas extends SelectableCanvas {
+export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -72,11 +74,6 @@ export class Canvas extends SelectableCanvas {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
@@ -115,9 +112,12 @@ export class Canvas extends SelectableCanvas {
 
   private _isClick: boolean;
 
-  textEditingManager = new TextEditingManager();
+  textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<CanvasOptions> = {}
+  ) {
     super(el, options);
     // bind event handlers
     (
@@ -164,7 +164,7 @@ export class Canvas extends SelectableCanvas {
   addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    functor(getWindow(), 'resize', this._onResize);
+    functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
     functor(
       canvasElement,
@@ -206,25 +206,26 @@ export class Canvas extends SelectableCanvas {
     this.addOrRemove(removeListener, 'remove');
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}up`,
       this._onMouseUp as EventListener
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -337,14 +338,14 @@ export class Canvas extends SelectableCanvas {
     if (source) {
       ctx.save();
       source.transform(ctx);
-      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      source.renderDragSourceEffect(e);
       ctx.restore();
       dirty = true;
     }
     if (target) {
       ctx.save();
       target.transform(ctx);
-      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      target.renderDropTargetEffect(e);
       ctx.restore();
       dirty = true;
     }
@@ -359,7 +360,7 @@ export class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   private _onDragEnd(e: DragEvent) {
-    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== 'none',
+    const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== NONE,
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,
@@ -613,14 +614,15 @@ export class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(canvasElement);
     addListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     addListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -628,7 +630,7 @@ export class Canvas extends SelectableCanvas {
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(
       canvasElement,
-      eventTypePrefix + 'down',
+      `${eventTypePrefix}down`,
       this._onMouseDown as EventListener
     );
   }
@@ -648,13 +650,10 @@ export class Canvas extends SelectableCanvas {
       this._onMouseMove as EventListener,
       addEventOptions
     );
+    const doc = getDocumentFromElement(canvasElement);
+    addListener(doc, `${eventTypePrefix}up`, this._onMouseUp as EventListener);
     addListener(
-      getDocument(),
-      `${eventTypePrefix}up`,
-      this._onMouseUp as EventListener
-    );
-    addListener(
-      getDocument(),
+      doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
       addEventOptions
@@ -674,14 +673,15 @@ export class Canvas extends SelectableCanvas {
     this._resetTransformEventData();
     this.mainTouchId = null;
     const eventTypePrefix = this._getEventPrefix();
+    const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(
-      getDocument(),
+      doc,
       'touchend',
       this._onTouchEnd as EventListener,
       addEventOptions
     );
     removeListener(
-      getDocument(),
+      doc,
       'touchmove',
       this._onMouseMove as EventListener,
       addEventOptions
@@ -694,7 +694,7 @@ export class Canvas extends SelectableCanvas {
       // from touch devices
       addListener(
         this.upperCanvasEl,
-        eventTypePrefix + 'down',
+        `${eventTypePrefix}down`,
         this._onMouseDown as EventListener
       );
       this._willAddMouseDown = 0;
@@ -711,13 +711,14 @@ export class Canvas extends SelectableCanvas {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
+      const doc = getDocumentFromElement(this.upperCanvasEl);
       removeListener(
-        getDocument(),
+        doc,
         `${eventTypePrefix}up`,
         this._onMouseUp as EventListener
       );
       removeListener(
-        getDocument(),
+        doc,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
         addEventOptions
@@ -1095,7 +1096,7 @@ export class Canvas extends SelectableCanvas {
     }
     // we start a group selector rectangle if
     // selection is enabled
-    // and there is no target, or the following 3 condition both apply
+    // and there is no target, or the following 3 conditions are satisfied:
     // target is not selectable ( otherwise we selected it )
     // target is not editing
     // target is not already selected ( otherwise we drag )
@@ -1103,8 +1104,7 @@ export class Canvas extends SelectableCanvas {
       this.selection &&
       (!target ||
         (!target.selectable &&
-          // @ts-ignore
-          !target.isEditing &&
+          !(target as IText).isEditing &&
           target !== this._activeObject))
     ) {
       const p = this.getPointer(e);
@@ -1369,7 +1369,6 @@ export class Canvas extends SelectableCanvas {
         : pointer;
     // seems used only here.
     // @TODO: investigate;
-    // @ts-ignore
     transform.reset = false;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
@@ -1457,10 +1456,7 @@ export class Canvas extends SelectableCanvas {
    * @param {FabricObject} target target of event to select/deselect
    * @returns true if grouping occurred
    */
-  protected handleMultiSelection(
-    e: TPointerEvent,
-    target?: FabricObject
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleMultiSelection(e: TPointerEvent, target?: FabricObject) {
     const activeObject = this._activeObject;
     const activeSelection = this._activeSelection;
     const isAS = activeObject === activeSelection;
@@ -1483,7 +1479,7 @@ export class Canvas extends SelectableCanvas {
       //  target accepts selection
       !target.onSelect({ e }) &&
       // make sure we are not on top of a control
-      !activeObject.__corner
+      !activeObject.getActiveControl()
     ) {
       if (isAS) {
         const prevActiveObjects =
@@ -1538,9 +1534,7 @@ export class Canvas extends SelectableCanvas {
    * ---
    * runs on mouse up
    */
-  protected handleSelection(
-    e: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleSelection(e: TPointerEvent) {
     if (!this.selection || !this._groupSelector) {
       return false;
     }
@@ -1585,24 +1579,20 @@ export class Canvas extends SelectableCanvas {
     return true;
   }
 
-  exitTextEditing() {
-    this.textEditingManager.exitTextEditing();
-  }
-
   /**
    * @override clear {@link textEditingManager}
    */
   clear() {
-    this.textEditingManager.dispose();
+    this.textEditingManager.clear();
     super.clear();
   }
 
   /**
    * @override clear {@link textEditingManager}
    */
-  destroy(this: TDestroyedCanvas<this>) {
+  destroy() {
     this.removeListeners();
-    super.destroy();
     this.textEditingManager.dispose();
+    super.destroy();
   }
 }

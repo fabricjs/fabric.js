@@ -1,15 +1,12 @@
 import { noop } from '../../constants';
 import type { BaseFilter } from '../../filters/BaseFilter';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { TCrossOrigin, TFiller } from '../../typedefs';
+import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
+import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 
-export type LoadImageOptions = {
-  /**
-   * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type LoadImageOptions = Abortable & {
   /**
    * cors value for the image loading, default to anonymous
    */
@@ -57,25 +54,29 @@ export const loadImage = (
     img.src = url;
   });
 
-export type EnlivenObjectOptions = {
-  /**
-   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type EnlivenObjectOptions = Abortable & {
   /**
    * Method for further parsing of object elements,
    * called after each fabric object created.
    */
-  reviver?: <T>(serializedObj: Record<string, any>, instance: T) => void;
+  reviver?: <T extends BaseFabricObject | FabricObject | BaseFilter>(
+    serializedObj: Record<string, any>,
+    instance: T
+  ) => void;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
+ * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
+ * called after each fabric object created.
+ * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = <T extends object = FabricObject>(
+export const enlivenObjects = <
+  T extends BaseFabricObject | FabricObject | BaseFilter
+>(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
@@ -98,8 +99,9 @@ export const enlivenObjects = <T extends object = FabricObject>(
       .then(resolve)
       .catch((error) => {
         // cleanup
-        instances.forEach((instance: any) => {
-          instance.dispose && instance.dispose();
+        instances.forEach((instance) => {
+          (instance as FabricObject).dispose &&
+            (instance as FabricObject).dispose();
         });
         reject(error);
       })
@@ -124,7 +126,7 @@ export const enlivenObjectEnlivables = <
   R extends Record<keyof D, T> = Record<keyof D, T>
 >(
   serializedObject: D,
-  { signal }: { signal?: AbortSignal } = {}
+  { signal }: Abortable = {}
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: T[] = [];

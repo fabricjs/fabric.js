@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { config } from '../config';
 import { WebGLProbe } from '../filters/GLProbes/WebGLProbe';
-import { TCopyPasteData, TFabricEnv } from './types';
+import type { TCopyPasteData, TFabricEnv } from './types';
 
 const copyPasteData: TCopyPasteData = {};
 
