@@ -17,7 +17,7 @@ import type { CSSRules } from './typedefs';
  * @return {Object} object containing parsed attributes' names/values
  */
 export function parseAttributes(
-  element: HTMLElement | SVGElement | null,
+  element: HTMLElement | null,
   attributes: string[],
   cssRules?: CSSRules
 ): Record<string, any> {

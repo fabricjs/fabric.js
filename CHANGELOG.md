@@ -31,7 +31,6 @@
 - ci() Refactor GHA actions for caching and reuse [#9029](https://github.com/fabricjs/fabric.js/pull/9029)
 - ci(): install dev deps types [#9039](https://github.com/fabricjs/fabric.js/pull/9039)
 
-- chore(TS): patch class registry [#8507](https://github.com/fabricjs/fabric.js/pull/8507)
 ## [6.0.0-beta10]
 
 - chore(TS): Remove @ts-nocheck from Text class. [#9018](https://github.com/fabricjs/fabric.js/pull/9018)
