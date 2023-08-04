@@ -10,10 +10,9 @@
  * different sources you will need to import all fabric because you may need all classes.
  */
 
-import type { ParsedViewboxTransform } from './parser/applyViewboxTransform';
+import type { SVGParsingOptions } from './parser/elements_parser';
 import type { CSSRules } from './parser/typedefs';
 import type { Constructor } from './typedefs';
-import type { LoadImageOptions } from './util';
 
 export const JSON = 'json';
 export const SVG = 'svg';
@@ -29,7 +28,7 @@ export type TJSONResolver<T extends object = any> = ConstructorWithType<T> & {
 export type TSVGResolver<T extends object = any> = ConstructorWithType<T> & {
   fromElement(
     element: Element,
-    options: LoadImageOptions & ParsedViewboxTransform & Record<string, any>,
+    options: SVGParsingOptions & Record<string, any>,
     cssRules?: CSSRules
   ): T | null | Promise<T | null>;
 };
