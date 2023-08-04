@@ -1815,11 +1815,11 @@ export class Text<
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
-   * @param {HTMLElement} element Element to parse
+   * @param {v} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
+    element: SVGElement,
     options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {

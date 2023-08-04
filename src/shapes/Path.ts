@@ -413,11 +413,11 @@ export class Path<
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {HTMLElement} element to parse
+   * @param {SVGElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
+    element: SVGElement,
     options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {

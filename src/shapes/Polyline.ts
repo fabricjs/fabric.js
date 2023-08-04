@@ -370,11 +370,11 @@ export class Polyline<
    * Returns Polyline instance from an SVG element
    * @static
    * @memberOf Polyline
-   * @param {HTMLElement} element Element to parser
+   * @param {SVGElement} element Element to parser
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
+    element: SVGElement,
     options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {

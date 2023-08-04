@@ -193,11 +193,11 @@ export class Rect<
    * Returns {@link Rect} instance from an SVG element
    * @static
    * @memberOf Rect
-   * @param {HTMLElement} element Element to parse
+   * @param {SVGElement} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
+    element: SVGElement,
     options: SVGParsingOptions,
     cssRules?: CSSRules
   ) {
