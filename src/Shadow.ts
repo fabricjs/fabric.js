@@ -224,4 +224,3 @@ export class Shadow {
 }
 
 classRegistry.setClass(Shadow, 'shadow');
-classRegistry.setSVGClass(Shadow, 'shadow');
