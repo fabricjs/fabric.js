@@ -2,7 +2,7 @@ import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { TMat2D } from '../typedefs';
+import type { Abortable, TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -376,6 +376,7 @@ export class Gradient<
    */
   static fromElement(
     el: SVGGradientElement,
+    options: Abortable,
     {
       gradientUnits,
       viewBoxWidth,

@@ -27,6 +27,7 @@ export type SerializedShadowOptions = {
   offsetY: number;
   affectStroke: boolean;
   nonScaling: boolean;
+  type: 'shadow';
 };
 
 export class Shadow {

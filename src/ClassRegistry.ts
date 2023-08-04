@@ -10,21 +10,24 @@
  * different sources you will need to import all fabric because you may need all classes.
  */
 
-import { Constructor } from '../typedefs';
+import type { CSSRules } from './parser/typedefs';
+import type { Abortable, Constructor } from './typedefs';
 
 export const JSON = 'json';
 export const SVG = 'svg';
 
 export type TJSONResolver<T extends object = any> = Constructor<T> & {
+  type: string;
   fromObject(data: unknown, options?: unknown): T | Promise<T>;
 };
 
 export type TSVGResolver<T extends object = any> = Constructor<T> & {
+  type: string;
   fromElement(
-    svgEl: SVGElement,
-    callback: (instance: T | null) => any,
-    options: unknown
-  ): void;
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ): T | null | Promise<T | null>;
 };
 
 type ResolverReturnValue<T extends object, S = true> = S extends true
