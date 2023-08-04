@@ -130,7 +130,7 @@ export class ElementsParser {
     const center = obj._findCenterFromElement();
     const gradient = await classRegistry
       .getSVGClass('gradient')
-      .fromElement(gradientDef, {
+      .fromElement(gradientDef, this.options, {
         ...this.options,
         opacity: opacityAttr,
         gradientUnits,
