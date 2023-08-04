@@ -99,6 +99,10 @@ export type {
   SerializedGroupProps,
 } from './src/shapes/Group';
 export { Group } from './src/shapes/Group';
+export type {
+  ActiveSelectionOptions,
+  MultiSelectionStacking,
+} from './src/shapes/ActiveSelection';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
 export { Image } from './src/shapes/Image';
 export type {
