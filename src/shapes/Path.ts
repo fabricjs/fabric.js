@@ -29,7 +29,6 @@ import type {
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -413,12 +412,12 @@ export class Path<
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {SVGElement} element to parse
+   * @param {HTMLElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Partial<PathProps>,
     cssRules?: CSSRules
   ) {
     const { d, ...parsedAttributes } = parseAttributes(
@@ -437,5 +436,6 @@ export class Path<
 }
 
 classRegistry.setClass(Path);
+classRegistry.setSVGClass(Path);
 
 /* _FROM_SVG_START_ */

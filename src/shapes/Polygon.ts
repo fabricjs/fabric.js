@@ -19,3 +19,4 @@ export class Polygon extends Polyline {
 }
 
 classRegistry.setClass(Polygon);
+classRegistry.setSVGClass(Polygon);

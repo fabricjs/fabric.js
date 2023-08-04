@@ -6,10 +6,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 interface UniqueCircleProps {
   /**
@@ -198,13 +197,13 @@ export class Circle<
    * Returns {@link Circle} instance from an SVG element
    * @static
    * @memberOf Circle
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ): Promise<Circle> {
     const {
@@ -239,3 +238,4 @@ export class Circle<
 }
 
 classRegistry.setClass(Circle);
+classRegistry.setSVGClass(Circle);

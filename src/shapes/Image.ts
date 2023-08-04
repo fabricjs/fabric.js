@@ -30,7 +30,6 @@ import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -831,14 +830,14 @@ export class Image<
   /**
    * Returns {@link Image} instance from an SVG element
    * @static
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions = {},
+    element: HTMLElement,
+    options: Abortable = {},
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(
@@ -858,3 +857,4 @@ export class Image<
 }
 
 classRegistry.setClass(Image);
+classRegistry.setSVGClass(Image);

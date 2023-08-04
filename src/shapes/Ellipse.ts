@@ -1,13 +1,12 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
@@ -152,12 +151,12 @@ export class Ellipse<
    * Returns {@link Ellipse} instance from an SVG element
    * @static
    * @memberOf Ellipse
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(
@@ -175,3 +174,4 @@ export class Ellipse<
 }
 
 classRegistry.setClass(Ellipse);
+classRegistry.setSVGClass(Ellipse);

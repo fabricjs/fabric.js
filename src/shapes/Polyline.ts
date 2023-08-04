@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
@@ -18,7 +18,6 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -370,12 +369,12 @@ export class Polyline<
    * Returns Polyline instance from an SVG element
    * @static
    * @memberOf Polyline
-   * @param {SVGElement} element Element to parser
+   * @param {HTMLElement} element Element to parser
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const points = parsePointsAttribute(element.getAttribute('points')),
@@ -409,3 +408,4 @@ export class Polyline<
 }
 
 classRegistry.setClass(Polyline);
+classRegistry.setSVGClass(Polyline);

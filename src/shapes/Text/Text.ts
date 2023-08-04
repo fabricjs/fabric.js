@@ -10,6 +10,7 @@ import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
 import type {
+  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
@@ -45,7 +46,6 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
-import type { SVGParsingOptions } from '../../parser/elements_parser';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1815,12 +1815,12 @@ export class Text<
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
-   * @param {v} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const parsedAttributes = parseAttributes(
@@ -1912,3 +1912,4 @@ export class Text<
 
 applyMixins(Text, [TextSVGExportMixin]);
 classRegistry.setClass(Text);
+classRegistry.setSVGClass(Text);

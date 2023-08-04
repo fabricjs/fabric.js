@@ -56,3 +56,4 @@ export class Triangle<
 }
 
 classRegistry.setClass(Triangle);
+classRegistry.setSVGClass(Triangle);

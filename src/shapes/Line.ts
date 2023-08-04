@@ -1,6 +1,6 @@
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import { Point } from '../Point';
@@ -10,7 +10,6 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import { makeBoundingBoxFromPoints } from '../util';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
-import type { SVGParsingOptions } from '../parser/elements_parser';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
 
@@ -236,13 +235,13 @@ export class Line<
    * Returns Line instance from an SVG element
    * @static
    * @memberOf Line
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
   static async fromElement(
-    element: SVGElement,
-    options: SVGParsingOptions,
+    element: HTMLElement,
+    options: Abortable,
     cssRules?: CSSRules
   ) {
     const {
@@ -284,3 +283,4 @@ export class Line<
 }
 
 classRegistry.setClass(Line);
+classRegistry.setSVGClass(Line);
