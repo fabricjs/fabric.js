@@ -43,16 +43,15 @@ export class ActiveSelection extends Group {
     //  noop
   }
 
-  selectAll(...targets: FabricObject[]) {
-    this.add(...targets);
-  }
-
   /**
    * Adds objects with respect to {@link multiSelectionStacking}
    * @param targets object to add to selection
    */
-  multiSelect(...targets: FabricObject[]) {
-    if (this.multiSelectionStacking === 'selection-order') {
+  addToSelection(mode: 'multi-select' | 'default', ...targets: FabricObject[]) {
+    if (
+      mode === 'default' ||
+      this.multiSelectionStacking === 'selection-order'
+    ) {
       this.add(...targets);
     } else {
       //  respect object stacking as it is on canvas

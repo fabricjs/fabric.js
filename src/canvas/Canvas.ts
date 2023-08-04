@@ -1506,7 +1506,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           }
         } else {
           //  `target` isn't part of active selection => add it
-          activeSelection.multiSelect(target);
+          activeSelection.addToSelection('multi-select', target);
           this._hoveredTarget = activeSelection;
           this._hoveredTargets = [...this.targets];
         }
@@ -1514,7 +1514,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       } else {
         isInteractiveTextObject(activeObject) && activeObject.exitEditing();
         // add the active object and the target to the active selection and set it as the active object
-        activeSelection.multiSelect(activeObject, target);
+        activeSelection.addToSelection('multi-select', activeObject, target);
         this._hoveredTarget = activeSelection;
         // ISSUE 4115: should we consider subTargets here?
         // this._hoveredTargets = [];
@@ -1570,7 +1570,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.setActiveObject(objects[0], e);
     } else if (objects.length > 1) {
       // add to active selection and make it the active object
-      this._activeSelection.selectAll(...objects);
+      this._activeSelection.addToSelection('default', ...objects);
       this.setActiveObject(this._activeSelection, e);
     }
 
