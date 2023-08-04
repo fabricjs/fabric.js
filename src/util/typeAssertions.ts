@@ -83,9 +83,3 @@ export const isFabricObjectWithDragSupport = (
       'function'
   );
 };
-
-export const isPathObject = (
-  fabricObject: FabricObject
-): fabricObject is Path => {
-  return !!fabricObject && fabricObject.type === 'path';
-};

@@ -798,12 +798,13 @@ export class Image<
       // TODO: redundant - handled by enlivenObjectEnlivables
       rf && enlivenObjects<BaseFilter>([rf], options),
       enlivenObjectEnlivables(object, options),
-    ]).then(([el, filters = [], hydratedProps = {}]) => {
+    ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
         ...object,
         // TODO: this creates a difference between image creation and restoring from JSON
         src,
         filters,
+        resizeFilter,
         ...hydratedProps,
       });
     });
