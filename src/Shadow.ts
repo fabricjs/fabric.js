@@ -27,7 +27,7 @@ export type SerializedShadowOptions = {
   offsetY: number;
   affectStroke: boolean;
   nonScaling: boolean;
-  type: 'shadow';
+  type: string;
 };
 
 export class Shadow {
@@ -84,6 +84,9 @@ export class Shadow {
   declare id: number;
 
   static ownDefaults = shadowDefaultValues;
+
+  static type = 'shadow';
+
   /**
    * @see {@link http://fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
@@ -200,9 +203,9 @@ export class Shadow {
       offsetY: this.offsetY,
       affectStroke: this.affectStroke,
       nonScaling: this.nonScaling,
-      type: 'shadow',
+      type: (this.constructor as typeof Shadow).type,
     };
-    const defaults = Shadow.ownDefaults;
+    const defaults = Shadow.ownDefaults as SerializedShadowOptions;
     return !this.includeDefaultValues
       ? pickBy(data, (value, key) => value !== defaults[key])
       : data;
