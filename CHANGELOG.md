@@ -3,6 +3,8 @@
 ## [next]
 
 - fix(ActiveSelection): expose `select` [#9141](https://github.com/fabricjs/fabric.js/pull/9141)
+- chore(TS): BREAKING remove canvas.interactive, added typings for canvas options [#9140](https://github.com/fabricjs/fabric.js/pull/9140)
+- chore(TS): BREAKING PREVIOUS BETA mv + rename `TProps` => `TOptions` [#9139](https://github.com/fabricjs/fabric.js/pull/9139)
 - test(playwright): Use embedded eval from playwright [#9133](https://github.com/fabricjs/fabric.js/pull/9133)
 - chore(TS): Fix event types and .once this binding [#9119](https://github.com/fabricjs/fabric.js/pull/9130)
 - docs(): rm `canvas2pdf` [#9135](https://github.com/fabricjs/fabric.js/pull/9135)
