@@ -173,7 +173,7 @@ export class Group extends createCollectionMixin(
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects;
+    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
