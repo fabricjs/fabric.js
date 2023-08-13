@@ -1037,3 +1037,19 @@ export const joinPath = (pathData: TSimplePathData, fractionDigits?: number) =>
         .join(' ');
     })
     .join(' ');
+
+/**
+ * Round numbers in a path command
+ * @param command A path command
+ * @param fractionDigits Number of fraction digitst to "leave"
+ * @returns A path command with rounded numbers
+ */
+export const roundCommand = (
+  command: TSimpleParsedCommand,
+  fractionDigits: number
+) =>
+  command.map((item) => {
+    if (typeof item === 'string') return item;
+    const digits = Math.pow(10, fractionDigits);
+    return Math.round(item * digits) / digits;
+  }) as TSimpleParsedCommand;

@@ -117,4 +117,20 @@
     const result = fabric.util.joinPath(pathData);
     assert.equal(result, expected, 'path data should have the specified number or less of fraction digits.');
   });
+
+  QUnit.test('fabric.util.roundComamnd should round the numbers in commands.', function (assert) {
+    const pathData = [
+      ["M", 3.12345678, 2.12345678],
+      ["L", 1.00001111, 2.40001111],
+      ["Z"],
+    ];
+    const expected = [
+      ["M", 3.123, 2.123],
+      ["L", 1.000, 2.400],
+      ["Z"],
+    ]
+    const digit = 3;
+    const result = pathData.map(command => fabric.util.roundCommand(command, digit));
+    assert.deepEqual(result, expected, 'should round the numbers in the path data.');
+  });
 })();
