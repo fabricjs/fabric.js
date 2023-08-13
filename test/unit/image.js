@@ -118,7 +118,7 @@
       assert.ok(image instanceof fabric.Image);
       assert.ok(image instanceof fabric.Object);
 
-      assert.equal(image.constructor.name, 'Image');
+      assert.equal(image.constructor.type, 'Image');
 
       done();
     });
@@ -538,6 +538,18 @@
     fabric.Image.fromURL(IMG_SRC).then(function(instance) {
       assert.ok(instance instanceof fabric.Image);
       assert.sameImageObject(REFERENCE_IMG_OBJECT, instance.toObject());
+      done();
+    });
+  });
+
+    QUnit.test('fromURL non defaults', function(assert) {
+    var done = assert.async();
+    assert.ok(typeof fabric.Image.fromURL === 'function');
+    fabric.Image.fromURL(IMG_SRC, {
+      crossOrigin: 'use-credentials',
+    }).then(function(instance) {
+      assert.ok(instance instanceof fabric.Image);
+      assert.sameImageObject({ ...REFERENCE_IMG_OBJECT, crossOrigin: 'use-credentials' }, instance.toObject());
       done();
     });
   });

@@ -704,8 +704,8 @@ export const getPathSegmentsInfo = (
     ) {
       case 'M':
         tempInfo = <TPathSegmentInfoCommon<'M'>>basicInfo;
-        x2 = x1 = current[1];
-        y2 = y1 = current[2];
+        tempInfo.x = x2 = x1 = current[1];
+        tempInfo.y = y2 = y1 = current[2];
         break;
       case 'L':
         tempInfo = <TPathSegmentInfoCommon<'L'>>basicInfo;

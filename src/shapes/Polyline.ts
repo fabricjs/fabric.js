@@ -4,21 +4,20 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
+import type { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -29,7 +28,7 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
 }
 
 export class Polyline<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -54,6 +53,8 @@ export class Polyline<
   private declare initialized: true | undefined;
 
   static ownDefaults: Record<string, any> = polylineDefaultValues;
+
+  static type = 'Polyline';
 
   static getDefaults() {
     return {
@@ -81,6 +82,8 @@ export class Polyline<
   declare strokeOffset: Point;
 
   static cacheProperties = [...cacheProperties, 'points'];
+
+  strokeDiff: Point;
 
   /**
    * Constructor
@@ -114,19 +117,31 @@ export class Polyline<
     return true;
   }
 
-  private _projectStrokeOnPoints() {
-    return projectStrokeOnPoints(this.points, this, this.isOpen());
+  private _projectStrokeOnPoints(options: TProjectStrokeOnPointsOptions) {
+    return projectStrokeOnPoints(this.points, options, this.isOpen());
   }
 
   /**
    * Calculate the polygon bounding box
    * @private
    */
-  _calcDimensions() {
+  _calcDimensions(options?: Partial<TProjectStrokeOnPointsOptions>) {
+    options = {
+      scaleX: this.scaleX,
+      scaleY: this.scaleY,
+      skewX: this.skewX,
+      skewY: this.skewY,
+      strokeLineCap: this.strokeLineCap,
+      strokeLineJoin: this.strokeLineJoin,
+      strokeMiterLimit: this.strokeMiterLimit,
+      strokeUniform: this.strokeUniform,
+      strokeWidth: this.strokeWidth,
+      ...(options || {}),
+    };
     const points = this.exactBoundingBox
-      ? this._projectStrokeOnPoints().map(
-          (projection) => projection.projectedPoint
-        )
+      ? this._projectStrokeOnPoints(
+          options as TProjectStrokeOnPointsOptions
+        ).map((projection) => projection.projectedPoint)
       : this.points;
     if (points.length === 0) {
       return {
@@ -136,22 +151,30 @@ export class Polyline<
         height: 0,
         pathOffset: new Point(),
         strokeOffset: new Point(),
+        strokeDiff: new Point(),
       };
     }
-    const bbox = makeBoundingBoxFromPoints(points);
-    const bboxNoStroke = makeBoundingBoxFromPoints(this.points);
-    const offsetX = bbox.left + bbox.width / 2,
-      offsetY = bbox.top + bbox.height / 2;
-    const pathOffsetX =
-      offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
-    const pathOffsetY =
-      offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY));
+    const bbox = makeBoundingBoxFromPoints(points),
+      // Remove scale effect, since it's applied after
+      matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
+      bboxNoStroke = makeBoundingBoxFromPoints(
+        this.points.map((p) => transformPoint(p, matrix, true))
+      ),
+      offsetX = bbox.left + bbox.width / 2,
+      offsetY = bbox.top + bbox.height / 2,
+      pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
+      pathOffsetY =
+        offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
+      scale = new Point(this.scaleX, this.scaleY);
     return {
       ...bbox,
       pathOffset: new Point(pathOffsetX, pathOffsetY),
-      strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(
-        new Point(bbox.left, bbox.top)
-      ),
+      strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
+        .subtract(new Point(bbox.left, bbox.top))
+        .multiply(scale),
+      strokeDiff: new Point(bbox.width, bbox.height)
+        .subtract(new Point(bboxNoStroke.width, bboxNoStroke.height))
+        .multiply(scale),
     };
   }
 
@@ -171,9 +194,9 @@ export class Polyline<
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset, strokeOffset } =
+    const { left, top, width, height, pathOffset, strokeOffset, strokeDiff } =
       this._calcDimensions();
-    this.set({ width, height, pathOffset, strokeOffset });
+    this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
       this.setPositionByOrigin(
         new Point(left + width / 2, top + height / 2),
@@ -187,27 +210,48 @@ export class Polyline<
    */
   _getNonTransformedDimensions() {
     return this.exactBoundingBox
-      ? new Point(this.width, this.height)
+      ? // TODO: fix this
+        new Point(this.width, this.height)
       : super._getNonTransformedDimensions();
   }
 
   /**
    * @override stroke and skewing are taken into account when projecting stroke on points,
-   * therefore we don't want the default calculation to account for skewing as well
+   * therefore we don't want the default calculation to account for skewing as well.
+   * Though it is possible to pass `width` and `height` in `options`, doing so is very strange, use with discretion.
    *
    * @private
    */
-  _getTransformedDimensions(options?: any) {
-    return this.exactBoundingBox
-      ? super._getTransformedDimensions({
-          ...(options || {}),
-          // disable stroke bbox calculations
-          strokeWidth: 0,
-          // disable skewing bbox calculations
-          skewX: 0,
-          skewY: 0,
-        })
-      : super._getTransformedDimensions(options);
+  _getTransformedDimensions(options: any = {}) {
+    if (this.exactBoundingBox) {
+      let size: Point;
+      /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because 
+        the stroke projections are affected. 
+        When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on 
+        projections follows a linear function (e.g. scaleX of 2 just multiply width by 2)*/
+      if (
+        Object.keys(options).some(
+          (key) =>
+            this.strokeUniform ||
+            (this.constructor as typeof Polyline).layoutProperties.includes(
+              key as keyof TProjectStrokeOnPointsOptions
+            )
+        )
+      ) {
+        const { width, height } = this._calcDimensions(options);
+        size = new Point(options.width ?? width, options.height ?? height);
+      } else {
+        size = new Point(
+          options.width ?? this.width,
+          options.height ?? this.height
+        );
+      }
+      return size.multiply(
+        new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)
+      );
+    } else {
+      return super._getTransformedDimensions(options);
+    }
   }
 
   /**
@@ -218,13 +262,13 @@ export class Polyline<
     const changed = this.initialized && this[key as keyof this] !== value;
     const output = super._set(key, value);
     if (
+      this.exactBoundingBox &&
       changed &&
       (((key === 'scaleX' || key === 'scaleY') &&
         this.strokeUniform &&
         (this.constructor as typeof Polyline).layoutProperties.includes(
           'strokeUniform'
-        ) &&
-        this.strokeLineJoin !== 'round') ||
+        )) ||
         (this.constructor as typeof Polyline).layoutProperties.includes(
           key as keyof Polyline
         ))
@@ -269,7 +313,11 @@ export class Polyline<
       );
     }
     return [
-      `<${this.constructor.name.toLowerCase() as 'polyline' | 'polygon'} `,
+      `<${
+        (this.constructor as typeof Polyline).type.toLowerCase() as
+          | 'polyline'
+          | 'polygon'
+      } `,
       'COMMON_PARTS',
       `points="${points.join('')}" />\n`,
     ];
@@ -321,18 +369,23 @@ export class Polyline<
    * Returns Polyline instance from an SVG element
    * @static
    * @memberOf Polyline
-   * @param {SVGElement} element Element to parser
+   * @param {HTMLElement} element Element to parser
    * @param {Object} [options] Options object
    */
-  static async fromElement(element: SVGElement, options?: any) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       { left, top, ...parsedAttributes } = parseAttributes(
         element,
-        this.ATTRIBUTE_NAMES
+        this.ATTRIBUTE_NAMES,
+        cssRules
       );
-    return new this(points || [], {
+    return new this(points, {
       ...parsedAttributes,
       ...options,
     });
@@ -347,7 +400,7 @@ export class Polyline<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPolylineProps>>(object: T) {
     return this._fromObject<Polyline>(object, {
       extraParam: 'points',
     });

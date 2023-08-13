@@ -12,7 +12,6 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { AssertKeys } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -20,6 +19,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/typeAssertions';
+import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -65,7 +65,7 @@ type TSyntheticEventContext = {
   drag: DragEventData;
 };
 
-export class Canvas extends SelectableCanvas {
+export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -73,11 +73,6 @@ export class Canvas extends SelectableCanvas {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
@@ -118,7 +113,7 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(el: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (
@@ -339,14 +334,14 @@ export class Canvas extends SelectableCanvas {
     if (source) {
       ctx.save();
       source.transform(ctx);
-      (source as AssertKeys<FabricObject, 'canvas'>).renderDragSourceEffect(e);
+      source.renderDragSourceEffect(e);
       ctx.restore();
       dirty = true;
     }
     if (target) {
       ctx.save();
       target.transform(ctx);
-      (target as AssertKeys<FabricObject, 'canvas'>).renderDropTargetEffect(e);
+      target.renderDropTargetEffect(e);
       ctx.restore();
       dirty = true;
     }
@@ -1457,10 +1452,7 @@ export class Canvas extends SelectableCanvas {
    * @param {FabricObject} target target of event to select/deselect
    * @returns true if grouping occurred
    */
-  protected handleMultiSelection(
-    e: TPointerEvent,
-    target?: FabricObject
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleMultiSelection(e: TPointerEvent, target?: FabricObject) {
     const activeObject = this._activeObject;
     const activeSelection = this._activeSelection;
     const isAS = activeObject === activeSelection;
@@ -1483,7 +1475,7 @@ export class Canvas extends SelectableCanvas {
       //  target accepts selection
       !target.onSelect({ e }) &&
       // make sure we are not on top of a control
-      !activeObject.__corner
+      !activeObject.getActiveControl()
     ) {
       if (isAS) {
         const prevActiveObjects =
@@ -1538,9 +1530,7 @@ export class Canvas extends SelectableCanvas {
    * ---
    * runs on mouse up
    */
-  protected handleSelection(
-    e: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  protected handleSelection(e: TPointerEvent) {
     if (!this.selection || !this._groupSelector) {
       return false;
     }

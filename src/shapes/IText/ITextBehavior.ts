@@ -4,16 +4,16 @@ import type {
   TPointerEventInfo,
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
-import type { FabricObject } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
 import { Text } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT } from '../../constants';
+import { LEFT, RIGHT, reNewline } from '../../constants';
 
 /**
  *  extend this regex to support non english languages
@@ -39,7 +39,7 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends Text<Props, SProps, EventSpec> {
@@ -313,19 +313,23 @@ export abstract class ITextBehavior<
    * @param {Number} direction 1 or -1
    * @return {Number} Index of the beginning or end of a word
    */
-  searchWordBoundary(selectionStart: number, direction: number): number {
+  searchWordBoundary(selectionStart: number, direction: 1 | -1): number {
     const text = this._text;
-    let index = this._reSpace.test(text[selectionStart])
-        ? selectionStart - 1
-        : selectionStart,
+    // if we land on a space we move the cursor backwards
+    // if we are searching boundary end we move the cursor backwards ONLY if we don't land on a line break
+    let index =
+        selectionStart > 0 &&
+        this._reSpace.test(text[selectionStart]) &&
+        (direction === -1 || !reNewline.test(text[selectionStart - 1]))
+          ? selectionStart - 1
+          : selectionStart,
       _char = text[index];
-
-    while (!reNonWord.test(_char) && index > 0 && index < text.length) {
+    while (index > 0 && index < text.length && !reNonWord.test(_char)) {
       index += direction;
       _char = text[index];
     }
-    if (reNonWord.test(_char)) {
-      index += direction === 1 ? 0 : 1;
+    if (direction === -1 && reNonWord.test(_char)) {
+      index++;
     }
     return index;
   }
@@ -336,14 +340,13 @@ export abstract class ITextBehavior<
    */
   selectWord(selectionStart: number) {
     selectionStart = selectionStart || this.selectionStart;
-    const newSelectionStart = this.searchWordBoundary(
-        selectionStart,
-        -1
-      ) /* search backwards */,
-      newSelectionEnd = this.searchWordBoundary(
-        selectionStart,
-        1
-      ); /* search forward */
+    // search backwards
+    const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
+      // search forward
+      newSelectionEnd = Math.max(
+        newSelectionStart,
+        this.searchWordBoundary(selectionStart, 1)
+      );
 
     this.selectionStart = newSelectionStart;
     this.selectionEnd = newSelectionEnd;
@@ -371,7 +374,7 @@ export abstract class ITextBehavior<
   /**
    * Enters editing state
    */
-  enterEditing(e: TPointerEvent) {
+  enterEditing(e?: TPointerEvent) {
     if (this.isEditing || !this.editable) {
       return;
     }
@@ -391,7 +394,7 @@ export abstract class ITextBehavior<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered', { e });
+    this.fire('editing:entered', e ? { e } : undefined);
     this._fireSelectionChanged();
     if (this.canvas) {
       // @ts-expect-error in reality it is an IText instance
@@ -404,6 +407,10 @@ export abstract class ITextBehavior<
    * called by {@link canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
+    if (this.getActiveControl()) {
+      return;
+    }
+
     const el = this.hiddenTextarea!;
     // regain focus
     getDocumentFromElement(el).activeElement !== el && el.focus();
@@ -664,6 +671,7 @@ export abstract class ITextBehavior<
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
+    this.selectionStart !== this.selectionEnd && this.clearContextTop();
   }
 
   /**
@@ -671,8 +679,8 @@ export abstract class ITextBehavior<
    */
   exitEditing() {
     const isTextChanged = this._textBeforeEdit !== this.text;
-    this.selectionEnd = this.selectionStart;
     this._exitEditing();
+    this.selectionEnd = this.selectionStart;
     this._restoreEditingProps();
     if (this._forceClearCache) {
       this.initDimensions();

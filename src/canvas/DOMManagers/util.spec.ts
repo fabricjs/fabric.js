@@ -1,23 +1,26 @@
-// for JEST, add back this specific test
-// QUnit.test('fabric.util.makeElementUnselectable', function (assert) {
-//   var makeElementUnselectable = fabric.util.makeElementUnselectable;
+import { makeElementUnselectable } from './util';
+import { getFabricDocument } from '../../env';
+import { NONE } from '../../constants';
 
-//   assert.ok(typeof makeElementUnselectable === 'function');
-
-//   var el = fabric.getFabricDocument().createElement('p');
-//   el.appendChild(fabric.getFabricDocument().createTextNode('foo'));
-
-//   assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
-
-//   if (typeof el.onselectstart !== 'undefined') {
-//     assert.equal(el.onselectstart.toString(), (() => false).toString());
-//   }
-
-//   // not sure if it's a good idea to test implementation details here
-//   // functional test would probably make more sense
-//   if (typeof el.unselectable === 'string') {
-//     assert.equal('on', el.unselectable);
-//   } else if (typeof el.userSelect !== 'undefined') {
-//     assert.equal('none', el.userSelect);
-//   }
-// });
+describe('DOMManagers utils', () => {
+  describe('makeElementUnselectable', () => {
+    it('makes element not selectable', () => {
+      const el = getFabricDocument().createElement('p');
+      el.appendChild(getFabricDocument().createTextNode('foo'));
+      const returnedEl = makeElementUnselectable(el);
+      expect(returnedEl).toBe(el);
+      expect(el.style.userSelect).toBe(NONE);
+    });
+    it('replace onselectstart if exists', () => {
+      const el = getFabricDocument().createElement('p');
+      el.appendChild(getFabricDocument().createTextNode('foo'));
+      el.onselectstart = () => 'fail';
+      expect(el.onselectstart({} as Event)).toBe('fail');
+      makeElementUnselectable(el);
+      expect(el.onselectstart).toBeTruthy();
+      if (el.onselectstart) {
+        expect(el.onselectstart({} as Event)).toBe(false);
+      }
+    });
+  });
+});

@@ -1,18 +1,18 @@
-// @ts-nocheck
 import { config } from '../../config';
 import { getFabricDocument, getEnv } from '../../env';
-import type { TPointerEvent } from '../../EventTypeDefs';
 import { capValue } from '../../util/misc/capValue';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextBehavior } from './ITextBehavior';
 import type { TKeyMapIText } from './constants';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT } from '../../constants';
+import type { IText } from './IText';
+import type { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextBehavior<Props, SProps, EventSpec> {
@@ -118,8 +118,10 @@ export abstract class ITextKeyBehavior<
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
     if (e.keyCode in keyMap) {
+      // @ts-expect-error legacy method calling pattern
       this[keyMap[e.keyCode]](e);
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
+      // @ts-expect-error legacy method calling pattern
       this[this.ctrlKeysMapDown[e.keyCode]](e);
     } else {
       return;
@@ -148,6 +150,7 @@ export abstract class ITextKeyBehavior<
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
+      // @ts-expect-error legacy method calling pattern
       this[this.ctrlKeysMapUp[e.keyCode]](e);
     } else {
       return;
@@ -161,7 +164,7 @@ export abstract class ITextKeyBehavior<
    * Handles onInput event
    * @param {Event} e Event object
    */
-  onInput(e: Event) {
+  onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: Event) {
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();
@@ -172,7 +175,7 @@ export abstract class ITextKeyBehavior<
       this.updateFromTextArea();
       this.fire('changed');
       if (this.canvas) {
-        this.canvas.fire('text:changed', { target: this });
+        this.canvas.fire('text:changed', { target: this as unknown as IText });
         this.canvas.requestRenderAll();
       }
     };
@@ -190,7 +193,7 @@ export abstract class ITextKeyBehavior<
       selectionStart = this.selectionStart,
       selectionEnd = this.selectionEnd,
       selection = selectionStart !== selectionEnd;
-    let copiedStyle,
+    let copiedStyle: TextStyleDeclaration[] | undefined,
       removedText,
       charDiff = nextCharCount - charCount,
       removeFrom,
@@ -235,7 +238,7 @@ export abstract class ITextKeyBehavior<
           () =>
             // this return an array of references, but that is fine since we are
             // copying the style later.
-            copiedStyle[0]
+            copiedStyle![0]
         );
       }
       if (selection) {
@@ -279,10 +282,10 @@ export abstract class ITextKeyBehavior<
     this.inCompositionMode = false;
   }
 
-  //  */
-  onCompositionUpdate(e) {
-    this.compositionStart = e.target.selectionStart;
-    this.compositionEnd = e.target.selectionEnd;
+  onCompositionUpdate({ target }: CompositionEvent) {
+    const { selectionStart, selectionEnd } = target as HTMLTextAreaElement;
+    this.compositionStart = selectionStart;
+    this.compositionEnd = selectionEnd;
     this.updateTextareaPosition();
   }
 
@@ -303,7 +306,7 @@ export abstract class ITextKeyBehavior<
         true
       );
     } else {
-      copyPasteData.copiedTextStyle = null;
+      copyPasteData.copiedTextStyle = undefined;
     }
     this._copyDone = true;
   }
@@ -335,7 +338,7 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Gets start offset of a selection
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    * @param {Boolean} isRight
    * @return {Number}
    */
@@ -443,9 +446,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor down
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  moveCursorDown(e: TPointerEvent) {
+  moveCursorDown(e: KeyboardEvent) {
     if (
       this.selectionStart >= this._text.length &&
       this.selectionEnd >= this._text.length
@@ -457,9 +460,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor up
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  moveCursorUp(e: TPointerEvent) {
+  moveCursorUp(e: KeyboardEvent) {
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
@@ -469,11 +472,13 @@ export abstract class ITextKeyBehavior<
   /**
    * Moves cursor up or down, fires the events
    * @param {String} direction 'Up' or 'Down'
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  _moveCursorUpOrDown(direction: 'Up' | 'Down', e: TPointerEvent) {
-    const action = `get${direction}CursorOffset`,
-      offset = this[action](e, this._selectionDirection === RIGHT);
+  _moveCursorUpOrDown(direction: 'Up' | 'Down', e: KeyboardEvent) {
+    const offset = this[`get${direction}CursorOffset`](
+      e,
+      this._selectionDirection === RIGHT
+    );
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     } else {
@@ -525,9 +530,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor left
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  moveCursorLeft(e: TPointerEvent) {
+  moveCursorLeft(e: KeyboardEvent) {
     if (this.selectionStart === 0 && this.selectionEnd === 0) {
       return;
     }
@@ -537,13 +542,19 @@ export abstract class ITextKeyBehavior<
   /**
    * @private
    * @return {Boolean} true if a change happened
+   *
+   * @todo refactor not to use method name composition
    */
-  _move(e, prop, direction): boolean {
-    let newValue;
+  _move(
+    e: KeyboardEvent,
+    prop: 'selectionStart' | 'selectionEnd',
+    direction: 'Left' | 'Right'
+  ): boolean {
+    let newValue: number | undefined;
     if (e.altKey) {
-      newValue = this['findWordBoundary' + direction](this[prop]);
+      newValue = this[`findWordBoundary${direction}`](this[prop]);
     } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
-      newValue = this['findLineBoundary' + direction](this[prop]);
+      newValue = this[`findLineBoundary${direction}`](this[prop]);
     } else {
       this[prop] += direction === 'Left' ? -1 : 1;
       return true;
@@ -552,27 +563,28 @@ export abstract class ITextKeyBehavior<
       this[prop] = newValue;
       return true;
     }
+    return false;
   }
 
   /**
    * @private
    */
-  _moveLeft(e, prop) {
+  _moveLeft(e: KeyboardEvent, prop: 'selectionStart' | 'selectionEnd') {
     return this._move(e, prop, 'Left');
   }
 
   /**
    * @private
    */
-  _moveRight(e, prop) {
+  _moveRight(e: KeyboardEvent, prop: 'selectionStart' | 'selectionEnd') {
     return this._move(e, prop, 'Right');
   }
 
   /**
    * Moves cursor left without keeping selection
-   * @param {TPointerEvent} e
+   * @param {KeyboardEvent} e
    */
-  moveCursorLeftWithoutShift(e: TPointerEvent) {
+  moveCursorLeftWithoutShift(e: KeyboardEvent) {
     let change = true;
     this._selectionDirection = LEFT;
 
@@ -590,9 +602,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor left while keeping selection
-   * @param {TPointerEvent} e
+   * @param {KeyboardEvent} e
    */
-  moveCursorLeftWithShift(e: TPointerEvent) {
+  moveCursorLeftWithShift(e: KeyboardEvent) {
     if (
       this._selectionDirection === RIGHT &&
       this.selectionStart !== this.selectionEnd
@@ -606,9 +618,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor right
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  moveCursorRight(e: TPointerEvent) {
+  moveCursorRight(e: KeyboardEvent) {
     if (
       this.selectionStart >= this._text.length &&
       this.selectionEnd >= this._text.length
@@ -621,17 +633,13 @@ export abstract class ITextKeyBehavior<
   /**
    * Moves cursor right or Left, fires event
    * @param {String} direction 'Left', 'Right'
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  _moveCursorLeftOrRight(direction: string, e: TPointerEvent) {
-    let actionName = 'moveCursor' + direction + 'With';
+  _moveCursorLeftOrRight(direction: 'Left' | 'Right', e: KeyboardEvent) {
+    const actionName = `moveCursor${direction}${
+      e.shiftKey ? 'WithShift' : 'WithoutShift'
+    }` as const;
     this._currentCursorOpacity = 1;
-
-    if (e.shiftKey) {
-      actionName += 'Shift';
-    } else {
-      actionName += 'outShift';
-    }
     if (this[actionName](e)) {
       this.abortCursorAnimation();
       this.initDelayedCursor();
@@ -642,9 +650,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor right while keeping selection
-   * @param {TPointerEvent} e
+   * @param {KeyboardEvent} e
    */
-  moveCursorRightWithShift(e: TPointerEvent) {
+  moveCursorRightWithShift(e: KeyboardEvent) {
     if (
       this._selectionDirection === LEFT &&
       this.selectionStart !== this.selectionEnd
@@ -658,9 +666,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Moves cursor right without keeping selection
-   * @param {TPointerEvent} e Event object
+   * @param {KeyboardEvent} e Event object
    */
-  moveCursorRightWithoutShift(e: TPointerEvent) {
+  moveCursorRightWithoutShift(e: KeyboardEvent) {
     let changed = true;
     this._selectionDirection = RIGHT;
 

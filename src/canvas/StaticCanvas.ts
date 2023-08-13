@@ -1,14 +1,12 @@
 import { config } from '../config';
-import { CENTER, iMatrix, VERSION } from '../constants';
+import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
-import type { BaseFabricObject as FabricObject } from '../EventTypeDefs';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
-import type { Rect } from '../shapes/Rect';
 import type {
   Abortable,
   Constructor,
@@ -20,6 +18,7 @@ import type {
   TSVGReviver,
   TToCanvasElementOptions,
   TValidToObjectMethod,
+  TOptions,
 } from '../typedefs';
 import {
   cancelAnimFrame,
@@ -44,6 +43,9 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { StaticCanvasOptions } from './StaticCanvasOptions';
+import { staticCanvasDefaults } from './StaticCanvasOptions';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -64,25 +66,6 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-export const StaticCanvasDefaults = {
-  backgroundColor: '',
-  backgroundImage: null,
-  overlayColor: '',
-  overlayImage: null,
-  includeDefaultValues: true,
-  renderOnAddRemove: true,
-  controlsAboveOverlay: false,
-  allowTouchScrolling: false,
-  imageSmoothingEnabled: true,
-  viewportTransform: iMatrix.concat(),
-  backgroundVpt: true,
-  overlayVpt: true,
-  enableRetinaScaling: true,
-  svgViewportTransformation: true,
-  skipOffscreen: true,
-  clipPath: undefined,
-};
-
 /**
  * Static canvas class
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
@@ -94,120 +77,44 @@ export const StaticCanvasDefaults = {
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
-  EventSpec extends StaticCanvasEvents = StaticCanvasEvents
-> extends createCollectionMixin(CommonMethods<CanvasEvents>) {
-  /**
-   * Background color of canvas instance.
-   * @type {(String|TFiller)}
-   * @default
-   */
+    EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+  >
+  extends createCollectionMixin(CommonMethods<CanvasEvents>)
+  implements StaticCanvasOptions
+{
+  declare width: number;
+  declare height: number;
+
+  // background
+  declare backgroundVpt: boolean;
   declare backgroundColor: TFiller | string;
-
-  /**
-   * Background image of canvas instance.
-   * since 2.4.0 image caching is active, please when putting an image as background, add to the
-   * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
-   * vale. As an alternative you can disable image objectCaching
-   * @type FabricObject
-   * @default
-   */
-  declare backgroundImage: FabricObject | null;
-
-  /**
-   * Overlay color of canvas instance.
-   * @since 1.3.9
-   * @type {(String|TFiller)}
-   * @default
-   */
+  declare backgroundImage?: FabricObject;
+  // overlay
+  declare overlayVpt: boolean;
   declare overlayColor: TFiller | string;
+  declare overlayImage?: FabricObject;
 
-  /**
-   * Overlay image of canvas instance.
-   * since 2.4.0 image caching is active, please when putting an image as overlay, add to the
-   * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
-   * vale. As an alternative you can disable image objectCaching
-   * @type FabricObject
-   * @default
-   */
-  declare overlayImage: FabricObject | null;
+  declare clipPath?: FabricObject;
 
-  /**
-   * Indicates whether toObject/toDatalessObject should include default values
-   * if set to false, takes precedence over the object value.
-   * @type Boolean
-   * @default
-   */
   declare includeDefaultValues: boolean;
 
-  /**
-   * Indicates whether {@link add}, {@link insertAt} and {@link remove},
-   * {@link moveTo}, {@link clear} and many more, should also re-render canvas.
-   * Disabling this option will not give a performance boost when adding/removing a lot of objects to/from canvas at once
-   * since the renders are queued and executed one per frame.
-   * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
-   * Left default to true to do not break documentation and old app, fiddles.
-   * @type Boolean
-   * @default
-   */
+  // rendering config
   declare renderOnAddRemove: boolean;
+  declare skipOffscreen: boolean;
+  declare enableRetinaScaling: boolean;
+  declare imageSmoothingEnabled: boolean;
 
   /**
-   * Indicates whether object controls (borders/controls) are rendered above overlay image
-   * @type Boolean
-   * @default
+   * @todo move to Canvas
    */
   declare controlsAboveOverlay: boolean;
 
   /**
-   * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
-   * @type Boolean
-   * @default
+   * @todo move to Canvas
    */
   declare allowTouchScrolling: boolean;
 
-  /**
-   * Indicates whether this canvas will use image smoothing, this is on by default in browsers
-   * @type Boolean
-   * @default
-   */
-  declare imageSmoothingEnabled: boolean;
-
-  /**
-   * The transformation (a Canvas 2D API transform matrix) which focuses the viewport
-   * @type Array
-   * @example <caption>Default transform</caption>
-   * canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-   * @example <caption>Scale by 70% and translate toward bottom-right by 50, without skewing</caption>
-   * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
-   * @default
-   */
   declare viewportTransform: TMat2D;
-
-  /**
-   * if set to false background image is not affected by viewport transform
-   * @since 1.6.3
-   * @type Boolean
-   * @todo we should really find a different way to do this
-   * @default
-   */
-  declare backgroundVpt: boolean;
-
-  /**
-   * if set to false overlya image is not affected by viewport transform
-   * @since 1.6.3
-   * @type Boolean
-   * @todo we should really find a different way to do this
-   * @default
-   */
-  declare overlayVpt: boolean;
-
-  /**
-   * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
-   * @type Boolean
-   * @default
-   */
-  declare enableRetinaScaling: boolean;
-
   /**
    * Describe canvas element extension over design
    * properties are tl,tr,bl,br.
@@ -217,26 +124,6 @@ export class StaticCanvas<
    * The coordinates get updated with @method calcViewportBoundaries.
    */
   declare vptCoords: TCornerPoint;
-
-  /**
-   * Based on vptCoords and object.aCoords, skip rendering of objects that
-   * are not included in current viewport.
-   * May greatly help in applications with crowded canvas and use of zoom/pan
-   * If One of the corner of the bounding box of the object is on the canvas
-   * the objects get rendered.
-   * @type Boolean
-   * @default true
-   */
-  declare skipOffscreen: boolean;
-
-  /**
-   * a fabricObject that, without stroke define a clipping area with their shape. filled in black
-   * the clipPath object gets used when the canvas has rendered, and the context is placed in the
-   * top left corner of the canvas.
-   * clipPath will clip away controls, if you do not want this to happen use controlsAboveOverlay = true
-   * @type FabricObject
-   */
-  declare clipPath: FabricObject;
 
   /**
    * A reference to the canvas actual HTMLCanvasElement.
@@ -250,20 +137,6 @@ export class StaticCanvas<
   get contextContainer() {
     return this.elements.lower?.ctx;
   }
-
-  /**
-   * Width in virtual/logical pixels of the canvas.
-   * The canvas can be larger than width if retina scaling is active
-   * @type number
-   */
-  declare width: number;
-
-  /**
-   * Height in virtual/logical pixels of the canvas.
-   * The canvas can be taller than width if retina scaling is active
-   * @type height
-   */
-  declare height: number;
 
   /**
    * If true the Canvas is in the process or has been disposed/destroyed.
@@ -285,7 +158,7 @@ export class StaticCanvas<
 
   declare elements: StaticCanvasDOMManager;
 
-  static ownDefaults: Record<string, any> = StaticCanvasDefaults;
+  static ownDefaults = staticCanvasDefaults;
 
   // reference to
   protected declare __cleanupTask?: {
@@ -297,7 +170,10 @@ export class StaticCanvas<
     return StaticCanvas.ownDefaults;
   }
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(
+    el: string | HTMLCanvasElement,
+    options: TOptions<StaticCanvasOptions> = {}
+  ) {
     super();
     Object.assign(
       this,
@@ -336,7 +212,7 @@ export class StaticCanvas<
   }
 
   _onObjectAdded(obj: FabricObject) {
-    if (obj.canvas && obj.canvas !== this) {
+    if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
       /* _DEV_MODE_START_ */
       console.warn(
         'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
@@ -408,7 +284,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions) {
+  setWidth(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ width: value }, options);
   }
 
@@ -420,7 +296,7 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions) {
+  setHeight(value: number, options: TCanvasSizeOptions = {}) {
     return this.setDimensions({ height: value }, options);
   }
 
@@ -586,8 +462,8 @@ export class StaticCanvas<
    */
   clear() {
     this.remove(...this.getObjects());
-    this.backgroundImage = null;
-    this.overlayImage = null;
+    this.backgroundImage = undefined;
+    this.overlayImage = undefined;
     this.backgroundColor = '';
     this.overlayColor = '';
     this.clearContext(this.getContext());
@@ -681,7 +557,7 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
-    // @ts-ignore node-canvas stuff
+    // @ts-expect-error node-canvas stuff
     ctx.patternQuality = 'best';
     this.fire('before:render', { ctx });
     this._renderBackground(ctx);
@@ -1061,12 +937,7 @@ export class StaticCanvas<
   }
 
   /* _TO_SVG_START_ */
-  /**
-   * When true, getSvgTransform() will apply the StaticCanvas.viewportTransform to the SVG transformation. When true,
-   * a zoomed canvas will then produce zoomed SVG output.
-   * @type Boolean
-   * @default
-   */
+
   declare svgViewportTransformation: boolean;
 
   /**
@@ -1197,13 +1068,9 @@ export class StaticCanvas<
     const clipPath = this.clipPath;
     if (clipPath) {
       clipPath.clipPathId = `CLIPPATH_${uid()}`;
-      return (
-        '<clipPath id="' +
-        clipPath.clipPathId +
-        '" >\n' +
-        this.clipPath.toClipPathSVG(options.reviver) +
-        '</clipPath>\n'
-      );
+      return `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(
+        options.reviver
+      )}</clipPath>\n`;
     }
     return '';
   }
@@ -1220,10 +1087,12 @@ export class StaticCanvas<
           const shouldTransform = this[`${prop}Vpt`],
             vpt = this.viewportTransform,
             object = {
+              // otherwise circular dependency
+              isType: () => false,
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
             };
-          return fill.toSVG(object as Rect, {
+          return fill.toSVG(object as FabricObject, {
             additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
           });
         }
@@ -1414,7 +1283,7 @@ export class StaticCanvas<
     this.renderOnAddRemove = false;
 
     return Promise.all([
-      enlivenObjects(objects, {
+      enlivenObjects<FabricObject>(objects, {
         reviver,
         signal,
       }),
@@ -1614,11 +1483,11 @@ export class StaticCanvas<
     if (this.backgroundImage) {
       this.backgroundImage.dispose();
     }
-    this.backgroundImage = null;
+    this.backgroundImage = undefined;
     if (this.overlayImage) {
       this.overlayImage.dispose();
     }
-    this.overlayImage = null;
+    this.overlayImage = undefined;
     this.elements.dispose();
   }
 

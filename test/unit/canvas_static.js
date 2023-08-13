@@ -192,8 +192,6 @@
     var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
     assert.ok('overlayColor' in canvas);
-    assert.ok('backgroundImage' in canvas);
-    assert.ok('overlayImage' in canvas);
     assert.ok('includeDefaultValues' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
@@ -1055,7 +1053,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
   });
 
   QUnit.test('toObject non includeDefaultValues', function(assert) {
@@ -1134,7 +1132,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1173,7 +1171,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
 
       assert.equal(obj.get('left'), 268);
@@ -1202,7 +1200,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1233,7 +1231,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1310,12 +1308,12 @@
 
   QUnit.test('loadFromJSON with text', function(assert) {
     var done = assert.async();
-    var json = '{"objects":[{"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json).then(function() {
 
       canvas.renderAll();
 
-      assert.equal(canvas.item(0).constructor.name, 'Text');
+      assert.equal(canvas.item(0).constructor.type, 'Text');
       assert.equal(150, canvas.item(0).left);
       assert.equal(200, canvas.item(0).top);
       assert.equal('NAME HERE', canvas.item(0).text);
@@ -1327,10 +1325,10 @@
   QUnit.test('loadFromJSON with clipPath', function(assert) {
     var done = assert.async();
     var canvas3 = new fabric.StaticCanvas();
-    var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
+    var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
     canvas3.loadFromJSON(json).then(function() {
       assert.ok(canvas3.clipPath instanceof fabric.Text);
-      assert.equal(canvas3.clipPath.constructor.name, 'Text');
+      assert.equal(canvas3.clipPath.constructor.type, 'Text');
       done();
     });
   });
@@ -1598,7 +1596,7 @@
       assert.notOk(cloned instanceof fabric.Canvas, 'is not cloned in a Canvas');
 
       var clonedRect = cloned.getObjects()[0];
-      assert.equal(clonedRect.constructor.name, 'Rect', 'the rect has been cloned too');
+      assert.equal(clonedRect.constructor.type, 'Rect', 'the rect has been cloned too');
       assert.equal(clonedRect.width, rect.width, 'the rect has been cloned too with properties');
       assert.equal(cloned.width, canvas2.width, 'the canvas has been cloned with properties');
       done();

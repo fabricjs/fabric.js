@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { parseStyleObject } from './parseStyleObject';
 import { parseStyleString } from './parseStyleString';
 
@@ -9,8 +8,8 @@ import { parseStyleString } from './parseStyleString';
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
-export function parseStyleAttribute(element) {
-  const oStyle = {},
+export function parseStyleAttribute(element: HTMLElement): Record<string, any> {
+  const oStyle: Record<string, any> = {},
     style = element.getAttribute('style');
 
   if (!style) {

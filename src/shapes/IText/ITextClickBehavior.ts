@@ -3,11 +3,11 @@ import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
-import { invertTransform, transformPoint } from '../../util/misc/matrix';
+import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 
 // TODO: this code seems wrong.
@@ -18,7 +18,7 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
@@ -131,7 +131,12 @@ export abstract class ITextClickBehavior<
    * current compositionMode. It will be set to false.
    */
   _mouseDownHandler({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
+    if (
+      !this.canvas ||
+      !this.editable ||
+      notALeftClick(e as MouseEvent) ||
+      this.getActiveControl()
+    ) {
       return;
     }
 
@@ -196,7 +201,7 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (this.__lastSelected && !this.__corner) {
+    if (this.__lastSelected && !this.getActiveControl()) {
       this.selected = false;
       this.__lastSelected = false;
       this.enterEditing(e);
@@ -231,28 +236,19 @@ export abstract class ITextClickBehavior<
   }
 
   /**
-   * Returns coordinates of a pointer relative to object's top left corner in object's plane
-   * @param {Point} [pointer] Pointer to operate upon
-   * @return {Point} Coordinates of a pointer (x, y)
-   */
-  getLocalPointer(pointer: Point): Point {
-    return transformPoint(
-      pointer,
-      invertTransform(this.calcTransformMatrix())
-    ).add(new Point(this.width / 2, this.height / 2));
-  }
-
-  /**
    * Returns index of a character corresponding to where an object was clicked
    * @param {TPointerEvent} e Event object
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.getLocalPointer(this.canvas!.getPointer(e));
+    const mouseOffset = this.canvas!.getPointer(e)
+      .transform(invertTransform(this.calcTransformMatrix()))
+      .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,
       charIndex = 0,
       lineIndex = 0;
-    for (let i = 0, len = this._textLines.length; i < len; i++) {
+
+    for (let i = 0; i < this._textLines.length; i++) {
       if (height <= mouseOffset.y) {
         height += this.getHeightOfLine(i);
         lineIndex = i;
@@ -266,61 +262,31 @@ export abstract class ITextClickBehavior<
     }
     const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
     let width = lineLeftOffset;
-    const jlen = this._textLines[lineIndex].length;
-    // handling of RTL: in order to get things work correctly,
-    // we assume RTL writing is mirrored compared to LTR writing.
-    // so in position detection we mirror the X offset, and when is time
-    // of rendering it, we mirror it again.
-    if (this.direction === 'rtl') {
-      mouseOffset.x = this.width - mouseOffset.x;
-    }
-    let prevWidth = 0;
-    for (let j = 0; j < jlen; j++) {
-      prevWidth = width;
+    const charLength = this._textLines[lineIndex].length;
+    const chars = this.__charBounds[lineIndex];
+    for (let j = 0; j < charLength; j++) {
       // i removed something about flipX here, check.
-      width += this.__charBounds[lineIndex][j].kernedWidth;
-      if (width <= mouseOffset.x) {
-        charIndex++;
-      } else {
+      const charWidth = chars[j].kernedWidth;
+      const widthAfter = width + charWidth;
+      if (mouseOffset.x <= widthAfter) {
+        // if the pointer is closer to the end of the char we increment charIndex
+        // in order to position the cursor after the char
+        if (
+          Math.abs(mouseOffset.x - widthAfter) <=
+          Math.abs(mouseOffset.x - width)
+        ) {
+          charIndex++;
+        }
         break;
       }
+      width = widthAfter;
+      charIndex++;
     }
-    return this._getNewSelectionStartFromOffset(
-      mouseOffset,
-      prevWidth,
-      width,
-      charIndex,
-      jlen
+
+    return Math.min(
+      // if object is horizontally flipped, mirror cursor location from the end
+      this.flipX ? charLength - charIndex : charIndex,
+      this._text.length
     );
-  }
-
-  /**
-   * @private
-   */
-  _getNewSelectionStartFromOffset(
-    mouseOffset: XY,
-    prevWidth: number,
-    width: number,
-    index: number,
-    jlen: number
-  ) {
-    const distanceBtwLastCharAndCursor = mouseOffset.x - prevWidth,
-      distanceBtwNextCharAndCursor = width - mouseOffset.x,
-      offset =
-        distanceBtwNextCharAndCursor > distanceBtwLastCharAndCursor ||
-        distanceBtwNextCharAndCursor < 0
-          ? 0
-          : 1;
-    let newSelectionStart = index + offset;
-    // if object is horizontally flipped, mirror cursor location from the end
-    if (this.flipX) {
-      newSelectionStart = jlen - newSelectionStart;
-    }
-
-    if (newSelectionStart > this._text.length) {
-      newSelectionStart = this._text.length;
-    }
-
-    return newSelectionStart;
   }
 }
