@@ -5,16 +5,12 @@ import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
 import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import {
-  invertTransform,
-  multiplyTransformMatrices,
-  transformPoint,
-} from '../util/misc/matrix';
+import { invertTransform, transformPoint } from '../util/misc/matrix';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
-import { applyTransformToObject } from '../util/misc/objectTransforms';
+import { sendObjectToPlane } from '../util/misc/planeChange';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
@@ -419,13 +415,10 @@ export class Group extends createCollectionMixin(
    */
   _enterGroup(object: FabricObject, removeParentTransform?: boolean) {
     if (removeParentTransform) {
-      // can this be converted to utils (sendObjectToPlane)?
-      applyTransformToObject(
+      sendObjectToPlane(
         object,
-        multiplyTransformMatrices(
-          invertTransform(this.calcTransformMatrix()),
-          object.calcTransformMatrix()
-        )
+        object.group?.calcTransformMatrix(),
+        this.calcTransformMatrix()
       );
     }
     this._shouldSetNestedCoords() && object.setCoords();
@@ -463,13 +456,7 @@ export class Group extends createCollectionMixin(
   _exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     object._set('group', undefined);
     if (!removeParentTransform) {
-      applyTransformToObject(
-        object,
-        multiplyTransformMatrices(
-          this.calcTransformMatrix(),
-          object.calcTransformMatrix()
-        )
-      );
+      sendObjectToPlane(object, this.calcTransformMatrix());
       object.setCoords();
     }
     this._watchObject(false, object);
