@@ -7,6 +7,7 @@ import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { SprayBrushPoint } from './typedefs';
 import { CENTER } from '../constants';
+import { LayoutManager } from '../LayoutManager';
 
 /**
  *
@@ -141,7 +142,7 @@ export class SprayBrush extends BaseBrush {
       this.optimizeOverlapping ? getUniqueRects(rects) : rects,
       {
         objectCaching: true,
-        layout: 'fixed',
+        layoutManager: new LayoutManager('fixed'),
         subTargetCheck: false,
         interactive: false,
       }

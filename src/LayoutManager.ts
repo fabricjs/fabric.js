@@ -2,7 +2,7 @@ import { Point } from './Point';
 import { CENTER } from './constants';
 import { makeBoundingBoxFromPoints } from './util/misc/boundingBoxFromPoints';
 import { cos } from './util/misc/cos';
-import { invertTransform, transformPoint } from './util/misc/matrix';
+import { invertTransform } from './util/misc/matrix';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { resolveOrigin } from './util/misc/resolveOrigin';
 import { sin } from './util/misc/sin';
@@ -64,17 +64,11 @@ export type LayoutResult = {
 };
 
 export class LayoutManager {
-  /**
-   * Specifies the **layout strategy** for instance
-   * Used by `getLayoutStrategyResult` to calculate layout
-   * `fit-content`, `fit-content-lazy`, `fixed`, `clip-path` are supported out of the box
-   * @default
-   */
-  declare layout: LayoutStrategy;
-
   private _firstLayoutDone = false;
 
   protected target: Group;
+
+  constructor(protected layout: LayoutStrategy = 'fit-content') {}
 
   attach(target: Group) {
     this.target = target;
@@ -236,7 +230,7 @@ export class LayoutManager {
         if (this.target.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.target.group.calcTransformMatrix());
-          clipPathCenter = transformPoint(clipPathCenter, inv);
+          clipPathCenter = clipPathCenter.transform(inv);
         }
         return {
           centerX: clipPathCenter.x,
@@ -472,4 +466,8 @@ export class LayoutManager {
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
   onLayout(context: LayoutContext, result: LayoutResult) {}
+
+  toJSON() {
+    return { layout: this.layout };
+  }
 }

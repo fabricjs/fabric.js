@@ -14,7 +14,7 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { LayoutEvent } from '../LayoutManager';
+import type { LayoutEvent, LayoutStrategy } from '../LayoutManager';
 import { LayoutManager } from '../LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
@@ -30,6 +30,7 @@ export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {
   objects: SerializedObjectProps[];
+  layout: LayoutStrategy;
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
@@ -542,7 +543,6 @@ export class Group extends createCollectionMixin(
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
     return {
       ...super.toObject([
-        'layout',
         'subTargetCheck',
         'interactive',
         ...propertiesToInclude,
@@ -637,6 +637,7 @@ export class Group extends createCollectionMixin(
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
     objects = [],
+    layout,
     ...options
   }: T) {
     return Promise.all([
@@ -644,7 +645,15 @@ export class Group extends createCollectionMixin(
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>
-        new this(objects, { ...options, ...hydratedOptions }, true)
+        new this(
+          objects,
+          {
+            ...options,
+            ...hydratedOptions,
+            layoutManager: new LayoutManager(layout),
+          },
+          true
+        )
     );
   }
 }
