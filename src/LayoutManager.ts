@@ -111,6 +111,50 @@ export class LayoutManager {
     });
   }
 
+  /**
+   * initial layout logic:
+   * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
+   * so it is placed in the center of the bbox received from the constructor
+   *
+   * @param {LayoutContext} context
+   */
+  performLayout(context: LayoutContext) {
+    let bubblingContext: LayoutResult | undefined;
+    if (!this._firstLayoutDone && context.type !== 'initialization') {
+      //  reject layout requests before initialization layout
+      return;
+    }
+    const { result, ...rest } = this.getLayoutResult({
+      layout: this.layout,
+      ...context,
+    });
+    if (!this._firstLayoutDone) {
+      if (result) {
+        this.commitLayout(context, { result, ...rest });
+        bubblingContext = { result, ...rest };
+      } else {
+        const {
+          prevCenter: { x: centerX, y: centerY },
+        } = rest;
+        bubblingContext = {
+          ...rest,
+          result: {
+            centerX,
+            centerY,
+            width: this.target.width,
+            height: this.target.height,
+          },
+        };
+      }
+
+      this._firstLayoutDone = true;
+    } else if (result) {
+      this.commitLayout(context, { result, ...rest });
+      bubblingContext = { result, ...rest };
+    }
+    bubblingContext && this.onLayout(context, bubblingContext);
+  }
+
   protected getLayoutResult(context: PassedLayoutContext): LayoutResult {
     const prevCenter = this.target.getRelativeCenterPoint();
     const result = this.getLayoutStrategyResult(
@@ -139,107 +183,42 @@ export class LayoutManager {
     return { result, prevCenter, nextCenter, offset };
   }
 
-  performLayout(context: LayoutContext) {
-    let bubblingContext: LayoutResult | undefined;
-    if (!this._firstLayoutDone && context.type !== 'initialization') {
-      //  reject layout requests before initialization layout
-      return;
-    } else if (!this._firstLayoutDone) {
-      bubblingContext = this.performInitialLayout({
-        layout: this.layout,
-        ...context,
-      });
-      this._firstLayoutDone = true;
-    } else {
-      bubblingContext = this.performSecondaryLayout({
-        layout: this.layout,
-        ...context,
-      });
-    }
-    bubblingContext && this.onLayout(context, bubblingContext);
-  }
-
-  protected performInitialLayout(context: PassedLayoutContext) {
-    const { target } = this;
-    const layoutResult = this.getLayoutResult(context);
-
-    if (layoutResult.result) {
-      const {
-        result: { width, height },
-        offset,
-        prevCenter,
-        nextCenter,
-      } = layoutResult;
-      // set dimensions
-      target.set({ width, height });
-      //  adjust objects to account for new center
-      !context.objectsRelativeToGroup &&
-        target.forEachObject((object) => {
-          object.group === target && this.adjustObjectPosition(object, offset);
-        });
-      //  set position
-      if (!nextCenter.eq(prevCenter)) {
-        target.setPositionByOrigin(nextCenter, CENTER, CENTER);
-        target.setCoords();
-      }
-
-      return layoutResult;
-    } else {
-      const {
-        prevCenter: { x: centerX, y: centerY },
-      } = layoutResult;
-
-      return {
-        ...layoutResult,
-        result: {
-          centerX,
-          centerY,
-          width: target.width,
-          height: target.height,
-        },
-      };
-    }
-  }
-
-  /**
-   * initial layout logic:
-   * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
-   * so it is placed in the center of the bbox received from the constructor
-   *
-   * @param {LayoutContext} context
-   */
-  protected performSecondaryLayout(context: PassedLayoutContext) {
-    const layoutResult = this.getLayoutResult(context);
-
-    if (!layoutResult.result) {
-      return;
-    }
-
-    this.commitLayout(context, layoutResult as Required<LayoutResult>);
-    return layoutResult;
-  }
-
   protected commitLayout(
     context: LayoutContext,
-    { result, prevCenter, nextCenter, offset }: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>
   ) {
     const { target } = this;
+    const {
+      result: { width, height },
+      prevCenter,
+      nextCenter,
+    } = layoutResult;
     // set dimensions
-    target.set({ width: result.width, height: result.height });
-    //  adjust objects to account for new center
-    target.forEachObject((object) => {
-      object.group === target && this.adjustObjectPosition(object, offset);
-    });
-    // adjust clip path to account for new center
-    context.layout !== 'clip-path' &&
-      target.clipPath &&
-      !target.clipPath.absolutePositioned &&
-      this.adjustObjectPosition(target.clipPath as FabricObject, offset);
+    target.set({ width, height });
+    this.layoutChildren(context, layoutResult);
     //  set position
     if (!nextCenter.eq(prevCenter)) {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       target.setCoords();
     }
+  }
+
+  protected layoutChildren(
+    context: LayoutContext,
+    { offset }: Required<LayoutResult>
+  ) {
+    const { target } = this;
+    //  adjust objects to account for new center
+    !context.objectsRelativeToGroup &&
+      target.forEachObject((object) => {
+        object.group === target && this.adjustObjectPosition(object, offset);
+      });
+    // adjust clip path to account for new center
+    context.type !== 'initialization' &&
+      context.layout !== 'clip-path' &&
+      target.clipPath &&
+      !target.clipPath.absolutePositioned &&
+      this.adjustObjectPosition(target.clipPath as FabricObject, offset);
   }
 
   /**
@@ -277,8 +256,8 @@ export class LayoutManager {
 
   /**
    * Override this method to customize layout.
-   * If you need to run logic once layout completes use `onLayout`
-   * @public
+   * If you need to run logic once layout completes use {@link onLayout}
+   *
    * @param {string} layoutDirective
    * @param {FabricObject[]} objects
    * @param {LayoutContext} context
@@ -360,6 +339,32 @@ export class LayoutManager {
           };
         }
       }
+    }
+  }
+
+  /**
+   * Override this method to customize layout.
+   * A wrapper around {@link getObjectsBoundingBox}
+   *
+   * @param {string} layoutDirective
+   * @param {FabricObject[]} objects
+   * @param {LayoutContext} context
+   * @returns {LayoutStrategyResult | undefined}
+   */
+  protected prepareBoundingBox<T extends LayoutStrategy>(
+    layoutDirective: T,
+    objects: FabricObject[],
+    context: LayoutContext
+  ) {
+    if (context.type === 'initialization') {
+      return this.prepareInitialBoundingBox(layoutDirective, objects, context);
+    } else if (context.type === 'imperative' && context.context) {
+      return {
+        ...(this.getObjectsBoundingBox(objects) || {}),
+        ...context.context,
+      };
+    } else {
+      return this.getObjectsBoundingBox(objects);
     }
   }
 
@@ -470,32 +475,6 @@ export class LayoutManager {
       width: size.x,
       height: size.y,
     };
-  }
-
-  /**
-   * Override this method to customize layout.
-   * A wrapper around {@link getObjectsBoundingBox}
-   *
-   * @param {string} layoutDirective
-   * @param {FabricObject[]} objects
-   * @param {LayoutContext} context
-   * @returns {LayoutStrategyResult | undefined}
-   */
-  protected prepareBoundingBox<T extends LayoutStrategy>(
-    layoutDirective: T,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) {
-    if (context.type === 'initialization') {
-      return this.prepareInitialBoundingBox(layoutDirective, objects, context);
-    } else if (context.type === 'imperative' && context.context) {
-      return {
-        ...(this.getObjectsBoundingBox(objects) || {}),
-        ...context.context,
-      };
-    } else {
-      return this.getObjectsBoundingBox(objects);
-    }
   }
 
   /**
