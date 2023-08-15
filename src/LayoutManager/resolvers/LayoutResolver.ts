@@ -9,7 +9,7 @@ import { sin } from '../../util/misc/sin';
 import type { LayoutContext, LayoutStrategyResult } from '../types';
 
 export abstract class LayoutResolver {
-  abstract getLayoutStrategyResult(
+  abstract calcLayoutResult(
     target: Group,
     objects: FabricObject[],
     context: LayoutContext

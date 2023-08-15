@@ -6,7 +6,7 @@ import { LayoutResolver } from './LayoutResolver';
 export class FitContentLayoutResolver extends LayoutResolver {
   lazy = true;
 
-  getLayoutStrategyResult(
+  calcLayoutResult(
     target: Group,
     objects: FabricObject[],
     context: LayoutContext

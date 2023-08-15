@@ -6,7 +6,7 @@ import type { LayoutContext, LayoutStrategyResult } from '../types';
 import { LayoutResolver } from './LayoutResolver';
 
 export class ClipPathLayoutResolver extends LayoutResolver {
-  getLayoutStrategyResult(
+  calcLayoutResult(
     target: Group,
     objects: FabricObject[],
     context: LayoutContext

@@ -4,7 +4,7 @@ import type { LayoutContext, LayoutStrategyResult } from '../types';
 import { LayoutResolver } from './LayoutResolver';
 
 export class FixedLayoutResolver extends LayoutResolver {
-  public getLayoutStrategyResult(
+  public calcLayoutResult(
     target: Group,
     objects: FabricObject[],
     context: LayoutContext
