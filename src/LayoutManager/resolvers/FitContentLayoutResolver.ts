@@ -4,6 +4,9 @@ import type { LayoutResolverResult, StrictLayoutContext } from '../types';
 import { LayoutResolver } from './LayoutResolver';
 
 export class FitContentLayoutResolver extends LayoutResolver {
+  /**
+   * optimize layout when possible
+   */
   lazy = true;
 
   calcLayoutResult(
