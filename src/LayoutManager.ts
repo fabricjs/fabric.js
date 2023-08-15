@@ -9,6 +9,12 @@ import { sin } from './util/misc/sin';
 import type { Group } from './shapes/Group';
 import type { FabricObject } from './shapes/Object/FabricObject';
 
+export type LayoutStrategy =
+  | 'fit-content'
+  | 'fit-content-lazy'
+  | 'fixed'
+  | 'clip-path';
+
 export type LayoutContextType =
   | 'initialization'
   | 'object_modified'
@@ -35,12 +41,6 @@ export type PassedLayoutContext = LayoutContext & {
 export type LayoutEvent = {
   context: LayoutContext;
 } & LayoutResult;
-
-export type LayoutStrategy =
-  | 'fit-content'
-  | 'fit-content-lazy'
-  | 'fixed'
-  | 'clip-path';
 
 /**
  * positioning and layout data **relative** to instance's parent
