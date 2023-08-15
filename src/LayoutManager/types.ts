@@ -1,4 +1,4 @@
-import { ModifiedEvent } from '../EventTypeDefs';
+import type { ModifiedEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
