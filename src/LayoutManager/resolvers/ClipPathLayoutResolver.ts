@@ -1,6 +1,6 @@
 import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { sendPointToPlane } from '../../util';
+import { sendPointToPlane } from '../../util/misc/planeChange';
 import type { LayoutResolverResult, StrictLayoutContext } from '../types';
 import { LayoutResolver } from './LayoutResolver';
 
