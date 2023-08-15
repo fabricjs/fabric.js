@@ -14,7 +14,7 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { LayoutEvent, LayoutStrategy } from '../LayoutManager';
+import type { LayoutEvent, LayoutStrategy } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
