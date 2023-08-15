@@ -290,8 +290,11 @@ export class LayoutManager {
       objects.length > context.targets.length
     ) {
       //  calculate added objects' bbox with existing bbox
-      const addedObjects = context.targets.concat(this.target);
-      return this.prepareBoundingBox(layoutDirective, addedObjects, context);
+      return this.prepareBoundingBox(
+        layoutDirective,
+        [...context.targets, this.target],
+        context
+      );
     } else if (
       layoutDirective === 'fit-content' ||
       layoutDirective === 'fit-content-lazy' ||
