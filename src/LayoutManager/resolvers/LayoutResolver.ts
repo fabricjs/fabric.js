@@ -1,6 +1,7 @@
 import { Point } from '../../Point';
 import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
+import type { TBBox } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { cos } from '../../util/misc/cos';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
@@ -11,6 +12,25 @@ import type {
   LayoutResolverResult,
   StrictLayoutContext,
 } from '../types';
+
+export function getObjectSizeVector(object: FabricObject) {
+  const sizeVector = object._getTransformedDimensions().scalarDivide(2);
+  if (object.angle) {
+    const rad = degreesToRadians(object.angle),
+      sine = Math.abs(sin(rad)),
+      cosine = Math.abs(cos(rad)),
+      rx = sizeVector.x * cosine + sizeVector.y * sine,
+      ry = sizeVector.x * sine + sizeVector.y * cosine;
+    return new Point(rx, ry);
+  }
+  return sizeVector;
+}
+
+export function getObjectBounds(object: FabricObject) {
+  const objCenter = object.getRelativeCenterPoint();
+  const sizeVector = getObjectSizeVector(object);
+  return [objCenter.subtract(sizeVector), objCenter.add(sizeVector)];
+}
 
 export abstract class LayoutResolver {
   abstract calcLayoutResult(
@@ -165,32 +185,26 @@ export abstract class LayoutResolver {
     if (objects.length === 0) {
       return;
     }
-    const objectBounds: Point[] = [];
-    objects.forEach((object) => {
-      const objCenter = object.getRelativeCenterPoint();
-      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
-      if (object.angle) {
-        const rad = degreesToRadians(object.angle),
-          sine = Math.abs(sin(rad)),
-          cosine = Math.abs(cos(rad)),
-          rx = sizeVector.x * cosine + sizeVector.y * sine,
-          ry = sizeVector.x * sine + sizeVector.y * cosine;
-        sizeVector = new Point(rx, ry);
-      }
-      objectBounds.push(
-        objCenter.subtract(sizeVector),
-        objCenter.add(sizeVector)
-      );
-    });
-    const { left, top, width, height } =
-      makeBoundingBoxFromPoints(objectBounds);
+    const bbox = makeBoundingBoxFromPoints(
+      objects.reduce((bounds, object) => {
+        bounds.push(...getObjectBounds(object));
+        return bounds;
+      }, [] as Point[])
+    );
+    return this.getBoundingBoxResult(target, bbox, ignoreOffset);
+  }
 
+  protected getBoundingBoxResult(
+    target: Group,
+    { left, top, width, height }: TBBox,
+    ignoreOffset?: boolean
+  ): LayoutResolverResult {
     const size = new Point(width, height),
       relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
         size.scalarDivide(2)
-      ),
-      //  we send `relativeCenter` up to group's containing plane
-      center = relativeCenter.transform(target.calcOwnMatrix());
+      );
+    //  we send `relativeCenter` up to group's containing plane
+    const center = relativeCenter.transform(target.calcOwnMatrix());
 
     return {
       centerX: center.x,
