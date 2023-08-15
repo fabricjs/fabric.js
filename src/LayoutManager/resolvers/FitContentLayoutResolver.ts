@@ -1,7 +1,7 @@
 import type { Point } from '../../Point';
 import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { makeBoundingBoxFromPoints } from '../../util';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import type { LayoutResolverResult, StrictLayoutContext } from '../types';
 import {
   LayoutResolver,
