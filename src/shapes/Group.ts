@@ -497,6 +497,15 @@ export class Group extends createCollectionMixin(
   }
 
   /**
+   * Hook that is called once layout has completed.
+   * Exposed for running side effects etc., override if necessary.
+   * Consider using the `layout` event with a caveat of not being able to listen to the initial layout.
+   *
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  onLayout(data: LayoutEvent) {}
+
+  /**
    * Renders instance on a given context
    * @param {CanvasRenderingContext2D} ctx context to render instance on
    */

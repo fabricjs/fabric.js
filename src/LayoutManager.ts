@@ -28,6 +28,7 @@ export type LayoutContext = {
 };
 
 export type PassedLayoutContext = LayoutContext & {
+  prevLayout?: LayoutStrategy;
   layout: LayoutStrategy;
 };
 
@@ -61,9 +62,14 @@ export type LayoutStrategyResult = {
    * correctionY to translate objects by, measured as `centerY`
    */
   correctionY?: number;
+  /**
+   * new width of instance
+   */
   width: number;
+  /**
+   * new height of instance
+   */
   height: number;
-  prevLayout?: LayoutStrategy;
 };
 
 export type LayoutResult = {
@@ -134,23 +140,30 @@ export class LayoutManager {
   }
 
   performLayout(context: LayoutContext) {
-    if (!this._firstLayoutDone && context.type === 'initialization') {
-      this.performInitialLayout({ layout: this.layout, ...context });
-      return;
-    } else if (!this._firstLayoutDone) {
+    let bubblingContext: LayoutResult | undefined;
+    if (!this._firstLayoutDone && context.type !== 'initialization') {
       //  reject layout requests before initialization layout
       return;
+    } else if (!this._firstLayoutDone) {
+      bubblingContext = this.performInitialLayout({
+        layout: this.layout,
+        ...context,
+      });
+      this._firstLayoutDone = true;
+    } else {
+      bubblingContext = this.performSecondaryLayout({
+        layout: this.layout,
+        ...context,
+      });
     }
-    this.performSecondaryLayout({ layout: this.layout, ...context });
+    bubblingContext && this.onLayout(context, bubblingContext);
   }
 
   protected performInitialLayout(context: PassedLayoutContext) {
     const { target } = this;
     const layoutResult = this.getLayoutResult(context);
-    let bubblingContext: LayoutResult;
 
     if (layoutResult.result) {
-      bubblingContext = layoutResult;
       const {
         result: { width, height },
         offset,
@@ -169,11 +182,14 @@ export class LayoutManager {
         target.setPositionByOrigin(nextCenter, CENTER, CENTER);
         target.setCoords();
       }
+
+      return layoutResult;
     } else {
       const {
         prevCenter: { x: centerX, y: centerY },
       } = layoutResult;
-      bubblingContext = {
+
+      return {
         ...layoutResult,
         result: {
           centerX,
@@ -183,11 +199,6 @@ export class LayoutManager {
         },
       };
     }
-
-    //  flag for next layouts
-    this._firstLayoutDone = true;
-
-    this.bubble(context, bubblingContext);
   }
 
   /**
@@ -222,7 +233,8 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       target.setCoords();
     }
-    this.bubble(context, { result, offset, prevCenter, nextCenter });
+
+    return { result, offset, prevCenter, nextCenter };
   }
 
   /**
@@ -233,20 +245,20 @@ export class LayoutManager {
     object.setRelativeXY(object.getRelativeXY().add(offset));
   }
 
-  protected bubble(context: LayoutContext, layoutData: LayoutResult) {
+  protected onLayout(context: LayoutContext, layoutData: LayoutResult) {
     const { target } = this;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
-    this.onLayout({
+    target.onLayout({
       context,
       ...layoutData,
     });
-    this.target.fire('layout', {
+    target.fire('layout', {
       context,
       ...layoutData,
     });
 
-    //  recursive up
+    //  bubble
     if (target.group?.layoutManager) {
       //  append the path recursion to context
       if (!context.path) {
@@ -525,20 +537,6 @@ export class LayoutManager {
       height: size.y,
     };
   }
-
-  /**
-   * Hook that is called once layout has completed.
-   * Provided for layout customization, override if necessary.
-   * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
-   *
-   */
-  onLayout(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    data: {
-      context: LayoutContext;
-    } & LayoutResult
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-  ) {}
 
   toJSON() {
     return { layout: this.layout };
