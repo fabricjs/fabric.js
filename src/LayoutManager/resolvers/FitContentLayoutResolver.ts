@@ -16,19 +16,18 @@ export class FitContentLayoutResolver extends LayoutResolver {
   lazy = true;
 
   calcLayoutResult(
-    target: Group,
-    objects: FabricObject[],
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
+    objects: FabricObject[]
   ): LayoutResolverResult | undefined {
     if (
       this.lazy &&
       context.type === 'added' &&
       objects.length > context.targets.length
     ) {
-      return this.getLazyBoundingBox(target, context.targets);
+      return this.getLazyBoundingBox(context.target, context.targets);
     }
 
-    return this.calcBoundingBox(target, objects, context);
+    return this.calcBoundingBox(objects, context);
   }
 
   getLazyBoundingBox(

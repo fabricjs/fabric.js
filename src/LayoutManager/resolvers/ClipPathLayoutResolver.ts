@@ -1,5 +1,4 @@
 import { Point } from '../../Point';
-import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendPointToPlane } from '../../util';
 import type { LayoutResolverResult, StrictLayoutContext } from '../types';
@@ -7,10 +6,10 @@ import { LayoutResolver } from './LayoutResolver';
 
 export class ClipPathLayoutResolver extends LayoutResolver {
   calcLayoutResult(
-    target: Group,
-    objects: FabricObject[],
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
+    objects: FabricObject[]
   ): LayoutResolverResult | undefined {
+    const { target } = context;
     const clipPath = target.clipPath;
     if (!clipPath) {
       return;
@@ -42,7 +41,7 @@ export class ClipPathLayoutResolver extends LayoutResolver {
           true
         );
       if (context.type === 'initialization' || isLayoutChange) {
-        const bbox = this.calcBoundingBox(target, objects, context) || {};
+        const bbox = this.calcBoundingBox(objects, context) || {};
         const center = new Point(bbox.centerX || 0, bbox.centerY || 0);
         return {
           centerX: center.x + clipPathCenter.x,

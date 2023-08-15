@@ -14,7 +14,11 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { LayoutBeforeEvent, LayoutEvent } from '../LayoutManager/types';
+import type {
+  ImperativeLayoutContext,
+  LayoutBeforeEvent,
+  LayoutEvent,
+} from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
@@ -112,7 +116,6 @@ export class Group extends createCollectionMixin(
     super();
     this._objects = objects;
     this.layoutManager = layoutManager;
-    this.layoutManager.attach(this);
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -130,6 +133,7 @@ export class Group extends createCollectionMixin(
     this.layoutManager.performLayout({
       type: 'initialization',
       objectsRelativeToGroup,
+      target: this,
     });
     this.set({ angle, skewX, skewY });
   }
@@ -239,6 +243,7 @@ export class Group extends createCollectionMixin(
     this.layoutManager.performLayout({
       type,
       targets,
+      target: this,
     });
     this._set('dirty', true);
   }
@@ -287,7 +292,11 @@ export class Group extends createCollectionMixin(
    * @private
    */
   __objectMonitor(ev: ObjectEvents['modified']) {
-    this.layoutManager.performLayout({ ...ev, type: 'object_modified' });
+    this.layoutManager.performLayout({
+      ...ev,
+      type: 'object_modified',
+      target: this,
+    });
     this._set('dirty', true);
   }
 
@@ -487,6 +496,10 @@ export class Group extends createCollectionMixin(
     super.setCoords();
     this._shouldSetNestedCoords() &&
       this.forEachObject((object) => object.setCoords());
+  }
+
+  triggerLayout(context?: ImperativeLayoutContext) {
+    this.layoutManager.triggerLayout({ ...context, target: this });
   }
 
   /**

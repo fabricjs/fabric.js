@@ -10,6 +10,7 @@ export type LayoutContextType =
   | 'imperative';
 
 export type LayoutContext = {
+  target: Group;
   prevResolver?: LayoutResolver;
   resolver?: LayoutResolver;
   type: LayoutContextType;
@@ -68,3 +69,9 @@ export type LayoutResult = {
   nextCenter: Point;
   offset: Point;
 };
+
+export type ImperativeLayoutContext = Partial<LayoutResolverResult> &
+  (
+    | { resolver?: LayoutResolver; once?: never }
+    | { resolver: LayoutResolver; once?: boolean }
+  );

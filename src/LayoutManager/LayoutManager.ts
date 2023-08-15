@@ -8,48 +8,35 @@ import type { LayoutResolver } from './resolvers/LayoutResolver';
 import type {
   LayoutContext,
   LayoutResult,
-  LayoutResolverResult,
   StrictLayoutContext,
+  ImperativeLayoutContext,
 } from './types';
 
 export class LayoutManager {
   private _firstLayoutDone = false;
 
-  protected target: Group;
   resolver: LayoutResolver;
 
   constructor(resolver: LayoutResolver = new FitContentLayoutResolver()) {
     this.resolver = resolver;
   }
 
-  attach(target: Group) {
-    this.target = target;
-  }
-
-  /**
-   * @param {Partial<LayoutResolverResult> & { layout?: string }} [context] pass values to use for layout calculations
-   */
-  public triggerLayout(
-    context?: Partial<LayoutResolverResult> &
-      (
-        | { resolver?: LayoutResolver; once?: never }
-        | { resolver: LayoutResolver; once?: boolean }
-      )
-  ) {
+  triggerLayout({
+    target,
+    resolver,
+    once,
+    ...context
+  }: ImperativeLayoutContext & { target: Group }) {
     const prevResolver = this.resolver;
-    if (
-      context?.resolver &&
-      context.resolver !== prevResolver &&
-      !context.once
-    ) {
-      this.resolver = context.resolver;
+    if (resolver && resolver !== prevResolver && !once) {
+      this.resolver = resolver;
     }
     this.performLayout({
+      target,
       type: 'imperative',
-      context: {
-        ...context,
-        prevResolver,
-      },
+      resolver,
+      prevResolver,
+      context,
     });
   }
 
@@ -84,8 +71,8 @@ export class LayoutManager {
           result: {
             centerX,
             centerY,
-            width: this.target.width,
-            height: this.target.height,
+            width: context.target.width,
+            height: context.target.height,
           },
         };
       }
@@ -99,7 +86,7 @@ export class LayoutManager {
   }
 
   protected onBeforeLayout(context: LayoutContext) {
-    const { target } = this;
+    const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onBeforeLayout({
@@ -111,11 +98,11 @@ export class LayoutManager {
   }
 
   protected getLayoutResult(context: StrictLayoutContext): LayoutResult {
-    const prevCenter = this.target.getRelativeCenterPoint();
+    const { target } = context;
+    const prevCenter = target.getRelativeCenterPoint();
     const result = context.resolver.calcLayoutResult(
-      this.target,
-      this.target.getObjects(),
-      context
+      context,
+      target.getObjects()
     );
     if (!result) {
       return {
@@ -132,7 +119,7 @@ export class LayoutManager {
     );
     const vector = prevCenter.subtract(nextCenter).add(correction);
     const offset = vector.transform(
-      invertTransform(this.target.calcOwnMatrix()),
+      invertTransform(target.calcOwnMatrix()),
       true
     );
     return { result, prevCenter, nextCenter, offset };
@@ -142,7 +129,7 @@ export class LayoutManager {
     context: LayoutContext,
     layoutResult: Required<LayoutResult>
   ) {
-    const { target } = this;
+    const { target } = context;
     const {
       result: { width, height },
       prevCenter,
@@ -162,7 +149,7 @@ export class LayoutManager {
     context: LayoutContext,
     { offset }: Required<LayoutResult>
   ) {
-    const { target } = this;
+    const { target } = context;
     //  adjust objects to account for new center
     !context.objectsRelativeToGroup &&
       target.forEachObject((object) => {
@@ -185,7 +172,7 @@ export class LayoutManager {
   }
 
   protected onLayout(context: LayoutContext, layoutData: LayoutResult) {
-    const { target } = this;
+    const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onLayout({
@@ -205,7 +192,11 @@ export class LayoutManager {
       }
       context.path.push(target);
       //  all parents should invalidate their layout
-      target.group.layoutManager.performLayout(context);
+      const parent = target.group;
+      parent.layoutManager.performLayout({
+        ...context,
+        target: parent,
+      });
     }
   }
 }

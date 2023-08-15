@@ -7,11 +7,7 @@ import { cos } from '../../util/misc/cos';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { sin } from '../../util/misc/sin';
-import type {
-  LayoutContext,
-  LayoutResolverResult,
-  StrictLayoutContext,
-} from '../types';
+import type { LayoutResolverResult, StrictLayoutContext } from '../types';
 
 export function getObjectSizeVector(object: FabricObject) {
   const sizeVector = object._getTransformedDimensions().scalarDivide(2);
@@ -34,34 +30,24 @@ export function getObjectBounds(object: FabricObject) {
 
 export abstract class LayoutResolver {
   abstract calcLayoutResult(
-    target: Group,
-    objects: FabricObject[],
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
+    objects: FabricObject[]
   ): LayoutResolverResult | undefined;
 
   /**
    * Override this method to customize layout.
    * A wrapper around {@link getObjectsBoundingBox}
-   *
-   * @param {string} layoutDirective
-   * @param {FabricObject[]} objects
-   * @param {LayoutContext} context
-   * @returns {LayoutResolverResult | undefined}
    */
-  calcBoundingBox(
-    target: Group,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) {
+  calcBoundingBox(objects: FabricObject[], context: StrictLayoutContext) {
     if (context.type === 'initialization') {
-      return this.calcInitialBoundingBox(target, objects, context);
+      return this.calcInitialBoundingBox(objects, context);
     } else if (context.type === 'imperative' && context.context) {
       return {
-        ...(this.getObjectsBoundingBox(target, objects) || {}),
+        ...(this.getObjectsBoundingBox(context.target, objects) || {}),
         ...context.context,
       };
     } else {
-      return this.getObjectsBoundingBox(target, objects);
+      return this.getObjectsBoundingBox(context.target, objects);
     }
   }
 
@@ -70,10 +56,10 @@ export abstract class LayoutResolver {
    *
    */
   protected calcInitialBoundingBox(
-    target: Group,
     objects: FabricObject[],
-    context: LayoutContext
+    context: StrictLayoutContext
   ) {
+    const { target } = context;
     const options = context.options || {},
       hasX = typeof options.left === 'number',
       hasY = typeof options.top === 'number',
