@@ -1,5 +1,7 @@
+import { ModifiedEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
 import type { Group } from '../shapes/Group';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutResolver } from './resolvers/LayoutResolver';
 
 export type LayoutContextType =
@@ -19,7 +21,23 @@ export type LayoutContext = {
    */
   path?: Group[];
   [key: string]: any;
-};
+} & (
+  | {
+      type: 'initialization';
+      objectsRelativeToGroup?: boolean;
+    }
+  | {
+      type: 'added' | 'removed';
+      targets: FabricObject[];
+    }
+  | ({
+      type: 'object_modified';
+    } & ModifiedEvent)
+  | {
+      type: 'imperative';
+      context?: Partial<LayoutResolverResult>;
+    }
+);
 
 export type StrictLayoutContext = LayoutContext & {
   resolver: LayoutResolver;

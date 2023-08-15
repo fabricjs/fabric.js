@@ -3,6 +3,7 @@ import { CENTER } from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
+import { ClipPathLayoutResolver } from './resolvers/ClipPathLayoutResolver';
 import { FitContentLayoutResolver } from './resolvers/FitContentLayoutResolver';
 import type { LayoutResolver } from './resolvers/LayoutResolver';
 import type {
@@ -158,7 +159,7 @@ export class LayoutManager {
       });
     // adjust clip path to account for new center
     context.type !== 'initialization' &&
-      context.layout !== 'clip-path' &&
+      !(context.resolver instanceof ClipPathLayoutResolver) &&
       target.clipPath &&
       !target.clipPath.absolutePositioned &&
       this.adjustObjectPosition(target.clipPath as FabricObject, offset);
