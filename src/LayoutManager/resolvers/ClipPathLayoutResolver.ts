@@ -41,13 +41,18 @@ export class ClipPathLayoutResolver extends LayoutResolver {
           true
         );
       if (context.type === 'initialization' || isLayoutChange) {
-        const bbox = this.calcBoundingBox(objects, context) || {};
-        const center = new Point(bbox.centerX || 0, bbox.centerY || 0);
+        const {
+          centerX = 0,
+          centerY = 0,
+          correctionX = 0,
+          correctionY = 0,
+        } = this.calcBoundingBox(objects, context) || {};
+        const center = new Point(centerX, centerY);
         return {
           centerX: center.x + clipPathCenter.x,
           centerY: center.y + clipPathCenter.y,
-          correctionX: bbox.correctionX - clipPathCenter.x,
-          correctionY: bbox.correctionY - clipPathCenter.y,
+          correctionX: correctionX - clipPathCenter.x,
+          correctionY: correctionY - clipPathCenter.y,
           width: clipPath.width,
           height: clipPath.height,
         };
