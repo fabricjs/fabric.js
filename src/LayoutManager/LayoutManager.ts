@@ -141,10 +141,9 @@ export class LayoutManager {
     // layout descendants
     this.layoutChildren(context, layoutResult);
     //  set position
-    if (!nextCenter.eq(prevCenter)) {
+    !nextCenter.eq(prevCenter) &&
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
-      target.setCoords();
-    }
+    context.type !== 'initialization' && target.setCoords();
   }
 
   protected layoutChildren(
