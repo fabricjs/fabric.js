@@ -6,14 +6,18 @@ import { cos } from '../../util/misc/cos';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { sin } from '../../util/misc/sin';
-import type { LayoutContext, LayoutStrategyResult } from '../types';
+import type {
+  LayoutContext,
+  LayoutResolverResult,
+  StrictLayoutContext,
+} from '../types';
 
 export abstract class LayoutResolver {
   abstract calcLayoutResult(
     target: Group,
     objects: FabricObject[],
-    context: LayoutContext
-  ): LayoutStrategyResult | undefined;
+    context: StrictLayoutContext
+  ): LayoutResolverResult | undefined;
 
   /**
    * Override this method to customize layout.
@@ -22,7 +26,7 @@ export abstract class LayoutResolver {
    * @param {string} layoutDirective
    * @param {FabricObject[]} objects
    * @param {LayoutContext} context
-   * @returns {LayoutStrategyResult | undefined}
+   * @returns {LayoutResolverResult | undefined}
    */
   calcBoundingBox(
     target: Group,
@@ -72,7 +76,7 @@ export abstract class LayoutResolver {
 
     const bbox =
       this.getObjectsBoundingBox(target, objects) ||
-      ({} as LayoutStrategyResult);
+      ({} as LayoutResolverResult);
     const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
     const {
       left: x,
@@ -151,13 +155,13 @@ export abstract class LayoutResolver {
    * Calculate the bbox of objects relative to instance's containing plane
    *
    * @param {FabricObject[]} objects
-   * @returns {LayoutStrategyResult | undefined} bounding box
+   * @returns {LayoutResolverResult | undefined} bounding box
    */
   getObjectsBoundingBox(
     target: Group,
     objects: FabricObject[],
     ignoreOffset?: boolean
-  ): LayoutStrategyResult | undefined {
+  ): LayoutResolverResult | undefined {
     if (objects.length === 0) {
       return;
     }

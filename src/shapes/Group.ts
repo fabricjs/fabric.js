@@ -14,8 +14,8 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { LayoutEvent, LayoutStrategy } from '../LayoutManager/types';
-import { LayoutManager } from '../LayoutManager';
+import type { LayoutEvent } from '../LayoutManager/types';
+import { LayoutManager } from '../LayoutManager/LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   layout: LayoutEvent;
@@ -30,7 +30,6 @@ export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {
   objects: SerializedObjectProps[];
-  layout: LayoutStrategy;
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
@@ -258,13 +257,6 @@ export class Group extends createCollectionMixin(
     if (key === 'canvas' && prev !== value) {
       this.forEachObject((object) => {
         object._set(key, value);
-      });
-    }
-    if (key === 'layout' && prev !== value) {
-      this.layoutManager.performLayout({
-        type: 'layout_change',
-        layout: value,
-        prevLayout: prev,
       });
     }
     if (key === 'interactive') {
@@ -649,7 +641,6 @@ export class Group extends createCollectionMixin(
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
     objects = [],
-    layout,
     ...options
   }: T) {
     return Promise.all([
@@ -662,7 +653,6 @@ export class Group extends createCollectionMixin(
           {
             ...options,
             ...hydratedOptions,
-            layoutManager: new LayoutManager(layout),
           },
           true
         )

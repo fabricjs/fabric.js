@@ -1,28 +1,17 @@
 import type { Point } from '../Point';
 import type { Group } from '../shapes/Group';
-import type { FabricObject } from '../shapes/Object/FabricObject';
-
-export type LayoutStrategy =
-  | 'fit-content'
-  | 'fit-content-lazy'
-  | 'fixed'
-  | 'clip-path';
+import type { LayoutResolver } from './resolvers/LayoutResolver';
 
 export type LayoutContextType =
   | 'initialization'
   | 'object_modified'
   | 'added'
   | 'removed'
-  | 'layout_change'
   | 'imperative';
 
 export type LayoutContext = {
-  layout?: LayoutStrategy;
-  resolve: <T extends LayoutStrategy>(
-    layoutDirective: T,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) => LayoutStrategyResult | undefined;
+  prevResolver?: LayoutResolver;
+  resolver?: LayoutResolver;
   type: LayoutContextType;
   /**
    * array of objects starting from the object that triggered the call to the current one
@@ -31,9 +20,8 @@ export type LayoutContext = {
   [key: string]: any;
 };
 
-export type PassedLayoutContext = LayoutContext & {
-  prevLayout?: LayoutStrategy;
-  layout: LayoutStrategy;
+export type StrictLayoutContext = LayoutContext & {
+  resolver: LayoutResolver;
 };
 
 export type LayoutEvent = {
@@ -43,7 +31,7 @@ export type LayoutEvent = {
  * positioning and layout data **relative** to instance's parent
  */
 
-export type LayoutStrategyResult = {
+export type LayoutResolverResult = {
   /**
    * new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
    */
@@ -71,7 +59,7 @@ export type LayoutStrategyResult = {
 };
 
 export type LayoutResult = {
-  result?: LayoutStrategyResult;
+  result?: LayoutResolverResult;
   prevCenter: Point;
   nextCenter: Point;
   offset: Point;
