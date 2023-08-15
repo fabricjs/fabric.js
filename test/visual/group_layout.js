@@ -37,7 +37,7 @@
     // function fixedLayout(canvas, callback) {
     //     var g = createGroupForLayoutTests('fixed layout', {
     //         backgroundColor: 'azure',
-    //         layoutManager: new fabric.LayoutManager('fixed'),
+    //         layoutManager: new fabric.LayoutManager(new fabric.FixedLayoutResolver()),
     //         width: 50,
     //         height: 50,
     //         angle: 30
@@ -264,7 +264,7 @@
                 originX: 'center',
                 originY: 'center',
             }),
-            layoutManager: new fabric.LayoutManager('clip-path')
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayoutResolver())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -289,7 +289,7 @@
                 originY: 'center',
                 scaleX: 0.6
             }),
-            layoutManager: new fabric.LayoutManager('clip-path')
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayoutResolver())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -314,7 +314,7 @@
                 top: -100,
                 scaleX: 1.5,
             }),
-            layoutManager: new fabric.LayoutManager('clip-path')
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayoutResolver())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -342,7 +342,7 @@
                 top: 150,
                 skewX: 20
             }),
-            layoutManager: new fabric.LayoutManager('clip-path'),
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayoutResolver()),
         });
         canvas.add(g);
         canvas.renderAll();
