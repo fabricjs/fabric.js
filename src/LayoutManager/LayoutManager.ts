@@ -54,24 +54,24 @@ export class LayoutManager {
       return;
     }
     this.onBeforeLayout(context);
-    const { result, ...rest } = this.getLayoutResult({
+    const layoutResult = this.getLayoutResult({
       resolver: this.resolver,
       ...context,
     });
     let bubblingContext: LayoutResult | undefined;
     if (!this._firstLayoutDone) {
-      if (result) {
-        this.commitLayout(context, { result, ...rest });
-        bubblingContext = { result, ...rest };
+      if (layoutResult) {
+        this.commitLayout(context, layoutResult);
+        bubblingContext = layoutResult;
       } else {
-        const {
-          prevCenter: { x: centerX, y: centerY },
-        } = rest;
+        const prevCenter = context.target.getRelativeCenterPoint();
         bubblingContext = {
-          ...rest,
+          prevCenter,
+          nextCenter: prevCenter,
+          offset: new Point(),
           result: {
-            centerX,
-            centerY,
+            centerX: prevCenter.x,
+            centerY: prevCenter.y,
             width: context.target.width,
             height: context.target.height,
           },
@@ -79,9 +79,9 @@ export class LayoutManager {
       }
 
       this._firstLayoutDone = true;
-    } else if (result) {
-      this.commitLayout(context, { result, ...rest });
-      bubblingContext = { result, ...rest };
+    } else if (layoutResult) {
+      this.commitLayout(context, layoutResult);
+      bubblingContext = layoutResult;
     }
     bubblingContext && this.onLayout(context, bubblingContext);
   }
@@ -98,7 +98,9 @@ export class LayoutManager {
     });
   }
 
-  protected getLayoutResult(context: StrictLayoutContext): LayoutResult {
+  protected getLayoutResult(
+    context: StrictLayoutContext
+  ): Required<LayoutResult> | undefined {
     const { target } = context;
     const prevCenter = target.getRelativeCenterPoint();
     const result = context.resolver.calcLayoutResult(
@@ -106,12 +108,7 @@ export class LayoutManager {
       target.getObjects()
     );
     if (!result) {
-      return {
-        result,
-        prevCenter,
-        nextCenter: prevCenter,
-        offset: new Point(),
-      };
+      return;
     }
     const nextCenter = new Point(result.centerX, result.centerY);
     const correction = new Point(
