@@ -209,14 +209,21 @@ export class LayoutManager {
    * @param {LayoutContext} context
    */
   protected performSecondaryLayout(context: PassedLayoutContext) {
-    const { target } = this;
-    const { result, offset, prevCenter, nextCenter } =
-      this.getLayoutResult(context);
+    const layoutResult = this.getLayoutResult(context);
 
-    if (!result) {
+    if (!layoutResult.result) {
       return;
     }
 
+    this.commitLayout(context, layoutResult as Required<LayoutResult>);
+    return layoutResult;
+  }
+
+  protected commitLayout(
+    context: LayoutContext,
+    { result, prevCenter, nextCenter, offset }: Required<LayoutResult>
+  ) {
+    const { target } = this;
     // set dimensions
     target.set({ width: result.width, height: result.height });
     //  adjust objects to account for new center
@@ -233,8 +240,6 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       target.setCoords();
     }
-
-    return { result, offset, prevCenter, nextCenter };
   }
 
   /**
