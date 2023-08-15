@@ -137,6 +137,7 @@ export class LayoutManager {
     } = layoutResult;
     // set dimensions
     target.set({ width, height });
+    // layout descendants
     this.layoutChildren(context, layoutResult);
     //  set position
     if (!nextCenter.eq(prevCenter)) {
