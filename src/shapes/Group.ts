@@ -136,7 +136,7 @@ export class Group extends createCollectionMixin(
       objectsRelativeToGroup,
       target: this,
     });
-    this.set({ angle, skewX, skewY });
+    this.set({ angle: angle ?? 0, skewX: skewX ?? 0, skewY: skewY ?? 0 });
   }
 
   /**
