@@ -106,9 +106,9 @@ export class Group extends createCollectionMixin(
     objects: FabricObject[] = [],
     {
       layoutManager = new LayoutManager(),
-      angle,
-      skewX,
-      skewY,
+      angle = 0,
+      skewX = 0,
+      skewY = 0,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
@@ -136,7 +136,7 @@ export class Group extends createCollectionMixin(
       objectsRelativeToGroup,
       target: this,
     });
-    this.set({ angle: angle ?? 0, skewX: skewX ?? 0, skewY: skewY ?? 0 });
+    this.set({ angle, skewX, skewY });
   }
 
   /**
