@@ -213,7 +213,7 @@
         g.item(0).set({ left: point.x });
         g.item(1).set({ skewX: -45 });
         g.item(2).rotate(45);
-        g.layoutManager.triggerLayout();
+        g.triggerLayout();
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
