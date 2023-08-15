@@ -102,6 +102,9 @@ export class Group extends createCollectionMixin(
     objects: FabricObject[] = [],
     {
       layoutManager = new LayoutManager(),
+      angle,
+      skewX,
+      skewY,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
@@ -120,15 +123,15 @@ export class Group extends createCollectionMixin(
       false
     );
     // setting angle, skewX, skewY must occur after initial layout
-    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
+    this.set({ ...options });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
     this.layoutManager._applyLayoutStrategy({
       type: 'initialization',
-      options,
       objectsRelativeToGroup,
     });
+    this.set({ angle, skewX, skewY });
   }
 
   /**

@@ -114,12 +114,6 @@ export class LayoutManager {
       //  reject layout requests before initialization layout
       return;
     }
-    const options = isFirstLayout && context.options;
-    const initialTransform = options && {
-      angle: options.angle || 0,
-      skewX: options.skewX || 0,
-      skewY: options.skewY || 0,
-    };
     const { target } = this;
     const center = target.getRelativeCenterPoint();
     let result = this.getLayoutStrategyResult(
@@ -148,10 +142,9 @@ export class LayoutManager {
         target.clipPath &&
         !target.clipPath.absolutePositioned &&
         this._adjustObjectPosition(target.clipPath as FabricObject, diff);
-      if (!newCenter.eq(center) || initialTransform) {
+      if (!newCenter.eq(center)) {
         //  set position
         target.setPositionByOrigin(newCenter, CENTER, CENTER);
-        initialTransform && target.set(initialTransform);
         target.setCoords();
       }
     } else if (isFirstLayout) {
@@ -162,7 +155,6 @@ export class LayoutManager {
         width: target.width,
         height: target.height,
       };
-      initialTransform && target.set(initialTransform);
       diff = new Point();
     } else {
       //  no `result` so we return
