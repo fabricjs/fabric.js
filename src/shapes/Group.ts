@@ -126,12 +126,13 @@ export class Group extends createCollectionMixin(
       false
     );
     // setting angle, skewX, skewY must occur after initial layout
-    this.set({ ...options });
+    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
     this.layoutManager.performLayout({
       type: 'initialization',
+      options: { ...options, angle, skewX, skewY },
       objectsRelativeToGroup,
       target: this,
     });
