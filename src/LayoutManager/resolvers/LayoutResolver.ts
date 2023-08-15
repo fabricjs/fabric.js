@@ -38,14 +38,18 @@ export abstract class LayoutResolver {
    * Override this method to customize layout.
    * A wrapper around {@link getObjectsBoundingBox}
    */
-  calcBoundingBox(objects: FabricObject[], context: StrictLayoutContext) {
+  calcBoundingBox(
+    objects: FabricObject[],
+    context: StrictLayoutContext
+  ): LayoutResolverResult | undefined {
     if (context.type === 'initialization') {
       return this.calcInitialBoundingBox(objects, context);
     } else if (context.type === 'imperative' && context.context) {
+      // TODO: maybe error prune
       return {
-        ...(this.getObjectsBoundingBox(context.target, objects) || {}),
+        ...this.getObjectsBoundingBox(context.target, objects),
         ...context.context,
-      };
+      } as LayoutResolverResult;
     } else {
       return this.getObjectsBoundingBox(context.target, objects);
     }
@@ -58,7 +62,7 @@ export abstract class LayoutResolver {
   protected calcInitialBoundingBox(
     objects: FabricObject[],
     context: StrictLayoutContext
-  ) {
+  ): LayoutResolverResult | undefined {
     const { target } = context;
     const options = context.options || {},
       hasX = typeof options.left === 'number',
