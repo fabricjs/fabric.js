@@ -24,7 +24,7 @@ export class LayoutManager {
 
   triggerLayout({
     target,
-    resolver,
+    resolver = this.resolver,
     once,
     ...context
   }: ImperativeLayoutContext & { target: Group }) {
