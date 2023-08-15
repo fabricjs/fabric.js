@@ -61,15 +61,16 @@ export class LayoutManager {
    * @param {LayoutContext} context
    */
   performLayout(context: LayoutContext) {
-    let bubblingContext: LayoutResult | undefined;
     if (!this._firstLayoutDone && context.type !== 'initialization') {
       //  reject layout requests before initialization layout
       return;
     }
+    this.onBeforeLayout(context);
     const { result, ...rest } = this.getLayoutResult({
       resolver: this.resolver,
       ...context,
     });
+    let bubblingContext: LayoutResult | undefined;
     if (!this._firstLayoutDone) {
       if (result) {
         this.commitLayout(context, { result, ...rest });
@@ -95,6 +96,18 @@ export class LayoutManager {
       bubblingContext = { result, ...rest };
     }
     bubblingContext && this.onLayout(context, bubblingContext);
+  }
+
+  protected onBeforeLayout(context: LayoutContext) {
+    const { target } = this;
+
+    //  fire layout hook and event (event will fire only for layouts after initialization layout)
+    target.onBeforeLayout({
+      context,
+    });
+    target.fire('layout:before', {
+      context,
+    });
   }
 
   protected getLayoutResult(context: StrictLayoutContext): LayoutResult {

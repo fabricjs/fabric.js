@@ -24,13 +24,17 @@ export type StrictLayoutContext = LayoutContext & {
   resolver: LayoutResolver;
 };
 
+export type LayoutBeforeEvent = {
+  context: LayoutContext;
+};
+
 export type LayoutEvent = {
   context: LayoutContext;
 } & LayoutResult;
+
 /**
  * positioning and layout data **relative** to instance's parent
  */
-
 export type LayoutResolverResult = {
   /**
    * new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)

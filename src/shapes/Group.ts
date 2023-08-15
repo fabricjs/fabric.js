@@ -14,10 +14,11 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { LayoutEvent } from '../LayoutManager/types';
+import type { LayoutBeforeEvent, LayoutEvent } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
+  'layout:before': LayoutBeforeEvent;
   layout: LayoutEvent;
 }
 
@@ -487,6 +488,12 @@ export class Group extends createCollectionMixin(
     this._shouldSetNestedCoords() &&
       this.forEachObject((object) => object.setCoords());
   }
+
+  /**
+   * Hook that is called before layout begins.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  onBeforeLayout(data: LayoutBeforeEvent) {}
 
   /**
    * Hook that is called once layout has completed.
