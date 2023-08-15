@@ -127,7 +127,7 @@ export class Group extends createCollectionMixin(
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
-    this.layoutManager._applyLayoutStrategy({
+    this.layoutManager.performLayout({
       type: 'initialization',
       objectsRelativeToGroup,
     });
@@ -236,9 +236,9 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
-    this.layoutManager._applyLayoutStrategy({
-      type: type,
-      targets: targets,
+    this.layoutManager.performLayout({
+      type,
+      targets,
     });
     this._set('dirty', true);
   }
@@ -261,7 +261,7 @@ export class Group extends createCollectionMixin(
       });
     }
     if (key === 'layout' && prev !== value) {
-      this.layoutManager._applyLayoutStrategy({
+      this.layoutManager.performLayout({
         type: 'layout_change',
         layout: value,
         prevLayout: prev,
@@ -294,7 +294,7 @@ export class Group extends createCollectionMixin(
    * @private
    */
   __objectMonitor(ev: ObjectEvents['modified']) {
-    this.layoutManager._applyLayoutStrategy({ ...ev, type: 'object_modified' });
+    this.layoutManager.performLayout({ ...ev, type: 'object_modified' });
     this._set('dirty', true);
   }
 
