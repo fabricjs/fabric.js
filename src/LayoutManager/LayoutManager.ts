@@ -15,7 +15,7 @@ import type {
 
 export class LayoutManager {
   private _firstLayoutDone = false;
-  private _lastLayoutStrategy?: LayoutStrategy;
+  private _prevLayoutStrategy?: LayoutStrategy;
 
   strategy: LayoutStrategy;
 
@@ -51,10 +51,10 @@ export class LayoutManager {
 
     const layoutResult = this.getLayoutResult({
       strategy: this.strategy,
-      prevStrategy: this._lastLayoutStrategy,
+      prevStrategy: this._prevLayoutStrategy,
       strategyChange:
-        !!this._lastLayoutStrategy &&
-        this.strategy !== this._lastLayoutStrategy,
+        !!this._prevLayoutStrategy &&
+        this.strategy !== this._prevLayoutStrategy,
       ...context,
     });
     let bubblingContext: LayoutResult | undefined;
@@ -84,7 +84,7 @@ export class LayoutManager {
     }
 
     bubblingContext && this.onLayout(context, bubblingContext);
-    this._lastLayoutStrategy = context.strategy;
+    this._prevLayoutStrategy = context.strategy;
   }
 
   protected onBeforeLayout(context: LayoutContext) {

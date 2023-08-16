@@ -4,7 +4,7 @@ import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 
-export type LayoutContextType =
+export type LayoutContextTrigger =
   | 'initialization'
   | 'object_modified'
   | 'added'
@@ -14,7 +14,7 @@ export type LayoutContextType =
 export type LayoutContext = {
   target: Group;
   strategy?: LayoutStrategy;
-  type: LayoutContextType;
+  type: LayoutContextTrigger;
   /**
    * array of objects starting from the object that triggered the call to the current one
    */
