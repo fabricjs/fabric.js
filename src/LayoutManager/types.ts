@@ -13,7 +13,6 @@ export type LayoutContextType =
 
 export type LayoutContext = {
   target: Group;
-  prevStrategy?: LayoutStrategy;
   strategy?: LayoutStrategy;
   type: LayoutContextType;
   /**
@@ -41,6 +40,8 @@ export type LayoutContext = {
 
 export type StrictLayoutContext = LayoutContext & {
   strategy: LayoutStrategy;
+  prevStrategy?: LayoutStrategy;
+  strategyChange: boolean;
 };
 
 export type LayoutBeforeEvent = {

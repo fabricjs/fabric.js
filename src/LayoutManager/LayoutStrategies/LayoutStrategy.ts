@@ -56,8 +56,10 @@ export abstract class LayoutStrategy {
   }
 
   /**
-   * Calculates center taking into account originX, originY while not being sure that width/height are initialized
+   * Calculate the bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height, originX, originY)
+   * so it is placed in the center of the bbox received from the constructor
    *
+   * @todo revisit stroke calculations and respect angle and skew so that we can set them before initial layout
    */
   protected calcInitialBoundingBox(
     objects: FabricObject[],
@@ -114,8 +116,7 @@ export abstract class LayoutStrategy {
         width: bbox.width,
         height: bbox.height,
         strokeWidth: 0,
-      }),
-      rotationCorrection = new Point(0, 0);
+      });
 
     //  calculate center and correction
     const originT = origin.scalarAdd(0.5);
@@ -145,7 +146,7 @@ export abstract class LayoutStrategy {
         : -(hasHeight
             ? (sizeAfter.y - strokeWidthVector.y) * 0.5
             : sizeAfter.y * originT.y)
-    ).add(rotationCorrection);
+    );
     const correction = new Point(
       hasWidth ? -sizeAfter.x / 2 : 0,
       hasHeight ? -sizeAfter.y / 2 : 0

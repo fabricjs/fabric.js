@@ -15,6 +15,7 @@ import type {
 
 export class LayoutManager {
   private _firstLayoutDone = false;
+  private _lastLayoutStrategy?: LayoutStrategy;
 
   strategy: LayoutStrategy;
 
@@ -29,36 +30,35 @@ export class LayoutManager {
     ...context
   }: ImperativeLayoutContext & { target: Group }) {
     const prevStrategy = this.strategy;
-    if (strategy && strategy !== prevStrategy && !once) {
+    if (strategy !== prevStrategy && !once) {
       this.strategy = strategy;
     }
     this.performLayout({
       target,
       type: 'imperative',
       strategy,
-      prevStrategy,
       context,
     });
   }
 
-  /**
-   * initial layout logic:
-   * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
-   * so it is placed in the center of the bbox received from the constructor
-   *
-   * @param {LayoutContext} context
-   */
   performLayout(context: LayoutContext) {
     if (!this._firstLayoutDone && context.type !== 'initialization') {
       //  reject layout requests before initialization layout
       return;
     }
+
     this.onBeforeLayout(context);
+
     const layoutResult = this.getLayoutResult({
       strategy: this.strategy,
+      prevStrategy: this._lastLayoutStrategy,
+      strategyChange:
+        !!this._lastLayoutStrategy &&
+        this.strategy !== this._lastLayoutStrategy,
       ...context,
     });
     let bubblingContext: LayoutResult | undefined;
+
     if (!this._firstLayoutDone) {
       if (layoutResult) {
         this.commitLayout(context, layoutResult);
@@ -77,13 +77,14 @@ export class LayoutManager {
           },
         };
       }
-
       this._firstLayoutDone = true;
     } else if (layoutResult) {
       this.commitLayout(context, layoutResult);
       bubblingContext = layoutResult;
     }
+
     bubblingContext && this.onLayout(context, bubblingContext);
+    this._lastLayoutStrategy = context.strategy;
   }
 
   protected onBeforeLayout(context: LayoutContext) {

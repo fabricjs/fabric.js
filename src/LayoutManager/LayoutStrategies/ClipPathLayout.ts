@@ -10,16 +10,14 @@ export class ClipPathLayout extends LayoutStrategy {
     objects: FabricObject[]
   ): LayoutStrategyResult | undefined {
     const { target } = context;
-    const clipPath = target.clipPath;
+    const { clipPath } = target;
     if (!clipPath) {
       return;
     }
-    const isLayoutChange =
-      context.prevStrategy && context.strategy !== context.prevStrategy;
     const clipPathSizeAfter = clipPath._getTransformedDimensions();
     if (
       clipPath.absolutePositioned &&
-      (context.type === 'initialization' || isLayoutChange)
+      (context.type === 'initialization' || context.strategyChange)
     ) {
       //  we want the center point to exist in group's containing plane
       const clipPathCenter = sendPointToPlane(
@@ -40,7 +38,7 @@ export class ClipPathLayout extends LayoutStrategy {
           target.calcOwnMatrix(),
           true
         );
-      if (context.type === 'initialization' || isLayoutChange) {
+      if (context.type === 'initialization' || context.strategyChange) {
         const {
           centerX = 0,
           centerY = 0,
