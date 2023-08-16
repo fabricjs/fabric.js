@@ -63,4 +63,8 @@ export class ClipPathLayout extends LayoutStrategy {
       }
     }
   }
+
+  shouldAdjustClipPath() {
+    return false;
+  }
 }

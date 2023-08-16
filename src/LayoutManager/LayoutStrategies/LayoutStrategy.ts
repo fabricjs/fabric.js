@@ -30,6 +30,10 @@ export abstract class LayoutStrategy {
     }
   }
 
+  shouldAdjustClipPath() {
+    return true;
+  }
+
   /**
    * Calculate the bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height, originX, originY)
    * so it is placed in the center of the bbox received from the constructor

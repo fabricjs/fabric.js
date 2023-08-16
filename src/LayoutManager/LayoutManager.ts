@@ -2,7 +2,6 @@ import { Point } from '../Point';
 import { CENTER } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
-import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
@@ -138,7 +137,7 @@ export class LayoutManager {
       });
     // adjust clip path to account for new center
     context.type !== 'initialization' &&
-      !(context.strategy instanceof ClipPathLayout) &&
+      context.strategy.shouldAdjustClipPath() &&
       target.clipPath &&
       !target.clipPath.absolutePositioned &&
       this.adjustObjectPosition(target.clipPath as FabricObject, offset);
