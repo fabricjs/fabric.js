@@ -50,7 +50,7 @@ export type LayoutResult = {
 
 export type ImperativeLayoutContext = {
   strategy?: LayoutStrategy;
-  overrides: Partial<LayoutStrategyResult>;
+  overrides?: Partial<LayoutStrategyResult>;
 };
 
 export type LayoutContext = {

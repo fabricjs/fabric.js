@@ -502,7 +502,7 @@ export class Group extends createCollectionMixin(
   triggerLayout({
     strategy = this.layoutManager.strategy,
     overrides,
-  }: ImperativeLayoutContext) {
+  }: ImperativeLayoutContext = {}) {
     this.layoutManager.performLayout({
       target: this,
       type: 'imperative',
