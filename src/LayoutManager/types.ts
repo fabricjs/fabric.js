@@ -1,6 +1,6 @@
 import type { ModifiedEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
-import type { Group } from '../shapes/Group';
+import type { Group, GroupProps } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 
@@ -65,6 +65,7 @@ export type LayoutContext = {
 } & (
   | {
       type: 'initialization';
+      options?: Partial<GroupProps>;
       objectsRelativeToGroup?: boolean;
     }
   | {
