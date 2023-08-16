@@ -161,11 +161,8 @@ export class LayoutManager {
 
     //  bubble
     if (target.group?.layoutManager) {
-      //  append the path recursion to context
-      if (!context.path) {
-        context.path = [];
-      }
-      context.path.push(target);
+      //  add target to context#path
+      (context.path || (context.path = [])).push(target);
       //  all parents should invalidate their layout
       const parent = target.group;
       parent.layoutManager.performLayout({
