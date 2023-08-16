@@ -11,47 +11,6 @@ export type LayoutContextTrigger =
   | 'removed'
   | 'imperative';
 
-export type LayoutContext = {
-  target: Group;
-  strategy?: LayoutStrategy;
-  type: LayoutContextTrigger;
-  /**
-   * array of objects starting from the object that triggered the call to the current one
-   */
-  path?: Group[];
-  [key: string]: any;
-} & (
-  | {
-      type: 'initialization';
-      objectsRelativeToGroup?: boolean;
-    }
-  | {
-      type: 'added' | 'removed';
-      targets: FabricObject[];
-    }
-  | ({
-      type: 'object_modified';
-    } & ModifiedEvent)
-  | {
-      type: 'imperative';
-      context?: Partial<LayoutStrategyResult>;
-    }
-);
-
-export type StrictLayoutContext = LayoutContext & {
-  strategy: LayoutStrategy;
-  prevStrategy?: LayoutStrategy;
-  strategyChange: boolean;
-};
-
-export type LayoutBeforeEvent = {
-  context: LayoutContext;
-};
-
-export type LayoutEvent = {
-  context: LayoutContext;
-} & LayoutResult;
-
 /**
  * positioning and layout data **relative** to instance's parent
  */
@@ -94,3 +53,44 @@ export type ImperativeLayoutContext = Partial<LayoutStrategyResult> &
     | { strategy?: LayoutStrategy; once?: never }
     | { strategy: LayoutStrategy; once?: boolean }
   );
+
+export type LayoutContext = {
+  target: Group;
+  strategy?: LayoutStrategy;
+  type: LayoutContextTrigger;
+  /**
+   * array of objects starting from the object that triggered the call to the current one
+   */
+  path?: Group[];
+  [key: string]: any;
+} & (
+  | {
+      type: 'initialization';
+      objectsRelativeToGroup?: boolean;
+    }
+  | {
+      type: 'added' | 'removed';
+      targets: FabricObject[];
+    }
+  | ({
+      type: 'object_modified';
+    } & ModifiedEvent)
+  | {
+      type: 'imperative';
+      context?: Partial<LayoutStrategyResult>;
+    }
+);
+
+export type StrictLayoutContext = LayoutContext & {
+  strategy: LayoutStrategy;
+  prevStrategy?: LayoutStrategy;
+  strategyChange: boolean;
+};
+
+export type LayoutBeforeEvent = {
+  context: LayoutContext;
+};
+
+export type LayoutEvent = {
+  context: LayoutContext;
+} & LayoutResult;
