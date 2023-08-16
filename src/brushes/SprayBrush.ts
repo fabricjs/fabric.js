@@ -8,7 +8,7 @@ import { BaseBrush } from './BaseBrush';
 import type { SprayBrushPoint } from './typedefs';
 import { CENTER } from '../constants';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
-import { FixedLayoutResolver } from '../LayoutManager/resolvers/FixedLayoutResolver';
+import { FixedLayout } from '../LayoutManager/LayoutStrategies/FixedLayout';
 
 /**
  *
@@ -143,7 +143,7 @@ export class SprayBrush extends BaseBrush {
       this.optimizeOverlapping ? getUniqueRects(rects) : rects,
       {
         objectCaching: true,
-        layoutManager: new LayoutManager(new FixedLayoutResolver()),
+        layoutManager: new LayoutManager(new FixedLayout()),
         subTargetCheck: false,
         interactive: false,
       }

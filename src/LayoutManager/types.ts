@@ -2,7 +2,7 @@ import type { ModifiedEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { LayoutResolver } from './resolvers/LayoutResolver';
+import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 
 export type LayoutContextType =
   | 'initialization'
@@ -13,8 +13,8 @@ export type LayoutContextType =
 
 export type LayoutContext = {
   target: Group;
-  prevResolver?: LayoutResolver;
-  resolver?: LayoutResolver;
+  prevStrategy?: LayoutStrategy;
+  strategy?: LayoutStrategy;
   type: LayoutContextType;
   /**
    * array of objects starting from the object that triggered the call to the current one
@@ -35,12 +35,12 @@ export type LayoutContext = {
     } & ModifiedEvent)
   | {
       type: 'imperative';
-      context?: Partial<LayoutResolverResult>;
+      context?: Partial<LayoutStrategyResult>;
     }
 );
 
 export type StrictLayoutContext = LayoutContext & {
-  resolver: LayoutResolver;
+  strategy: LayoutStrategy;
 };
 
 export type LayoutBeforeEvent = {
@@ -54,7 +54,7 @@ export type LayoutEvent = {
 /**
  * positioning and layout data **relative** to instance's parent
  */
-export type LayoutResolverResult = {
+export type LayoutStrategyResult = {
   /**
    * new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
    */
@@ -82,14 +82,14 @@ export type LayoutResolverResult = {
 };
 
 export type LayoutResult = {
-  result?: LayoutResolverResult;
+  result?: LayoutStrategyResult;
   prevCenter: Point;
   nextCenter: Point;
   offset: Point;
 };
 
-export type ImperativeLayoutContext = Partial<LayoutResolverResult> &
+export type ImperativeLayoutContext = Partial<LayoutStrategyResult> &
   (
-    | { resolver?: LayoutResolver; once?: never }
-    | { resolver: LayoutResolver; once?: boolean }
+    | { strategy?: LayoutStrategy; once?: never }
+    | { strategy: LayoutStrategy; once?: boolean }
   );

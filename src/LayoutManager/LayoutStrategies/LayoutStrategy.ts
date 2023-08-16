@@ -7,7 +7,7 @@ import { cos } from '../../util/misc/cos';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import { sin } from '../../util/misc/sin';
-import type { LayoutResolverResult, StrictLayoutContext } from '../types';
+import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 
 export function getObjectSizeVector(object: FabricObject) {
   const sizeVector = object._getTransformedDimensions().scalarDivide(2);
@@ -28,11 +28,11 @@ export function getObjectBounds(object: FabricObject) {
   return [objCenter.subtract(sizeVector), objCenter.add(sizeVector)];
 }
 
-export abstract class LayoutResolver {
+export abstract class LayoutStrategy {
   abstract calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]
-  ): LayoutResolverResult | undefined;
+  ): LayoutStrategyResult | undefined;
 
   /**
    * Override this method to customize layout.
@@ -41,7 +41,7 @@ export abstract class LayoutResolver {
   calcBoundingBox(
     objects: FabricObject[],
     context: StrictLayoutContext
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     if (context.type === 'initialization') {
       return this.calcInitialBoundingBox(objects, context);
     } else if (context.type === 'imperative' && context.context) {
@@ -49,7 +49,7 @@ export abstract class LayoutResolver {
       return {
         ...this.getObjectsBoundingBox(context.target, objects),
         ...context.context,
-      } as LayoutResolverResult;
+      } as LayoutStrategyResult;
     } else {
       return this.getObjectsBoundingBox(context.target, objects);
     }
@@ -62,7 +62,7 @@ export abstract class LayoutResolver {
   protected calcInitialBoundingBox(
     objects: FabricObject[],
     context: StrictLayoutContext
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     const { target } = context;
     const options = context.options || {},
       hasX = typeof options.left === 'number',
@@ -86,7 +86,7 @@ export abstract class LayoutResolver {
 
     const bbox =
       this.getObjectsBoundingBox(target, objects) ||
-      ({} as LayoutResolverResult);
+      ({} as LayoutStrategyResult);
     const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
     const {
       left: x,
@@ -165,13 +165,13 @@ export abstract class LayoutResolver {
    * Calculate the bbox of objects relative to instance's containing plane
    *
    * @param {FabricObject[]} objects
-   * @returns {LayoutResolverResult | undefined} bounding box
+   * @returns {LayoutStrategyResult | undefined} bounding box
    */
   getObjectsBoundingBox(
     target: Group,
     objects: FabricObject[],
     ignoreOffset?: boolean
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     if (objects.length === 0) {
       return;
     }
@@ -188,7 +188,7 @@ export abstract class LayoutResolver {
     target: Group,
     { left, top, width, height }: TBBox,
     ignoreOffset?: boolean
-  ): LayoutResolverResult {
+  ): LayoutStrategyResult {
     const size = new Point(width, height),
       relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
         size.scalarDivide(2)

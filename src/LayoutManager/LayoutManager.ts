@@ -3,40 +3,40 @@ import { CENTER } from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
-import { ClipPathLayoutResolver } from './resolvers/ClipPathLayoutResolver';
-import { FitContentLayoutResolver } from './resolvers/FitContentLayoutResolver';
-import type { LayoutResolver } from './resolvers/LayoutResolver';
+import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
+import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
+import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import type {
+  ImperativeLayoutContext,
   LayoutContext,
   LayoutResult,
   StrictLayoutContext,
-  ImperativeLayoutContext,
 } from './types';
 
 export class LayoutManager {
   private _firstLayoutDone = false;
 
-  resolver: LayoutResolver;
+  strategy: LayoutStrategy;
 
-  constructor(resolver: LayoutResolver = new FitContentLayoutResolver()) {
-    this.resolver = resolver;
+  constructor(strategy: LayoutStrategy = new FitContentLayout()) {
+    this.strategy = strategy;
   }
 
   triggerLayout({
     target,
-    resolver = this.resolver,
+    strategy = this.strategy,
     once,
     ...context
   }: ImperativeLayoutContext & { target: Group }) {
-    const prevResolver = this.resolver;
-    if (resolver && resolver !== prevResolver && !once) {
-      this.resolver = resolver;
+    const prevStrategy = this.strategy;
+    if (strategy && strategy !== prevStrategy && !once) {
+      this.strategy = strategy;
     }
     this.performLayout({
       target,
       type: 'imperative',
-      resolver,
-      prevResolver,
+      strategy,
+      prevStrategy,
       context,
     });
   }
@@ -55,7 +55,7 @@ export class LayoutManager {
     }
     this.onBeforeLayout(context);
     const layoutResult = this.getLayoutResult({
-      resolver: this.resolver,
+      strategy: this.strategy,
       ...context,
     });
     let bubblingContext: LayoutResult | undefined;
@@ -103,7 +103,7 @@ export class LayoutManager {
   ): Required<LayoutResult> | undefined {
     const { target } = context;
     const prevCenter = target.getRelativeCenterPoint();
-    const result = context.resolver.calcLayoutResult(
+    const result = context.strategy.calcLayoutResult(
       context,
       target.getObjects()
     );
@@ -155,7 +155,7 @@ export class LayoutManager {
       });
     // adjust clip path to account for new center
     context.type !== 'initialization' &&
-      !(context.resolver instanceof ClipPathLayoutResolver) &&
+      !(context.strategy instanceof ClipPathLayout) &&
       target.clipPath &&
       !target.clipPath.absolutePositioned &&
       this.adjustObjectPosition(target.clipPath as FabricObject, offset);

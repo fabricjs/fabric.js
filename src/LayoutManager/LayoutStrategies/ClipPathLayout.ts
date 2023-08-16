@@ -1,21 +1,21 @@
 import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendPointToPlane } from '../../util/misc/planeChange';
-import type { LayoutResolverResult, StrictLayoutContext } from '../types';
-import { LayoutResolver } from './LayoutResolver';
+import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
+import { LayoutStrategy } from './LayoutStrategy';
 
-export class ClipPathLayoutResolver extends LayoutResolver {
+export class ClipPathLayout extends LayoutStrategy {
   calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     const { target } = context;
     const clipPath = target.clipPath;
     if (!clipPath) {
       return;
     }
     const isLayoutChange =
-      context.prevResolver && context.resolver !== context.prevResolver;
+      context.prevStrategy && context.strategy !== context.prevStrategy;
     const clipPathSizeAfter = clipPath._getTransformedDimensions();
     if (
       clipPath.absolutePositioned &&

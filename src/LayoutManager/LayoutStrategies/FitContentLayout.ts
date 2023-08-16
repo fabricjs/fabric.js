@@ -2,14 +2,14 @@ import type { Point } from '../../Point';
 import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import type { LayoutResolverResult, StrictLayoutContext } from '../types';
+import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import {
-  LayoutResolver,
+  LayoutStrategy,
   getObjectBounds,
   getObjectSizeVector,
-} from './LayoutResolver';
+} from './LayoutStrategy';
 
-export class FitContentLayoutResolver extends LayoutResolver {
+export class FitContentLayout extends LayoutStrategy {
   /**
    * optimize layout when possible
    */
@@ -18,7 +18,7 @@ export class FitContentLayoutResolver extends LayoutResolver {
   calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     if (
       this.lazy &&
       context.type === 'added' &&
@@ -34,7 +34,7 @@ export class FitContentLayoutResolver extends LayoutResolver {
     target: Group,
     objects: FabricObject[],
     ignoreOffset?: boolean
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     if (objects.length === 0) {
       return;
     }

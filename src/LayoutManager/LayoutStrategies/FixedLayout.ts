@@ -1,12 +1,12 @@
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { LayoutResolverResult, StrictLayoutContext } from '../types';
-import { LayoutResolver } from './LayoutResolver';
+import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
+import { LayoutStrategy } from './LayoutStrategy';
 
-export class FixedLayoutResolver extends LayoutResolver {
+export class FixedLayout extends LayoutStrategy {
   calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]
-  ): LayoutResolverResult | undefined {
+  ): LayoutStrategyResult | undefined {
     if (context.type === 'initialization' || context.type === 'imperative') {
       return this.calcBoundingBox(objects, context);
     }
