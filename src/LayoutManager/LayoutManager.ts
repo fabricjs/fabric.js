@@ -113,14 +113,14 @@ export class LayoutManager {
     // set dimensions
     target.set({ width, height });
     // layout descendants
-    this.layoutChildren(context, layoutResult);
+    this.layoutObjects(context, layoutResult);
     //  set position
     !nextCenter.eq(prevCenter) &&
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
     context.type !== 'initialization' && target.setCoords();
   }
 
-  protected layoutChildren(
+  protected layoutObjects(
     context: LayoutContext,
     { offset }: Required<LayoutResult>
   ) {
