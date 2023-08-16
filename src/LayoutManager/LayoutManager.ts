@@ -92,11 +92,15 @@ export class LayoutManager {
       result.correctionX ?? 0,
       result.correctionY ?? 0
     );
-    const vector = prevCenter.subtract(nextCenter).add(correction);
-    const offset = vector.transform(
-      invertTransform(target.calcOwnMatrix()),
-      true
+    const relativeCorrection = new Point(
+      result.relativeCorrectionX ?? 0,
+      result.relativeCorrectionY ?? 0
     );
+    const offset = prevCenter
+      .subtract(nextCenter)
+      .add(correction)
+      .transform(invertTransform(target.calcOwnMatrix()), true)
+      .add(relativeCorrection);
     return { result, prevCenter, nextCenter, offset };
   }
 

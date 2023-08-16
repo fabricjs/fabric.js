@@ -16,11 +16,11 @@ export type LayoutTrigger =
  */
 export type LayoutStrategyResult = {
   /**
-   * new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
+   * new centerX as measured by the **containing** plane (same as `left` with `originX` set to `center`)
    */
   centerX: number;
   /**
-   * new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
+   * new centerY as measured by the **containing** plane (same as `top` with `originY` set to `center`)
    */
   centerY: number;
   /**
@@ -31,6 +31,14 @@ export type LayoutStrategyResult = {
    * correctionY to translate objects by, measured as `centerY`
    */
   correctionY?: number;
+  /**
+   * correctionX to translate objects by as measured by the plane
+   */
+  relativeCorrectionX?: number;
+  /**
+   * correctionY to translate objects by as measured by the plane
+   */
+  relativeCorrectionY?: number;
   /**
    * new width of instance
    */
