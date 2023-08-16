@@ -30,7 +30,7 @@ export abstract class LayoutStrategy {
     }
   }
 
-  shouldAdjustClipPath() {
+  shouldLayoutClipPath() {
     return true;
   }
 

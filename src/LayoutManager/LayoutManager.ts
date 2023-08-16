@@ -127,27 +127,32 @@ export class LayoutManager {
 
   protected layoutObjects(
     context: StrictLayoutContext,
-    { offset }: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>
   ) {
     const { target } = context;
     //  adjust objects to account for new center
     !context.objectsRelativeToGroup &&
       target.forEachObject((object) => {
-        object.group === target && this.adjustObjectPosition(object, offset);
+        object.group === target &&
+          this.layoutObject(object, context, layoutResult);
       });
     // adjust clip path to account for new center
     context.type !== 'initialization' &&
-      context.strategy.shouldAdjustClipPath() &&
+      context.strategy.shouldLayoutClipPath() &&
       target.clipPath &&
       !target.clipPath.absolutePositioned &&
-      this.adjustObjectPosition(target.clipPath as FabricObject, offset);
+      this.layoutObject(target.clipPath as FabricObject, context, layoutResult);
   }
 
   /**
    * @param {FabricObject} object
    * @param {Point} offset
    */
-  protected adjustObjectPosition(object: FabricObject, offset: Point) {
+  protected layoutObject(
+    object: FabricObject,
+    context: StrictLayoutContext,
+    { offset }: Required<LayoutResult>
+  ) {
     object.setRelativeXY(object.getRelativeXY().add(offset));
   }
 
