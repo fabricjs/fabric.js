@@ -28,6 +28,14 @@ export function getObjectBounds(object: FabricObject) {
   return [objCenter.subtract(sizeVector), objCenter.add(sizeVector)];
 }
 
+export function shouldPerformLayout(context: StrictLayoutContext) {
+  return (
+    context.type === 'initialization' ||
+    context.type === 'imperative' ||
+    context.strategyChange
+  );
+}
+
 export abstract class LayoutStrategy {
   abstract calcLayoutResult(
     context: StrictLayoutContext,
