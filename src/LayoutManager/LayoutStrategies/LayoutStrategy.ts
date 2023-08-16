@@ -45,11 +45,7 @@ export abstract class LayoutStrategy {
     if (context.type === 'initialization') {
       return this.calcInitialBoundingBox(objects, context);
     } else if (context.type === 'imperative' && context.overrides) {
-      // TODO: maybe error prune
-      return {
-        ...this.getObjectsBoundingBox(context.target, objects),
-        ...context.overrides,
-      } as LayoutStrategyResult;
+      return context.overrides;
     } else {
       return this.getObjectsBoundingBox(context.target, objects);
     }
