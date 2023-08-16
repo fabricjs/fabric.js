@@ -53,6 +53,9 @@ export type LayoutResult = {
   result?: LayoutStrategyResult;
   prevCenter: Point;
   nextCenter: Point;
+  /**
+   * The vector used to offset objects by, as measured by the plane
+   */
   offset: Point;
 };
 
