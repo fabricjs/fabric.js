@@ -96,9 +96,9 @@ export type StrictLayoutContext = LayoutContext & {
 };
 
 export type LayoutBeforeEvent = {
-  context: LayoutContext;
+  context: StrictLayoutContext;
 };
 
 export type LayoutEvent = {
-  context: LayoutContext;
+  context: StrictLayoutContext;
 } & LayoutResult;

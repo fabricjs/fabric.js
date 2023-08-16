@@ -23,24 +23,26 @@ export class LayoutManager {
       return;
     }
 
-    this.onBeforeLayout(context);
-
-    const layoutResult = this.getLayoutResult({
+    const strictContext: StrictLayoutContext = {
       strategy: this.strategy,
       prevStrategy: this._prevLayoutStrategy,
       strategyChange:
         !!this._prevLayoutStrategy &&
         this.strategy !== this._prevLayoutStrategy,
       ...context,
-    });
+    };
+
+    this.onBeforeLayout(strictContext);
+
+    const layoutResult = this.getLayoutResult(strictContext);
     let bubblingContext: LayoutResult | undefined;
 
     if (!this._firstLayoutDone) {
       if (layoutResult) {
-        this.commitLayout(context, layoutResult);
+        this.commitLayout(strictContext, layoutResult);
         bubblingContext = layoutResult;
       } else {
-        const prevCenter = context.target.getRelativeCenterPoint();
+        const prevCenter = strictContext.target.getRelativeCenterPoint();
         bubblingContext = {
           prevCenter,
           nextCenter: prevCenter,
@@ -48,22 +50,22 @@ export class LayoutManager {
           result: {
             centerX: prevCenter.x,
             centerY: prevCenter.y,
-            width: context.target.width,
-            height: context.target.height,
+            width: strictContext.target.width,
+            height: strictContext.target.height,
           },
         };
       }
       this._firstLayoutDone = true;
     } else if (layoutResult) {
-      this.commitLayout(context, layoutResult);
+      this.commitLayout(strictContext, layoutResult);
       bubblingContext = layoutResult;
     }
 
-    bubblingContext && this.onLayout(context, bubblingContext);
-    this._prevLayoutStrategy = context.strategy;
+    bubblingContext && this.onLayout(strictContext, bubblingContext);
+    this._prevLayoutStrategy = strictContext.strategy;
   }
 
-  protected onBeforeLayout(context: LayoutContext) {
+  protected onBeforeLayout(context: StrictLayoutContext) {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
@@ -105,7 +107,7 @@ export class LayoutManager {
   }
 
   protected commitLayout(
-    context: LayoutContext,
+    context: StrictLayoutContext,
     layoutResult: Required<LayoutResult>
   ) {
     const { target } = context;
@@ -125,7 +127,7 @@ export class LayoutManager {
   }
 
   protected layoutObjects(
-    context: LayoutContext,
+    context: StrictLayoutContext,
     { offset }: Required<LayoutResult>
   ) {
     const { target } = context;
@@ -150,7 +152,7 @@ export class LayoutManager {
     object.setRelativeXY(object.getRelativeXY().add(offset));
   }
 
-  protected onLayout(context: LayoutContext, layoutData: LayoutResult) {
+  protected onLayout(context: StrictLayoutContext, layoutData: LayoutResult) {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
