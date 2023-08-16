@@ -156,17 +156,17 @@ export class LayoutManager {
     object.setRelativeXY(object.getRelativeXY().add(offset));
   }
 
-  protected onLayout(context: StrictLayoutContext, layoutData: LayoutResult) {
+  protected onLayout(context: StrictLayoutContext, layoutResult: LayoutResult) {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onLayout({
       context,
-      ...layoutData,
+      ...layoutResult,
     });
     target.fire('layout', {
       context,
-      ...layoutData,
+      ...layoutResult,
     });
 
     //  bubble
