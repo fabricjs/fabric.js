@@ -499,8 +499,16 @@ export class Group extends createCollectionMixin(
       this.forEachObject((object) => object.setCoords());
   }
 
-  triggerLayout(context?: ImperativeLayoutContext) {
-    this.layoutManager.triggerLayout({ ...context, target: this });
+  triggerLayout({
+    strategy = this.layoutManager.strategy,
+    overrides,
+  }: ImperativeLayoutContext) {
+    this.layoutManager.performLayout({
+      target: this,
+      type: 'imperative',
+      strategy,
+      overrides,
+    });
   }
 
   /**

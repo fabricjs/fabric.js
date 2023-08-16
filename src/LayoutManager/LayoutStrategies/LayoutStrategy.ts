@@ -44,11 +44,11 @@ export abstract class LayoutStrategy {
   ): LayoutStrategyResult | undefined {
     if (context.type === 'initialization') {
       return this.calcInitialBoundingBox(objects, context);
-    } else if (context.type === 'imperative' && context.context) {
+    } else if (context.type === 'imperative' && context.overrides) {
       // TODO: maybe error prune
       return {
         ...this.getObjectsBoundingBox(context.target, objects),
-        ...context.context,
+        ...context.overrides,
       } as LayoutStrategyResult;
     } else {
       return this.getObjectsBoundingBox(context.target, objects);

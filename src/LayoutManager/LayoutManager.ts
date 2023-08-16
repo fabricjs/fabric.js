@@ -1,17 +1,11 @@
 import { Point } from '../Point';
 import { CENTER } from '../constants';
-import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
 import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
-import type {
-  ImperativeLayoutContext,
-  LayoutContext,
-  LayoutResult,
-  StrictLayoutContext,
-} from './types';
+import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 export class LayoutManager {
   private _firstLayoutDone = false;
@@ -21,24 +15,6 @@ export class LayoutManager {
 
   constructor(strategy: LayoutStrategy = new FitContentLayout()) {
     this.strategy = strategy;
-  }
-
-  triggerLayout({
-    target,
-    strategy = this.strategy,
-    once,
-    ...context
-  }: ImperativeLayoutContext & { target: Group }) {
-    const prevStrategy = this.strategy;
-    if (strategy !== prevStrategy && !once) {
-      this.strategy = strategy;
-    }
-    this.performLayout({
-      target,
-      type: 'imperative',
-      strategy,
-      context,
-    });
   }
 
   performLayout(context: LayoutContext) {

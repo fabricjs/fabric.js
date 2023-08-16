@@ -48,11 +48,10 @@ export type LayoutResult = {
   offset: Point;
 };
 
-export type ImperativeLayoutContext = Partial<LayoutStrategyResult> &
-  (
-    | { strategy?: LayoutStrategy; once?: never }
-    | { strategy: LayoutStrategy; once?: boolean }
-  );
+export type ImperativeLayoutContext = {
+  strategy?: LayoutStrategy;
+  overrides: Partial<LayoutStrategyResult>;
+};
 
 export type LayoutContext = {
   target: Group;
@@ -77,7 +76,7 @@ export type LayoutContext = {
     } & ModifiedEvent)
   | {
       type: 'imperative';
-      context?: Partial<LayoutStrategyResult>;
+      overrides?: Partial<LayoutStrategyResult>;
     }
 );
 
