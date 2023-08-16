@@ -3,11 +3,8 @@ import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
-import {
-  LayoutStrategy,
-  getObjectBounds,
-  getObjectSizeVector,
-} from './LayoutStrategy';
+import { LayoutStrategy } from './LayoutStrategy';
+import { getObjectBounds, getObjectSizeVector } from './utils';
 
 export class FitContentLayout extends LayoutStrategy {
   /**
