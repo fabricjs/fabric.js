@@ -468,7 +468,7 @@ export class InteractiveFabricObject<
         this.borderScaleFactor
       );
     }
-    this._drawBorders(ctx, size, styleOverride);
+    this._drawBorders(ctx, size.scalarAdd(this.padding * 2), styleOverride);
   }
 
   /**
