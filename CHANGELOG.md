@@ -3,6 +3,9 @@
 ## [next]
 
 - fix(): border rendering with padding under group [#9161](https://github.com/fabricjs/fabric.js/pull/9161)
+## [6.0.0-beta11]
+
+- patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
 - patch(): ActiveSelection initialization + types [#9143](https://github.com/fabricjs/fabric.js/pull/9143)
 - chore(TS): BREAKING remove canvas.interactive, added typings for canvas options [#9140](https://github.com/fabricjs/fabric.js/pull/9140)
 - chore(TS): BREAKING PREVIOUS BETA mv + rename `TProps` => `TOptions` [#9139](https://github.com/fabricjs/fabric.js/pull/9139)
