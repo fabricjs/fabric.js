@@ -193,7 +193,6 @@ exports[`Text toObject 1`] = `
   "top": 0,
   "type": "Text",
   "underline": false,
-  "version": "6.0.0-beta10",
   "visible": true,
   "width": 60,
 }

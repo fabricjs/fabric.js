@@ -51,7 +51,6 @@ fox",
   "top": 0,
   "type": "Textbox",
   "underline": false,
-  "version": "6.0.0-beta10",
   "visible": true,
   "width": 102,
 }
@@ -67,7 +66,6 @@ brown
 fox",
   "top": 0,
   "type": "Textbox",
-  "version": "6.0.0-beta10",
   "width": 102,
 }
 `;
@@ -157,7 +155,6 @@ fox",
   "top": 0,
   "type": "Textbox",
   "underline": false,
-  "version": "6.0.0-beta10",
   "visible": true,
   "width": 120,
 }
