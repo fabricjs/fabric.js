@@ -36,31 +36,26 @@ export class LayoutManager {
     const layoutResult = this.getLayoutResult(strictContext);
     let bubblingContext: LayoutResult | undefined;
 
-    if (!this._firstLayoutDone) {
-      if (layoutResult) {
-        this.commitLayout(strictContext, layoutResult);
-        bubblingContext = layoutResult;
-      } else {
-        const prevCenter = strictContext.target.getRelativeCenterPoint();
-        bubblingContext = {
-          prevCenter,
-          nextCenter: prevCenter,
-          offset: new Point(),
-          result: {
-            centerX: prevCenter.x,
-            centerY: prevCenter.y,
-            width: strictContext.target.width,
-            height: strictContext.target.height,
-          },
-        };
-      }
-      this._firstLayoutDone = true;
-    } else if (layoutResult) {
+    if (layoutResult) {
       this.commitLayout(strictContext, layoutResult);
       bubblingContext = layoutResult;
+    } else if (!this._firstLayoutDone) {
+      const prevCenter = strictContext.target.getRelativeCenterPoint();
+      bubblingContext = {
+        prevCenter,
+        nextCenter: prevCenter,
+        offset: new Point(),
+        result: {
+          centerX: prevCenter.x,
+          centerY: prevCenter.y,
+          width: strictContext.target.width,
+          height: strictContext.target.height,
+        },
+      };
     }
 
-    bubblingContext && this.onLayout(strictContext, bubblingContext);
+    this._firstLayoutDone = true;
+    bubblingContext && this.onAfterLayout(strictContext, bubblingContext);
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
@@ -156,7 +151,10 @@ export class LayoutManager {
     object.setRelativeXY(object.getRelativeXY().add(offset));
   }
 
-  protected onLayout(context: StrictLayoutContext, layoutResult: LayoutResult) {
+  protected onAfterLayout(
+    context: StrictLayoutContext,
+    layoutResult: LayoutResult
+  ) {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)

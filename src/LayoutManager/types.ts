@@ -25,18 +25,32 @@ export type LayoutStrategyResult = {
   centerY: number;
   /**
    * correctionX to translate objects by, measured as `centerX`
+   *
+   * Since objects are measured relative to the group's center, once the group's size changes we must apply a correction to
+   * the objects' positions so that they relate to the new center.
+   * In other words, this value makes it possible to layout objects relative to the tl corner, for instance, but not only.
+   *
+   * @see `relativeCorrectionX`
    */
   correctionX?: number;
   /**
    * correctionY to translate objects by, measured as `centerY`
+   *
+   * Since objects are measured relative to the group's center, once the group's size changes we must apply a correction to
+   * the objects' positions so that they relate to the new center.
+   * In other words, this value makes it possible to layout objects relative to the tl corner, for instance, but not only.
+   *
+   * @see `relativeCorrectionY`
    */
   correctionY?: number;
   /**
    * correctionX to translate objects by as measured by the plane
+   * @see `correctionX`
    */
   relativeCorrectionX?: number;
   /**
    * correctionY to translate objects by as measured by the plane
+   * @see `correctionY`
    */
   relativeCorrectionY?: number;
   /**
