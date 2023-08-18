@@ -118,6 +118,7 @@ export class LayoutManager {
     !nextCenter.eq(prevCenter) &&
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
     context.type !== 'initialization' && target.setCoords();
+    target._set('dirty', true);
   }
 
   protected layoutObjects(

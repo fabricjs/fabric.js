@@ -246,7 +246,6 @@ export class Group extends createCollectionMixin(
       targets,
       target: this,
     });
-    this._set('dirty', true);
   }
 
   _onStackOrderChanged() {
@@ -298,7 +297,6 @@ export class Group extends createCollectionMixin(
       type: 'object_modified',
       target: this,
     });
-    this._set('dirty', true);
   }
 
   /**
