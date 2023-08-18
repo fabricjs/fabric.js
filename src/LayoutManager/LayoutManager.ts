@@ -159,7 +159,7 @@ export class LayoutManager {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
-    target.onLayout({
+    target.onAfterLayout({
       context,
       ...layoutResult,
     });

@@ -522,7 +522,7 @@ export class Group extends createCollectionMixin(
    *
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  onLayout(data: LayoutEvent) {}
+  onAfterLayout(data: LayoutEvent) {}
 
   /**
    * Renders instance on a given context
