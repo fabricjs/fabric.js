@@ -60,12 +60,17 @@
     fabricClass: 'Canvas',
   });
 
-  function paddingControlsRendering(canvas, callback) {
-    var rect = new fabric.Rect({
+  function paddingControlsRendering(group, canvas, callback) {
+    const rect = new fabric.Rect({
       width: 90, height: 90, strokeWidth: 2, padding: 8,
       fill: 'orange', stroke: 'green', top: 55, left: 55,
     });
-    canvas.add(rect);
+    const target = group ? new fabric.Group([rect]) : rect;
+    if (group) {
+      target.set({ scaleX: 2 });
+      rect.set({ scaleX: 0.5 });
+    }
+    canvas.add(target);
     canvas.setActiveObject(rect);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
@@ -73,7 +78,17 @@
 
   tests.push({
     test: 'Rect with padding',
-    code: paddingControlsRendering,
+    code: paddingControlsRendering.bind(null, false),
+    golden: 'controls2.png',
+    percentage: 0.02,
+    width: 200,
+    height: 200,
+    fabricClass: 'Canvas',
+  });
+
+  tests.push({
+    test: 'Rect with padding under group',
+    code: paddingControlsRendering.bind(null, true),
     golden: 'controls2.png',
     percentage: 0.02,
     width: 200,
