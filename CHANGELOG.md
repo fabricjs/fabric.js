@@ -4,6 +4,7 @@
 
 - refactor(): Layout Mananger [#9152](https://github.com/fabricjs/fabric.js/pull/9152)
   **BREAKING**: beta - group layout
+
 ## [6.0.0-beta11]
 
 - patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
