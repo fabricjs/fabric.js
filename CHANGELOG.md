@@ -2,6 +2,8 @@
 
 ## [next]
 
+- CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
+
 ## [6.0.0-beta11]
 
 - patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
