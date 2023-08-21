@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(MultiSelection): add target from behind active selection [#8744](https://github.com/fabricjs/fabric.js/issues/8744)
+
 ## [6.0.0-beta11]
 
 - patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
