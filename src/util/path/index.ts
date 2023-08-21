@@ -6,7 +6,7 @@ import { cos } from '../misc/cos';
 import { multiplyTransformMatrices, transformPoint } from '../misc/matrix';
 import { sin } from '../misc/sin';
 import { toFixed } from '../misc/toFixed';
-import {
+import type {
   TCurveInfo,
   TComplexPathData,
   TParsedAbsoluteCubicCurveCommand,
@@ -21,9 +21,10 @@ import {
   TEndPathInfo,
   TParsedArcCommand,
 } from './typedefs';
-import { XY, Point } from '../../Point';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
 import { rePathCommand } from './regex';
-import { cleanupSvgAttribute } from '../internals/cleanupSvAttribute';
+import { cleanupSvgAttribute } from '../internals/cleanupSvgAttribute';
 
 /**
  * Commands that may be repeated
@@ -703,8 +704,8 @@ export const getPathSegmentsInfo = (
     ) {
       case 'M':
         tempInfo = <TPathSegmentInfoCommon<'M'>>basicInfo;
-        x2 = x1 = current[1];
-        y2 = y1 = current[2];
+        tempInfo.x = x2 = x1 = current[1];
+        tempInfo.y = y2 = y1 = current[2];
         break;
       case 'L':
         tempInfo = <TPathSegmentInfoCommon<'L'>>basicInfo;

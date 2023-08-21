@@ -1,11 +1,11 @@
 import { Color } from '../color/Color';
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { blendColorFragmentSource } from './shaders/blendColor';
 
-type TBlendMode =
+export type TBlendMode =
   | 'multiply'
   | 'add'
   | 'difference'
@@ -65,6 +65,8 @@ export class BlendColor extends BaseFilter {
   declare alpha: number;
 
   static defaults = blendColorDefaultValues;
+
+  static type = 'BlendColor';
 
   getCacheKey() {
     return `${this.type}_${this.mode}`;

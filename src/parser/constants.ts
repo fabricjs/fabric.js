@@ -1,15 +1,5 @@
-//@ts-nocheck
 import { getSvgRegex } from './getSvgRegex';
-
-export const cssRules = {};
-export const gradientDefs = {};
-export const clipPaths = {};
-
-export const storage = {
-  cssRules,
-  gradientDefs,
-  clipPaths,
-};
+import { LEFT, TOP } from '../constants';
 
 export const reNum = String.raw`(?:[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?)`;
 
@@ -49,11 +39,11 @@ export const svgValidTagNames = [
   ],
   svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs'],
   attributesMap = {
-    cx: 'left',
-    x: 'left',
+    cx: LEFT,
+    x: LEFT,
     r: 'radius',
-    cy: 'top',
-    y: 'top',
+    cy: TOP,
+    y: TOP,
     display: 'visible',
     visibility: 'visible',
     transform: 'transformMatrix',
@@ -80,18 +70,12 @@ export const svgValidTagNames = [
     'vector-effect': 'strokeUniform',
     'image-rendering': 'imageSmoothing',
   },
-  colorAttributes = {
-    stroke: 'strokeOpacity',
-    fill: 'fillOpacity',
-  },
   fSize = 'font-size',
   cPath = 'clip-path';
 
 export const svgValidTagNamesRegEx = getSvgRegex(svgValidTagNames);
 
 export const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
-
-export const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
 
 export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 

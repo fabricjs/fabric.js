@@ -1,7 +1,14 @@
 import { cache } from '../../cache';
 import { config } from '../../config';
-import { ALIASING_LIMIT, iMatrix, VERSION } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
+import {
+  ALIASING_LIMIT,
+  CENTER,
+  iMatrix,
+  LEFT,
+  TOP,
+  VERSION,
+} from '../../constants';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
@@ -10,6 +17,8 @@ import type {
   TFiller,
   TSize,
   TCacheCanvasDimensions,
+  Abortable,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -27,7 +36,11 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { isFiller, isSerializableFiller, isTextObject } from '../../util/types';
+import {
+  isFiller,
+  isSerializableFiller,
+  isTextObject,
+} from '../../util/typeAssertions';
 import type { Image } from '../Image';
 import {
   cacheProperties,
@@ -37,14 +50,14 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import { SerializedObjectProps } from './types/SerializedObjectProps';
-import { ObjectProps } from './types/ObjectProps';
-import { TProps } from './types';
+import type { SerializedObjectProps } from './types/SerializedObjectProps';
+import type { ObjectProps } from './types/ObjectProps';
+import { getEnv } from '../../env';
 
-export type TCachedFabricObject = FabricObject &
+export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
     Pick<
-      FabricObject,
+      T,
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
@@ -85,7 +98,7 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -256,6 +269,15 @@ export class FabricObject<
   }
 
   /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'FabricObject';
+
+  /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists because is very hard to catch all the ways in which a type value
@@ -265,7 +287,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    const name = this.constructor.name;
+    const name = (this.constructor as typeof FabricObject).type;
     if (name === 'FabricObject') {
       return 'object';
     }
@@ -502,7 +524,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.constructor.name,
+        type: (this.constructor as typeof FabricObject).type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -574,7 +596,7 @@ export class FabricObject<
       : Object.getPrototypeOf(this);
 
     return pickBy(object, (value, key) => {
-      if (key === 'left' || key === 'top' || key === 'type') {
+      if (key === LEFT || key === TOP || key === 'type') {
         return true;
       }
       const baseValue = baseValues[key];
@@ -596,7 +618,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${this.constructor.name}>`;
+    return `#<${(this.constructor as typeof FabricObject).type}>`;
   }
 
   /**
@@ -748,8 +770,8 @@ export class FabricObject<
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.dirty = false;
       this.drawObject(ctx);
+      this.dirty = false;
     }
     ctx.restore();
   }
@@ -1286,11 +1308,11 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<FabricObject>}
    */
-  clone(propertiesToInclude: string[]) {
+  clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     return (this.constructor as typeof FabricObject).fromObject(
       objectForm
-    ) as unknown as this;
+    ) as unknown as Promise<this>;
   }
 
   /**
@@ -1386,12 +1408,12 @@ export class FabricObject<
     }
     this.setPositionByOrigin(
       new Point(canvas.width / 2, canvas.height / 2),
-      'center',
-      'center'
+      CENTER,
+      CENTER
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
-    // @ts-ignore this needs to be fixed somehow, or ignored globally
+    // @ts-expect-error this needs to be fixed somehow, or ignored globally
     canvas._objects = [this];
     this.set('canvas', canvas);
     this.setCoords();
@@ -1441,7 +1463,10 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.constructor.name) || types.includes(this.type);
+    return (
+      types.includes((this.constructor as typeof FabricObject).type) ||
+      types.includes(this.type)
+    );
   }
 
   /**
@@ -1467,7 +1492,7 @@ export class FabricObject<
    */
   rotate(angle: TDegree) {
     const shouldCenterOrigin =
-      (this.originX !== 'center' || this.originY !== 'center') &&
+      (this.originX !== CENTER || this.originY !== CENTER) &&
       this.centeredRotation;
 
     if (shouldCenterOrigin) {
@@ -1510,6 +1535,10 @@ export class FabricObject<
     runningAnimations.cancelByTarget(this);
     this.off();
     this._set('canvas', undefined);
+    // clear caches
+    this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
+    this._cacheCanvas = undefined;
+    this._cacheContext = null;
   }
 
   /**
@@ -1523,10 +1552,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     object: Record<string, unknown>,
-    {
-      extraParam,
-      ...options
-    }: { extraParam?: string; signal?: AbortSignal } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1535,7 +1561,7 @@ export class FabricObject<
         // to avoid accidental overrides later
         if (extraParam) {
           const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-ignore;
+          // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
           return new this(allOptions);
@@ -1551,9 +1577,9 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends TProps<SerializedObjectProps>>(
+  static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
-    options?: { signal?: AbortSignal }
+    options?: Abortable
   ) {
     return this._fromObject(object, options);
   }

@@ -6,12 +6,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import { TClassProperties } from '../typedefs';
-import {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import type { CSSRules } from '../parser/typedefs';
 
 interface UniqueCircleProps {
   /**
@@ -53,7 +50,7 @@ export const circleDefaultValues: UniqueCircleProps = {
 };
 
 export class Circle<
-    Props extends TProps<CircleProps> = Partial<CircleProps>,
+    Props extends TOptions<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -63,6 +60,8 @@ export class Circle<
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;
+
+  static type = 'Circle';
 
   static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
@@ -150,7 +149,7 @@ export class Circle<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(): (string | number)[] {
+  _toSVG(): string[] {
     const angle = (this.endAngle - this.startAngle) % 360;
 
     if (angle === 0) {
@@ -159,7 +158,7 @@ export class Circle<
         'COMMON_PARTS',
         'cx="0" cy="0" ',
         'r="',
-        this.radius,
+        `${this.radius}`,
         '" />\n',
       ];
     } else {
@@ -198,34 +197,34 @@ export class Circle<
    * Returns {@link Circle} instance from an SVG element
    * @static
    * @memberOf Circle
-   * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static fromElement(element: SVGElement, callback: (circle: Circle) => any) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ): Promise<Circle> {
     const {
       left = 0,
       top = 0,
-      radius,
+      radius = 0,
       ...otherParsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
-
-    if (!radius || radius < 0) {
-      throw new Error(
-        'value of `r` attribute is required and can not be negative'
-      );
-    }
+    } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    ) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.
-    callback(
-      new this({
-        ...otherParsedAttributes,
-        radius,
-        left: left - radius,
-        top: top - radius,
-      })
-    );
+
+    return new this({
+      ...otherParsedAttributes,
+      radius,
+      left: left - radius,
+      top: top - radius,
+    });
   }
 
   /* _FROM_SVG_END_ */
@@ -233,7 +232,7 @@ export class Circle<
   /**
    * @todo how do we declare this??
    */
-  static fromObject<T extends TProps<SerializedCircleProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedCircleProps>>(object: T) {
     return super._fromObject<Circle>(object);
   }
 }

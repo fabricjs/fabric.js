@@ -1,15 +1,12 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
+import type { CSSRules } from '../parser/typedefs';
 
 export const ellipseDefaultValues: UniqueEllipseProps = {
   rx: 0,
@@ -30,7 +27,7 @@ export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
-    Props extends TProps<EllipseProps> = Partial<EllipseProps>,
+    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -50,6 +47,8 @@ export class Ellipse<
    * @default
    */
   declare ry: number;
+
+  static type = 'Ellipse';
 
   static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
@@ -117,16 +116,11 @@ export class Ellipse<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG() {
+  _toSVG(): string[] {
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      'cx="0" cy="0" ',
-      'rx="',
-      this.rx,
-      '" ry="',
-      this.ry,
-      '" />\n',
+      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
     ];
   }
 
@@ -157,19 +151,23 @@ export class Ellipse<
    * Returns {@link Ellipse} instance from an SVG element
    * @static
    * @memberOf Ellipse
-   * @param {SVGElement} element Element to parse
-   * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (ellipse: Ellipse) => void
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
   ) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;
     parsedAttributes.top = (parsedAttributes.top || 0) - parsedAttributes.ry;
-    callback(new this(parsedAttributes));
+    return new this(parsedAttributes);
   }
 
   /* _FROM_SVG_END_ */

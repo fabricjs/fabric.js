@@ -21,6 +21,8 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
 export class Pixelate extends BaseFilter {
   declare blocksize: number;
 
+  static type = 'Pixelate';
+
   static defaults = pixelateDefaultValues;
 
   /**

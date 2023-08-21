@@ -1,8 +1,8 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import { BaseFabricObject } from './EventTypeDefs';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
 import type { XY, Point } from './Point';
+import type { FabricObject as BaseFabricObject } from './shapes/Object/Object';
 
 interface NominalTag<T> {
   nominalTag?: T;
@@ -43,26 +43,11 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export const enum ImageFormat {
-  jpeg = 'jpeg',
-  jpg = 'jpeg',
-  png = 'png',
-}
+export type ImageFormat = 'jpeg' | 'png';
 
-export const enum SVGElementName {
-  linearGradient = 'linearGradient',
-  radialGradient = 'radialGradient',
-  stop = 'stop',
-}
+export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
-export const enum SupportedSVGUnit {
-  mm = 'mm',
-  cm = 'cm',
-  in = 'in',
-  pt = 'pt',
-  pc = 'pc',
-  em = 'em',
-}
+export type SupportedSVGUnit = 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'em';
 
 /**
  * A transform matrix.
@@ -112,19 +97,30 @@ export type TCacheCanvasDimensions = {
 
 export type TRectBounds = [min: XY, max: XY];
 
-export type TToCanvasElementOptions = {
+export type TToCanvasElementOptions<
+  T extends BaseFabricObject = BaseFabricObject
+> = {
   left?: number;
   top?: number;
   width?: number;
   height?: number;
-  filter?: (object: BaseFabricObject) => boolean;
+  filter?: (object: T) => boolean;
 };
 
-export type TDataUrlOptions = TToCanvasElementOptions & {
-  multiplier: number;
-  format?: ImageFormat;
-  quality?: number;
-  enableRetinaScaling?: boolean;
+export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
+  TToCanvasElementOptions<T> & {
+    multiplier: number;
+    format?: ImageFormat;
+    quality?: number;
+    enableRetinaScaling?: boolean;
+  };
+
+export type Abortable = {
+  /**
+   * handle aborting
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   */
+  signal?: AbortSignal;
 };
 
-export type AssertKeys<T, K extends keyof T> = T & Record<K, NonNullable<T[K]>>;
+export type TOptions<T> = Partial<T> & Record<string, any>;

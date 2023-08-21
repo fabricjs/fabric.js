@@ -1,4 +1,5 @@
-import { TClassProperties } from '../../typedefs';
+import { LEFT, reNewline } from '../../constants';
+import type { TClassProperties } from '../../typedefs';
 import type { Text } from './Text';
 
 const fontProperties = [
@@ -8,7 +9,7 @@ const fontProperties = [
   'fontStyle',
 ] as const;
 
-const textDecorationProperties = [
+export const textDecorationProperties = [
   'underline',
   'overline',
   'linethrough',
@@ -34,7 +35,21 @@ export const additionalProps = [
   'direction',
 ] as const;
 
-export const styleProperties = [
+export type StylePropertiesType =
+  | 'fill'
+  | 'stroke'
+  | 'strokeWidth'
+  | 'fontSize'
+  | 'fontFamily'
+  | 'fontWeight'
+  | 'fontStyle'
+  | 'textBackgroundColor'
+  | 'deltaY'
+  | 'overline'
+  | 'underline'
+  | 'linethrough';
+
+export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
   ...textDecorationProperties,
   'stroke',
@@ -48,7 +63,7 @@ export const styleProperties = [
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
 export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _reNewline: /\r?\n/,
+  _reNewline: reNewline,
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
@@ -58,7 +73,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   underline: false,
   overline: false,
   linethrough: false,
-  textAlign: 'left',
+  textAlign: LEFT,
   fontStyle: 'normal',
   lineHeight: 1.16,
   superscript: {
@@ -72,9 +87,9 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   textBackgroundColor: '',
   stroke: null,
   shadow: null,
-  path: null,
+  path: undefined,
   pathStartOffset: 0,
-  pathSide: 'left',
+  pathSide: LEFT,
   pathAlign: 'baseline',
   _fontSizeFraction: 0.222,
   offsets: {
@@ -89,3 +104,8 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
 };
+
+export const JUSTIFY = 'justify';
+export const JUSTIFY_LEFT = 'justify-left';
+export const JUSTIFY_RIGHT = 'justify-right';
+export const JUSTIFY_CENTER = 'justify-center';

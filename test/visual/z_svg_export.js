@@ -23,7 +23,7 @@
   function toSVGCanvas(canvas, callback) {
     var svg = canvas.toSVG();
     var dataUrl = svgToDataURL(svg);
-    var image = fabric.getDocument().createElement('img');
+    var image = fabric.getFabricDocument().createElement('img');
     image.onload = function() {
       var newCanvas = fabric.util.createCanvasElement();
       newCanvas.width = canvas.width;
@@ -402,7 +402,7 @@
   });
 
   function multipleGradients(canvas, callback) {
-    fabric.loadSVGFromURL(getAssetName('svg_linear_9'), function(objects) {
+    fabric.loadSVGFromURL(getAssetName('svg_linear_9')).then(({ objects }) => {
       var group = fabric.util.groupSVGElements(objects);
       canvas.add(group);
       toSVGCanvas(canvas, callback);

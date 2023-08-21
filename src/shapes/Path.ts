@@ -1,7 +1,8 @@
 import { config } from '../config';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point, XY } from '../Point';
+import type { XY } from '../Point';
+import { Point } from '../Point';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -12,19 +13,22 @@ import {
 } from '../util/path';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import {
+import type {
   TComplexPathData,
   TPathSegmentInfo,
   TSimplePathData,
 } from '../util/path/typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+} from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
+import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -44,7 +48,7 @@ export interface IPathBBox extends TBBox {
 }
 
 export class Path<
-  Props extends TProps<PathProps> = Partial<PathProps>,
+  Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -57,11 +61,11 @@ export class Path<
 
   declare pathOffset: Point;
 
-  declare fromSVG?: boolean;
-
   declare sourcePath?: string;
 
   declare segmentsInfo?: TPathSegmentInfo[];
+
+  static type = 'Path';
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
@@ -77,8 +81,8 @@ export class Path<
   ) {
     super(options as Props);
     this._setPath(path || [], true);
-    typeof left === 'number' && this.set('left', left);
-    typeof top === 'number' && this.set('top', top);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
   }
 
   /**
@@ -256,7 +260,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver: TSVGReviver) {
+  toClipPathSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
@@ -272,7 +276,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toSVG(reviver: TSVGReviver) {
+  toSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver: reviver,
@@ -293,10 +297,11 @@ export class Path<
   }
 
   setBoundingBox(adjustPosition?: boolean) {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
+    const { width, height, pathOffset } = this._calcDimensions();
     this.set({ width, height, pathOffset });
-    adjustPosition &&
-      this.setPositionByOrigin(new Point(left, top), 'left', 'top');
+    // using pathOffset because it match the use case.
+    // if pathOffset change here we need to use left + width/2 , top + height/2
+    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
   }
 
   _calcBoundsFromPath(): TBBox {
@@ -372,12 +377,9 @@ export class Path<
    */
   _calcDimensions(): IPathBBox {
     const bbox = this._calcBoundsFromPath();
-    const strokeCorrection = this.fromSVG ? 0 : this.strokeWidth / 2;
 
     return {
       ...bbox,
-      left: bbox.left - strokeCorrection,
-      top: bbox.top - strokeCorrection,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
         bbox.top + bbox.height / 2
@@ -400,7 +402,7 @@ export class Path<
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
     return this._fromObject<Path>(object, {
       extraParam: 'path',
     });
@@ -410,26 +412,26 @@ export class Path<
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {SVGElement} element to parse
-   * @param {(path: Path) => void} callback Callback to invoke after the element has been parsed
+   * @param {HTMLElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (path: Path) => void,
-    options: Partial<PathProps>
+  static async fromElement(
+    element: HTMLElement,
+    options: Partial<PathProps>,
+    cssRules?: CSSRules
   ) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    callback(
-      new this(parsedAttributes.d, {
-        ...parsedAttributes,
-        ...options,
-        // we pass undefined to instruct the constructor to position the object using the bbox
-        left: undefined,
-        top: undefined,
-        fromSVG: true,
-      })
+    const { d, ...parsedAttributes } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
     );
+    return new this(d, {
+      ...parsedAttributes,
+      ...options,
+      // we pass undefined to instruct the constructor to position the object using the bbox
+      left: undefined,
+      top: undefined,
+    });
   }
 }
 

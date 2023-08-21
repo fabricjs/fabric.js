@@ -1,17 +1,16 @@
 import { iMatrix } from '../../constants';
-import { scaleMatrix } from '../../parser/scaleMatrix';
-import { skewXMatrix, skewYMatrix } from '../../parser/skewMatrix';
-import { XY, Point } from '../../Point';
-import { TDegree, TMat2D } from '../../typedefs';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
+import type { TDegree, TRadian, TMat2D } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
 
-type TRotateMatrixArgs = {
+export type TRotateMatrixArgs = {
   angle?: TDegree;
 };
 
-type TTranslateMatrixArgs = {
+export type TTranslateMatrixArgs = {
   translateX?: number;
   translateY?: number;
 };
@@ -38,6 +37,7 @@ export const isIdentityMatrix = (mat: TMat2D) =>
 
 /**
  * Apply transform t to point p
+ * @deprecated use {@link Point#transform}
  * @param  {Point | XY} p The point to transform
  * @param  {Array} t The transform
  * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
@@ -57,7 +57,7 @@ export const transformPoint = (
 export const invertTransform = (t: TMat2D): TMat2D => {
   const a = 1 / (t[0] * t[3] - t[1] * t[2]),
     r = [a * t[3], -a * t[1], -a * t[2], a * t[0], 0, 0] as TMat2D,
-    { x, y } = transformPoint(new Point(t[4], t[5]), r, true);
+    { x, y } = new Point(t[4], t[5]).transform(r, true);
   r[4] = -x;
   r[5] = -y;
   return r;
@@ -85,6 +85,25 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
+ * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
+ *
+ * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
+ *
+ * @param matrices an array of matrices
+ * @param [is2x2] flag to multiply matrices as 2x2 matrices
+ * @returns the multiplication product
+ */
+export const multiplyTransformMatrixArray = (
+  matrices: (TMat2D | undefined | null | false)[],
+  is2x2?: boolean
+) =>
+  matrices.reduceRight(
+    (product: TMat2D, curr) =>
+      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
+    iMatrix
+  );
+
+/**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
@@ -107,22 +126,130 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
 };
 
 /**
- * Returns a transform matrix starting from an object of the same kind of
- * the one returned from qrDecompose, useful also if you want to calculate some
- * transformations from an object that is not enlived yet
- * @param  {Object} options
- * @param  {Number} [options.angle] angle in degrees
- * @return {TMat2D} transform matrix
+ * Generate a translation matrix
+ *
+ * A translation matrix in the form of
+ * [ 1 0 x ]
+ * [ 0 1 y ]
+ * [ 0 0 1 ]
+ *
+ * See @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate for more details
+ *
+ * @param {number} x translation on X axis
+ * @param {number} [y] translation on Y axis
+ * @returns {TMat2D} matrix
  */
-export const calcRotateMatrix = ({ angle }: TRotateMatrixArgs): TMat2D => {
-  if (!angle) {
-    return iMatrix;
-  }
-  const theta = degreesToRadians(angle),
-    cosin = cos(theta),
-    sinus = sin(theta);
-  return [cosin, sinus, -sinus, cosin, 0, 0];
-};
+export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
+  1,
+  0,
+  0,
+  1,
+  x,
+  y,
+];
+
+/**
+ * Generate a rotation matrix around around a point (x,y), defaulting to (0,0)
+ *
+ * A matrix in the form of
+ * [cos(a) -sin(a) -x*cos(a)+y*sin(a)+x]
+ * [sin(a)  cos(a) -x*sin(a)-y*cos(a)+y]
+ * [0       0      1                 ]
+ *
+ *
+ * @param {TDegree} angle rotation in degrees
+ * @param {XY} [pivotPoint] pivot point to rotate around
+ * @returns {TMat2D} matrix
+ */
+export function createRotateMatrix(
+  { angle = 0 }: TRotateMatrixArgs = {},
+  { x = 0, y = 0 }: Partial<XY> = {}
+): TMat2D {
+  const angleRadiant = degreesToRadians(angle),
+    cosValue = cos(angleRadiant),
+    sinValue = sin(angleRadiant);
+  return [
+    cosValue,
+    sinValue,
+    -sinValue,
+    cosValue,
+    x ? x - (cosValue * x - sinValue * y) : 0,
+    y ? y - (sinValue * x + cosValue * y) : 0,
+  ];
+}
+
+/**
+ * Generate a scale matrix around the point (0,0)
+ *
+ * A matrix in the form of
+ * [x 0 0]
+ * [0 y 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale
+ *
+ * @param {number} x scale on X axis
+ * @param {number} [y] scale on Y axis
+ * @returns {TMat2D} matrix
+ */
+export const createScaleMatrix = (x: number, y: number = x): TMat2D => [
+  x,
+  0,
+  0,
+  y,
+  0,
+  0,
+];
+
+export const angleToSkew = (angle: TDegree) =>
+  Math.tan(degreesToRadians(angle));
+
+export const skewToAngle = (value: TRadian) =>
+  radiansToDegrees(Math.atan(value));
+
+/**
+ * Generate a skew matrix for the X axis
+ *
+ * A matrix in the form of
+ * [1 x 0]
+ * [0 1 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
+ *
+ * @param {TDegree} skewValue translation on X axis
+ * @returns {TMat2D} matrix
+ */
+export const createSkewXMatrix = (skewValue: TDegree): TMat2D => [
+  1,
+  0,
+  angleToSkew(skewValue),
+  1,
+  0,
+  0,
+];
+
+/**
+ * Generate a skew matrix for the Y axis
+ *
+ * A matrix in the form of
+ * [1 0 0]
+ * [y 1 0]
+ * [0 0 1]
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy
+ *
+ * @param {TDegree} skewValue translation on Y axis
+ * @returns {TMat2D} matrix
+ */
+export const createSkewYMatrix = (skewValue: TDegree): TMat2D => [
+  1,
+  angleToSkew(skewValue),
+  0,
+  1,
+  0,
+  0,
+];
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
@@ -147,17 +274,14 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMat = scaleMatrix(
-    flipX ? -scaleX : scaleX,
-    flipY ? -scaleY : scaleY
+  return multiplyTransformMatrixArray(
+    [
+      createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
+      skewX && createSkewXMatrix(skewX),
+      skewY && createSkewYMatrix(skewY),
+    ],
+    true
   );
-  if (skewX) {
-    scaleMat = multiplyTransformMatrices(scaleMat, skewXMatrix(skewX), true);
-  }
-  if (skewY) {
-    scaleMat = multiplyTransformMatrices(scaleMat, skewYMatrix(skewY), true);
-  }
-  return scaleMat;
 };
 
 /**
@@ -182,13 +306,9 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  let matrix = [1, 0, 0, 1, translateX, translateY] as TMat2D;
-  if (angle) {
-    matrix = multiplyTransformMatrices(matrix, calcRotateMatrix({ angle }));
-  }
-  const scaleMatrix = calcDimensionsMatrix(otherOptions);
-  if (scaleMatrix !== iMatrix) {
-    matrix = multiplyTransformMatrices(matrix, scaleMatrix);
-  }
-  return matrix;
+  return multiplyTransformMatrixArray([
+    createTranslateMatrix(translateX, translateY),
+    angle && createRotateMatrix({ angle }),
+    calcDimensionsMatrix(otherOptions),
+  ]);
 };

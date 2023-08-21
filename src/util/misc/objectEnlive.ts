@@ -1,16 +1,13 @@
 import { noop } from '../../constants';
-import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { TCrossOrigin, TFiller } from '../../typedefs';
+import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
+import type { BaseFilter } from '../../filters/BaseFilter';
+import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 
-export type LoadImageOptions = {
-  /**
-   * see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type LoadImageOptions = Abortable & {
   /**
    * cors value for the image loading, default to anonymous
    */
@@ -58,53 +55,45 @@ export const loadImage = (
     img.src = url;
   });
 
-export type EnlivenObjectOptions = {
-  /**
-   * handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   */
-  signal?: AbortSignal;
+export type EnlivenObjectOptions = Abortable & {
   /**
    * Method for further parsing of object elements,
    * called after each fabric object created.
    */
-  reviver?: (
+  reviver?: <T extends BaseFabricObject | FabricObject | BaseFilter>(
     serializedObj: Record<string, any>,
-    instance: FabricObject
+    instance: T
   ) => void;
-  /**
-   * Namespace to get klass "Class" object from
-   */
-  namespace?: any;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
- * @param {object} [options.namespace] Namespace to get klass "Class" object from
  * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
  * called after each fabric object created.
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = (
+export const enlivenObjects = <
+  T extends BaseFabricObject | FabricObject | BaseFilter
+>(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
-  new Promise<FabricObject[]>((resolve, reject) => {
-    const instances: FabricObject[] = [];
+  new Promise<T[]>((resolve, reject) => {
+    const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
         classRegistry
           .getClass(obj.type)
-          // @ts-ignore
           .fromObject(obj, {
             signal,
             reviver,
           })
-          .then((fabricInstance: FabricObject) => {
-            reviver(obj, fabricInstance);
+          .then((fabricInstance: T) => {
+            reviver<T>(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
           })
@@ -113,8 +102,9 @@ export const enlivenObjects = (
       .then(resolve)
       .catch((error) => {
         // cleanup
-        instances.forEach(function (instance) {
-          instance.dispose && instance.dispose();
+        instances.forEach((instance) => {
+          (instance as FabricObject).dispose &&
+            (instance as FabricObject).dispose();
         });
         reject(error);
       })
@@ -134,7 +124,7 @@ export const enlivenObjectEnlivables = <
   R = Record<string, FabricObject | TFiller | null>
 >(
   serializedObject: any,
-  { signal }: { signal?: AbortSignal } = {}
+  { signal }: Abortable = {}
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller)[] = [];
@@ -150,10 +140,12 @@ export const enlivenObjectEnlivables = <
       }
       // clipPath
       if (value.type) {
-        return enlivenObjects([value], { signal }).then(([enlived]) => {
-          instances.push(enlived);
-          return enlived;
-        });
+        return enlivenObjects<FabricObject>([value], { signal }).then(
+          ([enlived]) => {
+            instances.push(enlived);
+            return enlived;
+          }
+        );
       }
       // pattern
       if (value.source) {

@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { halfPI } from '../constants';
-import {
+import type {
   ControlActionHandler,
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
-import { TDegree, TMat2D } from '../typedefs';
+import type { TDegree, TMat2D } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
-import {
-  ControlRenderingStyleOverride,
-  renderCircleControl,
-  renderSquareControl,
-} from './controlRendering';
+import type { ControlRenderingStyleOverride } from './controlRendering';
+import { renderCircleControl, renderSquareControl } from './controlRendering';
 
 export class Control {
   /**
@@ -171,6 +168,14 @@ export class Control {
    * @return {Boolean} true if the action/event modified the object
    */
   declare mouseUpHandler?: ControlActionHandler;
+
+  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+    // TODO: locking logic can be handled here instead of in the control handler logic
+    return (
+      fabricObject.canvas?.getActiveObject() === fabricObject &&
+      fabricObject.isControlVisible(controlKey)
+    );
+  }
 
   /**
    * Returns control actionHandler

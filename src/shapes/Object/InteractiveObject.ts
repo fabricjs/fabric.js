@@ -1,20 +1,21 @@
 import { Point } from '../../Point';
-import type { AssertKeys, TCornerPoint, TDegree, TMat2D } from '../../typedefs';
+import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
+  createTranslateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
-  TQrDecomposeOut,
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
-import { FabricObjectProps } from './types/FabricObjectProps';
-import { TFabricObjectProps, SerializedObjectProps } from './types';
+import type { FabricObjectProps } from './types/FabricObjectProps';
+import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
 type TOCoord = Point & {
@@ -22,13 +23,13 @@ type TOCoord = Point & {
   touchCorner: TCornerPoint;
 };
 
-type TControlSet = Record<string, Control>;
+export type TControlSet = Record<string, Control>;
 
-type TBorderRenderingStyleOverride = Partial<
+export type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
 
-type TStyleOverride = ControlRenderingStyleOverride &
+export type TStyleOverride = ControlRenderingStyleOverride &
   TBorderRenderingStyleOverride &
   Partial<
     Pick<InteractiveFabricObject, 'hasBorders' | 'hasControls'> & {
@@ -172,6 +173,10 @@ export class InteractiveFabricObject<
     return super._updateCacheCanvas();
   }
 
+  getActiveControl() {
+    return this.__corner;
+  }
+
   /**
    * Determines which corner is under the mouse cursor, represented by `pointer`.
    * This function is return a corner only if the object is the active one.
@@ -183,31 +188,27 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): 0 | string {
-    if (
-      !this.hasControls ||
-      !this.canvas ||
-      (this.canvas._activeObject as unknown as this) !== this
-    ) {
-      return 0;
+  _findTargetCorner(pointer: Point, forTouch = false): string {
+    if (!this.hasControls || !this.canvas) {
+      return '';
     }
 
     this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
-      const [cornerKey, corner] = cornerEntries[i];
-      if (!this.isControlVisible(cornerKey)) {
-        continue;
+      const [key, corner] = cornerEntries[i];
+      if (this.controls[key].shouldActivate(key, this)) {
+        const lines = this._getImageLines(
+          forTouch ? corner.touchCorner : corner.corner
+        );
+        const xPoints = this._findCrossPoints(pointer, lines);
+        if (xPoints !== 0 && xPoints % 2 === 1) {
+          this.__corner = key;
+          return key;
+        }
       }
-      const lines = this._getImageLines(
-        forTouch ? corner.touchCorner : corner.corner
-      );
-      const xPoints = this._findCrossPoints(pointer, lines);
-      if (xPoints !== 0 && xPoints % 2 === 1) {
-        this.__corner = cornerKey;
-        return cornerKey;
-      }
+
       // // debugging
       //
       // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
@@ -222,7 +223,7 @@ export class InteractiveFabricObject<
       // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
       // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
-    return 0;
+    return '';
   }
 
   /**
@@ -235,8 +236,8 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
-      tMatrix = [1, 0, 0, 1, center.x, center.y] as TMat2D,
-      rMatrix = calcRotateMatrix({
+      tMatrix = createTranslateMatrix(center.x, center.y),
+      rMatrix = createRotateMatrix({
         angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
       }),
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
@@ -351,7 +352,6 @@ export class InteractiveFabricObject<
   drawSelectionBackground(ctx: CanvasRenderingContext2D): void {
     if (
       !this.selectionBackgroundColor ||
-      (this.canvas && !this.canvas.interactive) ||
       (this.canvas && (this.canvas._activeObject as unknown as this) !== this)
     ) {
       return;
@@ -616,9 +616,11 @@ export class InteractiveFabricObject<
    * @param {TPointerEvent} [options.e] event if the process is generated by an event
    * @param {FabricObject} [options.object] next object we are setting as active, and reason why
    * this is being deselected
-
    */
-  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }): boolean {
+  onDeselect(options?: {
+    e?: TPointerEvent;
+    object?: InteractiveFabricObject;
+  }): boolean {
     // implemented by sub-classes, as needed.
     return false;
   }
@@ -653,7 +655,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
+  renderDragSourceEffect(e: DragEvent) {
     // for subclasses
   }
 
@@ -666,7 +668,7 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @returns {boolean}
    */
-  renderDropTargetEffect(this: AssertKeys<this, 'canvas'>, e: DragEvent) {
+  renderDropTargetEffect(e: DragEvent) {
     // for subclasses
   }
 }

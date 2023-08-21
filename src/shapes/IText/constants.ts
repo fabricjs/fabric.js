@@ -1,33 +1,51 @@
-import type { IText } from './IText';
-export type TKeyMapIText = Record<KeyboardEvent['keyCode'], keyof IText>;
+export type TKeyMapIText = Record<
+  KeyboardEvent['keyCode'],
+  CursorHandlingMethods
+>;
+
+export type CursorHandlingMethods =
+  | 'moveCursorUp'
+  | 'moveCursorDown'
+  | 'moveCursorLeft'
+  | 'moveCursorRight'
+  | 'exitEditing'
+  | 'copy'
+  | 'cut'
+  | 'selectAll';
+
+const MOVE_CURSOR_UP: CursorHandlingMethods = 'moveCursorUp';
+const MOVE_CURSOR_DOWN: CursorHandlingMethods = 'moveCursorDown';
+const MOVE_CURSOR_LEFT: CursorHandlingMethods = 'moveCursorLeft';
+const MOVE_CURSOR_RIGHT: CursorHandlingMethods = 'moveCursorRight';
+const EXIT_EDITING: CursorHandlingMethods = 'exitEditing';
 
 // @TODO look into import { Key } from 'ts-key-enum';
 // and transition from keyCode to Key
 // also reduce string duplication
 export const keysMap: TKeyMapIText = {
-  9: 'exitEditing',
-  27: 'exitEditing',
-  33: 'moveCursorUp',
-  34: 'moveCursorDown',
-  35: 'moveCursorRight',
-  36: 'moveCursorLeft',
-  37: 'moveCursorLeft',
-  38: 'moveCursorUp',
-  39: 'moveCursorRight',
-  40: 'moveCursorDown',
+  9: EXIT_EDITING,
+  27: EXIT_EDITING,
+  33: MOVE_CURSOR_UP,
+  34: MOVE_CURSOR_DOWN,
+  35: MOVE_CURSOR_RIGHT,
+  36: MOVE_CURSOR_LEFT,
+  37: MOVE_CURSOR_LEFT,
+  38: MOVE_CURSOR_UP,
+  39: MOVE_CURSOR_RIGHT,
+  40: MOVE_CURSOR_DOWN,
 };
 
 export const keysMapRtl: TKeyMapIText = {
-  9: 'exitEditing',
-  27: 'exitEditing',
-  33: 'moveCursorUp',
-  34: 'moveCursorDown',
-  35: 'moveCursorLeft',
-  36: 'moveCursorRight',
-  37: 'moveCursorRight',
-  38: 'moveCursorUp',
-  39: 'moveCursorLeft',
-  40: 'moveCursorDown',
+  9: EXIT_EDITING,
+  27: EXIT_EDITING,
+  33: MOVE_CURSOR_UP,
+  34: MOVE_CURSOR_DOWN,
+  35: MOVE_CURSOR_LEFT,
+  36: MOVE_CURSOR_RIGHT,
+  37: MOVE_CURSOR_RIGHT,
+  38: MOVE_CURSOR_UP,
+  39: MOVE_CURSOR_LEFT,
+  40: MOVE_CURSOR_DOWN,
 };
 
 /**
@@ -35,7 +53,7 @@ export const keysMapRtl: TKeyMapIText = {
  */
 export const ctrlKeysMapUp: TKeyMapIText = {
   67: 'copy',
-  // @ts-ignore there was a reason this wasn't deleted. for now leave it here
+  // there was a reason this wasn't deleted. for now leave it here
   88: 'cut',
 };
 

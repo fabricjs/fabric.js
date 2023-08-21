@@ -1,19 +1,25 @@
-// @ts-nocheck
 import { cache } from '../../cache';
 import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
-import { TextStyle, TextStyleDeclaration, StyledText } from './StyledText';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type {
+  CompleteTextStyleDeclaration,
+  TextStyle,
+  TextStyleDeclaration,
+} from './StyledText';
+import { StyledText } from './StyledText';
 import { SHARED_ATTRIBUTES } from '../../parser/attributes';
 import { parseAttributes } from '../../parser/parseAttributes';
-import type { Point } from '../../Point';
 import type {
+  Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElement } from '../../util/misc/dom';
+import type { TextStyleArray } from '../../util/misc/textStyles';
 import {
   hasStyleChanged,
   stylesFromArray,
@@ -21,19 +27,25 @@ import {
 } from '../../util/misc/textStyles';
 import { getPathSegmentsInfo, getPointOnPath } from '../../util/path';
 import { cacheProperties } from '../Object/FabricObject';
-import { Path } from '../Path';
+import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
+import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
   textLayoutProperties,
+  JUSTIFY,
+  JUSTIFY_CENTER,
+  JUSTIFY_LEFT,
+  JUSTIFY_RIGHT,
 } from './constants';
+import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
+import { isFiller } from '../../util/typeAssertions';
+import type { Gradient } from '../../gradient/Gradient';
+import type { Pattern } from '../../Pattern';
+import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -48,29 +60,32 @@ function getMeasuringContext() {
   return measuringContext;
 }
 
-type TPathSide = 'left' | 'right';
+export type TPathSide = 'left' | 'right';
 
-type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+export type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+
+export type TextLinesInfo = {
+  lines: string[];
+  graphemeLines: string[][];
+  graphemeText: string[];
+  _unwrappedLines: string[][];
+};
 
 /**
  * Measure and return the info of a single grapheme.
  * needs the the info of previous graphemes already filled
  * Override to customize measuring
  */
-export type GraphemeBBox<onPath = false> = {
+export type GraphemeBBox = {
   width: number;
   height: number;
   kernedWidth: number;
   left: number;
   deltaY: number;
-} & (onPath extends true
-  ? {
-      // on path
-      renderLeft: number;
-      renderTop: number;
-      angle: number;
-    }
-  : Record<string, never>);
+  renderLeft?: number;
+  renderTop?: number;
+  angle?: number;
+};
 
 // @TODO this is not complete
 interface UniqueTextProps {
@@ -92,16 +107,20 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-    UniqueTextProps {}
+    UniqueTextProps {
+  styles: TextStyleArray | TextStyle;
+}
 
-export interface TextProps extends FabricObjectProps, UniqueTextProps {}
+export interface TextProps extends FabricObjectProps, UniqueTextProps {
+  styles: TextStyle;
+}
 
 /**
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -270,7 +289,7 @@ export class Text<
    * });
    * @default
    */
-  declare path: Path | null;
+  declare path?: Path;
 
   /**
    * Offset amount for text path starting position
@@ -345,8 +364,11 @@ export class Text<
 
   /**
    * contains characters bounding boxes
+   * This variable is considered to be protected.
+   * But for how mixins are implemented right now, we can't leave it private
+   * @protected
    */
-  protected __charBounds: GraphemeBBox[][] = [];
+  __charBounds: GraphemeBBox[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -390,11 +412,13 @@ export class Text<
 
   static ownDefaults: Record<string, any> = textDefaultValues;
 
+  static type = 'Text';
+
   static getDefaults() {
     return { ...super.getDefaults(), ...Text.ownDefaults };
   }
 
-  constructor(text: string, options: any) {
+  constructor(text: string, options: Props = {} as Props) {
     super({ ...options, text, styles: options?.styles || {} });
     this.initialized = true;
     if (this.path) {
@@ -419,7 +443,7 @@ export class Text<
    * @private
    * Divides text into lines of text and lines of graphemes.
    */
-  _splitText() {
+  _splitText(): TextLinesInfo {
     const newLines = this._splitTextIntoLines(this.text);
     this.textLines = newLines.lines;
     this._textLines = newLines.graphemeLines;
@@ -445,7 +469,7 @@ export class Text<
         this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
       this.height = this.calcTextHeight();
     }
-    if (this.textAlign.indexOf('justify') !== -1) {
+    if (this.textAlign.includes(JUSTIFY)) {
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
@@ -464,7 +488,7 @@ export class Text<
       spaces;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       if (
-        this.textAlign !== 'justify' &&
+        this.textAlign !== JUSTIFY &&
         (i === len - 1 || this.isEndOfWrapping(i))
       ) {
         continue;
@@ -615,14 +639,14 @@ export class Text<
     ctx.textBaseline = 'alphabetic';
     if (this.path) {
       switch (this.pathAlign) {
-        case 'center':
+        case CENTER:
           ctx.textBaseline = 'middle';
           break;
         case 'ascender':
-          ctx.textBaseline = 'top';
+          ctx.textBaseline = TOP;
           break;
         case 'descender':
-          ctx.textBaseline = 'bottom';
+          ctx.textBaseline = BOTTOM;
           break;
       }
     }
@@ -697,7 +721,8 @@ export class Text<
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
       for (let j = 0; j < jlen; j++) {
-        const charBox = this.__charBounds[i][j];
+        // at this point charbox are either standard or full with pathInfo if there is a path.
+        const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
         if (this.path) {
           ctx.save();
@@ -765,15 +790,16 @@ export class Text<
    */
   _measureChar(
     _char: string,
-    charStyle: TextStyleDeclaration,
+    charStyle: CompleteTextStyleDeclaration,
     previousChar: string | undefined,
-    prevCharStyle: any
+    prevCharStyle: CompleteTextStyleDeclaration | Record<string, never>
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      previousFontDeclaration = this._getFontDeclaration(prevCharStyle),
       couple = previousChar + _char,
-      stylesAreEqual = fontDeclaration === previousFontDeclaration,
+      stylesAreEqual =
+        previousChar &&
+        fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width: number | undefined,
       coupleWidth: number | undefined,
@@ -810,12 +836,13 @@ export class Text<
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
         fontCache[couple] = coupleWidth;
-        kernedWidth = coupleWidth - previousWidth;
+        // safe to use the non-null since if undefined we defined it before.
+        kernedWidth = coupleWidth - previousWidth!;
       }
     }
     return {
       width: width * fontMultiplier,
-      kernedWidth: kernedWidth * fontMultiplier,
+      kernedWidth: kernedWidth! * fontMultiplier,
     };
   }
 
@@ -855,7 +882,7 @@ export class Text<
       prevGrapheme: string | undefined,
       graphemeInfo: GraphemeBBox | undefined;
 
-    const reverse = this.pathSide === 'right',
+    const reverse = this.pathSide === RIGHT,
       path = this.path,
       line = this._textLines[lineIndex],
       llength = line.length,
@@ -876,22 +903,20 @@ export class Text<
       width: 0,
       kernedWidth: 0,
       height: this.fontSize,
-    };
+      deltaY: 0,
+    } as GraphemeBBox;
     if (path && path.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;
-      const startingPoint = getPointOnPath(path.path, 0, path.segmentsInfo);
-      startingPoint.x += path.pathOffset.x;
-      startingPoint.y += path.pathOffset.y;
       switch (this.textAlign) {
-        case 'left':
+        case LEFT:
           positionInPath = reverse ? totalPathLength - width : 0;
           break;
-        case 'center':
+        case CENTER:
           positionInPath = (totalPathLength - width) / 2;
           break;
-        case 'right':
+        case RIGHT:
           positionInPath = reverse ? 0 : totalPathLength - width;
           break;
         //todo - add support for justify
@@ -910,7 +935,7 @@ export class Text<
         }
         // it would probably much faster to send all the grapheme position for a line
         // and calculate path position/angle at once.
-        this._setGraphemeOnPath(positionInPath, graphemeInfo, startingPoint);
+        this._setGraphemeOnPath(positionInPath, graphemeInfo);
         positionInPath += graphemeInfo.kernedWidth;
       }
     }
@@ -925,19 +950,15 @@ export class Text<
    * @param {GraphemeBBox} graphemeInfo current grapheme box information
    * @param {Object} startingPoint position of the point
    */
-  _setGraphemeOnPath(
-    positionInPath: number,
-    graphemeInfo: GraphemeBBox<true>,
-    startingPoint: Point
-  ) {
+  _setGraphemeOnPath(positionInPath: number, graphemeInfo: GraphemeBBox) {
     const centerPosition = positionInPath + graphemeInfo.kernedWidth / 2,
-      path = this.path;
+      path = this.path!;
 
     // we are at currentPositionOnPath. we want to know what point on the path is.
-    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo);
-    graphemeInfo.renderLeft = info.x - startingPoint.x;
-    graphemeInfo.renderTop = info.y - startingPoint.y;
-    graphemeInfo.angle = info.angle + (this.pathSide === 'right' ? Math.PI : 0);
+    const info = getPointOnPath(path.path, centerPosition, path.segmentsInfo)!;
+    graphemeInfo.renderLeft = info.x - path.pathOffset.x;
+    graphemeInfo.renderTop = info.y - path.pathOffset.y;
+    graphemeInfo.angle = info.angle + (this.pathSide === RIGHT ? Math.PI : 0);
   }
 
   /**
@@ -1116,7 +1137,7 @@ export class Text<
     lineIndex: number
   ) {
     const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.indexOf('justify') !== -1,
+      isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1141,7 +1162,7 @@ export class Text<
     if (currentDirection !== this.direction) {
       ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
-      ctx.textAlign = isLtr ? 'left' : 'right';
+      ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
     top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
     if (shortCut) {
@@ -1154,7 +1175,7 @@ export class Text<
     for (let i = 0, len = line.length - 1; i <= len; i++) {
       timeToRender = i === len || this.charSpacing || path;
       charsToRender += line[i];
-      charBox = this.__charBounds[lineIndex][i];
+      charBox = this.__charBounds[lineIndex][i] as Required<GraphemeBBox>;
       if (boxWidth === 0) {
         left += sign * (charBox.kernedWidth - charBox.width);
         boxWidth += charBox.width;
@@ -1245,13 +1266,13 @@ export class Text<
     ctx: CanvasRenderingContext2D,
     property: `${T}Style`,
     filler: TFiller | string
-  ) {
-    let offsetX, offsetY;
-    if (filler.toLive) {
+  ): { offsetX: number; offsetY: number } {
+    let offsetX: number, offsetY: number;
+    if (isFiller(filler)) {
       if (
-        filler.gradientUnits === 'percentage' ||
-        filler.gradientTransform ||
-        filler.patternTransform
+        (filler as Gradient<'linear'>).gradientUnits === 'percentage' ||
+        (filler as Gradient<'linear'>).gradientTransform ||
+        (filler as Pattern).patternTransform
       ) {
         // need to transform gradient in a pattern.
         // this is a slow process. If you are hitting this codepath, and the object
@@ -1261,10 +1282,10 @@ export class Text<
         offsetY = -this.height / 2;
         ctx.translate(offsetX, offsetY);
         ctx[property] = this._applyPatternGradientTransformText(filler);
-        return { offsetX: offsetX, offsetY: offsetY };
+        return { offsetX, offsetY };
       } else {
         // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx, this)!;
+        ctx[property] = filler.toLive(ctx)!;
         return this._applyPatternGradientTransform(ctx, filler);
       }
     } else {
@@ -1274,20 +1295,37 @@ export class Text<
     return { offsetX: 0, offsetY: 0 };
   }
 
+  /**
+   * This function prepare the canvas for a stroke style, and stroke and strokeWidth
+   * need to be sent in as defined
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {CompleteTextStyleDeclaration} style with stroke and strokeWidth defined
+   * @returns
+   */
   _setStrokeStyles(
     ctx: CanvasRenderingContext2D,
-    { stroke, strokeWidth }: Pick<this, 'stroke' | 'strokeWidth'>
+    {
+      stroke,
+      strokeWidth,
+    }: Pick<CompleteTextStyleDeclaration, 'stroke' | 'strokeWidth'>
   ) {
     ctx.lineWidth = strokeWidth;
     ctx.lineCap = this.strokeLineCap;
     ctx.lineDashOffset = this.strokeDashOffset;
     ctx.lineJoin = this.strokeLineJoin;
     ctx.miterLimit = this.strokeMiterLimit;
-    return this.handleFiller(ctx, 'strokeStyle', stroke);
+    return this.handleFiller(ctx, 'strokeStyle', stroke!);
   }
 
+  /**
+   * This function prepare the canvas for a ill style, and fill
+   * need to be sent in as defined
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {CompleteTextStyleDeclaration} style with ill defined
+   * @returns
+   */
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
-    return this.handleFiller(ctx, 'fillStyle', fill);
+    return this.handleFiller(ctx, 'fillStyle', fill!);
   }
 
   /**
@@ -1315,36 +1353,39 @@ export class Text<
       shouldFill = method === 'fillText' && fullDecl.fill,
       shouldStroke =
         method === 'strokeText' && fullDecl.stroke && fullDecl.strokeWidth;
-    let fillOffsets, strokeOffsets;
 
     if (!shouldStroke && !shouldFill) {
       return;
     }
     ctx.save();
 
-    shouldFill && (fillOffsets = this._setFillStyles(ctx, fullDecl));
-    shouldStroke && (strokeOffsets = this._setStrokeStyles(ctx, fullDecl));
-
     ctx.font = this._getFontDeclaration(fullDecl);
 
-    if (decl && decl.textBackgroundColor) {
+    if (decl.textBackgroundColor) {
       this._removeShadow(ctx);
     }
-    if (decl && decl.deltaY) {
+    if (decl.deltaY) {
       top += decl.deltaY;
     }
-    shouldFill &&
+
+    if (shouldFill) {
+      const fillOffsets = this._setFillStyles(ctx, fullDecl);
       ctx.fillText(
         _char,
         left - fillOffsets.offsetX,
         top - fillOffsets.offsetY
       );
-    shouldStroke &&
+    }
+
+    if (shouldStroke) {
+      const strokeOffsets = this._setStrokeStyles(ctx, fullDecl);
       ctx.strokeText(
         _char,
         left - strokeOffsets.offsetX,
         top - strokeOffsets.offsetY
       );
+    }
+
     ctx.restore();
   }
 
@@ -1408,35 +1449,35 @@ export class Text<
       isEndOfWrapping = this.isEndOfWrapping(lineIndex);
     let leftOffset = 0;
     if (
-      textAlign === 'justify' ||
-      (textAlign === 'justify-center' && !isEndOfWrapping) ||
-      (textAlign === 'justify-right' && !isEndOfWrapping) ||
-      (textAlign === 'justify-left' && !isEndOfWrapping)
+      textAlign === JUSTIFY ||
+      (textAlign === JUSTIFY_CENTER && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_RIGHT && !isEndOfWrapping) ||
+      (textAlign === JUSTIFY_LEFT && !isEndOfWrapping)
     ) {
       return 0;
     }
-    if (textAlign === 'center') {
+    if (textAlign === CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'right') {
+    if (textAlign === RIGHT) {
       leftOffset = lineDiff;
     }
-    if (textAlign === 'justify-center') {
+    if (textAlign === JUSTIFY_CENTER) {
       leftOffset = lineDiff / 2;
     }
-    if (textAlign === 'justify-right') {
+    if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
     if (direction === 'rtl') {
       if (
-        textAlign === 'right' ||
-        textAlign === 'justify' ||
-        textAlign === 'justify-right'
+        textAlign === RIGHT ||
+        textAlign === JUSTIFY ||
+        textAlign === JUSTIFY_RIGHT
       ) {
         leftOffset = 0;
-      } else if (textAlign === 'left' || textAlign === 'justify-left') {
+      } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;
-      } else if (textAlign === 'center' || textAlign === 'justify-center') {
+      } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
         leftOffset = -lineDiff / 2;
       }
     }
@@ -1484,12 +1525,13 @@ export class Text<
    * @param {String} property the property name
    * @returns the value of 'property'
    */
-  getValueOfPropertyAt(lineIndex: number, charIndex: number, property: string) {
+  getValueOfPropertyAt<T extends StylePropertiesType>(
+    lineIndex: number,
+    charIndex: number,
+    property: T
+  ): this[T] {
     const charStyle = this._getStyleDeclaration(lineIndex, charIndex);
-    if (charStyle && typeof charStyle[property] !== 'undefined') {
-      return charStyle[property];
-    }
-    return this[property];
+    return (charStyle[property] ?? this[property]) as this[T];
   }
 
   /**
@@ -1528,14 +1570,15 @@ export class Text<
       let size = this.getHeightOfChar(i, 0);
       let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
-        const charBox = this.__charBounds[i][j];
+        const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
         currentFill = this.getValueOfPropertyAt(i, j, 'fill');
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
           ctx.save();
-          ctx.fillStyle = lastFill;
+          // bug? verify lastFill is a valid fill here.
+          ctx.fillStyle = lastFill as string;
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
           ctx.fillRect(
@@ -1557,7 +1600,8 @@ export class Text<
             drawStart = this.width - drawStart - boxWidth;
           }
           if (lastDecoration && lastFill) {
-            ctx.fillStyle = lastFill;
+            // bug? verify lastFill is a valid fill here.
+            ctx.fillStyle = lastFill as string;
             ctx.fillRect(
               drawStart,
               top + offsetY * size + dy,
@@ -1579,7 +1623,7 @@ export class Text<
       if (this.direction === 'rtl') {
         drawStart = this.width - drawStart - boxWidth;
       }
-      ctx.fillStyle = currentFill;
+      ctx.fillStyle = currentFill as string;
       currentDecoration &&
         currentFill &&
         ctx.fillRect(
@@ -1601,25 +1645,31 @@ export class Text<
    * @returns {String} font declaration formatted for canvas context.
    */
   _getFontDeclaration(
-    styleObject?: TextStyleDeclaration,
+    {
+      fontFamily = this.fontFamily,
+      fontStyle = this.fontStyle,
+      fontWeight = this.fontWeight,
+      fontSize = this.fontSize,
+    }: Partial<
+      Pick<
+        TextStyleDeclaration,
+        'fontFamily' | 'fontStyle' | 'fontWeight' | 'fontSize'
+      >
+    > = {},
     forMeasuring?: boolean
   ): string {
-    const style = styleObject || this,
-      family = this.fontFamily,
-      fontIsGeneric = Text.genericFonts.indexOf(family.toLowerCase()) > -1;
-    const fontFamily =
-      family === undefined ||
-      family.indexOf("'") > -1 ||
-      family.indexOf(',') > -1 ||
-      family.indexOf('"') > -1 ||
-      fontIsGeneric
-        ? style.fontFamily
-        : `"${style.fontFamily}"`;
+    const parsedFontFamily =
+      fontFamily.includes("'") ||
+      fontFamily.includes('"') ||
+      fontFamily.includes(',') ||
+      Text.genericFonts.includes(fontFamily.toLowerCase())
+        ? fontFamily
+        : `"${fontFamily}"`;
     return [
-      style.fontStyle,
-      style.fontWeight,
-      forMeasuring ? this.CACHE_FONT_SIZE + 'px' : style.fontSize + 'px',
-      fontFamily,
+      fontStyle,
+      fontWeight,
+      `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`,
+      parsedFontFamily,
     ].join(' ');
   }
 
@@ -1662,7 +1712,7 @@ export class Text<
    * @param {String} text text to split
    * @returns  Lines in the text
    */
-  _splitTextIntoLines(text: string) {
+  _splitTextIntoLines(text: string): TextLinesInfo {
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
@@ -1690,7 +1740,7 @@ export class Text<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      ...super.toObject([...additionalProps, ...propertiesToInclude] as K[]),
       styles: stylesToArray(this.styles, this.text),
       ...(this.path ? { path: this.path.toObject() } : {}),
     };
@@ -1765,70 +1815,50 @@ export class Text<
    * Returns Text instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
-   * @param {SVGElement} element Element to parse
-   * @param {Function} callback callback function invoked after parsing
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
-  static fromElement(
-    element: SVGElement,
-    callback: (text: Text | null) => any,
-    options: object
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
   ) {
-    if (!element) {
-      return callback(null);
-    }
+    const parsedAttributes = parseAttributes(
+      element,
+      Text.ATTRIBUTE_NAMES,
+      cssRules
+    );
 
-    const parsedAttributes = parseAttributes(element, Text.ATTRIBUTE_NAMES),
-      parsedAnchor = parsedAttributes.textAnchor || 'left';
-    options = Object.assign({}, options, parsedAttributes);
+    const {
+      textAnchor = LEFT as typeof LEFT | typeof CENTER | typeof RIGHT,
+      textDecoration = '',
+      dx = 0,
+      dy = 0,
+      top = 0,
+      left = 0,
+      fontSize = DEFAULT_SVG_FONT_SIZE,
+      strokeWidth = 1,
+      ...restOfOptions
+    } = { ...options, ...parsedAttributes };
 
-    options.top = options.top || 0;
-    options.left = options.left || 0;
-    if (parsedAttributes.textDecoration) {
-      const textDecoration = parsedAttributes.textDecoration;
-      if (textDecoration.indexOf('underline') !== -1) {
-        options.underline = true;
-      }
-      if (textDecoration.indexOf('overline') !== -1) {
-        options.overline = true;
-      }
-      if (textDecoration.indexOf('line-through') !== -1) {
-        options.linethrough = true;
-      }
-      delete options.textDecoration;
-    }
-    if ('dx' in parsedAttributes) {
-      options.left += parsedAttributes.dx;
-    }
-    if ('dy' in parsedAttributes) {
-      options.top += parsedAttributes.dy;
-    }
-    if (!('fontSize' in options)) {
-      options.fontSize = DEFAULT_SVG_FONT_SIZE;
-    }
-
-    let textContent = '';
-
-    // The XML is not properly parsed in IE9 so a workaround to get
-    // textContent is through firstChild.data. Another workaround would be
-    // to convert XML loaded from a file to be converted using DOMParser (same way loadSVGFromString() does)
-    if (!('textContent' in element)) {
-      if ('firstChild' in element && element.firstChild !== null) {
-        if ('data' in element.firstChild && element.firstChild.data !== null) {
-          textContent = element.firstChild.data;
-        }
-      }
-    } else {
-      textContent = element.textContent;
-    }
-
-    textContent = textContent
+    const textContent = (element.textContent || '')
       .replace(/^\s+|\s+$|\n+/g, '')
       .replace(/\s+/g, ' ');
-    const originalStrokeWidth = options.strokeWidth;
-    options.strokeWidth = 0;
 
-    const text = new this(textContent, options),
+    // this code here is probably the usual issue for SVG center find
+    // this can later looked at again and probably removed.
+
+    const text = new this(textContent, {
+        left: left + dx,
+        top: top + dy,
+        underline: textDecoration.includes('underline'),
+        overline: textDecoration.includes('overline'),
+        linethrough: textDecoration.includes('line-through'),
+        // we initialize this as 0
+        strokeWidth: 0,
+        fontSize,
+        ...restOfOptions,
+      }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1841,10 +1871,10 @@ export class Text<
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (parsedAnchor === 'center') {
+    if (textAnchor === CENTER) {
       offX = text.getScaledWidth() / 2;
     }
-    if (parsedAnchor === 'right') {
+    if (textAnchor === RIGHT) {
       offX = text.getScaledWidth();
     }
     text.set({
@@ -1853,10 +1883,9 @@ export class Text<
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
           text.lineHeight,
-      strokeWidth:
-        typeof originalStrokeWidth !== 'undefined' ? originalStrokeWidth : 1,
+      strokeWidth,
     });
-    callback(text);
+    return text;
   }
 
   /* _FROM_SVG_END_ */
@@ -1866,8 +1895,10 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>>(object: T) {
-    return this._fromObject<Text>(
+  static fromObject<T extends TOptions<SerializedTextProps>, S extends Text>(
+    object: T
+  ) {
+    return this._fromObject<S>(
       {
         ...object,
         styles: stylesFromArray(object.styles || {}, object.text),
