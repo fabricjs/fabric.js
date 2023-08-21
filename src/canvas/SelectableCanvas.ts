@@ -28,7 +28,6 @@ import type {
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
-import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -772,17 +771,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     obj: FabricObject,
     globalPointer: Point
   ): boolean {
-    if (
-      obj &&
-      obj.visible &&
-      obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(pointer)
-    ) {
+    if (obj && obj.visible && obj.evented && obj.containsPoint(pointer)) {
       if (
-        (this.perPixelTargetFind || obj.perPixelTargetFind) &&
-        !(obj as unknown as IText).isEditing
+        // if `obj` is selected we want it to be easy to interact with it
+        this.getActiveObject() !== obj &&
+        (this.perPixelTargetFind || obj.perPixelTargetFind)
       ) {
         if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
           return true;
