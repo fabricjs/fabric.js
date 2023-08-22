@@ -2,6 +2,8 @@
 
 ## [next]
 
+- ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
+
 ## [6.0.0-beta11]
 
 - patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
