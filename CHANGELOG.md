@@ -2,7 +2,8 @@
 
 ## [next]
 
-- fix(): border rendering with padding under group [#9161](https://github.com/fabricjs/fabric.js/pull/9161)
+- fix(Object): border rendering with padding under group [#9161](https://github.com/fabricjs/fabric.js/pull/9161)
+- fix(MultiSelection): add target from behind active selection [#8744](https://github.com/fabricjs/fabric.js/issues/8744)
 - test(): fix snapshots by removing version [#9164](https://github.com/fabricjs/fabric.js/pull/9164)
 
 ## [6.0.0-beta11]
