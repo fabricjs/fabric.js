@@ -12,6 +12,7 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { removeFromArray } from '../util';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -1484,9 +1485,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           // find target from active objects to remove or from under active selection to add
           target = this.searchPossibleTargets(
             [
-              ...this._objects.filter(
-                (object) => !prevActiveObjects.includes(object)
-              ),
+              ...removeFromArray([...this._objects], ...prevActiveObjects),
               ...prevActiveObjects,
             ],
             this.getPointer(e, true)
