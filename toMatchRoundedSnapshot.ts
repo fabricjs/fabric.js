@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import { expect } from '@jest/globals';
-import { toMatchSnapshot } from 'jest-snapshot';
+import { toMatchSnapshot, Context } from 'jest-snapshot';
 import { cloneDeep } from './src/util/internals/cloneDeep';
 
 // https://github.com/jestjs/jest/blob/70b17d2e3d2bf40dd27fecdcdd06c159d26a7c6c/website/versioned_docs/version-25.x/ExpectAPI.md?plain=1#L241-L262
@@ -24,7 +24,7 @@ expect.extend({
     (keys ?? Object.keys(clone)).forEach((key) => {
       roundDeep(clone, key);
     });
-    return toMatchSnapshot.call(this, clone, ...propertiesOrHint);
+    return toMatchSnapshot.call(this as Context, clone, ...propertiesOrHint);
   },
 });
 
