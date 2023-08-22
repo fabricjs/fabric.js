@@ -40,7 +40,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "docs": "typedoc --out docs fabric.ts",
+    "docs": "typedoc",
     "cli": "node ./scripts/index.mjs",
     "sandboxscript": "node ./scripts/sandbox.mjs",
     "changelog": "auto-changelog -o change-output.md --unreleased-only",
