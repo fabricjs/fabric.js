@@ -1,4 +1,5 @@
 {
+  // https://typedoc.org/options/
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["fabric.ts"],
   "out": "docs",
