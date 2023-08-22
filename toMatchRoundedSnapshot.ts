@@ -16,7 +16,7 @@ function roundDeep(received: any, key: string | number) {
 
 expect.extend({
   toMatchRoundedSnapshot(
-    received: Record<string, unknown>,
+    { version, ...received }: Record<string, unknown>,
     keys?: string[],
     ...propertiesOrHint
   ) {
