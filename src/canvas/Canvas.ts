@@ -12,7 +12,6 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { removeFromArray } from '../util';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -1482,14 +1481,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects to remove or from under active selection to add
-          target = this.searchPossibleTargets(
-            [
-              ...removeFromArray([...this._objects], ...prevActiveObjects),
-              ...prevActiveObjects,
-            ],
-            this.getPointer(e, true)
-          );
+          const pointer = this.getPointer(e, true);
+          target =
+            // first search active objects for a target to remove
+            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            //  if not found, search under active selection for a target to add
+            // `prevActiveObjects` will be searched but we already know they will not be found
+            this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
