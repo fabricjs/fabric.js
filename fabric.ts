@@ -41,7 +41,11 @@ export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
-export { FabricObject as Object } from './src/shapes/Object/FabricObject';
+import { FabricObject } from './src/shapes/Object/FabricObject';
+/** @deprecated Object is a keyword. Please use FabricObject instead */
+class Object extends FabricObject { };
+export { FabricObject, Object };
+
 export type {
   TFabricObjectProps,
   FabricObjectProps,
