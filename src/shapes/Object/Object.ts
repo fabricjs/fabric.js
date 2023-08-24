@@ -41,7 +41,7 @@ import {
   isSerializableFiller,
   isTextObject,
 } from '../../util/typeAssertions';
-import type { Image } from '../Image';
+import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -98,13 +98,12 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
-  >
+  Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+>
   extends AnimatableObject<EventSpec>
-  implements ObjectProps
-{
+  implements ObjectProps {
   declare minScaleLimit: number;
 
   declare opacity: number;
@@ -517,10 +516,10 @@ export class FabricObject<
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
           ? {
-              ...this.clipPath.toObject(propertiesToInclude),
-              inverted: this.clipPath.inverted,
-              absolutePositioned: this.clipPath.absolutePositioned,
-            }
+            ...this.clipPath.toObject(propertiesToInclude),
+            inverted: this.clipPath.inverted,
+            absolutePositioned: this.clipPath.absolutePositioned,
+          }
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
@@ -1332,9 +1331,9 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
+   * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): Image {
+  cloneAsImage(options: any): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     const ImageClass = classRegistry.getClass('image');

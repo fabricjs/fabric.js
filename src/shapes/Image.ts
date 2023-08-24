@@ -67,23 +67,22 @@ export interface SerializedImageProps extends SerializedObjectProps {
   cropY: number;
 }
 
-export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
+export interface ImageProps extends FabricObjectProps, UniqueImageProps { }
 
 const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image<
-    Props extends TOptions<ImageProps> = Partial<ImageProps>,
-    SProps extends SerializedImageProps = SerializedImageProps,
-    EventSpec extends ObjectEvents = ObjectEvents
-  >
+export class FabricImage<
+  Props extends TOptions<ImageProps> = Partial<ImageProps>,
+  SProps extends SerializedImageProps = SerializedImageProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+>
   extends FabricObject<Props, SProps, EventSpec>
-  implements ImageProps
-{
+  implements ImageProps {
   /**
-   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link FabricImage.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -182,7 +181,7 @@ export class Image<
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      ...Image.ownDefaults,
+      ...FabricImage.ownDefaults,
     };
   }
   /**
@@ -202,9 +201,9 @@ export class Image<
     this.setElement(
       typeof arg0 === 'string'
         ? ((
-            (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
-            getFabricDocument()
-          ).getElementById(arg0) as ImageSource)
+          (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
+          getFabricDocument()
+        ).getElementById(arg0) as ImageSource)
         : arg0,
       options
     );
@@ -230,7 +229,7 @@ export class Image<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(Image.CSS_CANVAS);
+    element.classList.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -376,14 +375,14 @@ export class Image<
       svgString.push(
         '<clipPath id="imageCrop_' + clipPathId + '">\n',
         '\t<rect x="' +
-          x +
-          '" y="' +
-          y +
-          '" width="' +
-          this.width +
-          '" height="' +
-          this.height +
-          '" />\n',
+        x +
+        '" y="' +
+        y +
+        '" width="' +
+        this.width +
+        '" height="' +
+        this.height +
+        '" />\n',
         '</clipPath>\n'
       );
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
@@ -394,15 +393,12 @@ export class Image<
     imageMarkup.push(
       '\t<image ',
       'COMMON_PARTS',
-      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${
-        y - this.cropY
-        // we're essentially moving origin of transformation from top/left corner to the center of the shape
-        // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-        // so that object's center aligns with container's left/top
-      }" width="${
-        element.width || (element as HTMLImageElement).naturalWidth
-      }" height="${
-        element.height || (element as HTMLImageElement).naturalHeight
+      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${y - this.cropY
+      // we're essentially moving origin of transformation from top/left corner to the center of the shape
+      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+      // so that object's center aligns with container's left/top
+      }" width="${element.width || (element as HTMLImageElement).naturalWidth
+      }" height="${element.height || (element as HTMLImageElement).naturalHeight
       }"${imageRendering}${clipPath}></image>\n`
     );
 
@@ -410,8 +406,7 @@ export class Image<
       const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
-        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
-          this.height
+        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${this.height
         }" styles="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
@@ -598,7 +593,7 @@ export class Image<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   drawCacheOnCanvas(
-    this: TCachedFabricObject<Image>,
+    this: TCachedFabricObject<FabricImage>,
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
@@ -687,8 +682,8 @@ export class Image<
    */
   parsePreserveAspectRatioAttribute() {
     const pAR = parsePreserveAspectRatioAttribute(
-        this.preserveAspectRatio || ''
-      ),
+      this.preserveAspectRatio || ''
+    ),
       pWidth = this.width,
       pHeight = this.height,
       parsedAttributes = { width: pWidth, height: pHeight };
@@ -764,7 +759,7 @@ export class Image<
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
@@ -781,12 +776,12 @@ export class Image<
   ];
 
   /**
-   * Creates an instance of Image from its object representation
+   * Creates an instance of FabricImage from its object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @param {object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
@@ -815,20 +810,20 @@ export class Image<
    * @static
    * @param {String} url URL to create an image from
    * @param {LoadImageOptions} [options] Options object
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
   static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
     imageOptions: T
-  ): Promise<Image> {
+  ): Promise<FabricImage> {
     return loadImage(url, { crossOrigin, signal }).then(
       (img) => new this(img, imageOptions)
     );
   }
 
   /**
-   * Returns {@link Image} instance from an SVG element
+   * Returns {@link FabricImage} instance from an SVG element
    * @static
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
@@ -856,5 +851,8 @@ export class Image<
   }
 }
 
-classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);
+classRegistry.setClass(FabricImage);
+classRegistry.setSVGClass(FabricImage);
+
+/** @deprecated Image is a keyword. Please use FabricImage instead */
+export class Image extends FabricImage { };

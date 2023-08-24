@@ -5,7 +5,7 @@ import type {
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { FabricObject } from '../Object/FabricObject';
-import { Text } from '../Text/Text';
+import { FabricText } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
@@ -42,7 +42,7 @@ export abstract class ITextBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<Props, SProps, EventSpec> {
+> extends FabricText<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;
@@ -318,11 +318,11 @@ export abstract class ITextBehavior<
     // if we land on a space we move the cursor backwards
     // if we are searching boundary end we move the cursor backwards ONLY if we don't land on a line break
     let index =
-        selectionStart > 0 &&
+      selectionStart > 0 &&
         this._reSpace.test(text[selectionStart]) &&
         (direction === -1 || !reNewline.test(text[selectionStart - 1]))
-          ? selectionStart - 1
-          : selectionStart,
+        ? selectionStart - 1
+        : selectionStart,
       _char = text[index];
     while (index > 0 && index < text.length && !reNonWord.test(_char)) {
       index += direction;
@@ -560,8 +560,8 @@ export abstract class ITextBehavior<
       return { left: '1px', top: '1px' };
     }
     const desiredPosition = this.inCompositionMode
-        ? this.compositionStart
-        : this.selectionStart,
+      ? this.compositionStart
+      : this.selectionStart,
       boundaries = this._getCursorBoundaries(desiredPosition),
       cursorLocation = this.get2DCursorLocation(desiredPosition),
       lineIndex = cursorLocation.lineIndex,
@@ -714,7 +714,7 @@ export abstract class ITextBehavior<
    */
   removeStyleFromTo(start: number, end: number) {
     const { lineIndex: lineStart, charIndex: charStart } =
-        this.get2DCursorLocation(start, true),
+      this.get2DCursorLocation(start, true),
       { lineIndex: lineEnd, charIndex: charEnd } = this.get2DCursorLocation(
         end,
         true

@@ -43,7 +43,7 @@ export { PatternBrush } from './src/brushes/PatternBrush';
 
 import { FabricObject } from './src/shapes/Object/FabricObject';
 /** @deprecated Object is a keyword. Please use FabricObject instead */
-class Object extends FabricObject { };
+const Object = FabricObject;
 export { FabricObject, Object };
 
 export type {
@@ -75,7 +75,7 @@ export type {
   TPathSide,
   TextProps,
 } from './src/shapes/Text/Text';
-export { Text } from './src/shapes/Text/Text';
+export { Text, FabricText } from './src/shapes/Text/Text';
 export type {
   ITextProps,
   SerializedITextProps,
@@ -108,7 +108,7 @@ export type {
   MultiSelectionStacking,
 } from './src/shapes/ActiveSelection';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
-export { Image } from './src/shapes/Image';
+export { Image, FabricImage } from './src/shapes/Image';
 export type {
   ImageSource,
   SerializedImageProps,
