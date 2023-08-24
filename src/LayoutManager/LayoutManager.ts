@@ -133,8 +133,7 @@ export class LayoutManager {
           this.layoutObject(context, layoutResult, object);
       });
     // adjust clip path to account for new center
-    context.type !== 'initialization' &&
-      context.strategy.shouldLayoutClipPath() &&
+    context.strategy.shouldLayoutClipPath(context) &&
       target.clipPath &&
       !target.clipPath.absolutePositioned &&
       this.layoutObject(context, layoutResult, target.clipPath as FabricObject);

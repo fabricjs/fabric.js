@@ -3,7 +3,6 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { cos } from '../../util/misc/cos';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { sin } from '../../util/misc/sin';
-import type { StrictLayoutContext } from '../types';
 
 export const getObjectSizeVector = (object: FabricObject) => {
   const sizeVector = object._getTransformedDimensions().scalarDivide(2);
@@ -22,12 +21,4 @@ export const getObjectBounds = (object: FabricObject) => {
   const objCenter = object.getRelativeCenterPoint();
   const sizeVector = getObjectSizeVector(object);
   return [objCenter.subtract(sizeVector), objCenter.add(sizeVector)];
-};
-
-export const shouldPerformLayout = (context: StrictLayoutContext) => {
-  return (
-    context.type === 'initialization' ||
-    context.type === 'imperative' ||
-    context.strategyChange
-  );
 };

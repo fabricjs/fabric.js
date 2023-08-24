@@ -3,7 +3,6 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendPointToPlane } from '../../util/misc/planeChange';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
-import { shouldPerformLayout } from './utils';
 
 export class ClipPathLayout extends LayoutStrategy {
   calcLayoutResult(
@@ -16,7 +15,7 @@ export class ClipPathLayout extends LayoutStrategy {
       return;
     }
     const clipPathSizeAfter = clipPath._getTransformedDimensions();
-    if (clipPath.absolutePositioned && shouldPerformLayout(context)) {
+    if (clipPath.absolutePositioned && this.shouldPerformLayout(context)) {
       //  we want the center point to exist in group's containing plane
       const clipPathCenter = sendPointToPlane(
         clipPath.getCenterPoint(),
@@ -36,7 +35,7 @@ export class ClipPathLayout extends LayoutStrategy {
           target.calcOwnMatrix(),
           true
         );
-      if (shouldPerformLayout(context)) {
+      if (this.shouldPerformLayout(context)) {
         const {
           centerX = 0,
           centerY = 0,
@@ -64,7 +63,8 @@ export class ClipPathLayout extends LayoutStrategy {
     }
   }
 
-  shouldLayoutClipPath() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  shouldLayoutClipPath(context: StrictLayoutContext) {
     return false;
   }
 }

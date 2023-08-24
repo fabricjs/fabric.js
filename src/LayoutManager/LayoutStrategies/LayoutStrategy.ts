@@ -30,8 +30,17 @@ export abstract class LayoutStrategy {
     }
   }
 
-  shouldLayoutClipPath() {
-    return true;
+  shouldLayoutClipPath(context: StrictLayoutContext) {
+    return context.type !== 'initialization';
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  shouldPerformLayout(context: StrictLayoutContext) {
+    return (
+      context.type === 'initialization' ||
+      context.type === 'imperative' ||
+      context.strategyChange
+    );
   }
 
   /**
