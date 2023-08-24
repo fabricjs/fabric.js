@@ -170,7 +170,7 @@ export abstract class LayoutStrategy {
     }
     const bbox = makeBoundingBoxFromPoints(
       objects.reduce((bounds, object) => {
-        bounds.push(...getObjectBounds(object));
+        bounds.push(...getObjectBounds(target, object));
         return bounds;
       }, [] as Point[])
     );
