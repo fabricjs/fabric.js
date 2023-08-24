@@ -1,3 +1,5 @@
+import type { IText } from '../../fabric';
+import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
@@ -11,9 +13,11 @@ export class LayoutManager {
   private _prevLayoutStrategy?: LayoutStrategy;
 
   strategy: LayoutStrategy;
+  private _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   constructor(strategy: LayoutStrategy = new FitContentLayout()) {
     this.strategy = strategy;
+    this._subscriptions = new Map();
   }
 
   performLayout(context: LayoutContext) {
@@ -59,8 +63,72 @@ export class LayoutManager {
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
+  /**
+   * subscribe to object layout triggers
+   */
+  protected subscribe(context: StrictLayoutContext, object: FabricObject) {
+    const { target } = context;
+    this.unsubscribe(context, object);
+    const disposers = [
+      object.on('modified', (e) =>
+        this.performLayout({
+          trigger: 'modified',
+          e: { ...e, target: object },
+          type: 'object_modified',
+          target,
+        })
+      ),
+      ...(
+        [
+          'moving',
+          'resizing',
+          'rotating',
+          'scaling',
+          'skewing',
+          'changed',
+        ] as TModificationEvents[]
+      ).map((key) =>
+        object.on(key, (e) =>
+          this.performLayout({
+            trigger: key,
+            e: { ...e, target: object },
+            type: 'object_modifying',
+            target,
+          })
+        )
+      ),
+      (object as IText).on('changed', (e) =>
+        this.performLayout({
+          trigger: 'text:changed',
+          e: { ...e, target: object },
+          type: 'object_modifying',
+          target,
+        })
+      ),
+    ];
+    this._subscriptions.set(object, disposers);
+  }
+
+  /**
+   * unsubscribe object layout triggers
+   */
+  protected unsubscribe(context: StrictLayoutContext, object: FabricObject) {
+    (this._subscriptions.get(object) || []).forEach((d) => d());
+  }
+
   protected onBeforeLayout(context: StrictLayoutContext) {
     const { target } = context;
+
+    // handle layout triggers subscription
+    if (context.type === 'initialization') {
+      context.target._objects.forEach((object) =>
+        this.subscribe(context, object)
+      );
+    } else if (context.type === 'added') {
+      context.targets.forEach((object) => this.subscribe(context, object));
+    } else if (context.type === 'removed') {
+      context.targets.forEach((object) => this.unsubscribe(context, object));
+    }
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onBeforeLayout({
@@ -127,7 +195,7 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    !context.objectsRelativeToGroup &&
+    (context.type !== 'initialization' || !context.objectsRelativeToGroup) &&
       target.forEachObject((object) => {
         object.group === target &&
           this.layoutObject(context, layoutResult, object);

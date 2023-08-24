@@ -12,6 +12,11 @@ export class FitContentLayout extends LayoutStrategy {
    */
   optimized = true;
 
+  /**
+   * skip `object_modifying` triggers
+   */
+  lazy = false;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   shouldPerformLayout(context: StrictLayoutContext) {
     return true;
@@ -29,28 +34,33 @@ export class FitContentLayout extends LayoutStrategy {
       context.type === 'added' &&
       objects.length > context.targets.length
     ) {
-      return this.getLazyBoundingBox(context.target, context.targets);
+      const sizeVector = getObjectSizeVector(context.target);
+      return this.getLazyBoundingBox(context.target, context.targets, [
+        sizeVector,
+        sizeVector.scalarMultiply(-1),
+      ]);
+    } else if (this.lazy && context.type === 'object_modifying') {
+      return;
     }
-
     return this.calcBoundingBox(objects, context);
   }
 
   getLazyBoundingBox(
     target: Group,
     objects: FabricObject[],
+    caches: Point[],
     ignoreOffset?: boolean
   ): LayoutStrategyResult | undefined {
     if (objects.length === 0) {
       return;
     }
-    const sizeVector = getObjectSizeVector(target);
     const bbox = makeBoundingBoxFromPoints(
       objects.reduce(
         (bounds, object) => {
           bounds.push(...getObjectBounds(object));
           return bounds;
         },
-        [sizeVector, sizeVector.scalarMultiply(-1)] as Point[]
+        [...caches]
       )
     );
     return this.getBoundingBoxResult(target, bbox, ignoreOffset);

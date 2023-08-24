@@ -4,7 +4,11 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TBBox } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
+import type {
+  InitializationLayoutContext,
+  LayoutStrategyResult,
+  StrictLayoutContext,
+} from '../types';
 import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
@@ -51,7 +55,7 @@ export abstract class LayoutStrategy {
    */
   protected calcInitialBoundingBox(
     objects: FabricObject[],
-    context: StrictLayoutContext
+    context: InitializationLayoutContext & StrictLayoutContext
   ): LayoutStrategyResult | undefined {
     const { target } = context;
     const options = context.options || {},

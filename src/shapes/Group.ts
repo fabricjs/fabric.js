@@ -15,7 +15,7 @@ import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type {
-  ImperativeLayoutContext,
+  ImperativeLayoutOptions,
   LayoutBeforeEvent,
   LayoutEvent,
 } from '../LayoutManager/types';
@@ -116,7 +116,6 @@ export class Group extends createCollectionMixin(
     super();
     this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
     this.layoutManager = layoutManager;
-    this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
       true
@@ -288,18 +287,6 @@ export class Group extends createCollectionMixin(
   }
 
   /**
-   * invalidates layout on object modified
-   * @private
-   */
-  __objectMonitor(ev: ObjectEvents['modified']) {
-    this.layoutManager.performLayout({
-      ...ev,
-      type: 'object_modified',
-      target: this,
-    });
-  }
-
-  /**
    * keeps track of the selected objects
    * @private
    */
@@ -325,17 +312,15 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject} object
    */
   _watchObject(watch: boolean, object: FabricObject) {
-    const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
-    // @ts-expect-error TS limitations
-    object[directive]('changed', this.__objectMonitor);
-    // @ts-expect-error TS limitations
-    object[directive]('modified', this.__objectMonitor);
-    // @ts-expect-error TS limitations
-    object[directive]('selected', this.__objectSelectionTracker);
-    // @ts-expect-error TS limitations
-    object[directive]('deselected', this.__objectSelectionDisposer);
+    if (watch) {
+      object.on('selected', this.__objectSelectionTracker);
+      object.on('deselected', this.__objectSelectionDisposer);
+    } else {
+      object.off('selected', this.__objectSelectionTracker);
+      object.off('deselected', this.__objectSelectionDisposer);
+    }
   }
 
   /**
@@ -500,7 +485,7 @@ export class Group extends createCollectionMixin(
   triggerLayout({
     strategy = this.layoutManager.strategy,
     overrides,
-  }: ImperativeLayoutContext = {}) {
+  }: ImperativeLayoutOptions = {}) {
     this.layoutManager.performLayout({
       target: this,
       type: 'imperative',

@@ -1,11 +1,17 @@
-import type { ModifiedEvent } from '../EventTypeDefs';
+import type {
+  BasicTransformEvent,
+  ModifiedEvent,
+  TModificationEvents,
+} from '../EventTypeDefs';
 import type { Point } from '../Point';
 import type { Group, GroupProps } from '../shapes/Group';
+import type { ITextEvents } from '../shapes/IText/ITextBehavior';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 
 export type LayoutTrigger =
   | 'initialization'
+  | 'object_modifying'
   | 'object_modified'
   | 'added'
   | 'removed'
@@ -73,12 +79,12 @@ export type LayoutResult = {
   offset: Point;
 };
 
-export type ImperativeLayoutContext = {
+export type ImperativeLayoutOptions = {
   strategy?: LayoutStrategy;
   overrides?: LayoutStrategyResult;
 };
 
-export type LayoutContext = {
+export type CommonLayoutContext = {
   target: Group;
   strategy?: LayoutStrategy;
   type: LayoutTrigger;
@@ -86,25 +92,50 @@ export type LayoutContext = {
    * array of objects starting from the object that triggered the call to the current one
    */
   path?: Group[];
-  [key: string]: any;
-} & (
-  | {
-      type: 'initialization';
-      options?: Partial<GroupProps>;
-      objectsRelativeToGroup?: boolean;
-    }
-  | {
-      type: 'added' | 'removed';
-      targets: FabricObject[];
-    }
-  | ({
-      type: 'object_modified';
-    } & ModifiedEvent)
-  | {
-      type: 'imperative';
-      overrides?: LayoutStrategyResult;
-    }
-);
+};
+
+export type InitializationLayoutContext = CommonLayoutContext & {
+  type: 'initialization';
+  options?: Partial<GroupProps>;
+  objectsRelativeToGroup?: boolean;
+};
+
+export type CollectionChangeLayoutContext = CommonLayoutContext & {
+  type: 'added' | 'removed';
+  targets: FabricObject[];
+};
+
+export type ObjectModifiedLayoutContext = CommonLayoutContext & {
+  type: 'object_modified';
+  trigger: 'modified';
+  e: ModifiedEvent;
+};
+
+export type ObjectModifyingLayoutContext =
+  | CommonLayoutContext & {
+      type: 'object_modifying';
+    } & (
+        | {
+            trigger: TModificationEvents;
+            e: BasicTransformEvent & { target: FabricObject };
+          }
+        | {
+            trigger: 'text:changed';
+            e: ITextEvents['changed'] & { target: FabricObject };
+          }
+      );
+
+export type ImperativeLayoutContext = CommonLayoutContext & {
+  type: 'imperative';
+  overrides?: LayoutStrategyResult;
+};
+
+export type LayoutContext =
+  | InitializationLayoutContext
+  | CollectionChangeLayoutContext
+  | ObjectModifiedLayoutContext
+  | ObjectModifyingLayoutContext
+  | ImperativeLayoutContext;
 
 export type StrictLayoutContext = LayoutContext & {
   strategy: LayoutStrategy;
