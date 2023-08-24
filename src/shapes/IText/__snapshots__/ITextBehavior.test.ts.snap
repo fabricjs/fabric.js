@@ -136,7 +136,6 @@ exports[`text imperative changes insertChars 2`] = `
   "text": "tabest",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 58,
 }
 `;
@@ -258,7 +257,6 @@ exports[`text imperative changes insertChars and removes chars 2`] = `
   "text": "tabst",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 47,
 }
 `;
@@ -342,7 +340,6 @@ exports[`text imperative changes insertChars and removes chars 4`] = `
   "text": "tab",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 31,
 }
 `;
@@ -550,7 +547,6 @@ exports[`text imperative changes insertChars can accept some style for the new t
 aest",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 39,
 }
 `;
@@ -725,7 +721,6 @@ exports[`text imperative changes insertChars handles new lines correctly 2`] = `
 est",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 31,
 }
 `;
@@ -804,7 +799,6 @@ exports[`text imperative changes removeChars 2`] = `
   "text": "tt",
   "top": 0,
   "type": "IText",
-  "version": "6.0.0-beta10",
   "width": 14,
 }
 `;

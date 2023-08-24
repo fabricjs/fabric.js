@@ -54,6 +54,7 @@ body:
         - 6.0.0-beta5
         - 6.0.0-beta4
         - 6.0.0-beta3
+        - 6.0.0-beta12
         - 6.0.0-beta11
         - 6.0.0-beta10
         - 6.0.0-beta1
@@ -95,6 +96,7 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 20.5.1
         - 20.5.0
         - 20.4.0
         - 20.3.1
@@ -114,6 +116,7 @@ body:
         - 19.1.0
         - 19.0.1
         - 19.0.0
+        - 18.17.1
         - 18.17.0
         - 18.16.1
         - 18.16.0
@@ -150,6 +153,7 @@ body:
         - 17.1.0
         - 17.0.1
         - 17.0.0
+        - 16.20.2
         - 16.20.1
         - 16.20.0
         - 16.19.1
