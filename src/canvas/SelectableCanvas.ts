@@ -17,7 +17,6 @@ import {
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -33,7 +32,7 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement } from '../util';
+import { createCanvasElement, invertTransform } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
@@ -409,18 +408,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the pointer in object coordinates
-   * @private
-   */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
-    );
-  }
-
-  /**
    * Set the canvas tolerance value for pixel taret find.
    * Use only integer numbers.
    * @private
@@ -761,7 +748,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
    * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
    * @return {Boolean} true if point is contained within an area of given object
@@ -772,14 +758,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     obj: FabricObject,
     globalPointer: Point
   ): boolean {
-    if (
-      obj &&
-      obj.visible &&
-      obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(pointer)
-    ) {
+    if (obj && obj.visible && obj.evented && obj.containsPoint(pointer)) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
@@ -812,8 +791,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
       const objToCheck = objects[i];
+      // this strange logic indicates a severe bug in containsPoint
       const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
+        ? sendPointToPlane(
+            pointer,
+            invertTransform(this.viewportTransform),
+            objToCheck.group.calcTransformMatrix()
+          )
         : pointer;
       if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
         target = objects[i];
@@ -851,15 +835,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       this.targets[0]
       ? this.targets[0]
       : target;
-  }
-
-  /**
-   * Returns pointer coordinates without the effect of the viewport
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
-   */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
   }
 
   /**
@@ -908,7 +883,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
     if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
+      pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
     const retinaScaling = this.getRetinaScaling();
