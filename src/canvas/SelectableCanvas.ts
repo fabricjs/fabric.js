@@ -839,28 +839,20 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
    * @param {Event} e
-   * @param {Boolean} ignoreVpt
+   * @param {Boolean} inHTMLPlane
+   * `true` returns a point that from the viewer's perspective remains untouched
+   * by {@link viewportTransform} changes\
+   * `false` returns a point in the canvas plane,
+   * the same plane as the plane {@link FabricObject#getCenterPoint} exists in
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
+  getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
     // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
+    if (this._absolutePointer && !inHTMLPlane) {
       return this._absolutePointer;
     }
-    if (this._pointer && ignoreVpt) {
+    if (this._pointer && inHTMLPlane) {
       return this._pointer;
     }
 
@@ -882,7 +874,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
+    if (!inHTMLPlane) {
       pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
