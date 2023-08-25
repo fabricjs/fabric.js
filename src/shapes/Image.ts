@@ -854,5 +854,8 @@ export class FabricImage<
 classRegistry.setClass(FabricImage);
 classRegistry.setSVGClass(FabricImage);
 
-/** @deprecated Image is a keyword. Please use FabricImage instead */
+/**
+ * @deprecated The old fabric.Image class can't be imported as Image because of a reserved word clash.
+ * For this reason it has been renamed to FabricImage. Please use FabricImage in place of Image.
+ */
 export class Image extends FabricImage { };
