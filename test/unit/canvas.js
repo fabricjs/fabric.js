@@ -1162,26 +1162,6 @@
     assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
   });
 
-  //  QUnit.test('getPointer', function(assert) {
-  //    var done = assert.async();
-  //    assert.ok(typeof canvas.getPointer === 'function');
-  //
-  //    fabric.util.addListener(upperCanvasEl, 'click', function(e) {
-  //       canvas.calcOffset();
-  //       var pointer = canvas.getPointer(e);
-  //       assert.equal(pointer.x, 101, 'pointer.x should be correct');
-  //       assert.equal(pointer.y, 102, 'pointer.y should be correct');
-  //
-  //       done();
-  //   });
-
-  //     setTimeout(function() {
-  //       simulateEvent(upperCanvasEl, 'click', {
-  //         pointerX: 101, pointerY: 102
-  //       });
-  //     }, 100);
-  // });
-
   QUnit.test('getCenter', function(assert) {
     assert.ok(typeof canvas.getCenter === 'function');
     var center = canvas.getCenter();
@@ -2049,7 +2029,7 @@
     };
     canvas.setActiveObject(rect);
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getHTMLPointFromEvent(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
@@ -2065,7 +2045,7 @@
       target: canvas.upperCanvasEl
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getHTMLPointFromEvent(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform;
@@ -2076,7 +2056,7 @@
 
     var alreadySelected = true;
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getHTMLPointFromEvent(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
@@ -2094,7 +2074,7 @@
       shiftKey: true
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getHTMLPointFromEvent(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;

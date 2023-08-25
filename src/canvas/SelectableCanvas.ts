@@ -582,11 +582,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getPointer(e),
+          this.getCanvasPointFromEvent(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getPointer(e);
+      : this.getCanvasPointFromEvent(e);
     const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
@@ -701,7 +701,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return undefined;
     }
 
-    const pointer = this.getPointer(e, true),
+    const pointer = this.getHTMLPointFromEvent(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -838,7 +838,32 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns pointer coordinates relative to canvas.
+   * Returns pointer relative to the {@link HTMLCanvasElement}
+   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}
+   */
+  getHTMLPointFromEvent(e: TPointerEvent) {
+    if (this._pointer) {
+      return this._pointer;
+    }
+    return this.getPointer(e, true);
+  }
+
+  /**
+   * Returns pointer relative to instance's `(0, 0)`
+   */
+  getCanvasPointFromEvent(e: TPointerEvent) {
+    if (this._absolutePointer) {
+      return this._absolutePointer;
+    }
+    return this.getPointer(e);
+  }
+
+  /**
+   * Returns pointer relative to canvas.
+   *
+   * This method is protected since v6 to protect you from misuse
+   * See {@link getHTMLPointFromEvent}, {@link getCanvasPointFromEvent}
+   *
    * @param {Event} e
    * @param {Boolean} inHTMLPlane
    * `true` returns a point that from the viewer's perspective remains untouched
@@ -847,7 +872,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * the same plane as the plane {@link FabricObject#getCenterPoint} exists in
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
+  protected getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
     // return cached values if we are in the event processing chain
     if (this._absolutePointer && !inHTMLPlane) {
       return this._absolutePointer;
