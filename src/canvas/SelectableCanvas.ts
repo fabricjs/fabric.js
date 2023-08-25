@@ -895,14 +895,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {Point}
    */
   protected getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !inHTMLPlane) {
-      return this._absolutePointer;
-    }
-    if (this._pointer && inHTMLPlane) {
-      return this._pointer;
-    }
-
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
