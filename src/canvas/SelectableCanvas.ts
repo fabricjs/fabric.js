@@ -748,6 +748,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Checks point is inside the object.
+   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
    * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
    * @return {Boolean} true if point is contained within an area of given object
