@@ -6,10 +6,12 @@
 export function getScrollLeftTop(element: HTMLElement | null) {
   let left = 0,
     top = 0;
-  if (!element) {
+  const doc = element && getDocumentFromElement(element);
+
+  if (!element || !doc) {
     return { left, top };
   }
-  const doc = getDocumentFromElement(element);
+
   const docElement = doc.documentElement,
     body = doc.body || {
       scrollLeft: 0,

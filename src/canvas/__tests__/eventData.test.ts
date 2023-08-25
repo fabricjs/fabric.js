@@ -5,6 +5,7 @@ import { Canvas } from '../Canvas';
 describe('Canvas event data', () => {
   let canvas: Canvas;
   let spy: jest.SpyInstance;
+
   beforeEach(() => {
     canvas = new Canvas(null);
     spy = jest.spyOn(canvas, 'fire');
@@ -23,7 +24,6 @@ describe('Canvas event data', () => {
         'mousemove',
         'mouseout',
         'mouseover',
-        'mouseup',
         'dblclick',
         'wheel',
         'contextmenu',
@@ -44,6 +44,24 @@ describe('Canvas event data', () => {
       canvas
         .getSelectionElement()
         .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
+      expect(spy.mock.calls).toMatchSnapshot();
+    }
+  );
+
+  // must call mousedown for mouseup to be listened to
+  test.each([[iMatrix], [[2, Math.PI, 0, 0.5, 50, 50] as TMat2D]] as const)(
+    'HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s',
+    (viewportTransform) => {
+      viewportTransform && canvas.setViewportTransform(viewportTransform);
+      canvas
+        .getSelectionElement()
+        .dispatchEvent(
+          new MouseEvent('mousedown', { clientX: 50, clientY: 50 })
+        );
+      spy.mockReset();
+      document.dispatchEvent(
+        new MouseEvent('mouseup', { clientX: 50, clientY: 50 })
+      );
       expect(spy.mock.calls).toMatchSnapshot();
     }
   );
