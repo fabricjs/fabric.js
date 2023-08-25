@@ -819,7 +819,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
    * @see {@link fabric.Canvas#_searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
+   * @param {Object} [pointer] x,y object of HTML point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
@@ -839,8 +839,18 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns pointer relative to the {@link HTMLCanvasElement}
-   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}
+   * @returns point existing in the same plane as the {@link HTMLCanvasElement},
+   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}.
+   * This means that changes to the {@link viewportTransform} do not change the values of the point
+   * and it remains unchanged from the viewer's perspective.
+   *
+   * @example
+   * const pointInCanvasPlane = sendPointToPlane(
+   *  this.getHTMLPointFromEvent(e),
+   *  undefined,
+   *  canvas.viewportTransform
+   * );
+   *
    */
   getHTMLPointFromEvent(e: TPointerEvent) {
     if (this._pointer) {
@@ -850,7 +860,17 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns pointer relative to instance's `(0, 0)`
+   * @returns point existing in the canvas plane (the same plane as the plane {@link FabricObject#getCenterPoint} exists in),
+   * relative to instance's `(0, 0)`.
+   * This means that changes to the {@link viewportTransform} do not change the values of the point,
+   * however, from the viewer's perspective the point is changed.
+   *
+   * @example
+   * const pointInHTMLPlane = sendPointToPlane(
+   *  this.getCanvasPointFromEvent(e),
+   *  canvas.viewportTransform
+   * );
+   *
    */
   getCanvasPointFromEvent(e: TPointerEvent) {
     if (this._absolutePointer) {
@@ -862,8 +882,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * Returns pointer relative to canvas.
    *
-   * This method is protected since v6 to protect you from misuse
-   * See {@link getHTMLPointFromEvent}, {@link getCanvasPointFromEvent}
+   * **IMPORTANT**:
+   * This method is protected since v6 to protect you from misuse.
+   * Use {@link getHTMLPointFromEvent}, {@link getCanvasPointFromEvent} instead.
    *
    * @param {Event} e
    * @param {Boolean} inHTMLPlane
