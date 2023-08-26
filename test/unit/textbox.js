@@ -16,7 +16,7 @@
     var textbox = new fabric.Textbox('test');
     assert.ok(textbox instanceof fabric.Textbox);
     assert.ok(textbox instanceof fabric.IText);
-    assert.ok(textbox instanceof fabric.Text);
+    assert.ok(textbox instanceof fabric.FabricText);
   });
 
   QUnit.test('constructor with width', function(assert) {

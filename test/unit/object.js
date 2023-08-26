@@ -24,7 +24,7 @@
     var cObj = new fabric.Object();
 
     assert.ok(cObj);
-    assert.ok(cObj instanceof fabric.Object);
+    assert.ok(cObj instanceof fabric.FabricObject);
     assert.ok(cObj.constructor === fabric.Object);
 
     assert.equal(cObj.constructor.type, 'FabricObject');
@@ -369,7 +369,7 @@
     assert.ok(typeof cObj.cloneAsImage === 'function');
     var image = cObj.cloneAsImage();
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
@@ -378,7 +378,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var image = cObj.cloneAsImage({ enableRetinaScaling: true });
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 200, 'the image has been scaled by retina');
   });
 
