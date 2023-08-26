@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
 - CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
 
 ## [6.0.0-beta12]
