@@ -1491,18 +1491,26 @@ export class FabricObject<
    * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
-    const shouldCenterOrigin =
-      (this.originX !== CENTER || this.originY !== CENTER) &&
-      this.centeredRotation;
+    const { centeredRotation, originX, originY } = this;
 
-    if (shouldCenterOrigin) {
-      this._setOriginToCenter();
+    if (centeredRotation) {
+      const { x, y } = this.getRelativeCenterPoint();
+      this.originX = CENTER;
+      this.originY = CENTER;
+      this.top = y;
+      this.left = x;
     }
 
     this.set('angle', angle);
 
-    if (shouldCenterOrigin) {
-      this._resetOrigin();
+    if (centeredRotation) {
+      const { x, y } = this.translateToOriginPoint(
+        this.getRelativeCenterPoint(),
+        originX,
+        originY
+      );
+      this.left = x;
+      this.top = y;
     }
   }
 
