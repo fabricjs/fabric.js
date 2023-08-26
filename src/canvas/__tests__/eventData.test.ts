@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { IText, iMatrix } from '../../../fabric';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
