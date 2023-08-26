@@ -135,7 +135,7 @@ jobs:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
   coverage:
-    needs: [node-coverage, jest, e2e]
+    needs: [node-coverage, e2e]
     name: Coverage reporting
     runs-on: ubuntu-latest
     steps:
@@ -151,10 +151,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-visual
-          path: .nyc_output
-      - uses: actions/download-artifact@v3
-        with:
-          name: coverage-jest
           path: .nyc_output
       - uses: actions/download-artifact@v3
         with:
