@@ -42,13 +42,13 @@ describe('perPixelTargetFind', () => {
     expect(isTargetTransparent).not.toBeCalled();
   });
 
-  test('perPixelTargetFind === not-selected, object is not selected', () => {
+  test('perPixelTargetFind === "not-selected", object is not selected', () => {
     object.perPixelTargetFind = 'not-selected';
     expect(checkTarget()).toBe(false);
     expect(isTargetTransparent).toBeCalled();
   });
 
-  test('perPixelTargetFind === not-selected, object is selected', () => {
+  test('perPixelTargetFind === "not-selected", object is selected', () => {
     object.perPixelTargetFind = 'not-selected';
     canvas.setActiveObject(object);
     expect(checkTarget()).toBe(true);
