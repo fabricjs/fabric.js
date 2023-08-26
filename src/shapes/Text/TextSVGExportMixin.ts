@@ -143,9 +143,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     top: number
   ) {
     const styleProps = this.getSvgSpanStyles(
-      styleDecl,
-      char !== char.trim() || !!char.match(multipleSpacesRegex)
-    ),
+        styleDecl,
+        char !== char.trim() || !!char.match(multipleSpacesRegex)
+      ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
       dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '';
@@ -272,7 +272,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   /**
    * @deprecated unused
    */
-  _getSVGLineTopOffset(this: TextSVGExportMixin & FabricText, lineIndex: number) {
+  _getSVGLineTopOffset(
+    this: TextSVGExportMixin & FabricText,
+    lineIndex: number
+  ) {
     let lineTopOffset = 0,
       j;
     for (j = 0; j < lineIndex; j++) {
@@ -325,10 +328,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       stroke ? colorPropToSVG('stroke', stroke) : '',
       strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
       fontFamily
-        ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"')
-          ? `'${fontFamily}'`
-          : fontFamily
-        }; `
+        ? `font-family: ${
+            !fontFamily.includes("'") && !fontFamily.includes('"')
+              ? `'${fontFamily}'`
+              : fontFamily
+          }; `
         : '',
       fontSize ? `font-size: ${fontSize}px; ` : '',
       fontStyle ? `font-style: ${fontStyle}; ` : '',
@@ -353,10 +357,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       .filter(
         (decoration) =>
           style[
-          decoration.replace('-', '') as
-          | 'overline'
-          | 'underline'
-          | 'linethrough'
+            decoration.replace('-', '') as
+              | 'overline'
+              | 'underline'
+              | 'linethrough'
           ]
       )
       .join(' ');

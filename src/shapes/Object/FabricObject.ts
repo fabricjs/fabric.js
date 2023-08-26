@@ -13,13 +13,13 @@ export interface FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends FabricObjectSVGExportMixin { }
+> extends FabricObjectSVGExportMixin {}
 
 export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends InteractiveFabricObject<Props, SProps, EventSpec> { }
+> extends InteractiveFabricObject<Props, SProps, EventSpec> {}
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 
@@ -31,4 +31,4 @@ export { cacheProperties } from './defaultValues';
 /**
  * @deprecated Object is a keyword. Please use FabricObject instead
  */
-export class _Object extends FabricObject { }
+export class _Object extends FabricObject {}

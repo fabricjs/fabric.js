@@ -7,7 +7,10 @@ import type { StylePropertiesType } from './constants';
 import type { FabricText } from './Text';
 import { pick } from '../../util';
 
-export type CompleteTextStyleDeclaration = Pick<FabricText, StylePropertiesType>;
+export type CompleteTextStyleDeclaration = Pick<
+  FabricText,
+  StylePropertiesType
+>;
 
 export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 

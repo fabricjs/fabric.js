@@ -107,7 +107,7 @@ interface UniqueTextProps {
 
 export interface SerializedTextProps
   extends SerializedObjectProps,
-  UniqueTextProps {
+    UniqueTextProps {
   styles: TextStyleArray | TextStyle;
 }
 
@@ -120,12 +120,13 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class FabricText<
-  Props extends TOptions<TextProps> = Partial<TextProps>,
-  SProps extends SerializedTextProps = SerializedTextProps,
-  EventSpec extends ObjectEvents = ObjectEvents
->
+    Props extends TOptions<TextProps> = Partial<TextProps>,
+    SProps extends SerializedTextProps = SerializedTextProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
   extends StyledText<Props, SProps, EventSpec>
-  implements UniqueTextProps {
+  implements UniqueTextProps
+{
   /**
    * Properties that requires a text layout recalculation when changed
    * @type string[]
@@ -567,8 +568,9 @@ export class FabricText<
    * @return {String} String representation of text object
    */
   toString(): string {
-    return `#<Text (${this.complexity()}): { "text": "${this.text
-      }", "fontFamily": "${this.fontFamily}" }>`;
+    return `#<Text (${this.complexity()}): { "text": "${
+      this.text
+    }", "fontFamily": "${this.fontFamily}" }>`;
   }
 
   /**
@@ -1658,9 +1660,9 @@ export class FabricText<
   ): string {
     const parsedFontFamily =
       fontFamily.includes("'") ||
-        fontFamily.includes('"') ||
-        fontFamily.includes(',') ||
-        FabricText.genericFonts.includes(fontFamily.toLowerCase())
+      fontFamily.includes('"') ||
+      fontFamily.includes(',') ||
+      FabricText.genericFonts.includes(fontFamily.toLowerCase())
         ? fontFamily
         : `"${fontFamily}"`;
     return [
@@ -1847,16 +1849,16 @@ export class FabricText<
     // this can later looked at again and probably removed.
 
     const text = new this(textContent, {
-      left: left + dx,
-      top: top + dy,
-      underline: textDecoration.includes('underline'),
-      overline: textDecoration.includes('overline'),
-      linethrough: textDecoration.includes('line-through'),
-      // we initialize this as 0
-      strokeWidth: 0,
-      fontSize,
-      ...restOfOptions,
-    }),
+        left: left + dx,
+        top: top + dy,
+        underline: textDecoration.includes('underline'),
+        overline: textDecoration.includes('overline'),
+        linethrough: textDecoration.includes('line-through'),
+        // we initialize this as 0
+        strokeWidth: 0,
+        fontSize,
+        ...restOfOptions,
+      }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
@@ -1880,7 +1882,7 @@ export class FabricText<
       top:
         text.top -
         (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
-        text.lineHeight,
+          text.lineHeight,
       strokeWidth,
     });
     return text;
@@ -1893,9 +1895,10 @@ export class FabricText<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<FabricText>}
    */
-  static fromObject<T extends TOptions<SerializedTextProps>, S extends FabricText>(
-    object: T
-  ) {
+  static fromObject<
+    T extends TOptions<SerializedTextProps>,
+    S extends FabricText
+  >(object: T) {
     return this._fromObject<S>(
       {
         ...object,
@@ -1913,4 +1916,4 @@ classRegistry.setClass(FabricText);
 classRegistry.setSVGClass(FabricText);
 
 /** @deprecated Text is a keyword. Please use FabricText instead */
-export class Text extends FabricText { };
+export class Text extends FabricText {}
