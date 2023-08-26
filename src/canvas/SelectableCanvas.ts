@@ -786,6 +786,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         ? !this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)
         : true;
     }
+
     return false;
   }
 
