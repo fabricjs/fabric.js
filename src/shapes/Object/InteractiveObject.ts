@@ -462,7 +462,10 @@ export class InteractiveFabricObject<
               // and is the qrDecompose of a matrix that takes in account zoom too
               new Point(options.scaleX, options.scaleY)
         ).scalarMultiply(this.strokeWidth);
-      size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
+      size = bbox
+        .add(stroke)
+        .scalarAdd(this.borderScaleFactor)
+        .scalarAdd(this.padding * 2);
     } else {
       size = this._calculateCurrentDimensions().scalarAdd(
         this.borderScaleFactor

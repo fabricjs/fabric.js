@@ -1481,11 +1481,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects
-          target = this.searchPossibleTargets(
-            prevActiveObjects,
-            this.getPointer(e, true)
-          );
+          const pointer = this.getPointer(e, true);
+          target =
+            // first search active objects for a target to remove
+            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            //  if not found, search under active selection for a target to add
+            // `prevActiveObjects` will be searched but we already know they will not be found
+            this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
