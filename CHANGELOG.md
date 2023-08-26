@@ -2,6 +2,8 @@
 
 ## [next]
 
+- CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
+
 ## [6.0.0-beta12]
 
 - fix(Object): border rendering with padding under group [#9161](https://github.com/fabricjs/fabric.js/pull/9161)
