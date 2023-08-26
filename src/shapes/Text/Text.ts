@@ -1915,5 +1915,10 @@ applyMixins(FabricText, [TextSVGExportMixin]);
 classRegistry.setClass(FabricText);
 classRegistry.setSVGClass(FabricText);
 
-/** @deprecated Text is a keyword. Please use FabricText instead */
+/**
+ * @deprecated The old fabric.Text class can't be imported as Text because of conflict with Web API.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Text/Text
+ * For this reason it has been renamed to FabricText.
+ * Please use `import { FabricText }` in place of `import { Text as FabricText }`
+ */
 export class Text extends FabricText {}

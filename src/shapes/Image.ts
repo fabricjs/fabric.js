@@ -860,7 +860,9 @@ classRegistry.setClass(FabricImage);
 classRegistry.setSVGClass(FabricImage);
 
 /**
- * @deprecated The old fabric.Image class can't be imported as Image because of a reserved word clash.
- * For this reason it has been renamed to FabricImage. Please use FabricImage in place of Image.
+ * @deprecated The old fabric.Image class can't be imported as Image because of conflict with Web API.
+ * https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image
+ * For this reason it has been renamed to FabricImage.
+ * Please use `import { FabricImage }` in place of `import { Image as FabricImage }`
  */
 export class Image extends FabricImage {}
