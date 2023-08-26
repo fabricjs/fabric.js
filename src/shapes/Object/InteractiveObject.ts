@@ -1,5 +1,5 @@
 import { Point } from '../../Point';
-import type { TCornerPoint, TDegree } from '../../typedefs';
+import type { PerPixelTargetFind, TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
@@ -87,7 +87,7 @@ export class InteractiveFabricObject<
 
   declare selectable: boolean;
   declare evented: boolean;
-  declare perPixelTargetFind: boolean;
+  declare perPixelTargetFind: PerPixelTargetFind;
   declare activeOn: 'down' | 'up';
 
   declare hoverCursor: CSSStyleDeclaration['cursor'] | null;

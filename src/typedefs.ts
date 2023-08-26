@@ -124,3 +124,5 @@ export type Abortable = {
 };
 
 export type TOptions<T> = Partial<T> & Record<string, any>;
+
+export type PerPixelTargetFind = boolean | 'not-selected';

@@ -20,6 +20,7 @@ import { isCollection } from '../util/typeAssertions';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
+  PerPixelTargetFind,
   TMat2D,
   TOriginX,
   TOriginY,
@@ -28,6 +29,7 @@ import type {
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
+import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -166,7 +168,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare containerClass: string;
 
   // target find config
-  declare perPixelTargetFind: boolean;
+  declare perPixelTargetFind: PerPixelTargetFind;
   declare targetFindTolerance: number;
   declare skipTargetFind: boolean;
 
@@ -772,17 +774,17 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     globalPointer: Point
   ): boolean {
     if (obj && obj.visible && obj.evented && obj.containsPoint(pointer)) {
-      if (
-        // if `obj` is selected we want it to be easy to interact with it
-        this.getActiveObject() !== obj &&
-        (this.perPixelTargetFind || obj.perPixelTargetFind)
-      ) {
-        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
-          return true;
-        }
-      } else {
-        return true;
-      }
+      const shouldPerformPixelFind =
+        !(obj as unknown as IText).isEditing &&
+        (this.perPixelTargetFind === true ||
+          obj.perPixelTargetFind === true ||
+          ((this.perPixelTargetFind === 'not-selected' ||
+            obj.perPixelTargetFind === 'not-selected') &&
+            !this.getActiveObjects().includes(obj)));
+
+      return shouldPerformPixelFind
+        ? !this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)
+        : true;
     }
     return false;
   }

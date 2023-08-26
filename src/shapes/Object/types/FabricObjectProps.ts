@@ -1,4 +1,4 @@
-import type { TDegree } from '../../../typedefs';
+import type { PerPixelTargetFind, TDegree } from '../../../typedefs';
 import type { BorderProps } from './BorderProps';
 import type { ControlProps } from './ControlProps';
 import type { LockInteractionProps } from './LockInteractionProps';
@@ -81,7 +81,7 @@ export interface FabricObjectProps
    * @type Boolean
    * @default
    */
-  perPixelTargetFind: boolean;
+  perPixelTargetFind: PerPixelTargetFind;
 
   /**
    * When set to `false`, an object can not be selected for modification (using either point-click-based or group-based selection).

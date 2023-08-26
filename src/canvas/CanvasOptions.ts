@@ -1,6 +1,6 @@
 import type { ModifierKey, TOptionalModifierKey } from '../EventTypeDefs';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TOptions } from '../typedefs';
+import type { PerPixelTargetFind, TOptions } from '../typedefs';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 
 export interface CanvasTransformOptions {
@@ -182,7 +182,7 @@ export interface TargetFindOptions {
    * @type Boolean
    * @default
    */
-  perPixelTargetFind: boolean;
+  perPixelTargetFind: PerPixelTargetFind;
 
   /**
    * Number of pixels around target pixel to tolerate (consider active) during object detection
