@@ -2,7 +2,7 @@
 
 ## [next]
 
-- feat(`perPixelTargetFind`): selected/not-selected object + `perPixelTargetFind` [#9167](https://github.com/fabricjs/fabric.js/pull/9167)
+- feat(`perPixelTargetFind`): support `not-selected` option [#9167](https://github.com/fabricjs/fabric.js/pull/9167)
 - CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
 
 ## [6.0.0-beta12]
