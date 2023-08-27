@@ -1497,8 +1497,8 @@ export class FabricObject<
       const { x, y } = this.getRelativeCenterPoint();
       this.originX = CENTER;
       this.originY = CENTER;
-      this.top = y;
       this.left = x;
+      this.top = y;
     }
 
     this.set('angle', angle);
@@ -1511,6 +1511,8 @@ export class FabricObject<
       );
       this.left = x;
       this.top = y;
+      this.originX = originX;
+      this.originY = originY;
     }
   }
 
