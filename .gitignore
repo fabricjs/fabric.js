@@ -11,3 +11,4 @@ before_commit
 /cli_output/
 e2e/test-report/
 e2e/test-results/
+docs/

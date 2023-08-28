@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
+- ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
 - fix(utils) Fixes the code for the anchor point in point controls for polygons [#9178](https://github.com/fabricjs/fabric.js/pull/9178)
 - CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
 
