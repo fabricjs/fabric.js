@@ -882,9 +882,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * Returns pointer relative to canvas.
    *
-   * **IMPORTANT**:
-   * This method is protected since v6 to protect you from misuse.
-   * Use {@link getHTMLPointFromEvent}, {@link getCanvasPointFromEvent} instead.
+   * @deprecated This method is deprecated since v6 to protect you from misuse.
+   * Use {@link getHTMLPointFromEvent} or {@link getCanvasPointFromEvent} instead.
    *
    * @param {Event} e
    * @param {Boolean} inHTMLPlane
@@ -894,7 +893,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * the same plane as the plane {@link FabricObject#getCenterPoint} exists in
    * @return {Point}
    */
-  protected getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
+  getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
