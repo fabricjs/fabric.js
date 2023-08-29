@@ -1,11 +1,22 @@
 /* eslint-disable no-restricted-globals */
-import { IText, iMatrix } from '../../../fabric';
+import '../../../jest.extend';
+import { Point } from '../../Point';
+import { iMatrix } from '../../constants';
+import { IText } from '../../shapes/IText/IText';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
 describe('Canvas event data', () => {
   let canvas: Canvas;
   let spy: jest.SpyInstance;
+
+  const snapshotOptions = {
+    cloneDeepWith: (value: any) => {
+      if (value instanceof Point) {
+        return new Point(Math.round(value.x), Math.round(value.y));
+      }
+    },
+  };
 
   beforeEach(() => {
     canvas = new Canvas(null);
@@ -33,8 +44,8 @@ describe('Canvas event data', () => {
       .map(
         (type) =>
           [
-            [type, iMatrix],
-            [type, [2, Math.PI, 0, 0.5, 50, 50] as TMat2D],
+            [type, undefined],
+            [type, [2, Math.PI, 0, 0.5, 0, 0] as TMat2D],
           ] as const
       )
       .flat()
@@ -45,12 +56,12 @@ describe('Canvas event data', () => {
       canvas
         .getSelectionElement()
         .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
-      expect(spy.mock.calls).toMatchSnapshot();
+      expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
 
   // must call mousedown for mouseup to be listened to
-  test.each([[iMatrix], [[2, Math.PI, 0, 0.5, 50, 50] as TMat2D]] as const)(
+  test.each([[undefined], [[2, Math.PI, 0, 0.5, 50, 50] as TMat2D]] as const)(
     'HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s',
     (viewportTransform) => {
       viewportTransform && canvas.setViewportTransform(viewportTransform);
@@ -63,7 +74,7 @@ describe('Canvas event data', () => {
       document.dispatchEvent(
         new MouseEvent('mouseup', { clientX: 50, clientY: 50 })
       );
-      expect(spy.mock.calls).toMatchSnapshot();
+      expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
 
@@ -113,7 +124,7 @@ describe('Canvas event data', () => {
           clientY: 50,
         })
       );
-      expect(spy.mock.calls).toMatchSnapshot();
+      expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
 });

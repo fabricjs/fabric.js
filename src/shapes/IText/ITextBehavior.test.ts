@@ -1,4 +1,4 @@
-import '../../../toMatchRoundedSnapshot';
+import { roundSnapshotOptions } from '../../../jest.extend';
 import { IText } from './IText';
 
 export function matchTextStateSnapshot(text: IText) {
@@ -14,9 +14,8 @@ export function matchTextStateSnapshot(text: IText) {
     text: t,
     lines,
     charBounds,
-  }).toMatchRoundedSnapshot();
-  text.includeDefaultValues = false;
-  expect(text.toObject()).toMatchRoundedSnapshot(['width']);
+  }).toMatchSnapshot(roundSnapshotOptions);
+  expect(text).toMatchObjectSnapshot({ includeDefaultValues: false });
 }
 
 function create() {

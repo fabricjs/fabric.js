@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
     "contextmenu:before",
@@ -25,7 +25,7 @@ exports[`Canvas event data HTML event "contextmenu" should fire a corresponding 
 ]
 `;
 
-exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "contextmenu:before",
@@ -50,14 +50,14 @@ exports[`Canvas event data HTML event "contextmenu" should fire a corresponding 
 ]
 `;
 
-exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
     "mouse:dblclick",
     {
       "absolutePointer": Point {
-        "x": 50,
-        "y": 50,
+        "x": 25,
+        "y": -57,
       },
       "button": 1,
       "e": MouseEvent {
@@ -76,14 +76,14 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
 ]
 `;
 
-exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "mouse:dblclick",
     {
       "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
+        "x": 50,
+        "y": 50,
       },
       "button": 1,
       "e": MouseEvent {
@@ -639,7 +639,54 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
 ]
 `;
 
-exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
+[
+  [
+    "mouse:down:before",
+    {
+      "absolutePointer": Point {
+        "x": 25,
+        "y": -57,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:down",
+    {
+      "absolutePointer": Point {
+        "x": 25,
+        "y": -57,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+]
+`;
+
+exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "mouse:down:before",
@@ -686,16 +733,15 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
-    "mouse:down:before",
+    "mouse:over",
     {
       "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
+        "x": 25,
+        "y": -57,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -704,36 +750,12 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
-      "subTargets": [],
-      "target": undefined,
-      "transform": null,
-    },
-  ],
-  [
-    "mouse:down",
-    {
-      "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
-      },
-      "button": 1,
-      "e": MouseEvent {
-        "isTrusted": false,
-      },
-      "isClick": false,
-      "pointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "subTargets": [],
-      "target": undefined,
-      "transform": null,
     },
   ],
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "mouse:over",
@@ -755,15 +777,20 @@ exports[`Canvas event data HTML event "mouseenter" should fire a corresponding c
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `[]`;
+
+exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `[]`;
+
+exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
-    "mouse:over",
+    "mouse:move:before",
     {
       "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
+        "x": 25,
+        "y": -57,
       },
+      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -772,16 +799,36 @@ exports[`Canvas event data HTML event "mouseenter" should fire a corresponding c
         "x": 50,
         "y": 50,
       },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:move",
+    {
+      "absolutePointer": Point {
+        "x": 25,
+        "y": -57,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
     },
   ],
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `[]`;
-
-exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `[]`;
-
-exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "mouse:move:before",
@@ -828,16 +875,15 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
-    "mouse:move:before",
+    "mouse:out",
     {
       "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
+        "x": 25,
+        "y": -57,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -846,36 +892,13 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
-      "subTargets": [],
       "target": undefined,
-      "transform": null,
-    },
-  ],
-  [
-    "mouse:move",
-    {
-      "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
-      },
-      "button": 1,
-      "e": MouseEvent {
-        "isTrusted": false,
-      },
-      "isClick": false,
-      "pointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "subTargets": [],
-      "target": undefined,
-      "transform": null,
     },
   ],
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
     "mouse:out",
@@ -898,81 +921,9 @@ exports[`Canvas event data HTML event "mouseout" should fire a corresponding can
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
-[
-  [
-    "mouse:out",
-    {
-      "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
-      },
-      "e": MouseEvent {
-        "isTrusted": false,
-      },
-      "isClick": false,
-      "pointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "target": undefined,
-    },
-  ],
-]
-`;
+exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `[]`;
 
-exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `[]`;
-
-exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `[]`;
-
-exports[`Canvas event data HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
-[
-  [
-    "mouse:up:before",
-    {
-      "absolutePointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "button": 1,
-      "e": MouseEvent {
-        "isTrusted": false,
-      },
-      "isClick": false,
-      "pointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "subTargets": [],
-      "target": undefined,
-      "transform": null,
-    },
-  ],
-  [
-    "mouse:up",
-    {
-      "absolutePointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "button": 1,
-      "currentSubTargets": [],
-      "currentTarget": undefined,
-      "e": MouseEvent {
-        "isTrusted": false,
-      },
-      "isClick": true,
-      "pointer": Point {
-        "x": 50,
-        "y": 50,
-      },
-      "subTargets": [],
-      "target": undefined,
-      "transform": null,
-    },
-  ],
-]
-`;
+exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `[]`;
 
 exports[`Canvas event data HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
 [
@@ -1023,10 +974,10 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
 ]
 `;
 
-exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event with viewportTransform of [ 1, 0, 0, 1, 0, 0 ] 1`] = `
+exports[`Canvas event data HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
 [
   [
-    "mouse:wheel",
+    "mouse:up:before",
     {
       "absolutePointer": Point {
         "x": 50,
@@ -1046,17 +997,66 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
       "transform": null,
     },
   ],
+  [
+    "mouse:up",
+    {
+      "absolutePointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "button": 1,
+      "currentSubTargets": [],
+      "currentTarget": undefined,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": true,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
 ]
 `;
 
-exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 50, 50 ] 1`] = `
+exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event with viewportTransform of [ 2, 3.141592653589793, 0, 0.5, 0, 0 ] 1`] = `
 [
   [
     "mouse:wheel",
     {
       "absolutePointer": Point {
-        "x": 0,
-        "y": 0,
+        "x": 25,
+        "y": -57,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+]
+`;
+
+exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event with viewportTransform of undefined 1`] = `
+[
+  [
+    "mouse:wheel",
+    {
+      "absolutePointer": Point {
+        "x": 50,
+        "y": 50,
       },
       "button": 1,
       "e": MouseEvent {

@@ -1,4 +1,4 @@
-import '../../../toMatchRoundedSnapshot';
+import { roundSnapshotOptions } from '../../../jest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { Text } from './Text';
@@ -9,7 +9,7 @@ afterEach(() => {
 
 describe('Text', () => {
   it('toObject', async () => {
-    expect(new Text('text').toObject()).toMatchRoundedSnapshot(['width']);
+    expect(new Text('text')).toMatchObjectSnapshot();
   });
 
   it('fromObject', async () => {
@@ -25,7 +25,7 @@ describe('Text', () => {
       const text = new Text('');
       const style = text.getCompleteStyleDeclaration(0, 0);
       const measurement = text._measureChar('a', style, zwc, style);
-      expect(measurement).toMatchRoundedSnapshot();
+      expect(measurement).toMatchSnapshot(roundSnapshotOptions);
       expect(measurement).toEqual(text._measureChar('a', style, zwc, style));
     });
 
