@@ -13,22 +13,6 @@ type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
   includeDefaultValues?: boolean;
 };
 
-const extractOptions = (propertiesOrHint?: ObjectOptions | string) => {
-  if (typeof propertiesOrHint === 'object') {
-    const {
-      cloneDeepWith: customizer,
-      includeDefaultValues,
-      ...rest
-    } = propertiesOrHint;
-    return {
-      propertiesOrHint: rest,
-      customizer,
-      includeDefaultValues,
-    };
-  }
-  return { propertiesOrHint };
-};
-
 export const roundSnapshotOptions = {
   cloneDeepWith: (value) => {
     if (typeof value === 'number') {
@@ -43,25 +27,30 @@ expect.extend({
     propertiesOrHint?: ExtendedOptions,
     hint?: string
   ) {
-    const { propertiesOrHint: options = {}, customizer } =
-      extractOptions(propertiesOrHint);
+    if (typeof received === 'string') {
+      return toMatchSnapshot.call(
+        this,
+        received,
+        propertiesOrHint || hint || ''
+      );
+    }
+    const { cloneDeepWith: customizer, ...properties } = propertiesOrHint || {};
     return toMatchSnapshot.call(
       this,
       customizer ? cloneDeepWith(received, customizer) : received,
-      options,
+      properties,
       hint
     );
   },
   toMatchObjectSnapshot(
     received: FabricObject | Record<string, any>,
-    propertiesOrHint?: ObjectOptions | string,
+    {
+      cloneDeepWith: customizer,
+      includeDefaultValues,
+      ...properties
+    }: ObjectOptions = {},
     hint?: string
   ) {
-    const {
-      propertiesOrHint: options = {},
-      customizer,
-      includeDefaultValues,
-    } = extractOptions(propertiesOrHint);
     let snapshot: Record<string, any>;
     if (received instanceof FabricObject) {
       const restore = received.includeDefaultValues;
@@ -83,7 +72,7 @@ expect.extend({
           return Math.round(value);
         }
       }),
-      options,
+      properties,
       hint
     );
   },
