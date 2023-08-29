@@ -1,4 +1,5 @@
 import type { TColorArg } from '../../color/typedefs';
+import type { AnimationBase } from './AnimationBase';
 
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 
@@ -23,7 +24,7 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
 
 /**
  * An easing function used to calculate the current value
- * @see {@link AnimationBase['calculate']}
+ * @see {@link AnimationBase#calculate}
  *
  * @param timeElapsed ms elapsed since start
  * @param startValue
