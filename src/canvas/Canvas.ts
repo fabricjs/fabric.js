@@ -513,8 +513,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       subTargets: targets,
       dragSource: this._dragSource,
       // this is an absolute pointer, the name convention is wrong.
-      // such was in 5.x
-      pointer: this.getPointer(e),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     });
     //  will be set by the drop target
     options.didDrop = false;
