@@ -3,6 +3,10 @@
 ## [next]
 
 - chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
+- test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
+- fix(CanvasEvents): regression of `getPointer` usages + BREAKING: drop event data [#9186](https://github.com/fabricjs/fabric.js/pull/9186)
+- feat(Object): BREAKING rm \_setOriginToCenter and \_resetOrigin unuseful methods [#9179](https://github.com/fabricjs/fabric.js/pull/9179)
+- fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
 - ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
 - fix(utils) Fixes the code for the anchor point in point controls for polygons [#9178](https://github.com/fabricjs/fabric.js/pull/9178)
 - CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)

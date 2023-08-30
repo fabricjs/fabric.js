@@ -163,6 +163,7 @@ export interface DragEventData extends TEvent<DragEvent> {
 
 export interface DropEventData extends DragEventData {
   pointer: Point;
+  absolutePointer: Point;
 }
 
 interface DnDEvents {

@@ -245,8 +245,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const shared = {
       e,
       isClick: false,
-      pointer: this.getPointer(e),
-      absolutePointer: this.getPointer(e, true),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
@@ -273,8 +273,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.fire('mouse:over', {
         e,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
@@ -512,7 +512,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      pointer: this.getPointer(e),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -930,8 +931,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         subTargets: targets,
         button,
         isClick,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
       };
     if (eventType === 'up') {
@@ -998,6 +999,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
+    // this is an absolute pointer, the naming is wrong
     const pointer = this.getPointer(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
@@ -1014,6 +1016,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
+          // this is an absolute pointer, the naming is wrong
           pointer,
         });
     }
@@ -1030,6 +1033,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
+        // this is an absolute pointer, the naming is wrong
         pointer: pointer,
       });
     } else {
@@ -1315,8 +1319,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target: oldTarget,
         nextTarget: target,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
       fireCanvas && this.fire(canvasIn, outOpt);
       oldTarget.fire(targetOut, outOpt);
@@ -1328,8 +1332,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target,
         previousTarget: oldTarget,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
       fireCanvas && this.fire(canvasOut, inOpt);
       target.fire(targetIn, inOpt);
