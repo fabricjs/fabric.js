@@ -14,7 +14,8 @@ export async function executeInBrowser<C, R>(
 ): Promise<R> {
   return (
     await page.evaluateHandle(() => ({
-      getCanvas: (selector = '#canvas') => canvasMap.get(document.querySelector(selector)),
+      getCanvas: (selector = '#canvas') =>
+        canvasMap.get(document.querySelector(selector)),
       getObject: (key) => objectMap.get(key),
     }))
   ).evaluate(runInBrowser, context);
