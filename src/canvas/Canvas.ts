@@ -19,6 +19,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/typeAssertions';
+import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -64,7 +65,7 @@ type TSyntheticEventContext = {
   drag: DragEventData;
 };
 
-export class Canvas extends SelectableCanvas {
+export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -72,11 +73,6 @@ export class Canvas extends SelectableCanvas {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
@@ -117,7 +113,7 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(el: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (
@@ -249,8 +245,8 @@ export class Canvas extends SelectableCanvas {
     const shared = {
       e,
       isClick: false,
-      pointer: this.getPointer(e),
-      absolutePointer: this.getPointer(e, true),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
@@ -277,8 +273,8 @@ export class Canvas extends SelectableCanvas {
       this.fire('mouse:over', {
         e,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
@@ -516,7 +512,8 @@ export class Canvas extends SelectableCanvas {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      pointer: this.getPointer(e),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -934,8 +931,8 @@ export class Canvas extends SelectableCanvas {
         subTargets: targets,
         button,
         isClick,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
       };
     if (eventType === 'up') {
@@ -1002,6 +999,7 @@ export class Canvas extends SelectableCanvas {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
+    // this is an absolute pointer, the naming is wrong
     const pointer = this.getPointer(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
@@ -1018,6 +1016,7 @@ export class Canvas extends SelectableCanvas {
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
+          // this is an absolute pointer, the naming is wrong
           pointer,
         });
     }
@@ -1034,6 +1033,7 @@ export class Canvas extends SelectableCanvas {
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
+        // this is an absolute pointer, the naming is wrong
         pointer: pointer,
       });
     } else {
@@ -1319,8 +1319,8 @@ export class Canvas extends SelectableCanvas {
         target: oldTarget,
         nextTarget: target,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
       fireCanvas && this.fire(canvasIn, outOpt);
       oldTarget.fire(targetOut, outOpt);
@@ -1332,8 +1332,8 @@ export class Canvas extends SelectableCanvas {
         target,
         previousTarget: oldTarget,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
       fireCanvas && this.fire(canvasOut, inOpt);
       target.fire(targetIn, inOpt);
@@ -1485,11 +1485,13 @@ export class Canvas extends SelectableCanvas {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects
-          target = this.searchPossibleTargets(
-            prevActiveObjects,
-            this.getPointer(e, true)
-          );
+          const pointer = this.getPointer(e, true);
+          target =
+            // first search active objects for a target to remove
+            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            //  if not found, search under active selection for a target to add
+            // `prevActiveObjects` will be searched but we already know they will not be found
+            this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;

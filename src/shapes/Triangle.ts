@@ -1,10 +1,7 @@
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import type { TOptions } from '../typedefs';
 import type { ObjectEvents } from '../EventTypeDefs';
 
 export const triangleDefaultValues = {
@@ -13,7 +10,7 @@ export const triangleDefaultValues = {
 };
 
 export class Triangle<
-    Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >

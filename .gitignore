@@ -12,3 +12,4 @@ before_commit
 e2e/test-report/
 e2e/test-results/
 **/.cache/
+docs/
