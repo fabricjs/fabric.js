@@ -512,7 +512,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      // this is an absolute pointer, the name convention is wrong.
       pointer: this.getPointer(e, true),
       absolutePointer: this.getPointer(e),
     });
