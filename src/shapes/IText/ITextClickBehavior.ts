@@ -7,7 +7,7 @@ import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 
 // TODO: this code seems wrong.
@@ -18,7 +18,7 @@ function notALeftClick(e: MouseEvent) {
 }
 
 export abstract class ITextClickBehavior<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ITextEvents = ITextEvents
   >

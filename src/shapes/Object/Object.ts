@@ -18,6 +18,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   Abortable,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -51,7 +52,6 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import type { TProps } from './types';
 import { getEnv } from '../../env';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
@@ -98,7 +98,7 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -1491,18 +1491,28 @@ export class FabricObject<
    * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
-    const shouldCenterOrigin =
-      (this.originX !== CENTER || this.originY !== CENTER) &&
-      this.centeredRotation;
+    const { centeredRotation, originX, originY } = this;
 
-    if (shouldCenterOrigin) {
-      this._setOriginToCenter();
+    if (centeredRotation) {
+      const { x, y } = this.getRelativeCenterPoint();
+      this.originX = CENTER;
+      this.originY = CENTER;
+      this.left = x;
+      this.top = y;
     }
 
     this.set('angle', angle);
 
-    if (shouldCenterOrigin) {
-      this._resetOrigin();
+    if (centeredRotation) {
+      const { x, y } = this.translateToOriginPoint(
+        this.getRelativeCenterPoint(),
+        originX,
+        originY
+      );
+      this.left = x;
+      this.top = y;
+      this.originX = originX;
+      this.originY = originY;
     }
   }
 
@@ -1577,7 +1587,7 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends TProps<SerializedObjectProps>>(
+  static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
     options?: Abortable
   ) {

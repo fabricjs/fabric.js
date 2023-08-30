@@ -14,6 +14,7 @@ import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
@@ -29,11 +30,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
@@ -123,7 +120,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -1898,7 +1895,7 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>, S extends Text>(
+  static fromObject<T extends TOptions<SerializedTextProps>, S extends Text>(
     object: T
   ) {
     return this._fromObject<S>(

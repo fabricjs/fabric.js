@@ -1,14 +1,10 @@
 import { kRect } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { Abortable, TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
 
@@ -31,7 +27,7 @@ export interface RectProps extends FabricObjectProps, UniqueRectProps {}
 const RECT_PROPS = ['rx', 'ry'] as const;
 
 export class Rect<
-    Props extends TProps<RectProps> = Partial<RectProps>,
+    Props extends TOptions<RectProps> = Partial<RectProps>,
     SProps extends SerializedRectProps = SerializedRectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >

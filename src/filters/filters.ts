@@ -1,4 +1,5 @@
 export { BaseFilter } from './BaseFilter';
+export type { TBlendMode } from './BlendColor';
 export { BlendColor } from './BlendColor';
 export { BlendImage } from './BlendImage';
 export { Blur } from './Blur';
@@ -23,6 +24,7 @@ export { Invert } from './Invert';
 export { Noise } from './Noise';
 export { Pixelate } from './Pixelate';
 export { RemoveColor } from './RemoveColor';
+export type { TResizeType } from './Resize';
 export { Resize } from './Resize';
 export { Saturation } from './Saturation';
 export { Vibrance } from './Vibrance';

@@ -60,12 +60,17 @@
     fabricClass: 'Canvas',
   });
 
-  function paddingControlsRendering(canvas, callback) {
-    var rect = new fabric.Rect({
+  function paddingControlsRendering(group, canvas, callback) {
+    const rect = new fabric.Rect({
       width: 90, height: 90, strokeWidth: 2, padding: 8,
       fill: 'orange', stroke: 'green', top: 55, left: 55,
     });
-    canvas.add(rect);
+    const target = group ? new fabric.Group([rect]) : rect;
+    if (group) {
+      target.set({ scaleX: 2 });
+      rect.set({ scaleX: 0.5 });
+    }
+    canvas.add(target);
     canvas.setActiveObject(rect);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
@@ -73,7 +78,17 @@
 
   tests.push({
     test: 'Rect with padding',
-    code: paddingControlsRendering,
+    code: paddingControlsRendering.bind(null, false),
+    golden: 'controls2.png',
+    percentage: 0.02,
+    width: 200,
+    height: 200,
+    fabricClass: 'Canvas',
+  });
+
+  tests.push({
+    test: 'Rect with padding under group',
+    code: paddingControlsRendering.bind(null, true),
     golden: 'controls2.png',
     percentage: 0.02,
     width: 200,
@@ -321,11 +336,12 @@
     fabricClass: 'Canvas',
   });
 
-  function controlBoxes2(canvas, callback) {
+  function controlBoxes2(padding, canvas, callback) {
     canvas.loadFromJSON('{"version":"5.2.0","objects":[{"type":"Rect","version":"5.2.0","left":38,"top":201,"width":150,"height":150,"fill":"red","skewX":0.15,"skewY":36},{"type":"Rect","version":"5.2.0","left":20,"top":2,"width":150,"height":150,"fill":"#020aed","scaleX":1.24,"scaleY":0.81,"angle":35.95,"skewX":25.46},{"type":"Group","version":"5.2.0","left":152.65,"top":21,"width":320.4,"height":335.5,"scaleX":0.75,"skewY":24.57, "objects":[{"type":"Rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"green","angle":30,"skewX":14.71,"skewY":36, "flipX": true, "flipY": true},{"type":"Rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"yellow","angle":45,"skewX":14.71}]},{"type":"Group","version":"5.2.0","left":329.65,"top":65,"width":320.4,"height":335.5,"scaleX":1.29,"scaleY":1.29, "flipX": true,"objects":[{"type":"Rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"purple","angle":30,"skewX":14.71,"skewY":36},{"type":"Rect","version":"5.2.0","left":-29.85,"top":-167.75,"width":150,"height":150,"fill":"pink","angle":45,"skewX":14.71}]}]}')
       .then(function() {
         canvas.renderAll();
-        canvas.getObjects().forEach(function(object) {
+        canvas.getObjects().forEach(function (object) {
+          object.padding = padding;
           object.borderScaleFactor = 3;
           object.transparentCorners = false;
           object._renderControls(canvas.contextContainer, {
@@ -349,8 +365,18 @@
 
   tests.push({
     test: 'controlboxes with skewY and flipX',
-    code: controlBoxes2,
+    code: controlBoxes2.bind(null, 0),
     golden: 'controls13.png',
+    percentage: 0.002,
+    width: 700,
+    height: 600,
+    fabricClass: 'Canvas',
+  });
+
+    tests.push({
+    test: 'controlboxes with skewY and flipX and padding',
+    code: controlBoxes2.bind(null, 10),
+    golden: 'controls14.png',
     percentage: 0.002,
     width: 700,
     height: 600,

@@ -23,13 +23,13 @@ type TOCoord = Point & {
   touchCorner: TCornerPoint;
 };
 
-type TControlSet = Record<string, Control>;
+export type TControlSet = Record<string, Control>;
 
-type TBorderRenderingStyleOverride = Partial<
+export type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
 
-type TStyleOverride = ControlRenderingStyleOverride &
+export type TStyleOverride = ControlRenderingStyleOverride &
   TBorderRenderingStyleOverride &
   Partial<
     Pick<InteractiveFabricObject, 'hasBorders' | 'hasControls'> & {
@@ -352,7 +352,6 @@ export class InteractiveFabricObject<
   drawSelectionBackground(ctx: CanvasRenderingContext2D): void {
     if (
       !this.selectionBackgroundColor ||
-      (this.canvas && !this.canvas.interactive) ||
       (this.canvas && (this.canvas._activeObject as unknown as this) !== this)
     ) {
       return;
@@ -463,7 +462,10 @@ export class InteractiveFabricObject<
               // and is the qrDecompose of a matrix that takes in account zoom too
               new Point(options.scaleX, options.scaleY)
         ).scalarMultiply(this.strokeWidth);
-      size = bbox.add(stroke).scalarAdd(this.borderScaleFactor);
+      size = bbox
+        .add(stroke)
+        .scalarAdd(this.borderScaleFactor)
+        .scalarAdd(this.padding * 2);
     } else {
       size = this._calculateCurrentDimensions().scalarAdd(
         this.borderScaleFactor
