@@ -1370,13 +1370,13 @@ export class FabricObject<
     viewportTransform,
     format,
     multiplier,
-    canvasElement,
     canvasProvider = () =>
       new StaticCanvas(undefined, {
         enableRetinaScaling: false,
         renderOnAddRemove: false,
         skipOffscreen: false,
       }),
+    ctx,
     ...options
   }: ObjectToCanvasElementOptions = {}) {
     const origParams = saveObjectTransform(this),
@@ -1439,7 +1439,7 @@ export class FabricObject<
     const canvasEl = canvas.toCanvasElement(
       (multiplier || 1) * retinaScaling,
       options,
-      canvasElement
+      ctx
     );
     this.set('canvas', originalCanvas);
     this.shadow = originalShadow;

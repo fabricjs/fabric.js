@@ -100,9 +100,11 @@ export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
   T extends BaseFabricObject = BaseFabricObject
-> = TBBox & {
-  filter: (object: T) => boolean;
-};
+> = Partial<
+  TBBox & {
+    filter: (object: T) => boolean;
+  }
+>;
 
 type ToDataUrlExtraOptions = { quality: number };
 
@@ -126,14 +128,17 @@ type ObjectToCanvasElementExtraOptions = ToCanvasElementExtraOptions & {
    */
   viewportTransform: boolean;
   /**
-   * The element being to used to draw the object onto.
+   * The context to draw the object onto.
+   * Supports passing a pdf/svg ctx in node.
+   * @see https://github.com/Automattic/node-canvas#createcanvas
    */
-  canvasElement: HTMLCanvasElement;
 
   /**
    * Create the fabric canvas instance that will generate the output
    */
   canvasProvider: () => StaticCanvas;
+
+  ctx: CanvasRenderingContext2D;
 };
 
 export type ObjectToCanvasElementOptions = Partial<
@@ -144,11 +149,8 @@ export type ObjectToDataUrlOptions = ObjectToCanvasElementOptions &
   Partial<ToDataUrlExtraOptions>;
 
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
-  Partial<
-    TToCanvasElementOptions<T> &
-      ToCanvasElementExtraOptions &
-      ToDataUrlExtraOptions
-  >;
+  TToCanvasElementOptions<T> &
+    Partial<ToCanvasElementExtraOptions & ToDataUrlExtraOptions>;
 
 export type Abortable = {
   /**

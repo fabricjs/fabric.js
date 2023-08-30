@@ -1411,11 +1411,12 @@ export class StaticCanvas<
    * @param {Number} [options.width] Cropping width.
    * @param {Number} [options.height] Cropping height.
    * @param {(object: fabric.Object) => boolean} [options.filter] Function to filter objects.
+   * @param {CanvasRenderingContext2D} [ctx] Supports passing a pdf/svg ctx to in node, see https://github.com/Automattic/node-canvas#createcanvas.
    */
   toCanvasElement(
     multiplier = 1,
-    { width, height, left, top, filter }: Partial<TToCanvasElementOptions> = {},
-    canvasEl = createCanvasElement()
+    { width, height, left, top, filter }: TToCanvasElementOptions = {},
+    ctx = createCanvasElement().getContext('2d')!
   ): HTMLCanvasElement {
     const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
@@ -1431,20 +1432,20 @@ export class StaticCanvas<
       objectsToRender = filter
         ? this._objects.filter((obj) => filter(obj))
         : this._objects;
-    canvasEl.width = scaledWidth;
-    canvasEl.height = scaledHeight;
+    ctx.canvas.width = scaledWidth;
+    ctx.canvas.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
     this.calcViewportBoundaries();
-    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
+    this.renderCanvas(ctx, objectsToRender);
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
     this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
-    return canvasEl;
+    return ctx.canvas;
   }
 
   /**
