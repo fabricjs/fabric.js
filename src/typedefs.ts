@@ -122,3 +122,5 @@ export type Abortable = {
    */
   signal?: AbortSignal;
 };
+
+export type TOptions<T> = Partial<T> & Record<string, any>;

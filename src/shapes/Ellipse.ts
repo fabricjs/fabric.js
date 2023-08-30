@@ -1,14 +1,10 @@
 import { twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { Abortable, TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
 
@@ -31,7 +27,7 @@ export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
-    Props extends TProps<EllipseProps> = Partial<EllipseProps>,
+    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -120,16 +116,11 @@ export class Ellipse<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG() {
+  _toSVG(): string[] {
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      'cx="0" cy="0" ',
-      'rx="',
-      this.rx,
-      '" ry="',
-      this.ry,
-      '" />\n',
+      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
     ];
   }
 

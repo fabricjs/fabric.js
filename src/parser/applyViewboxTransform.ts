@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { svgNS } from './constants';
 import {
   parsePreserveAspectRatioAttribute,
@@ -6,15 +5,26 @@ import {
 } from '../util/misc/svgParsing';
 import { svgViewBoxElementsRegEx, reViewBoxAttrValue } from './constants';
 import { NONE } from '../constants';
+
+export type ParsedViewboxTransform = Partial<{
+  width: number;
+  height: number;
+  minX: number;
+  minY: number;
+  viewBoxWidth: number;
+  viewBoxHeight: number;
+}>;
+
 /**
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
-
-export function applyViewboxTransform(element: HTMLElement) {
+export function applyViewboxTransform(
+  element: Element
+): ParsedViewboxTransform {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
   }
-  let viewBoxAttr = element.getAttribute('viewBox');
+  const viewBoxAttr: string | null = element.getAttribute('viewBox');
   let scaleX = 1;
   let scaleY = 1;
   let minX = 0;
@@ -25,19 +35,14 @@ export function applyViewboxTransform(element: HTMLElement) {
   const heightAttr = element.getAttribute('height');
   const x = element.getAttribute('x') || 0;
   const y = element.getAttribute('y') || 0;
-  const missingViewBox =
-    !viewBoxAttr || !(viewBoxAttr = viewBoxAttr.match(reViewBoxAttrValue));
+  const goodViewbox = viewBoxAttr && reViewBoxAttrValue.test(viewBoxAttr);
+  const missingViewBox = !goodViewbox;
   const missingDimAttr =
     !widthAttr || !heightAttr || widthAttr === '100%' || heightAttr === '100%';
-  const toBeParsed = missingViewBox && missingDimAttr;
-  const parsedDim: any = {};
+
   let translateMatrix = '';
   let widthDiff = 0;
   let heightDiff = 0;
-
-  parsedDim.width = 0;
-  parsedDim.height = 0;
-  parsedDim.toBeParsed = toBeParsed;
 
   if (missingViewBox) {
     if (
@@ -46,7 +51,7 @@ export function applyViewboxTransform(element: HTMLElement) {
       element.parentNode.nodeName !== '#document'
     ) {
       translateMatrix =
-        ' translate(' + parseUnit(x) + ' ' + parseUnit(y) + ') ';
+        ' translate(' + parseUnit(x || '0') + ' ' + parseUnit(y || '0') + ') ';
       matrix = (element.getAttribute('transform') || '') + translateMatrix;
       element.setAttribute('transform', matrix);
       element.removeAttribute('x');
@@ -54,20 +59,30 @@ export function applyViewboxTransform(element: HTMLElement) {
     }
   }
 
-  if (toBeParsed) {
-    return parsedDim;
+  if (missingViewBox && missingDimAttr) {
+    return {
+      width: 0,
+      height: 0,
+    };
   }
 
+  const parsedDim: ParsedViewboxTransform = {
+    width: 0,
+    height: 0,
+  };
+
   if (missingViewBox) {
-    parsedDim.width = parseUnit(widthAttr);
-    parsedDim.height = parseUnit(heightAttr);
+    parsedDim.width = parseUnit(widthAttr!);
+    parsedDim.height = parseUnit(heightAttr!);
     // set a transform for elements that have x y and are inner(only) SVGs
     return parsedDim;
   }
-  minX = -parseFloat(viewBoxAttr[1]);
-  minY = -parseFloat(viewBoxAttr[2]);
-  const viewBoxWidth = parseFloat(viewBoxAttr[3]);
-  const viewBoxHeight = parseFloat(viewBoxAttr[4]);
+
+  const pasedViewBox = viewBoxAttr.match(reViewBoxAttrValue)!;
+  minX = -parseFloat(pasedViewBox[1]);
+  minY = -parseFloat(pasedViewBox[2]);
+  const viewBoxWidth = parseFloat(pasedViewBox[3]);
+  const viewBoxHeight = parseFloat(pasedViewBox[4]);
   parsedDim.minX = minX;
   parsedDim.minY = minY;
   parsedDim.viewBoxWidth = viewBoxWidth;
@@ -122,8 +137,9 @@ export function applyViewboxTransform(element: HTMLElement) {
   ) {
     return parsedDim;
   }
-  if ((x || y) && element.parentNode.nodeName !== '#document') {
-    translateMatrix = ' translate(' + parseUnit(x) + ' ' + parseUnit(y) + ') ';
+  if ((x || y) && element.parentNode!.nodeName !== '#document') {
+    translateMatrix =
+      ' translate(' + parseUnit(x || '0') + ' ' + parseUnit(y || '0') + ') ';
   }
 
   matrix =

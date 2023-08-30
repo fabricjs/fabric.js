@@ -19,6 +19,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/typeAssertions';
+import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -64,7 +65,7 @@ type TSyntheticEventContext = {
   drag: DragEventData;
 };
 
-export class Canvas extends SelectableCanvas {
+export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -72,11 +73,6 @@ export class Canvas extends SelectableCanvas {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
@@ -117,7 +113,7 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(el: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (
@@ -1485,11 +1481,13 @@ export class Canvas extends SelectableCanvas {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects
-          target = this.searchPossibleTargets(
-            prevActiveObjects,
-            this.getPointer(e, true)
-          );
+          const pointer = this.getPointer(e, true);
+          target =
+            // first search active objects for a target to remove
+            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            //  if not found, search under active selection for a target to add
+            // `prevActiveObjects` will be searched but we already know they will not be found
+            this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;

@@ -3,8 +3,13 @@ import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TCrossOrigin, TSize } from '../typedefs';
-import type { Abortable } from '../typedefs';
+import type {
+  TClassProperties,
+  TCrossOrigin,
+  TSize,
+  Abortable,
+  TOptions,
+} from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
@@ -17,11 +22,7 @@ import {
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
@@ -74,7 +75,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 export class Image<
-    Props extends TProps<ImageProps> = Partial<ImageProps>,
+    Props extends TOptions<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -168,9 +169,9 @@ export class Image<
   declare filters: BaseFilter[];
   declare resizeFilter: Resize;
 
-  protected declare _element: ImageSource;
-  protected declare _filteredEl?: HTMLCanvasElement;
-  protected declare _originalElement: ImageSource;
+  declare _element: ImageSource;
+  declare _filteredEl?: HTMLCanvasElement;
+  declare _originalElement: ImageSource;
 
   static type = 'Image';
 
@@ -597,13 +598,11 @@ export class Image<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   drawCacheOnCanvas(
-    this: TCachedFabricObject<Props, SProps, EventSpec> & {
-      imageSmoothing: boolean;
-    },
+    this: TCachedFabricObject<Image>,
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-ignore ( expect-error) this line is not error free.
+    // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 
@@ -789,7 +788,7 @@ export class Image<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Image>}
    */
-  static fromObject<T extends TProps<SerializedImageProps>>(
+  static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
     options: Abortable = {}
   ) {
@@ -818,7 +817,7 @@ export class Image<
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<Image>}
    */
-  static fromURL<T extends TProps<ImageProps>>(
+  static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
     imageOptions: T

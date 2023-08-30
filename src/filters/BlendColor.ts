@@ -5,7 +5,7 @@ import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { blendColorFragmentSource } from './shaders/blendColor';
 
-type TBlendMode =
+export type TBlendMode =
   | 'multiply'
   | 'add'
   | 'difference'

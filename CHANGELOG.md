@@ -3,12 +3,36 @@
 ## [next]
 
 - fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
+- ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
+- fix(utils) Fixes the code for the anchor point in point controls for polygons [#9178](https://github.com/fabricjs/fabric.js/pull/9178)
+- CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)
+
+## [6.0.0-beta12]
+
+- fix(Object): border rendering with padding under group [#9161](https://github.com/fabricjs/fabric.js/pull/9161)
+- fix(MultiSelection): add target from behind active selection [#8744](https://github.com/fabricjs/fabric.js/issues/8744)
+- test(): fix snapshots by removing version [#9164](https://github.com/fabricjs/fabric.js/pull/9164)
+
+## [6.0.0-beta11]
+
+- patch(): Avoid unwanted mutation to passed objects array to Group constructor [#9151](https://github.com/fabricjs/fabric.js/pull/9151)
+- patch(): ActiveSelection initialization + types [#9143](https://github.com/fabricjs/fabric.js/pull/9143)
+- chore(TS): BREAKING remove canvas.interactive, added typings for canvas options [#9140](https://github.com/fabricjs/fabric.js/pull/9140)
+- chore(TS): BREAKING PREVIOUS BETA mv + rename `TProps` => `TOptions` [#9139](https://github.com/fabricjs/fabric.js/pull/9139)
+- test(playwright): Use embedded eval from playwright [#9133](https://github.com/fabricjs/fabric.js/pull/9133)
+- chore(TS): Fix event types and .once this binding [#9119](https://github.com/fabricjs/fabric.js/pull/9130)
+- docs(): rm `canvas2pdf` [#9135](https://github.com/fabricjs/fabric.js/pull/9135)
+- chore(TS): export types [#9129](https://github.com/fabricjs/fabric.js/pull/9129)
+- ci(e2e): support relative imports [#9108](https://github.com/fabricjs/fabric.js/pull/9108)
+- chore(TS): complete type check [#9119](https://github.com/fabricjs/fabric.js/pull/9119)
+- chore(TS): Add type-checking to files excluded with ts-nocheck [#9097](https://github.com/fabricjs/fabric.js/pull/9097)
+- chore(TS): Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
+- docs(): revise test section [#9114](https://github.com/fabricjs/fabric.js/pull/9114)
 - fix(): #8344 stroke projection [#8374](https://github.com/fabricjs/fabric.js/pull/8374)
 - fix(Filters) Removing type from the options passed in the constructor [#9089](https://github.com/fabricjs/fabric.js/pull/9089)
 - feat(InteractiveObject): add `getActiveControl()` to expose `__corner` [#9102](https://github.com/fabricjs/fabric.js/pull/9102)
 - ci(sandbox): bump next.js [#9100](https://github.com/fabricjs/fabric.js/pull/9100)
 - test(playwright): add snapshots, refactor utils, coverage [#9078](https://github.com/fabricjs/fabric.js/pull/9078)
-- chore(TS) Add type-checking to files excluded with ts-nocheck ( Parser mostly ) [#9085](https://github.com/fabricjs/fabric.js/pull/9085)
 - test(Text): Add some tests for text in Jest [#9083](https://github.com/fabricjs/fabric.js/pull/9083)
 - ci(): Install system deps only when necessary [#9086](https://github.com/fabricjs/fabric.js/pull/9086)
 - fix(util, Path): path distance measurement fix for M cmd [#9076](https://github.com/fabricjs/fabric.js/pull/9076)

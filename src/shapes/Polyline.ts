@@ -4,7 +4,7 @@ import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
 import type { XY } from '../Point';
 import { Point } from '../Point';
-import type { Abortable, TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
@@ -13,11 +13,7 @@ import type { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/t
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
@@ -32,7 +28,7 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
 }
 
 export class Polyline<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -389,7 +385,7 @@ export class Polyline<
         this.ATTRIBUTE_NAMES,
         cssRules
       );
-    return new this(points || [], {
+    return new this(points, {
       ...parsedAttributes,
       ...options,
     });
@@ -404,7 +400,7 @@ export class Polyline<
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
-  static fromObject<T extends TProps<SerializedPolylineProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPolylineProps>>(object: T) {
     return this._fromObject<Polyline>(object, {
       extraParam: 'points',
     });

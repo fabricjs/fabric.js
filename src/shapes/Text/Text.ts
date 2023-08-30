@@ -14,6 +14,7 @@ import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
@@ -29,11 +30,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
@@ -63,9 +60,16 @@ function getMeasuringContext() {
   return measuringContext;
 }
 
-type TPathSide = 'left' | 'right';
+export type TPathSide = 'left' | 'right';
 
-type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+export type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+
+export type TextLinesInfo = {
+  lines: string[];
+  graphemeLines: string[][];
+  graphemeText: string[];
+  _unwrappedLines: string[][];
+};
 
 /**
  * Measure and return the info of a single grapheme.
@@ -116,7 +120,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class Text<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -360,8 +364,11 @@ export class Text<
 
   /**
    * contains characters bounding boxes
+   * This variable is considered to be protected.
+   * But for how mixins are implemented right now, we can't leave it private
+   * @protected
    */
-  protected __charBounds: GraphemeBBox[][] = [];
+  __charBounds: GraphemeBBox[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -436,7 +443,7 @@ export class Text<
    * @private
    * Divides text into lines of text and lines of graphemes.
    */
-  _splitText() {
+  _splitText(): TextLinesInfo {
     const newLines = this._splitTextIntoLines(this.text);
     this.textLines = newLines.lines;
     this._textLines = newLines.graphemeLines;
@@ -1705,7 +1712,7 @@ export class Text<
    * @param {String} text text to split
    * @returns  Lines in the text
    */
-  _splitTextIntoLines(text: string) {
+  _splitTextIntoLines(text: string): TextLinesInfo {
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
@@ -1733,7 +1740,7 @@ export class Text<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      ...super.toObject([...additionalProps, ...propertiesToInclude] as K[]),
       styles: stylesToArray(this.styles, this.text),
       ...(this.path ? { path: this.path.toObject() } : {}),
     };
@@ -1888,7 +1895,7 @@ export class Text<
    * @param {Object} object plain js Object to create an instance from
    * @returns {Promise<Text>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>, S extends Text>(
+  static fromObject<T extends TOptions<SerializedTextProps>, S extends Text>(
     object: T
   ) {
     return this._fromObject<S>(
