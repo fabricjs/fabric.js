@@ -513,6 +513,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       subTargets: targets,
       dragSource: this._dragSource,
       pointer: this.getHTMLPointFromEvent(e),
+      absolutePointer: this.getCanvasPointFromEvent(e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -1014,6 +1015,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
+          // this is an absolute pointer, the naming is wrong
           pointer,
         });
     }
@@ -1030,6 +1032,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
+        // this is an absolute pointer, the naming is wrong
         pointer,
       });
     } else {

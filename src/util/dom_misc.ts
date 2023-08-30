@@ -5,9 +5,11 @@
  */
 export function getScrollLeftTop(element: HTMLElement | null) {
   const doc = element && getDocumentFromElement(element);
+  let left = 0,
+    top = 0;
 
   if (!element || !doc) {
-    return { left: 0, top: 0 };
+    return { left, top };
   }
 
   const docElement = doc.documentElement,
