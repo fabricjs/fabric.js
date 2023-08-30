@@ -481,7 +481,8 @@ function assertDragEventStream(name, a, b) {
                         dragSource: iText,
                         dropTarget: iText,
                         didDrop: true,
-                        pointer: new fabric.Point(110, 15),
+                        pointer: new fabric.Point(100, 15),
+                        absolutePointer: new fabric.Point(110, 15),
                     },
                     {
                         e: drop,
