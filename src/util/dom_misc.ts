@@ -4,17 +4,19 @@
  * @return {Object} Object with left/top values
  */
 export function getScrollLeftTop(element: HTMLElement | null) {
-  let left = 0,
-    top = 0;
-  if (!element) {
-    return { left, top };
+  const doc = element && getDocumentFromElement(element);
+
+  if (!element || !doc) {
+    return { left: 0, top: 0 };
   }
-  const doc = getDocumentFromElement(element);
+
   const docElement = doc.documentElement,
     body = doc.body || {
       scrollLeft: 0,
       scrollTop: 0,
     };
+  let left = 0,
+    top = 0;
   // While loop checks (and then sets element to) .parentNode OR .host
   //  to account for ShadowDOM. We still want to traverse up out of ShadowDOM,
   //  but the .parentNode of a root ShadowDOM node will always be null, instead
