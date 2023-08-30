@@ -1,33 +1,24 @@
-import { fabric } from '../../../HEADER';
 import { noop } from '../../constants';
-import { TCrossOrigin } from '../../typedefs';
-import { TObject } from '../../__types__';
-import { camelize, capitalize } from '../lang_string';
+import type { Pattern } from '../../Pattern';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
+import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
 import { createImage } from './dom';
+import { classRegistry } from '../../ClassRegistry';
+import type { BaseFilter } from '../../filters/BaseFilter';
+import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 
-/**
- * Returns klass "Class" object of given namespace
- * @memberOf fabric.util
- * @param {String} type Type of object (eg. 'circle')
- * @param {object} namespace Namespace to get klass "Class" object from
- * @return {Object} klass "Class"
- */
-export const getKlass = (type: string, namespace = fabric): any =>
-  namespace[capitalize(camelize(type), true)];
-
-type LoadImageOptions = {
-  signal?: AbortSignal;
+export type LoadImageOptions = Abortable & {
+  /**
+   * cors value for the image loading, default to anonymous
+   */
   crossOrigin?: TCrossOrigin;
 };
 
 /**
  * Loads image element from given url and resolve it, or catch.
- * @memberOf fabric.util
  * @param {String} url URL representing an image
- * @param {Object} [options] image loading options
- * @param {string} [options.crossOrigin] cors value for the image loading, default to anonymous
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @param {Promise<fabric.Image>} img the loaded image.
+ * @param {LoadImageOptions} [options] image loading options
+ * @returns {Promise<HTMLImageElement>} the loaded image.
  */
 export const loadImage = (
   url: string,
@@ -64,41 +55,45 @@ export const loadImage = (
     img.src = url;
   });
 
-type EnlivenObjectOptions = {
-  signal?: AbortSignal;
-  reviver?: (arg: any, arg2: any) => void;
-  namespace?: any;
+export type EnlivenObjectOptions = Abortable & {
+  /**
+   * Method for further parsing of object elements,
+   * called after each fabric object created.
+   */
+  reviver?: <T extends BaseFabricObject | FabricObject | BaseFilter>(
+    serializedObj: Record<string, any>,
+    instance: T
+  ) => void;
 };
 
 /**
  * Creates corresponding fabric instances from their object representations
- * @static
- * @memberOf fabric.util
  * @param {Object[]} objects Objects to enliven
- * @param {object} [options]
- * @param {object} [options.namespace] Namespace to get klass "Class" object from
- * @param {(serializedObj: object, instance: fabric.Object) => any} [options.reviver] Method for further parsing of object elements,
+ * @param {EnlivenObjectOptions} [options]
+ * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
  * called after each fabric object created.
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<fabric.Object[]>}
+ * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = (
+export const enlivenObjects = <
+  T extends BaseFabricObject | FabricObject | BaseFilter
+>(
   objects: any[],
-  { signal, reviver = noop, namespace = fabric }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {}
 ) =>
-  new Promise<TObject[]>((resolve, reject) => {
-    const instances: TObject[] = [];
+  new Promise<T[]>((resolve, reject) => {
+    const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
       objects.map((obj) =>
-        getKlass(obj.type, namespace)
+        classRegistry
+          .getClass(obj.type)
           .fromObject(obj, {
             signal,
             reviver,
-            namespace,
           })
-          .then((fabricInstance: TObject) => {
-            reviver(obj, fabricInstance);
+          .then((fabricInstance: T) => {
+            reviver<T>(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
           })
@@ -107,8 +102,9 @@ export const enlivenObjects = (
       .then(resolve)
       .catch((error) => {
         // cleanup
-        instances.forEach(function (instance) {
-          instance.dispose && instance.dispose();
+        instances.forEach((instance) => {
+          (instance as FabricObject).dispose &&
+            (instance as FabricObject).dispose();
         });
         reject(error);
       })
@@ -119,19 +115,19 @@ export const enlivenObjects = (
 
 /**
  * Creates corresponding fabric instances residing in an object, e.g. `clipPath`
- * @static
- * @memberOf fabric.util
  * @param {Object} object with properties to enlive ( fill, stroke, clipPath, path )
  * @param {object} [options]
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @returns {Promise<{[key:string]:fabric.Object|fabric.Pattern|fabric.Gradient|null}>} the input object with enlived values
+ * @returns {Promise<Record<string, FabricObject | TFiller | null>>} the input object with enlived values
  */
-export const enlivenObjectEnlivables = (
+export const enlivenObjectEnlivables = <
+  R = Record<string, FabricObject | TFiller | null>
+>(
   serializedObject: any,
-  { signal }: { signal?: AbortSignal } = {}
+  { signal }: Abortable = {}
 ) =>
-  new Promise((resolve, reject) => {
-    const instances: any[] = [];
+  new Promise<R>((resolve, reject) => {
+    const instances: (FabricObject | TFiller)[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
     const promises = Object.values(serializedObject).map((value: any) => {
@@ -140,43 +136,46 @@ export const enlivenObjectEnlivables = (
       }
       // gradient
       if (value.colorStops) {
-        return new fabric.Gradient(value);
+        return new (classRegistry.getClass('gradient'))(value);
       }
       // clipPath
       if (value.type) {
-        return enlivenObjects([value], { signal }).then(([enlived]) => {
-          instances.push(enlived);
-          return enlived;
-        });
+        return enlivenObjects<FabricObject>([value], { signal }).then(
+          ([enlived]) => {
+            instances.push(enlived);
+            return enlived;
+          }
+        );
       }
       // pattern
       if (value.source) {
-        return fabric.Pattern.fromObject(value, { signal }).then(
-          (pattern: any) => {
+        return classRegistry
+          .getClass('pattern')
+          .fromObject(value, { signal })
+          .then((pattern: Pattern) => {
             instances.push(pattern);
             return pattern;
-          }
-        );
+          });
       }
       return value;
     });
     const keys = Object.keys(serializedObject);
     Promise.all(promises)
       .then((enlived) => {
-        return enlived.reduce(function (acc, instance, index) {
+        return enlived.reduce((acc, instance, index) => {
           acc[keys[index]] = instance;
           return acc;
         }, {});
       })
       .then(resolve)
-      .catch(function (error) {
+      .catch((error) => {
         // cleanup
-        instances.forEach((instance) => {
+        instances.forEach((instance: any) => {
           instance.dispose && instance.dispose();
         });
         reject(error);
       })
-      .finally(function () {
+      .finally(() => {
         signal && signal.removeEventListener('abort', reject);
       });
   });

@@ -1,10 +1,16 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: true,
+    tsconfigRootDir: './',
+  },
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    // this is too noisy for now
+    // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
   ],
   overrides: [
@@ -13,6 +19,9 @@ module.exports = {
     },
   ],
   rules: {
+    '@typescript-eslint/consistent-type-exports': 'error',
+    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/ban-types': 1,
     '@typescript-eslint/ban-ts-comment': 1,
     'no-restricted-globals': [
       'error',

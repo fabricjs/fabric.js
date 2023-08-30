@@ -1,5 +1,7 @@
 //@ts-nocheck
-import { Point } from '../point.class';
+import { Point } from '../Point';
+import { FabricObject } from '../shapes/Object/FabricObject';
+import { uid } from '../util/internals/uid';
 
 (function (global) {
   /** ERASER_START */
@@ -105,7 +107,7 @@ import { Point } from '../point.class';
      */
     _createEraserSVGMarkup: function (reviver) {
       if (this.eraser) {
-        this.eraser.clipPathId = 'MASK_' + fabric.Object.__uid++;
+        this.eraser.clipPathId = 'MASK_' + uid();
         return [
           '<mask id="',
           this.eraser.clipPathId,
@@ -292,7 +294,7 @@ import { Point } from '../point.class';
       options = fabric.util.object.clone(object, true);
     delete options.objects;
     return Promise.all([
-      fabric.util.enlivenObjects(objects),
+      fabric.util.enlivenObjects<FabricObject>(objects),
       fabric.util.enlivenObjectEnlivables(options),
     ]).then(function (enlivedProps) {
       return new fabric.Eraser(

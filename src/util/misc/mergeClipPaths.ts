@@ -1,7 +1,6 @@
-import { fabric } from '../../../HEADER';
-import { TObject } from '../../__types__';
+import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { sendObjectToPlane } from './planeChange';
-
+import { Group } from '../../shapes/Group';
 /**
  * Merges 2 clip paths into one visually equal clip path
  *
@@ -21,7 +20,7 @@ import { sendObjectToPlane } from './planeChange';
  * @param {fabric.Object} c2
  * @returns {fabric.Object} merged clip path
  */
-export const mergeClipPaths = (c1: TObject, c2: TObject) => {
+export const mergeClipPaths = (c1: FabricObject, c2: FabricObject) => {
   let a = c1,
     b = c2;
   if (a.inverted && !b.inverted) {
@@ -37,5 +36,5 @@ export const mergeClipPaths = (c1: TObject, c2: TObject) => {
     //  case (1)
     a.inverted = b.inverted = false;
   }
-  return new fabric.Group([a], { clipPath: b, inverted });
+  return new Group([a], { clipPath: b, inverted });
 };

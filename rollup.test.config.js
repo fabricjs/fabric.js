@@ -1,6 +1,8 @@
 import commonjs from '@rollup/plugin-commonjs';
 import ts from 'rollup-plugin-ts';
 
+// https://github.com/artberri/rollup-plugin-istanbul
+
 // https://rollupjs.org/guide/en/#configuration-files
 export default {
   external: ['qunit', 'fabric'],

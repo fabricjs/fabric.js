@@ -1,1 +1,2 @@
-export * from './gradient.class';
+export * from './Gradient';
+export * from './typedefs';

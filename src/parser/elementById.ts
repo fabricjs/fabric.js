@@ -1,23 +1,18 @@
-//@ts-nocheck
-
 /**
  * @private
+ * TODO: verify if this is still needed
  * to support IE8 missing getElementById on SVGdocument and on node xmlDOM
  */
-export function elementById(doc, id) {
-  let el;
-  doc.getElementById && (el = doc.getElementById(id));
-  if (el) {
-    return el;
+export function elementById(doc: Document, id: string): Element | null {
+  if (doc.getElementById) {
+    return doc.getElementById(id);
   }
-  let node,
-    i,
-    len,
-    nodelist = doc.getElementsByTagName('*');
-  for (i = 0, len = nodelist.length; i < len; i++) {
-    node = nodelist[i];
+  const nodelist = doc.getElementsByTagName('*');
+  for (let i = 0, len = nodelist.length; i < len; i++) {
+    const node = nodelist[i];
     if (id === node.getAttribute('id')) {
       return node;
     }
   }
+  return null;
 }

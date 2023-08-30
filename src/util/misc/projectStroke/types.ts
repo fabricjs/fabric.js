@@ -1,6 +1,5 @@
-import { Point } from '../../../point.class';
-import { TDegree } from '../../../typedefs';
-import { getBisector } from '../vectors';
+import type { Point } from '../../../Point';
+import type { TDegree, TRadian } from '../../../typedefs';
 
 export type TProjectStrokeOnPointsOptions = {
   strokeWidth: number;
@@ -20,5 +19,6 @@ export type TProjectStrokeOnPointsOptions = {
 export type TProjection = {
   projectedPoint: Point;
   originPoint: Point;
-  bisector?: ReturnType<typeof getBisector>;
+  angle?: TRadian;
+  bisector?: Point;
 };

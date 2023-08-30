@@ -11,7 +11,6 @@
     assert.ok(point instanceof fabric.Point);
     assert.ok(point.constructor === fabric.Point);
     assert.ok(typeof point.constructor === 'function');
-    assert.equal(point.type, 'point');
     assert.strictEqual(point.x, 0, 'constructor assign x value');
     assert.strictEqual(point.y, 0, 'constructor assign y value');
 

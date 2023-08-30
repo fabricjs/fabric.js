@@ -246,8 +246,7 @@
   QUnit.test('setCoords', function(assert) {
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
-    assert.equal(cObj.setCoords(), cObj, 'chainable');
-
+    cObj.setCoords();
     assert.equal(cObj.oCoords.tl.x, 150);
     assert.equal(cObj.oCoords.tl.y, 150);
     assert.equal(cObj.oCoords.tr.x, 250);
@@ -470,8 +469,8 @@
 
   QUnit.test('scaleToWidth', function(assert) {
     var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToWidth === 'function',  'scaleToWidth should exist');
-    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
+    assert.ok(typeof cObj.scaleToWidth === 'function', 'scaleToWidth should exist');
+    cObj.scaleToWidth(100);
     assert.equal(cObj.getScaledWidth(), 100);
     assert.equal(cObj.get('scaleX'), 100 / 560);
   });
@@ -481,10 +480,10 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    assert.equal(cObj.scaleToWidth(100, true), cObj, 'chainable');
+    cObj.scaleToWidth(100, true);
     assert.equal(cObj.getScaledWidth(), 100, 'is not influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560);
-    assert.equal(cObj.scaleToWidth(100), cObj, 'chainable');
+    cObj.scaleToWidth(100);
     assert.equal(cObj.getScaledWidth(), 50, 'is influenced by zoom - width');
     assert.equal(cObj.get('scaleX'), 100 / 560 / 2);
   });
@@ -493,7 +492,7 @@
   QUnit.test('scaleToHeight', function(assert) {
     var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
     assert.ok(typeof cObj.scaleToHeight === 'function', 'scaleToHeight should exist');
-    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
+    cObj.scaleToHeight(100);
     assert.equal(cObj.getScaledHeight(), 100);
     assert.equal(cObj.get('scaleY'), 100 / 560);
   });
@@ -503,10 +502,10 @@
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    assert.equal(cObj.scaleToHeight(100, true), cObj, 'chainable');
+    cObj.scaleToHeight(100, true);
     assert.equal(cObj.getScaledHeight(), 100, 'is not influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560);
-    assert.equal(cObj.scaleToHeight(100), cObj, 'chainable');
+    cObj.scaleToHeight(100);
     assert.equal(cObj.getScaledHeight(), 50, 'is influenced by zoom - height');
     assert.equal(cObj.get('scaleY'), 100 / 560 / 2);
   });
@@ -566,14 +565,16 @@
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 0);
 
-    cObj.set('height', 167).setCoords();
+    cObj.set('height', 167);
+    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 167);
 
-    cObj.scale(2).setCoords();
+    cObj.scale(2)
+    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
@@ -593,21 +594,24 @@
     assert.equal(boundingRect.width.toFixed(2), 1);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('width', 123).setCoords();
+    cObj.set('width', 123)
+    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('height', 167).setCoords();
+    cObj.set('height', 167)
+    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 168);
 
-    cObj.scale(2).setCoords();
+    cObj.scale(2)
+    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
