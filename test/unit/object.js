@@ -305,14 +305,6 @@
     assert.ok(typeof cObj.render === 'function');
   });
 
-  QUnit.test('rotate', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.rotate === 'function');
-    assert.equal(cObj.get('angle'), 0);
-    cObj.rotate(45);
-    assert.equal(cObj.get('angle'), 45);
-  });
-
   QUnit.test('scale', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.scale === 'function');
@@ -338,7 +330,7 @@
     assert.equal(cObj.get('angle'), 45);
   });
 
-  QUnit.test('rotate', function(assert) {
+  QUnit.test('rotate what?', function(assert) {
     var cObj = new fabric.Object();
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');
