@@ -871,9 +871,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * by the viewportTransform ( sort of coordinates of what is displayed
    * on the canvas where you are clicking.
    * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
+   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
+   * To interact with your shapes top and left you want to use ignoreVpt false
+   * most of the time, while ignoreVpt true will give you coordinates
    * compatible with the object.oCoords system.
    * of the time.
    * @param {Event} e
