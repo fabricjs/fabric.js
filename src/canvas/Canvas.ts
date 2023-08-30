@@ -999,6 +999,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
+    // this is an absolute pointer, the naming is wrong
     const pointer = this.getPointer(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
@@ -1015,6 +1016,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
+          // this is an absolute pointer, the naming is wrong
           pointer,
         });
     }
@@ -1031,6 +1033,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
+        // this is an absolute pointer, the naming is wrong
         pointer: pointer,
       });
     } else {
