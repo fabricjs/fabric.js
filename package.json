@@ -103,7 +103,6 @@
     "eslint": "8.40",
     "eslint-config-prettier": "^8.6.0",
     "fireworm": "^0.7.2",
-    "fontfaceobserver": "^2.3.0",
     "fs-extra": "^10.0.1",
     "fuzzy": "^0.1.3",
     "http-server": "^14.1.1",

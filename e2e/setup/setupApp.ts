@@ -1,14 +1,18 @@
 import { test } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
-import { JSDOM } from 'jsdom';
 import path from 'path';
-import { setupFonts } from './setupFonts';
-import { setupImports } from './setupImports';
+import imports from '../imports';
+import { JSDOM } from 'jsdom';
 
 test.beforeEach(async ({ page }, { file }) => {
   await page.goto('/e2e/site');
-  await setupImports(page);
-  await setupFonts(page);
+  // expose imports for consumption
+  page.addScriptTag({
+    type: 'importmap',
+    content: JSON.stringify({
+      imports,
+    }),
+  });
   // add test script
   const testDir = path.relative(
     path.resolve(process.cwd(), 'e2e', 'tests'),
