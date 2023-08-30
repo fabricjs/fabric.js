@@ -1,4 +1,5 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
+import type { StaticCanvas } from './canvas/StaticCanvas';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
 import type { XY, Point } from './Point';
@@ -99,21 +100,55 @@ export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
   T extends BaseFabricObject = BaseFabricObject
-> = {
-  left?: number;
-  top?: number;
-  width?: number;
-  height?: number;
-  filter?: (object: T) => boolean;
+> = TBBox & {
+  filter: (object: T) => boolean;
 };
 
+type ToDataUrlExtraOptions = { quality: number };
+
+type ToCanvasElementExtraOptions = {
+  multiplier: number;
+  enableRetinaScaling: boolean;
+  format: ImageFormat;
+};
+
+type ObjectToCanvasElementExtraOptions = ToCanvasElementExtraOptions & {
+  /**
+   * Remove current object shadow.
+   */
+  withoutShadow: boolean;
+  /**
+   * Remove current object transform ( no scale , no angle, no flip, no skew )
+   */
+  withoutTransform: boolean;
+  /**
+   * Account for canvas viewport transform
+   */
+  viewportTransform: boolean;
+  /**
+   * The element being to used to draw the object onto.
+   */
+  canvasElement: HTMLCanvasElement;
+
+  /**
+   * Create the fabric canvas instance that will generate the output
+   */
+  canvasProvider: () => StaticCanvas;
+};
+
+export type ObjectToCanvasElementOptions = Partial<
+  TBBox & ObjectToCanvasElementExtraOptions
+>;
+
+export type ObjectToDataUrlOptions = ObjectToCanvasElementOptions &
+  Partial<ToDataUrlExtraOptions>;
+
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
-  TToCanvasElementOptions<T> & {
-    multiplier: number;
-    format?: ImageFormat;
-    quality?: number;
-    enableRetinaScaling?: boolean;
-  };
+  Partial<
+    TToCanvasElementOptions<T> &
+      ToCanvasElementExtraOptions &
+      ToDataUrlExtraOptions
+  >;
 
 export type Abortable = {
   /**

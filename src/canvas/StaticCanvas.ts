@@ -1378,16 +1378,16 @@ export class StaticCanvas<
    * @example <caption>Generate dataURL with objects that overlap a specified object</caption>
    * var myObject;
    * var dataURL = canvas.toDataURL({
-   *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
+   *   filter: (object) => object.isOverlapping(myObject)
    * });
    */
-  toDataURL(options = {} as TDataUrlOptions): string {
-    const {
-      format = 'png',
-      quality = 1,
-      multiplier = 1,
-      enableRetinaScaling = false,
-    } = options;
+  toDataURL({
+    format = 'png',
+    quality = 1,
+    multiplier = 1,
+    enableRetinaScaling = false,
+    ...options
+  }: TDataUrlOptions = {}): string {
     const finalMultiplier =
       multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
 
@@ -1405,7 +1405,7 @@ export class StaticCanvas<
    * This is an intermediary step used to get to a dataUrl but also it is useful to
    * create quick image copies of a canvas without passing for the dataUrl string
    * @param {Number} [multiplier] a zoom factor.
-   * @param {Object} [options] Cropping informations
+   * @param {Object} [options] Cropping information.
    * @param {Number} [options.left] Cropping left offset.
    * @param {Number} [options.top] Cropping top offset.
    * @param {Number} [options.width] Cropping width.
@@ -1414,7 +1414,8 @@ export class StaticCanvas<
    */
   toCanvasElement(
     multiplier = 1,
-    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+    { width, height, left, top, filter }: Partial<TToCanvasElementOptions> = {},
+    canvasEl = createCanvasElement()
   ): HTMLCanvasElement {
     const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
@@ -1427,7 +1428,6 @@ export class StaticCanvas<
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElement(),
       objectsToRender = filter
         ? this._objects.filter((obj) => filter(obj))
         : this._objects;
