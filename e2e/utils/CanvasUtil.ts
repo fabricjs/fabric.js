@@ -9,7 +9,7 @@ export class CanvasUtil {
   }
 
   press(keyPressed: Parameters<Page['press']>[1]) {
-    return this.page.press(`canvas_top=${this.selector}`, keyPressed);
+    return this.page.keyboard.press(keyPressed, { delay: 200 });
   }
 
   screenshot(options: LocatorScreenshotOptions = {}) {
