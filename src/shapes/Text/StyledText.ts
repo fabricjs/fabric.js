@@ -179,7 +179,7 @@ export abstract class StyledText<
   }
 
   private _extendStyles(index: number, styles: TextStyleDeclaration): void {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(index);
+    const { lineIndex, charIndex } = this.get2DCursorLocation(index, true);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
@@ -231,7 +231,11 @@ export abstract class StyledText<
    * @param {Number} startIndex Start index to get styles at
    * @param {Number} [endIndex] End index to get styles at, if not specified startIndex + 1
    */
-  setSelectionStyles(styles: object, startIndex: number, endIndex?: number) {
+  setSelectionStyles(
+    styles: TextStyleDeclaration,
+    startIndex: number,
+    endIndex?: number
+  ) {
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       this._extendStyles(i, styles);
     }

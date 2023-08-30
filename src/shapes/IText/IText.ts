@@ -499,10 +499,13 @@ export class IText<
       lineIndex = cursorLocation.lineIndex,
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
-      charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
+      {
+        fontSize: charHeight,
+        deltaY: dy,
+        fill,
+      } = this.getCompleteStyleDeclaration(lineIndex, charIndex),
       multiplier = this.scaleX * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
-      dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =
         boundaries.topOffset +
         ((1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex)) /
@@ -514,9 +517,7 @@ export class IText<
       // and why can't happen at the top of the function
       this.renderSelection(ctx, boundaries);
     }
-    ctx.fillStyle =
-      this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
+    ctx.fillStyle = this.cursorColor || (fill as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,

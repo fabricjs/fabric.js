@@ -162,9 +162,9 @@ export abstract class ITextKeyBehavior<
 
   /**
    * Handles onInput event
-   * @param {Event} e Event object
+   * @param {InputEvent} e Event object
    */
-  onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: Event) {
+  onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: InputEvent) {
     const fromPaste = this.fromPaste;
     this.fromPaste = false;
     e && e.stopPropagation();

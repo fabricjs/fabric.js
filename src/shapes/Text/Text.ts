@@ -1562,19 +1562,26 @@ export class Text<
       const lineLeftOffset = this._getLineLeftOffset(i);
       let boxStart = 0;
       let boxWidth = 0;
-      let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
-      let currentDecoration;
-      let currentFill;
+      let {
+        [type]: lastDecoration,
+        fill: lastFill,
+        fontSize: size,
+        deltaY: dy,
+      } = this.getCompleteStyleDeclaration(i, 0);
+      let currentDecoration = false;
+      let currentFill = '';
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
-      let size = this.getHeightOfChar(i, 0);
-      let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
-        currentDecoration = this.getValueOfPropertyAt(i, j, type);
-        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
-        const currentSize = this.getHeightOfChar(i, j);
-        const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
+        const {
+          [type]: decoration,
+          fill,
+          fontSize: currentSize,
+          deltaY: currentDy,
+        } = this.getCompleteStyleDeclaration(i, j);
+        currentDecoration = decoration;
+        // bug? verify fill is a valid fill here.
+        currentFill = (fill as string) || '';
         if (path && currentDecoration && currentFill) {
           ctx.save();
           // bug? verify lastFill is a valid fill here.
@@ -1714,19 +1721,19 @@ export class Text<
    */
   _splitTextIntoLines(text: string): TextLinesInfo {
     const lines = text.split(this._reNewline),
-      newLines = new Array<string[]>(lines.length),
+      graphemeLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
-    let newText: string[] = [];
+    let graphemeText: string[] = [];
     for (let i = 0; i < lines.length; i++) {
-      newLines[i] = this.graphemeSplit(lines[i]);
-      newText = newText.concat(newLines[i], newLine);
+      graphemeLines[i] = this.graphemeSplit(lines[i]);
+      graphemeText = graphemeText.concat(graphemeLines[i], newLine);
     }
-    newText.pop();
+    graphemeText.pop();
     return {
-      _unwrappedLines: newLines,
+      _unwrappedLines: graphemeLines,
       lines: lines,
-      graphemeText: newText,
-      graphemeLines: newLines,
+      graphemeText,
+      graphemeLines,
     };
   }
 

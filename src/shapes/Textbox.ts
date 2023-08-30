@@ -515,15 +515,13 @@ export class Textbox<
    * @override
    */
   _splitTextIntoLines(text: string) {
-    const newText = super._splitTextIntoLines(text),
-      graphemeLines = this._wrapText(newText.lines, this.width),
-      lines = new Array(graphemeLines.length);
-    for (let i = 0; i < graphemeLines.length; i++) {
-      lines[i] = graphemeLines[i].join('');
-    }
-    newText.lines = lines;
-    newText.graphemeLines = graphemeLines;
-    return newText;
+    const { lines, ...rest } = super._splitTextIntoLines(text),
+      graphemeLines = this._wrapText(lines, this.width);
+    return {
+      ...rest,
+      graphemeLines,
+      lines: graphemeLines.map((line) => line.join('')),
+    };
   }
 
   getMinWidth() {

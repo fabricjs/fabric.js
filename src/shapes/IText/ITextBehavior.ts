@@ -564,9 +564,8 @@ export abstract class ITextBehavior<
         ? this.compositionStart
         : this.selectionStart,
       boundaries = this._getCursorBoundaries(desiredPosition),
-      cursorLocation = this.get2DCursorLocation(desiredPosition),
-      lineIndex = cursorLocation.lineIndex,
-      charIndex = cursorLocation.charIndex,
+      // bug? should this be ,true for unwrapped lines?
+      { lineIndex, charIndex } = this.get2DCursorLocation(desiredPosition),
       charHeight =
         this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize') *
         this.lineHeight,
