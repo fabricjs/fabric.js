@@ -826,7 +826,8 @@ export class Group extends createCollectionMixin(
       return;
     }
 
-    const bbox = this.getObjectsBoundingBox(objects) || ({} as LayoutResult);
+    const bbox =
+      this.getObjectsBoundingBox(objects, true) || ({} as LayoutResult);
     const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
     const width = hasWidth ? this.width : w,
       height = hasHeight ? this.height : h,
@@ -897,14 +898,14 @@ export class Group extends createCollectionMixin(
   }
 
   /**
-   * Calculate the bbox of objects relative to instance's containing plane
+   * Calculate the bbox of objects, by default relative to instance's containing plane
    * @public
    * @param {FabricObject[]} objects
    * @returns {LayoutResult | null} bounding box
    */
   getObjectsBoundingBox(
     objects: FabricObject[],
-    ignoreOffset?: boolean
+    ignoreContainingPlane?: boolean
   ): LayoutResult | null {
     if (objects.length === 0) {
       return null;
@@ -930,15 +931,13 @@ export class Group extends createCollectionMixin(
       makeBoundingBoxFromPoints(objectBounds);
 
     const size = new Point(width, height),
-      relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
-        size.scalarDivide(2)
-      ),
+      relativeCenter = new Point(left, top).add(size.scalarDivide(2)),
       //  we send `relativeCenter` up to group's containing plane
       center = relativeCenter.transform(this.calcOwnMatrix());
 
     return {
-      centerX: center.x,
-      centerY: center.y,
+      centerX: ignoreContainingPlane ? relativeCenter.x : center.x,
+      centerY: ignoreContainingPlane ? relativeCenter.y : center.y,
       width: size.x,
       height: size.y,
     };
