@@ -45,27 +45,22 @@ const styles = {
     1: { fill: 'blue', fontWeight: 'bold' },
     2: { fill: 'blue', fontWeight: 'bold', fontSize: 63 },
     4: {
-      fontFamily: 'Courier',
       textDecoration: ' underline',
       underline: true,
     },
     5: {
-      fontFamily: 'Courier',
       textDecoration: ' underline',
       underline: true,
     },
     6: {
-      fontFamily: 'Courier',
       textDecoration: ' overline',
       overline: true,
     },
     7: {
-      fontFamily: 'Courier',
       textDecoration: ' overline',
       overline: true,
     },
     8: {
-      fontFamily: 'Courier',
       textDecoration: ' overline',
       overline: true,
     },
