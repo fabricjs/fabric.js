@@ -179,7 +179,7 @@ export abstract class StyledText<
   }
 
   private _extendStyles(index: number, styles: TextStyleDeclaration): void {
-    const { lineIndex, charIndex } = this.get2DCursorLocation(index, true);
+    const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
