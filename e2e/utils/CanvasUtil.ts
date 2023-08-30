@@ -8,6 +8,10 @@ export class CanvasUtil {
     return this.page.click(`canvas_top=${this.selector}`, clickProperties);
   }
 
+  press(keyPressed: Parameters<Page['press']>[1]) {
+    return this.page.press(`canvas_top=${this.selector}`, keyPressed);
+  }
+
   screenshot(options: LocatorScreenshotOptions = {}) {
     return this.page
       .locator(`canvas_wrapper=${this.selector}`)

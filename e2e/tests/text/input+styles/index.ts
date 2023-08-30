@@ -1,15 +1,15 @@
-import * as fabric from 'fabric';
-import { beforeAll } from 'test';
+import { Textbox, util } from 'fabric';
+import { beforeAll } from '../../test';
 
 beforeAll(
   (canvas) => {
     const textValue = 'fabric.js sandbox';
-    const text = new fabric.Textbox(textValue, {
+    const text = new Textbox(textValue, {
       originX: 'center',
       splitByGrapheme: true,
       width: 200,
       top: 20,
-      styles: fabric.util.stylesFromArray(
+      styles: util.stylesFromArray(
         [
           {
             style: {
@@ -25,6 +25,7 @@ beforeAll(
     });
     canvas.add(text);
     canvas.centerObjectH(text);
+    return { text };
   },
   { width: 300, height: 700 }
 );
