@@ -22,7 +22,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 export type GraphemeData = {
   wordsData: {
-    word: string[];
+    word: string[] | string;
     width: number;
   }[][];
   largestWordWidth: number;
@@ -327,6 +327,12 @@ export class Textbox<
    *
    */
   getGraphemeDataForRender(lines: string[]): GraphemeData {
+    // this method has issues.
+    // it has been typed after some small refactors and is unclear how is working
+    // graphemeArray is either a string or a string[].
+    // the data returned is also inconsistent for empty lines.
+    // check issue https://github.com/fabricjs/fabric.js/issues/9190 for details
+    // and linked prs.
     const splitByGrapheme = this.splitByGrapheme,
       infix = splitByGrapheme ? '' : ' ';
 
@@ -339,17 +345,16 @@ export class Textbox<
         : this.wordSplit(line);
 
       if (wordsOrGraphemes.length === 0) {
-        return [];
+        // @ts-expect-error
+        wordsOrGraphemes.push([]);
       }
 
       return wordsOrGraphemes.map((word: string) => {
         // if using splitByGrapheme words are already in graphemes.
-        const graphemeArray = splitByGrapheme
-          ? [word]
-          : this.graphemeSplit(word);
+        const graphemeArray = splitByGrapheme ? word : this.graphemeSplit(word);
         const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + infix.length;
+        offset += graphemeArray.length + infix.length;
         return { word: graphemeArray, width };
       });
     });
@@ -372,7 +377,11 @@ export class Textbox<
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word: string[], lineIndex: number, charOffset = 0): number {
+  _measureWord(
+    word: string | string[],
+    lineIndex: number,
+    charOffset = 0
+  ): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
