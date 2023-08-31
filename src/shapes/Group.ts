@@ -3,7 +3,7 @@ import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
-import type { TClassProperties, TSVGReviver } from '../typedefs';
+import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -20,11 +20,7 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import { CENTER } from '../constants';
 
 export type LayoutContextType =
@@ -177,7 +173,7 @@ export class Group extends createCollectionMixin(
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects;
+    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -1092,7 +1088,7 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TProps<SerializedGroupProps>>({
+  static fromObject<T extends TOptions<SerializedGroupProps>>({
     objects = [],
     ...options
   }: T) {

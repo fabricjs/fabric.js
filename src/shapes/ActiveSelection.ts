@@ -1,7 +1,15 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
+import type { GroupProps, LayoutContext } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import type { TOptions } from '../typedefs';
+
+export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
+
+export interface ActiveSelectionOptions extends GroupProps {
+  multiSelectionStacking: MultiSelectionStacking;
+}
 
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
@@ -14,14 +22,13 @@ export class ActiveSelection extends Group {
    * @default `canvas-stacking`
    */
   // TODO FIX THIS WITH THE DEFAULTS LOGIC
-  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
-    'canvas-stacking';
+  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
 
   constructor(
     objects?: FabricObject[],
-    options?: any,
+    options?: TOptions<ActiveSelectionOptions>,
     objectsRelativeToGroup?: boolean
   ) {
     super(objects, options, objectsRelativeToGroup);
@@ -132,6 +139,25 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
+  }
+
+  _applyLayoutStrategy(context: LayoutContext): void {
+    super._applyLayoutStrategy(context);
+    if (this._objects.length === 0) {
+      // in this case layout was skipped
+      // we reset transform for the next selection
+      Object.assign(this, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        flipX: false,
+        flipY: false,
+      });
+    }
   }
 
   /**

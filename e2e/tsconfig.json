@@ -11,5 +11,7 @@
      * **IMPORTANT**: be sure to keep this updated to reflect `./imports.ts` correctly
      */
     "paths": { "fabric": ["../dist"], "fabric/node": ["../dist/index.node"] }
+    "resolveJsonModule": true,
+    "paths": { "fabric": ["../dist"] }
   }
 }
