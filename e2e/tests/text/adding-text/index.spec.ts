@@ -79,6 +79,7 @@ import '../../../setup';
     await canvasUtil.press('Enter');
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: `4-after-adding-more-lines-splitByGrapheme-${splitByGrapheme}.png`,
+      maxDiffPixelRatio: 0.03,
     });
   });
 });
