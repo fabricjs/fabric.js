@@ -9,7 +9,7 @@ afterEach(() => {
 
 describe('FabricText', () => {
   it('toObject', async () => {
-    expect(new FabricText('text').toObject()).toMatchRoundedSnapshot(['width']);
+    expect(new FabricText('text').toObject()).toMatchObjectSnapshot();
   });
 
   it('fromObject', async () => {
