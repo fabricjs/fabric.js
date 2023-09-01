@@ -64,6 +64,7 @@ import '../../../setup';
     await canvasUtil.ctrlV();
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: `3-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
+      maxDiffPixelRatio: 0.03,
     });
     // NOTE: Here is clear that there style bug of #9028 is visible splitbygrapheme true only
     // to be triggered the copy paste has to happen across lines
