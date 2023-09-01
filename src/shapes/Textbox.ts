@@ -500,8 +500,8 @@ export class Textbox<
    * and counting style.
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number) {
-    if (this.splitByGrapheme) {
+  missingNewlineOffset(lineIndex: number, skipWrapping: boolean) {
+    if (this.splitByGrapheme && !skipWrapping) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;

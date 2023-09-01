@@ -529,11 +529,10 @@ export class Text<
   /**
    * Detect if a line has a linebreak and so we need to account for it when moving
    * and counting style.
-   * It return always for text and Itext.
+   * It return always 1 for text and Itext. Textbox has its own implementation
    * @return Number
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  missingNewlineOffset(lineIndex: number) {
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean) {
     return 1;
   }
 
@@ -552,7 +551,8 @@ export class Text<
           charIndex: selectionStart,
         };
       }
-      selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+      selectionStart -=
+        lines[i].length + this.missingNewlineOffset(i, skipWrapping);
     }
     return {
       lineIndex: i - 1,
