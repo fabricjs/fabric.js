@@ -12,7 +12,7 @@ canvas.setDimensions({
 const textValue = 'fabric.js sandbox';
 const text = new fabric.Textbox(textValue, {
   originX: 'center',
-  // splitByGrapheme: true,
+  splitByGrapheme: true,
   width: 200,
   top: 20,
   styles: fabric.util.stylesFromArray(
