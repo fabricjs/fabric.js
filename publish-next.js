@@ -1,4 +1,4 @@
-var cp = require('child_process');
+let cp = require('child_process');
 
 console.log('npm version prerelease --preid=rc');
 
