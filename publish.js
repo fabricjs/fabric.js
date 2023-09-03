@@ -1,7 +1,7 @@
-var cp = require('child_process');
+let cp = require('child_process');
 
-var args = process.argv.slice(2).join(' '); // args will be passed to npm publish (like --dry-run)
-var preRelease = process.env.PRE_RELEASE;
+let args = process.argv.slice(2).join(' '); // args will be passed to npm publish (like --dry-run)
+let preRelease = process.env.PRE_RELEASE;
 
 // allow publishing of pre-releases with beta tag
 if (preRelease === 'true') {
