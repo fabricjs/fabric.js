@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  let REFERENCE_OBJECT = {
     version:                  fabric.version,
     type:                     'Polygon',
     originX:                  'left',
@@ -42,7 +42,7 @@
     strokeUniform:              false
   };
 
-  var REFERENCE_EMPTY_OBJECT = {
+  let REFERENCE_EMPTY_OBJECT = {
     points: [],
     width: 0,
     height: 0,
@@ -55,7 +55,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Polygon);
 
-    var polygon = new fabric.Polygon(getPoints());
+    let polygon = new fabric.Polygon(getPoints());
 
     assert.ok(polygon instanceof fabric.Polygon);
     assert.ok(polygon instanceof fabric.Polyline);
@@ -67,7 +67,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins top-left', function(assert) {
 
-    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
+    let polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
 
     assert.equal(polygon.left, 9);
     assert.equal(polygon.top, 11);
