@@ -1,13 +1,13 @@
 (function() {
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+  let canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
   QUnit.module('fabric.ObjectGeometry');
 
   QUnit.test('intersectsWithRectangle', function(assert) {
-    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
+    let cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithRect === 'function');
 
-    var point1 = new fabric.Point(110, 100),
+    let point1 = new fabric.Point(110, 100),
         point2 = new fabric.Point(210, 200),
         point3 = new fabric.Point(0, 0),
         point4 = new fabric.Point(10, 10);
@@ -17,14 +17,14 @@
   });
 
   QUnit.test('intersectsWithRectangle absolute', function(assert) {
-    var cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
-    var absolute = true;
+    let cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
+    let absolute = true;
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
     canvas.calcViewportBoundaries();
 
-    var point1 = new fabric.Point(5, 5),
+    let point1 = new fabric.Point(5, 5),
         point2 = new fabric.Point(15, 15),
         point3 = new fabric.Point(25, 25),
         point4 = new fabric.Point(35, 35);
@@ -36,21 +36,21 @@
   });
 
   QUnit.test('intersectsWithObject', function(assert) {
-    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
+    let cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithObject === 'function', 'has intersectsWithObject method');
 
-    var cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
+    let cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
     cObj2.setCoords();
     assert.ok(cObj.intersectsWithObject(cObj2), 'cobj2 does intersect with cobj');
     assert.ok(cObj2.intersectsWithObject(cObj), 'cobj2 does intersect with cobj');
 
-    var cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
+    let cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
     cObj3.setCoords();
     assert.ok(!cObj.intersectsWithObject(cObj3), 'cobj3 does not intersect with cobj (external)');
     assert.ok(!cObj3.intersectsWithObject(cObj), 'cobj3 does not intersect with cobj (external)');
 
-    var cObj4 = new fabric.Object({ left: 0, top: 0, width: 200, height: 200 });
+    let cObj4 = new fabric.Object({ left: 0, top: 0, width: 200, height: 200 });
     cObj4.setCoords();
     assert.ok(cObj4.intersectsWithObject(cObj), 'overlapping objects are considered intersecting');
     assert.ok(cObj.intersectsWithObject(cObj4), 'overlapping objects are considered intersecting');
