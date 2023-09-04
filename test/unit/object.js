@@ -1,6 +1,6 @@
 (function(){
 
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+  let canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
 
   QUnit.module('fabric.Object', {
     afterEach: function () {
@@ -21,7 +21,7 @@
   QUnit.test('constructor & properties', function(assert) {
     assert.ok(typeof fabric.Object === 'function');
 
-    var cObj = new fabric.Object();
+    let cObj = new fabric.Object();
 
     assert.ok(cObj);
     assert.ok(cObj instanceof fabric.Object);
@@ -35,7 +35,7 @@
   });
 
   QUnit.test('get', function(assert) {
-    var cObj = new fabric.Object({
+    let cObj = new fabric.Object({
       left: 11,
       top: 22,
       width: 50,
@@ -51,7 +51,7 @@
   });
 
   QUnit.test('set', function(assert) {
-    var cObj = new fabric.Object({ left: 11, top: 22, width: 50, height: 60, opacity: 0.7 });
+    let cObj = new fabric.Object({ left: 11, top: 22, width: 50, height: 60, opacity: 0.7 });
 
     cObj.set('left', 12);
     cObj.set('top', 23);
@@ -69,7 +69,7 @@
   });
 
   QUnit.test('set with object of prop/values', function(assert) {
-    var cObj = new fabric.Object({  });
+    let cObj = new fabric.Object({  });
 
     assert.equal(cObj, cObj.set({ width: 99, height: 88, fill: 'red' }), 'chainable');
 
@@ -98,7 +98,7 @@
   // });
 
   QUnit.test('stateProperties', function(assert) {
-    var cObj = new fabric.Object();
+    let cObj = new fabric.Object();
     assert.ok(cObj.constructor.stateProperties);
     assert.ok(cObj.constructor.stateProperties.length > 0);
   });
