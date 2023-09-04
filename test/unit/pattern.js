@@ -1,5 +1,5 @@
 (function() {
-  var IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
+  let IMG_SRC = isNode() ? ('file://' + __dirname + '/../fixtures/greyfloral.png') : '../fixtures/greyfloral.png';
 
   function setSrc(img, src, callback) {
     img.onload = callback;
@@ -8,7 +8,7 @@
 
   QUnit.module('fabric.Pattern');
 
-  var img = fabric.getFabricDocument().createElement('img');
+  let img = fabric.getFabricDocument().createElement('img');
   setSrc(img, IMG_SRC);
 
   function createPattern() {
@@ -19,12 +19,12 @@
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Pattern);
-    var pattern = createPattern();
+    let pattern = createPattern();
     assert.ok(pattern instanceof fabric.Pattern, 'should inherit from fabric.Pattern');
   });
 
   QUnit.test('properties', function(assert) {
-    var pattern = createPattern();
+    let pattern = createPattern();
     assert.equal(pattern.source, img);
     assert.equal(pattern.repeat, 'repeat');
     assert.equal(pattern.offsetX, 0);
@@ -33,11 +33,11 @@
   });
 
   QUnit.test('toObject', function(assert) {
-    var pattern = createPattern();
+    let pattern = createPattern();
 
     assert.ok(typeof pattern.toObject === 'function');
 
-    var object = pattern.toObject();
+    let object = pattern.toObject();
 
     assert.ok(object.source.indexOf('fixtures/greyfloral.png') > -1);
     assert.equal(object.repeat, 'repeat');
@@ -47,16 +47,16 @@
   });
 
   QUnit.test('toObject with custom props', function(assert) {
-    var pattern = createPattern();
+    let pattern = createPattern();
     pattern.patternTransform = [1, 0, 0, 2, 0, 0];
     pattern.id = 'myId';
-    var object = pattern.toObject(['id']);
+    let object = pattern.toObject(['id']);
     assert.equal(object.id, 'myId');
     assert.deepEqual(object.patternTransform, pattern.patternTransform);
   });
 
   QUnit.test('toObject with custom props', function(assert) {
-    var pattern = createPattern();
+    let pattern = createPattern();
     pattern.patternTransform = [1, 0, 0, 2, 0, 0];
     pattern.id = 'myId';
     var object = pattern.toObject(['id']);
