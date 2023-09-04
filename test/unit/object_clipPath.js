@@ -10,12 +10,12 @@
   });
 
   QUnit.test('constructor & properties', function(assert) {
-    var cObj = new fabric.Object();
+    let cObj = new fabric.Object();
     assert.equal(cObj.clipPath, undefined, 'clipPath should not be defined out of the box');
   });
 
   QUnit.test('toObject with clipPath', function(assert) {
-    var emptyObjectRepr = {
+    let emptyObjectRepr = {
       version:                  fabric.version,
       type:                     'FabricObject',
       originX:                  'left',
@@ -49,7 +49,7 @@
       strokeUniform:             false
     };
 
-    var cObj = new fabric.Object();
+    let cObj = new fabric.Object();
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.clipPath = new fabric.Object();
@@ -68,10 +68,10 @@
   });
 
   QUnit.test('from object with clipPath', function(assert) {
-    var done = assert.async();
-    var rect = new fabric.Rect({ width: 100, height: 100 });
+    let done = assert.async();
+    let rect = new fabric.Rect({ width: 100, height: 100 });
     rect.clipPath = new fabric.Circle({ radius: 50 });
-    var toObject = rect.toObject();
+    let toObject = rect.toObject();
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
@@ -80,10 +80,10 @@
   });
 
   QUnit.test('from object with clipPath inverted, absolutePositioned', function(assert) {
-    var done = assert.async();
-    var rect = new fabric.Rect({ width: 100, height: 100 });
+    let done = assert.async();
+    let rect = new fabric.Rect({ width: 100, height: 100 });
     rect.clipPath = new fabric.Circle({ radius: 50, inverted: true, absolutePositioned: true });
-    var toObject = rect.toObject();
+    let toObject = rect.toObject();
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
