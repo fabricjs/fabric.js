@@ -1,6 +1,6 @@
 (function(){
 
-  var LINE_OBJECT = {
+  let LINE_OBJECT = {
     version:                  fabric.version,
     type:                     'Line',
     originX:                  'left',
@@ -42,7 +42,7 @@
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Line);
-    var line = new fabric.Line([10, 11, 20, 21]);
+    let line = new fabric.Line([10, 11, 20, 21]);
 
     assert.ok(line instanceof fabric.Line);
     assert.ok(line instanceof fabric.Object);
@@ -54,7 +54,7 @@
     assert.equal(line.get('x2'), 20);
     assert.equal(line.get('y2'), 21);
 
-    var lineWithoutPoints = new fabric.Line();
+    let lineWithoutPoints = new fabric.Line();
 
     assert.equal(lineWithoutPoints.get('x1'), 0);
     assert.equal(lineWithoutPoints.get('y1'), 0);
@@ -63,24 +63,24 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var line = new fabric.Line();
+    let line = new fabric.Line();
     assert.ok(typeof line.complexity === 'function');
   });
 
   QUnit.test('toSVG', function(assert) {
-    var line = new fabric.Line([11, 12, 13, 14]);
-    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 12 13)\"  >\n<line style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x1=\"-1\" y1=\"-1\" x2=\"1\" y2=\"1\" />\n</g>\n';
+    let line = new fabric.Line([11, 12, 13, 14]);
+    let EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 12 13)\"  >\n<line style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"  x1=\"-1\" y1=\"-1\" x2=\"1\" y2=\"1\" />\n</g>\n';
     assert.equal(line.toSVG(), EXPECTED_SVG);
   });
 
   QUnit.test('toObject', function(assert) {
-    var line = new fabric.Line([11, 12, 13, 14]);
+    let line = new fabric.Line([11, 12, 13, 14]);
     assert.ok(typeof line.toObject === 'function');
     assert.deepEqual(LINE_OBJECT, line.toObject());
   });
 
   QUnit.test('fromObject', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     assert.ok(typeof fabric.Line.fromObject === 'function');
     fabric.Line.fromObject(LINE_OBJECT).then(function(line) {
       assert.ok(line instanceof fabric.Line);
@@ -90,11 +90,11 @@
   });
 
   QUnit.test('fromElement', function(assert) {
-    var done = assert.async()
+    let done = assert.async()
     assert.ok(typeof fabric.Line.fromElement === 'function');
 
-    var namespace        = 'http://www.w3.org/2000/svg';
-    var lineEl           = fabric.getFabricDocument().createElementNS(namespace, 'line'),
+    let namespace        = 'http://www.w3.org/2000/svg';
+    let lineEl           = fabric.getFabricDocument().createElementNS(namespace, 'line'),
         x1               = 11,
         y1               = 23,
         x2               = 34,
