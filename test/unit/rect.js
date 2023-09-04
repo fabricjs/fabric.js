@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_RECT = {
+  let REFERENCE_RECT = {
     version:                  fabric.version,
     type:                     'Rect',
     originX:                  'left',
@@ -41,7 +41,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Rect);
 
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(rect instanceof fabric.Rect);
     assert.ok(rect instanceof fabric.Object);
@@ -50,35 +50,35 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(typeof rect.complexity === 'function');
   });
 
   QUnit.test('cache properties', function(assert) {
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(fabric.Rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
     assert.ok(fabric.Rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
   });
 
   QUnit.test('toObject', function(assert) {
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
     assert.ok(typeof rect.toObject === 'function');
 
-    var object = rect.toObject();
+    let object = rect.toObject();
     assert.deepEqual(object, REFERENCE_RECT);
   });
 
   QUnit.test('fabric.Rect.fromObject', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     assert.ok(typeof fabric.Rect.fromObject === 'function');
 
     return fabric.Rect.fromObject(REFERENCE_RECT).then(function(rect) {
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), REFERENCE_RECT);
 
-      var expectedObject = {
+      let expectedObject = {
         ...REFERENCE_RECT,
         fill: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 },
         stroke: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 }
@@ -92,8 +92,8 @@
   });
 
   QUnit.test('fabric.Rect.fromObject with pattern fill', function(assert) {
-    var done = assert.async();
-    var fillObj = {
+    let done = assert.async();
+    let fillObj = {
       type: 'Pattern',
       source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
     };
@@ -104,10 +104,10 @@
   });
 
   QUnit.test('fabric.Rect.fromElement', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     assert.ok(typeof fabric.Rect.fromElement === 'function');
 
-    var elRect = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
+    let elRect = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
     fabric.Rect.fromElement(elRect).then((rect) => {
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
@@ -116,9 +116,9 @@
   });
 
   QUnit.test('fabric.Rect.fromElement with custom attributes', function(assert) {
-    var done = assert.async();
-    var namespace = 'http://www.w3.org/2000/svg';
-    var elRectWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'rect');
+    let done = assert.async();
+    let namespace = 'http://www.w3.org/2000/svg';
+    let elRectWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'rect');
 
     elRectWithAttrs.setAttributeNS(namespace, 'x', 10);
     elRectWithAttrs.setAttributeNS(namespace, 'y', 20);
