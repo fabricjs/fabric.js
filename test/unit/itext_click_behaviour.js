@@ -1,6 +1,6 @@
 (function(){
   QUnit.module('iText click interaction', function (hooks) {
-    var canvas;
+    let canvas;
     hooks.before(function () {
       canvas = new fabric.Canvas(null, {
         enableRetinaScaling: false
@@ -24,10 +24,10 @@
     }
 
     QUnit.test('doubleClickHandler', async function (assert) {
-      var done = assert.async();
-      var iText = new fabric.IText('test need some word\nsecond line');
+      let done = assert.async();
+      let iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
-      var eventData = {
+      let eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
@@ -59,9 +59,9 @@
       done();
     });
     QUnit.test('doubleClickHandler no editing', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
+      let iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
-      var eventData = {
+      let eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
@@ -75,10 +75,10 @@
       assertCursorAnimation(assert, iText);
     });
     QUnit.test('tripleClickHandler', async function (assert) {
-      var done = assert.async();
-      var iText = new fabric.IText('test need some word\nsecond line');
+      let done = assert.async();
+      let iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
-      var eventData = {
+      let eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
@@ -110,9 +110,9 @@
       done();
     });
     QUnit.test('tripleClickHandler', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
+      let iText = new fabric.IText('test need some word\nsecond line');
       iText.canvas = canvas;
-      var eventData = {
+      let eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
