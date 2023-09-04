@@ -13,9 +13,9 @@
     return new fabric.Text(text || 'x');
   }
 
-  var CHAR_WIDTH = 20;
+  let CHAR_WIDTH = 20;
 
-  var REFERENCE_TEXT_OBJECT = {
+  let REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
     type:                      'Text',
     originX:                   'left',
@@ -69,7 +69,7 @@
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Text);
-    var text = createTextObject();
+    let text = createTextObject();
 
     assert.ok(text);
     assert.ok(text instanceof fabric.Text);
@@ -80,15 +80,15 @@
   });
 
   QUnit.test('toString', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.toString === 'function');
     assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
-    var fontDecl = text._getFontDeclaration();
+    let fontDecl = text._getFontDeclaration();
     assert.ok(typeof fontDecl === 'string', 'it returns a string');
     assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
     text.fontFamily = '"Times New Roman"';
@@ -102,32 +102,32 @@
   });
 
   QUnit.test('_getFontDeclaration with coma', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     text.fontFamily = 'Arial, sans-serif';
-    var fontDecl = text._getFontDeclaration();
+    let fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
   });
 
   fabric.Text.genericFonts.forEach(function(fontName) {
     QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
-      var text = createTextObject();
+      let text = createTextObject();
       text.fontFamily = fontName;
-      var fontDecl = text._getFontDeclaration();
+      let fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName, 'it does not quote ' + fontName);
       text.fontFamily = fontName.toUpperCase();
-      var fontDecl = text._getFontDeclaration();
+      let fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
     });
   });
 
   QUnit.test('complexity', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.complexity === 'function');
     assert.equal(text.complexity(), 1);
   });
 
   QUnit.test('set', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.set === 'function');
     assert.equal(text.set('text', 'bar'), text, 'should be chainable');
 
@@ -139,29 +139,29 @@
   });
 
   QUnit.test('lineHeight with single line', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     text.text = 'text with one line';
     text.lineHeight = 2;
     text.initDimensions();
-    var height = text.height;
+    let height = text.height;
     text.lineHeight = 0.5;
     text.initDimensions();
-    var heightNew = text.height;
+    let heightNew = text.height;
     assert.equal(height, heightNew, 'text height does not change with one single line');
   });
 
   QUnit.test('lineHeight with multi line', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     text.text = 'text with\ntwo lines';
     text.lineHeight = 0.1;
     text.initDimensions();
-    var height = text.height,
+    let height = text.height,
         minimumHeight = text.fontSize * text._fontSizeMult;
     assert.equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
   });
 
   QUnit.test('set with "hash"', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
 
     text.set({ opacity: 0.123, fill: 'red', fontFamily: 'blah' });
 
@@ -171,8 +171,8 @@
   });
 
   QUnit.test('get bounding rect after init', function(assert) {
-    var string = 'Some long text, the quick brown fox jumps over the lazy dog etc... blah blah blah';
-    var text = new fabric.Text(string, {
+    let string = 'Some long text, the quick brown fox jumps over the lazy dog etc... blah blah blah';
+    let text = new fabric.Text(string, {
       left: 30,
       top: 30,
       fill: '#ffffff',
@@ -181,21 +181,21 @@
       fontFamily: 'Arial',
       originY: 'bottom'
     });
-    var br = text.getBoundingRect();
+    let br = text.getBoundingRect();
     text.setCoords();
-    var br2 = text.getBoundingRect();
+    let br2 = text.getBoundingRect();
     assert.deepEqual(br, br2, 'text bounding box is the same before and after calling setCoords');
   });
 
   QUnit.test('fabric.Text.fromElement', function(assert) {
     assert.ok(typeof fabric.Text.fromElement === 'function');
 
-    var elText = fabric.getFabricDocument().createElement('text');
+    let elText = fabric.getFabricDocument().createElement('text');
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
       assert.ok(text instanceof fabric.Text);
-      var expectedObject = {
+      let expectedObject = {
         ...REFERENCE_TEXT_OBJECT,
         left: 0,
         top: -14.05,
@@ -209,9 +209,9 @@
   });
 
   QUnit.test('fabric.Text.fromElement with custom attributes', function(assert) {
-    var done = assert.async();
-    var namespace = 'http://www.w3.org/2000/svg';
-    var elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
+    let done = assert.async();
+    let namespace = 'http://www.w3.org/2000/svg';
+    let elTextWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'text');
     elTextWithAttrs.textContent = 'x';
 
     elTextWithAttrs.setAttributeNS(namespace, 'x', 10);
@@ -238,7 +238,7 @@
 
       assert.ok(textWithAttrs instanceof fabric.Text);
 
-      var expectedObject = {
+      let expectedObject = {
         ...REFERENCE_TEXT_OBJECT,
         /* left varies slightly due to node-canvas rendering */
         left:             fabric.util.toFixed(textWithAttrs.left + '', 2),
@@ -267,7 +267,7 @@
   });
 
   QUnit.test('dimensions after text change', function(assert) {
-    var text = new fabric.Text('x');
+    let text = new fabric.Text('x');
     assert.equal(text.width, CHAR_WIDTH);
 
     text.set('text', 'xx');
@@ -275,12 +275,12 @@
   });
 
   QUnit.test('dimensions without text', function(assert) {
-    var text = new fabric.Text('');
+    let text = new fabric.Text('');
     assert.equal(text.width, 2);
   });
 
   QUnit.test('setting fontFamily', function(assert) {
-    var text = new fabric.Text('x');
+    let text = new fabric.Text('x');
     text.path = 'foobar.js';
 
     text.set('fontFamily', 'foobar');
@@ -291,7 +291,7 @@
   });
 
   QUnit.test('text styleHas', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y');
+    let text = new fabric.Text('xxxxxx\nx y');
     text.styles = { };
     assert.ok(typeof text.styleHas === 'function');
     assert.equal(text.styleHas('stroke'), false, 'the text style has no stroke');
@@ -300,7 +300,7 @@
   });
 
   QUnit.test('text cleanStyle', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y');
+    let text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { stroke: 'red' }}};
     text.stroke = 'red';
     assert.ok(typeof text.cleanStyle === 'function');
@@ -313,7 +313,7 @@
   });
 
   QUnit.test('text cleanStyle with different sub styles styles', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y');
+    let text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { fill: 'red' }, 1: { stroke: 'red' }, 2: { stroke: 'blue' }}};
     text.stroke = 'red';
     text.cleanStyle('stroke');
@@ -325,7 +325,7 @@
   });
 
   QUnit.test('text cleanStyle with undefined and set styles', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y');
+    let text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 1: { stroke: 'red' }, 3: { stroke: 'red' }}};
     text.stroke = 'red';
     text.cleanStyle('stroke');
@@ -334,7 +334,7 @@
   });
 
   QUnit.test('text cleanStyle with empty styles', function(assert) {
-    var text = new fabric.Text('xxxxxx\nx y');
+    let text = new fabric.Text('xxxxxx\nx y');
     text.styles = { 1: { 0: { }, 1: { }}, 2: { }, 3: { 4: { }}};
     text.cleanStyle('any');
     assert.equal(text.styles[1], undefined, 'the style has been cleaned since there was no useful information');
@@ -343,7 +343,7 @@
   });
 
   QUnit.test('text cleanStyle with full style', function(assert) {
-    var text = new fabric.Text('xxx');
+    let text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
     text.fill = 'black';
     text.cleanStyle('fill');
@@ -352,7 +352,7 @@
   });
 
   QUnit.test('text cleanStyle with no relevant style', function(assert) {
-    var text = new fabric.Text('xxx');
+    let text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { other: 'value1' }, 1:  { other: 'value2' }, 2:  { other: 'value3' }}};
     text.fill = 'black';
     text.cleanStyle('fill');
@@ -366,7 +366,7 @@
   });
 
   QUnit.test('text removeStyle with some style', function(assert) {
-    var text = new fabric.Text('xxx');
+    let text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { stroke: 'black', fill: 'blue' }, 1:  { fill: 'blue' }, 2:  { fill: 'blue' }}};
     assert.ok(typeof text.removeStyle === 'function');
     text.fill = 'red';
@@ -380,16 +380,16 @@
   });
 
   QUnit.test('text toObject removes empty style object', function(assert) {
-    var text = new fabric.Text('xxx');
+    let text = new fabric.Text('xxx');
     text.styles = { 0: { 0: {} } };
-    var obj = text.toObject();
+    let obj = text.toObject();
     assert.deepEqual(obj.styles, [], 'empty style object has been removed');
   });
 
   QUnit.test('text toObject can handle style objects with only a textBackgroundColor property', function(assert) {
-    var text = new fabric.Text('xxx');
+    let text = new fabric.Text('xxx');
     text.styles = { 0: { 0: { textBackgroundColor: 'blue' } } };
-    var obj = text.toObject();
+    let obj = text.toObject();
     assert.deepEqual(
       obj.styles,
       [{ start: 0, end: 1, style: { textBackgroundColor: 'blue' }}],
@@ -398,25 +398,25 @@
   });
 
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
-    var text = new fabric.Text('xxx', { fontWeight: 400 });
+    let text = new fabric.Text('xxx', { fontWeight: 400 });
     text.initDimensions();
-    var cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
-    var cacheProp = text.fontStyle + '_400';
+    let cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
+    let cacheProp = text.fontStyle + '_400';
     assert.equal(cacheProp in cache, true, '400 is converted to string');
   });
 
   QUnit.test('getFontCache is case insensitive', function(assert) {
-    var text = new fabric.Text('xxx', { fontWeight: 'BOld', fontStyle: 'NormaL' });
+    let text = new fabric.Text('xxx', { fontWeight: 'BOld', fontStyle: 'NormaL' });
     text.initDimensions();
-    var text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
+    let text2 = new fabric.Text('xxx', { fontWeight: 'bOLd', fontStyle: 'nORMAl' });
     text2.initDimensions();
-    var cache = fabric.cache.getFontCache(text);
-    var cache2 = fabric.cache.getFontCache(text2);
+    let cache = fabric.cache.getFontCache(text);
+    let cache2 = fabric.cache.getFontCache(text2);
     assert.equal(cache, cache2, 'you get the same cache');
   });
   // moved
   QUnit.test('getSelectionStyles with no arguments', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
+    let iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { textDecoration: 'underline' },
@@ -438,7 +438,7 @@
   });
 
   QUnit.test('getSelectionStyles with 2 args', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
+    let iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { textDecoration: 'underline' },
@@ -466,7 +466,7 @@
   });
 
   QUnit.test('setSelectionStyles', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
+    let iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { fill: '#112233' },
@@ -508,7 +508,7 @@
   });
 
   QUnit.test('getStyleAtPosition', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
+    let iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { textDecoration: 'underline' },
@@ -533,7 +533,7 @@
   });
 
   QUnit.test('getStyleAtPosition complete', function(assert) {
-    var iText = new fabric.Text('test foo bar-baz\nqux', {
+    let iText = new fabric.Text('test foo bar-baz\nqux', {
       styles: {
         0: {
           0: { underline: true },
@@ -548,7 +548,7 @@
       }
     });
 
-    var expectedStyle0 = {
+    let expectedStyle0 = {
       stroke: null,
       strokeWidth: 1,
       fill: 'rgb(0,0,0)',
@@ -563,7 +563,7 @@
       deltaY: 0,
     };
 
-    var expectedStyle2 = {
+    let expectedStyle2 = {
       stroke: null,
       strokeWidth: 1,
       fill: 'rgb(0,0,0)',
@@ -586,76 +586,76 @@
   });
 
   QUnit.test('getSvgSpanStyles produces correct output', function(assert) {
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       fill: 'red',
       strokeWidth: 30,
       fontFamily: 'Verdana',
       fontSize: 25,
     };
-    var styleString = iText.getSvgSpanStyles(styleObject);
-    var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); ';
+    let styleString = iText.getSvgSpanStyles(styleObject);
+    let expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); ';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgSpanStyles produces correct output with useWhiteSpace', function(assert) {
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       fill: 'red',
       strokeWidth: 30,
       fontFamily: 'Verdana',
       fontSize: 25,
     };
-    var styleString = iText.getSvgSpanStyles(styleObject, true);
-    var expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
+    let styleString = iText.getSvgSpanStyles(styleObject, true);
+    let expected = 'stroke-width: 30; font-family: \'Verdana\'; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline true produces correct output', function(assert){
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       overline: true,
     };
-    var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline';
+    let styleString = iText.getSvgTextDecoration(styleObject);
+    let expected = 'overline';
     assert.equal(styleString, expected, 'style is as expected');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       overline: true,
       underline: true,
     };
-    var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline';
+    let styleString = iText.getSvgTextDecoration(styleObject);
+    let expected = 'overline underline';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       overline: true,
       underline: true,
       linethrough: true,
     };
-    var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through';
+    let styleString = iText.getSvgTextDecoration(styleObject);
+    let expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
   QUnit.test('getSvgTextDecoration with overline underline true produces correct output', function(assert){
-    var iText = new fabric.IText('test foo bar-baz');
-    var styleObject = {
+    let iText = new fabric.IText('test foo bar-baz');
+    let styleObject = {
       overline: true,
       underline: true,
       linethrough: true,
     };
-    var styleString = iText.getSvgTextDecoration(styleObject);
-    var expected = 'overline underline line-through';
+    let styleString = iText.getSvgTextDecoration(styleObject);
+    let expected = 'overline underline line-through';
     assert.equal(styleString, expected, 'style is as expected with overline underline');
   });
 
   QUnit.test('getHeightOfLine measures height of aline', function(assert) {
-    var text = new fabric.Text('xxx\n');
-    var height1 = text.getHeightOfLine(0);
-    var height2 = text.getHeightOfLine(1);
+    let text = new fabric.Text('xxx\n');
+    let height1 = text.getHeightOfLine(0);
+    let height2 = text.getHeightOfLine(1);
     assert.equal(Math.round(height1), 52, 'height of line with text is ok');
     assert.equal(Math.round(height2), 52, 'height of empty line is ok');
     assert.equal(height1, height2, 'should have same height');
@@ -663,17 +663,17 @@
 
   QUnit.test('_measureChar handles 0 width chars', function(assert) {
     fabric.cache.clearFontCache();
-    var zwc =  '\u200b';
-    var text = new fabric.Text('');
-    var style = text.getCompleteStyleDeclaration(0, 0);
-    var box = text._measureChar('a', style, zwc, style);
-    var box2 = text._measureChar('a', style, zwc, style);
+    let zwc =  '\u200b';
+    let text = new fabric.Text('');
+    let style = text.getCompleteStyleDeclaration(0, 0);
+    let box = text._measureChar('a', style, zwc, style);
+    let box2 = text._measureChar('a', style, zwc, style);
     assert.equal(fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 
   QUnit.test('_deleteStyleDeclaration', function(assert) {
-    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+    let text = new fabric.Text('aaa aaq ggg gg oee eee', {
       styles: {
         0: {
           0: { fontSize: 4 },
@@ -702,7 +702,7 @@
   });
 
   QUnit.test('_setStyleDeclaration', function(assert) {
-    var text = new fabric.Text('aaa aaq ggg gg oee eee', {
+    let text = new fabric.Text('aaa aaq ggg gg oee eee', {
       styles: {
         0: {
           0: { fontSize: 4 },
@@ -727,13 +727,13 @@
       width: 5,
     });
     assert.equal(typeof text._setStyleDeclaration, 'function', 'function exists');
-    var newStyle = { fontSize: 10 };
+    let newStyle = { fontSize: 10 };
     text._setStyleDeclaration(0, 10, newStyle);
     assert.equal(text.styles[0][10], newStyle, 'style has been changed');
   });
 
   QUnit.test('styleHas', function(assert) {
-    var textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
+    let textbox = new fabric.Textbox('aaa\naaq ggg gg oee eee', {
       styles: {
         0: {
           0: { fontSize: 4 },
@@ -757,7 +757,7 @@
   });
 
   QUnit.test('text with a path', function(assert) {
-    var text = new fabric.Text('a', {
+    let text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
     assert.ok(text.path, 'text has a path');
@@ -767,19 +767,19 @@
   });
 
   QUnit.test('text with a path toObject', function(assert) {
-    var text = new fabric.Text('a', {
+    let text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
-    var toObject = text.toObject();
+    let toObject = text.toObject();
     assert.ok(toObject.path, 'export has a path');
   });
 
   QUnit.test('text with a path fromObject', function(assert) {
-    var done = assert.async();
-    var text = new fabric.Text('a', {
+    let done = assert.async();
+    let text = new fabric.Text('a', {
       path: new fabric.Path('M0 0 h 100 v 100 h -100 z')
     });
-    var toObject = text.toObject();
+    let toObject = text.toObject();
     fabric.Text.fromObject(toObject).then(function(text) {
       assert.equal(text.path.constructor.type, 'Path', 'the path is restored');
       assert.ok(text.path instanceof fabric.Path, 'the path is a path');
@@ -789,12 +789,12 @@
   });
 
   QUnit.test('cacheProperties for text', function(assert) {
-    var text = new fabric.Text('a');
+    let text = new fabric.Text('a');
     assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction');
   });
 
   QUnit.test('_getLineLeftOffset', function(assert) {
-    var text = new fabric.Text('long line of text\nshort');
+    let text = new fabric.Text('long line of text\nshort');
     assert.equal(text._getLineLeftOffset(1), 0, 'with align left is 0');
     text.textAlign = 'right';
     assert.equal(Math.round(text._getLineLeftOffset(1)), 174, 'with align right is diff between width and lineWidth');
@@ -814,7 +814,7 @@
   });
 
   QUnit.test('_getLineLeftOffset with direction rtl', function(assert) {
-    var text = new fabric.Text('long line of text\nshort');
+    let text = new fabric.Text('long line of text\nshort');
     text.direction = 'rtl';
     assert.equal(Math.round(text._getLineLeftOffset(1)), -174, 'with align left is diff between width and lineWidth, negative');
     text.textAlign = 'right';
