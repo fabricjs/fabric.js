@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_PATH_OBJECT = {
+  let REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
     type:                     'Path',
     originX:                  'left',
@@ -36,8 +36,8 @@
   };
 
   function getPathElement(path) {
-    var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.getFabricDocument().createElementNS(namespace, 'path');
+    let namespace = 'http://www.w3.org/2000/svg';
+    let el = fabric.getFabricDocument().createElementNS(namespace, 'path');
     el.setAttributeNS(namespace, 'd', path);
     el.setAttributeNS(namespace, 'fill', 'red');
     el.setAttributeNS(namespace, 'stroke', 'blue');
@@ -82,7 +82,7 @@
 
       assert.equal(path.constructor.type, 'Path');
 
-      var error;
+      let error;
       try {
         new fabric.Path();
       }
@@ -96,8 +96,8 @@
   });
 
   QUnit.test('initialize', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
+    let done = assert.async();
+    let path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
 
     assert.equal(path.left, 100);
     assert.equal(path.top, 0);
@@ -105,8 +105,8 @@
   });
 
   QUnit.test('initialize with strokeWidth', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { strokeWidth: 50 });
+    let done = assert.async();
+    let path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { strokeWidth: 50 });
 
     assert.equal(path.left, 75);
     assert.equal(path.top, 75);
@@ -114,8 +114,8 @@
   });
 
   QUnit.test('initialize with strokeWidth with originX and originY center/center', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path(
+    let done = assert.async();
+    let path = new fabric.Path(
       'M 100 100 L 200 100 L 170 200 z',
       { strokeWidth: 4, originX: 'center', originY: 'center' }
     );
@@ -126,8 +126,8 @@
   });
 
   QUnit.test('initialize with strokeWidth with originX and originY top/left', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path(
+    let done = assert.async();
+    let path = new fabric.Path(
       'M 100 100 L 200 100 L 170 200 z',
       { strokeWidth: 4, originX: 'left', originY: 'top' }
     );
@@ -138,8 +138,8 @@
   });
 
     QUnit.test('initialize with strokeWidth with originX and originY bottom/right', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path(
+    let done = assert.async();
+    let path = new fabric.Path(
       'M 100 100 L 200 100 L 170 200 z',
       { strokeWidth: 4, originX: 'right', originY: 'bottom' }
     );
@@ -150,12 +150,12 @@
   });
 
   QUnit.test('set path after initialization', function (assert) {
-    var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
+    let done = assert.async();
+    let path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var opts = { ...REFERENCE_PATH_OBJECT };
+    let opts = { ...REFERENCE_PATH_OBJECT };
     delete opts.path;
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -166,12 +166,12 @@
   });
 
   QUnit.test('Path initialized with strokeWidth takes that in account for positioning', function (assert) {
-    var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
+    let done = assert.async();
+    let path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var opts = { ...REFERENCE_PATH_OBJECT };
+    let opts = { ...REFERENCE_PATH_OBJECT };
     delete opts.path;
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -182,7 +182,7 @@
   });
 
   QUnit.test('toString', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toString === 'function');
       assert.equal(path.toString(), '#<Path (4): { "top": 100, "left": 100 }>');
@@ -191,7 +191,7 @@
   });
 
   QUnit.test('toObject', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     makePathObject(function(path) {
       assert.ok(typeof path.toObject === 'function');
       assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
@@ -200,12 +200,12 @@
   });
 
   QUnit.test('toObject', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     makePathObject(function(path) {
       path.top = fabric.Path.getDefaults().top;
       path.left = fabric.Path.getDefaults().left;
       path.includeDefaultValues = false;
-      var obj = path.toObject();
+      let obj = path.toObject();
       assert.equal(obj.top, fabric.Path.getDefaults().top, 'top is available also when equal to prototype');
       assert.equal(obj.left, fabric.Path.getDefaults().left, 'left is available also when equal to prototype');
       done();
