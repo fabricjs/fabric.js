@@ -1,8 +1,8 @@
 (function(){
 
   function makeElement() {
-    var element = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
-    var attributes = {
+    let element = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'path');
+    let attributes = {
       'cx':           101,
       'x':            102,
       'cy':           103,
@@ -12,7 +12,7 @@
       'fill-rule':    'foo',
       'stroke-width': 4
     };
-    for (var prop in attributes) {
+    for (let prop in attributes) {
       element.setAttribute(prop, attributes[prop]);
     }
     return element;
@@ -25,9 +25,9 @@
   QUnit.test('parseAttributes', function(assert) {
     assert.ok(fabric.parseAttributes);
 
-    var element = makeElement();
-    var attributeNames = 'cx cy x y r opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
-    var parsedAttributes = fabric.parseAttributes(element, attributeNames);
+    let element = makeElement();
+    let attributeNames = 'cx cy x y r opacity fill-rule stroke-width transform fill fill-rule'.split(' ');
+    let parsedAttributes = fabric.parseAttributes(element, attributeNames);
 
     assert.deepEqual(parsedAttributes, {
       left:         102,
@@ -40,8 +40,8 @@
   });
 
   QUnit.test('parseAttributesNoneValues', function(assert) {
-    var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.getFabricDocument().createElementNS(namespace, 'path');
+    let namespace = 'http://www.w3.org/2000/svg';
+    let element = fabric.getFabricDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'fill', 'none');
     element.setAttributeNS(namespace, 'stroke', 'none');
 
@@ -49,15 +49,15 @@
   });
 
   QUnit.test('parseAttributesFillRule', function(assert) {
-    var namespace = 'http://www.w3.org/2000/svg';
-    var element = fabric.getFabricDocument().createElementNS(namespace, 'path');
+    let namespace = 'http://www.w3.org/2000/svg';
+    let element = fabric.getFabricDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'fill-rule', 'evenodd');
 
     assert.deepEqual(fabric.parseAttributes(element, ['fill-rule']), { fillRule: 'evenodd' });
   });
 
   QUnit.test('parseAttributesFillRuleWithoutTransformation', function(assert) {
-    var namespace = 'http://www.w3.org/2000/svg';
+    let namespace = 'http://www.w3.org/2000/svg';
     var element = fabric.getFabricDocument().createElementNS(namespace,  'path');
     element.setAttributeNS(namespace, 'fill-rule', 'inherit');
 
