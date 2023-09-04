@@ -1,7 +1,7 @@
 (function() {
-  var canvas = this.canvas = new fabric.Canvas();
+  let canvas = this.canvas = new fabric.Canvas();
 
-  var ITEXT_OBJECT = {
+  let ITEXT_OBJECT = {
     version:                  fabric.version,
     type:                     'IText',
     originX:                  'left',
@@ -62,14 +62,14 @@
     });
 
     QUnit.test('constructor', function(assert) {
-      var iText = new fabric.IText('test');
+      let iText = new fabric.IText('test');
 
       assert.ok(iText instanceof fabric.IText);
       assert.ok(iText instanceof fabric.Text);
     });
 
     QUnit.test('initial properties', function(assert) {
-      var iText = new fabric.IText('test');
+      let iText = new fabric.IText('test');
       assert.ok(iText instanceof fabric.IText);
 
       assert.equal(iText.text, 'test');
@@ -78,7 +78,7 @@
     });
 
     QUnit.test('fromObject', function(assert) {
-      var done = assert.async();
+      let done = assert.async();
       assert.ok(typeof fabric.IText.fromObject === 'function');
       fabric.IText.fromObject(ITEXT_OBJECT).then(function(iText) {
         assert.ok(iText instanceof fabric.IText);
@@ -88,33 +88,33 @@
     });
 
     QUnit.test('lineHeight with single line', function(assert) {
-      var text = new fabric.IText('text with one line');
+      let text = new fabric.IText('text with one line');
       text.lineHeight = 2;
       text.initDimensions();
-      var height = text.height;
+      let height = text.height;
       text.lineHeight = 0.5;
       text.initDimensions();
-      var heightNew = text.height;
+      let heightNew = text.height;
       assert.equal(height, heightNew, 'text height does not change with one single line');
     });
 
     QUnit.test('lineHeight with multi line', function(assert) {
-      var text = new fabric.IText('text with\ntwo lines');
+      let text = new fabric.IText('text with\ntwo lines');
       text.lineHeight = 0.1;
       text.initDimensions();
-      var height = text.height,
+      let height = text.height,
           minimumHeight = text.fontSize * text._fontSizeMult;
       assert.equal(height > minimumHeight, true, 'text height is always bigger than minimum Height');
     });
 
     QUnit.test('toObject', function(assert) {
-      var stylesObject = {
+      let stylesObject = {
         0: {
           0: { fill: 'red' },
           1: { textDecoration: 'underline' }
         }
       };
-      var stylesArray = [
+      let stylesArray = [
         {
           start: 0,
           end: 1,
