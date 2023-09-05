@@ -1,6 +1,6 @@
 (function() {
-  var canvas = new fabric.Canvas();
-  var parsePath = fabric.util.parsePath;
+  let canvas = new fabric.Canvas();
+  let parsePath = fabric.util.parsePath;
   QUnit.module('fabric.BaseBrush', function(hooks) {
     hooks.afterEach(function() {
       canvas.cancelRequestedRender();
@@ -9,7 +9,7 @@
     QUnit.test('fabric brush constructor', function(assert) {
       assert.ok(fabric.BaseBrush);
 
-      var brush = new fabric.BaseBrush();
+      let brush = new fabric.BaseBrush();
 
       assert.ok(brush instanceof fabric.BaseBrush, 'should inherit from fabric.BaseBrush');
       assert.equal(brush.color, 'rgb(0, 0, 0)', 'default color is black');
@@ -17,16 +17,16 @@
     });
     QUnit.test('fabric pencil brush constructor', function(assert) {
       assert.ok(fabric.PencilBrush);
-      var brush = new fabric.PencilBrush(canvas);
+      let brush = new fabric.PencilBrush(canvas);
       assert.equal(brush.canvas, canvas, 'assigns canvas');
       assert.deepEqual(brush._points, [], 'points is an empty array');
     });
 
 	  QUnit.test('decimate points', function(assert) {
-	    var brush = new fabric.PencilBrush(canvas);
-	    var points = [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 5, y: 0 }];
-	    var distance = 6;
-	    var newPoints = brush.decimatePoints(points, distance);
+	    let brush = new fabric.PencilBrush(canvas);
+	    let points = [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }, { x: 4, y: 0 }, { x: 5, y: 0 }];
+	    let distance = 6;
+	    let newPoints = brush.decimatePoints(points, distance);
 	    assert.equal(newPoints[0], points[0], 'first point is always present');
 	    assert.equal(newPoints[1], points[points.length-1], 'last point is always present');
 	    assert.equal(newPoints.length, 2, 'All points removed except first and last');
