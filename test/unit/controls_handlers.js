@@ -1,9 +1,9 @@
 (function(){
   QUnit.module('fabric.controlsUtils', function(hooks) {
-    var eventData, transform;
-    var canvas = new fabric.Canvas(null);
+    let eventData, transform;
+    let canvas = new fabric.Canvas(null);
     hooks.beforeEach(function() {
-      var target = new fabric.Rect({ width: 100, height: 100 });
+      let target = new fabric.Rect({ width: 100, height: 100 });
       canvas.add(target);
       eventData = {};
       transform = prepareTransform(target, 'mr');
@@ -13,7 +13,7 @@
       canvas.clear();
     });
     function prepareTransform(target, corner) {
-      var origin = canvas._getOriginFromCorner(target, corner);
+      let origin = canvas._getOriginFromCorner(target, corner);
       return {
         target,
         corner,
@@ -25,17 +25,17 @@
     }
     QUnit.test('changeWidth changes the width', function(assert) {
       assert.equal(transform.target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
+      let changed = fabric.controlsUtils.changeWidth(eventData, transform, 200, 300);
       assert.ok(changed, 'control changed target');
       assert.equal(transform.target.width, 199);
       assert.equal(transform.target.left, 0);
       assert.equal(transform.target.top, 0);
     });
     QUnit.test('changeWidth does not change the width', function (assert) {
-      var target = new fabric.Rect({ width: 100, height: 100, canvas });
+      let target = new fabric.Rect({ width: 100, height: 100, canvas });
       target._set = () => { };
       assert.equal(target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, Object.assign({}, transform, { target }), 200, 300);
+      let changed = fabric.controlsUtils.changeWidth(eventData, Object.assign({}, transform, { target }), 200, 300);
       assert.ok(!changed, 'control change was rejected');
       assert.equal(target.width, 100);
       assert.equal(target.left, 0);
@@ -43,7 +43,7 @@
     });
     QUnit.test('changeWidth does not change the width of target\'s other side', function (assert) {
       assert.equal(transform.target.width, 100);
-      var changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'ml'), 200, 300);
+      let changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'ml'), 200, 300);
       assert.ok(!changed, 'control should not have changed target');
       assert.equal(transform.target.width, 100);
       changed = fabric.controlsUtils.changeWidth(eventData, prepareTransform(transform.target, 'mr'), -200, 300);
@@ -86,7 +86,7 @@
       assert.equal(Math.ceil(transform.target.width), 52);
     });
     QUnit.test('changeWidth will fire events on canvas and target resizing', function(assert) {
-      var done = assert.async();
+      let done = assert.async();
       transform.target.canvas.on('object:resizing', function(options) {
         assert.equal(options.target, transform.target);
       });
@@ -112,7 +112,7 @@
     QUnit.test('scalingXOrSkewingY changes scaleX to flip', function(assert) {
       transform.target.scaleX = 1;
       transform.target.strokeWidth = 0;
-      var returned = fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, -50, 300);
+      let returned = fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, -50, 300);
       assert.equal(transform.target.scaleX, 0.5);
       assert.equal(transform.target.flipX, true, 'the object flipped X');
       assert.equal(returned, true, 'action was permitted');
@@ -121,7 +121,7 @@
       transform.target.scaleX = 1;
       transform.target.strokeWidth = 0;
       transform.target.lockScalingFlip = true;
-      var returned = fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, -50, 300);
+      let returned = fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, -50, 300);
       assert.equal(transform.target.scaleX, 1);
       assert.equal(transform.target.flipX, false, 'the object did not flip X');
       assert.equal(returned, false, 'action was not permitted X');
@@ -135,7 +135,7 @@
     QUnit.test('scalingYOrSkewingX changes scaleY to flip', function(assert) {
       transform.target.scaleY = 1;
       transform.target.strokeWidth = 0;
-      var returned = fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, -80);
+      let returned = fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, -80);
       assert.equal(transform.target.scaleY, 0.8);
       assert.equal(transform.target.flipY, true, 'the object flipped Y');
       assert.equal(returned, true, 'action was permitted Y');
@@ -144,7 +144,7 @@
       transform.target.scaleY = 1;
       transform.target.strokeWidth = 0;
       transform.target.lockScalingFlip = true;
-      var returned = fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, -80);
+      let returned = fabric.controlsUtils.scalingYOrSkewingX(eventData, transform, 200, -80);
       assert.equal(transform.target.scaleY, 1);
       assert.equal(transform.target.flipY, false, 'the object did not flip Y');
       assert.equal(returned, false, 'action was not permitted Y');
