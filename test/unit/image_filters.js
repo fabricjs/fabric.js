@@ -1,10 +1,10 @@
 (function() {
 
-  var canvas = fabric.getFabricDocument().createElement('canvas'),
+  let canvas = fabric.getFabricDocument().createElement('canvas'),
       context = canvas.getContext('2d');
 
   function _createImageData(context) {
-    var imageData = context.createImageData(3, 1);
+    let imageData = context.createImageData(3, 1);
     imageData.data[0] = 200;
     imageData.data[1] = 100;
     imageData.data[2] = 50;
@@ -25,41 +25,41 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.filters.Brightness);
 
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(filter instanceof fabric.filters.Brightness, 'should inherit from fabric.filters.Brightness');
   });
 
   QUnit.test('properties', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
 
     assert.equal(filter.type, 'Brightness');
     assert.equal(filter.brightness, 0);
 
-    var filter2 = new fabric.filters.Brightness({brightness: 0.12});
+    let filter2 = new fabric.filters.Brightness({brightness: 0.12});
     assert.equal(filter2.brightness, 0.12);
   });
 
   QUnit.test('applyTo2d', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(typeof filter.applyTo2d === 'function');
   });
 
   QUnit.test('applyTo2d values', function(assert) {
-    var filter = new fabric.filters.Brightness({brightness: 0.2});
-    var options = { imageData: _createImageData(context) };
+    let filter = new fabric.filters.Brightness({brightness: 0.2});
+    let options = { imageData: _createImageData(context) };
     filter.applyTo2d(options);
-    var data = options.imageData.data;
-    var expected = [251, 151, 101, 1, 81, 255, 61, 1, 255, 255, 54, 1];
-    for (var i = 0; i < 12; i++) {
+    let data = options.imageData.data;
+    let expected = [251, 151, 101, 1, 81, 255, 61, 1, 255, 255, 54, 1];
+    for (let i = 0; i < 12; i++) {
       assert.equal(data[i], expected[i]);
     }
   });
 
   QUnit.test('toObject', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(typeof filter.toObject === 'function');
 
-    var object = filter.toObject();
+    let object = filter.toObject();
     assert.equal(JSON.stringify(object), '{"type":"Brightness","brightness":0}');
 
     filter.brightness = 100;
@@ -69,10 +69,10 @@
   });
 
   QUnit.test('toJSON', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(typeof filter.toJSON === 'function');
 
-    var json = filter.toJSON();
+    let json = filter.toJSON();
     assert.equal(JSON.stringify(json), '{"type":"Brightness","brightness":0}');
 
     filter.brightness = 100;
@@ -82,10 +82,10 @@
   });
 
   QUnit.test('fromObject', function(assert) {
-    var done = assert.async();
-    var filter = new fabric.filters.Brightness();
+    let done = assert.async();
+    let filter = new fabric.filters.Brightness();
 
-    var object = filter.toObject();
+    let object = filter.toObject();
     fabric.filters.Brightness.fromObject(object).then((newFilter) => {
       assert.deepEqual(newFilter, filter, 'enlived filter match');
       done();
@@ -93,7 +93,7 @@
   });
 
   QUnit.test('isNeutralState', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
 
     assert.ok(filter.isNeutralState(), 'Is neutral when brightness is 0');
     filter.brightness = 0.15;
@@ -105,35 +105,35 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.filters.Composed);
 
-    var filter = new fabric.filters.Composed();
+    let filter = new fabric.filters.Composed();
     assert.ok(filter instanceof fabric.filters.Composed, 'should inherit from fabric.filters.Composed');
   });
 
   QUnit.test('properties', function(assert) {
-    var filter = new fabric.filters.Composed();
+    let filter = new fabric.filters.Composed();
 
     assert.equal(filter.type, 'Composed');
 
   });
 
   QUnit.test('toObject', function(assert) {
-    var filter = new fabric.filters.Composed();
+    let filter = new fabric.filters.Composed();
     assert.ok(typeof filter.toObject === 'function');
 
-    var object = filter.toObject();
+    let object = filter.toObject();
     assert.equal(JSON.stringify(object), '{"type":"Composed","subFilters":[]}');
 
   });
 
   QUnit.test('toObject with subfilters', function(assert) {
-    var filter = new fabric.filters.Composed();
-    var brightness = new fabric.filters.Brightness();
-    var contrast = new fabric.filters.Contrast();
+    let filter = new fabric.filters.Composed();
+    let brightness = new fabric.filters.Brightness();
+    let contrast = new fabric.filters.Contrast();
     filter.subFilters.push(brightness);
     filter.subFilters.push(contrast);
-    var contrastObj = contrast.toObject();
-    var brightnessObj = brightness.toObject();
-    var object = filter.toObject();
+    let contrastObj = contrast.toObject();
+    let brightnessObj = brightness.toObject();
+    let object = filter.toObject();
     assert.equal(object.subFilters.length, 2, 'there are 2 subfilters');
     assert.deepEqual(object.subFilters[0], brightnessObj, 'the first subfilter has been serialized');
     assert.deepEqual(object.subFilters[1], contrastObj, 'the second subfilter has been serialized');
