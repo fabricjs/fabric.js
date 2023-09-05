@@ -10,7 +10,7 @@
   });
 
   QUnit.test('animateColor', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     function testing(val, complete) {
       if (complete !== 1) {
         assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
@@ -56,7 +56,7 @@
   });
 
   QUnit.test('animateColor with opacity', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     fabric.util.animateColor({
       startValue: 'rgba(255, 0, 0, 0.9)',
       endValue: 'rgba(0, 0, 255, 0.7)',
@@ -71,7 +71,7 @@
   });
 
   QUnit.test('animateColor, opacity out of bounds value are ignored', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
       endValue: [255, 255, 255, 3],
@@ -89,7 +89,7 @@
   });
 
   QUnit.test('animateColor opacity only', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     let called = false;
     fabric.util.animateColor({
       startValue: 'rgba(255, 0, 0, 0.9)',
@@ -111,7 +111,7 @@
   });
 
   QUnit.test('endValue', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     fabric.util.animate({
       startValue: 2,
       endValue: 5,
@@ -126,8 +126,8 @@
   });
 
   QUnit.test('animation context', function (assert) {
-    var done = assert.async();
-    var options = { foo: 'bar' };
+    let done = assert.async();
+    let options = { foo: 'bar' };
     const context = fabric.util.animate(options);
     assert.equal(context.state, 'pending', 'state');
     assert.ok(typeof context.abort === 'function', 'context');
