@@ -5,7 +5,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Circle);
 
-    var circle = new fabric.Circle();
+    let circle = new fabric.Circle();
 
     assert.ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
     assert.ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
@@ -15,13 +15,13 @@
 
   QUnit.test('constructor with radius', function(assert) {
     assert.ok(fabric.Circle);
-    var circle = new fabric.Circle({ radius: 20 });
+    let circle = new fabric.Circle({ radius: 20 });
     assert.equal(circle.width, 40, 'width is set');
     assert.equal(circle.height, 40, 'height is set');
   });
 
   QUnit.test('getRadiusX, getRadiusY', function(assert) {
-    var circle = new fabric.Circle({ radius: 10 });
+    let circle = new fabric.Circle({ radius: 10 });
 
     assert.ok(typeof circle.getRadiusX === 'function', 'getRadiusX should exist');
     assert.ok(typeof circle.getRadiusY === 'function', 'getRadiusY should exist');
@@ -46,7 +46,7 @@
   });
 
   QUnit.test('setRadius', function(assert) {
-    var circle = new fabric.Circle({radius: 10, strokeWidth: 0});
+    let circle = new fabric.Circle({radius: 10, strokeWidth: 0});
 
     assert.ok(typeof circle.setRadius === 'function');
 
@@ -66,7 +66,7 @@
   });
 
   QUnit.test('set radius', function(assert) {
-    var circle = new fabric.Circle({strokeWidth: 0});
+    let circle = new fabric.Circle({strokeWidth: 0});
 
     circle.set('radius', 20);
 
@@ -78,14 +78,14 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var circle = new fabric.Circle();
+    let circle = new fabric.Circle();
     assert.ok(typeof circle.complexity === 'function');
     assert.equal(circle.complexity(), 1);
   });
 
   QUnit.test('toObject', function(assert) {
-    var circle = new fabric.Circle();
-    var defaultProperties = {
+    let circle = new fabric.Circle();
+    let defaultProperties = {
       version:                  fabric.version,
       type:                     'Circle',
       originX:                  'left',
