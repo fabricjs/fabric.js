@@ -4,21 +4,21 @@ function pixelmatch(img1, img2, output, width, height, options) {
 
     if (!options) options = {};
 
-    var threshold = options.threshold === undefined ? 0.1 : options.threshold;
+    let threshold = options.threshold === undefined ? 0.1 : options.threshold;
 
     // maximum acceptable square distance between two colors;
     // 35215 is the maximum possible value for the YIQ difference metric
-    var maxDelta = 35215 * threshold * threshold,
+    let maxDelta = 35215 * threshold * threshold,
         diff = 0;
 
     // compare each pixel of one image against the other one
-    for (var y = 0; y < height; y++) {
-        for (var x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
 
-            var pos = (y * width + x) * 4;
+            let pos = (y * width + x) * 4;
 
             // squared YUV distance between colors at this pixel position
-            var delta = colorDelta(img1, img2, pos, pos);
+            let delta = colorDelta(img1, img2, pos, pos);
 
             // the color difference is above the threshold
             if (delta > maxDelta) {
@@ -36,7 +36,7 @@ function pixelmatch(img1, img2, output, width, height, options) {
 
             } else if (output) {
                 // pixels are similar; draw background as grayscale image blended with white
-                var val = blend(grayPixel(img1, pos), 0.1);
+                let val = blend(grayPixel(img1, pos), 0.1);
                 drawPixel(output, pos, val, val, val);
             }
         }
@@ -50,7 +50,7 @@ function pixelmatch(img1, img2, output, width, height, options) {
 // based on "Anti-aliased Pixel and Intensity Slope Detector" paper by V. Vysniauskas, 2009
 
 function antialiased(img, x1, y1, width, height, img2) {
-    var x0 = Math.max(x1 - 1, 0),
+    let x0 = Math.max(x1 - 1, 0),
         y0 = Math.max(y1 - 1, 0),
         x2 = Math.min(x1 + 1, width - 1),
         y2 = Math.min(y1 + 1, height - 1),
@@ -63,12 +63,12 @@ function antialiased(img, x1, y1, width, height, img2) {
         minX, minY, maxX, maxY;
 
     // go through 8 adjacent pixels
-    for (var x = x0; x <= x2; x++) {
-        for (var y = y0; y <= y2; y++) {
+    for (let x = x0; x <= x2; x++) {
+        for (let y = y0; y <= y2; y++) {
             if (x === x1 && y === y1) continue;
 
             // brightness delta between the center pixel and adjacent one
-            var delta = colorDelta(img, img, pos, (y * width + x) * 4, true);
+            let delta = colorDelta(img, img, pos, (y * width + x) * 4, true);
 
             // count the number of equal, darker and brighter adjacent pixels
             if (delta === 0) zeroes++;
