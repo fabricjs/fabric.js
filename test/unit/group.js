@@ -1,29 +1,29 @@
 (function() {
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+  let canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeGroupWith2Objects() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
     return new fabric.Group([rect1, rect2], { strokeWidth: 0 });
   }
 
   function makeGroupWith2ObjectsWithOpacity() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, opacity: 0.8 });
 
     return new fabric.Group([rect1, rect2], {strokeWidth: 0});
   }
 
   function makeGroupWith2ObjectsAndNoExport() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
       rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, excludeFromExport: true });
 
     return new fabric.Group([rect1, rect2], { strokeWidth: 0 });
   }
 
   function makeGroupWith4Objects() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
         rect3 = new fabric.Rect({ top: 40, left: 0, width: 20, height: 40 }),
         rect4 = new fabric.Rect({ top: 75, left: 75, width: 40, height: 40 });
@@ -40,22 +40,22 @@
   });
 
   QUnit.test('constructor', function(assert) {
-    var group = makeGroupWith2Objects();
+    let group = makeGroupWith2Objects();
 
     assert.ok(group);
     assert.ok(group instanceof fabric.Group, 'should be instance of fabric.Group');
   });
 
   QUnit.test('toString', function(assert) {
-    var group = makeGroupWith2Objects();
+    let group = makeGroupWith2Objects();
     assert.equal(group.toString(), '#<Group: (2)>', 'should return proper representation');
   });
 
   QUnit.test('getObjects', function(assert) {
-    var rect1 = new fabric.Rect(),
+    let rect1 = new fabric.Rect(),
         rect2 = new fabric.Rect();
 
-    var group = new fabric.Group([rect1, rect2]);
+    let group = new fabric.Group([rect1, rect2]);
 
     assert.ok(typeof group.getObjects === 'function');
     assert.ok(Array.isArray(group.getObjects()), 'should be an array');
@@ -64,8 +64,8 @@
   });
 
   QUnit.test('add', function(assert) {
-    var group = makeGroupWith2Objects();
-    var rect1 = new fabric.Rect(),
+    let group = makeGroupWith2Objects();
+    let rect1 = new fabric.Rect(),
         rect2 = new fabric.Rect(),
         rect3 = new fabric.Rect();
 
@@ -80,7 +80,7 @@
   });
 
   QUnit.test('remove', function(assert) {
-    var rect1 = new fabric.Rect(),
+    let rect1 = new fabric.Rect(),
         rect2 = new fabric.Rect(),
         rect3 = new fabric.Rect(),
         group = new fabric.Group([rect1, rect2, rect3]),
@@ -96,11 +96,11 @@
       assert.ok(rect1.group === undefined, 'group should not be referenced');
       fired = true;
     });
-    var removed = group.remove(rect2);
+    let removed = group.remove(rect2);
     assert.deepEqual(removed, [rect2], 'should return removed objects');
     assert.deepEqual(group.getObjects(), [rect1, rect3], 'should remove object properly');
 
-    var removed = group.remove(rect1, rect3);
+    let removed = group.remove(rect1, rect3);
     assert.deepEqual(removed, [rect1, rect3], 'should return removed objects');
     assert.equal(group.isEmpty(), true, 'group should be empty');
     assert.ok(fired, 'should have fired removed event on rect1');
@@ -108,7 +108,7 @@
   });
 
   QUnit.test('size', function(assert) {
-    var group = makeGroupWith2Objects();
+    let group = makeGroupWith2Objects();
 
     assert.ok(typeof group.size === 'function');
     assert.equal(group.size(), 2);
@@ -120,7 +120,7 @@
   });
 
   QUnit.test('set', function(assert) {
-    var group = makeGroupWith2Objects(),
+    let group = makeGroupWith2Objects(),
         firstObject = group.getObjects()[0];
 
     assert.ok(typeof group.set === 'function');
@@ -139,7 +139,7 @@
   });
 
   QUnit.test('contains', function(assert) {
-    var rect1           = new fabric.Rect(),
+    let rect1           = new fabric.Rect(),
         rect2           = new fabric.Rect(),
         notIncludedRect = new fabric.Rect(),
         group           = new fabric.Group([rect1, rect2]);
@@ -153,13 +153,13 @@
   });
 
   QUnit.test('toObject', function(assert) {
-    var group = makeGroupWith2Objects();
+    let group = makeGroupWith2Objects();
 
     assert.ok(typeof group.toObject === 'function');
 
-    var clone = group.toObject();
+    let clone = group.toObject();
 
-    var expectedObject = {
+    let expectedObject = {
       version: fabric.version,
       type:                     'Group',
       originX:                  'left',
