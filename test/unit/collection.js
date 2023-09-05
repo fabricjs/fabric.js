@@ -29,7 +29,7 @@
   });
 
   QUnit.test('add', function(assert) {
-    var obj = { prop: 4 };
+    let obj = { prop: 4 };
     assert.ok(typeof collection.add === 'function', 'has add method');
     assert.deepEqual(collection._objects, [], 'start with empty array of items');
     collection.add(obj);
@@ -45,7 +45,7 @@
   });
 
   QUnit.test('insertAt', function (assert) {
-    var rect1 = new fabric.Rect({ id: 1 }),
+    let rect1 = new fabric.Rect({ id: 1 }),
         rect2 = new fabric.Rect({ id: 2 }),
         rect3 = new fabric.Rect({ id: 3 }),
         rect4 = new fabric.Rect({ id: 4 }),
@@ -97,11 +97,11 @@
   });
 
   QUnit.test('remove', function(assert) {
-    var obj = { prop: 4 }, obj2 = { prop: 2 }, obj3 = { prop: 3 };
+    let obj = { prop: 4 }, obj2 = { prop: 2 }, obj3 = { prop: 3 };
     collection.add({ prop: 0 }, {prop: 1}, obj2, obj, obj3);
-    var previousLength = collection._objects.length;
+    let previousLength = collection._objects.length;
     assert.ok(typeof collection.remove === 'function', 'has remove method');
-    var returned = collection.remove(obj);
+    let returned = collection.remove(obj);
     assert.deepEqual(returned, [obj], 'should return removed objects');
     assert.ok(Array.isArray(collection.remove()), 'should return empty array');
     assert.equal(collection.remove({ prop: 'foo' }).length, 0, 'nothing removed');
@@ -127,10 +127,10 @@
   });
 
   QUnit.test('forEachObject', function(assert) {
-    var obj = { prop: false }, obj2 = { prop: false }, obj3 = { prop: false }, fired = 0;
+    let obj = { prop: false }, obj2 = { prop: false }, obj3 = { prop: false }, fired = 0;
     collection.add(obj2, obj, obj3);
     assert.ok(typeof collection.forEachObject === 'function', 'has forEachObject method');
-    var callback = function(_obj) {
+    let callback = function(_obj) {
       _obj.prop = true;
       fired++;
     };
@@ -148,19 +148,19 @@
     }
     class C extends fabric.Object {
     }
-    var obj = new A(), obj2 = new B(), obj3 = new C();
+    let obj = new A(), obj2 = new B(), obj3 = new C();
     collection.add(obj2, obj, obj3);
     assert.ok(typeof collection.getObjects === 'function', 'has getObjects method');
-    var returned = collection.getObjects();
+    let returned = collection.getObjects();
     assert.notEqual(returned, collection._objects, 'does not return a reference to _objects');
     assert.deepEqual(returned, [obj2, obj, obj3], 'returns objects');
   });
 
   QUnit.test('item', function(assert) {
-    var obj = { type: 'a' }, obj2 = { type: 'b' }, index = 1;
+    let obj = { type: 'a' }, obj2 = { type: 'b' }, index = 1;
     collection.add(obj2, obj);
     assert.ok(typeof collection.item === 'function', 'has item method');
-    var returned = collection.item(index);
+    let returned = collection.item(index);
     assert.equal(returned, collection._objects[index], 'return the object at index');
   });
 
