@@ -8,17 +8,17 @@
  **/
 (function(exports) {
   function extendObject(destination, source) {
-    for (var prop in source) {
+    for (let prop in source) {
       destination[prop] = source[prop];
     }
     return destination;
   }
-  var eventMatchers = {
+  let eventMatchers = {
     HTMLEvents: /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
     MouseEvents: /^(?:click|mouse(?:down|up|over|move|out))$/,
     KeyboardEvent: /^(?:key(?:up|down|press))$/
   };
-  var defaultOptions = {
+  let defaultOptions = {
     pointerX: 0,
     pointerY: 0,
     button: 0,
@@ -32,13 +32,13 @@
 
   exports.simulateEvent = function(element, eventName) {
 
-    var options = extendObject(extendObject({ }, defaultOptions), arguments[2] || { }),
+    let options = extendObject(extendObject({ }, defaultOptions), arguments[2] || { }),
         oEvent,
         eventType;
 
     element = typeof element === 'string' ? fabric.getFabricDocument().getElementById(element) : element;
 
-    for (var name in eventMatchers) {
+    for (let name in eventMatchers) {
       if (eventMatchers[name].test(eventName)) {
         eventType = name;
         break;
