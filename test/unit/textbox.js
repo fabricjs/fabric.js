@@ -1,5 +1,5 @@
 (function() {
-  var canvas = this.canvas = new fabric.Canvas();
+  let canvas = this.canvas = new fabric.Canvas();
   QUnit.module('fabric.Textbox', {
     before() {
       fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
@@ -13,24 +13,24 @@
   });
 
   QUnit.test('constructor', function(assert) {
-    var textbox = new fabric.Textbox('test');
+    let textbox = new fabric.Textbox('test');
     assert.ok(textbox instanceof fabric.Textbox);
     assert.ok(textbox instanceof fabric.IText);
     assert.ok(textbox instanceof fabric.Text);
   });
 
   QUnit.test('constructor with width', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 400 });
+    let textbox = new fabric.Textbox('test', { width: 400 });
     assert.equal(textbox.width, 400, 'width is taken by contstructor');
   });
 
   QUnit.test('constructor with width too small', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 5 });
+    let textbox = new fabric.Textbox('test', { width: 5 });
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
   });
 
   QUnit.test('initial properties', function(assert) {
-    var textbox = new fabric.Textbox('test');
+    let textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
     assert.equal(textbox.constructor.type, 'Textbox');
     assert.deepEqual(textbox.styles, { });
