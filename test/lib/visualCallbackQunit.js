@@ -1,8 +1,8 @@
 (function (window) {
 
   function appendResults(node, output, { goldenName }) {
-      var template = document.getElementById('error_output');
-      var errorOutput = template.content.cloneNode(true);
+      let template = document.getElementById('error_output');
+      let errorOutput = template.content.cloneNode(true);
       Object.keys(output).forEach(key => {
         const canvas = output[key];
         errorOutput.querySelector(`*[data-canvas-type="${key}"]`).appendChild(canvas);
@@ -34,25 +34,25 @@
 
   visualCallback.prototype.testDone = function (details) {
     if (window && document && this.currentArgs.enabled) {
-      var fabricCanvasDataRef = this.currentArgs.fabric;
-      var ouputImageDataRef = this.currentArgs.diff;
-      var goldenCanvasRef = this.currentArgs.golden;
-      var goldenName = this.currentArgs.goldenName;
-      var id = 'qunit-test-output-' + details.testId;
-      var fabricCopy = document.createElement('canvas');
-      var diff = document.createElement('canvas');
+      let fabricCanvasDataRef = this.currentArgs.fabric;
+      let ouputImageDataRef = this.currentArgs.diff;
+      let goldenCanvasRef = this.currentArgs.golden;
+      let goldenName = this.currentArgs.goldenName;
+      let id = 'qunit-test-output-' + details.testId;
+      let fabricCopy = document.createElement('canvas');
+      let diff = document.createElement('canvas');
       diff.width = fabricCopy.width = fabricCanvasDataRef.width;
       diff.height = fabricCopy.height = fabricCanvasDataRef.height;
       diff.getContext('2d').putImageData(ouputImageDataRef, 0, 0);
       fabricCopy.getContext('2d').putImageData(fabricCanvasDataRef, 0, 0);
 
-      var data = {
+      let data = {
         actual: fabricCopy,
         expected: goldenCanvasRef,
         diff
       };
 
-      var node = document.getElementById(id);
+      let node = document.getElementById(id);
 
       if (node) {
         appendResults(node, data, { goldenName });
