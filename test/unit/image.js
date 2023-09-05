@@ -1,37 +1,37 @@
 (function() {
 
   function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
+    let isAbsolute = /^https?:/.test(path);
     if (isAbsolute) { return path; };
-    var imgEl = _createImageElement();
+    let imgEl = _createImageElement();
     imgEl.src = path;
-    var src = imgEl.src;
+    let src = imgEl.src;
     imgEl = null;
     return src;
   }
 
   function makeImageElement(attributes) {
-    var element = {};
+    let element = {};
     element.getAttribute = function(x) {
       return element[x];
     };
     element.setAttribute = function(x, value) {
       element[x] = value;
     };
-    for (var prop in attributes) {
+    for (let prop in attributes) {
       element.setAttribute(prop, attributes[prop]);
     }
     return element;
   }
 
-  var IMG_SRC     = isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
+  let IMG_SRC     = isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : getAbsolutePath('../fixtures/test_image.gif'),
       IMG_SRC_REL = isNode() ? ('file://' + require('path').join(__dirname + '/../fixtures/test_image.gif')) : '../fixtures/test_image.gif',
       IMG_WIDTH   = 276,
       IMG_HEIGHT  = 110;
 
-  var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
+  let IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
-  var REFERENCE_IMG_OBJECT = {
+  let REFERENCE_IMG_OBJECT = {
     version:                  fabric.version,
     type:                     'Image',
     originX:                  'left',
