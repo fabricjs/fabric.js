@@ -1,5 +1,5 @@
 (function(){
-  var canvas = fabric.getFabricDocument().createElement('canvas'),
+  let canvas = fabric.getFabricDocument().createElement('canvas'),
     ctx = canvas.getContext('2d');
 
   async function assertCursorAnimation(assert, text, active = false, delay = false) {
