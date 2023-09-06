@@ -5,7 +5,7 @@
   QUnit.test('constructor & properties', function(assert) {
     assert.ok(typeof fabric.Intersection === 'function');
 
-    var intersection = new fabric.Intersection();
+    let intersection = new fabric.Intersection();
 
     assert.ok(intersection);
     assert.ok(intersection instanceof fabric.Intersection);
@@ -15,16 +15,16 @@
     assert.ok('status' in intersection, 'has status property');
     assert.equal(intersection.status, undefined, 'no default value for status');
 
-    var status = 'status';
+    let status = 'status';
     intersection = new fabric.Intersection(status);
     assert.equal(intersection.status, status, 'constructor pass status value');
   });
 
   QUnit.test('append', function(assert) {
-    var point = new fabric.Point(1, 1);
-    var intersection = new fabric.Intersection();
+    let point = new fabric.Point(1, 1);
+    let intersection = new fabric.Intersection();
     assert.ok(typeof intersection.append === 'function', 'has appendPoint method');
-    var returned = intersection.append(point, point);
+    let returned = intersection.append(point, point);
     assert.ok(returned instanceof fabric.Intersection, 'returns a fabric.Intersection');
     assert.equal(returned, intersection, 'is chainable');
     assert.equal(intersection.points.indexOf(point), 0, 'now intersection contain points');
