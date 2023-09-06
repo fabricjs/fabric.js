@@ -1,10 +1,10 @@
 (function() {
 
-  var canvas = fabric.getFabricDocument().createElement('canvas'),
+  let canvas = fabric.getFabricDocument().createElement('canvas'),
       context = canvas.getContext('2d');
 
   function _createImageData(context) {
-    var imageData = context.createImageData(3, 1);
+    let imageData = context.createImageData(3, 1);
     imageData.data[0] = 200;
     imageData.data[1] = 100;
     imageData.data[2] = 50;
@@ -25,32 +25,32 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.filters.Brightness);
 
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(filter instanceof fabric.filters.Brightness, 'should inherit from fabric.filters.Brightness');
   });
 
   QUnit.test('properties', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
 
     assert.equal(filter.type, 'Brightness');
     assert.equal(filter.brightness, 0);
 
-    var filter2 = new fabric.filters.Brightness({brightness: 0.12});
+    let filter2 = new fabric.filters.Brightness({brightness: 0.12});
     assert.equal(filter2.brightness, 0.12);
   });
 
   QUnit.test('applyTo2d', function(assert) {
-    var filter = new fabric.filters.Brightness();
+    let filter = new fabric.filters.Brightness();
     assert.ok(typeof filter.applyTo2d === 'function');
   });
 
   QUnit.test('applyTo2d values', function(assert) {
-    var filter = new fabric.filters.Brightness({brightness: 0.2});
-    var options = { imageData: _createImageData(context) };
+    let filter = new fabric.filters.Brightness({brightness: 0.2});
+    let options = { imageData: _createImageData(context) };
     filter.applyTo2d(options);
-    var data = options.imageData.data;
-    var expected = [251, 151, 101, 1, 81, 255, 61, 1, 255, 255, 54, 1];
-    for (var i = 0; i < 12; i++) {
+    let data = options.imageData.data;
+    let expected = [251, 151, 101, 1, 81, 255, 61, 1, 255, 255, 54, 1];
+    for (let i = 0; i < 12; i++) {
       assert.equal(data[i], expected[i]);
     }
   });
