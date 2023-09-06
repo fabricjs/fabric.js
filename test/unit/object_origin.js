@@ -1,6 +1,6 @@
 (function() {
 
-  var rectOptions = {
+  let rectOptions = {
     'originX':                  'left',
     'originY':                  'top',
     'left':                     35,
@@ -17,13 +17,13 @@
   QUnit.module('fabric.ObjectOrigins');
 
   QUnit.test('getCenterPoint', function(assert) {
-    var rect = new fabric.Rect(rectOptions), p;
+    let rect = new fabric.Rect(rectOptions), p;
     p = rect.getCenterPoint();
     assert.deepEqual(p, new fabric.Point(57, 87));
   });
 
   QUnit.test('translateToCenterPoint', function(assert) {
-    var rect = new fabric.Rect(rectOptions),
+    let rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
 
@@ -59,7 +59,7 @@
   });
 
   QUnit.test('translateToCenterPointRotated', function(assert) {
-    var rect = new fabric.Rect(rectOptions),
+    let rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
     rect.angle = 35;
@@ -94,7 +94,7 @@
 
 
   QUnit.test('translateToOriginPoint', function(assert) {
-    var rect = new fabric.Rect(rectOptions),
+    let rect = new fabric.Rect(rectOptions),
         p,
         point = new fabric.Point(15, 20);
 
