@@ -5,7 +5,7 @@
   QUnit.test('constructor & properties', function(assert) {
     assert.ok(typeof fabric.Point === 'function');
 
-    var point = new fabric.Point();
+    let point = new fabric.Point();
 
     assert.ok(point);
     assert.ok(point instanceof fabric.Point);
@@ -14,21 +14,21 @@
     assert.strictEqual(point.x, 0, 'constructor assign x value');
     assert.strictEqual(point.y, 0, 'constructor assign y value');
 
-    var x = 5, y = 6;
+    let x = 5, y = 6;
     point = new fabric.Point(x, y);
     assert.equal(point.x, x, 'constructor pass x value');
     assert.equal(point.y, y, 'constructor pass y value');
   });
 
   QUnit.test('point add', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
+    let x1 = 2, y1 = 3, x2 = 4, y2 = 5,
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
     assert.ok(typeof point.add === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.add(point2);
+    let returned = point.add(point2);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 + x2, 'x coords should be added');
@@ -40,14 +40,14 @@
   });
 
   QUnit.test('point addEquals', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
+    let x1 = 2, y1 = 3, x2 = 4, y2 = 5,
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
     assert.ok(typeof point.addEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.addEquals(point2);
+    let returned = point.addEquals(point2);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 + x2, 'x coords should be added');
@@ -57,13 +57,13 @@
   });
 
   QUnit.test('scalarAdd', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
+    let x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
     assert.ok(typeof point.scalarAdd === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarAdd(scalar);
+    let returned = point.scalarAdd(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 + scalar, 'x coords should be added');
@@ -71,13 +71,13 @@
   });
 
   QUnit.test('scalarAddEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
+    let x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
     assert.ok(typeof point.scalarAddEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarAddEquals(scalar);
+    let returned = point.scalarAddEquals(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 + scalar, 'x coords should be added');
@@ -85,14 +85,14 @@
   });
 
   QUnit.test('point subtract', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
+    let x1 = 2, y1 = 3, x2 = 4, y2 = 5,
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
     assert.ok(typeof point.subtract === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.subtract(point2);
+    let returned = point.subtract(point2);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 - x2, 'x coords should be added');
@@ -104,14 +104,14 @@
   });
 
   QUnit.test('point subtractEquals', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
+    let x1 = 2, y1 = 3, x2 = 4, y2 = 5,
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
     assert.ok(typeof point.subtractEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.subtractEquals(point2);
+    let returned = point.subtractEquals(point2);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 - x2, 'x coords should be added');
@@ -121,13 +121,13 @@
   });
 
   QUnit.test('scalarSubtract', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
+    let x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
     assert.ok(typeof point.scalarSubtract === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarSubtract(scalar);
+    let returned = point.scalarSubtract(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 - scalar, 'x coords should be added');
@@ -135,13 +135,13 @@
   });
 
   QUnit.test('scalarSubtractEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
+    let x1 = 2, y1 = 3, scalar = 3,
         point = new fabric.Point(x1, y1);
 
     assert.ok(typeof point.scalarSubtractEquals === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarSubtractEquals(scalar);
+    let returned = point.scalarSubtractEquals(scalar);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.equal(returned, point, 'is chainable');
     assert.equal(point.x, x1 - scalar, 'x coords should be added');
