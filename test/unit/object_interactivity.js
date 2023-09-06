@@ -5,7 +5,7 @@
   QUnit.test('isControlVisible', function(assert) {
     assert.ok(fabric.Object);
 
-    var cObj = new fabric.Object({ });
+    let cObj = new fabric.Object({ });
     assert.ok(typeof cObj.isControlVisible === 'function', 'isControlVisible should exist');
 
     assert.equal(cObj.isControlVisible('tl'), true);
@@ -22,7 +22,7 @@
   QUnit.test('setControlVisible', function(assert) {
     assert.ok(fabric.Object);
 
-    var cObj = new fabric.Object({ });
+    let cObj = new fabric.Object({ });
     assert.ok(typeof cObj.setControlVisible === 'function', 'setControlVisible should exist');
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false);
@@ -33,8 +33,8 @@
   QUnit.test('setControlVisible is per object', function(assert) {
     assert.ok(fabric.Object);
 
-    var cObj = new fabric.Object({ });
-    var cObj2 = new fabric.Object({ });
+    let cObj = new fabric.Object({ });
+    let cObj2 = new fabric.Object({ });
 
     cObj.setControlVisible('tl', false);
     assert.equal(cObj.isControlVisible('tl'), false, 'setting to false worked for cObj');
