@@ -7,7 +7,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Ellipse);
 
-    var ellipse = new fabric.Ellipse();
+    let ellipse = new fabric.Ellipse();
 
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
     assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
@@ -16,14 +16,14 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var ellipse = new fabric.Ellipse();
+    let ellipse = new fabric.Ellipse();
     assert.ok(typeof ellipse.complexity === 'function');
     assert.equal(ellipse.complexity(), 1);
   });
 
   QUnit.test('toObject', function(assert) {
-    var ellipse = new fabric.Ellipse();
-    var defaultProperties = {
+    let ellipse = new fabric.Ellipse();
+    let defaultProperties = {
       version:                  fabric.version,
       type:                     'Ellipse',
       originX:                  'left',
@@ -96,7 +96,7 @@
   });
 
   QUnit.test('isNotVisible', function(assert) {
-    var ellipse = new fabric.Ellipse();
+    let ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0);
     ellipse.set('ry', 0);
 
