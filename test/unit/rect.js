@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_RECT = {
+  let REFERENCE_RECT = {
     version:                  fabric.version,
     type:                     'Rect',
     originX:                  'left',
@@ -41,7 +41,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Rect);
 
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(rect instanceof fabric.Rect);
     assert.ok(rect instanceof fabric.Object);
@@ -50,13 +50,13 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(typeof rect.complexity === 'function');
   });
 
   QUnit.test('cache properties', function(assert) {
-    var rect = new fabric.Rect();
+    let rect = new fabric.Rect();
 
     assert.ok(fabric.Rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
     assert.ok(fabric.Rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
