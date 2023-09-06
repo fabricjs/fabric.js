@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  let REFERENCE_OBJECT = {
     version:                  fabric.version,
     type:                     'Polygon',
     originX:                  'left',
@@ -42,7 +42,7 @@
     strokeUniform:              false
   };
 
-  var REFERENCE_EMPTY_OBJECT = {
+  let REFERENCE_EMPTY_OBJECT = {
     points: [],
     width: 0,
     height: 0,
@@ -55,7 +55,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Polygon);
 
-    var polygon = new fabric.Polygon(getPoints());
+    let polygon = new fabric.Polygon(getPoints());
 
     assert.ok(polygon instanceof fabric.Polygon);
     assert.ok(polygon instanceof fabric.Polyline);
@@ -67,7 +67,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins top-left', function(assert) {
 
-    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
+    let polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
 
     assert.equal(polygon.left, 9);
     assert.equal(polygon.top, 11);
@@ -76,7 +76,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins center-center', function(assert) {
 
-    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'center', originY: 'center' });
+    let polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'center', originY: 'center' });
 
     assert.equal(polygon.left, 15);
     assert.equal(polygon.top, 17);
@@ -85,7 +85,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins bottom-right', function(assert) {
 
-    var polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'right', originY: 'bottom' });
+    let polygon = new fabric.Polygon(getPoints(), { strokeWidth: 2, originX: 'right', originY: 'bottom' });
 
     assert.equal(polygon.left, 21);
     assert.equal(polygon.top, 23);
@@ -93,11 +93,11 @@
   });
 
   QUnit.test('polygon with exactBoundingBox false', function(assert) {
-    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+    let polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: false,
       strokeWidth: 60,
     });
-    var dimensions = polygon._getNonTransformedDimensions();
+    let dimensions = polygon._getNonTransformedDimensions();
     assert.equal(dimensions.x, 70);
     assert.equal(dimensions.y, 150);
   });
