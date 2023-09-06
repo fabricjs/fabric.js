@@ -13,9 +13,9 @@
     return new fabric.Text(text || 'x');
   }
 
-  var CHAR_WIDTH = 20;
+  let CHAR_WIDTH = 20;
 
-  var REFERENCE_TEXT_OBJECT = {
+  let REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
     type:                      'Text',
     originX:                   'left',
@@ -69,7 +69,7 @@
 
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Text);
-    var text = createTextObject();
+    let text = createTextObject();
 
     assert.ok(text);
     assert.ok(text instanceof fabric.Text);
@@ -80,15 +80,15 @@
   });
 
   QUnit.test('toString', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.toString === 'function');
     assert.equal(text.toString(), '#<Text (1): { "text": "x", "fontFamily": "Times New Roman" }>');
   });
 
   QUnit.test('_getFontDeclaration', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text._getFontDeclaration === 'function', 'has a private method _getFontDeclaration');
-    var fontDecl = text._getFontDeclaration();
+    let fontDecl = text._getFontDeclaration();
     assert.ok(typeof fontDecl === 'string', 'it returns a string');
     assert.equal(fontDecl, 'normal normal 40px "Times New Roman"');
     text.fontFamily = '"Times New Roman"';
@@ -102,32 +102,32 @@
   });
 
   QUnit.test('_getFontDeclaration with coma', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     text.fontFamily = 'Arial, sans-serif';
-    var fontDecl = text._getFontDeclaration();
+    let fontDecl = text._getFontDeclaration();
     assert.equal(fontDecl, 'normal normal 40px Arial, sans-serif', 'if multiple font name detected no quotes added.');
   });
 
   fabric.Text.genericFonts.forEach(function(fontName) {
     QUnit.test('_getFontDeclaration with genericFonts', function(assert) {
-      var text = createTextObject();
+      let text = createTextObject();
       text.fontFamily = fontName;
-      var fontDecl = text._getFontDeclaration();
+      let fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName, 'it does not quote ' + fontName);
       text.fontFamily = fontName.toUpperCase();
-      var fontDecl = text._getFontDeclaration();
+      let fontDecl = text._getFontDeclaration();
       assert.equal(fontDecl, 'normal normal 40px ' + fontName.toUpperCase(), 'it uses a non case sensitive logic');
     });
   });
 
   QUnit.test('complexity', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.complexity === 'function');
     assert.equal(text.complexity(), 1);
   });
 
   QUnit.test('set', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     assert.ok(typeof text.set === 'function');
     assert.equal(text.set('text', 'bar'), text, 'should be chainable');
 
@@ -139,11 +139,11 @@
   });
 
   QUnit.test('lineHeight with single line', function(assert) {
-    var text = createTextObject();
+    let text = createTextObject();
     text.text = 'text with one line';
     text.lineHeight = 2;
     text.initDimensions();
-    var height = text.height;
+    let height = text.height;
     text.lineHeight = 0.5;
     text.initDimensions();
     var heightNew = text.height;
