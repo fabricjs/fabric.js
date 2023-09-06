@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  let REFERENCE_OBJECT = {
     version:                  fabric.version,
     type:                     'Polyline',
     originX:                  'left',
@@ -42,7 +42,7 @@
     strokeUniform:              false
   };
 
-  var REFERENCE_EMPTY_OBJECT = {
+  let REFERENCE_EMPTY_OBJECT = {
     points: [],
     width: 0,
     height: 0,
@@ -55,7 +55,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Polyline);
 
-    var polyline = new fabric.Polyline(getPoints());
+    let polyline = new fabric.Polyline(getPoints());
 
     assert.ok(polyline instanceof fabric.Polyline);
     assert.ok(polyline instanceof fabric.Object);
@@ -66,7 +66,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins top-left', function(assert) {
 
-    var polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
+    let polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'left', originY: 'top' });
 
     assert.equal(polyline.left, 9);
     assert.equal(polyline.top, 11);
@@ -75,7 +75,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins center-center', function(assert) {
 
-    var polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'center', originY: 'center' });
+    let polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'center', originY: 'center' });
 
     assert.equal(polyline.left, 15);
     assert.equal(polyline.top, 17);
@@ -84,7 +84,7 @@
 
   QUnit.test('constructor, with strokeWidth top-left and origins bottom-right', function(assert) {
 
-    var polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'right', originY: 'bottom' });
+    let polyline = new fabric.Polyline(getPoints(), { strokeWidth: 2, originX: 'right', originY: 'bottom' });
 
     assert.equal(polyline.left, 21);
     assert.equal(polyline.top, 23);
@@ -92,12 +92,12 @@
   });
 
   QUnit.test('complexity', function(assert) {
-    var polyline = new fabric.Polyline(getPoints());
+    let polyline = new fabric.Polyline(getPoints());
     assert.ok(typeof polyline.complexity === 'function');
   });
 
   QUnit.test('toObject', function(assert) {
-    var polyline = new fabric.Polyline(getPoints());
+    let polyline = new fabric.Polyline(getPoints());
     assert.ok(typeof polyline.toObject === 'function');
 
     assert.deepEqual({
@@ -107,9 +107,9 @@
   });
 
   QUnit.test('toSVG', function(assert) {
-    var polyline = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
+    let polyline = new fabric.Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
     assert.ok(typeof polyline.toSVG === 'function');
-    var EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15 17)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
+    let EXPECTED_SVG = '<g transform=\"matrix(1 0 0 1 15 17)\"  >\n<polygon style=\"stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;\"  points=\"-5,-5 5,5 \" />\n</g>\n';
     assert.deepEqual(polyline.toSVG(), EXPECTED_SVG);
   });
 
