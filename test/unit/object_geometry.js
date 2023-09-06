@@ -1,13 +1,13 @@
 (function() {
-  var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
+  let canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
   QUnit.module('fabric.ObjectGeometry');
 
   QUnit.test('intersectsWithRectangle', function(assert) {
-    var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
+    let cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithRect === 'function');
 
-    var point1 = new fabric.Point(110, 100),
+    let point1 = new fabric.Point(110, 100),
         point2 = new fabric.Point(210, 200),
         point3 = new fabric.Point(0, 0),
         point4 = new fabric.Point(10, 10);
@@ -17,14 +17,14 @@
   });
 
   QUnit.test('intersectsWithRectangle absolute', function(assert) {
-    var cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
-    var absolute = true;
+    let cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
+    let absolute = true;
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
     canvas.calcViewportBoundaries();
 
-    var point1 = new fabric.Point(5, 5),
+    let point1 = new fabric.Point(5, 5),
         point2 = new fabric.Point(15, 15),
         point3 = new fabric.Point(25, 25),
         point4 = new fabric.Point(35, 35);
