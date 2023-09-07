@@ -1,5 +1,5 @@
 (function() {
-  var canvas = this.canvas = new fabric.Canvas();
+  let canvas = this.canvas = new fabric.Canvas();
   QUnit.module('fabric.Textbox', {
     before() {
       fabric.config.configure({ NUM_FRACTION_DIGITS: 2 });
@@ -13,24 +13,24 @@
   });
 
   QUnit.test('constructor', function(assert) {
-    var textbox = new fabric.Textbox('test');
+    let textbox = new fabric.Textbox('test');
     assert.ok(textbox instanceof fabric.Textbox);
     assert.ok(textbox instanceof fabric.IText);
     assert.ok(textbox instanceof fabric.Text);
   });
 
   QUnit.test('constructor with width', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 400 });
+    let textbox = new fabric.Textbox('test', { width: 400 });
     assert.equal(textbox.width, 400, 'width is taken by contstructor');
   });
 
   QUnit.test('constructor with width too small', function(assert) {
-    var textbox = new fabric.Textbox('test', { width: 5 });
+    let textbox = new fabric.Textbox('test', { width: 5 });
     assert.equal(Math.round(textbox.width), 56, 'width is calculated by constructor');
   });
 
   QUnit.test('initial properties', function(assert) {
-    var textbox = new fabric.Textbox('test');
+    let textbox = new fabric.Textbox('test');
     assert.equal(textbox.text, 'test');
     assert.equal(textbox.constructor.type, 'Textbox');
     assert.deepEqual(textbox.styles, { });
@@ -38,7 +38,7 @@
   });
 
   QUnit.test('isEndOfWrapping', function(assert) {
-    var textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
+    let textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
       width: 70,
     });
     assert.equal(textbox.isEndOfWrapping(0), false, 'first line is not end of wrapping');
@@ -50,7 +50,7 @@
   });
 
   QUnit.test('_removeExtraneousStyles', function(assert) {
-    var textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
+    let textbox = new fabric.Textbox('a q o m s g\np q r s t w', {
       width: 40,
       styles: {
         0: { 0: { fontSize: 4 } },
@@ -72,7 +72,7 @@
   });
 
   QUnit.test('isEmptyStyles', function(assert) {
-    var textbox = new fabric.Textbox('x x', { width: 5, styles: { 0: { 0: { fill: 'red' } } } });
+    let textbox = new fabric.Textbox('x x', { width: 5, styles: { 0: { 0: { fill: 'red' } } } });
     assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
     assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
     assert.equal(textbox.isEmptyStyles(), false, 'style is not empty');
@@ -81,7 +81,7 @@
   });
 
   QUnit.test('isEmptyStyles does not crash on null styles', function(assert) {
-    var textbox = new fabric.Textbox('x x', { width: 5 });
+    let textbox = new fabric.Textbox('x x', { width: 5 });
     textbox.styles = null;
     assert.equal(textbox._textLines.length, 2, 'lines are wrapped');
     assert.equal(textbox._unwrappedTextLines.length, 1, 'there is only one text line');
