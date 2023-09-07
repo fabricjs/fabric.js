@@ -1,8 +1,8 @@
 require('source-map-support/register');
 require('./lib/assert');
 // set the fabric framework as a global for tests
-var chalk = require('chalk');
-var commander = require('commander');
+let chalk = require('chalk');
+let commander = require('commander');
 
 // TODO remove block and dependency when node 14 fades out
 // node 14 AbortController polyfill for tests
