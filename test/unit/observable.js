@@ -2,7 +2,7 @@ QUnit.module('fabric.Observable');
 
 QUnit.test('fabric.Observable exists', function (assert) {
   assert.ok(fabric.Observable);
-  var o = new fabric.Observable();
+  let o = new fabric.Observable();
   assert.ok(typeof o.fire === 'function');
   assert.ok(typeof o.on === 'function');
   assert.ok(typeof o.once === 'function');
@@ -10,9 +10,9 @@ QUnit.test('fabric.Observable exists', function (assert) {
 });
 
 QUnit.test('fire + on', function (assert) {
-  var foo = new fabric.Observable();
+  let foo = new fabric.Observable();
 
-  var eventFired = false;
+  let eventFired = false;
   foo.on('bar:baz', function () {
     eventFired = true;
   });
@@ -22,9 +22,9 @@ QUnit.test('fire + on', function (assert) {
 });
 
 QUnit.test('fire once', function (assert) {
-  var foo = new fabric.Observable();
+  let foo = new fabric.Observable();
 
-  var eventFired = 0;
+  let eventFired = 0;
   foo.once('bar:baz', () => {
     eventFired++;
   });
