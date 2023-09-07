@@ -1,6 +1,6 @@
 (function() {
 
-  var REFERENCE_PATH_OBJECT = {
+  let REFERENCE_PATH_OBJECT = {
     version:                  fabric.version,
     type:                     'Path',
     originX:                  'left',
@@ -36,8 +36,8 @@
   };
 
   function getPathElement(path) {
-    var namespace = 'http://www.w3.org/2000/svg';
-    var el = fabric.getFabricDocument().createElementNS(namespace, 'path');
+    let namespace = 'http://www.w3.org/2000/svg';
+    let el = fabric.getFabricDocument().createElementNS(namespace, 'path');
     el.setAttributeNS(namespace, 'd', path);
     el.setAttributeNS(namespace, 'fill', 'red');
     el.setAttributeNS(namespace, 'stroke', 'blue');
@@ -73,7 +73,7 @@
   });
 
   QUnit.test('constructor', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     assert.ok(fabric.Path);
 
     makePathObject(function(path) {
@@ -82,7 +82,7 @@
 
       assert.equal(path.constructor.type, 'Path');
 
-      var error;
+      let error;
       try {
         new fabric.Path();
       }
@@ -96,8 +96,8 @@
   });
 
   QUnit.test('initialize', function(assert) {
-    var done = assert.async();
-    var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
+    let done = assert.async();
+    let path = new fabric.Path('M 100 100 L 200 100 L 170 200 z', { top: 0, strokeWidth: 0 });
 
     assert.equal(path.left, 100);
     assert.equal(path.top, 0);
