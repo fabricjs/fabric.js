@@ -7,7 +7,7 @@
     ];
   }
 
-  var REFERENCE_OBJECT = {
+  let REFERENCE_OBJECT = {
     version:                  fabric.version,
     type:                     'Polyline',
     originX:                  'left',
