@@ -5,9 +5,9 @@
   };
 
   exports.getAsset = function(name, callback) {
-    var finalName = getAssetName(name);
+    let finalName = getAssetName(name);
     if (isNode()) {
-      var plainFileName = finalName.replace('file://', '');
+      let plainFileName = finalName.replace('file://', '');
       return fs.readFile(plainFileName, { encoding: 'utf8' }, callback);
     }
     else {
@@ -20,8 +20,8 @@
   };
 
   function createCanvasForTest(opts) {
-    var fabricClass = opts.fabricClass || 'StaticCanvas';
-    var options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
+    let fabricClass = opts.fabricClass || 'StaticCanvas';
+    let options = { enableRetinaScaling: false, renderOnAddRemove: false, width: 200, height: 200 };
     if (opts.width) {
       options.width = opts.width;
     }
@@ -36,25 +36,25 @@
   }
 
   function getAssetName(filename) {
-    var finalName = '/assets/' + filename + '.svg';
+    let finalName = '/assets/' + filename + '.svg';
     return isNode() ? localPath('/../visual', finalName) : finalName;
   }
   exports.getAssetName = getAssetName;
 
   function getGoldeName(filename) {
-    var finalName = '/golden/' + filename;
+    let finalName = '/golden/' + filename;
     return isNode() ? localPath('/../visual', finalName) : finalName;
   }
 
   function getFixtureName(filename) {
-    var finalName = '/fixtures/' + filename;
+    let finalName = '/fixtures/' + filename;
     return isNode() ? localPath('/..', finalName) : finalName;
   }
 
   function generateGolden(filename, original) {
     if (isNode() && original) {
-      var plainFileName = filename.replace('file://', '');
-      var dataUrl = original.toDataURL().split(',')[1];
+      let plainFileName = filename.replace('file://', '');
+      let dataUrl = original.toDataURL().split(',')[1];
       console.log('creating golden for ', filename);
       fs.writeFileSync(plainFileName, dataUrl, { encoding: 'base64' });
     }
@@ -84,7 +84,7 @@
 
   async function getImage(filename, original) {
     if (isNode() && original) {
-      var plainFileName = filename.replace('file://', '');
+      let plainFileName = filename.replace('file://', '');
       if (!fs.existsSync(plainFileName)) {
         generateGolden(filename, original);
       }
