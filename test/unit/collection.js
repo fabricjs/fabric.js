@@ -29,7 +29,7 @@
   });
 
   QUnit.test('add', function(assert) {
-    var obj = { prop: 4 };
+    let obj = { prop: 4 };
     assert.ok(typeof collection.add === 'function', 'has add method');
     assert.deepEqual(collection._objects, [], 'start with empty array of items');
     collection.add(obj);
@@ -45,7 +45,7 @@
   });
 
   QUnit.test('insertAt', function (assert) {
-    var rect1 = new fabric.Rect({ id: 1 }),
+    let rect1 = new fabric.Rect({ id: 1 }),
         rect2 = new fabric.Rect({ id: 2 }),
         rect3 = new fabric.Rect({ id: 3 }),
         rect4 = new fabric.Rect({ id: 4 }),
