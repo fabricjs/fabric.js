@@ -4,21 +4,21 @@ function pixelmatch(img1, img2, output, width, height, options) {
 
     if (!options) options = {};
 
-    var threshold = options.threshold === undefined ? 0.1 : options.threshold;
+    let threshold = options.threshold === undefined ? 0.1 : options.threshold;
 
     // maximum acceptable square distance between two colors;
     // 35215 is the maximum possible value for the YIQ difference metric
-    var maxDelta = 35215 * threshold * threshold,
+    let maxDelta = 35215 * threshold * threshold,
         diff = 0;
 
     // compare each pixel of one image against the other one
-    for (var y = 0; y < height; y++) {
-        for (var x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
 
-            var pos = (y * width + x) * 4;
+            let pos = (y * width + x) * 4;
 
             // squared YUV distance between colors at this pixel position
-            var delta = colorDelta(img1, img2, pos, pos);
+            let delta = colorDelta(img1, img2, pos, pos);
 
             // the color difference is above the threshold
             if (delta > maxDelta) {
@@ -36,7 +36,7 @@ function pixelmatch(img1, img2, output, width, height, options) {
 
             } else if (output) {
                 // pixels are similar; draw background as grayscale image blended with white
-                var val = blend(grayPixel(img1, pos), 0.1);
+                let val = blend(grayPixel(img1, pos), 0.1);
                 drawPixel(output, pos, val, val, val);
             }
         }
