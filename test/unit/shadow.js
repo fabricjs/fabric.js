@@ -2,7 +2,7 @@
 
   QUnit.module('fabric.Shadow');
 
-  var REFERENCE_SHADOW_OBJECT = {
+  let REFERENCE_SHADOW_OBJECT = {
     'color':   'rgb(0,255,0)',
     'blur':    10,
     'offsetX': 20,
@@ -12,7 +12,7 @@
   QUnit.test('constructor', function(assert) {
     assert.ok(fabric.Shadow);
 
-    var shadow = new fabric.Shadow();
+    let shadow = new fabric.Shadow();
     assert.ok(shadow instanceof fabric.Shadow, 'should inherit from fabric.Shadow');
   });
 
@@ -20,7 +20,7 @@
   QUnit.test('initializing with object', function(assert) {
     assert.ok(fabric.Shadow);
 
-    var shadow = new fabric.Shadow(REFERENCE_SHADOW_OBJECT);
+    let shadow = new fabric.Shadow(REFERENCE_SHADOW_OBJECT);
     assert.equal(shadow.color, 'rgb(0,255,0)');
     assert.equal(shadow.offsetX, 20);
     assert.equal(shadow.offsetY, 5);
@@ -31,28 +31,28 @@
     assert.ok(fabric.Shadow);
 
     // old text-shadow definition - color offsetX offsetY blur
-    var shadow1 = new fabric.Shadow('rgba(0,0,255,0.5) 10px 20px 5px');
+    let shadow1 = new fabric.Shadow('rgba(0,0,255,0.5) 10px 20px 5px');
 
     assert.equal(shadow1.color, 'rgba(0,0,255,0.5)');
     assert.equal(shadow1.offsetX, 10);
     assert.equal(shadow1.offsetY, 20);
     assert.equal(shadow1.blur, 5);
 
-    var shadow2 = new fabric.Shadow('rgb(0,0,255) 10px 20px ');
+    let shadow2 = new fabric.Shadow('rgb(0,0,255) 10px 20px ');
 
     assert.equal(shadow2.color, 'rgb(0,0,255)');
     assert.equal(shadow2.offsetX, 10);
     assert.equal(shadow2.offsetY, 20);
     assert.equal(shadow2.blur, 0);
 
-    var shadow3 = new fabric.Shadow('#00FF00 30 10 ');
+    let shadow3 = new fabric.Shadow('#00FF00 30 10 ');
 
     assert.equal(shadow3.color, '#00FF00');
     assert.equal(shadow3.offsetX, 30);
     assert.equal(shadow3.offsetY, 10);
     assert.equal(shadow3.blur, 0);
 
-    var shadow4 = new fabric.Shadow(' #FF0000 10px');
+    let shadow4 = new fabric.Shadow(' #FF0000 10px');
 
     assert.equal(shadow4.color, '#FF0000');
     assert.equal(shadow4.offsetX, 10);
