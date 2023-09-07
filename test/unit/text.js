@@ -13,9 +13,9 @@
     return new fabric.Text(text || 'x');
   }
 
-  var CHAR_WIDTH = 20;
+  let CHAR_WIDTH = 20;
 
-  var REFERENCE_TEXT_OBJECT = {
+  let REFERENCE_TEXT_OBJECT = {
     version:                   fabric.version,
     type:                      'Text',
     originX:                   'left',
