@@ -11,15 +11,15 @@
     }
   });
   QUnit.test('toSVG', function(assert) {
-    var TEXT_SVG = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-10\" y=\"12.57\" >x</tspan></text>\n</g>\n';
-    var text = new fabric.Text('x');
+    let TEXT_SVG = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-10\" y=\"12.57\" >x</tspan></text>\n</g>\n';
+    let text = new fabric.Text('x');
     assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG));
     text.set('fontFamily', 'Arial');
     assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(TEXT_SVG.replace('font-family="Times New Roman"', 'font-family="Arial"')));
   });
   QUnit.test('toSVG justified', function(assert) {
-    var TEXT_SVG_JUSTIFIED = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-60\" y=\"-13.65\" >xxxxxx</tspan><tspan x=\"-60\" y=\"38.78\" style=\"white-space: pre; \">x </tspan><tspan x=\"40\" y=\"38.78\" >y</tspan></text>\n</g>\n';
-    var text = new fabric.Text('xxxxxx\nx y', {
+    let TEXT_SVG_JUSTIFIED = '<g transform=\"\" style=\"\"  >\n\t\t<text xml:space=\"preserve\" font-family=\"Times New Roman\" font-size=\"40\" font-style=\"normal\" font-weight=\"normal\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\" ><tspan x=\"-60\" y=\"-13.65\" >xxxxxx</tspan><tspan x=\"-60\" y=\"38.78\" style=\"white-space: pre; \">x </tspan><tspan x=\"40\" y=\"38.78\" >y</tspan></text>\n</g>\n';
+    let text = new fabric.Text('xxxxxx\nx y', {
       textAlign: 'justify',
     });
 
