@@ -1,23 +1,23 @@
 (function() {
 
-  var canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
+  let canvas = this.canvas = new fabric.Canvas(null, {enableRetinaScaling: false, width: 600, height: 600});
 
   function makeAsWith2Objects() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0 });
 
     return new fabric.ActiveSelection([rect1, rect2], {strokeWidth: 0});
   }
 
   function makeAsWith2ObjectsWithOpacity() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10, strokeWidth: 0, opacity: 0.5 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40, strokeWidth: 0, opacity: 0.8 });
 
     return new fabric.ActiveSelection([rect1, rect2], {strokeWidth: 0});
   }
 
   function makeAsWith4Objects() {
-    var rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
+    let rect1 = new fabric.Rect({ top: 100, left: 100, width: 30, height: 10 }),
         rect2 = new fabric.Rect({ top: 120, left: 50, width: 10, height: 40 }),
         rect3 = new fabric.Rect({ top: 40, left: 0, width: 20, height: 40 }),
         rect4 = new fabric.Rect({ top: 75, left: 75, width: 40, height: 40 });
@@ -34,25 +34,25 @@
   });
 
   QUnit.test('constructor', function(assert) {
-    var group = makeAsWith2Objects();
+    let group = makeAsWith2Objects();
 
     assert.ok(group);
     assert.ok(group instanceof fabric.ActiveSelection, 'should be instance of fabric.ActiveSelection');
   });
 
   QUnit.test('toString', function(assert) {
-    var group = makeAsWith2Objects();
+    let group = makeAsWith2Objects();
     assert.equal(group.toString(), '#<ActiveSelection: (2)>', 'should return proper representation');
   });
 
   QUnit.test('toObject', function(assert) {
-    var group = makeAsWith2Objects();
+    let group = makeAsWith2Objects();
 
     assert.ok(typeof group.toObject === 'function');
 
-    var clone = group.toObject();
+    let clone = group.toObject();
 
-    var expectedObject = {
+    let expectedObject = {
       version:                  fabric.version,
       type:                     'ActiveSelection',
       originX:                  'left',
