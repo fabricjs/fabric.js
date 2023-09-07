@@ -5,7 +5,7 @@
   QUnit.test('constructor & properties', function(assert) {
     assert.ok(typeof fabric.Point === 'function');
 
-    var point = new fabric.Point();
+    let point = new fabric.Point();
 
     assert.ok(point);
     assert.ok(point instanceof fabric.Point);
@@ -14,21 +14,21 @@
     assert.strictEqual(point.x, 0, 'constructor assign x value');
     assert.strictEqual(point.y, 0, 'constructor assign y value');
 
-    var x = 5, y = 6;
+    let x = 5, y = 6;
     point = new fabric.Point(x, y);
     assert.equal(point.x, x, 'constructor pass x value');
     assert.equal(point.y, y, 'constructor pass y value');
   });
 
   QUnit.test('point add', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
+    let x1 = 2, y1 = 3, x2 = 4, y2 = 5,
         point = new fabric.Point(x1, y1),
         point2 = new fabric.Point(x2, y2);
 
     assert.ok(typeof point.add === 'function');
     assert.equal(point.x, x1, 'constructor pass x value');
     assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.add(point2);
+    let returned = point.add(point2);
     assert.ok(returned instanceof fabric.Point, 'returns a point class');
     assert.notEqual(returned, point, 'is not chainable');
     assert.equal(returned.x, x1 + x2, 'x coords should be added');
