@@ -16,7 +16,7 @@ function assertCanvasDisposing(klass) {
     });
 
     QUnit.test('dispose: clear references sync', function (assert) {
-        var el = fabric.getFabricDocument().createElement('canvas'),
+        let el = fabric.getFabricDocument().createElement('canvas'),
             parentEl = fabric.getFabricDocument().createElement('div');
 
         el.width = 200; el.height = 200;
@@ -26,10 +26,10 @@ function assertCanvasDisposing(klass) {
         fabric.config.configure({ devicePixelRatio: 1.25 });
 
         el.style.position = 'relative';
-        var elStyle = el.style.cssText;
+        let elStyle = el.style.cssText;
         assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
-        var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
+        let canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
         assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
         assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         assert.equal(el.getAttribute('data-fabric'), 'main', 'lowerCanvasEl should be marked by fabric');
