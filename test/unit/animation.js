@@ -10,7 +10,7 @@
   });
 
   QUnit.test('animateColor', function(assert) {
-    var done = assert.async();
+    let done = assert.async();
     function testing(val, complete) {
       if (complete !== 1) {
         assert.notEqual(val, 'rgba(0,0,255,1)', 'color is not blue');
@@ -56,7 +56,7 @@
   });
 
   QUnit.test('animateColor with opacity', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     fabric.util.animateColor({
       startValue: 'rgba(255, 0, 0, 0.9)',
       endValue: 'rgba(0, 0, 255, 0.7)',
@@ -71,7 +71,7 @@
   });
 
   QUnit.test('animateColor, opacity out of bounds value are ignored', function (assert) {
-    var done = assert.async();
+    let done = assert.async();
     fabric.util.animateColor({
       startValue: 'red',
       endValue: [255, 255, 255, 3],
