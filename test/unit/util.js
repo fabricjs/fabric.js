@@ -7,11 +7,11 @@
   }
 
   function getAbsolutePath(path) {
-    var isAbsolute = /^https?:/.test(path);
+    let isAbsolute = /^https?:/.test(path);
     if (isAbsolute) { return path; };
-    var imgEl = _createImageElement();
+    let imgEl = _createImageElement();
     imgEl.src = path;
-    var src = imgEl.src;
+    let src = imgEl.src;
     imgEl = null;
     return src;
   }
@@ -24,11 +24,11 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = isNode()
+  let IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
-  var IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
+  let IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
   QUnit.test('fabric.util.toFixed', function(assert) {
     assert.ok(typeof fabric.util.toFixed === 'function');
@@ -38,7 +38,7 @@
       assert.equal(fabric.util.toFixed(what, 5), 166.66667, 'should leave 5 fractional digits');
       assert.equal(fabric.util.toFixed(what, 0), 167, 'should leave 0 fractional digits');
 
-      var fractionless = (typeof what === 'number')
+      let fractionless = (typeof what === 'number')
         ? parseInt(what)
         : what.substring(0, what.indexOf('.'));
 
@@ -50,7 +50,7 @@
   });
 
   QUnit.test('fabric.util.removeFromArray', function(assert) {
-    var testArray = [1,2,3,4,5];
+    let testArray = [1,2,3,4,5];
 
     assert.ok(typeof fabric.util.removeFromArray === 'function');
 
@@ -96,8 +96,8 @@
 
   QUnit.test('createRotateMatrix', function (assert) {
     assert.ok(typeof fabric.util.createRotateMatrix === 'function', 'createRotateMatrix should exist');
-    var matrix = fabric.util.createRotateMatrix({ angle: 90 });
-    var expected = [
+    let matrix = fabric.util.createRotateMatrix({ angle: 90 });
+    let expected = [
       0,
       1,
       -1,
