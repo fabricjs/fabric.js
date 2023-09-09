@@ -339,7 +339,7 @@ export class Textbox<
         : this.wordSplit(line);
 
       if (wordsOrGraphemes.length === 0) {
-        return [];
+        return [{ word: [], width: 0 }];
       }
 
       return wordsOrGraphemes.map((word: string) => {
@@ -349,7 +349,7 @@ export class Textbox<
           : this.graphemeSplit(word);
         const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + infix.length;
+        offset += graphemeArray.length + infix.length;
         return { word: graphemeArray, width };
       });
     });
