@@ -22,7 +22,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 export type GraphemeData = {
   wordsData: {
-    word: string[] | string;
+    word: string[];
     width: number;
   }[][];
   largestWordWidth: number;
@@ -327,12 +327,6 @@ export class Textbox<
    *
    */
   getGraphemeDataForRender(lines: string[]): GraphemeData {
-    // this method has issues.
-    // it has been typed after some small refactors and is unclear how is working
-    // graphemeArray is either a string or a string[].
-    // the data returned is also inconsistent for empty lines.
-    // check issue https://github.com/fabricjs/fabric.js/issues/9190 for details
-    // and linked prs.
     const splitByGrapheme = this.splitByGrapheme,
       infix = splitByGrapheme ? '' : ' ';
 
