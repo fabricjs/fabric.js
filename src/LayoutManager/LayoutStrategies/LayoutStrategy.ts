@@ -48,21 +48,24 @@ export abstract class LayoutStrategy {
     const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
     if (context.type === 'initialization') {
       // translate the layout origin from left top to target's origin
-      const { originX, originY } = target;
       const origin = bboxCenter.add(size.scalarMultiply(-0.5));
       const center = origin.add(
         size.multiply(
-          new Point(-resolveOrigin(originX), -resolveOrigin(originY))
+          new Point(
+            -resolveOrigin(target.originX),
+            -resolveOrigin(target.originY)
+          )
         )
       );
       const correction = center.subtract(bboxCenter);
       return {
-        width,
-        height,
+        // in `initialization` we do not account for target's transformation matrix
         centerX: center.x,
         centerY: center.y,
         relativeCorrectionX: correction.x,
         relativeCorrectionY: correction.y,
+        width,
+        height,
       };
     } else {
       //  we send `relativeCenter` up to group's containing plane
@@ -70,8 +73,8 @@ export abstract class LayoutStrategy {
       return {
         centerX: center.x,
         centerY: center.y,
-        width: size.x,
-        height: size.y,
+        width,
+        height,
       };
     }
   }

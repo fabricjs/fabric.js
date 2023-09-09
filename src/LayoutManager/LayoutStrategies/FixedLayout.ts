@@ -3,6 +3,9 @@ import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
 export class FixedLayout extends LayoutStrategy {
+  /**
+   * @override respect target's initial size
+   */
   calcBoundingBox(
     objects: FabricObject[],
     context: StrictLayoutContext
