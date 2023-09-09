@@ -20,6 +20,8 @@ import type {
   LayoutEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
+import { Point } from '../Point';
+import { iMatrix } from '../constants';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -52,9 +54,12 @@ export const groupDefaultValues = {
  * @fires object:removed
  * @fires layout once layout completes
  */
-export class Group extends createCollectionMixin(
-  FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
-) {
+export class Group
+  extends createCollectionMixin(
+    FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
+  )
+  implements GroupProps
+{
   /**
    * Used to optimize performance
    * set to `false` if you don't need contained objects to be targets of events
@@ -106,16 +111,16 @@ export class Group extends createCollectionMixin(
     objects: FabricObject[] = [],
     {
       layoutManager = new LayoutManager(),
-      angle = 0,
-      skewX = 0,
-      skewY = 0,
+      left,
+      top,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
-    super();
+    // @ts-expect-error options error
+    super(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
-    this.layoutManager = layoutManager;
+
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
       true
@@ -124,19 +129,27 @@ export class Group extends createCollectionMixin(
       this,
       false
     );
-    // setting angle, skewX, skewY must occur after initial layout
-    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
+
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
+
+    // perform initial layout
+    // at this point the translation (center point) can not be determined because it depends on layout
+    // so we save only the 2x2 matrix in order to reapply it after layout
+    const [a, b, c, d] = this.calcOwnMatrix();
+    applyTransformToObject(this, iMatrix);
+    this.layoutManager = layoutManager;
     this.layoutManager.performLayout({
       type: 'initialization',
-      options: { ...options, angle, skewX, skewY },
       objectsRelativeToGroup,
       target: this,
       targets: [...objects],
     });
-    this.set({ angle, skewX, skewY });
+    const layoutOrigin = this.getRelativeXY();
+    const origin = new Point(left ?? layoutOrigin.x, top ?? layoutOrigin.y);
+    applyTransformToObject(this, [a, b, c, d, 0, 0]);
+    this.setRelativeXY(origin);
   }
 
   /**
@@ -265,9 +278,6 @@ export class Group extends createCollectionMixin(
         object._set(key, value);
       });
     }
-    if (key === 'interactive') {
-      this.forEachObject((object) => this._watchObject(value, object));
-    }
     return this;
   }
 
@@ -357,7 +367,7 @@ export class Group extends createCollectionMixin(
     this._shouldSetNestedCoords() && object.setCoords();
     object._set('group', this);
     object._set('canvas', this.canvas);
-    this.interactive && this._watchObject(true, object);
+    this._watchObject(true, object);
     const activeObject =
       this.canvas &&
       this.canvas.getActiveObject &&
