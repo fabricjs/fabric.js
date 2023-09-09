@@ -1,9 +1,10 @@
 import type { IText } from '../../fabric';
 import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { CENTER } from '../constants';
+import { CENTER, iMatrix } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
@@ -165,7 +166,13 @@ export class LayoutManager {
         : prevCenter
             .subtract(nextCenter)
             .add(correction)
-            .transform(invertTransform(target.calcOwnMatrix()), true)
+            .transform(
+              // in `initialization` we do not account for target's transformation matrix
+              context.type === 'initialization'
+                ? iMatrix
+                : invertTransform(target.calcOwnMatrix()),
+              true
+            )
             .add(relativeCorrection);
     return {
       result,
@@ -190,8 +197,21 @@ export class LayoutManager {
     // layout descendants
     this.layoutObjects(context, layoutResult);
     //  set position
-    !nextCenter.eq(prevCenter) &&
+    // in `initialization` we do not account for target's transformation matrix
+    if (context.type === 'initialization') {
+      const origin = nextCenter.add(
+        new Point(width, height).multiply(
+          new Point(
+            resolveOrigin(target.originX),
+            resolveOrigin(target.originY)
+          )
+        )
+      );
+      target.set({ left: origin.x, top: origin.y });
+    } else if (!nextCenter.eq(prevCenter)) {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
+    }
+    // invalidate
     context.type !== 'initialization' && target.setCoords();
     target._set('dirty', true);
   }

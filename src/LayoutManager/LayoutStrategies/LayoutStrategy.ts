@@ -47,7 +47,7 @@ export abstract class LayoutStrategy {
     const size = new Point(width, height);
     const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
     if (context.type === 'initialization') {
-      // fix layout origin from left top to given origin
+      // translate the layout origin from left top to target's origin
       const { originX, originY } = target;
       const origin = bboxCenter.add(size.scalarMultiply(-0.5));
       const center = origin.add(

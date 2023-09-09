@@ -111,15 +111,6 @@ export class Group
       layoutManager = new LayoutManager(),
       left,
       top,
-      // width,
-      // height,
-      angle = 0,
-      scaleX = 1,
-      scaleY = 1,
-      skewX = 0,
-      skewY = 0,
-      flipX = false,
-      flipY = false,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
@@ -149,18 +140,8 @@ export class Group
       target: this,
       targets: [...objects],
     });
-    const layoutOrigin = this.getRelativeXY();
-    this.set({
-      angle,
-      scaleX,
-      scaleY,
-      skewX,
-      skewY,
-      flipX,
-      flipY,
-      left: left ?? layoutOrigin.x,
-      top: top ?? layoutOrigin.y,
-    });
+    typeof left === 'number' && this.set({ left });
+    typeof top === 'number' && this.set({ top });
   }
 
   /**
