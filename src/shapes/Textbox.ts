@@ -378,11 +378,7 @@ export class Textbox<
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(
-    word: string | string[],
-    lineIndex: number,
-    charOffset = 0
-  ): number {
+  _measureWord(word: string[], lineIndex: number, charOffset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
