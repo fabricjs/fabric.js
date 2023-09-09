@@ -4,20 +4,12 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TBBox } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import type {
-  InitializationLayoutContext,
-  LayoutStrategyResult,
-  StrictLayoutContext,
-} from '../types';
+import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
   shouldPerformLayout(context: StrictLayoutContext) {
-    return (
-      context.type === 'initialization' ||
-      context.type === 'imperative' ||
-      context.strategyChange
-    );
+    return context.type === 'imperative' || context.strategyChange;
   }
 
   shouldLayoutClipPath(context: StrictLayoutContext) {
@@ -42,118 +34,36 @@ export abstract class LayoutStrategy {
     context: StrictLayoutContext
   ): LayoutStrategyResult | undefined {
     if (context.type === 'initialization') {
-      return this.calcInitialBoundingBox(objects, context);
+      const result = this.getObjectsBoundingBox(context.target, objects);
+      if (result) {
+        // fix layout origin from left top to given origin
+        const {
+          target: { originX, originY },
+        } = context;
+        const size = new Point(result.width, result.height);
+        const layoutCenter = new Point(result.centerX, result.centerY);
+        const origin = layoutCenter.add(
+          new Point(result.width, result.height).scalarMultiply(-0.5)
+        );
+        const center = origin.add(
+          size.multiply(
+            new Point(-resolveOrigin(originX), -resolveOrigin(originY))
+          )
+        );
+        const correction = center.subtract(layoutCenter);
+        return {
+          ...result,
+          centerX: center.x,
+          centerY: center.y,
+          relativeCorrectionX: correction.x,
+          relativeCorrectionY: correction.y,
+        };
+      }
     } else if (context.type === 'imperative' && context.overrides) {
       return context.overrides;
     } else {
       return this.getObjectsBoundingBox(context.target, objects);
     }
-  }
-
-  /**
-   * Calculate the bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height, originX, originY)
-   * so it is placed in the center of the bbox received from the constructor
-   *
-   * @todo revisit stroke calculations and respect angle and skew so that we can set them before initial layout
-   */
-  protected calcInitialBoundingBox(
-    objects: FabricObject[],
-    context: InitializationLayoutContext & StrictLayoutContext
-  ): LayoutStrategyResult | undefined {
-    const { target } = context;
-    const options = context.options || {},
-      hasX = typeof options.left === 'number',
-      hasY = typeof options.top === 'number',
-      hasWidth = typeof options.width === 'number',
-      hasHeight = typeof options.height === 'number';
-
-    //  performance enhancement
-    //  skip layout calculation if bbox is defined
-    if (
-      (hasX &&
-        hasY &&
-        hasWidth &&
-        hasHeight &&
-        context.objectsRelativeToGroup) ||
-      objects.length === 0
-    ) {
-      //  return nothing to skip layout
-      return;
-    }
-
-    const bbox =
-      this.getObjectsBoundingBox(target, objects) ||
-      ({} as LayoutStrategyResult);
-    const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
-    const {
-      left: x,
-      top: y,
-      width: initialWidth,
-      height: initialHeight,
-      originX,
-      originY,
-    } = target;
-    const width = hasWidth ? initialWidth : w,
-      height = hasHeight ? initialHeight : h,
-      calculatedCenter = new Point(centerX, centerY),
-      origin = new Point(resolveOrigin(originX), resolveOrigin(originY)),
-      size = new Point(width, height),
-      strokeWidthVector = target._getTransformedDimensions({
-        width: 0,
-        height: 0,
-      }),
-      sizeAfter = target._getTransformedDimensions({
-        width: width,
-        height: height,
-        strokeWidth: 0,
-      }),
-      bboxSizeAfter = target._getTransformedDimensions({
-        width: bbox.width,
-        height: bbox.height,
-        strokeWidth: 0,
-      });
-    //  calculate center and correction
-    const originT = origin.scalarAdd(0.5);
-    const originCorrection = sizeAfter.multiply(originT);
-    const centerCorrection = new Point(
-      hasWidth ? bboxSizeAfter.x / 2 : originCorrection.x,
-      hasHeight ? bboxSizeAfter.y / 2 : originCorrection.y
-    );
-    const center = new Point(
-      hasX
-        ? x - (sizeAfter.x + strokeWidthVector.x) * origin.x
-        : calculatedCenter.x - centerCorrection.x,
-      hasY
-        ? y - (sizeAfter.y + strokeWidthVector.y) * origin.y
-        : calculatedCenter.y - centerCorrection.y
-    );
-    const offsetCorrection = new Point(
-      hasX
-        ? center.x - calculatedCenter.x + bboxSizeAfter.x * (hasWidth ? 0.5 : 0)
-        : -(hasWidth
-            ? (sizeAfter.x - strokeWidthVector.x) * 0.5
-            : sizeAfter.x * originT.x),
-      hasY
-        ? center.y -
-          calculatedCenter.y +
-          bboxSizeAfter.y * (hasHeight ? 0.5 : 0)
-        : -(hasHeight
-            ? (sizeAfter.y - strokeWidthVector.y) * 0.5
-            : sizeAfter.y * originT.y)
-    );
-    const correction = new Point(
-      hasWidth ? -sizeAfter.x / 2 : 0,
-      hasHeight ? -sizeAfter.y / 2 : 0
-    ).add(offsetCorrection);
-
-    return {
-      centerX: center.x,
-      centerY: center.y,
-      correctionX: correction.x,
-      correctionY: correction.y,
-      width: size.x,
-      height: size.y,
-    };
   }
 
   /**

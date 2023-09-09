@@ -4,7 +4,7 @@ import type {
   TModificationEvents,
 } from '../EventTypeDefs';
 import type { Point } from '../Point';
-import type { Group, GroupProps } from '../shapes/Group';
+import type { Group } from '../shapes/Group';
 import type { ITextEvents } from '../shapes/IText/ITextBehavior';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
@@ -96,7 +96,6 @@ export type CommonLayoutContext = {
 
 export type InitializationLayoutContext = CommonLayoutContext & {
   type: 'initialization';
-  options?: Partial<GroupProps>;
   objectsRelativeToGroup?: boolean;
   targets: FabricObject[];
 };

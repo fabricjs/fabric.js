@@ -142,7 +142,7 @@ export class LayoutManager {
     const prevCenter = target.getRelativeCenterPoint();
     const result = context.strategy.calcLayoutResult(
       context,
-      context.type === 'initialization' ? context.targets : target.getObjects()
+      target.getObjects()
     );
     if (!result) {
       return;
@@ -156,11 +156,14 @@ export class LayoutManager {
       result.relativeCorrectionX ?? 0,
       result.relativeCorrectionY ?? 0
     );
-    const offset = prevCenter
-      .subtract(nextCenter)
-      .add(correction)
-      .transform(invertTransform(target.calcOwnMatrix()), true)
-      .add(relativeCorrection);
+    const offset =
+      context.type === 'initialization' && context.objectsRelativeToGroup
+        ? new Point()
+        : prevCenter
+            .subtract(nextCenter)
+            .add(correction)
+            .transform(invertTransform(target.calcOwnMatrix()), true)
+            .add(relativeCorrection);
     return {
       result,
       prevCenter,
