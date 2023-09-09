@@ -345,13 +345,14 @@ export class Textbox<
         : this.wordSplit(line);
 
       if (wordsOrGraphemes.length === 0) {
-        // @ts-expect-error
-        wordsOrGraphemes.push([]);
+        return [{ word: [], width: 0 }];
       }
 
       return wordsOrGraphemes.map((word: string) => {
         // if using splitByGrapheme words are already in graphemes.
-        const graphemeArray = splitByGrapheme ? word : this.graphemeSplit(word);
+        const graphemeArray = splitByGrapheme
+          ? [word]
+          : this.graphemeSplit(word);
         const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
         offset += graphemeArray.length + infix.length;
