@@ -3,7 +3,6 @@ import { classRegistry } from '../ClassRegistry';
 import type { GroupProps, LayoutContext } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
-import type { TOptions } from '../typedefs';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -25,15 +24,6 @@ export class ActiveSelection extends Group {
   multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
-
-  constructor(
-    objects?: FabricObject[],
-    options?: TOptions<ActiveSelectionOptions>,
-    objectsRelativeToGroup?: boolean
-  ) {
-    super(objects, options, objectsRelativeToGroup);
-    this.setCoords();
-  }
 
   /**
    * @private
