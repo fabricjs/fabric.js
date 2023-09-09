@@ -20,8 +20,6 @@ import type {
   LayoutEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
-import { Point } from '../Point';
-import { iMatrix } from '../constants';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -113,6 +111,13 @@ export class Group
       layoutManager = new LayoutManager(),
       left,
       top,
+      angle = 0,
+      scaleX = 1,
+      scaleY = 1,
+      skewX = 0,
+      skewY = 0,
+      flipX = false,
+      flipY = false,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
@@ -135,10 +140,6 @@ export class Group
     });
 
     // perform initial layout
-    // at this point the translation (center point) can not be determined because it depends on layout
-    // so we save only the 2x2 matrix in order to reapply it after layout
-    const [a, b, c, d] = this.calcOwnMatrix();
-    applyTransformToObject(this, iMatrix);
     this.layoutManager = layoutManager;
     this.layoutManager.performLayout({
       type: 'initialization',
@@ -147,9 +148,17 @@ export class Group
       targets: [...objects],
     });
     const layoutOrigin = this.getRelativeXY();
-    const origin = new Point(left ?? layoutOrigin.x, top ?? layoutOrigin.y);
-    applyTransformToObject(this, [a, b, c, d, 0, 0]);
-    this.setRelativeXY(origin);
+    this.set({
+      angle,
+      scaleX,
+      scaleY,
+      skewX,
+      skewY,
+      flipX,
+      flipY,
+      left: left ?? layoutOrigin.x,
+      top: top ?? layoutOrigin.y,
+    });
   }
 
   /**
