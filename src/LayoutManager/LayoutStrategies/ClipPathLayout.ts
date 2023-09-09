@@ -1,7 +1,9 @@
 import type { FabricObject } from '../../shapes/Object/FabricObject';
+import { makeBoundingBoxFromPoints } from '../../util';
 import { sendPointToPlane } from '../../util/misc/planeChange';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
+import { getObjectBounds } from './utils';
 
 export class ClipPathLayout extends LayoutStrategy {
   shouldPerformLayout(context: StrictLayoutContext): boolean {
@@ -24,7 +26,9 @@ export class ClipPathLayout extends LayoutStrategy {
     if (!clipPath || !this.shouldPerformLayout(context)) {
       return;
     }
-    const bbox = this.calcBoundingBox([clipPath as FabricObject], context)!;
+    const { width, height } = makeBoundingBoxFromPoints(
+      getObjectBounds(target, clipPath as FabricObject)
+    );
     if (clipPath.absolutePositioned) {
       //  we want the center point to exist in group's containing plane
       const clipPathCenter = sendPointToPlane(
@@ -35,8 +39,8 @@ export class ClipPathLayout extends LayoutStrategy {
       return {
         centerX: clipPathCenter.x,
         centerY: clipPathCenter.y,
-        width: bbox.width,
-        height: bbox.height,
+        width,
+        height,
       };
     } else {
       //  we want the center point to exist in group's containing plane, so we send it upwards
@@ -65,8 +69,8 @@ export class ClipPathLayout extends LayoutStrategy {
         return {
           centerX: center.x + clipPathCenter.x,
           centerY: center.y + clipPathCenter.y,
-          width: bbox.width,
-          height: bbox.height,
+          width,
+          height,
         };
       }
     }
