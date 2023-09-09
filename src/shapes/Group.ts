@@ -274,7 +274,7 @@ export class Group
     const prev = this[key as keyof this];
     super._set(key, value);
     if (key === 'canvas' && prev !== value) {
-      this.forEachObject((object) => {
+      (this._objects || []).forEach((object) => {
         object._set(key, value);
       });
     }
