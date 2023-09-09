@@ -28,7 +28,7 @@ test.describe('control box rendering', () => {
                 cornerColor: color,
               });
               object.getObjects?.().forEach((subTarget) => {
-                // subTarget.padding = padding;
+                subTarget.padding = padding;
                 subTarget.borderScaleFactor = 3;
                 subTarget.transparentCorners = false;
                 const color = subTarget.fill;
