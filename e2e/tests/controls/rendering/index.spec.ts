@@ -16,7 +16,6 @@ test.describe('control box rendering', () => {
         await canvasUtil.executeInBrowser(
           async (canvas, [data, padding]) => {
             await canvas.loadFromJSON(data);
-            canvas.skipOffscreen = false;
             canvas.renderAll();
             canvas.getObjects().forEach((object) => {
               object.padding = padding;
