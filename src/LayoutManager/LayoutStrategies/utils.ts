@@ -42,9 +42,9 @@ export const getObjectSizeVector = (
  */
 export const getObjectBounds = (group: Group, object: FabricObject) => {
   const planeChange =
-    object.group !== group
+    object.group && object.group !== group
       ? calcPlaneChangeMatrix(
-          object.group!.calcTransformMatrix(),
+          object.group.calcTransformMatrix(),
           group.calcTransformMatrix()
         )
       : undefined;
