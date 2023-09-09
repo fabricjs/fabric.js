@@ -4,7 +4,9 @@ import { ObjectUtil } from '../../../utils/ObjectUtil';
 import type { Textbox } from 'fabric';
 import '../../../setup';
 
-[false, true].forEach((splitByGrapheme) => {
+test.describe.configure({ mode: 'serial' });
+
+for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
     context,
@@ -82,4 +84,4 @@ import '../../../setup';
       maxDiffPixelRatio: 0.03,
     });
   });
-});
+}
