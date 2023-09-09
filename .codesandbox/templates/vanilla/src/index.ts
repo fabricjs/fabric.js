@@ -44,4 +44,17 @@ function animate(toState) {
     }
   );
 }
+
+canvas.add(
+  new fabric.Line([30, 30, 30, 150], { strokeWidth: 2, stroke: 'red' })
+);
+canvas.add(
+  new fabric.Rect({
+    strokeWidth: 2,
+    stroke: 'green',
+    width: 400,
+    height: 100,
+    fill: 'blue',
+  })
+);
 // animate(1);
