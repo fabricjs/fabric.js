@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): Migrate json control tests [#9323](https://github.com/fabricjs/fabric.js/pull/9323)
 - docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
 - test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
 - fix(CanvasEvents): regression of `getPointer` usages + BREAKING: drop event data [#9186](https://github.com/fabricjs/fabric.js/pull/9186)
