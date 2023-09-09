@@ -12,10 +12,26 @@ import type {
 import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
-  abstract calcLayoutResult(
+  shouldPerformLayout(context: StrictLayoutContext) {
+    return (
+      context.type === 'initialization' ||
+      context.type === 'imperative' ||
+      context.strategyChange
+    );
+  }
+
+  shouldLayoutClipPath(context: StrictLayoutContext) {
+    return context.type !== 'initialization';
+  }
+
+  calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]
-  ): LayoutStrategyResult | undefined;
+  ): LayoutStrategyResult | undefined {
+    if (this.shouldPerformLayout(context)) {
+      return this.calcBoundingBox(objects, context);
+    }
+  }
 
   /**
    * Override this method to customize layout.
@@ -32,19 +48,6 @@ export abstract class LayoutStrategy {
     } else {
       return this.getObjectsBoundingBox(context.target, objects);
     }
-  }
-
-  shouldLayoutClipPath(context: StrictLayoutContext) {
-    return context.type !== 'initialization';
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  shouldPerformLayout(context: StrictLayoutContext) {
-    return (
-      context.type === 'initialization' ||
-      context.type === 'imperative' ||
-      context.strategyChange
-    );
   }
 
   /**
@@ -109,7 +112,6 @@ export abstract class LayoutStrategy {
         height: bbox.height,
         strokeWidth: 0,
       });
-
     //  calculate center and correction
     const originT = origin.scalarAdd(0.5);
     const originCorrection = sizeAfter.multiply(originT);
@@ -169,10 +171,7 @@ export abstract class LayoutStrategy {
       return;
     }
     const bbox = makeBoundingBoxFromPoints(
-      objects.reduce((bounds, object) => {
-        bounds.push(...getObjectBounds(target, object));
-        return bounds;
-      }, [] as Point[])
+      objects.map((object) => getObjectBounds(target, object)).flat()
     );
     return this.getBoundingBoxResult(target, bbox, ignoreOffset);
   }
