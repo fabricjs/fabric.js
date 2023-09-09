@@ -4,7 +4,7 @@ import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 import type { TOptions } from '../typedefs';
-import { LayoutEvent } from '../LayoutManager';
+import type { LayoutEvent } from '../LayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
