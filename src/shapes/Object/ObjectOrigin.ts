@@ -36,10 +36,6 @@ export class ObjectOrigin<EventSpec>
    */
   declare group?: Group;
 
-  declare _originalOriginX?: TOriginX;
-
-  declare _originalOriginY?: TOriginY;
-
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
    * @param {Object} [options]
@@ -218,50 +214,6 @@ export class ObjectOrigin<EventSpec>
         this.originY
       );
     this.set({ left: position.x, top: position.y });
-  }
-
-  /**
-   * Sets the origin/position of the object to it's center point
-   * @private
-   * @return {void}
-   */
-  _setOriginToCenter() {
-    this._originalOriginX = this.originX;
-    this._originalOriginY = this.originY;
-
-    const center = this.getRelativeCenterPoint();
-
-    this.originX = CENTER;
-    this.originY = CENTER;
-
-    this.left = center.x;
-    this.top = center.y;
-  }
-
-  /**
-   * Resets the origin/position of the object to it's original origin
-   * @private
-   * @return {void}
-   */
-  _resetOrigin() {
-    if (
-      this._originalOriginX !== undefined &&
-      this._originalOriginY !== undefined
-    ) {
-      const originPoint = this.translateToOriginPoint(
-        this.getRelativeCenterPoint(),
-        this._originalOriginX,
-        this._originalOriginY
-      );
-
-      this.left = originPoint.x;
-      this.top = originPoint.y;
-
-      this.originX = this._originalOriginX;
-      this.originY = this._originalOriginY;
-      this._originalOriginX = undefined;
-      this._originalOriginY = undefined;
-    }
   }
 
   /**

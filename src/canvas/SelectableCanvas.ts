@@ -832,7 +832,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link fabric.Canvas#_searchPossibleTargets}
+   * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
@@ -871,9 +871,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * by the viewportTransform ( sort of coordinates of what is displayed
    * on the canvas where you are clicking.
    * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
+   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
+   * To interact with your shapes top and left you want to use ignoreVpt false
+   * most of the time, while ignoreVpt true will give you coordinates
    * compatible with the object.oCoords system.
    * of the time.
    * @param {Event} e

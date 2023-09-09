@@ -14,6 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
+import type { Canvas } from '../../canvas/Canvas';
 
 /**
  *  extend this regex to support non english languages
@@ -404,7 +405,7 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * called by {@link canvas#textEditingManager}
+   * called by {@link Canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
     if (this.getActiveControl()) {
