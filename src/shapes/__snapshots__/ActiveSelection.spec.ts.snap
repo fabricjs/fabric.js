@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActiveSelection adding to canvas sets coords 1`] = `
+[
+  Point {
+    "x": 600,
+    "y": 200,
+  },
+  Point {
+    "x": 802,
+    "y": 200,
+  },
+  Point {
+    "x": 802,
+    "y": 250.5,
+  },
+  Point {
+    "x": 600,
+    "y": 250.5,
+  },
+]
+`;
+
+exports[`ActiveSelection adding to canvas sets coords 2`] = `
+[
+  Point {
+    "x": 100,
+    "y": 100,
+  },
+  Point {
+    "x": 201,
+    "y": 100,
+  },
+  Point {
+    "x": 201,
+    "y": 201,
+  },
+  Point {
+    "x": 100,
+    "y": 201,
+  },
+]
+`;
