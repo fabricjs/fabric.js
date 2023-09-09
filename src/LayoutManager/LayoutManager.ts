@@ -139,7 +139,10 @@ export class LayoutManager {
     context: StrictLayoutContext
   ): Required<LayoutResult> | undefined {
     const { target } = context;
-    const prevCenter = target.getRelativeCenterPoint();
+    const prevCenter =
+      context.type === 'initialization'
+        ? new Point()
+        : target.getRelativeCenterPoint();
     const result = context.strategy.calcLayoutResult(
       context,
       target.getObjects()

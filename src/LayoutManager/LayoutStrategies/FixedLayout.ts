@@ -14,6 +14,8 @@ export class FixedLayout extends LayoutStrategy {
       } = context;
       return {
         ...result,
+        centerX: result.centerX + (width - result.width) / 2,
+        centerY: result.centerY + (height - result.height) / 2,
         width: width || result.width,
         height: height || result.height,
       };

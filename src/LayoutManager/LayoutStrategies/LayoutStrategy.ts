@@ -7,7 +7,11 @@ import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
   shouldPerformLayout(context: StrictLayoutContext) {
-    return context.type === 'imperative' || context.strategyChange;
+    return (
+      context.type === 'initialization' ||
+      context.type === 'imperative' ||
+      context.strategyChange
+    );
   }
 
   shouldLayoutClipPath(context: StrictLayoutContext) {

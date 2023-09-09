@@ -7,10 +7,7 @@ import { getObjectBounds } from './utils';
 
 export class ClipPathLayout extends LayoutStrategy {
   shouldPerformLayout(context: StrictLayoutContext): boolean {
-    return (
-      !!context.target.clipPath &&
-      (context.type === 'initialization' || super.shouldPerformLayout(context))
-    );
+    return !!context.target.clipPath && super.shouldPerformLayout(context);
   }
 
   shouldLayoutClipPath() {
