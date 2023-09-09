@@ -24,7 +24,7 @@ import '../../../setup';
     );
 
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `1-initial-${splitByGrapheme ? 'splitByGrapheme': ''}.png`,
+      name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
     });
     await canvasUtil.click({
       position: {
