@@ -24,7 +24,7 @@ export class ClipPathLayout extends LayoutStrategy {
     if (!clipPath || !this.shouldPerformLayout(context)) {
       return;
     }
-    const bbox = this.calcBoundingBox([clipPath], context)!;
+    const bbox = this.calcBoundingBox([clipPath as FabricObject], context)!;
     if (clipPath.absolutePositioned) {
       //  we want the center point to exist in group's containing plane
       const clipPathCenter = sendPointToPlane(
