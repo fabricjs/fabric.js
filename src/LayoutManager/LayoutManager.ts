@@ -59,7 +59,7 @@ export class LayoutManager {
     }
 
     this._firstLayoutDone = true;
-    bubblingContext && this.onAfterLayout(strictContext, bubblingContext);
+    this.onAfterLayout(strictContext, bubblingContext);
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
@@ -225,18 +225,18 @@ export class LayoutManager {
 
   protected onAfterLayout(
     context: StrictLayoutContext,
-    layoutResult: LayoutResult
+    layoutResult?: LayoutResult
   ) {
     const { target } = context;
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onAfterLayout({
       context,
-      ...layoutResult,
+      result: layoutResult,
     });
     target.fire('layout', {
       context,
-      ...layoutResult,
+      result: layoutResult,
     });
 
     //  bubble

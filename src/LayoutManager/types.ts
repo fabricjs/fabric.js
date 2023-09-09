@@ -149,4 +149,8 @@ export type LayoutBeforeEvent = {
 
 export type LayoutEvent = {
   context: StrictLayoutContext;
-} & LayoutResult;
+  /**
+   * will be undefined if layout was skipped
+   */
+  result?: LayoutResult;
+};

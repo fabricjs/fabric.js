@@ -1,9 +1,10 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import type { GroupProps, LayoutContext } from './Group';
+import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 import type { TOptions } from '../typedefs';
+import { LayoutEvent } from '../LayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -141,8 +142,8 @@ export class ActiveSelection extends Group {
     return false;
   }
 
-  _applyLayoutStrategy(context: LayoutContext): void {
-    super._applyLayoutStrategy(context);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onAfterLayout(data: LayoutEvent): void {
     if (this._objects.length === 0) {
       // in this case layout was skipped
       // we reset transform for the next selection
