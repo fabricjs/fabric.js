@@ -1,7 +1,5 @@
 import { Point } from '../../Point';
-import type { Group } from '../../shapes/Group';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { TBBox } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
@@ -27,82 +25,50 @@ export abstract class LayoutStrategy {
 
   /**
    * Override this method to customize layout.
-   * A wrapper around {@link getObjectsBoundingBox}
    */
   calcBoundingBox(
     objects: FabricObject[],
     context: StrictLayoutContext
   ): LayoutStrategyResult | undefined {
-    if (context.type === 'initialization') {
-      const result = this.getObjectsBoundingBox(context.target, objects);
-      if (result) {
-        // fix layout origin from left top to given origin
-        const {
-          target: { originX, originY },
-        } = context;
-        const size = new Point(result.width, result.height);
-        const layoutCenter = new Point(result.centerX, result.centerY);
-        const origin = layoutCenter.add(
-          new Point(result.width, result.height).scalarMultiply(-0.5)
-        );
-        const center = origin.add(
-          size.multiply(
-            new Point(-resolveOrigin(originX), -resolveOrigin(originY))
-          )
-        );
-        const correction = center.subtract(layoutCenter);
-        return {
-          ...result,
-          centerX: center.x,
-          centerY: center.y,
-          relativeCorrectionX: correction.x,
-          relativeCorrectionY: correction.y,
-        };
-      }
-    } else if (context.type === 'imperative' && context.overrides) {
+    if (context.type === 'imperative' && context.overrides) {
       return context.overrides;
-    } else {
-      return this.getObjectsBoundingBox(context.target, objects);
     }
-  }
-
-  /**
-   * Calculate the bbox of objects relative to instance's containing plane
-   *
-   * @param {FabricObject[]} objects
-   * @returns {LayoutStrategyResult | undefined} bounding box
-   */
-  getObjectsBoundingBox(
-    target: Group,
-    objects: FabricObject[],
-    ignoreOffset?: boolean
-  ): LayoutStrategyResult | undefined {
     if (objects.length === 0) {
       return;
     }
-    const bbox = makeBoundingBoxFromPoints(
+    const { target } = context;
+    const { left, top, width, height } = makeBoundingBoxFromPoints(
       objects.map((object) => getObjectBounds(target, object)).flat()
     );
-    return this.getBoundingBoxResult(target, bbox, ignoreOffset);
-  }
-
-  protected getBoundingBoxResult(
-    target: Group,
-    { left, top, width, height }: TBBox,
-    ignoreOffset?: boolean
-  ): LayoutStrategyResult {
-    const size = new Point(width, height),
-      relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
-        size.scalarDivide(2)
+    const size = new Point(width, height);
+    const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
+    if (context.type === 'initialization') {
+      // fix layout origin from left top to given origin
+      const { originX, originY } = target;
+      const origin = bboxCenter.add(size.scalarMultiply(-0.5));
+      const center = origin.add(
+        size.multiply(
+          new Point(-resolveOrigin(originX), -resolveOrigin(originY))
+        )
       );
-    //  we send `relativeCenter` up to group's containing plane
-    const center = relativeCenter.transform(target.calcOwnMatrix());
-
-    return {
-      centerX: center.x,
-      centerY: center.y,
-      width: size.x,
-      height: size.y,
-    };
+      const correction = center.subtract(bboxCenter);
+      return {
+        width,
+        height,
+        centerX: center.x,
+        centerY: center.y,
+        relativeCorrectionX: correction.x,
+        relativeCorrectionY: correction.y,
+      };
+    } else {
+      //  we send `relativeCenter` up to group's containing plane
+      const center = bboxCenter.transform(target.calcOwnMatrix());
+      return {
+        centerX: center.x,
+        centerY: center.y,
+        width: size.x,
+        height: size.y,
+      };
+    }
   }
 }

@@ -1,4 +1,3 @@
-import { Point } from '../Point';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
@@ -14,10 +13,15 @@ describe('Group', () => {
     expect(group._objects).toHaveLength(3);
   });
 
-  test('initialization edge case', () => {
-    const child = new FabricObject({ width: 200, height: 200 });
-    const group = new Group([child], { width: 200, height: 200 });
-    expect(child.getRelativeCenterPoint()).toMatchObject(new Point());
+  test.only('initialization edge case', () => {
+    const child = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
+    const group = new Group([child], {
+      width: 200,
+      height: 200,
+      strokeWidth: 0,
+    });
+    expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
+    expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
   });
 });

@@ -111,6 +111,8 @@ export class Group
       layoutManager = new LayoutManager(),
       left,
       top,
+      // width,
+      // height,
       angle = 0,
       scaleX = 1,
       scaleY = 1,
