@@ -1,3 +1,4 @@
+import { FixedLayout, LayoutManager } from '../LayoutManager';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
@@ -13,7 +14,7 @@ describe('Group', () => {
     expect(group._objects).toHaveLength(3);
   });
 
-  test.only('initialization edge case', () => {
+  test('initialization edge case', () => {
     const child = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
     const group = new Group([child], {
       width: 200,
@@ -23,5 +24,37 @@ describe('Group', () => {
     expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
     expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+  });
+
+  it('should ignore size passed in options', () => {
+    const child = new FabricObject({
+      width: 200,
+      height: 200,
+      strokeWidth: 0,
+    });
+    const group = new Group([child], {
+      width: 300,
+      height: 300,
+      strokeWidth: 0,
+    });
+    expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
+    expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
+    expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+  });
+
+  it('fixed layout should respect size passed in options', () => {
+    const child = new FabricObject({
+      width: 200,
+      height: 200,
+      strokeWidth: 0,
+    });
+    const group = new Group([child], {
+      width: 100,
+      height: 300,
+      strokeWidth: 0,
+      layoutManager: new LayoutManager(new FixedLayout()),
+    });
+    expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
+    expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
   });
 });
