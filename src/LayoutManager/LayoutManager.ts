@@ -120,11 +120,7 @@ export class LayoutManager {
     const { target } = context;
 
     // handle layout triggers subscription
-    if (context.type === 'initialization') {
-      context.target._objects.forEach((object) =>
-        this.subscribe(context, object)
-      );
-    } else if (context.type === 'added') {
+    if (context.type === 'initialization' || context.type === 'added') {
       context.targets.forEach((object) => this.subscribe(context, object));
     } else if (context.type === 'removed') {
       context.targets.forEach((object) => this.unsubscribe(context, object));
@@ -146,7 +142,7 @@ export class LayoutManager {
     const prevCenter = target.getRelativeCenterPoint();
     const result = context.strategy.calcLayoutResult(
       context,
-      target.getObjects()
+      context.type === 'initialization' ? context.targets : target.getObjects()
     );
     if (!result) {
       return;
@@ -165,7 +161,12 @@ export class LayoutManager {
       .add(correction)
       .transform(invertTransform(target.calcOwnMatrix()), true)
       .add(relativeCorrection);
-    return { result, prevCenter, nextCenter, offset };
+    return {
+      result,
+      prevCenter,
+      nextCenter,
+      offset,
+    };
   }
 
   protected commitLayout(

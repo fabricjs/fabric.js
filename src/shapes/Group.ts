@@ -114,7 +114,7 @@ export class Group extends createCollectionMixin(
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
+    this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
     this.layoutManager = layoutManager;
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -134,6 +134,7 @@ export class Group extends createCollectionMixin(
       options: { ...options, angle, skewX, skewY },
       objectsRelativeToGroup,
       target: this,
+      targets: [...objects],
     });
     this.set({ angle, skewX, skewY });
   }
