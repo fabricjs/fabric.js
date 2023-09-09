@@ -207,7 +207,7 @@ export class LayoutManager {
           )
         )
       );
-      target.set({ left: origin.x, top: origin.y });
+      target.set({ left: context.x ?? origin.x, top: context.y ?? origin.y });
     } else if (!nextCenter.eq(prevCenter)) {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
     }

@@ -109,8 +109,6 @@ export class Group
     objects: FabricObject[] = [],
     {
       layoutManager = new LayoutManager(),
-      left,
-      top,
       ...options
     }: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
@@ -139,9 +137,9 @@ export class Group
       objectsRelativeToGroup,
       target: this,
       targets: [...objects],
+      x: options.left,
+      y: options.top,
     });
-    typeof left === 'number' && this.set({ left });
-    typeof top === 'number' && this.set({ top });
   }
 
   /**
