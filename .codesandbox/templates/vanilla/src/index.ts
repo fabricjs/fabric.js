@@ -9,11 +9,13 @@ canvas.setDimensions({
   width: 500,
   height: 500,
 });
-const textValue = 'fabric.js sandbox';
+const textValue = 'fabric.js sandbox\nawesome textbox item long long long ';
 const text = new fabric.Textbox(textValue, {
   originX: 'center',
+  objectCaching: false,
   splitByGrapheme: true,
-  width: 200,
+  fontSize: 48,
+  width: 210,
   top: 20,
   styles: fabric.util.stylesFromArray(
     [
@@ -24,6 +26,34 @@ const text = new fabric.Textbox(textValue, {
         },
         start: 0,
         end: 9,
+      },
+      {
+        style: {
+          fill: 'blue',
+        },
+        start: 19,
+        end: 26,
+      },
+      {
+        style: {
+          fill: 'red',
+        },
+        start: 26,
+        end: 32,
+      },
+      {
+        style: {
+          fill: 'green',
+        },
+        start: 33,
+        end: 34,
+      },
+      {
+        style: {
+          fill: 'yellow',
+        },
+        start: 35,
+        end: 36,
       },
     ],
     textValue
