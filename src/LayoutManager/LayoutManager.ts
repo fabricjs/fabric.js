@@ -2,6 +2,7 @@ import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER, iMatrix } from '../constants';
 import type { IText } from '../shapes/IText/IText';
+import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -120,6 +121,18 @@ export class LayoutManager {
     target.fire('layout:before', {
       context,
     });
+
+    if (context.type === 'imperative' && context.deep) {
+      const { strategy, ...tricklingContext } = context;
+      // traverse the tree
+      target.forEachObject((object) => {
+        (object as Group).layoutManager?.performLayout({
+          ...tricklingContext,
+          bubbles: false,
+          target: object as Group,
+        });
+      });
+    }
   }
 
   protected getLayoutResult(

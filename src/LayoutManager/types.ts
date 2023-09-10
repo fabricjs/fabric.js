@@ -82,6 +82,7 @@ export type LayoutResult = {
 type ImperativeLayoutCommonOptions = {
   overrides?: LayoutStrategyResult;
   bubbles?: boolean;
+  deep?: boolean;
 };
 
 export type ImperativeLayoutOptions = ImperativeLayoutCommonOptions & {
