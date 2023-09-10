@@ -57,8 +57,8 @@ describe('ActiveSelection', () => {
     expect(selection.item(0).getCenterPoint()).toEqual({ x: 50, y: 50 });
   });
 
-  // remove todo once #9152 is merged
-  it.todo('should not set coords in the constructor', () => {
+  // remove skip once #9152 is merged
+  it.skip('should not set coords in the constructor', () => {
     const spy = jest.spyOn(ActiveSelection.prototype, 'setCoords');
     new ActiveSelection([
       new FabricObject({
