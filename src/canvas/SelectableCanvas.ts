@@ -302,6 +302,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     super(el, options);
     this._activeSelection = activeSelection;
     this._activeSelection.set('canvas', this);
+    this._activeSelection.setCoords();
   }
 
   protected initElements(el: string | HTMLCanvasElement) {

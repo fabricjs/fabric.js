@@ -1,8 +1,9 @@
 import { test } from '@playwright/test';
+import setup from '../../setup';
 import { CanvasUtil } from '../../utils/CanvasUtil';
 import { ObjectUtil } from '../../utils/ObjectUtil';
 
-import '../../setup';
+setup();
 
 test('TEST NAME', async ({ page }) => {
   const canvasUtil = new CanvasUtil(page);
