@@ -10,7 +10,7 @@ export async function executeInBrowser<C, R>(
     },
     context: C
   ) => R,
-  context: C
+  context?: C
 ): Promise<R> {
   return (
     await page.evaluateHandle(() => ({
