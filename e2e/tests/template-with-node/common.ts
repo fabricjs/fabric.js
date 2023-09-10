@@ -10,6 +10,7 @@ export function render(canvas: StaticCanvas, fabric: typeof import('fabric')) {
   const textbox = new fabric.Textbox('fabric.js test', {
     width: 200,
     top: 20,
+    fontFamily: 'sans-serif',
   });
   canvas.add(textbox);
   canvas.centerObjectH(textbox);
