@@ -69,7 +69,7 @@ describe('ActiveSelection', () => {
       ]),
       viewportTransform: [2, 0, 0, 0.5, 400, 150],
     });
-    expect(canvas.getActiveSelection().getCoords()).toMatchSnapshot();
-    expect(canvas.getActiveSelection().getCoords(true)).toMatchSnapshot();
+    expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
+    expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
   });
 });
