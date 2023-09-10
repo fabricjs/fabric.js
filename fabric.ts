@@ -75,7 +75,6 @@ export { Text } from './src/shapes/Text/Text';
 export type {
   ITextProps,
   SerializedITextProps,
-  CursorBoundaries,
 } from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
 export type {

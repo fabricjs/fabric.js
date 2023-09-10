@@ -18,7 +18,7 @@ import {
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
 
-export type CursorBoundaries = {
+type CursorBoundaries = {
   left: number;
   top: number;
   leftOffset: number;
