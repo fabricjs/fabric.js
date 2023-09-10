@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): Migrate json control tests [#9323](https://github.com/fabricjs/fabric.js/pull/9323)
 - fix() Textbox inputs with new lines, regression from #9097 [#9192](https://github.com/fabricjs/fabric.js/pull/9192)
 - docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
 - test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
