@@ -12,9 +12,9 @@ import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 export class LayoutManager {
   private _firstLayoutDone = false;
   private _prevLayoutStrategy?: LayoutStrategy;
+  private _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
-  private _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   constructor(strategy: LayoutStrategy = new FitContentLayout()) {
     this.strategy = strategy;
@@ -39,28 +39,10 @@ export class LayoutManager {
     this.onBeforeLayout(strictContext);
 
     const layoutResult = this.getLayoutResult(strictContext);
-    let bubblingContext: LayoutResult | undefined;
-
-    if (layoutResult) {
-      this.commitLayout(strictContext, layoutResult);
-      bubblingContext = layoutResult;
-    } else if (!this._firstLayoutDone) {
-      const prevCenter = strictContext.target.getRelativeCenterPoint();
-      bubblingContext = {
-        prevCenter,
-        nextCenter: prevCenter,
-        offset: new Point(),
-        result: {
-          centerX: prevCenter.x,
-          centerY: prevCenter.y,
-          width: strictContext.target.width,
-          height: strictContext.target.height,
-        },
-      };
-    }
+    layoutResult && this.commitLayout(strictContext, layoutResult);
 
     this._firstLayoutDone = true;
-    this.onAfterLayout(strictContext, bubblingContext);
+    this.onAfterLayout(strictContext, layoutResult);
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
