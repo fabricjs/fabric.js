@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
+import setup from '../../../setup';
 import { CanvasUtil } from '../../../utils/CanvasUtil';
 
-import '../../../setup';
+setup();
 
 test('selection stale state #9087', async ({ page }) => {
   await test.step('select', async () => {

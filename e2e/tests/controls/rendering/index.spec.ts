@@ -3,8 +3,9 @@ import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { promiseSequence } from '../../../utils/promiseSequence';
 import data from './data.json';
 import data2 from './data2.json';
+import setup from '../../../setup';
 
-import '../../../setup';
+setup();
 
 test('control box rendering', async ({ page }) => {
   const cases = [
