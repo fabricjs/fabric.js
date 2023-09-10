@@ -485,13 +485,13 @@ export class Group
 
   triggerLayout({
     strategy = this.layoutManager.strategy,
-    overrides,
+    ...rest
   }: ImperativeLayoutOptions = {}) {
     this.layoutManager.performLayout({
       target: this,
       type: 'imperative',
       strategy,
-      overrides,
+      ...rest,
     });
   }
 

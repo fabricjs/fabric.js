@@ -79,9 +79,13 @@ export type LayoutResult = {
   offset: Point;
 };
 
-export type ImperativeLayoutOptions = {
-  strategy?: LayoutStrategy;
+type ImperativeLayoutCommonOptions = {
   overrides?: LayoutStrategyResult;
+  bubbles?: boolean;
+};
+
+export type ImperativeLayoutOptions = ImperativeLayoutCommonOptions & {
+  strategy?: LayoutStrategy;
 };
 
 export type CommonLayoutContext = {
@@ -127,10 +131,10 @@ export type ObjectModifyingLayoutContext =
           }
       );
 
-export type ImperativeLayoutContext = CommonLayoutContext & {
-  type: 'imperative';
-  overrides?: LayoutStrategyResult;
-};
+export type ImperativeLayoutContext = CommonLayoutContext &
+  ImperativeLayoutCommonOptions & {
+    type: 'imperative';
+  };
 
 export type LayoutContext =
   | InitializationLayoutContext
@@ -143,6 +147,8 @@ export type StrictLayoutContext = LayoutContext & {
   strategy: LayoutStrategy;
   prevStrategy?: LayoutStrategy;
   strategyChange: boolean;
+  bubbles: boolean;
+  stopPropagation(): void;
 };
 
 export type LayoutBeforeEvent = {

@@ -28,12 +28,16 @@ export class LayoutManager {
     }
 
     const strictContext: StrictLayoutContext = {
+      bubbles: true,
       strategy: this.strategy,
-      prevStrategy: this._prevLayoutStrategy,
-      strategyChange:
-        !!this._prevLayoutStrategy &&
-        this.strategy !== this._prevLayoutStrategy,
       ...context,
+      prevStrategy: this._prevLayoutStrategy,
+      get strategyChange() {
+        return !!this.prevStrategy && this.strategy !== this.prevStrategy;
+      },
+      stopPropagation() {
+        this.bubbles = false;
+      },
     };
 
     this.onBeforeLayout(strictContext);
@@ -232,7 +236,7 @@ export class LayoutManager {
     context: StrictLayoutContext,
     layoutResult?: LayoutResult
   ) {
-    const { target, strategy } = context;
+    const { target, strategy, bubbles } = context;
 
     if (strategy.shouldResetTransform(context)) {
       Object.assign(this, {
@@ -259,11 +263,11 @@ export class LayoutManager {
     });
 
     //  bubble
-    if (target.group?.layoutManager) {
+    const parent = target.group;
+    if (bubbles && parent?.layoutManager) {
       //  add target to context#path
       (context.path || (context.path = [])).push(target);
       //  all parents should invalidate their layout
-      const parent = target.group;
       parent.layoutManager.performLayout({
         ...context,
         target: parent,
