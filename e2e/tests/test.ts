@@ -4,6 +4,7 @@
 
 import type { Object as FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
+import * as fabric from 'fabric';
 
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
@@ -12,6 +13,9 @@ type AsyncReturnValue<T> = T | Promise<T>;
 
 const setupTasks: Promise<void>[] = [];
 const teardownTasks: Awaited<VoidFunction>[] = [];
+
+// makes possible call things in browser context.
+window.fabric = fabric;
 
 window.__setupFabricHook = () => Promise.all(setupTasks);
 window.__teardownFabricHook = () =>
