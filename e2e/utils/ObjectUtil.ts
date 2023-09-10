@@ -3,7 +3,7 @@ import { expect } from '@playwright/test';
 import type { Object as FabricObject } from 'fabric';
 import type { before, beforeAll } from 'test';
 
-export class ObjectUtil {
+export class ObjectUtil<T = FabricObject> {
   constructor(
     readonly page: Page,
     /**
@@ -13,7 +13,7 @@ export class ObjectUtil {
   ) {}
 
   async executeInBrowser<C, R>(
-    runInBrowser: (object: FabricObject, context: C) => R,
+    runInBrowser: (object: T, context: C) => R,
     context?: C
   ): Promise<R> {
     return (
