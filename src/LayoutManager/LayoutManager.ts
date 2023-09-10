@@ -196,10 +196,10 @@ export class LayoutManager {
       target.set({ left: context.x ?? origin.x, top: context.y ?? origin.y });
     } else if (!nextCenter.eq(prevCenter)) {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
+      // invalidate
+      target.setCoords();
+      target._set('dirty', true);
     }
-    // invalidate
-    context.type !== 'initialization' && target.setCoords();
-    target._set('dirty', true);
   }
 
   protected layoutObjects(
