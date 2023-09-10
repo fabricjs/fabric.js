@@ -1,8 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import setup from '../../../setup';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 
-import '../../../setup';
+setup();
 
 const dragA = 'fabric';
 const dragB = 'em ipsum\ndolor\nsit Amet2\nconsectge';
