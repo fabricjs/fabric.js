@@ -1,12 +1,12 @@
 import type { Page, TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { CanvasUtil } from '../../utils/CanvasUtil';
+import { promiseSequence } from '../../utils/promiseSequence';
 import common from './spec/common';
 import miterLimit from './spec/miterLimit';
 import singlePoint from './spec/singlePoint';
 import type { TestSpec } from './spec/util';
 import { toGroupKey, toKey, toTestName } from './spec/util';
-import { promiseSequence } from '../../../src/util/internals';
 
 import '../../setup';
 
