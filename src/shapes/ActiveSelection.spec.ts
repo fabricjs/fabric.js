@@ -57,6 +57,20 @@ describe('ActiveSelection', () => {
     expect(selection.item(0).getCenterPoint()).toEqual({ x: 50, y: 50 });
   });
 
+  // remove todo once #9152 is merged
+  it.todo('should not set coords in the constructor', () => {
+    const spy = jest.spyOn(ActiveSelection.prototype, 'setCoords');
+    new ActiveSelection([
+      new FabricObject({
+        left: 100,
+        top: 100,
+        width: 100,
+        height: 100,
+      }),
+    ]);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   it('sets coords after attaching to canvas', () => {
     const canvas = new Canvas(null, {
       activeSelection: new ActiveSelection([
