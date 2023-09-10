@@ -24,7 +24,7 @@ test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
   });
 
   await test.step('node', async () => {
-    if (!updateSnapshots) {
+    if (updateSnapshots === 'none') {
       expect(
         await createNodeSnapshot(render),
         'node snapshot should match browser snapshot'
