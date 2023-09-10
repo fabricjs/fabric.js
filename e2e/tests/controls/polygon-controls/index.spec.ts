@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
 
-import '../../../setup';
+import setup from '../../../setup';
+
+setup();
 
 test('polygon controls can modify polygon - exact false', async ({ page }) => {
   const canvasUtil = new CanvasUtil(page);

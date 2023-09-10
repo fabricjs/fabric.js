@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
+import setup from '../../setup';
 import { CanvasUtil } from '../../utils/CanvasUtil';
 import { createNodeSnapshot } from '../../utils/createNodeSnapshot';
 import { render } from './common';
 
-import '../../setup';
+setup();
 
 test('TEST NAME', async ({ page }, config) => {
   await test.step('browser', async () => {
