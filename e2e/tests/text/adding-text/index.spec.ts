@@ -1,8 +1,10 @@
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { expect, test } from '@playwright/test';
-import { ObjectUtil } from '../../../utils/ObjectUtil';
 import type { Textbox } from 'fabric';
-import '../../../setup';
+import setup from '../../../setup';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { ObjectUtil } from '../../../utils/ObjectUtil';
+
+setup();
 
 test.describe.configure({ mode: 'serial' });
 
