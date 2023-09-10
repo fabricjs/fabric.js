@@ -18,6 +18,13 @@ export abstract class LayoutStrategy {
     return context.type !== 'initialization';
   }
 
+  /**
+   * called from the `onAfterLayout` hook
+   */
+  shouldResetTransform(context: StrictLayoutContext) {
+    return context.target.size() === 0;
+  }
+
   calcLayoutResult(
     context: StrictLayoutContext,
     objects: FabricObject[]

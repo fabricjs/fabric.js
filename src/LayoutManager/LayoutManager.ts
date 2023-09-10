@@ -250,7 +250,21 @@ export class LayoutManager {
     context: StrictLayoutContext,
     layoutResult?: LayoutResult
   ) {
-    const { target } = context;
+    const { target, strategy } = context;
+
+    if (strategy.shouldResetTransform(context)) {
+      Object.assign(this, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        flipX: false,
+        flipY: false,
+      });
+    }
 
     //  fire layout hook and event (event will fire only for layouts after initialization layout)
     target.onAfterLayout({

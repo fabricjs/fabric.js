@@ -4,7 +4,6 @@ import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 import type { TOptions } from '../typedefs';
-import type { LayoutEvent } from '../LayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -140,25 +139,6 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onAfterLayout(data: LayoutEvent): void {
-    if (this._objects.length === 0) {
-      // in this case layout was skipped
-      // we reset transform for the next selection
-      Object.assign(this, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        flipX: false,
-        flipY: false,
-      });
-    }
   }
 
   /**
