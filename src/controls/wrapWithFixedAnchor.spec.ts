@@ -1,27 +1,6 @@
 import type { TransformActionHandler, Transform } from '../EventTypeDefs';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-/**
- * export function wrapWithFixedAnchor<T extends Transform>(
-  actionHandler: TransformActionHandler<T>
-) {
-  return ((eventData, transform, x, y) => {
-    const { target, originX, originY } = transform,
-      centerPoint = target.getRelativeCenterPoint(),
-      constraint = target.translateToOriginPoint(centerPoint, originX, originY),
-      actionPerformed = actionHandler(eventData, transform, x, y);
-    // flipping requires to change the transform origin, so we read from the mutated transform
-    // instead of leveraging the one destructured before
-    target.setPositionByOrigin(
-      constraint,
-      transform.originX,
-      transform.originY
-    );
-    return actionPerformed;
-  }) as TransformActionHandler<T>;
-}
- * 
- */
 
 const createTransformData = (): Transform => {
   return {
