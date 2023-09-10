@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
+import setup from '../../../setup';
 import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
-
-import setup from '../../../setup';
 
 setup();
 
