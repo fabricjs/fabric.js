@@ -19,7 +19,6 @@ test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
       'browser snapshot'
     ).toMatchSnapshot({
       name: 'textbox.png',
-      maxDiffPixelRatio: 0.03,
     });
   });
 
@@ -28,10 +27,7 @@ test('TEST NAME', async ({ page }, { config: { updateSnapshots } }) => {
       expect(
         await createNodeSnapshot(render),
         'node snapshot should match browser snapshot'
-      ).toMatchSnapshot({
-        name: 'textbox.png',
-        maxDiffPixelRatio: 0.03,
-      });
+      ).toMatchSnapshot({ name: 'textbox.png' });
     } else {
       test.step('Run the test again after updating snapshots to ensure node snapshots pass', () => {
         test.fail();
