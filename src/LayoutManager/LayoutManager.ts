@@ -1,7 +1,7 @@
-import type { IText } from '../../fabric';
 import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER, iMatrix } from '../constants';
+import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
@@ -236,7 +236,7 @@ export class LayoutManager {
     context: StrictLayoutContext,
     layoutResult?: LayoutResult
   ) {
-    const { target, strategy, bubbles } = context;
+    const { target, strategy, bubbles, ...bubblingContext } = context;
 
     if (strategy.shouldResetTransform(context)) {
       Object.assign(this, {
@@ -266,10 +266,10 @@ export class LayoutManager {
     const parent = target.group;
     if (bubbles && parent?.layoutManager) {
       //  add target to context#path
-      (context.path || (context.path = [])).push(target);
+      (bubblingContext.path || (bubblingContext.path = [])).push(target);
       //  all parents should invalidate their layout
       parent.layoutManager.performLayout({
-        ...context,
+        ...bubblingContext,
         target: parent,
       });
     }
