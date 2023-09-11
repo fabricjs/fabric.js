@@ -59,8 +59,8 @@ describe('wrapWithFixedAnchor', () => {
     expect(target.top).toBe(150.5);
     expect(target.left).toBe(201);
     // but the target anchor position didn't move
-    expect(newTargetTopLeftCorner.y).toBe(-203);
-    expect(newTargetTopLeftCorner.x).toBe(-152.5);
+    expect(newTargetTopLeftCorner.y).toBe(targetTopLeftCorner.y);
+    expect(newTargetTopLeftCorner.x).toBe(targetTopLeftCorner.x);
   });
   it('the fixed anchor point works with an origin swap', () => {
     const actionToWrap: TransformActionHandler = (eventData, transform) => {
