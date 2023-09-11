@@ -1,8 +1,10 @@
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { expect, test } from '@playwright/test';
-import { ObjectUtil } from '../../../utils/ObjectUtil';
 import type { Textbox } from 'fabric';
-import '../../../setup';
+import setup from '../../../setup';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { TextUtil } from '../../../utils/TextUtil';
+
+setup();
 
 [false, true].forEach((splitByGrapheme) => {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
@@ -11,7 +13,7 @@ import '../../../setup';
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const canvasUtil = new CanvasUtil(page);
-    const textBoxutil = new ObjectUtil(page, 'text');
+    const textBoxutil = new TextUtil<Textbox>(page, 'text');
 
     await textBoxutil.executeInBrowser(
       (textbox: Textbox, context) => {
@@ -26,59 +28,54 @@ import '../../../setup';
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
     });
+
+    const clickPoint = await textBoxutil.getCanvasCursorPositionAt(20);
+
     await canvasUtil.click({
-      position: {
-        x: 50,
-        y: 65,
-      },
+      position: clickPoint,
       delay: 200,
     });
     await canvasUtil.click({
-      position: {
-        x: 50,
-        y: 65,
-      },
+      position: clickPoint,
       delay: 200,
     });
+
     await page.mouse.down();
-    await page.mouse.move(65, 120, { steps: 15 });
+    await page.mouse.move(clickPoint.x + 100, clickPoint.y, { steps: 15 });
     await page.mouse.up();
     await canvasUtil.ctrlC();
     await canvasUtil.click({
-      position: {
-        x: 176,
-        y: 65,
-      },
+      position: clickPoint,
       delay: 200,
     });
     await canvasUtil.press('Enter');
     await canvasUtil.press('Enter');
+    await canvasUtil.press('Enter');
+    await canvasUtil.press('Enter');
+    await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      name: `2-before-deleting-${splitByGrapheme}.png`,
+    });
+    await canvasUtil.press('Backspace');
+    await canvasUtil.press('Backspace');
+    await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      name: `3-after-deleting-${splitByGrapheme}.png`,
+    });
     await canvasUtil.press('a');
     await canvasUtil.press('b');
     await canvasUtil.press('c');
     await canvasUtil.press('Enter');
     await canvasUtil.press('Enter');
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `2-before-pasting-splitByGrapheme-${splitByGrapheme}.png`,
+      name: `4-before-pasting-splitByGrapheme-${splitByGrapheme}.png`,
+    });
+    const pastePoint = await textBoxutil.getCanvasCursorPositionAt(36);
+    await canvasUtil.click({
+      position: pastePoint,
+      delay: 200,
     });
     await canvasUtil.ctrlV();
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `3-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
-      maxDiffPixelRatio: 0.03,
-    });
-    // NOTE: Here is clear that there style bug of #9028 is visible splitbygrapheme true only
-    // to be triggered the copy paste has to happen across lines
-    await canvasUtil.click({
-      position: {
-        x: 176,
-        y: 152,
-      },
-      delay: 200,
-    });
-    await canvasUtil.press('Enter');
-    await canvasUtil.press('Enter');
-    await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `4-after-adding-more-lines-splitByGrapheme-${splitByGrapheme}.png`,
+      name: `5-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
       maxDiffPixelRatio: 0.03,
     });
   });

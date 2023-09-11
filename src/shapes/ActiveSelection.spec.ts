@@ -1,3 +1,4 @@
+import { Canvas } from '../canvas/Canvas';
 import { ActiveSelection } from './ActiveSelection';
 import { FabricObject } from './Object/FabricObject';
 
@@ -54,5 +55,35 @@ describe('ActiveSelection', () => {
     });
     selection.add(new FabricObject({ left: 50, top: 50, strokeWidth: 0 }));
     expect(selection.item(0).getCenterPoint()).toEqual({ x: 50, y: 50 });
+  });
+
+  // remove skip once #9152 is merged
+  it.skip('should not set coords in the constructor', () => {
+    const spy = jest.spyOn(ActiveSelection.prototype, 'setCoords');
+    new ActiveSelection([
+      new FabricObject({
+        left: 100,
+        top: 100,
+        width: 100,
+        height: 100,
+      }),
+    ]);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('sets coords after attaching to canvas', () => {
+    const canvas = new Canvas(null, {
+      activeSelection: new ActiveSelection([
+        new FabricObject({
+          left: 100,
+          top: 100,
+          width: 100,
+          height: 100,
+        }),
+      ]),
+      viewportTransform: [2, 0, 0, 0.5, 400, 150],
+    });
+    expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
+    expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
   });
 });

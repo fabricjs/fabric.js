@@ -3,7 +3,6 @@ import { classRegistry } from '../ClassRegistry';
 import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
-import type { TOptions } from '../typedefs';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -11,6 +10,19 @@ export interface ActiveSelectionOptions extends GroupProps {
   multiSelectionStacking: MultiSelectionStacking;
 }
 
+/**
+ * Used by Canvas to manage selection.
+ * Canvas accepts an `activeSelection` option allowing overriding and customization.
+ *
+ * @example
+ * class MyActiveSelection extends ActiveSelection {
+ *   ...
+ * }
+ *
+ * const canvas = new Canvas(el, {
+ *  activeSelection: new MyActiveSelection()
+ * })
+ */
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
 
@@ -25,15 +37,6 @@ export class ActiveSelection extends Group {
   multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
-
-  constructor(
-    objects?: FabricObject[],
-    options?: TOptions<ActiveSelectionOptions>,
-    objectsRelativeToGroup?: boolean
-  ) {
-    super(objects, options, objectsRelativeToGroup);
-    this.setCoords();
-  }
 
   /**
    * @private

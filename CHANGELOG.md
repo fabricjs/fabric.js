@@ -4,6 +4,10 @@
 
 - refactor(): Layout Manager [#9152](https://github.com/fabricjs/fabric.js/pull/9152)
   **BREAKING**: beta - group layout
+- test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
+- test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
+- fix(ActiveSelection): make sure canvas is in charge of setting initial coords [#9322](https://github.com/fabricjs/fabric.js/pull/9322)
+- test(): Migrate json control tests [#9323](https://github.com/fabricjs/fabric.js/pull/9323)
 - fix() Textbox inputs with new lines, regression from #9097 [#9192](https://github.com/fabricjs/fabric.js/pull/9192)
 - docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
 - test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
