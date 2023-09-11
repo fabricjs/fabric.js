@@ -30,34 +30,37 @@ describe('wrapWithFixedAnchor', () => {
     const wrappedAction = wrapWithFixedAnchor(actionToWrap);
     const transformData = createTransformData();
     const { target } = transformData;
-    const targetAnchorPosition = target.translateToGivenOrigin(
+    // we are testing a left, top transform
+    expect(transformData.originX).toBe('left');
+    expect(transformData.originY).toBe('top');
+    const targetTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
       target.originY,
-      transformData.originX,
-      transformData.originY
+      'left',
+      'top'
     );
     // target position is 100,
     expect(target.top).toBe(100);
     expect(target.left).toBe(100);
     // target anchor corner is different
-    expect(targetAnchorPosition.y).toBe(-203);
-    expect(targetAnchorPosition.x).toBe(-152.5);
+    expect(targetTopLeftCorner.y).toBe(-203);
+    expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
     wrappedAction(event, transformData as Transform, 0, 0);
-    const newTargetAnchorPosition = target.translateToGivenOrigin(
+    const newTargetTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
       target.originY,
-      transformData.originX,
-      transformData.originY
+      'left',
+      'top'
     );
     // after transform the position of the object moved.
     expect(target.top).toBe(150.5);
     expect(target.left).toBe(201);
     // but the target anchor position didn't move
-    expect(newTargetAnchorPosition.y).toBe(-203);
-    expect(newTargetAnchorPosition.x).toBe(-152.5);
+    expect(newTargetTopLeftCorner.y).toBe(-203);
+    expect(newTargetTopLeftCorner.x).toBe(-152.5);
   });
   it('the fixed anchor point works with an origin swap', () => {
     const actionToWrap: TransformActionHandler = (eventData, transform) => {
@@ -71,20 +74,22 @@ describe('wrapWithFixedAnchor', () => {
 
     const transformData = createTransformData();
     const { target } = transformData;
-    const targetAnchorPosition = target.translateToGivenOrigin(
+    // we are testing a left, top transform
+    expect(transformData.originX).toBe('left');
+    expect(transformData.originY).toBe('top');
+    const targetTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
       target.originY,
       transformData.originX,
       transformData.originY
     );
-
     // target position is 100,
     expect(target.top).toBe(100);
     expect(target.left).toBe(100);
     // target anchor corner is different
-    expect(targetAnchorPosition.y).toBe(-203);
-    expect(targetAnchorPosition.x).toBe(-152.5);
+    expect(targetTopLeftCorner.y).toBe(-203);
+    expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
     wrappedAction(event, transformData as Transform, 0, 0);
     const newTargetAnchorPosition = target.translateToGivenOrigin(
@@ -94,21 +99,24 @@ describe('wrapWithFixedAnchor', () => {
       transformData.originX,
       transformData.originY
     );
+    // transform data ended up being right,bottom
+    expect(transformData.originX).toBe('right');
+    expect(transformData.originY).toBe('bottom');
     // after transform the position of the object moved.
     expect(target.top).toBe(-556.5);
     expect(target.left).toBe(-506);
-    // but the target anchor position didn't move
-    expect(newTargetAnchorPosition.y).toBe(-203);
-    expect(newTargetAnchorPosition.x).toBe(-152.5);
-    // while the top left corner of the object moved away
-    const topLeftCorner = target.translateToGivenOrigin(
+    // but the target anchor position didn't move from the topLeftCorner
+    expect(newTargetAnchorPosition.y).toBe(targetTopLeftCorner.y);
+    expect(newTargetAnchorPosition.x).toBe(targetTopLeftCorner.x);
+    // while the new top left corner of the object moved away
+    const newTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
       target.originY,
       'left',
       'top'
     );
-    expect(topLeftCorner.y).toBe(-910);
-    expect(topLeftCorner.x).toBe(-859.5);
+    expect(newTopLeftCorner.y).toBe(-910);
+    expect(newTopLeftCorner.x).toBe(-859.5);
   });
 });
