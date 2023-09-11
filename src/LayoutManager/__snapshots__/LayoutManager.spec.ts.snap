@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout Manager getLayoutResult #type trigger 1`] = `
+{
+  "nextCenter": Point {
+    "x": 50,
+    "y": 100,
+  },
+  "offset": Point {
+    "x": -70,
+    "y": -120,
+  },
+  "prevCenter": Point {
+    "x": 0,
+    "y": 0,
+  },
+  "result": {
+    "centerX": 50,
+    "centerY": 100,
+    "correctionX": 10,
+    "correctionY": 20,
+    "height": 250,
+    "relativeCorrectionX": -30,
+    "relativeCorrectionY": -40,
+    "width": 200,
+  },
+}
+`;
+
+exports[`Layout Manager getLayoutResult #type trigger 2`] = `
+{
+  "nextCenter": Point {
+    "x": 50,
+    "y": 100,
+  },
+  "offset": Point {
+    "x": 0,
+    "y": 0,
+  },
+  "prevCenter": Point {
+    "x": 0,
+    "y": 0,
+  },
+  "result": {
+    "centerX": 50,
+    "centerY": 100,
+    "correctionX": 10,
+    "correctionY": 20,
+    "height": 250,
+    "relativeCorrectionX": -30,
+    "relativeCorrectionY": -40,
+    "width": 200,
+  },
+}
+`;
+
+exports[`Layout Manager getLayoutResult #type trigger 3`] = `
+{
+  "nextCenter": Point {
+    "x": 50,
+    "y": 100,
+  },
+  "offset": Point {
+    "x": -70,
+    "y": -120,
+  },
+  "prevCenter": Point {
+    "x": 0,
+    "y": 0,
+  },
+  "result": {
+    "centerX": 50,
+    "centerY": 100,
+    "correctionX": 10,
+    "correctionY": 20,
+    "height": 250,
+    "relativeCorrectionX": -30,
+    "relativeCorrectionY": -40,
+    "width": 200,
+  },
+}
+`;

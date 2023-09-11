@@ -180,7 +180,6 @@ export class LayoutManager {
     const { target } = context;
     const {
       result: { width, height },
-      prevCenter,
       nextCenter,
     } = layoutResult;
     // set dimensions
@@ -190,6 +189,7 @@ export class LayoutManager {
     //  set position
     // in `initialization` we do not account for target's transformation matrix
     if (context.type === 'initialization') {
+      // TODO: what about strokeWidth?
       const origin = nextCenter.add(
         new Point(width, height).multiply(
           new Point(
@@ -199,11 +199,11 @@ export class LayoutManager {
         )
       );
       target.set({ left: context.x ?? origin.x, top: context.y ?? origin.y });
-    } else if (!nextCenter.eq(prevCenter)) {
+    } else {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
-      target._set('dirty', true);
+      target.set({ dirty: true });
     }
   }
 
