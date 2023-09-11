@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Layout Manager getLayoutResult #type trigger 1`] = `
+exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
 {
   "nextCenter": Point {
     "x": 50,
@@ -27,15 +27,15 @@ exports[`Layout Manager getLayoutResult #type trigger 1`] = `
 }
 `;
 
-exports[`Layout Manager getLayoutResult #type trigger 2`] = `
+exports[`Layout Manager getLayoutResult initialization trigger 1`] = `
 {
   "nextCenter": Point {
     "x": 50,
     "y": 100,
   },
   "offset": Point {
-    "x": 0,
-    "y": 0,
+    "x": -70,
+    "y": -120,
   },
   "prevCenter": Point {
     "x": 0,
@@ -54,15 +54,15 @@ exports[`Layout Manager getLayoutResult #type trigger 2`] = `
 }
 `;
 
-exports[`Layout Manager getLayoutResult #type trigger 3`] = `
+exports[`Layout Manager getLayoutResult initialization trigger 2`] = `
 {
   "nextCenter": Point {
     "x": 50,
     "y": 100,
   },
   "offset": Point {
-    "x": -70,
-    "y": -120,
+    "x": 0,
+    "y": 0,
   },
   "prevCenter": Point {
     "x": 0,

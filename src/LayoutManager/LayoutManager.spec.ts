@@ -240,6 +240,51 @@ describe('Layout Manager', () => {
         });
       }
     );
+
+    it('passing deep should layout the entire tree', () => {
+      const grandchild = new Group();
+      const child = new Group([grandchild, new FabricObject()]);
+      const targets = [child, new FabricObject()];
+      const target = new Group(targets);
+      const manager = new LayoutManager();
+
+      const mocks = [grandchild, child].map((target) => ({
+        mock: jest.spyOn(target.layoutManager, 'performLayout'),
+        target,
+      }));
+
+      const context: StrictLayoutContext = {
+        bubbles: true,
+        strategy: manager.strategy,
+        type: 'imperative',
+        deep: true,
+        target,
+        prevStrategy: undefined,
+        stopPropagation() {
+          this.bubbles = false;
+        },
+      };
+      manager.onBeforeLayout(context);
+
+      mocks.forEach(
+        ({
+          target,
+          mock: {
+            mock: {
+              calls: [args],
+            },
+          },
+        }) =>
+          expect(args).toMatchObject([
+            {
+              bubbles: false,
+              type: 'imperative',
+              deep: true,
+              target,
+            },
+          ])
+      );
+    });
   });
 
   describe('getLayoutResult', () => {
@@ -247,7 +292,7 @@ describe('Layout Manager', () => {
       { type: 'initialization', targets: [] },
       { type: 'initialization', objectsRelativeToGroup: true, targets: [] },
       { type: 'imperative' },
-    ] as const)('#type trigger', (options) => {
+    ] as const)('$type trigger', (options) => {
       const manager = new LayoutManager();
       jest.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
         centerX: 50,
