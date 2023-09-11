@@ -1,7 +1,6 @@
 import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER, iMatrix } from '../constants';
-import type { IText } from '../shapes/IText/IText';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
@@ -85,14 +84,6 @@ export class LayoutManager {
           })
         )
       ),
-      (object as IText).on('changed', (e) =>
-        this.performLayout({
-          trigger: 'text:changed',
-          e: { ...e, target: object },
-          type: 'object_modifying',
-          target,
-        })
-      ),
     ];
     this._subscriptions.set(object, disposers);
   }
@@ -102,6 +93,7 @@ export class LayoutManager {
    */
   protected unsubscribe(context: StrictLayoutContext, object: FabricObject) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
+    this._subscriptions.delete(object);
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {

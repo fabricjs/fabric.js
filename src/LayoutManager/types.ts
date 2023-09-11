@@ -127,7 +127,7 @@ export type ObjectModifyingLayoutContext =
             e: BasicTransformEvent & { target: FabricObject };
           }
         | {
-            trigger: 'text:changed';
+            trigger: 'changed';
             e: ITextEvents['changed'] & { target: FabricObject };
           }
       );
