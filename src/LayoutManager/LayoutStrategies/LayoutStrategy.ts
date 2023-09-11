@@ -15,7 +15,7 @@ export abstract class LayoutStrategy {
     return (
       context.type === 'initialization' ||
       context.type === 'imperative' ||
-      context.strategyChange
+      (!!context.prevStrategy && context.strategy !== context.prevStrategy)
     );
   }
 

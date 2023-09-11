@@ -147,7 +147,6 @@ export type LayoutContext =
 export type StrictLayoutContext = LayoutContext & {
   strategy: LayoutStrategy;
   prevStrategy?: LayoutStrategy;
-  strategyChange: boolean;
   bubbles: boolean;
   stopPropagation(): void;
 };

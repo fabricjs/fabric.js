@@ -32,9 +32,6 @@ export class LayoutManager {
       strategy: this.strategy,
       ...context,
       prevStrategy: this._prevLayoutStrategy,
-      get strategyChange() {
-        return !!this.prevStrategy && this.strategy !== this.prevStrategy;
-      },
       stopPropagation() {
         this.bubbles = false;
       },
