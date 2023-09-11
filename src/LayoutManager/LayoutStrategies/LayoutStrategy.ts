@@ -19,8 +19,10 @@ export abstract class LayoutStrategy {
     );
   }
 
-  shouldLayoutClipPath(context: StrictLayoutContext) {
-    return context.type !== 'initialization';
+  shouldLayoutClipPath({ type, target: { clipPath } }: StrictLayoutContext) {
+    return (
+      type !== 'initialization' && clipPath && !clipPath.absolutePositioned
+    );
   }
 
   /**

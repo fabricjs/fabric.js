@@ -123,7 +123,7 @@ export class LayoutManager {
     });
 
     if (context.type === 'imperative' && context.deep) {
-      const { strategy, ...tricklingContext } = context;
+      const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
         (object as Group).layoutManager?.performLayout({
@@ -228,8 +228,6 @@ export class LayoutManager {
       });
     // adjust clip path to account for new center
     context.strategy.shouldLayoutClipPath(context) &&
-      target.clipPath &&
-      !target.clipPath.absolutePositioned &&
       this.layoutObject(context, layoutResult, target.clipPath as FabricObject);
   }
 
