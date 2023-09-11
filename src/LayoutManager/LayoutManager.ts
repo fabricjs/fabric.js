@@ -287,4 +287,9 @@ export class LayoutManager {
       });
     }
   }
+
+  dispose() {
+    this._subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
+    this._subscriptions.clear();
+  }
 }
