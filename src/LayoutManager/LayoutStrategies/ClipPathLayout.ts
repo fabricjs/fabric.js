@@ -6,6 +6,8 @@ import { LayoutStrategy } from './LayoutStrategy';
 import { getObjectBounds } from './utils';
 
 export class ClipPathLayout extends LayoutStrategy {
+  static readonly type = 'clip-path';
+
   shouldPerformLayout(context: StrictLayoutContext): boolean {
     return !!context.target.clipPath && super.shouldPerformLayout(context);
   }

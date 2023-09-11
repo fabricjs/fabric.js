@@ -3,6 +3,8 @@ import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
 export class FixedLayout extends LayoutStrategy {
+  static readonly type = 'fixed';
+
   /**
    * @override respect target's initial size
    */

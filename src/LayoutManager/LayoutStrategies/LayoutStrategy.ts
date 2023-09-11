@@ -6,6 +6,11 @@ import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
+  /**
+   * override by subclass for persistence (TS does not support `static abstract`)
+   */
+  static type = 'strategy';
+
   shouldPerformLayout(context: StrictLayoutContext) {
     return (
       context.type === 'initialization' ||

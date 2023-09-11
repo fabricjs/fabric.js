@@ -292,4 +292,10 @@ export class LayoutManager {
     this._subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
     this._subscriptions.clear();
   }
+
+  toJSON() {
+    return {
+      strategy: (this.strategy.constructor as typeof LayoutStrategy).type,
+    };
+  }
 }
