@@ -236,10 +236,16 @@ export class LayoutManager {
     context: StrictLayoutContext,
     layoutResult?: LayoutResult
   ) {
-    const { target, strategy, bubbles, ...bubblingContext } = context;
+    const {
+      target,
+      strategy,
+      bubbles,
+      prevStrategy: _,
+      ...bubblingContext
+    } = context;
 
     if (strategy.shouldResetTransform(context)) {
-      Object.assign(this, {
+      Object.assign(target, {
         left: 0,
         top: 0,
         angle: 0,
