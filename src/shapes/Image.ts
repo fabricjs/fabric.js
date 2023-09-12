@@ -29,7 +29,6 @@ import { NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
-import type { TCachedFabricObject } from './Object/Object';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -597,10 +596,7 @@ export class Image<
    * it will set the imageSmoothing for the draw operation
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(
-    this: TCachedFabricObject<Image>,
-    ctx: CanvasRenderingContext2D
-  ) {
+  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
     // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
