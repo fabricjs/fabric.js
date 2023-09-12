@@ -502,7 +502,7 @@ export class Textbox<
    * If we are now wrapping the offset is always 1
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number, skipWrapping: boolean) {
+  missingNewlineOffset(lineIndex: number, skipWrapping: boolean): 0 | 1 {
     if (this.splitByGrapheme && !skipWrapping) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
