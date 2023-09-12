@@ -1,4 +1,4 @@
-import type { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import { FabricObjectSVGExportMixin } from './FabricObjectSVGExportMixin';
 import { InteractiveFabricObject } from './InteractiveObject';
 import { applyMixins } from '../../util/applyMixins';
@@ -19,7 +19,12 @@ export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
-> extends InteractiveFabricObject<Props, SProps, EventSpec> {}
+> extends InteractiveFabricObject<Props, SProps, EventSpec> {
+  // Override the `object` type so that it doesn't fallback to InteractiveFabricObject's one
+  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }): boolean {
+    return super.onDeselect(options);
+  }
+}
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);
 

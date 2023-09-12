@@ -620,7 +620,10 @@ export class InteractiveFabricObject<
    * @param {FabricObject} [options.object] next object we are setting as active, and reason why
    * this is being deselected
    */
-  onDeselect(options?: { e?: TPointerEvent; object?: FabricObject }): boolean {
+  onDeselect(options?: {
+    e?: TPointerEvent;
+    object?: InteractiveFabricObject;
+  }): boolean {
     // implemented by sub-classes, as needed.
     return false;
   }
