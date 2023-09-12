@@ -1,4 +1,4 @@
-import '../../toMatchRoundedSnapshot';
+import '../../jest.extend';
 import { Textbox } from './Textbox';
 
 describe('Textbox', () => {
@@ -6,9 +6,8 @@ describe('Textbox', () => {
     const textbox = await Textbox.fromObject({
       text: 'The quick \nbrown \nfox',
     });
-    expect(textbox.toObject()).toMatchRoundedSnapshot(['width']);
-    textbox.includeDefaultValues = false;
-    expect(textbox.toObject()).toMatchRoundedSnapshot(['width']);
+    expect(textbox).toMatchObjectSnapshot();
+    expect(textbox).toMatchObjectSnapshot({ includeDefaultValues: false });
   });
 
   it('toObject with styles', () => {
@@ -32,7 +31,7 @@ describe('Textbox', () => {
         },
       },
     });
-    expect(textbox.toObject()).toMatchRoundedSnapshot(['width']);
+    expect(textbox).toMatchObjectSnapshot();
   });
 
   it('stylesToArray edge case', () => {

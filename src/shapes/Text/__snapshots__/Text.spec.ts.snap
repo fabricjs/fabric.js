@@ -170,6 +170,7 @@ exports[`Text toObject 1`] = `
   "originY": "top",
   "overline": false,
   "paintFirst": "fill",
+  "path": undefined,
   "pathAlign": "baseline",
   "pathSide": "left",
   "pathStartOffset": 0,

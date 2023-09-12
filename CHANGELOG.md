@@ -3,6 +3,17 @@
 ## [next]
 
 - chore(TS): fix onDeselect type in FabricObject [#9325](https://github.com/fabricjs/fabric.js/pull/9325)
+- Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
+- test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
+- test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
+- fix(ActiveSelection): make sure canvas is in charge of setting initial coords [#9322](https://github.com/fabricjs/fabric.js/pull/9322)
+- test(): Migrate json control tests [#9323](https://github.com/fabricjs/fabric.js/pull/9323)
+- fix() Textbox inputs with new lines, regression from #9097 [#9192](https://github.com/fabricjs/fabric.js/pull/9192)
+- docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
+- test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
+- fix(CanvasEvents): regression of `getPointer` usages + BREAKING: drop event data [#9186](https://github.com/fabricjs/fabric.js/pull/9186)
+- feat(Object): BREAKING rm \_setOriginToCenter and \_resetOrigin unuseful methods [#9179](https://github.com/fabricjs/fabric.js/pull/9179)
+- fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
 - ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
 - fix(utils) Fixes the code for the anchor point in point controls for polygons [#9178](https://github.com/fabricjs/fabric.js/pull/9178)
 - CD(): website submodule [#9165](https://github.com/fabricjs/fabric.js/pull/9165)

@@ -193,7 +193,7 @@ function scaleObject(
       transform.signY = signY;
     }
   }
-  // minScale is taken are in the setter.
+  // minScale is taken care of in the setter.
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
   if (!by) {
