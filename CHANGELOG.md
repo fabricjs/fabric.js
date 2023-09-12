@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
 - test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
 - test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
 - fix(ActiveSelection): make sure canvas is in charge of setting initial coords [#9322](https://github.com/fabricjs/fabric.js/pull/9322)
