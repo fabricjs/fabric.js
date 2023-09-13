@@ -708,14 +708,14 @@
         target.item(1).item(1),
         target.item(1).item(1).item(1)
       ];
-      canvas._fireOverOutEvents(moveEvent, target);
+      canvas.handleSyntheticInOutEvents({ e: moveEvent, target });
       assert.equal(counterOver, 4, 'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, target, 'activeSelection is _hoveredTarget');
       assert.equal(canvas._hoveredTargets.length, 3, '3 additional subTargets are captured as _hoveredTargets');
 
       // perform MouseOut even on all hoveredTargets
       canvas.targets = [];
-      canvas._fireOverOutEvents(moveEvent, null);
+      canvas.handleSyntheticInOutEvents({ e: moveEvent });
       assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
       assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
       assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');

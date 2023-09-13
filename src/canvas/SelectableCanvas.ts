@@ -801,7 +801,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Array} [objects] objects array to look into
    * @param {Object} [pointer] point coordinates to check
    * @param {boolean} [param2.searchStrategy] strategy
-   * @returns {FabricObject[]} path of objects starting from **top most** object on screen.
+   * @returns {FabricObject[]} path of hits starting from **top most** object on screen.
    */
   protected findTargetsTraversal(
     objects: FabricObject[],
@@ -848,7 +848,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       searchStrategy: 'first-hit',
     });
     this.targets.push(...targets);
-    return targets.find((target) => !target.group || target.group.interactive);
+    return targets.find((target) => {
+      const parent = target.getParent(true);
+      return !parent || parent.interactive;
+    });
   }
 
   /**
