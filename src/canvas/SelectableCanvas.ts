@@ -30,7 +30,7 @@ import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { cos, createCanvasElement, sin } from '../util';
+import { cos, createCanvasElement, invertTransform, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions } from './CanvasOptions';
@@ -819,69 +819,96 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+   * Search for objects containing {@link pointer}.
+   * Search is not greedy, returning once a hit is found.
    * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object from given `objects`** that contains pointer
-   * @private
+   * @param {Object} [pointer] point coordinates to check
+   * @param {boolean} [param2.searchStrategy] strategy
+   * @returns {FabricObject[]} path of objects starting from **top most** object on screen.
    */
-  _searchPossibleTargets(
+  protected findTargetsTraversal(
     objects: FabricObject[],
-    pointer: Point
-  ): FabricObject | undefined {
-    // Cache all targets where their bounding box contains point.
-    let i = objects.length;
-    // Do not check for currently grouped objects, since we check the parent group itself.
-    // until we call this function specifically to search inside the activeGroup
-    while (i--) {
-      const target = objects[i];
-      if (this._checkTarget(target, pointer)) {
+    pointer: Point,
+    options: { searchStrategy: 'first-hit' | 'search-all' }
+  ): FabricObject[] {
+    const targets: FabricObject[] = [];
+    for (let index = objects.length - 1; index >= 0; index--) {
+      const target = objects[index];
+      const pointerToUse = target.group
+        ? this._normalizePointer(target.group, pointer)
+        : pointer;
+      if (this._checkTarget(pointerToUse, target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(
-            target._objects as FabricObject[],
-            pointer
+          targets.push(
+            ...this.findTargetsTraversal(
+              target._objects as FabricObject[],
+              pointer,
+              options
+            )
           );
-          subTarget && this.targets.push(subTarget);
         }
-        return target;
+        targets.push(target);
+        if (options.searchStrategy === 'first-hit') {
+          break;
+        }
       }
     }
+    return targets;
   }
 
   /**
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link _searchPossibleTargets}
+   * @see {@link findTargetsTraversal}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Point} [pointer] coordinates from viewport to check.
-   * @return {FabricObject} **top most object on screen** that contains pointer
+   * @param {Point} [pointer] x,y object of point coordinates we want to check.
+   * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}
    */
   searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point
   ): FabricObject | undefined {
-    const target = this._searchPossibleTargets(objects, pointer);
+    const targets = this.findTargetsTraversal(objects, pointer, {
+      searchStrategy: 'first-hit',
+    });
+    this.targets.push(...targets);
+    const found = targets.findIndex((target) => {
+      return !target.parent || target.parent.interactive;
+    });
+    this.targets = targets.slice(0, found);
+    return targets[found];
+  }
 
-    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
-    // that is still interactive
-    // TODO: reverify why interactive. the target should be returned always, but selected only
-    // if interactive.
-    if (
-      target &&
-      isCollection(target) &&
-      target.interactive &&
-      this.targets[0]
-    ) {
-      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
-      const targets = this.targets;
-      for (let i = targets.length - 1; i > 0; i--) {
-        const t = targets[i];
-        if (!(isCollection(t) && t.interactive)) {
-          // one of the subtargets was not interactive. that is the last subtarget we can return.
-          // we can't dig more deep;
-          return t;
-        }
-      }
-      return targets[0];
+  /**
+   * Returns pointer coordinates without the effect of the viewport
+   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
+   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
+   */
+  restorePointerVpt(pointer: Point): Point {
+    return pointer.transform(invertTransform(this.viewportTransform));
+  }
+
+  /**
+   * Returns pointer coordinates relative to canvas.
+   * Can return coordinates with or without viewportTransform.
+   * ignoreVpt false gives back coordinates that represent
+   * the point clicked on canvas element.
+   * ignoreVpt true gives back coordinates after being processed
+   * by the viewportTransform ( sort of coordinates of what is displayed
+   * on the canvas where you are clicking.
+   * ignoreVpt true = HTMLElement coordinates relative to top,left
+   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
+   * To interact with your shapes top and left you want to use ignoreVpt false
+   * most of the time, while ignoreVpt true will give you coordinates
+   * compatible with the object.oCoords system.
+   * of the time.
+   * @param {Event} e
+   * @param {Boolean} ignoreVpt
+   * @return {Point}
+   */
+  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
+    // return cached values if we are in the event processing chain
+    if (this._absolutePointer && !ignoreVpt) {
+      return this._absolutePointer;
     }
 
     return target;

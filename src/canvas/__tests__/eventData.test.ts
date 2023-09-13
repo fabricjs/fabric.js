@@ -892,3 +892,44 @@ describe('Event targets', () => {
     expect(canvasSpy.mock.calls).toMatchSnapshot();
   });
 });
+
+describe('Event targets', () => {
+  it('A selected subtarget should not fire an event twice', () => {
+    const target = new FabricObject();
+    const group = new Group([target], {
+      subTargetCheck: true,
+      interactive: true,
+    });
+    const canvas = new Canvas(null);
+    canvas.add(group);
+    const targetSpy = jest.fn();
+    target.on('mousedown', targetSpy);
+    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    canvas.getSelectionElement().dispatchEvent(
+      new MouseEvent('mousedown', {
+        clientX: 50,
+        clientY: 50,
+      })
+    );
+    expect(targetSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('searchPossibleTargets', () => {
+    const subTarget = new FabricObject();
+    const target = new Group([subTarget], {
+      subTargetCheck: true,
+    });
+    const parent = new Group([target], {
+      subTargetCheck: true,
+      interactive: true,
+    });
+    const canvas = new Canvas(null);
+    canvas.add(parent);
+    const targetSpy = jest.fn();
+    target.on('mousedown', targetSpy);
+    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    const found = canvas.searchPossibleTargets([parent], new Point());
+    expect(found).toBe(target);
+    expect(canvas.targets).toEqual([subTarget, target, parent]);
+  });
+});

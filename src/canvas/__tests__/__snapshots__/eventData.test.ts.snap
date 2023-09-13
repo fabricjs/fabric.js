@@ -114,6 +114,33 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "y": -13,
       },
       "currentSubTargets": [],
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 50,
+        "y": 50,
+      },
+      "subTargets": [
+        "Drag Target",
+      ],
+      "target": "Drag Target",
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:up",
+    {
+      "absolutePointer": Point {
+        "x": -30,
+        "y": -13,
+      },
+      "button": 1,
+      "currentSubTargets": [
+        "Drag Target",
+      ],
       "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
@@ -127,7 +154,9 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "transform": null,
       "viewportPoint": Point {
@@ -204,7 +233,9 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
     },
   ],
@@ -228,7 +259,9 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "viewportPoint": Point {
         "x": 50,
@@ -284,7 +317,9 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
     },
   ],
@@ -310,7 +345,9 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "viewportPoint": Point {
         "x": 50,
@@ -353,7 +390,9 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "viewportPoint": Point {
         "x": 50,
@@ -382,7 +421,9 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "viewportPoint": Point {
         "x": 50,
@@ -411,7 +452,9 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": -30,
         "y": -13,
       },
-      "subTargets": [],
+      "subTargets": [
+        "Drag Target",
+      ],
       "target": "Drag Target",
       "viewportPoint": Point {
         "x": 50,
