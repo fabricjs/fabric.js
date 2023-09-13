@@ -2,6 +2,9 @@
 
 ## [next]
 
+- fix(): Avoid firing twice in subselection + return correct subTarget [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
+  **BREAKING**:
+  - `_searchPossibleTargets` => `findTargetsTraversal`, now returns an array of hits
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
 - test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
 - test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
