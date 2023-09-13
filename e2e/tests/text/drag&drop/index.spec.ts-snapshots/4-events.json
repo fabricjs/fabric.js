@@ -26,24 +26,21 @@
         "isTrusted": true
       },
       "target": "b",
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a"
     },
     "canvas"
   ],
   [
-    "dragenter",
+    "dragleave",
     {
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "e": {
         "isTrusted": true
       },
-      "target": "b",
+      "target": "a",
+      "nextTarget": "b",
       "isClick": false,
       "pointer": {
         "x": 435,
@@ -54,20 +51,18 @@
         "y": 55
       }
     },
-    "b"
+    "a"
   ],
   [
     "dragenter",
     {
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
-      "canDrop": false,
       "e": {
         "isTrusted": true
       },
       "target": "b",
+      "previousTarget": "a",
       "isClick": false,
       "pointer": {
         "x": 435,
@@ -87,9 +82,7 @@
         "isTrusted": true
       },
       "target": "b",
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": false,
       "pointer": {
@@ -137,9 +130,7 @@
         "isTrusted": true
       },
       "target": "b",
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "b",
@@ -161,9 +152,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "b"
@@ -192,9 +181,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "b"

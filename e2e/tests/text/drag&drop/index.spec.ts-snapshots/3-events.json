@@ -26,9 +26,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a"
     },
     "canvas"
@@ -36,9 +34,7 @@
   [
     "dragenter",
     {
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "e": {
         "isTrusted": true
@@ -57,11 +53,9 @@
     "a"
   ],
   [
-    "dragenter",
+    "dragleave",
     {
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -70,12 +64,12 @@
       "target": "a",
       "isClick": false,
       "pointer": {
-        "x": 104,
-        "y": 60
+        "x": 39,
+        "y": 110
       },
       "absolutePointer": {
-        "x": 104,
-        "y": 60
+        "x": 39,
+        "y": 110
       }
     },
     "a"
@@ -83,105 +77,7 @@
   [
     "dragenter",
     {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 91,
-        "y": 70
-      },
-      "absolutePointer": {
-        "x": 91,
-        "y": 70
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 78,
-        "y": 80
-      },
-      "absolutePointer": {
-        "x": 78,
-        "y": 80
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 65,
-        "y": 90
-      },
-      "absolutePointer": {
-        "x": 65,
-        "y": 90
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 52,
-        "y": 100
-      },
-      "absolutePointer": {
-        "x": 52,
-        "y": 100
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -201,11 +97,9 @@
     "a"
   ],
   [
-    "dragenter",
+    "dragleave",
     {
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -214,12 +108,12 @@
       "target": "a",
       "isClick": false,
       "pointer": {
-        "x": 130,
-        "y": 114
+        "x": 261,
+        "y": 89
       },
       "absolutePointer": {
-        "x": 130,
-        "y": 114
+        "x": 261,
+        "y": 89
       }
     },
     "a"
@@ -227,57 +121,7 @@
   [
     "dragenter",
     {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 174,
-        "y": 106
-      },
-      "absolutePointer": {
-        "x": 174,
-        "y": 106
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 217,
-        "y": 97
-      },
-      "absolutePointer": {
-        "x": 217,
-        "y": 97
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -297,11 +141,9 @@
     "b"
   ],
   [
-    "dragenter",
+    "dragleave",
     {
-      "subTargets": [
-        "b"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -310,12 +152,12 @@
       "target": "b",
       "isClick": false,
       "pointer": {
-        "x": 430,
-        "y": 57
+        "x": 400,
+        "y": 69
       },
       "absolutePointer": {
-        "x": 430,
-        "y": 57
+        "x": 400,
+        "y": 69
       }
     },
     "b"
@@ -323,129 +165,7 @@
   [
     "dragenter",
     {
-      "subTargets": [
-        "b"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
-      "isClick": false,
-      "pointer": {
-        "x": 425,
-        "y": 59
-      },
-      "absolutePointer": {
-        "x": 425,
-        "y": 59
-      }
-    },
-    "b"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "b"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
-      "isClick": false,
-      "pointer": {
-        "x": 420,
-        "y": 61
-      },
-      "absolutePointer": {
-        "x": 420,
-        "y": 61
-      }
-    },
-    "b"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "b"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
-      "isClick": false,
-      "pointer": {
-        "x": 415,
-        "y": 63
-      },
-      "absolutePointer": {
-        "x": 415,
-        "y": 63
-      }
-    },
-    "b"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "b"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
-      "isClick": false,
-      "pointer": {
-        "x": 410,
-        "y": 65
-      },
-      "absolutePointer": {
-        "x": 410,
-        "y": 65
-      }
-    },
-    "b"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "b"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
-      "isClick": false,
-      "pointer": {
-        "x": 405,
-        "y": 67
-      },
-      "absolutePointer": {
-        "x": 405,
-        "y": 67
-      }
-    },
-    "b"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "canDrop": false,
       "e": {
@@ -460,102 +180,6 @@
       "absolutePointer": {
         "x": 254,
         "y": 133
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 249,
-        "y": 135
-      },
-      "absolutePointer": {
-        "x": 249,
-        "y": 135
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 244,
-        "y": 137
-      },
-      "absolutePointer": {
-        "x": 244,
-        "y": 137
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 240,
-        "y": 140
-      },
-      "absolutePointer": {
-        "x": 240,
-        "y": 140
-      }
-    },
-    "a"
-  ],
-  [
-    "dragenter",
-    {
-      "subTargets": [
-        "a"
-      ],
-      "dragSource": "a",
-      "canDrop": false,
-      "e": {
-        "isTrusted": true
-      },
-      "target": "a",
-      "isClick": false,
-      "pointer": {
-        "x": 240,
-        "y": 140
-      },
-      "absolutePointer": {
-        "x": 240,
-        "y": 140
       }
     },
     "a"
@@ -567,9 +191,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": false,
       "pointer": {
@@ -605,9 +227,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "a",
@@ -629,9 +249,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "a"
@@ -645,9 +263,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "a"

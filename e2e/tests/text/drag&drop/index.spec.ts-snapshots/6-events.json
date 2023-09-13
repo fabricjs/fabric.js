@@ -26,9 +26,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "a"
@@ -42,9 +40,7 @@
         "isTrusted": true
       },
       "target": "a",
-      "subTargets": [
-        "a"
-      ],
+      "subTargets": [],
       "dragSource": "a",
       "didDrop": true,
       "dropTarget": "a"

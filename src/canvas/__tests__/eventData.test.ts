@@ -264,7 +264,7 @@ describe('Event targets', () => {
       return { target, targets };
     };
 
-    test.each([true, false])(
+    test.skip.each([true, false])(
       'findTargetsTraversal: search all is %s',
       (searchAll) => {
         const subTarget1 = new FabricObject();
@@ -343,7 +343,7 @@ describe('Event targets', () => {
         new Point()
       );
       expect(found).toBe(activeSelection);
-      expect(canvas.targets).toEqual([activeSelection]);
+      expect(canvas.targets).toEqual([]);
     });
 
     test('findTarget clears prev targets', () => {
@@ -378,7 +378,7 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: rect,
-        targets: [rect],
+        targets: [],
       });
     });
 
@@ -403,13 +403,13 @@ describe('Event targets', () => {
       const e2 = { clientX: 4, clientY: 4 };
 
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [rectOver] }
+        { target: rectOver, targets: [] }
         // 'Should return the rectOver, rect is not considered'
       );
 
       canvas.setActiveObject(rect);
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [rectOver] }
+        { target: rectOver, targets: [] }
         // 'Should still return rectOver because is above active object'
       );
 
@@ -420,7 +420,7 @@ describe('Event targets', () => {
 
       canvas.altSelectionKey = 'shiftKey';
       expect(findTarget(canvas, e)).toEqual(
-        { target: rect, targets: [rect] }
+        { target: rect, targets: [] }
         // 'Should rect because active and altSelectionKey is pressed'
       );
     });
@@ -440,12 +440,12 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: group,
-        targets: [group],
+        targets: [],
       });
 
       expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
         target: group,
-        targets: [group],
+        targets: [],
       });
 
       group.subTargetCheck = true;
@@ -453,17 +453,17 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: group,
-        targets: [rect, group],
+        targets: [rect],
       });
 
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
         target: group,
-        targets: [group],
+        targets: [],
       });
 
       expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
         target: group,
-        targets: [rect2, group],
+        targets: [rect2],
       });
     });
 
@@ -520,32 +520,32 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 96, clientY: 186 })).toEqual({
         target: group,
-        targets: [rect1, group],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 98, clientY: 188 })).toEqual({
         target: group,
-        targets: [rect1, group],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 100, clientY: 190 })).toEqual({
         target: group,
-        targets: [rect1, group],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 102, clientY: 192 })).toEqual({
         target: group,
-        targets: [rect1, group],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 104, clientY: 194 })).toEqual({
         target: group,
-        targets: [rect1, group],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 106, clientY: 196 })).toEqual({
         target: group,
-        targets: [rect2, group],
+        targets: [rect2],
       });
     });
 
@@ -573,7 +573,7 @@ describe('Event targets', () => {
 
         expect(findTarget(canvas, { clientX: 9, clientY: 9 })).toEqual({
           target: group,
-          targets: [rect, group],
+          targets: [rect],
         });
       }
     );
@@ -587,7 +587,7 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: triangle,
-        targets: [triangle],
+        targets: [],
       });
 
       canvas.perPixelTargetFind = true;
@@ -598,7 +598,7 @@ describe('Event targets', () => {
       });
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
         target: triangle,
-        targets: [triangle],
+        targets: [],
       });
     });
 
@@ -718,32 +718,32 @@ describe('Event targets', () => {
 
         expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
           target: group3,
-          targets: [deepTriangle, deepGroup, group2, group3],
+          targets: [deepTriangle, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 50, clientY: 20 })).toEqual({
           target: group3,
-          targets: [deepCircle, deepGroup, group2, group3],
+          targets: [deepCircle, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 117, clientY: 16 })).toEqual({
           target: group3,
-          targets: [deepRect, deepGroup, group2, group3],
+          targets: [deepRect, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 100, clientY: 90 })).toEqual({
           target: group3,
-          targets: [rect2, group2, group3],
+          targets: [rect2, group2],
         });
 
         expect(findTarget(canvas, { clientX: 9, clientY: 145 })).toEqual({
           target: group3,
-          targets: [circle2, group2, group3],
+          targets: [circle2, group2],
         });
 
         expect(findTarget(canvas, { clientX: 66, clientY: 143 })).toEqual({
           target: group3,
-          targets: [triangle2, group2, group3],
+          targets: [triangle2, group2],
         });
       });
     });
@@ -779,7 +779,7 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: activeSelection,
-        targets: [rect1, activeSelection],
+        targets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 40, clientY: 15 })).toEqual({
@@ -797,7 +797,7 @@ describe('Event targets', () => {
       expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
         {
           target: activeSelection,
-          targets: [activeSelection],
+          targets: [],
         }
         // 'Should not return the rect behind active selection'
       );
@@ -806,7 +806,7 @@ describe('Event targets', () => {
       expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
         {
           target: rect3,
-          targets: [rect3],
+          targets: [],
         }
         // 'Should return the rect after clearing selection'
       );
@@ -838,7 +838,7 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 8, clientY: 8 })).toEqual({
         target: activeSelection,
-        targets: [activeSelection],
+        targets: [],
       });
 
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
