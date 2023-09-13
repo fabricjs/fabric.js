@@ -467,7 +467,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     };
     this.fire('dragenter', options);
     //  fire dragenter on targets
-    this.clearHoveringState();
     this.handleSyntheticInOutEvents('drag', options);
   }
 
@@ -487,7 +486,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     };
     this.fire('dragleave', options);
     //  fire dragleave on targets
-    this.handleSyntheticInOutEvents('drag', options);
+    this.handleSyntheticInOutEvents('drag', { ...options, target: undefined });
     this._renderDragEffects(e, this._dragSource);
     this._dropTarget = undefined;
     this.clearHoveringState();
