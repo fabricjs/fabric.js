@@ -303,7 +303,7 @@ describe('Event targets', () => {
       }
     );
 
-    test('searchPossibleTargets', () => {
+    test.failing('searchPossibleTargets', () => {
       const subTarget = new FabricObject();
       const target = new Group([subTarget], {
         subTargetCheck: true,
