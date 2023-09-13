@@ -532,7 +532,7 @@ export class Text<
    * It return always 1 for text and Itext. Textbox has its own implementation
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number, skipWrapping: boolean): 0 | 1;
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1;
   missingNewlineOffset(lineIndex: number): 1 {
     return 1;
   }
