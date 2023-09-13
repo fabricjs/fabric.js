@@ -77,11 +77,29 @@ const styles = {
   },
 };
 
+const roundPoint = (point: fabric.Point) => ({
+  x: Math.round(point.x),
+  y: Math.round(point.y),
+});
+
 const parseEvent = (
   type: string,
-  ev = {},
+  { pointer, absolutePointer, ...ev } = {},
   caller: fabric.Textbox | fabric.Canvas
-) => JSON.parse(JSON.stringify([type, ev, caller]));
+) =>
+  JSON.parse(
+    JSON.stringify([
+      type,
+      {
+        ...ev,
+        ...(pointer ? { pointer: roundPoint(pointer) } : {}),
+        ...(absolutePointer
+          ? { absolutePointer: roundPoint(absolutePointer) }
+          : {}),
+      },
+      caller,
+    ])
+  );
 
 class TestCanvas extends fabric.Canvas {
   eventStream = [];

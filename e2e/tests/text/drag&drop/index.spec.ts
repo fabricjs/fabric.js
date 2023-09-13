@@ -2,9 +2,9 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import type { IText } from '../../../..';
 import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
 
 setup();
 
@@ -30,14 +30,12 @@ const selectFabricInA = (page: Page) => {
   });
 };
 
-const readEventStream = async (page: Page) =>
-  JSON.stringify(
-    await new CanvasUtil(page).executeInBrowser((canvas) =>
-      canvas.readEventStream()
-    ),
-    null,
-    2
+const readEventStream = async (page: Page) => {
+  const data = await new CanvasUtil(page).executeInBrowser((canvas) =>
+    canvas.readEventStream()
   );
+  return JSON.stringify(data, null, 2);
+};
 
 test('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
@@ -140,6 +138,7 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.down();
     await page.mouse.move(580, 300, { steps: 40 });
     await page.mouse.up();
+    await readEventStream(page);
   });
 
   await test.step(`drag & drop to A(4) = ".js |${dragB}|sandbox"`, async () => {

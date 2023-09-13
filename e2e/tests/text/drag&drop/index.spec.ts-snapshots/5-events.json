@@ -1,77 +1,5 @@
 [
   [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
-    "selection:changed",
-    {},
-    "b"
-  ],
-  [
-    "text:selection:changed",
-    {
-      "target": "b"
-    },
-    "canvas"
-  ],
-  [
     "dragstart",
     {
       "e": {
@@ -118,12 +46,12 @@
       "target": "a",
       "isClick": false,
       "pointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       },
       "absolutePointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       }
     },
     "a"
@@ -142,12 +70,12 @@
       "target": "a",
       "isClick": false,
       "pointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       },
       "absolutePointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       }
     },
     "a"
@@ -163,15 +91,15 @@
         "a"
       ],
       "dragSource": "b",
+      "didDrop": false,
       "pointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       },
       "absolutePointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
-      },
-      "didDrop": false
+        "x": 120,
+        "y": 55
+      }
     },
     "canvas"
   ],
@@ -213,16 +141,16 @@
         "a"
       ],
       "dragSource": "b",
+      "didDrop": true,
+      "dropTarget": "a",
       "pointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
+        "x": 120,
+        "y": 55
       },
       "absolutePointer": {
-        "x": 119.99999821186069,
-        "y": 54.99999918043615
-      },
-      "didDrop": true,
-      "dropTarget": "a"
+        "x": 120,
+        "y": 55
+      }
     },
     "a"
   ],

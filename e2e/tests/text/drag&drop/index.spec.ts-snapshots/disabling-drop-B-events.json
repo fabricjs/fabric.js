@@ -1,26 +1,120 @@
 [
   [
-    "selection:changed",
-    {},
-    "a"
-  ],
-  [
-    "text:selection:changed",
+    "dragstart",
     {
+      "e": {
+        "isTrusted": true
+      },
       "target": "a"
     },
     "canvas"
   ],
   [
-    "selection:changed",
-    {},
+    "dragstart",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a"
+    },
     "a"
   ],
   [
-    "text:selection:changed",
+    "dragenter",
     {
-      "target": "a"
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [
+        "b"
+      ],
+      "dragSource": "a"
     },
     "canvas"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "b"
+      ],
+      "dragSource": "a",
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "isClick": false,
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "b"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "b"
+      ],
+      "dragSource": "a",
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "isClick": false,
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "b"
+  ],
+  [
+    "dragleave",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "subTargets": [],
+      "dragSource": "a"
+    },
+    "canvas"
+  ],
+  [
+    "dragend",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "subTargets": [],
+      "dragSource": "a",
+      "didDrop": false
+    },
+    "canvas"
+  ],
+  [
+    "dragend",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "subTargets": [],
+      "dragSource": "a",
+      "didDrop": false
+    },
+    "a"
   ]
 ]
