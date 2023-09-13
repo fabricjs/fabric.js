@@ -1,5 +1,5 @@
 import * as fabric from 'fabric';
-import { beforeAll } from '../../test';
+import { before } from '../../test';
 
 const styles = {
   0: {
@@ -77,41 +77,82 @@ const styles = {
   },
 };
 
-beforeAll(
-  (canvas) => {
-    const textValue = 'fabric.js sandbox';
-    const a = new fabric.Textbox(textValue, {
-      originX: 'center',
-      width: 210,
-      left: 150,
-      top: 20,
-      splitByGrapheme: true,
-      styles: fabric.util.stylesFromArray(
-        [
-          {
-            style: {
-              fontWeight: 'bold',
-              fontSize: 64,
-            },
-            start: 0,
-            end: 9,
+const parseEvent = (
+  type: string,
+  ev = {},
+  caller: fabric.Textbox | fabric.Canvas
+) => JSON.parse(JSON.stringify([type, ev, caller]));
+
+class TestCanvas extends fabric.Canvas {
+  eventStream = [];
+  readEventStream() {
+    const data = this.eventStream;
+    this.eventStream = [];
+    return data;
+  }
+  toJSON() {
+    return 'canvas';
+  }
+}
+
+const commonEvents = [
+  'dragstart',
+  // 'dragover',
+  // 'drag',
+  'dragenter',
+  'dragleave',
+  'drop',
+  'dragend',
+] as const;
+
+before('#canvas', (el) => {
+  const canvas = new TestCanvas(el, { width: 800, height: 500 });
+  const textValue = 'fabric.js sandbox';
+  const a = new fabric.Textbox(textValue, {
+    originX: 'center',
+    width: 210,
+    left: 150,
+    top: 20,
+    splitByGrapheme: true,
+    styles: fabric.util.stylesFromArray(
+      [
+        {
+          style: {
+            fontWeight: 'bold',
+            fontSize: 64,
           },
-        ],
-        textValue
-      ),
+          start: 0,
+          end: 9,
+        },
+      ],
+      textValue
+    ),
+  });
+  const b = new fabric.Textbox('lorem ipsum\ndolor\nsit Amet2\nconsectgetur', {
+    left: 400,
+    top: 20,
+    objectCaching: false,
+    fontFamily: 'Arial',
+    styles,
+  });
+
+  (
+    [...commonEvents, 'text:selection:changed', 'text:changed'] as const
+  ).forEach((type) => {
+    canvas.on(type, (ev) => {
+      canvas.eventStream.push(parseEvent(type, ev, canvas));
     });
-    const b = new fabric.Textbox(
-      'lorem ipsum\ndolor\nsit Amet2\nconsectgetur',
-      {
-        left: 400,
-        top: 20,
-        objectCaching: false,
-        fontFamily: 'Arial',
-        styles,
-      }
-    );
-    canvas.add(a, b);
-    return { a, b };
-  },
-  { width: 800, height: 500 }
-);
+  });
+  ([...commonEvents, 'selection:changed', 'changed'] as const).forEach(
+    (type) => {
+      a.on(type, (ev) => canvas.eventStream.push(parseEvent(type, ev, a)));
+      b.on(type, (ev) => canvas.eventStream.push(parseEvent(type, ev, b)));
+    }
+  );
+  Object.entries({ a, b }).forEach(
+    ([key, object]) => (object.toJSON = () => key)
+  );
+
+  canvas.add(a, b);
+  return { canvas, objects: { a, b } };
+});

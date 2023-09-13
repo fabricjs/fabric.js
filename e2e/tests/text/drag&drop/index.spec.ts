@@ -2,6 +2,7 @@ import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import type { IText } from '../../../..';
 import setup from '../../../setup';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 
@@ -12,6 +13,14 @@ const dragB = 'em ipsum\ndolor\nsit Amet2\nconsectge';
 
 test('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
+  const canvasUtil = new CanvasUtil(page);
+  const readEventStream = async () =>
+    JSON.stringify(
+      await canvasUtil.executeInBrowser((canvas) => canvas.readEventStream()),
+      null,
+      2
+    );
+
   const a = new TextUtil(page, 'a');
   const b = new TextUtil(page, 'b');
 
@@ -71,10 +80,13 @@ test('Drag & Drop', async ({ page }) => {
     });
   });
 
+  // clean the stream
+  await readEventStream();
+
   await test.step('drag & drop to end', async () => {
     await page.mouse.down();
-    await page.mouse.move(0, 140, { steps: 40 });
-    await page.mouse.move(435, 55, { steps: 40 });
+    await page.mouse.move(0, 140, { steps: 10 });
+    await page.mouse.move(435, 55, { steps: 10 });
     expect(
       await canvas.screenshot(),
       `1. drag "${dragA}" over "lor|em" (A => B)`
@@ -94,6 +106,9 @@ test('Drag & Drop', async ({ page }) => {
       `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`
     ).toMatchSnapshot({
       name: '3.drop-fabric-after-sandbox.png',
+    });
+    expect(await readEventStream()).toMatchSnapshot({
+      name: '3.events.json',
     });
   });
 
@@ -116,6 +131,9 @@ test('Drag & Drop', async ({ page }) => {
       `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`
     ).toMatchSnapshot({
       name: '4.drop--lor|fabric|em.png',
+    });
+    expect(await readEventStream()).toMatchSnapshot({
+      name: '4.events.json',
     });
   });
 
@@ -147,6 +165,9 @@ test('Drag & Drop', async ({ page }) => {
       `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`
     ).toMatchSnapshot({
       name: '5..js |em ips.png',
+    });
+    expect(await readEventStream()).toMatchSnapshot({
+      name: '5.events.json',
     });
   });
 });
