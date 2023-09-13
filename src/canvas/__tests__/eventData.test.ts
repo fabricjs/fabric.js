@@ -1,13 +1,23 @@
 /* eslint-disable no-restricted-globals */
 import '../../../jest.extend';
 import { Point } from '../../Point';
+import { ActiveSelection } from '../../shapes/ActiveSelection';
+import { Circle } from '../../shapes/Circle';
 import { Group } from '../../shapes/Group';
 import { IText } from '../../shapes/IText/IText';
 import { FabricObject } from '../../shapes/Object/FabricObject';
+import { Rect } from '../../shapes/Rect';
+import { Triangle } from '../../shapes/Triangle';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
 const genericVpt = [2.3, 0, 0, 2.3, 120, 80] as TMat2D;
+
+const registerTestObjects = (objects: Record<string, FabricObject>) => {
+  Object.entries(objects).forEach(([key, object]) => {
+    jest.spyOn(object, 'toJSON').mockReturnValue(key);
+  });
+};
 
 describe('Canvas event data', () => {
   let canvas: Canvas;
@@ -124,25 +134,6 @@ describe('Event targets', () => {
     expect(targetSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('searchPossibleTargets', () => {
-    const subTarget = new FabricObject();
-    const target = new Group([subTarget], {
-      subTargetCheck: true,
-    });
-    const parent = new Group([target], {
-      subTargetCheck: true,
-      interactive: true,
-    });
-    const canvas = new Canvas(null);
-    canvas.add(parent);
-    const targetSpy = jest.fn();
-    target.on('mousedown', targetSpy);
-    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
-    const found = canvas.searchPossibleTargets([parent], new Point());
-    expect(found).toBe(target);
-    expect(canvas.targets).toEqual([subTarget, target, parent]);
-  });
-
   test('mouseover and mouseout with subTargetCheck', () => {
     const rect1 = new FabricObject({
       width: 5,
@@ -197,7 +188,7 @@ describe('Event targets', () => {
     const getTargetsFromEventStream = (mock: jest.Mock) =>
       mock.mock.calls.map((args) => args[0].target);
 
-    Object.entries({
+    registerTestObjects({
       rect1,
       rect2,
       rect3,
@@ -206,8 +197,18 @@ describe('Event targets', () => {
       group1,
       group2,
       group,
-    }).forEach(([key, object]) => {
-      jest.spyOn(object, 'toJSON').mockReturnValue(key);
+    });
+
+    Object.values({
+      rect1,
+      rect2,
+      rect3,
+      rect4,
+      rect5,
+      group1,
+      group2,
+      group,
+    }).forEach((object) => {
       object.on('mouseover', enter);
       object.on('mouseout', exit);
     });
@@ -238,5 +239,612 @@ describe('Event targets', () => {
     fire(9, 1);
     expect(getTargetsFromEventStream(enter)).toEqual([rect1]);
     expect(getTargetsFromEventStream(exit)).toEqual([rect2]);
+  });
+
+  describe('findTarget', () => {
+    const mockEvent = ({
+      canvas,
+      ...init
+    }: MouseEventInit & { canvas: Canvas }) => {
+      const e = new MouseEvent('mousedown', {
+        ...init,
+      });
+      jest
+        .spyOn(e, 'target', 'get')
+        .mockReturnValue(canvas.getSelectionElement());
+      return e;
+    };
+
+    const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
+      const target = canvas.findTarget(
+        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev })
+      );
+      const targets = canvas.targets;
+      canvas.targets = [];
+      return { target, targets };
+    };
+
+    test.each([true, false])(
+      'findTargetsTraversal: search all is %s',
+      (searchAll) => {
+        const subTarget1 = new FabricObject();
+        const target1 = new Group([subTarget1], {
+          subTargetCheck: true,
+          interactive: true,
+        });
+        const subTarget2 = new FabricObject();
+        const target2 = new Group([subTarget2], {
+          subTargetCheck: true,
+        });
+        const parent = new Group([target1, target2], {
+          subTargetCheck: true,
+          interactive: true,
+        });
+        registerTestObjects({
+          subTarget1,
+          target1,
+          subTarget2,
+          target2,
+          parent,
+        });
+
+        const canvas = new Canvas(null);
+        canvas.add(parent);
+
+        jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+        const found = canvas['findTargetsTraversal']([parent], new Point(), {
+          searchStrategy: searchAll ? 'search-all' : 'first-hit',
+        });
+        expect(found).toEqual(
+          searchAll
+            ? [subTarget2, target2, subTarget1, target1, parent]
+            : [subTarget2, target2, parent]
+        );
+      }
+    );
+
+    test('searchPossibleTargets', () => {
+      const subTarget = new FabricObject();
+      const target = new Group([subTarget], {
+        subTargetCheck: true,
+      });
+      const parent = new Group([target], {
+        subTargetCheck: true,
+        interactive: true,
+      });
+      registerTestObjects({ subTarget, target, parent });
+
+      const canvas = new Canvas(null);
+      canvas.add(parent);
+
+      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      const found = canvas.searchPossibleTargets([parent], new Point());
+      expect(found).toBe(target);
+      expect(canvas.targets).toEqual([subTarget, target, parent]);
+    });
+
+    test('searchPossibleTargets with selection', () => {
+      const subTarget = new FabricObject();
+      const target = new Group([subTarget], {
+        subTargetCheck: true,
+      });
+      const other = new FabricObject();
+      const activeSelection = new ActiveSelection();
+      registerTestObjects({ subTarget, target, other, activeSelection });
+
+      const canvas = new Canvas(null, { activeSelection });
+      canvas.add(other, target);
+      activeSelection.add(target, other);
+      canvas.setActiveObject(activeSelection);
+
+      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      const found = canvas.searchPossibleTargets(
+        [activeSelection],
+        new Point()
+      );
+      expect(found).toBe(activeSelection);
+      expect(canvas.targets).toEqual([activeSelection]);
+    });
+
+    test('findTarget clears prev targets', () => {
+      const canvas = new Canvas();
+      canvas.targets = [new FabricObject()];
+      expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
+        target: undefined,
+        targets: [],
+      });
+    });
+
+    test('findTarget preserveObjectStacking false', () => {
+      const rect = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        controls: {},
+      });
+      const rectOver = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        controls: {},
+      });
+      registerTestObjects({ rect, rectOver });
+
+      const canvas = new Canvas(null, { preserveObjectStacking: false });
+      canvas.add(rect, rectOver);
+      canvas.setActiveObject(rect);
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: rect,
+        targets: [rect],
+      });
+    });
+
+    test('findTarget preserveObjectStacking true', () => {
+      const rect = new FabricObject({ left: 0, top: 0, width: 30, height: 30 });
+      const rectOver = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 30,
+        height: 30,
+      });
+      registerTestObjects({ rect, rectOver });
+
+      const canvas = new Canvas(null, { preserveObjectStacking: true });
+      canvas.add(rect, rectOver);
+
+      const e = {
+        clientX: 15,
+        clientY: 15,
+        shiftKey: true,
+      };
+      const e2 = { clientX: 4, clientY: 4 };
+
+      expect(findTarget(canvas, e)).toEqual(
+        { target: rectOver, targets: [rectOver] }
+        // 'Should return the rectOver, rect is not considered'
+      );
+
+      canvas.setActiveObject(rect);
+      expect(findTarget(canvas, e)).toEqual(
+        { target: rectOver, targets: [rectOver] }
+        // 'Should still return rectOver because is above active object'
+      );
+
+      expect(findTarget(canvas, e2)).toEqual(
+        { target: rect, targets: [] }
+        // 'Should rect because a corner of the activeObject has been hit'
+      );
+
+      canvas.altSelectionKey = 'shiftKey';
+      expect(findTarget(canvas, e)).toEqual(
+        { target: rect, targets: [rect] }
+        // 'Should rect because active and altSelectionKey is pressed'
+      );
+    });
+
+    test('findTarget with subTargetCheck', () => {
+      const canvas = new Canvas();
+      const rect = new FabricObject({ left: 0, top: 0, width: 10, height: 10 });
+      const rect2 = new FabricObject({
+        left: 30,
+        top: 30,
+        width: 10,
+        height: 10,
+      });
+      const group = new Group([rect, rect2]);
+      registerTestObjects({ rect, rect2, group });
+      canvas.add(group);
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: group,
+        targets: [group],
+      });
+
+      expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
+        target: group,
+        targets: [group],
+      });
+
+      group.subTargetCheck = true;
+      group.setCoords();
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: group,
+        targets: [rect, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+        target: group,
+        targets: [group],
+      });
+
+      expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
+        target: group,
+        targets: [rect2, group],
+      });
+    });
+
+    test('findTarget with subTargetCheck and canvas zoom', () => {
+      const nested1 = new FabricObject({
+        width: 100,
+        height: 100,
+        fill: 'yellow',
+      });
+      const nested2 = new FabricObject({
+        width: 100,
+        height: 100,
+        left: 100,
+        top: 100,
+        fill: 'purple',
+      });
+      const nestedGroup = new Group([nested1, nested2], {
+        scaleX: 0.5,
+        scaleY: 0.5,
+        top: 100,
+        left: 0,
+        subTargetCheck: true,
+      });
+      const rect1 = new FabricObject({
+        width: 100,
+        height: 100,
+        fill: 'red',
+      });
+      const rect2 = new FabricObject({
+        width: 100,
+        height: 100,
+        left: 100,
+        top: 100,
+        fill: 'blue',
+      });
+      const group = new Group([rect1, rect2, nestedGroup], {
+        top: -150,
+        left: -50,
+        subTargetCheck: true,
+      });
+      registerTestObjects({
+        rect1,
+        rect2,
+        nested1,
+        nested2,
+        nestedGroup,
+        group,
+      });
+
+      const canvas = new Canvas(null, {
+        viewportTransform: [0.1, 0, 0, 0.1, 100, 200],
+      });
+      canvas.add(group);
+
+      expect(findTarget(canvas, { clientX: 96, clientY: 186 })).toEqual({
+        target: group,
+        targets: [rect1, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 98, clientY: 188 })).toEqual({
+        target: group,
+        targets: [rect1, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 100, clientY: 190 })).toEqual({
+        target: group,
+        targets: [rect1, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 102, clientY: 192 })).toEqual({
+        target: group,
+        targets: [rect1, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 104, clientY: 194 })).toEqual({
+        target: group,
+        targets: [rect1, group],
+      });
+
+      expect(findTarget(canvas, { clientX: 106, clientY: 196 })).toEqual({
+        target: group,
+        targets: [rect2, group],
+      });
+    });
+
+    test.each([true, false])(
+      'findTarget on activeObject with subTargetCheck and preserveObjectStacking %s',
+      (preserveObjectStacking) => {
+        const rect = new FabricObject({
+          left: 0,
+          top: 0,
+          width: 10,
+          height: 10,
+        });
+        const rect2 = new FabricObject({
+          left: 30,
+          top: 30,
+          width: 10,
+          height: 10,
+        });
+        const group = new Group([rect, rect2], { subTargetCheck: true });
+        registerTestObjects({ rect, rect2, group });
+
+        const canvas = new Canvas(null, { preserveObjectStacking });
+        canvas.add(group);
+        canvas.setActiveObject(group);
+
+        expect(findTarget(canvas, { clientX: 9, clientY: 9 })).toEqual({
+          target: group,
+          targets: [rect, group],
+        });
+      }
+    );
+
+    test('findTarget with perPixelTargetFind', () => {
+      const triangle = new Triangle({ width: 30, height: 30 });
+      registerTestObjects({ triangle });
+
+      const canvas = new Canvas();
+      canvas.add(triangle);
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: triangle,
+        targets: [triangle],
+      });
+
+      canvas.perPixelTargetFind = true;
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: undefined,
+        targets: [],
+      });
+      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+        target: triangle,
+        targets: [triangle],
+      });
+    });
+
+    describe('findTarget with perPixelTargetFind in nested group', () => {
+      const prepareTest = () => {
+        const deepTriangle = new Triangle({
+          left: 0,
+          top: 0,
+          width: 30,
+          height: 30,
+          fill: 'yellow',
+        });
+        const triangle2 = new Triangle({
+          left: 100,
+          top: 120,
+          width: 30,
+          height: 30,
+          angle: 100,
+          fill: 'pink',
+        });
+        const deepCircle = new Circle({
+          radius: 30,
+          top: 0,
+          left: 30,
+          fill: 'blue',
+        });
+        const circle2 = new Circle({
+          scaleX: 2,
+          scaleY: 2,
+          radius: 10,
+          top: 120,
+          left: -20,
+          fill: 'purple',
+        });
+        const deepRect = new Rect({
+          width: 50,
+          height: 30,
+          top: 10,
+          left: 110,
+          fill: 'red',
+          skewX: 40,
+          skewY: 20,
+        });
+        const rect2 = new Rect({
+          width: 100,
+          height: 80,
+          top: 50,
+          left: 60,
+          fill: 'green',
+        });
+        const deepGroup = new Group([deepTriangle, deepCircle, deepRect], {
+          subTargetCheck: true,
+        });
+        const group2 = new Group([deepGroup, circle2, rect2, triangle2], {
+          subTargetCheck: true,
+        });
+        const group3 = new Group([group2], { subTargetCheck: true });
+
+        registerTestObjects({
+          deepTriangle,
+          triangle2,
+          deepCircle,
+          circle2,
+          rect2,
+          deepRect,
+          deepGroup,
+          group2,
+          group3,
+        });
+
+        const canvas = new Canvas(null, { perPixelTargetFind: true });
+        canvas.add(group3);
+
+        return {
+          canvas,
+          deepTriangle,
+          triangle2,
+          deepCircle,
+          circle2,
+          rect2,
+          deepRect,
+          deepGroup,
+          group2,
+          group3,
+        };
+      };
+
+      test.each([
+        { x: 5, y: 5 },
+        { x: 21, y: 9 },
+        { x: 37, y: 7 },
+        { x: 89, y: 47 },
+        { x: 16, y: 122 },
+        { x: 127, y: 37 },
+        { x: 87, y: 139 },
+      ])('transparent hit on %s', ({ x: clientX, y: clientY }) => {
+        const { canvas } = prepareTest();
+        expect(findTarget(canvas, { clientX, clientY })).toEqual({
+          target: undefined,
+          targets: [],
+        });
+      });
+
+      test('findTarget with perPixelTargetFind in nested group', () => {
+        const {
+          canvas,
+          deepTriangle,
+          triangle2,
+          deepCircle,
+          circle2,
+          rect2,
+          deepRect,
+          deepGroup,
+          group2,
+          group3,
+        } = prepareTest();
+
+        expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+          target: group3,
+          targets: [deepTriangle, deepGroup, group2, group3],
+        });
+
+        expect(findTarget(canvas, { clientX: 50, clientY: 20 })).toEqual({
+          target: group3,
+          targets: [deepCircle, deepGroup, group2, group3],
+        });
+
+        expect(findTarget(canvas, { clientX: 117, clientY: 16 })).toEqual({
+          target: group3,
+          targets: [deepRect, deepGroup, group2, group3],
+        });
+
+        expect(findTarget(canvas, { clientX: 100, clientY: 90 })).toEqual({
+          target: group3,
+          targets: [rect2, group2, group3],
+        });
+
+        expect(findTarget(canvas, { clientX: 9, clientY: 145 })).toEqual({
+          target: group3,
+          targets: [circle2, group2, group3],
+        });
+
+        expect(findTarget(canvas, { clientX: 66, clientY: 143 })).toEqual({
+          target: group3,
+          targets: [triangle2, group2, group3],
+        });
+      });
+    });
+
+    test('findTarget on active selection', () => {
+      const rect1 = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+      });
+      const rect2 = new FabricObject({
+        left: 20,
+        top: 20,
+        width: 10,
+        height: 10,
+      });
+      const rect3 = new FabricObject({
+        left: 20,
+        top: 0,
+        width: 10,
+        height: 10,
+      });
+      const activeSelection = new ActiveSelection([rect1, rect2], {
+        subTargetCheck: true,
+        cornerSize: 2,
+      });
+      registerTestObjects({ rect1, rect2, rect3, activeSelection });
+
+      const canvas = new Canvas(null, { activeSelection });
+      canvas.add(rect1, rect2, rect3);
+      canvas.setActiveObject(activeSelection);
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: activeSelection,
+        targets: [rect1, activeSelection],
+      });
+
+      expect(findTarget(canvas, { clientX: 40, clientY: 15 })).toEqual({
+        target: undefined,
+        targets: [],
+      });
+      expect(activeSelection.__corner).toBeUndefined();
+
+      expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
+        target: activeSelection,
+        targets: [],
+      });
+      expect(activeSelection.__corner).toBe('tl');
+
+      expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
+        {
+          target: activeSelection,
+          targets: [activeSelection],
+        }
+        // 'Should not return the rect behind active selection'
+      );
+
+      canvas.discardActiveObject();
+      expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
+        {
+          target: rect3,
+          targets: [rect3],
+        }
+        // 'Should return the rect after clearing selection'
+      );
+    });
+
+    test('findTarget on active selection with perPixelTargetFind', () => {
+      const rect1 = new Rect({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+      });
+      const rect2 = new Rect({
+        left: 20,
+        top: 20,
+        width: 10,
+        height: 10,
+      });
+      const activeSelection = new ActiveSelection([rect1, rect2]);
+      registerTestObjects({ rect1, rect2, activeSelection });
+
+      const canvas = new Canvas(null, {
+        activeSelection,
+        perPixelTargetFind: true,
+        preserveObjectStacking: true,
+      });
+      canvas.add(rect1, rect2);
+      canvas.setActiveObject(activeSelection);
+
+      expect(findTarget(canvas, { clientX: 8, clientY: 8 })).toEqual({
+        target: activeSelection,
+        targets: [activeSelection],
+      });
+
+      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+        target: undefined,
+        targets: [],
+      });
+    });
   });
 });
