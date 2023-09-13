@@ -1,6 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import type { IText } from '../../../..';
 import setup from '../../../setup';
+import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 
 setup();
@@ -10,6 +12,9 @@ const dragB = 'em ipsum\ndolor\nsit Amet2\nconsectge';
 
 test('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
+  const a = new TextUtil(page, 'a');
+  const b = new TextUtil(page, 'b');
+
   await test.step(`select "${dragA}" in A`, async () => {
     await canvas.click({
       position: {
@@ -25,6 +30,47 @@ test('Drag & Drop', async ({ page }) => {
       },
     });
   });
+
+  await test.step('click sets the cursor', async () => {
+    await page.mouse.move(130, 50);
+    await page.mouse.down();
+    expect(
+      await a.executeInBrowser((text) => [
+        text['draggableTextDelegate'].isActive(),
+        text.shouldStartDragging(),
+      ])
+    ).toEqual([true, true]);
+    expect(await a.isCursorActive()).toBeFalsy();
+    await page.mouse.up();
+    expect(
+      await a.executeInBrowser((text) => [
+        text['draggableTextDelegate'].isActive(),
+        text.shouldStartDragging(),
+      ])
+    ).toEqual([false, false]);
+    await a.expectObjectToMatch({
+      selectionStart: 3,
+      selectionEnd: 3,
+    });
+    expect(await a.isCursorActive()).toBeTruthy();
+  });
+
+  await test.step(`select "${dragA}" in A`, async () => {
+    await canvas.click({
+      position: {
+        x: 130,
+        y: 50,
+      },
+    });
+    await page.mouse.dblclick(130, 50);
+    await canvas.hover({
+      position: {
+        x: 130,
+        y: 40,
+      },
+    });
+  });
+
   await test.step('drag & drop to end', async () => {
     await page.mouse.down();
     await page.mouse.move(0, 140, { steps: 40 });
@@ -62,6 +108,9 @@ test('Drag & Drop', async ({ page }) => {
         y: 55,
       },
     });
+    expect(await page.evaluate(() => document.activeElement)).toBe(
+      await b.executeInBrowser((text) => text.hiddenTextarea)
+    );
     expect(
       await canvas.screenshot(),
       `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`
@@ -102,7 +151,68 @@ test('Drag & Drop', async ({ page }) => {
   });
 });
 
-async function waitForDragImage(
+for (const options of [
+  {
+    disabled: 'onDragStart',
+    exec: (text: IText) => (text.onDragStart = () => false),
+    expected: {
+      text: 'fabric.js sandbox',
+      selectionStart: 0,
+      selectionEnd: 6,
+    },
+  },
+  {
+    disabled: 'draggableTextDelegate#start',
+    exec: (text: IText) => (text['draggableTextDelegate'].start = () => false),
+    expected: {
+      text: 'fabric.js sandbox',
+      selectionStart: 3,
+      selectionEnd: 17,
+    },
+  },
+  {
+    disabled: 'draggableTextDelegate#isActive',
+    exec: (text: IText) =>
+      (text['draggableTextDelegate'].isActive = () => false),
+    expected: {
+      text: 'fabric.js sandbox',
+      selectionStart: 0,
+      selectionEnd: 6,
+    },
+  },
+] as const) {
+  test(`Disabling Drag & Drop by disabling ${options.disabled}`, async ({
+    page,
+  }) => {
+    const canvas = page.locator('canvas').nth(1);
+    const a = new TextUtil(page, 'a');
+    await test.step('disable dragging', () => a.executeInBrowser(options.exec));
+
+    await test.step(`select "${dragA}" in A`, async () => {
+      await canvas.click({
+        position: {
+          x: 130,
+          y: 50,
+        },
+      });
+      await page.mouse.dblclick(130, 50);
+      await canvas.hover({
+        position: {
+          x: 130,
+          y: 40,
+        },
+      });
+    });
+
+    await test.step('drag to end of text', async () => {
+      await page.mouse.down();
+      await page.mouse.move(240, 140, { steps: 40 });
+      a.expectObjectToMatch(options.expected);
+    });
+  });
+}
+
+async function waitForDataTransfer(
   page: Page,
   canvas: Locator,
   { x, y }: { x: number; y: number }
@@ -116,11 +226,28 @@ async function waitForDragImage(
     });
     await page.mouse.down();
     const dataTransfer = await page.evaluateHandle(() =>
-      Object.defineProperty(new DataTransfer(), 'setDragImage', {
-        value: (image, x, y) =>
-          window.dispatchEvent(
-            new CustomEvent('drag:image', { detail: { image, x, y } })
-          ),
+      Object.defineProperties(new DataTransfer(), {
+        __data: {
+          value: {},
+        },
+        setDragImage: {
+          value(image, x, y) {
+            window.dispatchEvent(
+              new CustomEvent('drag:data', {
+                detail: { image, x, y, data: this.__data },
+              })
+            );
+          },
+        },
+        setData: {
+          value(type, value) {
+            let out = value;
+            try {
+              out = JSON.parse(value);
+            } catch (error) {}
+            this.__data[type] = out;
+          },
+        },
       })
     );
     return [
@@ -128,21 +255,25 @@ async function waitForDragImage(
       page
         .evaluate(
           () =>
-            new Promise<{ image: string; x: number; y: number }>((resolve) =>
+            new Promise<{
+              image: string;
+              x: number;
+              y: number;
+              data: Record<string, any>;
+            }>((resolve) =>
               window.addEventListener(
-                'drag:image',
-                ({ detail: { image, x, y } }) =>
+                'drag:data',
+                ({ detail: { image, ...rest } }) =>
                   resolve({
                     image: image.toDataURL(`image/png`, 1),
-                    x,
-                    y,
+                    ...rest,
                   }),
                 { once: true }
               )
             )
         )
-        .then(({ x, y, image }) => {
-          return [binaryToBuffer(image), { x, y }] as const;
+        .then(({ x, y, image, ...data }) => {
+          return [binaryToBuffer(image), { x, y }, data] as const;
         }),
     ] as const;
   });
@@ -162,18 +293,18 @@ test('Drag Image A', async ({ page }) => {
   });
 
   await test.step('start dragging', async () => {
-    const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
+    const [dragEvent, trigger] = await waitForDataTransfer(page, canvas, {
       x: 130,
       y: 40,
     });
     await canvas.dispatchEvent('dragstart', dragEvent);
-    const [image, position] = await trigger;
+    const [image, position, data] = await trigger;
     expect(image, `drag image A: "${dragA}"`).toMatchSnapshot({
       name: 'drag-image-fabric.png',
       maxDiffPixelRatio: 0.03,
     });
     expect(
-      JSON.stringify(position, null, 2),
+      JSON.stringify({ position, ...data }, null, 2),
       `drag image A position: "${dragA}"`
     ).toMatchSnapshot({
       name: 'drag-image-fabric.json',
@@ -199,17 +330,17 @@ test('Drag Image B', async ({ page }) => {
   });
 
   await test.step('start dragging', async () => {
-    const [dragEvent, trigger] = await waitForDragImage(page, canvas, {
+    const [dragEvent, trigger] = await waitForDataTransfer(page, canvas, {
       x: 500,
       y: 280,
     });
     await canvas.dispatchEvent('dragstart', dragEvent);
-    const [image, position] = await trigger;
+    const [image, position, data] = await trigger;
     expect(image, `drag image B: "${dragB}"`).toMatchSnapshot({
       name: 'drag-image-em---tge.png',
     });
     expect(
-      JSON.stringify(position, null, 2),
+      JSON.stringify({ position, ...data }, null, 2),
       `drag image B position: "${dragB}"`
     ).toMatchSnapshot({
       name: 'drag-image-em---tge.json',
