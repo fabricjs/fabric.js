@@ -33,7 +33,7 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement } from '../util';
+import { createCanvasElement } from '../util/misc/dom';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
@@ -194,19 +194,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   targets: FabricObject[] = [];
 
-  /**
-   * Keep track of the hovered target
-   * @type FabricObject | null
-   * @private
-   */
-  declare _hoveredTarget?: FabricObject;
-
-  /**
-   * hold the list of nested targets hovered
-   * @type FabricObject[]
-   * @private
-   */
-  _hoveredTargets: FabricObject[] = [];
+  protected hoveringState: { target?: FabricObject; targets: FabricObject[] } =
+    {
+      target: undefined,
+      targets: [],
+    };
 
   /**
    * hold the list of objects to render
@@ -313,6 +305,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this._createCacheCanvas();
   }
 
+  protected setHoveringState(target?: FabricObject) {
+    this.hoveringState = { target, targets: [...this.targets] };
+  }
+
+  protected clearHoveringState() {
+    this.hoveringState = { target: undefined, targets: [] };
+  }
+
   /**
    * @private
    * @param {FabricObject} obj Object that was added
@@ -337,9 +337,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         target: obj,
       });
     }
-    if (obj === this._hoveredTarget) {
-      this._hoveredTarget = undefined;
-      this._hoveredTargets = [];
+    if (obj === this.hoveringState.target) {
+      this.clearHoveringState();
     }
     super._onObjectRemoved(obj);
   }

@@ -648,10 +648,11 @@
     var o3 = new fabric.Object();
     var control = [];
     var targetControl = [];
-    [o1, o2, o3].forEach(target => {
+    Object.entries({ o1, o2, o3 }).forEach(([key, target]) => {
       target.on(canvasEventName.replace(':', ''), () => {
         targetControl.push(target);
       });
+      target.toJSON = () => key;
     });
     canvas.add(o1, o2, o3);
     c.on(canvasEventName, function (ev) {
@@ -661,13 +662,14 @@
     event.initEvent(eventName, true, true);
 
     //  with targets
-    c._hoveredTarget = o3;
-    c._hoveredTargets = [o2, o1];
+    c.hoveringState = {
+      target: o3,
+      targets: [o2, o1, o3]
+    };
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(c._hoveredTarget, null, 'should clear `_hoveredTarget` ref');
-    assert.deepEqual(c._hoveredTargets, [], 'should clear `_hoveredTargets` ref');
+    assert.deepEqual(c.hoveringState, { target: undefined, targets: [] }, 'should clear hovering state');
     const expected = [o3, o2, o1];
-    assert.deepEqual(control.map(ev => ev.target), expected, 'should equal control');
+    assert.deepEqual(control.map(ev => ev.target.toJSON()), expected.map(target => target.toJSON()), 'should equal control');
     assert.deepEqual(targetControl, expected, 'should equal target control');
 
     //  without targets
@@ -708,17 +710,16 @@
         target.item(1).item(1),
         target.item(1).item(1).item(1)
       ];
-      canvas.handleSyntheticInOutEvents({ e: moveEvent, target });
+      canvas.handleSyntheticInOutEvents('mouse', { e: moveEvent, target });
       assert.equal(counterOver, 4, 'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets');
-      assert.equal(canvas._hoveredTarget, target, 'activeSelection is _hoveredTarget');
-      assert.equal(canvas._hoveredTargets.length, 3, '3 additional subTargets are captured as _hoveredTargets');
+      assert.equal(canvas.hoveringState.target, target, 'activeSelection is hovered target');
+      assert.equal(canvas.hoveringState.targets.length, 3, '3 additional subTargets are captured as hovered targets');
 
       // perform MouseOut even on all hoveredTargets
       canvas.targets = [];
-      canvas.handleSyntheticInOutEvents({ e: moveEvent });
+      canvas.handleSyntheticInOutEvents('mouse', { e: moveEvent });
       assert.equal(counterOut, 4, 'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets');
-      assert.equal(canvas._hoveredTarget, null, '_hoveredTarget has been set to null');
-      assert.equal(canvas._hoveredTargets.length, 0, '_hoveredTargets array is empty');
+      assert.deepEqual(canvas.hoveringState, { target: undefined, targets: [] }, 'should clear hovering state');
       done();
     });
   });
@@ -735,24 +736,25 @@
     assert.deepEqual(canvas._groupSelector, expectedGroupSelector, 'groupSelector is updated');
   });
 
-  QUnit.test('mouseEnter removes _hoveredTarget', function(assert) {
-    var event = fabric.getFabricDocument().createEvent('MouseEvent');
+  QUnit.test('mouseEnter removes clears hovering state', function (assert) {
+    const event = fabric.getFabricDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
-    var c = new fabric.Canvas();
-    c._hoveredTarget = new fabric.Object();
+    const c = new fabric.Canvas();
+    const target = new fabric.Object();
+    c.hoveringState = { target, targets: [target] };
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(c._hoveredTarget, null, '_hoveredTarget has been removed');
+    assert.deepEqual(c.hoveringState, { target: undefined, targets: [] }, 'should clear hovering state');
   });
-
-  QUnit.test('mouseEnter does not remove _hoveredTarget if a transform is happening', function(assert) {
+  
+  QUnit.test('mouseEnter does not clear hovering state if a transform is happening', function(assert) {
     var event = fabric.getFabricDocument().createEvent('MouseEvent');
     event.initEvent('mouseenter', true, true);
     var c = new fabric.Canvas();
-    var obj = new fabric.Object();
-    c._hoveredTarget = obj;
+    var target = new fabric.Object();
+    const state = c.hoveringState = { target, targets: [target] };
     c._currentTransform = {};
     c.upperCanvasEl.dispatchEvent(event);
-    assert.equal(c._hoveredTarget, obj, '_hoveredTarget has been not removed');
+    assert.equal(c.hoveringState, state, 'hoveringState has been not removed');
   });
 
   QUnit.test('mouseEnter removes __corner', function(assert) {

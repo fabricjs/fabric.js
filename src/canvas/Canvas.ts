@@ -12,7 +12,7 @@ import { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { removeFromArray } from '../util';
+import { removeFromArray } from '../util/internals/removeFromArray';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -84,13 +84,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private declare _willAddMouseDown: number;
 
   /**
-   * Holds a reference to an object on the canvas that is receiving the drag over event.
-   * @type FabricObject
-   * @private
-   */
-  private declare _draggedoverTarget?: FabricObject;
-
-  /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
@@ -99,8 +92,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   /**
    * Holds a reference to an object on the canvas that is the current drop target
-   * May differ from {@link _draggedoverTarget}
-   * @todo inspect whether {@link _draggedoverTarget} and {@link _dropTarget} should be merged somehow
+   * May differ from {@link _dragSource}
    * @type FabricObject
    * @private
    */
@@ -242,7 +234,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onMouseOut(e: TPointerEvent) {
-    const target = this._hoveredTarget;
+    const { target, targets } = this.hoveringState;
     const shared = {
       e,
       isClick: false,
@@ -250,13 +242,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       absolutePointer: this.getPointer(e),
     };
     this.fire('mouse:out', { ...shared, target });
-    this._hoveredTarget = undefined;
+    this.clearHoveringState();
     target && target.fire('mouseout', { ...shared });
-    this._hoveredTargets.forEach((nestedTarget) => {
+    targets.forEach((nestedTarget) => {
+      if (!nestedTarget || nestedTarget === target) {
+        return;
+      }
       this.fire('mouse:out', { ...shared, target: nestedTarget });
-      nestedTarget && nestedTarget.fire('mouseout', { ...shared });
+      nestedTarget.fire('mouseout', { ...shared });
     });
-    this._hoveredTargets = [];
   }
 
   /**
@@ -277,8 +271,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       });
-      this._hoveredTarget = undefined;
-      this._hoveredTargets = [];
+      this.clearHoveringState();
     }
   }
 
@@ -290,7 +283,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _onDragStart(e: DragEvent) {
     this._isClick = false;
     const activeObject = this.getActiveObject();
-    this._hoveredTargets = [];
+    this.clearHoveringState();
     if (
       isFabricObjectWithDragSupport(activeObject) &&
       activeObject.onDragStart(e)
@@ -378,7 +371,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     delete this._dragSource;
     // we need to call mouse up synthetically because the browser won't
     this._onMouseUp(e);
-    this._hoveredTargets = [];
+    this.clearHoveringState();
   }
 
   /**
@@ -391,7 +384,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       e,
       target: this._dragSource as FabricObject | undefined,
       dragSource: this._dragSource as FabricObject | undefined,
-      dropTarget: this._draggedoverTarget as FabricObject,
+      dropTarget: this.hoveringState.target,
     };
     this.fire('drag', options);
     this._dragSource && this._dragSource.fire('drag', options);
@@ -474,7 +467,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     };
     this.fire('dragenter', options);
     //  fire dragenter on targets
-    this._hoveredTargets = [];
+    this.clearHoveringState();
     this.handleSyntheticInOutEvents('drag', options);
   }
 
@@ -484,10 +477,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragLeave(e: DragEvent) {
+    const { target, targets } = this.hoveringState;
     const options = {
       e,
-      target: this._draggedoverTarget,
-      subTargets: this.targets,
+      target,
+      subTargets: targets,
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
@@ -498,7 +492,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._dropTarget = undefined;
     //  clear targets
     this.targets = [];
-    this._hoveredTargets = [];
+    this.clearHoveringState();
   }
 
   /**
@@ -1230,7 +1224,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   }
 
   /**
-   * Manage the mouseout/mouseover and dragenter/dragleave events for the fabric object on the canvas
+   * Handle mouseout/mouseover and dragenter/dragleave events
    * @param {Fabric.Object} target the target where the target from the mousemove event
    * @param {Event} e Event object fired on mousemove
    * @private
@@ -1242,9 +1236,17 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       ...context
     }: TSyntheticEventContext[T] & { target?: FabricObject }
   ) {
-    const prevTarget = this._hoveredTarget,
-      prevTargets = this._hoveredTargets,
-      targets = removeFromArray([...this.targets], target) as FabricObject[];
+    const { target: prevTarget, targets: verbosePrevTargets } =
+      this.hoveringState;
+    // targets/prevTargets may contain target/prevTarget respectively so we remove them
+    const prevTargets = removeFromArray(
+      [...verbosePrevTargets],
+      prevTarget
+    ) as FabricObject[];
+    const targets = removeFromArray(
+      [...this.targets],
+      target
+    ) as FabricObject[];
 
     this.fireSyntheticInOutEvents(type, {
       ...(context as TSyntheticEventContext[T]),
@@ -1259,8 +1261,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         oldTarget: prevTargets[i],
       });
     }
-    this._hoveredTarget = target;
-    this._hoveredTargets = targets;
   }
 
   /**
@@ -1481,8 +1481,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         if (target.group === activeSelection) {
           // `target` is part of active selection => remove it
           activeSelection.remove(target);
-          this._hoveredTarget = target;
-          this._hoveredTargets = removeFromArray([...this.targets], target);
+          this.setHoveringState(target);
           if (activeSelection.size() === 1) {
             // activate last remaining object
             this._setActiveObject(activeSelection.item(0) as FabricObject, e);
@@ -1490,18 +1489,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         } else {
           //  `target` isn't part of active selection => add it
           activeSelection.multiSelectAdd(target);
-          this._hoveredTarget = activeSelection;
-          this._hoveredTargets = removeFromArray([...this.targets], target);
+          this.setHoveringState(activeSelection);
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
         isInteractiveTextObject(activeObject) && activeObject.exitEditing();
         // add the active object and the target to the active selection and set it as the active object
         activeSelection.multiSelectAdd(activeObject, target);
-        this._hoveredTarget = activeSelection;
-        // ISSUE 4115: should we consider subTargets here?
-        // this._hoveredTargets = [];
-        // this._hoveredTargets = removeFromArray([...this.targets], target);
+        this.setHoveringState(activeSelection);
         this._setActiveObject(activeSelection, e);
         this._fireSelectionEvents([activeObject], e);
       }

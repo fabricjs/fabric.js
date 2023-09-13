@@ -275,9 +275,9 @@
   QUnit.test('remove actual hovered target', function(assert) {
     var rect1 = makeRect();
     canvas.add(rect1);
-    canvas._hoveredTarget = rect1;
+    canvas.hoveringState = { target: rect1, targets: [rect1] };
     canvas.remove(rect1);
-    assert.equal(canvas._hoveredTarget, null, 'reference to hovered target should be removed');
+    assert.deepEqual(canvas.hoveringState, { target: undefined, targets: [] }, 'hovering state should be removed');
   });
 
   QUnit.test('before:selection:cleared', function(assert) {
@@ -357,7 +357,7 @@
     canvas.add(rect1, rect2);
     canvas.on('selection:created', function( ) { isFired = true; });
     initActiveSelection(canvas, rect1, rect2, 'selection-order');
-    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'the created selection is also hovered');
+    assert.equal(canvas.hoveringState.target, canvas.getActiveObject(), 'the created selection is also hovered');
     assert.equal(isFired, true, 'selection:created fired');
     canvas.off('selection:created');
     canvas.clear();
@@ -406,7 +406,7 @@
     canvas.on('selection:updated', function( ) { isFired = true; });
     updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selection:updated fired');
-    assert.equal(canvas._hoveredTarget, canvas.getActiveObject(), 'hovered target is updated');
+    assert.equal(canvas.hoveringState.target, canvas.getActiveObject(), 'hovered target is updated');
   });
 
   QUnit.test('update active selection fires deselected on an object', function(assert) {
