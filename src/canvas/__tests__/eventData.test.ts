@@ -142,4 +142,101 @@ describe('Event targets', () => {
     expect(found).toBe(target);
     expect(canvas.targets).toEqual([subTarget, target, parent]);
   });
+
+  test('mouseover and mouseout with subTargetCheck', () => {
+    const rect1 = new FabricObject({
+      width: 5,
+      height: 5,
+      left: 5,
+      top: 0,
+      strokeWidth: 0,
+    });
+    const rect2 = new FabricObject({
+      width: 5,
+      height: 5,
+      left: 5,
+      top: 5,
+      strokeWidth: 0,
+    });
+    const rect3 = new FabricObject({
+      width: 5,
+      height: 5,
+      left: 0,
+      top: 5,
+      strokeWidth: 0,
+    });
+    const rect4 = new FabricObject({
+      width: 5,
+      height: 5,
+      left: 0,
+      top: 0,
+      strokeWidth: 0,
+    });
+    const rect5 = new FabricObject({
+      width: 5,
+      height: 5,
+      left: 2.5,
+      top: 2.5,
+      strokeWidth: 0,
+    });
+    const group1 = new Group([rect1, rect2], {
+      subTargetCheck: true,
+    });
+    const group2 = new Group([rect3, rect4], {
+      subTargetCheck: true,
+    });
+    // a group with 2 groups, with 2 rects each, one group left one group right
+    // each with 2 rects vertically aligned
+    const group = new Group([group1, group2], {
+      subTargetCheck: true,
+    });
+
+    const enter = jest.fn();
+    const exit = jest.fn();
+
+    const getTargetsFromEventStream = (mock: jest.Mock) =>
+      mock.mock.calls.map((args) => args[0].target);
+
+    Object.entries({
+      rect1,
+      rect2,
+      rect3,
+      rect4,
+      rect5,
+      group1,
+      group2,
+      group,
+    }).forEach(([key, object]) => {
+      jest.spyOn(object, 'toJSON').mockReturnValue(key);
+      object.on('mouseover', enter);
+      object.on('mouseout', exit);
+    });
+
+    const canvas = new Canvas();
+    canvas.add(group, rect5);
+
+    const fire = (x: number, y: number) => {
+      enter.mockClear();
+      exit.mockClear();
+      canvas
+        .getSelectionElement()
+        .dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y }));
+    };
+
+    fire(1, 1);
+    expect(getTargetsFromEventStream(enter)).toEqual([group, rect4, group2]);
+    expect(getTargetsFromEventStream(exit)).toEqual([]);
+
+    fire(5, 5);
+    expect(getTargetsFromEventStream(enter)).toEqual([rect5]);
+    expect(getTargetsFromEventStream(exit)).toEqual([group, rect4, group2]);
+
+    fire(9, 9);
+    expect(getTargetsFromEventStream(enter)).toEqual([group, rect2, group1]);
+    expect(getTargetsFromEventStream(exit)).toEqual([rect5]);
+
+    fire(9, 1);
+    expect(getTargetsFromEventStream(enter)).toEqual([rect1]);
+    expect(getTargetsFromEventStream(exit)).toEqual([rect2]);
+  });
 });
