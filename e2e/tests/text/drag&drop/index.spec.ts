@@ -41,6 +41,7 @@ const readEventStream = async (page: Page) =>
 
 test('Drag & Drop', async ({ page }) => {
   const canvas = page.locator('canvas').nth(1);
+  const textarea = page.locator('#textarea');
   const a = new TextUtil(page, 'a');
   const b = new TextUtil(page, 'b');
 
@@ -163,6 +164,50 @@ test('Drag & Drop', async ({ page }) => {
     });
     expect(await readEventStream(page)).toMatchSnapshot({
       name: '5.events.json',
+    });
+  });
+
+  await test.step(`drag & drop to textarea = ".js |${dragB}|sandbox"`, async () => {
+    await canvas.dragTo(textarea, {
+      sourcePosition: {
+        x: 120,
+        y: 55,
+      },
+    });
+    // expect(await page.evaluate(() => document.activeElement)).toBe(
+    //   await textarea.elementHandle()
+    // );
+    expect(
+      await page.screenshot(),
+      `6. drag & drop ".js |${dragB}|sandbox" to textarea (A => textarea)`
+    ).toMatchSnapshot({
+      name: '6.drop-textarea.png',
+    });
+    expect(await readEventStream(page)).toMatchSnapshot({
+      name: '6.events.json',
+    });
+  });
+
+  await test.step(`drag & drop "dolor" from textarea to B = "lor|dolor|fabrictur"`, async () => {
+    await page.mouse.move(25, 527);
+    await page.mouse.dblclick(25, 527);
+    await page.mouse.down();
+    await page.mouse.move(25, 527);
+    await page.mouse.move(25, 550, { steps: 10 });
+    await page.mouse.move(435, 55, { steps: 10 });
+    await canvas.hover({ position: { x: 435, y: 55 } });
+    await page.mouse.up();
+    expect(await page.evaluate(() => document.activeElement)).toBe(
+      await b.executeInBrowser((text) => text.hiddenTextarea)
+    );
+    expect(
+      await page.screenshot(),
+      `7. drag & drop "dolor" to B = "lor|dolor|fabrictur" (textarea => B)`
+    ).toMatchSnapshot({
+      name: '7.drop-textarea-to-B-lor|dolor|fabrictur.png',
+    });
+    expect(await readEventStream(page)).toMatchSnapshot({
+      name: '7.events.json',
     });
   });
 });

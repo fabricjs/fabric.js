@@ -1,0 +1,199 @@
+[
+  [
+    "dragenter",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "subTargets": []
+    },
+    "canvas"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "a"
+      ],
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "isClick": false,
+      "pointer": {
+        "x": 188.99999718368056,
+        "y": 351.9999947547913
+      },
+      "absolutePointer": {
+        "x": 188.99999718368056,
+        "y": 351.9999947547913
+      }
+    },
+    "a"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "a"
+      ],
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "isClick": false,
+      "pointer": {
+        "x": 229.99999657273298,
+        "y": 301.9999954998494
+      },
+      "absolutePointer": {
+        "x": 229.99999657273298,
+        "y": 301.9999954998494
+      }
+    },
+    "a"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "b"
+      ],
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "isClick": false,
+      "pointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "absolutePointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      }
+    },
+    "b"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "b"
+      ],
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "isClick": false,
+      "pointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "absolutePointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      }
+    },
+    "b"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [
+        "b"
+      ],
+      "canDrop": false,
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "isClick": false,
+      "pointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "absolutePointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      }
+    },
+    "b"
+  ],
+  [
+    "drop",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [
+        "b"
+      ],
+      "pointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "absolutePointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "didDrop": false
+    },
+    "canvas"
+  ],
+  [
+    "selection:changed",
+    {},
+    "b"
+  ],
+  [
+    "text:selection:changed",
+    {
+      "target": "b"
+    },
+    "canvas"
+  ],
+  [
+    "changed",
+    {
+      "index": 3,
+      "action": "drop"
+    },
+    "b"
+  ],
+  [
+    "text:changed",
+    {
+      "target": "b"
+    },
+    "canvas"
+  ],
+  [
+    "drop",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [
+        "b"
+      ],
+      "pointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "absolutePointer": {
+        "x": 434.999993517995,
+        "y": 54.99999918043615
+      },
+      "didDrop": true,
+      "dropTarget": "b"
+    },
+    "b"
+  ]
+]
