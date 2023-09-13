@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-globals */
 import '../../../jest.extend';
-import { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import { Group } from '../../shapes/Group';
 import { IText } from '../../shapes/IText/IText';
@@ -42,7 +41,7 @@ describe('Canvas event data', () => {
     'wheel',
     'contextmenu',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       canvas
@@ -53,7 +52,7 @@ describe('Canvas event data', () => {
   );
 
   // must call mousedown for mouseup to be listened to
-  test('HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s', () => {
+  test('HTML event "mouseup" should fire a corresponding canvas event', () => {
     canvas.setViewportTransform(genericVpt);
     canvas
       .getSelectionElement()
@@ -73,7 +72,7 @@ describe('Canvas event data', () => {
     'dragover',
     'drop',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       // select target and mock some essentials for events to fire
@@ -104,21 +103,43 @@ describe('Canvas event data', () => {
   );
 });
 
-it('A selected subtarget should not fire an event twice', () => {
-  const target = new FabricObject();
-  const group = new Group([target], {
-    subTargetCheck: true,
-    interactive: true,
+describe('Event targets', () => {
+  it('A selected subtarget should not fire an event twice', () => {
+    const target = new FabricObject();
+    const group = new Group([target], {
+      subTargetCheck: true,
+      interactive: true,
+    });
+    const canvas = new Canvas(null);
+    canvas.add(group);
+    const targetSpy = jest.fn();
+    target.on('mousedown', targetSpy);
+    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    canvas.getSelectionElement().dispatchEvent(
+      new MouseEvent('mousedown', {
+        clientX: 50,
+        clientY: 50,
+      })
+    );
+    expect(targetSpy).toHaveBeenCalledTimes(1);
   });
-  const canvas = new Canvas(null);
-  canvas.add(group);
-  const targetSpy = jest.fn();
-  target.on('mousedown', targetSpy);
-  jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
-  canvas.__onMouseDown({
-    target: canvas.getSelectionElement(),
-    clientX: 0,
-    clientY: 0,
-  } as unknown as TPointerEvent);
-  expect(targetSpy).toHaveBeenCalledTimes(1);
+
+  test('searchPossibleTargets', () => {
+    const subTarget = new FabricObject();
+    const target = new Group([subTarget], {
+      subTargetCheck: true,
+    });
+    const parent = new Group([target], {
+      subTargetCheck: true,
+      interactive: true,
+    });
+    const canvas = new Canvas(null);
+    canvas.add(parent);
+    const targetSpy = jest.fn();
+    target.on('mousedown', targetSpy);
+    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    const found = canvas.searchPossibleTargets([parent], new Point());
+    expect(found).toBe(target);
+    expect(canvas.targets).toEqual([subTarget, target, parent]);
+  });
 });

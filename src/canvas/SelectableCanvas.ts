@@ -796,62 +796,59 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+   * Search for objects containing {@link pointer}.
+   * Search is not greedy, returning once a hit is found.
    * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object from given `objects`** that contains pointer
-   * @private
+   * @param {Object} [pointer] point coordinates to check
+   * @param {boolean} [param2.searchStrategy] strategy
+   * @returns {FabricObject[]} path of objects starting from **top most** object on screen.
    */
-  _searchPossibleTargets(
+  protected findTargetsTraversal(
     objects: FabricObject[],
-    pointer: Point
-  ): FabricObject | undefined {
-    // Cache all targets where their bounding box contains point.
-    let target,
-      i = objects.length;
-    // Do not check for currently grouped objects, since we check the parent group itself.
-    // until we call this function specifically to search inside the activeGroup
-    while (i--) {
-      const objToCheck = objects[i];
-      const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
+    pointer: Point,
+    options: { searchStrategy: 'first-hit' | 'search-all' }
+  ): FabricObject[] {
+    const targets: FabricObject[] = [];
+    for (let index = objects.length - 1; index >= 0; index--) {
+      const target = objects[index];
+      const pointerToUse = target.group
+        ? this._normalizePointer(target.group, pointer)
         : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
+      if (this._checkTarget(pointerToUse, target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(
-            target._objects as FabricObject[],
-            pointer
+          targets.push(
+            ...this.findTargetsTraversal(
+              target._objects as FabricObject[],
+              pointer,
+              options
+            )
           );
-          subTarget && this.targets.push(subTarget);
         }
-        break;
+        targets.push(target);
+        if (options.searchStrategy === 'first-hit') {
+          break;
+        }
       }
     }
-    return target;
+    return targets;
   }
 
   /**
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link _searchPossibleTargets}
+   * @see {@link findTargetsTraversal}
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object on screen** that contains pointer
+   * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}
    */
   searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point
   ): FabricObject | undefined {
-    const target = this._searchPossibleTargets(objects, pointer);
-    // if we found something in this.targets, and the group is interactive, return that subTarget
-    // TODO: reverify why interactive. the target should be returned always, but selected only
-    // if interactive.
-    return target &&
-      isCollection(target) &&
-      target.interactive &&
-      this.targets[0]
-      ? this.targets[0]
-      : target;
+    const targets = this.findTargetsTraversal(objects, pointer, {
+      searchStrategy: 'first-hit',
+    });
+    this.targets.push(...targets);
+    return targets.find((target) => !target.group || target.group.interactive);
   }
 
   /**

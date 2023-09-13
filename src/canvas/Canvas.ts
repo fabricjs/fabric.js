@@ -400,7 +400,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   protected findDragTargets(e: DragEvent) {
     this.targets = [];
-    const target = this._searchPossibleTargets(
+    const target = this.searchPossibleTargets(
       this._objects,
       this.getPointer(e, true)
     );
