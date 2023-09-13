@@ -477,6 +477,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragLeave(e: DragEvent) {
+    this.targets = [];
     const { target, targets } = this.hoveringState;
     const options = {
       e,
@@ -485,13 +486,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
-
     //  fire dragleave on targets
-    this.handleSyntheticInOutEvents('drag', { ...options, target: undefined });
+    this.handleSyntheticInOutEvents('drag', options);
     this._renderDragEffects(e, this._dragSource);
     this._dropTarget = undefined;
-    //  clear targets
-    this.targets = [];
     this.clearHoveringState();
   }
 
