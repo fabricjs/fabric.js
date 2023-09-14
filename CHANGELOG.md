@@ -1,5 +1,7 @@
 # Changelog
 
+- fix(ActiveSelection): fix getActiveObjects [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
+
 ## [next]
 
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
