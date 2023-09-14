@@ -293,7 +293,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected readonly _activeSelection: ActiveSelection;
+  protected _activeSelection: ActiveSelection;
 
   constructor(
     el: string | HTMLCanvasElement,
@@ -1104,6 +1104,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return false;
     }
     this._activeObject = object;
+    if (object instanceof ActiveSelection) {
+      this._activeSelection = object;
+      this._activeSelection.set('canvas', this);
+      this._activeSelection.setCoords();
+    }
 
     return true;
   }
