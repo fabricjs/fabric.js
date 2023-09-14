@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IText cursor width under a group scaled by 1 and canvas zoomed by 1 1`] = `
+[
+  [
+    -92.2,
+    -18.6,
+    100,
+    40,
+  ],
+]
+`;
+
+exports[`IText cursor width under a group scaled by 1 and canvas zoomed by 50 1`] = `
+[
+  [
+    -43.2,
+    -18.6,
+    2,
+    40,
+  ],
+]
+`;
+
+exports[`IText cursor width under a group scaled by 200 and canvas zoomed by 0.005 1`] = `
+[
+  [
+    -92.2,
+    -18.6,
+    100,
+    40,
+  ],
+]
+`;
+
+exports[`IText cursor width under a group scaled by 200 and canvas zoomed by 1 1`] = `
+[
+  [
+    -42.5,
+    -18.6,
+    0.5,
+    40,
+  ],
+]
+`;
+
+exports[`IText cursor width under a group scaled by 200 and canvas zoomed by 50 1`] = `
+[
+  [
+    -42.2,
+    -18.6,
+    0,
+    40,
+  ],
+]
+`;
