@@ -88,8 +88,7 @@ describe('ActiveSelection', () => {
   });
 
   it('setting and getting are the same', () => {
-    const dom = document.createElement('canvas');
-    const canvas = new Canvas(dom);
+    const canvas = new Canvas(null);
     const obj1 = new FabricObject();
     const obj2 = new FabricObject();
     canvas.add(obj1, obj2);
