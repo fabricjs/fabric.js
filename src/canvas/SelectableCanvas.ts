@@ -704,8 +704,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
-    this.targets = [];
-
     if (activeObject && aObjects.length >= 1) {
       if (activeObject.findControl(pointer, isTouchEvent(e))) {
         // if we hit the corner of the active object, let's return that.
@@ -725,7 +723,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           return activeObject;
         } else {
           const subTargets = this.targets;
-          this.targets = [];
           const target = this.searchPossibleTargets(this._objects, pointer);
           if (
             e[this.altSelectionKey as ModifierKey] &&
@@ -870,8 +867,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const targets = this.findTargetsTraversal(objects, pointer, {
       searchStrategy: 'first-hit',
     });
+
     const found = targets.findIndex((target) => {
-      return !target.parent || target.parent.interactive;
+      return !target.group || target.group.interactive;
     });
 
     if (found > -1) {
