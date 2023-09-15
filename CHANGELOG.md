@@ -1,6 +1,6 @@
 # Changelog
 
-- fix(ActiveSelection): fix getActiveObjects [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
+- fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
 
 ## [next]
 
