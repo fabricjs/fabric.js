@@ -1104,7 +1104,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return false;
     }
     this._activeObject = object;
-    if (object instanceof ActiveSelection) {
+
+    if (object instanceof ActiveSelection && this._activeSelection !== object) {
+      this._activeSelection.dispose();
       this._activeSelection = object;
       this._activeSelection.set('canvas', this);
       this._activeSelection.setCoords();
