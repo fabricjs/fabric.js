@@ -146,6 +146,9 @@
 - fix(Utils): fix exported svg color [#9408](https://github.com/fabricjs/fabric.js/pull/9408)
 
 ## [6.0.0-beta13]
+- fix(): `searchPossibleTargets` `targets` value [#9343](https://github.com/fabricjs/fabric.js/pull/9343)
+
+## [6.0.0-b3]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
