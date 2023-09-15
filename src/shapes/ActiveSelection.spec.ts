@@ -86,4 +86,16 @@ describe('ActiveSelection', () => {
     expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
   });
+
+  it('setting and getting are the same', () => {
+    const dom = document.createElement('canvas');
+    const canvas = new Canvas(dom);
+    const obj1 = new FabricObject();
+    const obj2 = new FabricObject();
+    canvas.add(obj1, obj2);
+    const activeSelection = new ActiveSelection([obj1, obj2]);
+    canvas.setActiveObject(activeSelection);
+    expect(canvas.getActiveSelection()).toEqual(activeSelection);
+    expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
+  });
 });
