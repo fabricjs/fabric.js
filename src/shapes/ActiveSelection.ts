@@ -82,9 +82,9 @@ export class ActiveSelection extends Group {
    * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
+    const parent = object.getParent(true);
+    if (parent) {
       //  save ref to group for later in order to return to it
-      const parent = object.group;
       parent._exitGroup(object);
       object.__owningGroup = parent;
     }
@@ -100,7 +100,7 @@ export class ActiveSelection extends Group {
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
-    const parent = object.__owningGroup;
+    const parent = object.getParent(true);
     if (parent) {
       //  return to owning group
       parent._enterGroup(object, true);

@@ -48,11 +48,12 @@ export class StackedObject<
    * Returns instance's parent **EXCLUDING** `ActiveSelection`
    * @param {boolean} [strict] exclude canvas as well
    */
-  getParent<T extends boolean>(strict?: T): TAncestor | undefined {
-    return (
-      (isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
-      (strict ? undefined : this.canvas)
-    );
+  getParent<
+    T extends boolean,
+    R = (T extends true ? Group : TCollection) | undefined
+  >(strict?: T): R {
+    return ((isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
+      (strict ? undefined : this.canvas)) as R;
   }
 
   /**
