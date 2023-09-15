@@ -71,19 +71,21 @@ describe('ActiveSelection', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('sets coords after attaching to canvas', () => {
+  it('sets coords and canvas ref after attaching to canvas', () => {
+    const activeSelection = new ActiveSelection([
+      new FabricObject({
+        left: 100,
+        top: 100,
+        width: 100,
+        height: 100,
+      }),
+    ]);
     const canvas = new Canvas(null, {
-      activeSelection: new ActiveSelection([
-        new FabricObject({
-          left: 100,
-          top: 100,
-          width: 100,
-          height: 100,
-        }),
-      ]),
+      activeSelection,
       viewportTransform: [2, 0, 0, 0.5, 400, 150],
     });
     expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
+    expect(activeSelection.canvas).toBe(canvas);
   });
 });

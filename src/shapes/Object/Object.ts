@@ -75,6 +75,8 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
  *
  * @fires added
  * @fires removed
+ * @fires attached when attached to a canvas
+ * @fires detached when detached from a canvas
  *
  * @fires selected
  * @fires deselected
@@ -691,7 +693,7 @@ export class FabricObject<
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const isChanged = this[key as keyof this] !== value;
+    const prevValue = this[key as keyof this];
 
     if (key === 'scaleX' || key === 'scaleY') {
       value = this._constrainScale(value);
@@ -711,20 +713,26 @@ export class FabricObject<
 
     this[key as keyof this] = value;
 
-    if (isChanged) {
-      const groupNeedsUpdate = this.group && this.group.isOnACache();
+    if (prevValue !== value) {
       if (
         (this.constructor as typeof FabricObject).cacheProperties.includes(key)
       ) {
         this.dirty = true;
-        groupNeedsUpdate && this.group!.set('dirty', true);
+        this.group?.isOnACache() && this.group.set('dirty', true);
       } else if (
-        groupNeedsUpdate &&
+        this.group?.isOnACache() &&
         (this.constructor as typeof FabricObject).stateProperties.includes(key)
       ) {
-        this.group!.set('dirty', true);
+        this.group.set('dirty', true);
       }
     }
+
+    if (prevValue !== value && key === 'canvas') {
+      prevValue &&
+        this.fire('detached', { target: prevValue as unknown as Canvas });
+      value && this.fire('attached', { target: value as Canvas });
+    }
+
     return this;
   }
 

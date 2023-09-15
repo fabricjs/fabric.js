@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ActiveSelection sets coords after attaching to canvas 1`] = `
+exports[`ActiveSelection sets coords and canvas ref after attaching to canvas 1`] = `
 {
   "bl": Point {
     "x": 600,
@@ -21,7 +21,7 @@ exports[`ActiveSelection sets coords after attaching to canvas 1`] = `
 }
 `;
 
-exports[`ActiveSelection sets coords after attaching to canvas 2`] = `
+exports[`ActiveSelection sets coords and canvas ref after attaching to canvas 2`] = `
 {
   "bl": Point {
     "x": 100,
