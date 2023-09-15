@@ -58,4 +58,20 @@ describe('Object', () => {
     expect(fObj.top).toBe(0);
     expect(fObj.left).toBe(0);
   });
+
+  it('setting canvas should fire attached/detached events', () => {
+    const object = new FabricObject();
+    const canvasMock1 = { name: 'canvas1' };
+    const canvasMock2 = { name: 'canvas2' };
+    const spy = jest.spyOn(object, 'fire');
+    object.set({ canvas: canvasMock1 });
+    object.set({ canvas: canvasMock2 });
+    object.set({ canvas: undefined });
+    expect(spy.mock.calls).toEqual([
+      ['attached', { target: canvasMock1 }],
+      ['detached', { target: canvasMock1 }],
+      ['attached', { target: canvasMock2 }],
+      ['detached', { target: canvasMock2 }],
+    ]);
+  });
 });

@@ -250,6 +250,8 @@ export interface ObjectEvents
   // tree
   added: { target: Group | Canvas | StaticCanvas };
   removed: { target: Group | Canvas | StaticCanvas };
+  attached: { target: Canvas | StaticCanvas };
+  detached: { target: Canvas | StaticCanvas };
 
   // erasing
   'erasing:end': { path: FabricObject };
