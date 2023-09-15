@@ -123,9 +123,7 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": 50,
         "y": 50,
       },
-      "subTargets": [
-        "Drag Target",
-      ],
+      "subTargets": [],
       "target": "Drag Target",
       "transform": null,
     },
@@ -138,9 +136,7 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "y": -13,
       },
       "button": 1,
-      "currentSubTargets": [
-        "Drag Target",
-      ],
+      "currentSubTargets": [],
       "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
@@ -233,9 +229,7 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "subTargets": [
-        "Drag Target",
-      ],
+      "subTargets": [],
       "target": "Drag Target",
     },
   ],
@@ -317,9 +311,7 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "subTargets": [
-        "Drag Target",
-      ],
+      "subTargets": [],
       "target": "Drag Target",
     },
   ],
