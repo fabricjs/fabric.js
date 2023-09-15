@@ -689,11 +689,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Method that determines what object we are clicking on
+   * Determines what object and its sub targets {@link e} should target
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @return {FabricObject | null} the target found
+   * @return {FabricObject | undefined} the target found
    */
   findTarget(e: TPointerEvent): FabricObject | undefined {
     if (this.skipTargetFind) {
@@ -708,38 +708,58 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (activeObject.findControl(pointer, isTouchEvent(e))) {
         // if we hit the corner of the active object, let's return that.
         return activeObject;
-      } else if (
-        aObjects.length > 1 &&
-        // check pointer is over active selection and possibly perform `subTargetCheck`
-        this.searchPossibleTargets([activeObject], pointer)
-      ) {
+      }
+
+      // check pointer is over active selection and possibly perform `subTargetCheck`
+      const { target: selectedTarget, targets: selectedTargets } =
+        this.searchPossibleTargets([activeObject], pointer);
+
+      if (selectedTarget && aObjects.length > 1) {
         // active selection does not select sub targets like normal groups
+        // remove active selection for the array
+        this.targets = selectedTargets.slice(0, -1);
         return activeObject;
-      } else if (
-        activeObject === this.searchPossibleTargets([activeObject], pointer)
-      ) {
+      } else if (activeObject === selectedTarget) {
         // active object is not an active selection
         if (!this.preserveObjectStacking) {
+          this.targets = selectedTargets.slice(
+            0,
+            selectedTargets.indexOf(activeObject)
+          );
           return activeObject;
         } else {
-          const subTargets = this.targets;
-          const target = this.searchPossibleTargets(this._objects, pointer);
+          const { target, targets: canvasTargets } = this.searchPossibleTargets(
+            this._objects,
+            pointer
+          );
+
           if (
             e[this.altSelectionKey as ModifierKey] &&
             target &&
             target !== activeObject
           ) {
             // alt selection: select active object even though it is not the top most target
-            // restore targets
-            this.targets = subTargets;
+            this.targets = canvasTargets.slice(
+              0,
+              canvasTargets.indexOf(activeObject)
+            );
             return activeObject;
           }
+
+          this.targets = target
+            ? canvasTargets.slice(0, canvasTargets.indexOf(target))
+            : canvasTargets;
           return target;
         }
       }
     }
 
-    return this.searchPossibleTargets(this._objects, pointer);
+    const { target, targets } = this.searchPossibleTargets(
+      this._objects,
+      pointer
+    );
+    this.targets = target ? targets.slice(0, targets.indexOf(target)) : targets;
+    return target;
   }
 
   /**
@@ -865,23 +885,25 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   searchPossibleTargets(
     objects: FabricObject[],
-    pointer: Point
-  ): FabricObject | undefined {
+    pointer: Point,
+    {
+      searchStrategy = 'first-hit',
+    }: { searchStrategy?: 'first-hit' | 'search-all' } = {}
+  ) {
     const targets = this.findTargetsTraversal(objects, pointer, {
-      searchStrategy: 'first-hit',
+      searchStrategy,
     });
 
-    const found = targets.findIndex((target) => {
-      return !target.group || target.group.interactive;
+    const target = targets.find((target) => {
+      return (
+        !target.group || target.group.interactive || objects.includes(target)
+      );
     });
 
-    if (found > -1) {
-      this.targets = targets.slice(0, found);
-      return targets[found];
-    } else {
-      this.targets = targets;
-      return undefined;
-    }
+    return {
+      target,
+      targets,
+    };
   }
 
   /**
