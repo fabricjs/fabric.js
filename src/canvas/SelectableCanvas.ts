@@ -854,8 +854,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Function used to search objects for a object containing {@link pointer}
+   * Search objects for an object containing {@link pointer}
+   * depending on the tree's configuration (`subTargetCheck`, `interactive`, `selectable`)
+   *
    * @see {@link findTargetsTraversal}
+   *
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Point} [pointer] viewport point
    * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}

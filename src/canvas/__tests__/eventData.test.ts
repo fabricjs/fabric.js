@@ -1103,28 +1103,52 @@ describe('Event targets', () => {
       expect(canvas.targets).toEqual([subTarget]);
     });
 
-    test('searchPossibleTargets with selection', () => {
-      const subTarget = new FabricObject();
-      const target = new Group([subTarget], {
-        subTargetCheck: true,
-      });
-      const other = new FabricObject();
-      const activeSelection = new ActiveSelection();
-      registerTestObjects({ subTarget, target, other, activeSelection });
+    test.only.each([true, false])(
+      'searchPossibleTargets with selection and subTargetCheck %s',
+      (subTargetCheck) => {
+        const subTarget = new FabricObject();
+        const target = new Group([subTarget], {
+          subTargetCheck: true,
+        });
+        const other = new FabricObject();
+        const activeSelection = new ActiveSelection([], {
+          subTargetCheck,
+        });
+        registerTestObjects({ subTarget, target, other, activeSelection });
 
-      const canvas = new Canvas(null, { activeSelection });
-      canvas.add(other, target);
-      activeSelection.add(target, other);
-      canvas.setActiveObject(activeSelection);
+        const canvas = new Canvas(null, { activeSelection });
+        canvas.add(other, target);
+        activeSelection.add(target, other);
+        canvas.setActiveObject(activeSelection);
 
-      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
-      const found = canvas.searchPossibleTargets(
-        [activeSelection],
-        new Point()
-      );
-      expect(found).toBe(activeSelection);
-      expect(canvas.targets).toEqual([]);
-    });
+        jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+
+        const foundTargets = canvas['findTargetsTraversal'](
+          [activeSelection],
+          new Point(),
+          { searchStrategy: 'search-all' }
+        );
+        expect(foundTargets).toEqual(
+          subTargetCheck
+            ? [other, subTarget, target, activeSelection]
+            : [activeSelection]
+        );
+
+        const found = canvas.searchPossibleTargets(
+          [activeSelection],
+          new Point()
+        );
+        expect(found).toBe(activeSelection);
+        expect(canvas.targets).toEqual(subTargetCheck ? [other] : []);
+
+        const notFound = canvas.searchPossibleTargets(
+          canvas.getActiveObjects(),
+          new Point()
+        );
+        expect(notFound).toBeUndefined();
+        expect(canvas.targets).toEqual([other]);
+      }
+    );
 
     test('findTarget clears prev targets', () => {
       const canvas = new Canvas();
