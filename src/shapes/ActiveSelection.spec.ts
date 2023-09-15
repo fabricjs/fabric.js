@@ -87,14 +87,17 @@ describe('ActiveSelection', () => {
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
   });
 
-  it('setting and getting are the same', () => {
+  it(`setActiveObject` should update the active selection ref on canvas, () => {
     const canvas = new Canvas(null);
     const obj1 = new FabricObject();
     const obj2 = new FabricObject();
     canvas.add(obj1, obj2);
     const activeSelection = new ActiveSelection([obj1, obj2]);
+    const spy = jest.spyOn(activeSelection, 'setCoords');
     canvas.setActiveObject(activeSelection);
-    expect(canvas.getActiveSelection()).toEqual(activeSelection);
+    expect(canvas.getActiveSelection()).toBe(activeSelection);
     expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
+    expect(spy).toHaveBeenCalled();
+    expect(activeSelection.canvas).toBe(canvas);
   });
 });
