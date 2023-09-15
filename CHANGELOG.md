@@ -4,7 +4,7 @@
 
 - feat(FabricObject): attached/detached events [#9342](https://github.com/fabricjs/fabric.js/pull/9342)
 
-## [6.0.0-b3]
+## [6.0.0-beta13]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
