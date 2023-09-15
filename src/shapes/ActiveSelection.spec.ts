@@ -87,7 +87,7 @@ describe('ActiveSelection', () => {
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
   });
 
-  it(`setActiveObject` should update the active selection ref on canvas, () => {
+  it('`setActiveObject` should update the active selection ref on canvas', () => {
     const canvas = new Canvas(null);
     const obj1 = new FabricObject();
     const obj2 = new FabricObject();
