@@ -1083,7 +1083,7 @@ describe('Event targets', () => {
       }
     );
 
-    test('searchPossibleTargets', () => {
+    test('findTargets', () => {
       const subTarget = new FabricObject();
       const target = new Group([subTarget], {
         subTargetCheck: true,
@@ -1098,14 +1098,14 @@ describe('Event targets', () => {
       canvas.add(parent);
 
       jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
-      expect(canvas.searchPossibleTargets([parent], new Point())).toEqual({
+      expect(canvas.findTargets([parent], new Point())).toEqual({
         target,
         targets: [subTarget, target, parent],
       });
     });
 
     test.each([true, false])(
-      'searchPossibleTargets with selection and subTargetCheck %s',
+      'findTargets with selection and subTargetCheck %s',
       (subTargetCheck) => {
         const subTarget = new FabricObject();
         const target = new Group([subTarget], {
@@ -1135,9 +1135,7 @@ describe('Event targets', () => {
             : [activeSelection]
         );
 
-        expect(
-          canvas.searchPossibleTargets([activeSelection], new Point())
-        ).toEqual({
+        expect(canvas.findTargets([activeSelection], new Point())).toEqual({
           target: activeSelection,
           targets: subTargetCheck
             ? [other, activeSelection]
@@ -1145,7 +1143,7 @@ describe('Event targets', () => {
         });
 
         expect(
-          canvas.searchPossibleTargets(canvas.getActiveObjects(), new Point())
+          canvas.findTargets(canvas.getActiveObjects(), new Point())
         ).toEqual({
           target: other,
           targets: [other],
