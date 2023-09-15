@@ -854,10 +854,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+   * Function used to search objects for a object containing {@link pointer}
    * @see {@link findTargetsTraversal}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Point} [pointer] x,y object of point coordinates we want to check.
+   * @param {Point} [pointer] viewport point
    * @return {FabricObject} **top most selectable object on screen** that contains {@link pointer}
    */
   searchPossibleTargets(
