@@ -79,17 +79,17 @@ export class ActiveSelection extends Group {
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
-      //  save ref to group for later in order to return to it
-      const parent = object.group;
-      parent._exitGroup(object);
-      object.__owningGroup = parent;
+    // make sure we exit the parent only once
+    if (object.parent && object.parent === object.group) {
+      object.parent._exitGroup(object);
+    } else if (object.group && object.parent !== object.group) {
+      // in case `object` is transferred between active selections
+      object.group.remove(object);
     }
+
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -100,12 +100,8 @@ export class ActiveSelection extends Group {
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
-    const parent = object.__owningGroup;
-    if (parent) {
-      //  return to owning group
-      parent._enterGroup(object, true);
-      delete object.__owningGroup;
-    }
+    //  return to parent
+    object.parent?._enterGroup(object, true);
   }
 
   /**

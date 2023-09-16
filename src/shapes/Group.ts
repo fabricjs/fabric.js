@@ -402,14 +402,11 @@ export class Group extends createCollectionMixin(
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
-      object.group.remove(object);
-    }
+    object.group?.remove(object);
+    object._set('parent', this);
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -452,6 +449,7 @@ export class Group extends createCollectionMixin(
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    object._set('parent', undefined);
     object._set('canvas', undefined);
   }
 
