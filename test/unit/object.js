@@ -652,7 +652,7 @@
     assert.equal(object.group, activeSelection);
     assert.equal(object.parent, parent);
     assert.equal(object.canvas, canvas);
-    assert.ok(object.isDescendantOf(parent), 'should recognize owning group');
+    assert.ok(object.isDescendantOf(parent), 'should recognize parent');
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
     delete object.parent;

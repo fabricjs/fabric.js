@@ -83,9 +83,10 @@ export class ActiveSelection extends Group {
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
     // make sure we exit the parent only once
     if (object.parent && object.parent === object.group) {
+      // keep the object part of the parent
       object.parent._exitGroup(object);
     } else if (object.group && object.parent !== object.group) {
-      // in case `object` is transferred between active selections
+      // in case `object` is transferred between active selections we remove it from the prev
       object.group.remove(object);
     }
 
