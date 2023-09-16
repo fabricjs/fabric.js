@@ -47,5 +47,7 @@ describe('Group', () => {
     expect(object.group).toBeUndefined();
     expect(object.parent).toBeUndefined();
     expect(object.canvas).toBeUndefined();
+
+    expect(eventsSpy).toBeCalledTimes(3);
   });
 });
