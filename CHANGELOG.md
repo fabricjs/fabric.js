@@ -2,6 +2,8 @@
 
 ## [next]
 
+- TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
+
 ## [6.0.0-b3]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
