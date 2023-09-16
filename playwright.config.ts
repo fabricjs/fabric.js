@@ -61,6 +61,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Desktop Chrome'],
         browserName: 'chromium',
+        launchOptions: { devtools: !process.env.CI },
       },
     },
   ],
