@@ -2,6 +2,8 @@
 
 ## [next]
 
+- refactor(Group): `parent` + fix(ActiveSelection): transferring object [#9349](https://github.com/fabricjs/fabric.js/pull/9349)
+
 ## [6.0.0-b3]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
