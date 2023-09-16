@@ -27,7 +27,7 @@ test('TEST NAME', async ({ page }) => {
  * - Press the play button in playwright devtools  to execute the test
  * - The generated code will be logged to the console and attached to the test results
  *
- * To edit an existing test simply add `await page.pause();` where you want to start recording.
+ * To edit an existing test add `await page.pause();` where you want to start recording.
  */
 !process.env.CI &&
   test.only('Codegen', async ({ page, browser }) => {
