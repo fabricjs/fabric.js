@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { execSync } from 'child_process';
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
+import type { Canvas } from '../..';
 
 type EventModifiers = Pick<
   MouseEvent,
@@ -76,6 +77,23 @@ export default () => {
     handle = await page.evaluateHandle(() => {
       const events: (readonly [keyof DocumentEventMap, EventData?])[] = [];
 
+      const getCanvasSelector = ({
+        target = document.activeElement,
+        prefix = 'canvas_top',
+      }: {
+        target?: EventTarget;
+        prefix?: 'canvas_top' | 'canvas_wrapper' | '';
+      }) => {
+        const id =
+          target &&
+          Array.from(
+            (window.canvasMap as Map<HTMLCanvasElement, Canvas>).values()
+          )
+            .find((canvas) => target === canvas.getSelectionElement())
+            ?.getElement().id;
+        return id ? `${prefix}=#${id}` : undefined;
+      };
+
       const subscribe = <K extends keyof DocumentEventMap>(
         type: K,
         callback: (ev: DocumentEventMap[K]) => any,
@@ -114,7 +132,7 @@ export default () => {
           {
             x,
             y,
-            target,
+            selector: getCanvasSelector({ target }),
           },
         ] as const;
       };
@@ -171,13 +189,6 @@ export default () => {
         ];
       };
 
-      window.captureScreenshot = (name?: string, selector?: string) => {
-        disposers.length && events.push(['screenshot', { name, selector }]);
-        window.dispatchEvent(
-          new CustomEvent('screenshot', { detail: { name, selector } })
-        );
-      };
-
       let step = false;
       window.step = (name?: string) => {
         if (disposers.length) {
@@ -202,6 +213,24 @@ export default () => {
         disposers = [];
       };
 
+      window.captureScreenshot = ({
+        name,
+        selector = getCanvasSelector({ prefix: 'canvas_wrapper' }),
+      }: {
+        name?: string;
+        selector?: string;
+      } = {}) => {
+        disposers.length && events.push(['screenshot', { name, selector }]);
+        window.dispatchEvent(
+          new CustomEvent('screenshot', {
+            detail: {
+              name,
+              selector,
+            },
+          })
+        );
+      };
+
       return events;
     });
 
@@ -210,19 +239,21 @@ export default () => {
       counter++;
       try {
         // closing the test will cause this to fail because it keeps listening to the page
-        const { name, selector = 'canvas_wrapper=#canvas' } =
-          await page.evaluate(
-            () =>
-              new Promise<{ name?: string; selector?: string }>((resolve) =>
-                window.addEventListener(
-                  'screenshot',
-                  ({ detail }: CustomEvent) => resolve(detail),
-                  { once: true }
-                )
+        const { name, selector } = await page.evaluate(
+          () =>
+            new Promise<{ name?: string; selector?: string }>((resolve) =>
+              window.addEventListener(
+                'screenshot',
+                ({ detail }: CustomEvent) => resolve(detail),
+                { once: true }
               )
-          );
-        const screenshot = await page.locator(selector).screenshot();
-        testInfo.attach(name || `screenshot${counter}.png`, {
+            )
+        );
+        const screenshot = await (selector
+          ? page.locator(selector)
+          : page
+        ).screenshot();
+        testInfo.attach(name || `codegen_screenshot${counter}.png`, {
           body: screenshot,
         });
         const { updateSnapshots } = testInfo.config;
@@ -242,6 +273,10 @@ export default () => {
     // close last step
     (data.findLast(([type]) => type === 'step')?.[1] as StepEventData)?.type ===
       'start' && data.push(['step', { type: 'end' }]);
+
+    const toSelector = (selector?: string) =>
+      selector ? `'${selector}'` : 'selector';
+
     const codegen = [
       '// you may need to replace the `selector` value',
       `const selector = 'canvas_top=#canvas';`,
@@ -271,11 +306,13 @@ export default () => {
 
               case 'mousedown': {
                 if (array[index + 1]?.[0] !== 'mouseup') {
-                  const { x, y } = ev as MouseEventData;
+                  const { x, y, selector } = ev as MouseEventData;
                   return [
-                    `await page.hover(selector, ${JSON.stringify({
-                      position: { x, y },
-                    })});`,
+                    `await page.hover(${toSelector(selector)}, ${JSON.stringify(
+                      {
+                        position: { x, y },
+                      }
+                    )});`,
                     `await page.mouse.down();`,
                   ];
                 }
@@ -287,11 +324,13 @@ export default () => {
               }
               case 'mouseup': {
                 if (array[index - 1]?.[0] === 'mousedown') {
-                  const { x, y } = ev as MouseEventData;
+                  const { x, y, selector } = ev as MouseEventData;
                   return [
-                    `await page.click(selector, ${JSON.stringify({
-                      position: { x, y },
-                    })});`,
+                    `await page.click(${toSelector(selector)}, ${JSON.stringify(
+                      {
+                        position: { x, y },
+                      }
+                    )});`,
                   ];
                 }
                 return [`await page.mouse.up();`];
@@ -305,9 +344,9 @@ export default () => {
               case 'screenshot': {
                 const { name, selector } = ev as ScreenshotEventData;
                 return [
-                  `expect(await page.locator(${
-                    selector ? `'${selector}'` : 'selector'
-                  }).screenshot()).toMatchSnapshot(${
+                  `expect(await page.locator(${toSelector(
+                    selector
+                  )}).screenshot()).toMatchSnapshot(${
                     name ? JSON.stringify({ name }) : ''
                   });`,
                 ];
