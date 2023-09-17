@@ -29,8 +29,30 @@ const text = new fabric.Textbox(textValue, {
     textValue
   ),
 });
-canvas.add(text);
-canvas.centerObjectH(text);
+
+const rect = new fabric.Rect({
+  top: 65,
+  width: 150,
+  height: 150,
+  angle: 45,
+  fill: 'rgba(255,0,0,0.5)',
+  strokeWidth: 0,
+});
+
+const rect2 = new fabric.Rect({
+  left: 130,
+  width: 150,
+  height: 150,
+  angle: 45,
+  stroke: 'blue',
+  strokeWidth: 10,
+  fill: null,
+});
+
+const grp = new fabric.Group([rect, rect2, text]);
+
+canvas.add(grp);
+
 function animate(toState) {
   text.animate(
     { scaleX: Math.max(toState, 0.1) * 2 },
