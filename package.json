@@ -144,6 +144,12 @@
       ],
       "src/*": [
         "src/*"
+      ],
+      "test/playwright": [
+        "e2e/setup/index.ts"
+      ],
+      "test/jest": [
+        "jest.setup.ts"
       ]
     }
   },
@@ -161,6 +167,20 @@
       "default": "./dist/index.node.cjs",
       "node": "./dist/index.node.cjs",
       "types": "./dist/index.node.d.ts"
+    },
+    "./test/playwright": {
+      "import": "./e2e/setup/index.ts",
+      "require": null,
+      "default": "./e2e/setup/index.ts",
+      "node": "./e2e/setup/index.ts",
+      "types": "./e2e/setup/index.ts"
+    },
+    "./test/jest": {
+      "import": "./jest.setup.ts",
+      "require": null,
+      "default": "./jest.setup.ts",
+      "node": "./jest.setup.ts",
+      "types": "./jest.setup.ts"
     }
   }
 }

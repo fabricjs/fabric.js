@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import setup from '../../setup';
 import { existsSync, rmSync } from 'fs';
-import setupCodegen from '../../setup/setupCodegen';
+import setup, { setupCodegen } from '../../setup';
 
 setup();
 // run also in CI

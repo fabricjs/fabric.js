@@ -3,6 +3,8 @@ import setupCodegen from './setupCodegen';
 import setupCoverage from './setupCoverage';
 import setupSelectors from './setupSelectors';
 
+export { setupApp, setupCodegen, setupCoverage, setupSelectors };
+
 export default () => {
   // call first
   setupSelectors();

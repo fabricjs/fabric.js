@@ -388,8 +388,8 @@ export default () => {
         body,
       });
       console.log(
-        `\n\nCodegen of the test "${testInfo.title}" has completed successfully',
-        'Generated output is available in the test attachments\n\n`,
+        `\n\nCodegen of the test "${testInfo.title}" has completed successfully`,
+        'Generated output is available in the test attachments\n\n',
         body
       );
     }
