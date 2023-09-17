@@ -8,6 +8,7 @@ import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
+import { IMPERATIVE, INITIALIZATION } from './constants';
 
 export class LayoutManager {
   private _firstLayoutDone = false;
@@ -22,7 +23,7 @@ export class LayoutManager {
   }
 
   performLayout(context: LayoutContext) {
-    if (!this._firstLayoutDone && context.type !== 'initialization') {
+    if (!this._firstLayoutDone && context.type !== INITIALIZATION) {
       //  reject layout requests before initialization layout
       return;
     }
@@ -97,7 +98,7 @@ export class LayoutManager {
     const { target } = context;
 
     // handle layout triggers subscription
-    if (context.type === 'initialization' || context.type === 'added') {
+    if (context.type === INITIALIZATION || context.type === 'added') {
       context.targets.forEach((object) => this.subscribe(context, object));
     } else if (context.type === 'removed') {
       context.targets.forEach((object) => this.unsubscribe(context, object));
@@ -111,7 +112,7 @@ export class LayoutManager {
       context,
     });
 
-    if (context.type === 'imperative' && context.deep) {
+    if (context.type === IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
@@ -129,7 +130,7 @@ export class LayoutManager {
   ): Required<LayoutResult> | undefined {
     const { target } = context;
     const prevCenter =
-      context.type === 'initialization'
+      context.type === INITIALIZATION
         ? new Point()
         : target.getRelativeCenterPoint();
     const result = context.strategy.calcLayoutResult(
@@ -149,14 +150,14 @@ export class LayoutManager {
       result.relativeCorrectionY ?? 0
     );
     const offset =
-      context.type === 'initialization' && context.objectsRelativeToGroup
+      context.type === INITIALIZATION && context.objectsRelativeToGroup
         ? new Point()
         : prevCenter
             .subtract(nextCenter)
             .add(correction)
             .transform(
               // in `initialization` we do not account for target's transformation matrix
-              context.type === 'initialization'
+              context.type === INITIALIZATION
                 ? iMatrix
                 : invertTransform(target.calcOwnMatrix()),
               true
@@ -185,7 +186,7 @@ export class LayoutManager {
     this.layoutObjects(context, layoutResult);
     //  set position
     // in `initialization` we do not account for target's transformation matrix
-    if (context.type === 'initialization') {
+    if (context.type === INITIALIZATION) {
       // TODO: what about strokeWidth?
       const origin = nextCenter.add(
         new Point(width, height).multiply(
@@ -210,7 +211,7 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    (context.type !== 'initialization' || !context.objectsRelativeToGroup) &&
+    (context.type !== INITIALIZATION || !context.objectsRelativeToGroup) &&
       target.forEachObject((object) => {
         object.group === target &&
           this.layoutObject(context, layoutResult, object);

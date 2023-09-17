@@ -1,6 +1,7 @@
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
+import { INITIALIZATION } from '../constants';
 
 export class FixedLayout extends LayoutStrategy {
   static readonly type = 'fixed';
@@ -13,7 +14,7 @@ export class FixedLayout extends LayoutStrategy {
     context: StrictLayoutContext
   ): LayoutStrategyResult | undefined {
     const result = super.calcBoundingBox(objects, context);
-    if (context.type === 'initialization' && result) {
+    if (context.type === INITIALIZATION && result) {
       const {
         target: { width, height },
       } = context;

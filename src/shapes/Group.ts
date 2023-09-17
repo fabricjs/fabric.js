@@ -20,6 +20,7 @@ import type {
   LayoutEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
+import { IMPERATIVE, INITIALIZATION } from '../LayoutManager/constants';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -133,7 +134,7 @@ export class Group
     // perform initial layout
     this.layoutManager = layoutManager;
     this.layoutManager.performLayout({
-      type: 'initialization',
+      type: INITIALIZATION,
       objectsRelativeToGroup,
       target: this,
       targets: [...objects],
@@ -489,7 +490,7 @@ export class Group
   }: ImperativeLayoutOptions = {}) {
     this.layoutManager.performLayout({
       target: this,
-      type: 'imperative',
+      type: IMPERATIVE,
       strategy,
       ...rest,
     });
