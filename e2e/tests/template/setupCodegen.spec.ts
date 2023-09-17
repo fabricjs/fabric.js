@@ -1,7 +1,29 @@
 import { expect, test } from '@playwright/test';
 import setup from '../../setup';
+import { existsSync, rmSync } from 'fs';
 
 setup();
+
+// clear snapshots so we can test snapshot generation
+test.beforeEach(async ({ page }, testInfo) => {
+  ['a.png', 'b.png', 'codegen-1.png', 'codegen-2.png'].forEach((name) => {
+    const pathToFile = testInfo.snapshotPath(name);
+    existsSync(pathToFile) && rmSync(pathToFile);
+    expect(existsSync(pathToFile)).toBeFalsy();
+  });
+});
+// test codegen
+test.afterEach(async ({ page }, testInfo) => {
+  await test.step('test output', async () => {
+    const [events, codegen] = testInfo.attachments.slice(-2);
+    expect(events.body).toMatchSnapshot({ name: 'recorded_events.dat' });
+    expect(codegen.body).toMatchSnapshot({ name: 'codegen.dat' });
+    ['a.png', 'b.png', 'codegen-1.png', 'codegen-2.png'].forEach((name) => {
+      const pathToFile = testInfo.snapshotPath(name);
+      expect(existsSync(pathToFile)).toBeTruthy();
+    });
+  });
+});
 
 test('codegen', async ({ page }, testInfo) => {
   await test.step('generate test', async () => {
@@ -43,14 +65,27 @@ test('codegen', async ({ page }, testInfo) => {
     await page.mouse.move(475, 292, { steps: 10 });
     await page.mouse.up();
 
-    await test.step('captureScreenshot()', async () => {
+    await test.step(`step('screenshots')`, async () => {
+      const timeout = 1000;
       await page.evaluate(() => step('screenshots'));
-      await page.evaluate(() => captureScreenshot());
-      await page.evaluate(() => captureScreenshot({ name: 'a.png' }));
-      await page.evaluate(() => captureScreenshot({ selector: '#canvas' }));
-      await page.evaluate(() =>
-        captureScreenshot({ name: 'b.png', selector: '#canvas' })
-      );
+      await test.step(`captureScreenshot()`, async () => {
+        await page.evaluate(() => captureScreenshot());
+        await page.waitForTimeout(timeout);
+      });
+      await test.step(`captureScreenshot({ name: 'a.png' })`, async () => {
+        await page.evaluate(() => captureScreenshot({ name: 'a.png' }));
+        await page.waitForTimeout(timeout);
+      });
+      await test.step(`captureScreenshot({ selector: '#canvas' })`, async () => {
+        await page.evaluate(() => captureScreenshot({ selector: '#canvas' }));
+        await page.waitForTimeout(timeout);
+      });
+      await test.step(`captureScreenshot({ name: 'b.png', selector: '#canvas' })`, async () => {
+        await page.evaluate(() =>
+          captureScreenshot({ name: 'b.png', selector: '#canvas' })
+        );
+        await page.waitForTimeout(timeout);
+      });
     });
 
     await test.step('modifier keys', async () => {
@@ -118,18 +153,5 @@ test('codegen', async ({ page }, testInfo) => {
       await page.keyboard.up('Shift');
       await page.keyboard.up('Meta');
     });
-  });
-});
-
-test.afterEach(async ({ page }, testInfo) => {
-  await test.step('test output', async () => {
-    expect(testInfo.attachments).toHaveLength(3);
-    expect(testInfo.attachments.map(({ name }) => name)).toMatchObject([
-      'codegen_screenshot1.png',
-      'recorded events',
-      'codegen',
-    ]);
-    expect(testInfo.attachments[1].body).toMatchSnapshot();
-    expect(testInfo.attachments[2].body).toMatchSnapshot();
   });
 });

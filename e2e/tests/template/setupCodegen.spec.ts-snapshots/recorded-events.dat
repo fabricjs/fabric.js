@@ -1,0 +1,631 @@
+[
+  [
+    "mousedown",
+    {
+      "x": 443,
+      "y": 43,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 300,
+      "y": 206
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 300,
+      "y": 206,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "start",
+      "name": "1"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 268,
+      "y": 203,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 144,
+      "y": 48
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 144,
+      "y": 48,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "end"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "start"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 133,
+      "y": 72,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 135,
+      "y": 557
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 135,
+      "y": 557,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "end",
+      "name": "2"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 228,
+      "y": 294,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 475,
+      "y": 292
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 475,
+      "y": 292,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "start",
+      "name": "screenshots"
+    }
+  ],
+  [
+    "screenshot",
+    {}
+  ],
+  [
+    "screenshot",
+    {
+      "name": "a.png"
+    }
+  ],
+  [
+    "screenshot",
+    {
+      "selector": "#canvas"
+    }
+  ],
+  [
+    "screenshot",
+    {
+      "name": "b.png",
+      "selector": "#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "end"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "start",
+      "name": "modifier keys"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 475,
+      "y": 555,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Shift"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 805,
+      "y": 600
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 700,
+      "y": 572
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Control"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Control"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 455,
+      "y": 515
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Shift"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 469,
+      "y": 417
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 469,
+      "y": 417,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "end"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "start",
+      "name": "typing"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 58,
+      "y": 292,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 58,
+      "y": 292,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Shift"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "!"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "!"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "@"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "@"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "#"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "#"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Shift"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Control"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "1"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "2"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "3"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Alt"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Control"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 219,
+      "y": 256,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mousemove",
+    {
+      "x": 64,
+      "y": 250
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 64,
+      "y": 250,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Delete"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Delete"
+    }
+  ],
+  [
+    "mousedown",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "mouseup",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "dblclick",
+    {
+      "x": 113,
+      "y": 272,
+      "selector": "canvas_top=#canvas"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "Meta"
+    }
+  ],
+  [
+    "keydown",
+    {
+      "key": "S"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "S"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Shift"
+    }
+  ],
+  [
+    "keyup",
+    {
+      "key": "Meta"
+    }
+  ],
+  [
+    "step",
+    {
+      "type": "end"
+    }
+  ]
+]

@@ -253,7 +253,7 @@ export default () => {
           ? page.locator(selector)
           : page
         ).screenshot();
-        testInfo.attach(name || `codegen_screenshot${counter}.png`, {
+        testInfo.attach(name || `codegen${counter}.png`, {
           body: screenshot,
         });
         const { updateSnapshots } = testInfo.config;
