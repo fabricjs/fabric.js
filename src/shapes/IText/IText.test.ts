@@ -3,30 +3,40 @@ import { Group } from '../Group';
 import { IText } from './IText';
 
 describe('IText', () => {
-  test.each([
-    { scale: 1, zoom: 1 },
-    { scale: 1, zoom: 50 },
-    { scale: 200, zoom: 1 },
-    { scale: 200, zoom: 50 },
-    { scale: 200, zoom: 1 / 200 },
-  ])(
-    'cursor width under a group scaled by $scale and canvas zoomed by $zoom',
-    ({ scale, zoom }) => {
-      const text = new IText('testing', { cursorWidth: 100 });
-      const group = new Group([text]);
-      group.set({ scaleX: scale, scaleY: scale });
-      group.setCoords();
-      const fillRect = jest.fn();
-      const getZoom = jest.fn().mockReturnValue(zoom);
-      const mockContext = { fillRect };
-      const mockCanvas = { contextTop: mockContext, getZoom };
-      jest.replaceProperty(text, 'canvas', mockCanvas);
+  describe('cursor drawing width', () => {
+    test.each([
+      { scale: 1, zoom: 1, textScale: 1, angle: 0, textAngle: 0 },
+      { scale: 1, zoom: 50, textScale: 2, angle: 0, textAngle: 0 },
+      { scale: 200, zoom: 1, textScale: 2, angle: 45, textAngle: 0 },
+      { scale: 200, zoom: 1, textScale: 1, angle: 0, textAngle: 0 },
+      { scale: 200, zoom: 50, textScale: 1, angle: 30, textAngle: 30 },
+      { scale: 200, zoom: 1 / 200, textScale: 1, angle: 0, textAngle: 0 },
+      { scale: 200, zoom: 1 / 200, textScale: 2, angle: 0, textAngle: 90 },
+    ])(
+      'group scaled by $scale and rotated by $angle , text scaled by $textScale and rotated by $textAngle, and canvas zoomed by $zoom',
+      ({ scale, zoom, textScale, angle, textAngle }) => {
+        const text = new IText('testing', {
+          cursorWidth: 100,
+          angle: textAngle,
+          scaleX: textScale,
+          scaleY: textScale,
+        });
+        const group = new Group([text]);
+        group.set({ scaleX: scale, scaleY: scale, angle });
+        group.setCoords();
+        const fillRect = jest.fn();
+        const getZoom = jest.fn().mockReturnValue(zoom);
+        const mockContext = { fillRect };
+        const mockCanvas = { contextTop: mockContext, getZoom };
+        jest.replaceProperty(text, 'canvas', mockCanvas);
 
-      text.renderCursorAt(1);
-      expect(fillRect.mock.calls).toMatchSnapshot({
-        cloneDeepWith: (value) =>
-          typeof value === 'number' ? Math.round(value * 10) / 10 : undefined,
-      });
-    }
-  );
+        text.renderCursorAt(1);
+        const call = fillRect.mock.calls[0];
+        expect({ width: call[2], height: call[3] }).toMatchSnapshot({
+          cloneDeepWith: (value) =>
+            typeof value === 'number' ? value.toFixed(3) : undefined,
+        });
+      }
+    );
+  });
 });
