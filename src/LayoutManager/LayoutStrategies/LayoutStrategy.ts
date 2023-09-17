@@ -4,6 +4,7 @@ import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { getObjectBounds } from './utils';
+import { IMPERATIVE, INITIALIZATION } from '../constants';
 
 export abstract class LayoutStrategy {
   /**
@@ -13,16 +14,14 @@ export abstract class LayoutStrategy {
 
   shouldPerformLayout(context: StrictLayoutContext) {
     return (
-      context.type === 'initialization' ||
-      context.type === 'imperative' ||
+      context.type === INITIALIZATION ||
+      context.type === IMPERATIVE ||
       (!!context.prevStrategy && context.strategy !== context.prevStrategy)
     );
   }
 
   shouldLayoutClipPath({ type, target: { clipPath } }: StrictLayoutContext) {
-    return (
-      type !== 'initialization' && clipPath && !clipPath.absolutePositioned
-    );
+    return type !== INITIALIZATION && clipPath && !clipPath.absolutePositioned;
   }
 
   /**
@@ -48,7 +47,7 @@ export abstract class LayoutStrategy {
     objects: FabricObject[],
     context: StrictLayoutContext
   ): LayoutStrategyResult | undefined {
-    if (context.type === 'imperative' && context.overrides) {
+    if (context.type === IMPERATIVE && context.overrides) {
       return context.overrides;
     }
     if (objects.length === 0) {
@@ -60,7 +59,7 @@ export abstract class LayoutStrategy {
     );
     const size = new Point(width, height);
     const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
-    if (context.type === 'initialization') {
+    if (context.type === INITIALIZATION) {
       // translate the layout origin from left top to target's origin
       const origin = bboxCenter.add(size.scalarMultiply(-0.5));
       const center = origin.add(
