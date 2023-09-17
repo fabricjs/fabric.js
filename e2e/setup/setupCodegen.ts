@@ -240,7 +240,7 @@ export default () => {
             switch (type) {
               case 'keydown': {
                 {
-                  if (array[index + 1][0] !== 'keyup') {
+                  if (array[index + 1]?.[0] !== 'keyup') {
                     const key = getCodegenKey(ev as KeyboardEventData);
                     return [`await page.keyboard.down('${key}')`];
                   }
@@ -250,7 +250,7 @@ export default () => {
               case 'keyup': {
                 {
                   const key = getCodegenKey(ev as KeyboardEventData);
-                  if (array[index - 1][0] === 'keydown') {
+                  if (array[index - 1]?.[0] === 'keydown') {
                     return [`await page.keyboard.press('${key}')`];
                   }
                   return [`await page.keyboard.up('${key}')`];
@@ -258,7 +258,7 @@ export default () => {
               }
 
               case 'mousedown': {
-                if (array[index + 1][0] !== 'mouseup') {
+                if (array[index + 1]?.[0] !== 'mouseup') {
                   const { x, y } = ev as MouseEventData;
                   return [
                     `await test.step('Interaction Sequence', async () => {`,
@@ -275,7 +275,7 @@ export default () => {
                 return [`await page.mouse.move(${x}, ${y}, { steps: 10 });`];
               }
               case 'mouseup': {
-                if (array[index - 1][0] === 'mousedown') {
+                if (array[index - 1]?.[0] === 'mousedown') {
                   const { x, y } = ev as MouseEventData;
                   return [
                     `await page.click(selector, ${JSON.stringify({
