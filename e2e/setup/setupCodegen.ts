@@ -1,5 +1,8 @@
 import type { JSHandle } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import path from 'path';
 
 type EventModifiers = Pick<
   MouseEvent,
@@ -314,15 +317,23 @@ export default () => {
       )
       .join('\n');
     if (data.length) {
-      console.log(
-        `Recorded Events for "${testInfo.title}"`,
-        data,
-        '\n\n',
-        codegen
-      );
-      testInfo.attach('codegen', {
-        body: codegen,
+      testInfo.attach('recorded events', {
+        body: JSON.stringify(data, null, 2),
       });
+      const pathToFile = path.resolve(testInfo.outputDir, 'codegen.ts');
+      writeFileSync(pathToFile, codegen);
+      execSync(`prettier --write --ignore-path '' ${pathToFile}`);
+      testInfo.attach('codegen.ts', {
+        path: pathToFile,
+      });
+      const body = readFileSync(pathToFile).toString();
+      testInfo.attach('codegen', {
+        body,
+      });
+      console.log(
+        `\n\nCodegen has successfully generated output for the test "${testInfo.title}" available in attachments\n\n`,
+        body
+      );
     }
   });
 };
