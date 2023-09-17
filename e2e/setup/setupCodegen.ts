@@ -12,7 +12,7 @@ type EventModifiers = Pick<
 type MouseEventData = { x: number; y: number } & Partial<EventModifiers>;
 type KeyboardEventData = { key: string } & Partial<EventModifiers>;
 type ScreenshotEventData = { name?: string; selector?: string };
-type StepEventData = { type: 'start'; name: string } | { type: 'end' };
+type StepEventData = { type: 'start' | 'end'; name?: string };
 type EventData =
   | MouseEventData
   | KeyboardEventData
@@ -60,6 +60,8 @@ const getCodegenKey = ({
  * - Play with the canvas
  * - Capture screenshots:
  *   `captureScreenshots()`
+ * - Record steps:
+ *   `step('my step')` and the optional `endStep('forgot the add a step name')`
  * - Press the play button in playwright devtools when done
  * - The generated code will be logged to the console and attached to the test results with the screenshots
  *
@@ -177,17 +179,21 @@ export default () => {
       };
 
       let step = false;
-      window.step = (name: string) => {
+      window.step = (name?: string) => {
         if (disposers.length) {
           step && events.push(['step', { type: 'end' }]);
           events.push(['step', { type: 'start', name }]);
           step = true;
+        } else {
+          console.warn('Recoding is not in progress, call `startRecording()`');
         }
       };
-      window.endStep = () => {
+      window.endStep = (name?: string) => {
         if (step) {
-          events.push(['step', { type: 'end' }]);
+          events.push(['step', { type: 'end', name }]);
           step = false;
+        } else {
+          console.warn('A step is not in progress');
         }
       };
 
@@ -233,7 +239,13 @@ export default () => {
 
   test.afterEach(async ({ page }, testInfo) => {
     const data = await handle.jsonValue();
-    const codegen = [`const selector = 'canvas_top=#canvas';`]
+    // close last step
+    (data.findLast(([type]) => type === 'step')?.[1] as StepEventData)?.type ===
+      'start' && data.push(['step', { type: 'end' }]);
+    const codegen = [
+      '// you may need to replace the `selector` value',
+      `const selector = 'canvas_top=#canvas';`,
+    ]
       .concat(
         ...data
           .map(([type, ev], index, array) => {
@@ -261,7 +273,6 @@ export default () => {
                 if (array[index + 1]?.[0] !== 'mouseup') {
                   const { x, y } = ev as MouseEventData;
                   return [
-                    `await test.step('Interaction Sequence', async () => {`,
                     `await page.hover(selector, ${JSON.stringify({
                       position: { x, y },
                     })});`,
@@ -283,7 +294,7 @@ export default () => {
                     })});`,
                   ];
                 }
-                return [`await page.mouse.up();`, `});`];
+                return [`await page.mouse.up();`];
               }
 
               case 'dblclick': {
@@ -304,9 +315,19 @@ export default () => {
 
               case 'step': {
                 const { name, type } = ev as StepEventData;
-                return type === 'start'
-                  ? [`await test.step('${name}', async () => {`]
-                  : [`});`];
+                if (type === 'start') {
+                  const stepName =
+                    name ||
+                    (
+                      array
+                        .slice(index + 1)
+                        .find(([type]) => type === 'step')[1] as StepEventData
+                    ).name ||
+                    'step';
+                  return [`await test.step('${stepName}', async () => {`];
+                } else {
+                  return [`});`];
+                }
               }
 
               default:
@@ -322,16 +343,17 @@ export default () => {
       });
       const pathToFile = path.resolve(testInfo.outputDir, 'codegen.ts');
       writeFileSync(pathToFile, codegen);
-      execSync(`prettier --write --ignore-path '' ${pathToFile}`);
       testInfo.attach('codegen.ts', {
         path: pathToFile,
       });
+      execSync(`prettier --write --ignore-path '' ${pathToFile}`);
       const body = readFileSync(pathToFile).toString();
       testInfo.attach('codegen', {
         body,
       });
       console.log(
-        `\n\nCodegen has successfully generated output for the test "${testInfo.title}" available in attachments\n\n`,
+        `\n\nCodegen of the test "${testInfo.title}" has completed successfully',
+        'Generated output is available in the test attachments\n\n`,
         body
       );
     }
