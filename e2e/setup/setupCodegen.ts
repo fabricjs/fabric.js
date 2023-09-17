@@ -69,9 +69,6 @@ const getCodegenKey = ({
  * To edit an existing test add `await page.pause();` where you want to start recording.
  */
 export default () => {
-  if (process.env.CI) {
-    return;
-  }
   let handle: JSHandle<(readonly [keyof DocumentEventMap, EventData?])[]>;
   test.beforeEach(async ({ page }, testInfo) => {
     handle = await page.evaluateHandle(() => {

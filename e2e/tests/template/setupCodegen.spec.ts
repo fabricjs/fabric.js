@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test';
 import setup from '../../setup';
 import { existsSync, rmSync } from 'fs';
+import setupCodegen from '../../setup/setupCodegen';
 
 setup();
+// run also in CI
+setupCodegen();
 
 // clear snapshots so we can test snapshot generation
 test.beforeEach(async ({ page }, testInfo) => {
@@ -141,12 +144,6 @@ test('codegen', async ({ page }, testInfo) => {
       await page.mouse.move(64, 250, { steps: 10 });
       await page.mouse.up();
       await page.keyboard.press('Delete');
-      await page.click('canvas_top=#canvas', {
-        position: { x: 113, y: 272 },
-      });
-      await page.click('canvas_top=#canvas', {
-        position: { x: 113, y: 272 },
-      });
       await page.mouse.dblclick(113, 272);
       await page.keyboard.down('Meta');
       await page.keyboard.press('S');

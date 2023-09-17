@@ -10,5 +10,5 @@ export default () => {
   setupCoverage();
   // call at the end - navigates the page
   setupApp();
-  setupCodegen();
+  !process.env.CI && setupCodegen();
 };

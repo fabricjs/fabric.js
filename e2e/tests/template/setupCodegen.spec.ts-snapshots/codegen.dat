@@ -76,8 +76,6 @@ await test.step('typing', async () => {
   await page.keyboard.press('Delete');
   await page.click('canvas_top=#canvas', { position: { x: 113, y: 272 } });
   await page.mouse.up();
-  await page.mouse.up();
-  await page.mouse.up();
   await page.mouse.dblclick(113, 272);
   await page.keyboard.down('Meta');
   await page.keyboard.press('S');

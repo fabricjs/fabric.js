@@ -569,22 +569,6 @@
     }
   ],
   [
-    "mouseup",
-    {
-      "x": 113,
-      "y": 272,
-      "selector": "canvas_top=#canvas"
-    }
-  ],
-  [
-    "mouseup",
-    {
-      "x": 113,
-      "y": 272,
-      "selector": "canvas_top=#canvas"
-    }
-  ],
-  [
     "dblclick",
     {
       "x": 113,
