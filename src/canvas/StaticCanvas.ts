@@ -171,7 +171,7 @@ export class StaticCanvas<
   }
 
   constructor(
-    el: string | HTMLCanvasElement,
+    el?: string | HTMLCanvasElement,
     options: TOptions<StaticCanvasOptions> = {}
   ) {
     super();
@@ -189,7 +189,7 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
+  protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new StaticCanvasDOMManager(el);
   }
 
