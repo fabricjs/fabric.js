@@ -3,11 +3,12 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import type { XY } from '../Point';
 import { Point } from '../Point';
 import { config } from '../config';
-import { CENTER, LEFT, TOP } from '../constants';
+import { LEFT, TOP } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { CSSRules } from '../parser/typedefs';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { calcDimensionsMatrix } from '../util/misc/matrix';
@@ -197,10 +198,8 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
-      this.this.setRelativeCenterPoint(
-        new Point(left + width / 2, top + height / 2),
-        CENTER,
-        CENTER
+      this.setRelativeCenterPoint(
+        new Point(left + width / 2, top + height / 2)
       );
   }
 

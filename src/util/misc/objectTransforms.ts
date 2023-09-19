@@ -1,6 +1,6 @@
 import { Point } from '../../Point';
 import type { ObjectGeometry } from '../../shapes/Object/ObjectGeometry';
-import { TMat2D } from '../../typedefs';
+import type { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
 import type { TScaleMatrixArgs } from './matrix';
 import {

@@ -1,10 +1,11 @@
 import { iMatrix } from '../constants';
 import type { ObjectBBox } from '../shapes/Object/ObjectBBox';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { BBox, BBoxPlanes } from './BBox';
+import type { BBoxPlanes } from './BBox';
+import { BBox } from './BBox';
 
 /**
  * Performance optimization

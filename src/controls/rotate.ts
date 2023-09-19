@@ -2,7 +2,7 @@ import type {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { TRadian } from '../typedefs';
+import type { TRadian } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';

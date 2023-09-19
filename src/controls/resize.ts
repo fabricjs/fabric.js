@@ -1,7 +1,7 @@
 import { BBox } from '../BBox/BBox';
-import { TPointerEvent, Transform } from '../EventTypeDefs';
+import type { TPointerEvent, Transform } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { TAxis } from '../typedefs';
+import type { TAxis } from '../typedefs';
 import { sendVectorToPlane } from '../util/misc/planeChange';
 import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { dotProduct, magnitude } from '../util/misc/vectors';

@@ -6,7 +6,7 @@ import { degreesToRadians } from '../radiansDegreesConversion';
 import {
   calcAngleBetweenVectors,
   calcVectorRotation,
-  crossProduct,
+  det,
   getOrthonormalVector,
   getUnitVector,
   isBetweenVectors,
@@ -14,7 +14,7 @@ import {
   rotateVector,
 } from '../vectors';
 import { StrokeProjectionsBase } from './StrokeProjectionsBase';
-import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 const zeroVector = new Point();
 
@@ -275,7 +275,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
             this.bisector.multiply(this.strokeUniformScalar).scalarMultiply(-1)
           ),
       // the beginning of the circle segment is always to the right of the comparison vector (cross product > 0)
-      isProj0Start = crossProduct(proj0, comparisonVector) > 0,
+      isProj0Start = det(proj0, comparisonVector) > 0,
       startCircle = isProj0Start ? proj0 : proj1,
       endCircle = isProj0Start ? proj1 : proj0;
     if (!this.isSkewed()) {

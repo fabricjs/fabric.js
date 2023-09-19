@@ -2,7 +2,7 @@ import type { StaticCanvas } from '../canvas/StaticCanvas';
 import { iMatrix } from '../constants';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
-import { TBBox, TMat2D } from '../typedefs';
+import type { TBBox, TMat2D } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,

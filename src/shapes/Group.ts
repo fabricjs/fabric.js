@@ -1,10 +1,10 @@
-import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
+import { classRegistry } from '../ClassRegistry';
 import { createCollectionMixin } from '../Collection';
+import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
-import type { TSVGReviver } from '../typedefs';
-import { cos } from '../util/misc/cos';
-import type { TClassProperties, TOptions } from '../typedefs';
+import type { TClassProperties, TOptions, TSVGReviver } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { cos } from '../util/misc/cos';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -15,11 +15,12 @@ import {
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
+import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import { Rect } from './Rect';
-import { classRegistry } from '../ClassRegistry';
-import { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import { CENTER } from '../constants';
 
 export type LayoutContextType =
   | 'initialization'
@@ -648,7 +649,7 @@ export class Group extends createCollectionMixin(
         this._adjustObjectPosition(this.clipPath as FabricObject, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
-        this.setPositionByOrigin(newCenter, CENTER, CENTER);
+        this.setRelativeCenterPoint(newCenter);
         initialTransform && this.set(initialTransform);
         this.setCoords();
       }
@@ -913,7 +914,7 @@ export class Group extends createCollectionMixin(
     const objectBounds: Point[] = [];
     objects.forEach((object) => {
       const objCenter = object.getRelativeCenterPoint();
-      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
+      let sizeVector = object.getDimensionsVectorForLayout().scalarDivide(2);
       if (object.angle) {
         const rad = degreesToRadians(object.angle),
           sine = Math.abs(sin(rad)),

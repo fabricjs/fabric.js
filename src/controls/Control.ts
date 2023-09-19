@@ -5,11 +5,8 @@ import type {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import type {
-  InteractiveFabricObject,
-  TControlCoord,
-} from '../shapes/Object/InteractiveObject';
-import type { FabricObject } from '../shapes/Object/Object';
+import type { TControlCoord } from '../shapes/Object/InteractiveObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TDegree, TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
@@ -171,7 +168,7 @@ export class Control {
    */
   declare mouseUpHandler?: ControlActionHandler;
 
-  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+  shouldActivate(controlKey: string, fabricObject: FabricObject) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
       fabricObject.canvas?.getActiveObject() === fabricObject &&
@@ -188,7 +185,7 @@ export class Control {
    */
   getActionHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): TransformActionHandler | undefined {
     return this.actionHandler;
@@ -203,7 +200,7 @@ export class Control {
    */
   getMouseDownHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseDownHandler;
@@ -219,7 +216,7 @@ export class Control {
    */
   getMouseUpHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
@@ -237,7 +234,7 @@ export class Control {
   cursorStyleHandler(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: FabricObject
   ) {
     return control.cursorStyle;
   }
@@ -252,7 +249,7 @@ export class Control {
   getActionName(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: FabricObject
   ) {
     return control.actionName;
   }
@@ -263,7 +260,7 @@ export class Control {
    * @param {String} controlKey key where the control is memorized on the
    * @return {Boolean}
    */
-  getVisibility(fabricObject: InteractiveFabricObject, controlKey: string) {
+  getVisibility(fabricObject: FabricObject, controlKey: string) {
     return fabricObject._controlsVisibility?.[controlKey] ?? this.visible;
   }
 
@@ -272,18 +269,14 @@ export class Control {
    * @param {Boolean} visibility for the object
    * @return {Void}
    */
-  setVisibility(
-    visibility: boolean,
-    name: string,
-    fabricObject: InteractiveFabricObject
-  ) {
+  setVisibility(visibility: boolean, name: string, fabricObject: FabricObject) {
     this.visible = visibility;
   }
 
   positionHandler(
     dim: Point,
     finalMatrix: TMat2D,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     currentControl: Control
   ) {
     // // legacy

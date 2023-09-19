@@ -1,6 +1,6 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
 import type { Gradient } from './gradient/Gradient';
-import type { Pattern } from './Pattern';
+import type { Pattern } from './Pattern/Pattern';
 import type { XY, Point } from './Point';
 import type { FabricObject as BaseFabricObject } from './shapes/Object/Object';
 

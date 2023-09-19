@@ -1,5 +1,5 @@
 import { CommonMethods } from '../../CommonMethods';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
 import {
@@ -11,7 +11,7 @@ import { sendPointToPlane } from '../../util/misc/planeChange';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { resolveOriginPoint } from '../../util/misc/resolveOrigin';
 import type { Group } from '../Group';
-import { BaseProps } from './types/BaseProps';
+import type { BaseProps } from './types/BaseProps';
 
 type TMatrixCache = {
   key: string;

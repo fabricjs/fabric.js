@@ -1,5 +1,5 @@
 import { Point } from '../Point';
-import { TBBox, TCornerPoint, TMat2D } from '../typedefs';
+import type { TBBox, TCornerPoint, TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { invertTransform } from '../util/misc/matrix';

@@ -7,7 +7,7 @@ import type {
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TAxis, TAxisKey, TOriginX, TOriginY } from '../typedefs';
+import type { TAxis, TAxisKey, TOriginX, TOriginY } from '../typedefs';
 import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { createVector, dotProduct, getUnitVector } from '../util/misc/vectors';
 import { NOT_ALLOWED_CURSOR, findCornerQuadrant, isLocked } from './util';

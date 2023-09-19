@@ -3,7 +3,7 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import type { XY } from '../Point';
 import { Point } from '../Point';
 import { config } from '../config';
-import { CENTER, LEFT, TOP } from '../constants';
+import { LEFT, TOP } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { CSSRules } from '../parser/typedefs';
@@ -306,7 +306,7 @@ export class Path<
     this.set({ width, height, pathOffset });
     // using pathOffset because it match the use case.
     // if pathOffset change here we need to use left + width/2 , top + height/2
-    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
+    adjustPosition && this.setRelativeCenterPoint(pathOffset);
   }
 
   _calcBoundsFromPath(): TBBox {

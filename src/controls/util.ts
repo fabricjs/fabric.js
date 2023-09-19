@@ -7,7 +7,7 @@ import type {
 import { Point } from '../Point';
 import { PIBy4, twoMathPi } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TOriginX, TOriginY } from '../typedefs';
+import type { TOriginX, TOriginY } from '../typedefs';
 import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { calcVectorRotation } from '../util/misc/vectors';
 import type { Control } from './Control';

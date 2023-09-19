@@ -1,7 +1,7 @@
 import { iMatrix } from '../constants';
 import { Point } from '../Point';
 import type { ObjectBBox } from '../shapes/Object/ObjectBBox';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { mapValues } from '../util/internals';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
@@ -10,7 +10,8 @@ import {
 } from '../util/misc/planeChange';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { createVector } from '../util/misc/vectors';
-import { ViewportBBox, ViewportBBoxPlanes } from './ViewportBBox';
+import type { ViewportBBoxPlanes } from './ViewportBBox';
+import { ViewportBBox } from './ViewportBBox';
 
 export interface BBoxPlanes extends ViewportBBoxPlanes {
   parent(): TMat2D;
