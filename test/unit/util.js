@@ -427,27 +427,6 @@
     ]);
   });
 
-  QUnit.test('multiplyTransformMatrixChain', function (assert) {
-    assert.ok(typeof fabric.util.multiplyTransformMatrixChain === 'function');
-    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
-    assert.deepEqual(fabric.util.multiplyTransformMatrixChain([m1, m2]), [
-      23,
-      34,
-      31,
-      46,
-      160,
-      240
-    ]);
-    assert.deepEqual(fabric.util.multiplyTransformMatrixChain([m1, m2], true), [
-      23,
-      34,
-      31,
-      46,
-      0,
-      0
-    ]);
-  });
-
   QUnit.test('multiplyTransformMatrixArray', function (assert) {
     assert.ok(typeof fabric.util.multiplyTransformMatrixArray === 'function');
     const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];

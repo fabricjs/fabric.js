@@ -1,14 +1,14 @@
 import { BBox } from '../../BBox/BBox';
 import { iMatrix } from '../../constants';
-import { ObjectEvents } from '../../EventTypeDefs';
+import type { ObjectEvents } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { TDegree, TMat2D, TOriginX, TOriginY } from '../../typedefs';
 import {
-  calcRotateMatrix,
+  createRotateMatrix,
   invertTransform,
   isMatrixEqual,
   multiplyTransformMatrices,
-  multiplyTransformMatrixChain,
+  multiplyTransformMatrixArray,
 } from '../../util/misc/matrix';
 import { applyTransformToObject } from '../../util/misc/objectTransforms';
 import { calcBaseChangeMatrix } from '../../util/misc/planeChange';
@@ -80,7 +80,7 @@ export class ObjectTransformations<
     const transformCenter = (
       inViewport ? this.bbox : this.bbox.sendToCanvas()
     ).pointFromOrigin(resolveOriginPoint(originX, originY));
-    const ownToTransformPlaneChange = multiplyTransformMatrixChain([
+    const ownToTransformPlaneChange = multiplyTransformMatrixArray([
       [1, 0, 0, 1, -transformCenter.x, -transformCenter.y],
       inViewport ? this.getViewportTransform() : iMatrix,
       this.group?.calcTransformMatrix() || iMatrix,
@@ -88,7 +88,7 @@ export class ObjectTransformations<
     const transformToOwnPlaneChange = invertTransform(
       ownToTransformPlaneChange
     );
-    const ownTransformAfter = multiplyTransformMatrixChain([
+    const ownTransformAfter = multiplyTransformMatrixArray([
       transformToOwnPlaneChange,
       transform,
       ownToTransformPlaneChange,
@@ -152,14 +152,14 @@ export class ObjectTransformations<
   }
 
   scale(x: number, y: number, options?: ObjectTransformOptions) {
-    const rotation = calcRotateMatrix({
+    const rotation = createRotateMatrix({
       rotation: this.getTotalAngle(),
     });
     const [a, b, c, d] = options?.inViewport
       ? this.calcTransformMatrixInViewport()
       : this.calcTransformMatrix();
     return this.transformObject(
-      multiplyTransformMatrixChain([
+      multiplyTransformMatrixArray([
         rotation,
         [(x / a) * rotation[0], 0, 0, (y / d) * rotation[3], 0, 0],
         invertTransform(rotation),
@@ -169,11 +169,11 @@ export class ObjectTransformations<
   }
 
   scaleBy(x: number, y: number, options?: ObjectTransformOptions) {
-    const rotation = calcRotateMatrix({
+    const rotation = createRotateMatrix({
       rotation: this.getTotalAngle(),
     });
     return this.transformObject(
-      multiplyTransformMatrixChain([
+      multiplyTransformMatrixArray([
         rotation,
         [x, 0, 0, y, 0, 0],
         invertTransform(rotation),
@@ -274,7 +274,7 @@ export class ObjectTransformations<
    */
   rotate(angle: TDegree, options?: ObjectTransformOptions) {
     return this.transformObject(
-      calcRotateMatrix({
+      createRotateMatrix({
         rotation:
           degreesToRadians(angle) -
           this.getTotalAngle(options?.inViewport || false),
@@ -289,7 +289,7 @@ export class ObjectTransformations<
    * @returns true if transform has changed
    */
   rotateBy(angle: TDegree, options?: ObjectTransformOptions) {
-    return this.transformObject(calcRotateMatrix({ angle }), options);
+    return this.transformObject(createRotateMatrix({ angle }), options);
   }
 
   rotate3D(

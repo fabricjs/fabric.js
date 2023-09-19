@@ -72,11 +72,10 @@ interface CanvasRenderingOptions {
   renderOnAddRemove: boolean;
 
   /**
-   * Based on vptCoords and object.aCoords, skip rendering of objects that
-   * are not included in current viewport.
-   * May greatly help in applications with crowded canvas and use of zoom/pan
-   * If One of the corner of the bounding box of the object is on the canvas
-   * the objects get rendered.
+   * Skip rendering of objects that are not included in current viewport.
+   * May greatly help in applications with crowded canvas that use of zoom/pan
+   * If one of the corners of the bounding box of the object is on the canvas
+   * the objects is rendered.
    * @type Boolean
    * @default true
    */
