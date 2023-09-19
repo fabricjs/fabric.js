@@ -17,13 +17,13 @@ import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type {
   ImperativeLayoutOptions,
   LayoutBeforeEvent,
-  LayoutEvent,
+  LayoutAfterEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
-  layout: LayoutEvent;
+  'layout:after': LayoutAfterEvent;
 }
 
 export interface GroupOwnProps {
@@ -50,7 +50,8 @@ export const groupDefaultValues = {
 /**
  * @fires object:added
  * @fires object:removed
- * @fires layout once layout completes
+ * @fires layout:before
+ * @fires layout:after
  */
 export class Group
   extends createCollectionMixin(
@@ -494,21 +495,6 @@ export class Group
       ...rest,
     });
   }
-
-  /**
-   * Hook that is called before layout begins.
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  onBeforeLayout(data: LayoutBeforeEvent) {}
-
-  /**
-   * Hook that is called once layout has completed.
-   * Exposed for running side effects etc., override if necessary.
-   * Consider using the `layout` event with a caveat of not being able to listen to the initial layout.
-   *
-   */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  onAfterLayout(data: LayoutEvent) {}
 
   /**
    * Renders instance on a given context

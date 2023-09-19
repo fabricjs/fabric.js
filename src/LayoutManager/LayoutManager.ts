@@ -103,10 +103,7 @@ export class LayoutManager {
       context.targets.forEach((object) => this.unsubscribe(context, object));
     }
 
-    //  fire layout hook and event (event will fire only for layouts after initialization layout)
-    target.onBeforeLayout({
-      context,
-    });
+    //  fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
       context,
     });
@@ -184,15 +181,11 @@ export class LayoutManager {
     // in `initialization` we do not account for target's transformation matrix
     if (context.type === 'initialization') {
       // TODO: what about strokeWidth?
-      const origin = nextCenter.add(
-        size.multiply(
-          new Point(
-            resolveOrigin(target.originX),
-            resolveOrigin(target.originY)
-          )
-        )
-      );
-      target.set({ left: context.x ?? origin.x, top: context.y ?? origin.y });
+      target.set({
+        left:
+          context.x ?? nextCenter.x + size.x * resolveOrigin(target.originX),
+        top: context.y ?? nextCenter.y + size.y * resolveOrigin(target.originY),
+      });
     } else {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
@@ -226,7 +219,10 @@ export class LayoutManager {
     { offset }: Required<LayoutResult>,
     object: FabricObject
   ) {
-    object.setRelativeXY(object.getRelativeXY().add(offset));
+    object.set({
+      left: object.left + offset.x,
+      top: object.top + offset.y,
+    });
   }
 
   protected onAfterLayout(
@@ -255,12 +251,8 @@ export class LayoutManager {
       });
     }
 
-    //  fire layout hook and event (event will fire only for layouts after initialization layout)
-    target.onAfterLayout({
-      context,
-      result: layoutResult,
-    });
-    target.fire('layout', {
+    //  fire layout event (event will fire only for layouts after initialization layout)
+    target.fire('layout:after', {
       context,
       result: layoutResult,
     });

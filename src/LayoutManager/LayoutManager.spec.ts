@@ -141,7 +141,7 @@ describe('Layout Manager', () => {
           lifecycle.push(on);
         });
 
-        manager.subscribe({}, object);
+        manager['subscribe']({}, object);
 
         expect(lifecycle).toEqual([
           unsubscribe,
@@ -200,11 +200,6 @@ describe('Layout Manager', () => {
         const lifecycle: jest.SpyInstance[] = [];
         const targets = [new Group([new FabricObject()]), new FabricObject()];
         const target = new Group(targets);
-        const targetOnBeforeLayout = jest
-          .spyOn(target, 'onBeforeLayout')
-          .mockImplementation(() => {
-            lifecycle.push(targetOnBeforeLayout);
-          });
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
@@ -229,13 +224,7 @@ describe('Layout Manager', () => {
         };
         manager['onBeforeLayout'](context);
 
-        expect(lifecycle).toEqual([
-          subscription,
-          subscription,
-          targetOnBeforeLayout,
-          targetFire,
-        ]);
-        expect(targetOnBeforeLayout).toBeCalledWith({ context });
+        expect(lifecycle).toEqual([subscription, subscription, targetFire]);
         expect(targetFire).toBeCalledWith('layout:before', {
           context,
         });
@@ -454,11 +443,6 @@ describe('Layout Manager', () => {
         const lifecycle: jest.SpyInstance[] = [];
         const targets = [new Group([new FabricObject()]), new FabricObject()];
         const target = new Group(targets);
-        const targetOnAfterLayout = jest
-          .spyOn(target, 'onAfterLayout')
-          .mockImplementation(() => {
-            lifecycle.push(targetOnAfterLayout);
-          });
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
@@ -498,16 +482,11 @@ describe('Layout Manager', () => {
 
         expect(lifecycle).toEqual([
           shouldResetTransform,
-          targetOnAfterLayout,
           targetFire,
           ...(bubbles ? [parentPerformLayout] : []),
         ]);
         expect(shouldResetTransform).toBeCalledWith(context);
-        expect(targetOnAfterLayout).toBeCalledWith({
-          context,
-          result: layoutResult,
-        });
-        expect(targetFire).toBeCalledWith('layout', {
+        expect(targetFire).toBeCalledWith('layout:after', {
           context,
           result: layoutResult,
         });
