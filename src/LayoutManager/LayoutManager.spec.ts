@@ -141,7 +141,7 @@ describe('Layout Manager', () => {
           lifecycle.push(on);
         });
 
-        manager['subscribe']({}, object);
+        manager['subscribe'](object, {});
 
         expect(lifecycle).toEqual([
           unsubscribe,
@@ -155,7 +155,7 @@ describe('Layout Manager', () => {
         const performLayout = jest.spyOn(manager, 'performLayout');
         const object = new FabricObject();
         const target = new Group();
-        manager['subscribe']({ target }, object);
+        manager['subscribe'](object, { target });
 
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
@@ -180,7 +180,7 @@ describe('Layout Manager', () => {
 
         performLayout.mockClear();
         expect(manager['_subscriptions'].get(object)).toBeDefined();
-        manager['unsubscribe']({ target }, object);
+        manager['unsubscribe'](object, { target });
         expect(manager['_subscriptions'].get(object)).toBeUndefined();
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout).not.toHaveBeenCalled();

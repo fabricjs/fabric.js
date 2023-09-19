@@ -50,9 +50,9 @@ export class LayoutManager {
   /**
    * subscribe to object layout triggers
    */
-  protected subscribe(context: StrictLayoutContext, object: FabricObject) {
+  protected subscribe(object: FabricObject, context: StrictLayoutContext) {
     const { target } = context;
-    this.unsubscribe(context, object);
+    this.unsubscribe(object, context);
     const disposers = [
       object.on('modified', (e) =>
         this.performLayout({
@@ -88,9 +88,14 @@ export class LayoutManager {
   /**
    * unsubscribe object layout triggers
    */
-  protected unsubscribe(context: StrictLayoutContext, object: FabricObject) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected unsubscribe(object: FabricObject, context?: StrictLayoutContext) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);
+  }
+
+  unsubscribeTarget(target: Group) {
+    target.forEachObject((object) => this.unsubscribe(object));
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {
@@ -98,9 +103,9 @@ export class LayoutManager {
 
     // handle layout triggers subscription
     if (context.type === 'initialization' || context.type === 'added') {
-      context.targets.forEach((object) => this.subscribe(context, object));
+      context.targets.forEach((object) => this.subscribe(object, context));
     } else if (context.type === 'removed') {
-      context.targets.forEach((object) => this.unsubscribe(context, object));
+      context.targets.forEach((object) => this.unsubscribe(object, context));
     }
 
     //  fire layout event (event will fire only for layouts after initialization layout)
