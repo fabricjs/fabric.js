@@ -6,7 +6,9 @@ import { TextUtil } from '../../../utils/TextUtil';
 
 setup();
 
-[false, true].forEach((splitByGrapheme) => {
+test.describe.configure({ mode: 'serial' });
+
+for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
     context,
@@ -79,4 +81,4 @@ setup();
       maxDiffPixelRatio: 0.03,
     });
   });
-});
+}

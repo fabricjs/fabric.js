@@ -296,7 +296,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   protected readonly _activeSelection: ActiveSelection;
 
   constructor(
-    el: string | HTMLCanvasElement,
+    el?: string | HTMLCanvasElement,
     { activeSelection = new ActiveSelection(), ...options }: TCanvasOptions = {}
   ) {
     super(el, options);
@@ -305,7 +305,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this._activeSelection.setCoords();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
+  protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new CanvasDOMManager(el, {
       allowTouchScrolling: this.allowTouchScrolling,
       containerClass: this.containerClass,

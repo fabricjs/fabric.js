@@ -500,7 +500,7 @@ export class IText<
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
-      multiplier = this.scaleX * this.canvas!.getZoom(),
+      multiplier = this.getObjectScaling().x * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =
