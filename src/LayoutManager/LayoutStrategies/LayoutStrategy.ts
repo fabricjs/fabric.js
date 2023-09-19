@@ -56,7 +56,9 @@ export abstract class LayoutStrategy {
     }
     const { target } = context;
     const { left, top, width, height } = makeBoundingBoxFromPoints(
-      objects.map((object) => getObjectBounds(target, object)).flat()
+      objects
+        .map((object) => getObjectBounds(target, object))
+        .reduce((coords, curr) => coords.concat(curr), [])
     );
     const size = new Point(width, height);
     const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
