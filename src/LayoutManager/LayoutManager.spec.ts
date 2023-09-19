@@ -100,20 +100,6 @@ describe('Layout Manager', () => {
         );
       }
     });
-
-    it('should guard initial layout', () => {
-      const manager = new LayoutManager();
-      const onBeforeLayout = jest.spyOn(manager, 'onBeforeLayout');
-      const target = new Group();
-      manager.performLayout({ type: 'imperative', target });
-      expect(onBeforeLayout).not.toHaveBeenCalled();
-      manager.performLayout({
-        type: 'initialization',
-        target,
-        targets: [],
-      });
-      expect(onBeforeLayout).toHaveBeenCalled();
-    });
   });
 
   describe('onBeforeLayout', () => {
@@ -187,6 +173,20 @@ describe('Layout Manager', () => {
       });
     });
 
+    it('a non attached manager should not subscribe object', () => {
+      const manager = new LayoutManager();
+      const subscribe = jest.spyOn(manager, 'subscribe');
+      const object = new FabricObject();
+      const target = new Group([object]);
+      manager.performLayout({
+        type: 'initialization',
+        target,
+        targets: [object],
+      });
+
+      expect(subscribe).not.toHaveBeenCalled();
+    });
+
     it.each([
       { trigger: 'initialization', action: 'subscribe' },
       { trigger: 'added', action: 'subscribe' },
@@ -198,13 +198,18 @@ describe('Layout Manager', () => {
       '$trigger trigger should $action targets and call target hooks',
       ({ action }) => {
         const lifecycle: jest.SpyInstance[] = [];
-        const targets = [new Group([new FabricObject()]), new FabricObject()];
-        const target = new Group(targets);
+
+        const manager = new LayoutManager();
+
+        const targets = [
+          new Group([new FabricObject()], { layoutManager: manager }),
+          new FabricObject(),
+        ];
+        const target = new Group(targets, { layoutManager: manager });
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
 
-        const manager = new LayoutManager();
         const subscription = jest
           .spyOn(manager, action)
           .mockImplementation(() => {
@@ -232,16 +237,15 @@ describe('Layout Manager', () => {
     );
 
     it('passing deep should layout the entire tree', () => {
-      const grandchild = new Group();
-      const child = new Group([grandchild, new FabricObject()]);
-      const targets = [child, new FabricObject()];
-      const target = new Group(targets);
       const manager = new LayoutManager();
+      const grandchild = new Group([], { layoutManager: manager });
+      const child = new Group([grandchild, new FabricObject()], {
+        layoutManager: manager,
+      });
+      const targets = [child, new FabricObject()];
+      const target = new Group(targets, { layoutManager: manager });
 
-      const mocks = [grandchild, child].map((target) => ({
-        mock: jest.spyOn(target.layoutManager, 'performLayout'),
-        target,
-      }));
+      const performLayout = jest.spyOn(manager, 'performLayout');
 
       const context: StrictLayoutContext = {
         bubbles: true,
@@ -256,24 +260,19 @@ describe('Layout Manager', () => {
       };
       manager['onBeforeLayout'](context);
 
-      mocks.forEach(
-        ({
-          target,
-          mock: {
-            mock: {
-              calls: [args],
-            },
-          },
-        }) =>
-          expect(args).toMatchObject([
-            {
-              bubbles: false,
-              type: 'imperative',
-              deep: true,
-              target,
-            },
-          ])
-      );
+      expect(performLayout).toHaveBeenCalledTimes(2);
+      expect(performLayout.mock.calls[0][0]).toMatchObject({
+        bubbles: false,
+        type: 'imperative',
+        deep: true,
+        target: child,
+      });
+      expect(performLayout.mock.calls[1][0]).toMatchObject({
+        bubbles: false,
+        type: 'imperative',
+        deep: true,
+        target: grandchild,
+      });
     });
   });
 
@@ -441,20 +440,23 @@ describe('Layout Manager', () => {
       'should call target hooks with bubbling %s',
       (bubbles) => {
         const lifecycle: jest.SpyInstance[] = [];
-        const targets = [new Group([new FabricObject()]), new FabricObject()];
-        const target = new Group(targets);
+        const manager = new LayoutManager();
+        const targets = [
+          new Group([new FabricObject()], { layoutManager: manager }),
+          new FabricObject(),
+        ];
+        const target = new Group(targets, { layoutManager: manager });
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
 
-        const parent = new Group([target]);
+        const parent = new Group([target], { layoutManager: manager });
         const parentPerformLayout = jest
           .spyOn(parent.layoutManager, 'performLayout')
           .mockImplementation(() => {
             lifecycle.push(parentPerformLayout);
           });
 
-        const manager = new LayoutManager();
         const shouldResetTransform = jest
           .spyOn(manager.strategy, 'shouldResetTransform')
           .mockImplementation(() => {
@@ -531,16 +533,17 @@ describe('Layout Manager', () => {
     });
 
     test('bubbling', () => {
-      const targets = [new Group([new FabricObject()]), new FabricObject()];
-      const target = new Group(targets);
-      const parent = new Group([target]);
-      const grandParent = new Group([parent]);
       const manager = new LayoutManager();
+      const manager2 = new LayoutManager();
+      const targets = [
+        new Group([new FabricObject()], { layoutManager: manager }),
+        new FabricObject(),
+      ];
+      const target = new Group(targets, { layoutManager: manager });
+      const parent = new Group([target], { layoutManager: manager });
+      const grandParent = new Group([parent], { layoutManager: manager2 });
 
-      const grandParentPerformLayout = jest.spyOn(
-        grandParent.layoutManager,
-        'performLayout'
-      );
+      const grandParentPerformLayout = jest.spyOn(manager2, 'performLayout');
 
       const context: StrictLayoutContext = {
         bubbles: true,
@@ -569,6 +572,62 @@ describe('Layout Manager', () => {
           path: [target, parent],
         },
       ]);
+    });
+  });
+
+  describe('Group initial layout', () => {
+    it('fit content layout should ignore size passed in options', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      const group = new Group([child], {
+        width: 300,
+        height: 300,
+        strokeWidth: 0,
+        layoutManager: new LayoutManager(),
+      });
+      expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
+      expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+    });
+
+    test.each([true, false])(
+      'initialization edge case, legacy layout %s',
+      (legacy) => {
+        const child = new FabricObject({
+          width: 200,
+          height: 200,
+          strokeWidth: 0,
+        });
+        const group = new Group([child], {
+          width: 200,
+          height: 200,
+          strokeWidth: 0,
+          layoutManager: !legacy ? new LayoutManager() : undefined,
+        });
+        expect(group).toMatchObject({ width: 200, height: 200 });
+        expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
+        expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
+        expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+      }
+    );
+
+    it('fixed layout should respect size passed in options', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      const group = new Group([child], {
+        width: 100,
+        height: 300,
+        strokeWidth: 0,
+      });
+      expect(group).toMatchObject({ width: 100, height: 300 });
+      expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
     });
   });
 });

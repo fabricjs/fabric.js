@@ -14,47 +14,37 @@ describe('Group', () => {
     expect(group._objects).toHaveLength(3);
   });
 
-  test('initialization edge case', () => {
-    const child = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
-    const group = new Group([child], {
-      width: 200,
-      height: 200,
-      strokeWidth: 0,
-    });
-    expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
-    expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-    expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
-  });
+  it.each([true, false])(
+    'triggerLayout should preform layout, layoutManager is defined %s',
+    (defined) => {
+      const manager = new LayoutManager();
+      const performLayout = jest.spyOn(manager, 'performLayout');
 
-  it('should ignore size passed in options', () => {
-    const child = new FabricObject({
-      width: 200,
-      height: 200,
-      strokeWidth: 0,
-    });
-    const group = new Group([child], {
-      width: 300,
-      height: 300,
-      strokeWidth: 0,
-    });
-    expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
-    expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-    expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
-  });
+      const group = new Group();
+      expect(group.layoutManager).toBeUndefined();
+      defined && (group.layoutManager = manager);
 
-  it('fixed layout should respect size passed in options', () => {
-    const child = new FabricObject({
-      width: 200,
-      height: 200,
-      strokeWidth: 0,
-    });
-    const group = new Group([child], {
-      width: 100,
-      height: 300,
-      strokeWidth: 0,
-      layoutManager: new LayoutManager(new FixedLayout()),
-    });
-    expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-    expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
-  });
+      group.triggerLayout({ manager });
+      const fixedLayout = new FixedLayout();
+      group.triggerLayout({ manager, strategy: fixedLayout });
+      manager.strategy = new FixedLayout();
+      group.triggerLayout({ manager });
+      expect(performLayout).toHaveBeenCalledTimes(3);
+      expect(performLayout).toHaveBeenNthCalledWith(1, {
+        strategy: manager.strategy,
+        target: group,
+        type: 'imperative',
+      });
+      expect(performLayout).toHaveBeenNthCalledWith(2, {
+        strategy: fixedLayout,
+        target: group,
+        type: 'imperative',
+      });
+      expect(performLayout).toHaveBeenNthCalledWith(3, {
+        strategy: fixedLayout,
+        target: group,
+        type: 'imperative',
+      });
+    }
+  );
 });

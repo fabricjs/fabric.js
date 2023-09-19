@@ -10,7 +10,6 @@ import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 export class LayoutManager {
-  private _firstLayoutDone = false;
   private _prevLayoutStrategy?: LayoutStrategy;
   private _subscriptions: Map<FabricObject, VoidFunction[]>;
 
@@ -22,11 +21,6 @@ export class LayoutManager {
   }
 
   performLayout(context: LayoutContext) {
-    if (!this._firstLayoutDone && context.type !== 'initialization') {
-      //  reject layout requests before initialization layout
-      return;
-    }
-
     const strictContext: StrictLayoutContext = {
       bubbles: true,
       strategy: this.strategy,
@@ -42,7 +36,6 @@ export class LayoutManager {
     const layoutResult = this.getLayoutResult(strictContext);
     layoutResult && this.commitLayout(strictContext, layoutResult);
 
-    this._firstLayoutDone = true;
     this.onAfterLayout(strictContext, layoutResult);
     this._prevLayoutStrategy = strictContext.strategy;
   }
@@ -102,7 +95,11 @@ export class LayoutManager {
     const { target } = context;
 
     // handle layout triggers subscription
-    if (context.type === 'initialization' || context.type === 'added') {
+    if (
+      // subscribe only if instance is the target's `layoutManager`
+      target.layoutManager === this &&
+      (context.type === 'initialization' || context.type === 'added')
+    ) {
       context.targets.forEach((object) => this.subscribe(object, context));
     } else if (context.type === 'removed') {
       context.targets.forEach((object) => this.unsubscribe(object, context));
@@ -134,13 +131,16 @@ export class LayoutManager {
       context.type === 'initialization'
         ? new Point()
         : target.getRelativeCenterPoint();
+
     const result = context.strategy.calcLayoutResult(
       context,
       target.getObjects()
     );
+
     if (!result) {
       return;
     }
+
     const {
       center: nextCenter,
       correction = new Point(),

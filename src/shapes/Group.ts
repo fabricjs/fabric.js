@@ -483,10 +483,11 @@ export class Group
   }
 
   triggerLayout({
-    strategy = this.layoutManager?.strategy,
+    manager = this.layoutManager || new LayoutManager(),
+    strategy = manager.strategy,
     ...rest
   }: ImperativeLayoutOptions = {}) {
-    this.layoutManager?.performLayout({
+    manager.performLayout({
       target: this,
       type: 'imperative',
       strategy,

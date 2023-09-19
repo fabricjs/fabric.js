@@ -213,7 +213,7 @@
         g.item(0).set({ left: point.x });
         g.item(1).set({ skewX: -45 });
         g.item(2).rotate(45);
-        g.triggerLayout();
+        g.triggerLayout({ strategy: new fabric.FitContentLayout() });
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
@@ -230,7 +230,8 @@
 
     function fitContentLayoutAdd(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
-            backgroundColor: 'blue'
+            backgroundColor: 'blue',
+            layoutManager: new fabric.LayoutManager()
         });
         var rect = new fabric.Rect({
             top: 200,

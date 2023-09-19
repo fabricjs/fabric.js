@@ -1,6 +1,6 @@
 import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import { makeBoundingBoxFromPoints } from '../../util';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { sendPointToPlane } from '../../util/misc/planeChange';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';

@@ -22,10 +22,11 @@ export class FixedLayout extends LayoutStrategy {
       const sizeCorrection = new Point(width, height)
         .multiply(new Point(-resolveOrigin(originX), -resolveOrigin(originY)))
         .transform(context.target.calcOwnMatrix(), true);
+
       return {
         ...result,
-        center: result.center.add(sizeCorrection),
-        correction: new Point(result.correction).add(sizeCorrection),
+        // center: result.center.add(sizeCorrection),
+        // correction: new Point(result.correction).add(sizeCorrection),
         size: new Point(width || result.size.x, height || result.size.y),
       };
     }

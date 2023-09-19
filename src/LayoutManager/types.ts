@@ -7,6 +7,7 @@ import type { Point } from '../Point';
 import type { Group } from '../shapes/Group';
 import type { ITextEvents } from '../shapes/IText/ITextBehavior';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { LayoutManager } from './LayoutManager';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 
 export type LayoutTrigger =
@@ -61,6 +62,7 @@ type ImperativeLayoutCommonOptions = {
 
 export type ImperativeLayoutOptions = ImperativeLayoutCommonOptions & {
   strategy?: LayoutStrategy;
+  manager?: LayoutManager;
 };
 
 export type CommonLayoutContext = {
