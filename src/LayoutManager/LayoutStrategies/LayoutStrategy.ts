@@ -2,7 +2,11 @@ import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
-import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
+import type {
+  InitializationLayoutContext,
+  LayoutStrategyResult,
+  StrictLayoutContext,
+} from '../types';
 import { getObjectBounds } from './utils';
 
 export abstract class LayoutStrategy {
@@ -23,6 +27,13 @@ export abstract class LayoutStrategy {
     return (
       type !== 'initialization' && clipPath && !clipPath.absolutePositioned
     );
+  }
+
+  getInitialSize(
+    context: StrictLayoutContext & InitializationLayoutContext,
+    result: Pick<LayoutStrategyResult, 'center' | 'size'>
+  ) {
+    return result.size;
   }
 
   /**
@@ -61,23 +72,25 @@ export abstract class LayoutStrategy {
         .reduce((coords, curr) => coords.concat(curr), [])
     );
     const size = new Point(width, height);
-    const bboxCenter = new Point(left, top).add(size.scalarDivide(2));
+    const origin = new Point(left, top);
+    const bboxCenter = origin.add(size.scalarDivide(2));
     if (context.type === 'initialization') {
-      // translate the layout origin from left top to target's origin
-      const origin = bboxCenter.add(size.scalarMultiply(-0.5));
-      const center = origin.add(
-        size.multiply(
-          new Point(
-            -resolveOrigin(target.originX),
-            -resolveOrigin(target.originY)
-          )
-        )
+      const actualSize = this.getInitialSize(context, {
+        size,
+        center: bboxCenter,
+      });
+      const originFactor = new Point(
+        -resolveOrigin(target.originX),
+        -resolveOrigin(target.originY)
       );
+      const sizeCorrection = actualSize.subtract(size).multiply(originFactor);
+      // translate the layout origin from left top to target's origin
+      const center = origin.add(size.multiply(originFactor));
       return {
         // in `initialization` we do not account for target's transformation matrix
-        center,
+        center: center.add(sizeCorrection),
         relativeCorrection: center.subtract(bboxCenter),
-        size,
+        size: actualSize,
       };
     } else {
       //  we send `relativeCenter` up to group's containing plane
