@@ -6,5 +6,7 @@
   "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
   "excludeExternals": true,
   "tsconfig": "tsconfig.json",
+  "hideBreadcrumbs": "true",
+  "publicPath": "/apidocs/",
   "plugin": ["typedoc-plugin-markdown"]
 }
