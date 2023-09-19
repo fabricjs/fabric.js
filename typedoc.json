@@ -1,9 +1,13 @@
 {
-  // https://typedoc.org/options/
   "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["fabric.ts"],
   "out": "docs",
-  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"],
+  "exclude": [
+    "./*.extend.ts",
+    "**/*+(index|.spec|.e2e|.test).ts",
+    "./src/**/*.test.ts",
+    "./src/**/*.spec.ts"
+  ],
   "excludeExternals": true,
   "tsconfig": "tsconfig.json",
   "plugin": ["typedoc-plugin-markdown"]

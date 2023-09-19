@@ -512,7 +512,7 @@ export class FabricObject<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObject(propertiesToInclude: any[] = []): any {
+  toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
