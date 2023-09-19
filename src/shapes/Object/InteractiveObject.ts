@@ -199,7 +199,11 @@ export class InteractiveFabricObject<
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, coord] = cornerEntries[i];
       if (
-        this.controls[key].shouldActivate(key, this) &&
+        this.controls[key].shouldActivate(
+          key,
+          // @ts-expect-error FabricObject this
+          this
+        ) &&
         PlaneBBox.build(
           forTouch ? coord.touchCorner : coord.corner
         ).containsPoint(pointer)
@@ -300,7 +304,7 @@ export class InteractiveFabricObject<
       key: string,
       fabricObject: InteractiveFabricObject
     ) => R
-  ) {
+  ): Record<string, R> {
     return mapValues(this.controls, (value, key) => fn(value, key, this));
   }
 
