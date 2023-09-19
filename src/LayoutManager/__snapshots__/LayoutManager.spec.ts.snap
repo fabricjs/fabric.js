@@ -15,14 +15,22 @@ exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
     "y": 0,
   },
   "result": {
-    "centerX": 50,
-    "centerY": 100,
-    "correctionX": 10,
-    "correctionY": 20,
-    "height": 250,
-    "relativeCorrectionX": -30,
-    "relativeCorrectionY": -40,
-    "width": 200,
+    "center": Point {
+      "x": 50,
+      "y": 100,
+    },
+    "correction": Point {
+      "x": 10,
+      "y": 20,
+    },
+    "relativeCorrection": Point {
+      "x": -30,
+      "y": -40,
+    },
+    "size": Point {
+      "x": 200,
+      "y": 250,
+    },
   },
 }
 `;
@@ -42,14 +50,22 @@ exports[`Layout Manager getLayoutResult initialization trigger 1`] = `
     "y": 0,
   },
   "result": {
-    "centerX": 50,
-    "centerY": 100,
-    "correctionX": 10,
-    "correctionY": 20,
-    "height": 250,
-    "relativeCorrectionX": -30,
-    "relativeCorrectionY": -40,
-    "width": 200,
+    "center": Point {
+      "x": 50,
+      "y": 100,
+    },
+    "correction": Point {
+      "x": 10,
+      "y": 20,
+    },
+    "relativeCorrection": Point {
+      "x": -30,
+      "y": -40,
+    },
+    "size": Point {
+      "x": 200,
+      "y": 250,
+    },
   },
 }
 `;
@@ -69,14 +85,22 @@ exports[`Layout Manager getLayoutResult initialization trigger 2`] = `
     "y": 0,
   },
   "result": {
-    "centerX": 50,
-    "centerY": 100,
-    "correctionX": 10,
-    "correctionY": 20,
-    "height": 250,
-    "relativeCorrectionX": -30,
-    "relativeCorrectionY": -40,
-    "width": 200,
+    "center": Point {
+      "x": 50,
+      "y": 100,
+    },
+    "correction": Point {
+      "x": 10,
+      "y": 20,
+    },
+    "relativeCorrection": Point {
+      "x": -30,
+      "y": -40,
+    },
+    "size": Point {
+      "x": 200,
+      "y": 250,
+    },
   },
 }
 `;

@@ -5,6 +5,7 @@ import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type {
   LayoutContext,
+  LayoutResult,
   LayoutTrigger,
   StrictLayoutContext,
 } from './types';
@@ -17,9 +18,9 @@ describe('Layout Manager', () => {
   describe('Lifecycle', () => {
     test.each([true, false])('performLayout with result of %s', (result) => {
       const lifecycle: jest.SpyInstance[] = [];
-      const layoutResult = result
+      const layoutResult: LayoutResult | undefined = result
         ? {
-            result: { centerX: 0, centerY: 0, width: 0, height: 0 },
+            result: { center: new Point(), size: new Point() },
             prevCenter: new Point(),
             nextCenter: new Point(),
             offset: new Point(),
@@ -154,7 +155,7 @@ describe('Layout Manager', () => {
         const performLayout = jest.spyOn(manager, 'performLayout');
         const object = new FabricObject();
         const target = new Group();
-        manager.subscribe({ target }, object);
+        manager['subscribe']({ target }, object);
 
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
@@ -178,9 +179,9 @@ describe('Layout Manager', () => {
         ]);
 
         performLayout.mockClear();
-        expect(manager._subscriptions.get(object)).toBeDefined();
-        manager.unsubscribe({ target }, object);
-        expect(manager._subscriptions.get(object)).toBeUndefined();
+        expect(manager['_subscriptions'].get(object)).toBeDefined();
+        manager['unsubscribe']({ target }, object);
+        expect(manager['_subscriptions'].get(object)).toBeUndefined();
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout).not.toHaveBeenCalled();
       });
@@ -226,7 +227,7 @@ describe('Layout Manager', () => {
             this.bubbles = false;
           },
         };
-        manager.onBeforeLayout(context);
+        manager['onBeforeLayout'](context);
 
         expect(lifecycle).toEqual([
           subscription,
@@ -264,7 +265,7 @@ describe('Layout Manager', () => {
           this.bubbles = false;
         },
       };
-      manager.onBeforeLayout(context);
+      manager['onBeforeLayout'](context);
 
       mocks.forEach(
         ({
@@ -295,14 +296,10 @@ describe('Layout Manager', () => {
     ] as const)('$type trigger', (options) => {
       const manager = new LayoutManager();
       jest.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
-        centerX: 50,
-        centerY: 100,
-        width: 200,
-        height: 250,
-        correctionX: 10,
-        correctionY: 20,
-        relativeCorrectionX: -30,
-        relativeCorrectionY: -40,
+        center: new Point(50, 100),
+        size: new Point(200, 250),
+        correction: new Point(10, 20),
+        relativeCorrection: new Point(-30, -40),
       });
 
       const target = new Group([], { scaleX: 2, scaleY: 0.5, angle: 30 });
@@ -317,7 +314,7 @@ describe('Layout Manager', () => {
         },
       };
 
-      expect(manager.getLayoutResult(context)).toMatchSnapshot();
+      expect(manager['getLayoutResult'](context)).toMatchSnapshot();
     });
   });
 
@@ -368,7 +365,7 @@ describe('Layout Manager', () => {
         manager,
         context,
         layoutResult: {
-          result: { centerX: 5, centerY: 5, width: 10, height: 10 },
+          result: { center: new Point(5, 5), size: new Point(10, 10) },
           prevCenter: new Point(),
           nextCenter: new Point(5, 5),
           offset: new Point(-5, -5),
@@ -397,10 +394,12 @@ describe('Layout Manager', () => {
           lifecycle,
         } = prepareTest({ type: 'initialization', ...pos });
         const {
-          result: { width, height },
+          result: {
+            size: { x: width, y: height },
+          },
         } = layoutResult;
 
-        manager.commitLayout(context, layoutResult);
+        manager['commitLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
           targetMocks.set,
@@ -426,10 +425,12 @@ describe('Layout Manager', () => {
         lifecycle,
       } = prepareTest({ type: 'added' });
       const {
-        result: { width, height },
+        result: {
+          size: { x: width, y: height },
+        },
       } = layoutResult;
 
-      manager.commitLayout(context, layoutResult);
+      manager['commitLayout'](context, layoutResult);
 
       expect(lifecycle).toEqual([
         targetMocks.set,
@@ -487,13 +488,13 @@ describe('Layout Manager', () => {
             this.bubbles = false;
           },
         };
-        const layoutResult = {
-          result: { centerX: 0, centerY: 0, width: 0, height: 0 },
+        const layoutResult: LayoutResult = {
+          result: { center: new Point(), size: new Point() },
           prevCenter: new Point(),
           nextCenter: new Point(),
           offset: new Point(),
         };
-        manager.onAfterLayout(context, layoutResult);
+        manager['onAfterLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
           shouldResetTransform,
@@ -545,7 +546,7 @@ describe('Layout Manager', () => {
           this.bubbles = false;
         },
       };
-      manager.onAfterLayout(context);
+      manager['onAfterLayout'](context);
 
       expect(target.left).toBe(reset ? 0 : 50);
     });
@@ -573,13 +574,13 @@ describe('Layout Manager', () => {
           this.bubbles = false;
         },
       };
-      const layoutResult = {
-        result: { centerX: 0, centerY: 0, width: 0, height: 0 },
+      const layoutResult: LayoutResult = {
+        result: { center: new Point(), size: new Point() },
         prevCenter: new Point(),
         nextCenter: new Point(),
         offset: new Point(),
       };
-      manager.onAfterLayout(context, layoutResult);
+      manager['onAfterLayout'](context, layoutResult);
 
       expect(grandParentPerformLayout.mock.calls[0]).toMatchObject([
         {

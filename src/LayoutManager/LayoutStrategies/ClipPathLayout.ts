@@ -1,3 +1,4 @@
+import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { makeBoundingBoxFromPoints } from '../../util';
 import { sendPointToPlane } from '../../util/misc/planeChange';
@@ -28,6 +29,7 @@ export class ClipPathLayout extends LayoutStrategy {
     const { width, height } = makeBoundingBoxFromPoints(
       getObjectBounds(target, clipPath as FabricObject)
     );
+    const size = new Point(width, height);
     if (clipPath.absolutePositioned) {
       //  we want the center point to exist in group's containing plane
       const clipPathCenter = sendPointToPlane(
@@ -36,10 +38,8 @@ export class ClipPathLayout extends LayoutStrategy {
         target.group?.calcTransformMatrix()
       );
       return {
-        centerX: clipPathCenter.x,
-        centerY: clipPathCenter.y,
-        width,
-        height,
+        center: clipPathCenter,
+        size,
       };
     } else {
       //  we want the center point to exist in group's containing plane, so we send it upwards
@@ -49,27 +49,17 @@ export class ClipPathLayout extends LayoutStrategy {
       if (this.shouldPerformLayout(context)) {
         // the clip path is positioned relative to the group's center which is affected by the bbox
         // so we first calculate the bbox
-        const {
-          centerX = 0,
-          centerY = 0,
-          correctionX = 0,
-          correctionY = 0,
-        } = this.calcBoundingBox(objects, context) || {};
+        const { center = new Point(), correction = new Point() } =
+          this.calcBoundingBox(objects, context) || {};
         return {
-          centerX: centerX + clipPathCenter.x,
-          centerY: centerY + clipPathCenter.y,
-          correctionX: correctionX - clipPathCenter.x,
-          correctionY: correctionY - clipPathCenter.y,
-          width: clipPath.width,
-          height: clipPath.height,
+          center: center.add(clipPathCenter),
+          correction: correction.subtract(clipPathCenter),
+          size,
         };
       } else {
-        const center = target.getRelativeCenterPoint();
         return {
-          centerX: center.x + clipPathCenter.x,
-          centerY: center.y + clipPathCenter.y,
-          width,
-          height,
+          center: target.getRelativeCenterPoint().add(clipPathCenter),
+          size,
         };
       }
     }

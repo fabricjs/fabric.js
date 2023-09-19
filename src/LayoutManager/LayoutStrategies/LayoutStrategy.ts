@@ -71,24 +71,18 @@ export abstract class LayoutStrategy {
           )
         )
       );
-      const correction = center.subtract(bboxCenter);
       return {
         // in `initialization` we do not account for target's transformation matrix
-        centerX: center.x,
-        centerY: center.y,
-        relativeCorrectionX: correction.x,
-        relativeCorrectionY: correction.y,
-        width,
-        height,
+        center,
+        relativeCorrection: center.subtract(bboxCenter),
+        size,
       };
     } else {
       //  we send `relativeCenter` up to group's containing plane
       const center = bboxCenter.transform(target.calcOwnMatrix());
       return {
-        centerX: center.x,
-        centerY: center.y,
-        width,
-        height,
+        center,
+        size,
       };
     }
   }

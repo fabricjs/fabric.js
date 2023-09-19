@@ -17,7 +17,7 @@ export class Point implements XY {
 
   constructor();
   constructor(x: number, y: number);
-  constructor(point: XY);
+  constructor(point?: XY);
   constructor(arg0: number | XY = 0, y = 0) {
     if (typeof arg0 === 'object') {
       this.x = arg0.x;

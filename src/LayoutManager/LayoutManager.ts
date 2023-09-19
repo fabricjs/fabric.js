@@ -139,15 +139,11 @@ export class LayoutManager {
     if (!result) {
       return;
     }
-    const nextCenter = new Point(result.centerX, result.centerY);
-    const correction = new Point(
-      result.correctionX ?? 0,
-      result.correctionY ?? 0
-    );
-    const relativeCorrection = new Point(
-      result.relativeCorrectionX ?? 0,
-      result.relativeCorrectionY ?? 0
-    );
+    const {
+      center: nextCenter,
+      correction = new Point(),
+      relativeCorrection = new Point(),
+    } = result;
     const offset =
       context.type === 'initialization' && context.objectsRelativeToGroup
         ? new Point()
@@ -162,6 +158,7 @@ export class LayoutManager {
               true
             )
             .add(relativeCorrection);
+
     return {
       result,
       prevCenter,
@@ -176,11 +173,11 @@ export class LayoutManager {
   ) {
     const { target } = context;
     const {
-      result: { width, height },
+      result: { size },
       nextCenter,
     } = layoutResult;
     // set dimensions
-    target.set({ width, height });
+    target.set({ width: size.x, height: size.y });
     // layout descendants
     this.layoutObjects(context, layoutResult);
     //  set position
@@ -188,7 +185,7 @@ export class LayoutManager {
     if (context.type === 'initialization') {
       // TODO: what about strokeWidth?
       const origin = nextCenter.add(
-        new Point(width, height).multiply(
+        size.multiply(
           new Point(
             resolveOrigin(target.originX),
             resolveOrigin(target.originY)

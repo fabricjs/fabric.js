@@ -1,3 +1,4 @@
+import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
@@ -17,12 +18,13 @@ export class FixedLayout extends LayoutStrategy {
       const {
         target: { width, height },
       } = context;
+
       return {
         ...result,
-        centerX: result.centerX + (width - result.width) / 2,
-        centerY: result.centerY + (height - result.height) / 2,
-        width: width || result.width,
-        height: height || result.height,
+        center: result.center.add(
+          new Point(width, height).subtract(result.size).scalarDivide(2)
+        ),
+        size: new Point(width || result.size.x, height || result.size.y),
       };
     }
     return result;

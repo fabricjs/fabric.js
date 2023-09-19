@@ -17,56 +17,30 @@ export type LayoutTrigger =
   | 'removed'
   | 'imperative';
 
-/**
- * positioning and layout data **relative** to instance's parent
- */
 export type LayoutStrategyResult = {
   /**
-   * new centerX as measured by the **containing** plane (same as `left` with `originX` set to `center`)
+   * new center point as measured by the **containing** plane (same as `left` with `originX` set to `center`)
    */
-  centerX: number;
+  center: Point;
+
   /**
-   * new centerY as measured by the **containing** plane (same as `top` with `originY` set to `center`)
-   */
-  centerY: number;
-  /**
-   * correctionX to translate objects by, measured as `centerX`
+   * correction vector to translate objects by, measured in the same plane as `center`
    *
    * Since objects are measured relative to the group's center, once the group's size changes we must apply a correction to
    * the objects' positions so that they relate to the new center.
    * In other words, this value makes it possible to layout objects relative to the tl corner, for instance, but not only.
-   *
-   * @see `relativeCorrectionX`
    */
-  correctionX?: number;
+  correction?: Point;
+
   /**
-   * correctionY to translate objects by, measured as `centerY`
-   *
-   * Since objects are measured relative to the group's center, once the group's size changes we must apply a correction to
-   * the objects' positions so that they relate to the new center.
-   * In other words, this value makes it possible to layout objects relative to the tl corner, for instance, but not only.
-   *
-   * @see `relativeCorrectionY`
+   * correction vector to translate objects by as measured by the plane
    */
-  correctionY?: number;
+  relativeCorrection?: Point;
+
   /**
-   * correctionX to translate objects by as measured by the plane
-   * @see `correctionX`
+   * new width and height of the layout target
    */
-  relativeCorrectionX?: number;
-  /**
-   * correctionY to translate objects by as measured by the plane
-   * @see `correctionY`
-   */
-  relativeCorrectionY?: number;
-  /**
-   * new width of instance
-   */
-  width: number;
-  /**
-   * new height of instance
-   */
-  height: number;
+  size: Point;
 };
 
 export type LayoutResult = {
