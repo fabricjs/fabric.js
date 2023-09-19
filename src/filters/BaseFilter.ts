@@ -7,13 +7,13 @@ import type {
   TWebGLProgramCacheItem,
   TWebGLUniformLocationMap,
 } from './typedefs';
-import { isWebGLPipelineState } from './typedefs';
-import { GLPrecision } from './GLProbes/GLProbe';
+import { isWebGLPipelineState } from './utils';
 import {
   highPsourceCode,
   identityFragmentShader,
   vertexSource,
 } from './shaders/baseFilter';
+import type { Abortable } from '../typedefs';
 
 export class BaseFilter {
   /**
@@ -22,8 +22,17 @@ export class BaseFilter {
    * @default
    */
   get type(): string {
-    return this.constructor.name;
+    return (this.constructor as typeof BaseFilter).type;
   }
+
+  /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'BaseFilter';
 
   declare static defaults: Record<string, any>;
 
@@ -39,13 +48,13 @@ export class BaseFilter {
    * mainParameter
    * @private
    */
-  declare mainParameter?: keyof this;
+  declare mainParameter?: keyof this | undefined;
 
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ ...options }: Record<string, any> = {}) {
+  constructor({ type, ...options }: Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
@@ -69,11 +78,13 @@ export class BaseFilter {
     fragmentSource: string = this.getFragmentSource(),
     vertexSource: string = this.vertexSource
   ) {
-    const { WebGLProbe } = getEnv();
-    if (WebGLProbe.GLPrecision && WebGLProbe.GLPrecision !== GLPrecision.high) {
+    const {
+      WebGLProbe: { GLPrecision = 'highp' },
+    } = getEnv();
+    if (GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
         new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace(GLPrecision.high, WebGLProbe.GLPrecision)
+        highPsourceCode.replace('highp', GLPrecision)
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -394,7 +405,10 @@ export class BaseFilter {
     return this.toObject();
   }
 
-  static async fromObject({ type, ...options }: any) {
-    return new this(options);
+  static async fromObject(
+    { type, ...filterOptions }: Record<string, any>,
+    options: Abortable
+  ) {
+    return new this(filterOptions);
   }
 }

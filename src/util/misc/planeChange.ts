@@ -5,6 +5,8 @@ import type { TMat2D } from '../../typedefs';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
+export type ObjectRelation = 'sibling' | 'child';
+
 /**
  * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
  * The object will exist on the destination plane and we want it to seem unchanged by it so we invert the destination matrix (`to`) and then apply the source matrix (`from`)
@@ -66,16 +68,16 @@ export const sendPointToPlane = (
 
 /**
  * @see {@link sendPointToPlane}
- * @param point
+ * @param vector
  * @param from
  * @param to
  * @returns
  */
 export const sendVectorToPlane = (
-  point: Point,
+  vector: Point,
   from?: TMat2D,
   to?: TMat2D
-): Point => send2DToPlane(point, from, to, true);
+): Point => send2DToPlane(vector, from, to, true);
 
 /**
  *

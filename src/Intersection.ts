@@ -250,7 +250,7 @@ export class Intersection {
   ): Intersection {
     const result = new Intersection(),
       length = points1.length;
-    const coincidences = [];
+    const coincidences: Intersection[] = [];
 
     for (let i = 0; i < length; i++) {
       const a1 = points1[i],

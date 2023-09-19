@@ -31,10 +31,24 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - run: npm ci
+      - name: Latest major version for bug report update
+        id: major
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs-extra');
+            const semver = require('semver');
+            const { version } = fs.readJsonSync('./package.json');
+            return semver.major(version);
       - name: Update bug report version
         uses: ShaMan123/gha-populate-form-version@v2.0.1
         with:
-          semver: '>=4.0.0 || >=6.0.0-rc'
+          semver: '>=4.0.0 || >=${{ steps.major.outputs.result }}.0.0-rc || >=${{ steps.major.outputs.result }}.0.0-beta'
           dry_run: no-push
       - name: Update bug report node version
         uses: ShaMan123/gha-populate-form-version@v2.0.1

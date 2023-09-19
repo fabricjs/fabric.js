@@ -27,7 +27,7 @@
     assert.ok(cObj instanceof fabric.Object);
     assert.ok(cObj.constructor === fabric.Object);
 
-    assert.equal(cObj.constructor.name, 'FabricObject');
+    assert.equal(cObj.constructor.type, 'FabricObject');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 
@@ -293,7 +293,7 @@
 
   QUnit.test('toString', function (assert) {
     class Moo extends fabric.Object {
-      static type = 'moo'
+      static type = 'Moo'
     }
     var cObj = new fabric.Object();
     assert.equal(cObj.toString(), '#<FabricObject>');
@@ -303,14 +303,6 @@
   QUnit.test('render', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.render === 'function');
-  });
-
-  QUnit.test('rotate', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.rotate === 'function');
-    assert.equal(cObj.get('angle'), 0);
-    cObj.rotate(45);
-    assert.equal(cObj.get('angle'), 45);
   });
 
   QUnit.test('scale', function(assert) {
@@ -338,7 +330,7 @@
     assert.equal(cObj.get('angle'), 45);
   });
 
-  QUnit.test('rotate', function(assert) {
+  QUnit.test('rotate what?', function(assert) {
     var cObj = new fabric.Object();
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');

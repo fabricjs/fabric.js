@@ -14,7 +14,7 @@ export * from './fabric';
 
 export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);
@@ -24,9 +24,15 @@ export class StaticCanvas extends StaticCanvasBase {
   }
 }
 
+/**
+ * **NOTICE**:
+ * {@link Canvas} is designed for interactivity.
+ * Therefore, using it in node has no benefit.
+ * Use {@link StaticCanvas} instead.
+ */
 export class Canvas extends CanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);

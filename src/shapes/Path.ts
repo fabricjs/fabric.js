@@ -1,9 +1,19 @@
-//@ts-nocheck
+import { classRegistry } from '../ClassRegistry';
+import type { ObjectEvents } from '../EventTypeDefs';
+import type { XY } from '../Point';
+import { Point } from '../Point';
 import { config } from '../config';
+import { CENTER, LEFT, TOP } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import { Point } from '../Point';
-import { PathData } from '../typedefs';
+import type { CSSRules } from '../parser/typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TOptions,
+  TSVGReviver,
+} from '../typedefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -11,39 +21,68 @@ import {
   joinPath,
   makePathSimpler,
   parsePath,
-  type TPathSegmentsInfo,
 } from '../util/path';
-import { classRegistry } from '../ClassRegistry';
+import type {
+  TComplexPathData,
+  TPathSegmentInfo,
+  TSimplePathData,
+} from '../util/path/typedefs';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 
-export class Path extends FabricObject {
+interface UniquePathProps {
+  sourcePath?: string;
+  path?: TSimplePathData;
+}
+
+export interface SerializedPathProps
+  extends SerializedObjectProps,
+    UniquePathProps {}
+
+export interface PathProps extends FabricObjectProps, UniquePathProps {}
+
+export interface IPathBBox extends TBBox {
+  left: number;
+  top: number;
+  pathOffset: Point;
+}
+
+export class Path<
+  Props extends TOptions<PathProps> = Partial<PathProps>,
+  SProps extends SerializedPathProps = SerializedPathProps,
+  EventSpec extends ObjectEvents = ObjectEvents
+> extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Array of path points
    * @type Array
    * @default
    */
-  declare path: PathData;
+  declare path: TSimplePathData;
 
   declare pathOffset: Point;
 
   declare sourcePath?: string;
 
-  declare segmentsInfo?: TPathSegmentsInfo[];
+  declare segmentsInfo?: TPathSegmentInfo[];
+
+  static type = 'Path';
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
   /**
    * Constructor
-   * @param {Array|String} path Path data (sequence of coordinates and corresponding "command" tokens)
-   * @param {Object} [options] Options object
+   * @param {TComplexPathData} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {Partial<PathProps>} [options] Options object
    * @return {Path} thisArg
    */
   constructor(
-    path: PathData | string,
-    { path: _, left, top, ...options }: any = {}
+    path: TComplexPathData | string,
+    { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
-    super(options);
-    const pathTL = this._setPath(path || []);
+    super(options as Props);
+    const pathTL = this._setPath(path || [], true);
+    typeof left === 'number' && this.set(LEFT, left);
+    typeof top === 'number' && this.set(TOP, top);
     // this.setRelativeXY(
     //   new Point(left ?? pathTL.x, top ?? pathTL.y),
     //   typeof left === 'number' ? this.originX : 'left',
@@ -53,13 +92,24 @@ export class Path extends FabricObject {
 
   /**
    * @private
-   * @param {PathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
+   * @param {TComplexPathData | string} path Path data (sequence of coordinates and corresponding "command" tokens)
    * @param {boolean} [adjustPosition] pass true to reposition the object according to the bounding box
    * @returns {Point} top left position of the bounding box, useful for complementary positioning
    */
-  _setPath(path: PathData | string, adjustPosition?: boolean) {
+  _setPath(path: TComplexPathData | string, adjustPosition?: boolean) {
     this.path = makePathSimpler(Array.isArray(path) ? path : parsePath(path));
-    return this.setDimensions();
+    this.setBoundingBox(adjustPosition);
+  }
+
+  /**
+   * This function is an helper for svg import. it returns the center of the object in the svg
+   * untransformed coordinates, by look at the polyline/polygon points.
+   * @private
+   * @return {Point} center point from element coordinates
+   */
+  _findCenterFromElement(): Point {
+    const bbox = this._calcBoundsFromPath();
+    return new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2);
   }
 
   /**
@@ -67,8 +117,7 @@ export class Path extends FabricObject {
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
   _renderPathCommands(ctx: CanvasRenderingContext2D) {
-    let current, // current instruction
-      subpathStartX = 0,
+    let subpathStartX = 0,
       subpathStartY = 0,
       x = 0, // current x
       y = 0, // current y
@@ -79,34 +128,32 @@ export class Path extends FabricObject {
 
     ctx.beginPath();
 
-    for (let i = 0, len = this.path.length; i < len; ++i) {
-      current = this.path[i];
-
+    for (const command of this.path) {
       switch (
-        current[0] // first letter
+        command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           ctx.lineTo(x + l, y + t);
           break;
 
         case 'M': // moveTo, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           subpathStartX = x;
           subpathStartY = y;
           ctx.moveTo(x + l, y + t);
           break;
 
         case 'C': // bezierCurveTo, absolute
-          x = current[5];
-          y = current[6];
-          controlX = current[3];
-          controlY = current[4];
+          x = command[5];
+          y = command[6];
+          controlX = command[3];
+          controlY = command[4];
           ctx.bezierCurveTo(
-            current[1] + l,
-            current[2] + t,
+            command[1] + l,
+            command[2] + t,
             controlX + l,
             controlY + t,
             x + l,
@@ -116,18 +163,17 @@ export class Path extends FabricObject {
 
         case 'Q': // quadraticCurveTo, absolute
           ctx.quadraticCurveTo(
-            current[1] + l,
-            current[2] + t,
-            current[3] + l,
-            current[4] + t
+            command[1] + l,
+            command[2] + t,
+            command[3] + l,
+            command[4] + t
           );
-          x = current[3];
-          y = current[4];
-          controlX = current[1];
-          controlY = current[2];
+          x = command[3];
+          y = command[4];
+          controlX = command[1];
+          controlY = command[2];
           break;
 
-        case 'z':
         case 'Z':
           x = subpathStartX;
           y = subpathStartY;
@@ -148,7 +194,7 @@ export class Path extends FabricObject {
 
   /**
    * Returns string representation of an instance
-   * @return {String} string representation of an instance
+   * @return {string} string representation of an instance
    */
   toString() {
     return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${
@@ -161,12 +207,13 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: this.path.map((item) => {
-        return item.slice();
-      }),
+      path: cloneDeep(this.path),
     };
   }
 
@@ -175,10 +222,14 @@ export class Path extends FabricObject {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toDatalessObject(propertiesToInclude: (keyof this)[] = []) {
-    const o = this.toObject(['sourcePath', ...propertiesToInclude]);
-    if (o.sourcePath) {
+  toDatalessObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    const o = this.toObject<T, K>(propertiesToInclude);
+    if (this.sourcePath) {
       delete o.path;
+      o.sourcePath = this.sourcePath;
     }
     return o;
   }
@@ -197,6 +248,10 @@ export class Path extends FabricObject {
     ];
   }
 
+  /**
+   * @private
+   * @return the path command's translate transform attribute
+   */
   _getOffsetTransform() {
     const digits = config.NUM_FRACTION_DIGITS;
     return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(
@@ -208,9 +263,9 @@ export class Path extends FabricObject {
   /**
    * Returns svg clipPath representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver) {
+  toClipPathSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
@@ -224,9 +279,9 @@ export class Path extends FabricObject {
   /**
    * Returns svg representation of an instance
    * @param {Function} [reviver] Method for further parsing of svg representation.
-   * @return {String} svg representation of an instance
+   * @return {string} svg representation of an instance
    */
-  toSVG(reviver) {
+  toSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver: reviver,
@@ -236,42 +291,45 @@ export class Path extends FabricObject {
 
   /**
    * Returns number representation of an instance complexity
-   * @return {Number} complexity of this instance
+   * @return {number} complexity of this instance
    */
   complexity() {
     return this.path.length;
   }
 
   setDimensions() {
-    const { left, top, width, height, pathOffset } = this._calcDimensions();
-    this.set({ width, height, pathOffset });
-    return new Point(left, top);
+    this.setBoundingBox();
   }
 
-  /**
-   * @private
-   */
-  _calcDimensions() {
-    const bounds: Point[] = [];
+  setBoundingBox(adjustPosition?: boolean) {
+    const { width, height, pathOffset } = this._calcDimensions();
+    this.set({ width, height, pathOffset });
+    // using pathOffset because it match the use case.
+    // if pathOffset change here we need to use left + width/2 , top + height/2
+    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
+  }
+
+  _calcBoundsFromPath(): TBBox {
+    const bounds: XY[] = [];
     let subpathStartX = 0,
       subpathStartY = 0,
       x = 0, // current x
       y = 0; // current y
 
-    for (let i = 0; i < this.path.length; ++i) {
-      const current = this.path[i]; // current instruction
+    for (const command of this.path) {
+      // current instruction
       switch (
-        current[0] // first letter
+        command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           bounds.push(new Point(subpathStartX, subpathStartY), new Point(x, y));
           break;
 
         case 'M': // moveTo, absolute
-          x = current[1];
-          y = current[2];
+          x = command[1];
+          y = command[2];
           subpathStartX = x;
           subpathStartY = y;
           break;
@@ -281,16 +339,16 @@ export class Path extends FabricObject {
             ...getBoundsOfCurve(
               x,
               y,
-              current[1],
-              current[2],
-              current[3],
-              current[4],
-              current[5],
-              current[6]
+              command[1],
+              command[2],
+              command[3],
+              command[4],
+              command[5],
+              command[6]
             )
           );
-          x = current[5];
-          y = current[6];
+          x = command[5];
+          y = command[6];
           break;
 
         case 'Q': // quadraticCurveTo, absolute
@@ -298,27 +356,32 @@ export class Path extends FabricObject {
             ...getBoundsOfCurve(
               x,
               y,
-              current[1],
-              current[2],
-              current[1],
-              current[2],
-              current[3],
-              current[4]
+              command[1],
+              command[2],
+              command[1],
+              command[2],
+              command[3],
+              command[4]
             )
           );
-          x = current[3];
-          y = current[4];
+          x = command[3];
+          y = command[4];
           break;
 
-        case 'z':
         case 'Z':
           x = subpathStartX;
           y = subpathStartY;
           break;
       }
     }
+    return makeBoundingBoxFromPoints(bounds);
+  }
 
-    const bbox = makeBoundingBoxFromPoints(bounds);
+  /**
+   * @private
+   */
+  _calcDimensions(): IPathBBox {
+    const bbox = this._calcBoundsFromPath();
 
     return {
       ...bbox,
@@ -344,8 +407,8 @@ export class Path extends FabricObject {
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject(object) {
-    return this._fromObject(object, {
+  static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
+    return this._fromObject<Path>(object, {
       extraParam: 'path',
     });
   }
@@ -354,22 +417,26 @@ export class Path extends FabricObject {
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {SVGElement} element to parse
-   * @param {Function} callback Callback to invoke when an Path instance is created
-   * @param {Object} [options] Options object
-   * @param {Function} [callback] Options callback invoked after parsing is finished
+   * @param {HTMLElement} element to parse
+   * @param {Partial<PathProps>} [options] Options object
    */
-  static fromElement(element, callback, options) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    callback(
-      new this(parsedAttributes.d, {
-        ...parsedAttributes,
-        ...options,
-        // we pass undefined to instruct the constructor to position the object using the bbox
-        left: undefined,
-        top: undefined,
-      })
+  static async fromElement(
+    element: HTMLElement,
+    options: Partial<PathProps>,
+    cssRules?: CSSRules
+  ) {
+    const { d, ...parsedAttributes } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
     );
+    return new this(d, {
+      ...parsedAttributes,
+      ...options,
+      // we pass undefined to instruct the constructor to position the object using the bbox
+      left: undefined,
+      top: undefined,
+    });
   }
 }
 

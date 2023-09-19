@@ -1,9 +1,9 @@
-import { ObjectEvents } from '../../EventTypeDefs';
-import { Point } from '../../Point';
-import type { TBBox } from '../../typedefs';
 import { BBox } from '../../BBox/BBox';
-import { ObjectTransformations } from './ObjectTransformations';
 import { ViewportBBox } from '../../BBox/ViewportBBox';
+import type { ObjectEvents } from '../../EventTypeDefs';
+import type { Point } from '../../Point';
+import type { TBBox } from '../../typedefs';
+import { ObjectTransformations } from './ObjectTransformations';
 
 export class ObjectGeometry<
   EventSpec extends ObjectEvents = ObjectEvents

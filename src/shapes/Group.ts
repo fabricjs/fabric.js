@@ -1,8 +1,9 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import { resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { TSVGReviver } from '../typedefs';
+import { cos } from '../util/misc/cos';
+import type { TClassProperties, TOptions } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -18,6 +19,7 @@ import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import { CENTER } from '../constants';
 
 export type LayoutContextType =
   | 'initialization'
@@ -37,14 +39,13 @@ export type LayoutContext = {
   [key: string]: any;
 };
 
-export type GroupEvents = ObjectEvents &
-  CollectionEvents & {
-    layout: {
-      context: LayoutContext;
-      result: LayoutResult;
-      diff: Point;
-    };
+export interface GroupEvents extends ObjectEvents, CollectionEvents {
+  layout: {
+    context: LayoutContext;
+    result: LayoutResult;
+    diff: Point;
   };
+}
 
 export type LayoutStrategy =
   | 'fit-content'
@@ -74,6 +75,7 @@ export type LayoutResult = {
   correctionY?: number;
   width: number;
   height: number;
+  prevLayout?: LayoutStrategy;
 };
 
 export interface GroupOwnProps {
@@ -84,7 +86,10 @@ export interface GroupOwnProps {
 
 export interface SerializedGroupProps
   extends SerializedObjectProps,
-    GroupOwnProps {}
+    GroupOwnProps {
+  objects: SerializedObjectProps[];
+}
+
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
 
 export const groupDefaultValues = {
@@ -140,6 +145,8 @@ export class Group extends createCollectionMixin(
     'layout',
   ];
 
+  static type = 'Group';
+
   static ownDefaults: Record<string, any> = groupDefaultValues;
   private __objectSelectionTracker: (ev: ObjectEvents['selected']) => void;
   private __objectSelectionDisposer: (ev: ObjectEvents['deselected']) => void;
@@ -165,7 +172,7 @@ export class Group extends createCollectionMixin(
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects;
+    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -306,7 +313,7 @@ export class Group extends createCollectionMixin(
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const prev = this[key];
+    const prev = this[key as keyof this];
     super._set(key, value);
     if (key === 'canvas' && prev !== value) {
       this.forEachObject((object) => {
@@ -382,12 +389,16 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject} object
    */
   _watchObject(watch: boolean, object: FabricObject) {
-    const directive = watch ? 'on' : 'off';
+    const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
+    // @ts-expect-error TS limitations
     object[directive]('changed', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('modified', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('selected', this.__objectSelectionTracker);
+    // @ts-expect-error TS limitations
     object[directive]('deselected', this.__objectSelectionDisposer);
   }
 
@@ -634,10 +645,10 @@ export class Group extends createCollectionMixin(
         this.layout !== 'clip-path' &&
         this.clipPath &&
         !this.clipPath.absolutePositioned &&
-        this._adjustObjectPosition(this.clipPath, diff);
+        this._adjustObjectPosition(this.clipPath as FabricObject, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
-        this.setRelativeCenterPoint(newCenter);
+        this.setPositionByOrigin(newCenter, CENTER, CENTER);
         initialTransform && this.set(initialTransform);
         this.setCoords();
       }
@@ -826,16 +837,15 @@ export class Group extends createCollectionMixin(
       return;
     }
 
-    const {
-      centerX = 0,
-      centerY = 0,
-      width: w = 0,
-      height: h = 0,
-    } = this.getObjectsBoundingBox(objects) || {};
+    const bbox = this.getObjectsBoundingBox(objects) || ({} as LayoutResult);
+    const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
     const width = hasWidth ? this.width : w,
       height = hasHeight ? this.height : h,
       calculatedCenter = new Point(centerX, centerY),
-      origin = resolveOriginPoint(this.originX, this.originY),
+      origin = new Point(
+        resolveOrigin(this.originX),
+        resolveOrigin(this.originY)
+      ),
       size = new Point(width, height),
       // TODO: should probably be removed
       strokeWidthVector = new Point(),
@@ -903,10 +913,15 @@ export class Group extends createCollectionMixin(
     const objectBounds: Point[] = [];
     objects.forEach((object) => {
       const objCenter = object.getRelativeCenterPoint();
-      const sizeVector = object.bbox
-        .sendToParent()
-        .getBBoxVector()
-        .scalarDivide(2);
+      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
+      if (object.angle) {
+        const rad = degreesToRadians(object.angle),
+          sine = Math.abs(sin(rad)),
+          cosine = Math.abs(cos(rad)),
+          rx = sizeVector.x * cosine + sizeVector.y * sine,
+          ry = sizeVector.x * sine + sizeVector.y * cosine;
+        sizeVector = new Point(rx, ry);
+      }
       objectBounds.push(
         objCenter.subtract(sizeVector),
         objCenter.add(sizeVector)
@@ -962,7 +977,7 @@ export class Group extends createCollectionMixin(
         obj.includeDefaultValues = _includeDefaultValues;
         const data = obj[method || 'toObject'](propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
-        //delete data.version;
+        // delete data.version;
         return data;
       });
   }
@@ -972,7 +987,13 @@ export class Group extends createCollectionMixin(
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude: (keyof this)[] = []) {
+  toObject<
+    T extends Omit<
+      GroupProps & TClassProperties<this>,
+      keyof SerializedGroupProps
+    >,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
     return {
       ...super.toObject([
         'layout',
@@ -980,7 +1001,10 @@ export class Group extends createCollectionMixin(
         'interactive',
         ...propertiesToInclude,
       ]),
-      objects: this.__serializeObjects('toObject', propertiesToInclude),
+      objects: this.__serializeObjects(
+        'toObject',
+        propertiesToInclude as string[]
+      ),
     };
   }
 
@@ -1031,7 +1055,7 @@ export class Group extends createCollectionMixin(
    * Returns styles-string for svg-export, specific version for group
    * @return {String}
    */
-  getSvgStyles() {
+  getSvgStyles(): string {
     const opacity =
         typeof this.opacity !== 'undefined' && this.opacity !== 1
           ? `opacity: ${this.opacity};`
@@ -1045,7 +1069,7 @@ export class Group extends createCollectionMixin(
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: TSVGReviver) {
+  toClipPathSVG(reviver?: TSVGReviver): string {
     const svgString = [];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t', bg);
@@ -1065,9 +1089,12 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject({ objects = [], ...options }) {
+  static fromObject<T extends TOptions<SerializedGroupProps>>({
+    objects = [],
+    ...options
+  }: T) {
     return Promise.all([
-      enlivenObjects(objects),
+      enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(
       ([objects, hydratedOptions]) =>

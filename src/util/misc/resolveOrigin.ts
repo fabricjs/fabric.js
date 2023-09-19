@@ -1,5 +1,5 @@
 import { Point } from '../../Point';
-import { TOriginX, TOriginY } from '../../typedefs';
+import type { TOriginX, TOriginY } from '../../typedefs';
 
 const originOffset = {
   left: -0.5,

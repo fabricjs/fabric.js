@@ -46,7 +46,7 @@
     charSpacing:              0,
     styles:                   [],
     strokeUniform:            false,
-    path:                     null,
+    path:                     undefined,
     direction:                'ltr',
     pathStartOffset:          0,
     pathSide:                 'left',
@@ -73,7 +73,7 @@
       assert.ok(iText instanceof fabric.IText);
 
       assert.equal(iText.text, 'test');
-      assert.equal(iText.constructor.name, 'IText');
+      assert.equal(iText.constructor.type, 'IText');
       assert.deepEqual(iText.styles, { });
     });
 
@@ -414,8 +414,8 @@
       });
     });
 
-    QUnit.test('selectWord', function(assert) {
-      var iText = new fabric.IText('test foo bar-baz\nqux');
+    QUnit.test('selectWord', function (assert) {
+      var iText = new fabric.IText('test foo bar-baz\n\nqux');
 
       assert.equal(typeof iText.selectWord, 'function');
 
@@ -426,6 +426,10 @@
       iText.selectWord(7);
       assert.equal(iText.selectionStart, 5); // |foo|
       assert.equal(iText.selectionEnd, 8);
+
+      iText.selectWord(17);
+      assert.equal(iText.selectionStart, 17); // |\n|
+      assert.equal(iText.selectionEnd, 17);
     });
 
     QUnit.test('selectLine', function(assert) {
@@ -651,7 +655,7 @@
       });
       canvas.add(iText);
       assert.equal(typeof iText.toSVG, 'function');
-      var parser = new (fabric.getWindow().DOMParser)(),
+      var parser = new (fabric.getFabricWindow().DOMParser)(),
           svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;
@@ -690,7 +694,7 @@
       canvas.add(group);
       assert.equal(typeof iText1.toSVG, 'function');
       assert.equal(typeof iText2.toSVG, 'function');
-      var parser = new (fabric.getWindow().DOMParser)();
+      var parser = new (fabric.getFabricWindow().DOMParser)();
       var svgString = canvas.toSVG(),
           doc = parser.parseFromString(svgString, 'image/svg+xml'),
           style = doc.getElementsByTagName('style')[0].firstChild.data;

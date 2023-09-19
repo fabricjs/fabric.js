@@ -5,25 +5,42 @@ export {
   createVector,
   calcAngleBetweenVectors,
   getUnitVector,
-  getBisector,
+  calcVectorRotation,
+  crossProduct,
+  dotProduct,
+  getOrthonormalVector,
+  isBetweenVectors,
+  magnitude,
 } from './misc/vectors';
 export {
   degreesToRadians,
   radiansToDegrees,
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
-export { projectStrokeOnPoints } from './misc/projectStroke';
+export * from './misc/projectStroke';
+export type {
+  TComposeMatrixArgs,
+  TQrDecomposeOut,
+  TRotateMatrixArgs,
+  TScaleMatrixArgs,
+  TTranslateMatrixArgs,
+} from './misc/matrix';
 export {
   transformPoint,
   invertTransform,
   composeMatrix,
   qrDecompose,
+  createTranslateMatrix,
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
   calcDimensionsMatrix,
-  calcRotateMatrix,
   multiplyTransformMatrices,
-  multiplyTransformMatrixChain,
+  multiplyTransformMatrixArray,
   isIdentityMatrix,
 } from './misc/matrix';
+export type { TextStyleArray } from './misc/textStyles';
 export {
   stylesFromArray,
   stylesToArray,
@@ -61,12 +78,17 @@ export {
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
+export type {
+  EnlivenObjectOptions,
+  LoadImageOptions,
+} from './misc/objectEnlive';
 export {
   loadImage,
   enlivenObjects,
   enlivenObjectEnlivables,
 } from './misc/objectEnlive';
 export { pick } from './misc/pick';
+export * from './path/typedefs';
 export {
   joinPath,
   parsePath,
@@ -80,15 +102,9 @@ export {
 } from './path';
 export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
-export {
-  // getScrollLeftTop,
-  getElementOffset,
-  makeElementUnselectable,
-  makeElementSelectable,
-} from './dom_misc';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';
-export { animate, animateColor } from './animation/animate';
+export * from './animation';
 export * as ease from './animation/easing';
 export {
   requestAnimFrame,
@@ -96,8 +112,7 @@ export {
 } from './animation/AnimationFrameProvider';
 export { removeFromArray } from './internals/removeFromArray';
 export { getRandomInt } from './internals/getRandomInt';
-export { wrapElement } from './dom_misc';
-export { request } from './dom_request';
+export { request } from './internals/dom_request';
 
 // for test compatibility. We don't want to export it
 export { removeTransformMatrixForSvgParsing } from './transform_matrix_removal';

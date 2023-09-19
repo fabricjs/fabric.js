@@ -35,6 +35,21 @@ QUnit.test('fire once', function (assert) {
   assert.equal(eventFired, 1);
 });
 
+QUnit.test('fire once context', function (assert) {
+  var foo = new fabric.Observable();
+
+  var eventFired = false;
+  var context;
+  foo.once('bar:baz', function() {
+    context = this;
+    eventFired = true;
+  });
+
+  foo.fire('bar:baz');
+  assert.equal(eventFired, true);
+  assert.equal(context, foo);
+});
+
 QUnit.test('fire once multiple handlers', function (assert) {
   var foo = new fabric.Observable();
   var eventFired = 0;

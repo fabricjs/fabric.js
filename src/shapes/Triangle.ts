@@ -1,12 +1,24 @@
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import type { TOptions } from '../typedefs';
+import type { ObjectEvents } from '../EventTypeDefs';
 
 export const triangleDefaultValues = {
   width: 100,
   height: 100,
 };
 
-export class Triangle extends FabricObject {
+export class Triangle<
+    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
+    SProps extends SerializedObjectProps = SerializedObjectProps,
+    EventSpec extends ObjectEvents = ObjectEvents
+  >
+  extends FabricObject<Props, SProps, EventSpec>
+  implements FabricObjectProps
+{
+  static type = 'Triangle';
+
   static ownDefaults: Record<string, any> = triangleDefaultValues;
 
   static getDefaults() {

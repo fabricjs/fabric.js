@@ -79,15 +79,6 @@ $ npm install fabric --save
 $ yarn add fabric
 ```
 
-```js
-// v6
-import { Canvas, Rect } from 'fabric'; // browser
-import { StaticCanvas, Rect } from 'fabric/node'; // node
-
-// v5
-import { fabric } from 'fabric';
-```
-
 #### Browser
 
 [![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
@@ -103,6 +94,15 @@ This means that you may encounter `node-canvas` limitations and [bugs][node_canv
 Follow these [instructions][node_canvas_install] to get `node-canvas` up and running.
 
 ## Quick Start
+
+```js
+// v6
+import { Canvas, Rect } from 'fabric'; // browser
+import { StaticCanvas, Rect } from 'fabric/node'; // node
+
+// v5
+import { fabric } from 'fabric';
+```
 
 <details><summary><b>Plain HTML</b></summary>
 
@@ -191,6 +191,8 @@ http
 
 </details>
 
+See our ready to use [templates](./.codesandbox/templates/).
+
 ---
 
 ## Other Solutions
@@ -200,7 +202,6 @@ http
 | [Three.js][three.js]           | 3D graphics          |
 | [PixiJS][pixijs]               | WebGL renderer       |
 | [Konva][konva]                 | Similar features     |  ❌  |
-| [Canvas2PDF][canvas2pdf]       | PDF renderer         |
 | [html-to-image][html-to-image] | HTML to image/canvas |
 
 ## More Resources
@@ -228,7 +229,6 @@ http
 
 [asturur]: https://github.com/asturur
 [asturur_twitter]: https://twitter.com/AndreaBogazzi
-[canvas2pdf]: https://github.com/joshua-gould/canvas2pdf
 [cdnjs]: https://cdnjs.com/libraries/fabric.js
 [code_triage]: https://www.codetriage.com/kangax/fabric.js
 [codepens]: https://codepen.io/tag/fabricjs

@@ -1,13 +1,19 @@
 import type { Shadow } from '../../../Shadow';
-import { TFiller } from '../../../typedefs';
+import type { Canvas } from '../../../canvas/Canvas';
+import type { StaticCanvas } from '../../../canvas/StaticCanvas';
+import type { TFiller } from '../../../typedefs';
 import type { FabricObject } from '../Object';
-import { ClipPathProps, SerializedObjectProps } from './SerializedObjectProps';
+import type {
+  ClipPathProps,
+  SerializedObjectProps,
+} from './SerializedObjectProps';
 
 export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
   clipPath?: FabricObject;
   fill: TFiller | string | null;
   stroke: TFiller | string | null;
   shadow: Shadow | null;
+  canvas?: StaticCanvas | Canvas;
 
   /**
    * Minimum allowed scale value of an object
@@ -40,4 +46,14 @@ export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
    * @default
    */
   excludeFromExport: boolean;
+
+  /**
+   * When `true` the object will rotate on its center.
+   * When `false` will rotate around the origin point defined by originX and originY.
+   * The value of this property is IGNORED during a transform if the canvas has already
+   * centeredRotation set to `true`
+   * The object method `rotate` will always consider this property and never the canva's one.
+   * @default true
+   */
+  centeredRotation: boolean;
 }

@@ -1,5 +1,8 @@
-import { IPoint, Point } from '../../Point';
-import { TRadian } from '../../typedefs';
+import type { XY } from '../../Point';
+import { Point } from '../../Point';
+import type { TRadian } from '../../typedefs';
+
+const zero = new Point();
 
 /**
  * Rotates `vector` with `radians`
@@ -17,17 +20,29 @@ export const rotateVector = (vector: Point, radians: TRadian) =>
  * @param {Point} to
  * @returns {Point} vector
  */
-export const createVector = (from: IPoint, to: IPoint): Point =>
+export const createVector = (from: XY, to: XY): Point =>
   new Point(to).subtract(from);
 
 /**
  * return the magnitude of a vector
  * @return {number}
  */
-export const magnitude = (point: Point) => point.distanceFrom(new Point());
+export const magnitude = (point: Point) => point.distanceFrom(zero);
 
+/**
+ * Dot product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number}
+ */
 export const dot = (a: Point, b: Point) => a.x * b.x + a.y * b.y;
 
+/**
+ * Cross product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number} the magnitude of Z vector
+ */
 export const det = (a: Point, b: Point) => a.x * b.y - a.y * b.x;
 
 /**
@@ -45,14 +60,14 @@ export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
  * @param {Point} v
  * @returns the angle in radians of `v`
  */
-export const calcVectorRotation = (v: IPoint) =>
-  Math.atan2(v.y, v.x) as TRadian;
+export const calcVectorRotation = (v: XY) => Math.atan2(v.y, v.x) as TRadian;
 
 /**
  * @param {Point} v
  * @returns {Point} vector representing the unit vector pointing to the direction of `v`
  */
-export const getUnitVector = (v: Point): Point => v.scalarDivide(magnitude(v));
+export const getUnitVector = (v: Point): Point =>
+  v.eq(zero) ? v : v.scalarDivide(magnitude(v));
 
 export const dotProduct = (v: Point, onto: Point) => {
   const size = magnitude(v);
@@ -93,3 +108,20 @@ export const getOrthonormalVector = (
   v: Point,
   counterClockwise = true
 ): Point => getUnitVector(getOrthogonalVector(v, counterClockwise));
+
+/**
+ * Checks if the vector is between two others. It is considered
+ * to be inside when the vector to be tested is between the
+ * initial vector and the final vector (included) in a counterclockwise direction.
+ * @param {Point} t vector to be tested
+ * @param {Point} a initial vector
+ * @param {Point} b final vector
+ * @returns {boolean} true if the vector is among the others
+ */
+export const isBetweenVectors = (t: Point, a: Point, b: Point): boolean => {
+  if (t.eq(a) || t.eq(b)) return true;
+  const AxB = det(a, b),
+    AxT = det(a, t),
+    BxT = det(b, t);
+  return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
+};

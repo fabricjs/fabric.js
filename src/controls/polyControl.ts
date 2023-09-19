@@ -1,13 +1,13 @@
-import { Point } from '../Point';
-import { Control } from './Control';
-import { TMat2D } from '../typedefs';
-import type { Polyline } from '../shapes/Polyline';
-import {
+import type {
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { Point } from '../Point';
+import type { Polyline } from '../shapes/Polyline';
+import type { TMat2D } from '../typedefs';
 import { sendPointToPlane } from '../util';
+import { Control } from './Control';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 

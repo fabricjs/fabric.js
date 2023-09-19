@@ -1,7 +1,10 @@
-import { IPoint } from '../../../Point';
+import { Point, type XY } from '../../../Point';
+import { findIndexRight } from '../../internals';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
-import { TProjection, TProjectStrokeOnPointsOptions } from './types';
+import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
+
+export * from './types';
 
 /**
  *
@@ -11,18 +14,39 @@ import { TProjection, TProjectStrokeOnPointsOptions } from './types';
  *
  */
 export const projectStrokeOnPoints = (
-  points: IPoint[],
+  points: XY[],
   options: TProjectStrokeOnPointsOptions,
   openPath = false
 ): TProjection[] => {
   const projections: TProjection[] = [];
 
-  if (points.length <= 1) {
+  if (points.length === 0) {
     return projections;
   }
 
-  points.forEach((A, index) => {
-    let B: IPoint, C: IPoint;
+  // first we remove duplicate neighboring points
+  const reduced = points.reduce(
+    (reduced, point) => {
+      if (!reduced[reduced.length - 1].eq(point)) {
+        reduced.push(new Point(point));
+      }
+      return reduced;
+    },
+    [new Point(points[0])]
+  );
+
+  if (reduced.length === 1) {
+    openPath = true;
+  } else if (!openPath) {
+    // remove points from end in case they equal the first point
+    // in order to correctly project the first point
+    const start = reduced[0];
+    const index = findIndexRight(reduced, (point) => !point.eq(start));
+    reduced.splice(index + 1);
+  }
+
+  reduced.forEach((A, index, points) => {
+    let B: XY, C: XY;
     if (index === 0) {
       C = points[1];
       B = openPath ? A : points[points.length - 1];
@@ -34,7 +58,11 @@ export const projectStrokeOnPoints = (
       C = points[index + 1];
     }
 
-    if (openPath && (index === 0 || index === points.length - 1)) {
+    if (openPath && points.length === 1) {
+      projections.push(
+        ...new StrokeLineCapProjections(A, A, options).project()
+      );
+    } else if (openPath && (index === 0 || index === points.length - 1)) {
       projections.push(
         ...new StrokeLineCapProjections(
           A,

@@ -1,6 +1,6 @@
-import { TClassProperties } from '../typedefs';
+import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
   myParameter: 0,
@@ -89,6 +89,6 @@ export class MyFilter extends BaseFilter {
   static async fromObject(object: any) {
     // or overide with custom logic if your filter needs to
     // deserialize something that is not a plain value
-    return new MyFilter(object);
+    return new this(object) as BaseFilter;
   }
 }

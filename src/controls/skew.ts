@@ -1,17 +1,17 @@
-import {
+import { BBox } from '../BBox/BBox';
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
-import { TAxis, TAxisKey, TOriginX, TOriginY } from '../typedefs';
-import { findCornerQuadrant, isLocked, NOT_ALLOWED_CURSOR } from './util';
-import { wrapWithFireEvent } from './wrapWithFireEvent';
-import { BBox } from '../BBox/BBox';
-import { createVector, dotProduct, getUnitVector } from '../util/misc/vectors';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { TAxis, TAxisKey, TOriginX, TOriginY } from '../typedefs';
+import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
+import { createVector, dotProduct, getUnitVector } from '../util/misc/vectors';
+import { NOT_ALLOWED_CURSOR, findCornerQuadrant, isLocked } from './util';
+import { wrapWithFireEvent } from './wrapWithFireEvent';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 

@@ -1,23 +1,23 @@
-import {
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/Object/FabricObject';
-import { TAxis } from '../typedefs';
+import { Point } from '../Point';
 import type { Canvas } from '../canvas/Canvas';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { TAxis } from '../typedefs';
+import { resolveOriginPoint } from '../util/misc/resolveOrigin';
+import { dotProduct } from '../util/misc/vectors';
 import {
+  NOT_ALLOWED_CURSOR,
   findCornerQuadrant,
   isLocked,
   isTransformCentered,
-  NOT_ALLOWED_CURSOR,
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { Point } from '../Point';
-import { resolveOriginPoint } from '../util/misc/resolveOrigin';
-import { dotProduct } from '../util/misc/vectors';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;

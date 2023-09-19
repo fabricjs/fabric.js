@@ -1,8 +1,28 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
+import type { GroupProps, LayoutContext } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
+export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
+
+export interface ActiveSelectionOptions extends GroupProps {
+  multiSelectionStacking: MultiSelectionStacking;
+}
+
+/**
+ * Used by Canvas to manage selection.
+ * Canvas accepts an `activeSelection` option allowing overriding and customization.
+ *
+ * @example
+ * class MyActiveSelection extends ActiveSelection {
+ *   ...
+ * }
+ *
+ * const canvas = new Canvas(el, {
+ *  activeSelection: new MyActiveSelection()
+ * })
+ */
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
 
@@ -13,17 +33,10 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
-  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
-    'canvas-stacking';
+  // TODO FIX THIS WITH THE DEFAULTS LOGIC
+  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
-  constructor(
-    objects?: FabricObject[],
-    options?: any,
-    objectsRelativeToGroup?: boolean
-  ) {
-    super(objects, options, objectsRelativeToGroup);
-    this.setCoords();
-  }
+  static type = 'ActiveSelection';
 
   /**
    * @private
@@ -135,6 +148,25 @@ export class ActiveSelection extends Group {
     this._renderBackground(ctx);
     this._objects.forEach((object) => object.render(ctx));
     this._drawClipPath(ctx, this.clipPath);
+  }
+
+  _applyLayoutStrategy(context: LayoutContext): void {
+    super._applyLayoutStrategy(context);
+    if (this._objects.length === 0) {
+      // in this case layout was skipped
+      // we reset transform for the next selection
+      Object.assign(this, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        flipX: false,
+        flipY: false,
+      });
+    }
   }
 
   /**

@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { Image } from '../shapes/Image';
@@ -8,154 +7,167 @@ import {
   multiplyTransformMatrices,
   qrDecompose,
 } from '../util/misc/matrix';
-import { storage } from './constants';
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import { Point } from '../Point';
+import { getGradientDefs } from './getGradientDefs';
+import { getCSSRules } from './getCSSRules';
+import type { LoadImageOptions } from '../util';
+import type { CSSRules, TSvgReviverCallback } from './typedefs';
+import type { ParsedViewboxTransform } from './applyViewboxTransform';
+import type { SVGOptions } from '../gradient';
 
-const ElementsParser = function (
-  elements,
-  callback,
-  options,
-  reviver,
-  parsingOptions,
-  doc
-) {
-  this.elements = elements;
-  this.callback = callback;
-  this.options = options;
-  this.reviver = reviver;
-  this.svgUid = (options && options.svgUid) || 0;
-  this.parsingOptions = parsingOptions;
-  this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
-  this.doc = doc;
+const findTag = (el: Element) =>
+  classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
+
+type StorageType = {
+  fill: SVGGradientElement;
+  stroke: SVGGradientElement;
+  clipPath: Element[];
 };
 
-(function (proto) {
-  proto.parse = function () {
-    this.instances = new Array(this.elements.length);
-    this.numElements = this.elements.length;
-    this.createObjects();
-  };
+type NotParsedFabricObject = FabricObject & {
+  fill: string;
+  stroke: string;
+  clipPath?: string;
+  clipRule?: CanvasFillRule;
+};
 
-  proto.createObjects = function () {
-    this.elements.forEach((element, i) => {
-      element.setAttribute('svgUid', this.svgUid);
-      this.createObject(element, i);
-    });
-  };
+export class ElementsParser {
+  declare elements: Element[];
+  declare options: LoadImageOptions & ParsedViewboxTransform;
+  declare reviver: TSvgReviverCallback | undefined;
+  declare regexUrl: RegExp;
+  declare doc: Document;
+  declare clipPaths: Record<string, Element[]>;
+  declare gradientDefs: Record<string, SVGGradientElement>;
+  declare cssRules: CSSRules;
 
-  proto.findTag = function (el) {
-    return classRegistry.getSVGClass(
-      el.tagName.toLowerCase().replace('svg:', '')
+  constructor(
+    elements: Element[],
+    options: LoadImageOptions & ParsedViewboxTransform,
+    reviver: TSvgReviverCallback | undefined,
+    doc: Document,
+    clipPaths: Record<string, Element[]>
+  ) {
+    this.elements = elements;
+    this.options = options;
+    this.reviver = reviver;
+    this.regexUrl = /^url\(['"]?#([^'"]+)['"]?\)/g;
+    this.doc = doc;
+    this.clipPaths = clipPaths;
+    this.gradientDefs = getGradientDefs(doc);
+    this.cssRules = getCSSRules(doc);
+  }
+
+  parse(): Promise<Array<FabricObject | null>> {
+    return Promise.all(
+      this.elements.map((element) => this.createObject(element))
     );
-  };
+  }
 
-  proto.createObject = function (el, index) {
-    const klass = this.findTag(el);
-    if (klass && klass.fromElement) {
-      try {
-        klass.fromElement(el, this.createCallback(index, el), this.options);
-      } catch (err) {
-        console.log(err);
-      }
-    } else {
-      this.checkIfDone();
-    }
-  };
-
-  proto.createCallback = function (index, el) {
-    return (obj) => {
-      let _options;
+  async createObject(el: Element): Promise<FabricObject | null> {
+    const klass = findTag(el);
+    if (klass) {
+      const obj: NotParsedFabricObject = await klass.fromElement(
+        el,
+        this.options,
+        this.cssRules
+      );
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
       if (obj instanceof Image && obj._originalElement) {
-        _options = obj.parsePreserveAspectRatioAttribute(el);
+        removeTransformMatrixForSvgParsing(
+          obj,
+          obj.parsePreserveAspectRatioAttribute()
+        );
+      } else {
+        removeTransformMatrixForSvgParsing(obj);
       }
-      removeTransformMatrixForSvgParsing(obj, _options);
-      this.resolveClipPath(obj, el);
+      await this.resolveClipPath(obj, el);
       this.reviver && this.reviver(el, obj);
-      this.instances[index] = obj;
-      this.checkIfDone();
-    };
-  };
+      return obj;
+    }
+    return null;
+  }
 
-  proto.extractPropertyDefinition = function (obj, property, storageType) {
-    const value = obj[property],
+  extractPropertyDefinition(
+    obj: NotParsedFabricObject,
+    property: 'fill' | 'stroke' | 'clipPath',
+    storage: Record<string, StorageType[typeof property]>
+  ): StorageType[typeof property] | undefined {
+    const value = obj[property]!,
       regex = this.regexUrl;
     if (!regex.test(value)) {
-      return;
+      return undefined;
     }
+    // verify: can we remove the 'g' flag? and remove lastIndex changes?
     regex.lastIndex = 0;
-    const id = regex.exec(value)[1];
+    // we passed the regex test, so we know is not null;
+    const id = regex.exec(value)![1];
     regex.lastIndex = 0;
     // @todo fix this
-    return storage[storageType][this.svgUid][id];
-  };
+    return storage[id];
+  }
 
-  proto.resolveGradient = function (obj, el, property) {
+  resolveGradient(
+    obj: NotParsedFabricObject,
+    el: Element,
+    property: 'fill' | 'stroke'
+  ) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
-      'gradientDefs'
-    );
+      this.gradientDefs
+    ) as SVGGradientElement;
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
       const gradient = Gradient.fromElement(gradientDef, obj, {
         ...this.options,
         opacity: opacityAttr,
-      });
+      } as SVGOptions);
       obj.set(property, gradient);
     }
-  };
+  }
 
-  proto.createClipPathCallback = function (obj, container) {
-    return function (_newObj) {
-      removeTransformMatrixForSvgParsing(_newObj);
-      _newObj.fillRule = _newObj.clipRule;
-      container.push(_newObj);
-    };
-  };
-
-  proto.resolveClipPath = function (obj, usingElement) {
-    let clipPath = this.extractPropertyDefinition(obj, 'clipPath', 'clipPaths'),
-      element,
-      klass,
-      objTransformInv,
-      container,
-      gTransform,
-      options;
-    if (clipPath) {
-      container = [];
-      objTransformInv = invertTransform(obj.calcTransformMatrix());
+  async resolveClipPath(obj: NotParsedFabricObject, usingElement: Element) {
+    const clipPathElements = this.extractPropertyDefinition(
+      obj,
+      'clipPath',
+      this.clipPaths
+    ) as Element[];
+    if (clipPathElements) {
+      const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPath[0].parentNode;
+      const clipPathTag = clipPathElements[0].parentElement;
       let clipPathOwner = usingElement;
       while (
-        clipPathOwner.parentNode &&
+        clipPathOwner.parentElement &&
         clipPathOwner.getAttribute('clip-path') !== obj.clipPath
       ) {
-        clipPathOwner = clipPathOwner.parentNode;
+        clipPathOwner = clipPathOwner.parentElement;
       }
-      clipPathOwner.parentNode.appendChild(clipPathTag);
-      for (let i = 0; i < clipPath.length; i++) {
-        element = clipPath[i];
-        klass = this.findTag(element);
-        klass.fromElement(
-          element,
-          this.createClipPathCallback(obj, container),
-          this.options
-        );
-      }
-      if (container.length === 1) {
-        clipPath = container[0];
-      } else {
-        clipPath = new Group(container);
-      }
-      gTransform = multiplyTransformMatrices(
+      clipPathOwner.parentElement!.appendChild(clipPathTag!);
+      const container = await Promise.all(
+        clipPathElements.map((clipPathElement) => {
+          return findTag(clipPathElement)
+            .fromElement(clipPathElement, this.options, this.cssRules)
+            .then((enlivedClippath: NotParsedFabricObject) => {
+              removeTransformMatrixForSvgParsing(enlivedClippath);
+              enlivedClippath.fillRule = enlivedClippath.clipRule!;
+              delete enlivedClippath.clipRule;
+              return enlivedClippath;
+            });
+        })
+      );
+      const clipPath =
+        container.length === 1 ? container[0] : new Group(container);
+      const gTransform = multiplyTransformMatrices(
         objTransformInv,
         clipPath.calcTransformMatrix()
       );
       if (clipPath.clipPath) {
-        this.resolveClipPath(clipPath, clipPathOwner);
+        await this.resolveClipPath(clipPath, clipPathOwner);
       }
       const options = qrDecompose(gTransform);
       clipPath.flipX = false;
@@ -172,18 +184,7 @@ const ElementsParser = function (
     } else {
       // if clip-path does not resolve to any element, delete the property.
       delete obj.clipPath;
+      return;
     }
-  };
-
-  proto.checkIfDone = function () {
-    if (--this.numElements === 0) {
-      this.instances = this.instances.filter(function (el) {
-        // eslint-disable-next-line no-eq-null, eqeqeq
-        return el != null;
-      });
-      this.callback(this.instances, this.elements);
-    }
-  };
-})(ElementsParser.prototype);
-
-export { ElementsParser };
+  }
+}

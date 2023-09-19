@@ -27,6 +27,8 @@ export class Noise extends BaseFilter {
    */
   declare noise: number;
 
+  static type = 'Noise';
+
   static defaults = noiseDefaultValues;
 
   getFragmentSource() {

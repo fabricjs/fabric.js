@@ -124,34 +124,6 @@
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 0, 'tripleClick selection end is');
     });
-    QUnit.test('_getNewSelectionStartFromOffset end of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value did not change');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 519 }, 500, 520, index, jlen);
-      assert.equal(selection, index + 1, 'index value was moved to next char, since is very near');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 502 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value was NOT moved to next char, since is very near to first one');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 10;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value was NOT moved to next char, since is already at end of text');
-    });
     QUnit.test('getSelectionStartFromPointer with scale', function (assert) {
       const eventData = {
         which: 1,
@@ -186,7 +158,7 @@
       iText.abortCursorAnimation = () => aborted++;
       canvas.setActiveObject(iText);
       iText.enterEditing();
-      iText._mouseDownHandler({ e: {} });
+      iText._mouseDownHandler({ e: { target: canvas.upperCanvasEl } });
       assert.equal(animate, 1, 'called from enterEditing');
       assert.equal(aborted, 1, 'called from render');
     });
@@ -238,7 +210,7 @@
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(canvas._target, group, 'group should be found as target');
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();
@@ -252,14 +224,14 @@
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(iText.isEditing, true, 'iText should enter editing');
       assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
       group.interactive = false;
       iText.selected = true;
       iText.__lastSelected = true;
-      canvas.__onMouseUp({ clientX: 1, clientY: 1 });
+      canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
     });
     QUnit.test('_mouseUpHandler on a corner of selected text DOES NOT enter edit', function (assert) {

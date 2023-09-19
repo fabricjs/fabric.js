@@ -1,21 +1,16 @@
-//@ts-nocheck
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import { FabricObject as BaseFabricObject } from '../shapes/Object/Object';
-import { TMat2D } from '../typedefs';
+import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
-import {
-  parseColorStops,
-  parseCoords,
-  parseGradientUnits,
-  parseType,
-} from './parser';
-import {
+import { parseColorStops } from './parser/parseColorStops';
+import { parseCoords } from './parser/parseCoords';
+import { parseType, parseGradientUnits } from './parser/misc';
+import type {
   ColorStop,
   GradientCoords,
   GradientOptions,
@@ -24,6 +19,7 @@ import {
   SVGOptions,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { isPath } from '../util/typeAssertions';
 
 /**
  * Gradient class
@@ -56,7 +52,7 @@ export class Gradient<
    * @type Number[]
    * @default null
    */
-  declare gradientTransform: TMat2D | null;
+  declare gradientTransform?: TMat2D;
 
   /**
    * coordinates units for coords.
@@ -101,6 +97,8 @@ export class Gradient<
    */
   declare readonly id: string | number;
 
+  static type = 'Gradient';
+
   constructor({
     type = 'linear' as T,
     gradientUnits = 'pixels',
@@ -108,7 +106,7 @@ export class Gradient<
     colorStops = [],
     offsetX = 0,
     offsetY = 0,
-    gradientTransform = null,
+    gradientTransform,
     id,
   }: GradientOptions<T>) {
     this.id = id ? `${id}_${uid()}` : uid();
@@ -152,7 +150,7 @@ export class Gradient<
    */
   toObject(propertiesToInclude?: (keyof this | string)[]) {
     return {
-      ...pick(this, propertiesToInclude),
+      ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
       coords: this.coords,
       colorStops: this.colorStops,
@@ -160,8 +158,8 @@ export class Gradient<
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform
-        ? this.gradientTransform.concat()
-        : this.gradientTransform,
+        ? [...this.gradientTransform]
+        : undefined,
     };
   }
 
@@ -201,11 +199,8 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    if (
-      object instanceof BaseFabricObject &&
-      object.isType('Path') &&
-      this.gradientUnits !== 'percentage'
-    ) {
+    // todo what about polygon/polyline?
+    if (isPath(object) && this.gradientUnits !== 'percentage') {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }
@@ -377,6 +372,7 @@ export class Gradient<
     svgOptions: SVGOptions
   ): Gradient<GradientType> {
     const gradientUnits = parseGradientUnits(el);
+    const center = instance._findCenterFromElement();
     return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
@@ -391,8 +387,8 @@ export class Gradient<
       ),
       ...(gradientUnits === 'pixels'
         ? {
-            offsetX: -instance.left,
-            offsetY: -instance.top,
+            offsetX: instance.width / 2 - center.x,
+            offsetY: instance.height / 2 - center.y,
           }
         : {
             offsetX: 0,

@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import _ from 'lodash';
 import match from 'micromatch';
 import path from 'path';
+import { getGitInfo } from '../scripts/git.mjs';
 
 const BINARY_EXT = ['png', 'jpg', 'jpeg'];
 
@@ -39,8 +40,11 @@ export async function createCodeSandbox(appPath) {
   );
   // omit linked package
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
-    packageJSON.dependencies.fabric = '*';
+    const { repo, branch } = getGitInfo();
+    packageJSON.dependencies.fabric = `${repo}#${branch}`;
   }
+  packageJSON.scripts.postinstall =
+    'cd node_modules/fabric && npm i && npm run build -- -f';
   const files = {
     'package.json': {
       content: JSON.stringify(packageJSON, null, '\t'),

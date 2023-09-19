@@ -3,12 +3,13 @@ import type { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 
 export type TProgramCache = any;
 
-export type TTextureCache = any;
+export type TTextureCache = Record<string, WebGLTexture>;
 
 export type TPipelineResources = {
   blendImage?: HTMLCanvasElement;
   blurLayer1?: HTMLCanvasElement;
   blurLayer2?: HTMLCanvasElement;
+  sliceByTwo?: HTMLCanvasElement;
 } & Record<string, unknown>;
 
 export type TWebGLPipelineState = {
@@ -57,9 +58,3 @@ export type TWebGLProgramCacheItem = {
 };
 
 export type TApplyFilterArgs = {};
-
-export const isWebGLPipelineState = (
-  options: TWebGLPipelineState | T2DPipelineState
-): options is TWebGLPipelineState => {
-  return (options as TWebGLPipelineState).webgl !== undefined;
-};

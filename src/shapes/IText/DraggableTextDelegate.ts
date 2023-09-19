@@ -1,6 +1,5 @@
 import type { Canvas } from '../../canvas/Canvas';
-import { getDocument } from '../../env';
-import {
+import type {
   DragEventData,
   DropEventData,
   TPointerEvent,
@@ -9,7 +8,9 @@ import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
-import { TextStyleDeclaration } from '../Text/StyledText';
+import type { TextStyleDeclaration } from '../Text/StyledText';
+import { getDocumentFromElement } from '../../util/dom_misc';
+import { NONE } from '../../constants';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -151,7 +152,7 @@ export class DraggableTextDelegate {
     setStyle(dragImage, {
       position: 'fixed',
       left: `${-dragImage.width}px`,
-      border: 'none',
+      border: NONE,
       width: `${dragImage.width / retinaScaling}px`,
       height: `${dragImage.height / retinaScaling}px`,
     });
@@ -159,7 +160,9 @@ export class DraggableTextDelegate {
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
-    getDocument().body.appendChild(dragImage);
+    getDocumentFromElement(
+      (e.target || this.target.hiddenTextarea)! as HTMLElement
+    ).body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
 
@@ -203,7 +206,11 @@ export class DraggableTextDelegate {
    * @returns {boolean} determines whether {@link target} should/shouldn't become a drop target
    */
   canDrop(e: DragEvent): boolean {
-    if (this.target.editable && !this.target.__corner && !e.defaultPrevented) {
+    if (
+      this.target.editable &&
+      !this.target.getActiveControl() &&
+      !e.defaultPrevented
+    ) {
       if (this.isActive() && this.__dragStartSelection) {
         //  drag source trying to drop over itself
         //  allow dropping only outside of drag start selection
@@ -343,8 +350,8 @@ export class DraggableTextDelegate {
         const target = this.target;
         const canvas = this.target.canvas!;
         const { selectionStart, selectionEnd } = this.__dragStartSelection;
-        const dropEffect = e.dataTransfer?.dropEffect || 'none';
-        if (dropEffect === 'none') {
+        const dropEffect = e.dataTransfer?.dropEffect || NONE;
+        if (dropEffect === NONE) {
           // pointer is back over selection
           target.selectionStart = selectionStart;
           target.selectionEnd = selectionEnd;

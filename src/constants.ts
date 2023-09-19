@@ -1,4 +1,4 @@
-import { TMat2D } from './typedefs';
+import type { TMat2D } from './typedefs';
 // use this syntax so babel plugin see this import here
 import { version } from '../package.json';
 
@@ -19,3 +19,12 @@ export const kRect = 1 - 0.5522847498;
 export const LEFT_CLICK = 1;
 export const MIDDLE_CLICK = 2;
 export const RIGHT_CLICK = 3;
+
+export const CENTER = 'center';
+export const LEFT = 'left';
+export const TOP = 'top';
+export const BOTTOM = 'bottom';
+export const RIGHT = 'right';
+export const NONE = 'none';
+
+export const reNewline = /\r?\n/;

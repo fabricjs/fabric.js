@@ -65,7 +65,7 @@
                   '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
 
   function _createImageElement() {
-    return fabric.getDocument().createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -109,6 +109,19 @@
     assert.ok(canvas.lowerCanvasEl);
     assert.throws(() => new fabric.Canvas(canvas.lowerCanvasEl));
   });
+
+  QUnit.test('initialization with element exisiting in the dom', function (assert) {
+    const doc = fabric.getFabricDocument();
+    const wrapper = doc.createElement('div');
+    const canvasEl = doc.createElement('canvas');
+    wrapper.appendChild(canvasEl);
+    doc.body.appendChild(wrapper);
+    const canvas = new fabric.Canvas(canvasEl);
+    assert.equal(wrapper.firstChild, canvas.elements.container, 'replaced canvas el in dom');
+    assert.equal(canvas.elements.container.firstChild, canvas.elements.lower.el, 'appended canvas el to container');
+    assert.equal(canvas.elements.container.lastChild, canvas.elements.upper.el, 'appended upper canvas el to container');
+  });
+
 
   QUnit.test('initialProperties', function(assert) {
     assert.ok('backgroundColor' in canvas);
@@ -167,11 +180,6 @@
   QUnit.test('altActionKey', function(assert) {
     assert.ok(typeof canvas.altActionKey === 'string');
     assert.equal(canvas.altActionKey, 'shiftKey', 'default is shift');
-  });
-
-  QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive === 'boolean');
-    assert.ok(canvas.interactive, 'default is true');
   });
 
   QUnit.test('selection', function(assert) {
@@ -344,7 +352,7 @@
     activeSelection.multiSelectionStacking = multiSelectionStacking;
     activeSelection.add(...existing);
     canvas.setActiveObject(activeSelection);
-    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true }, target);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true, target: canvas.upperCanvasEl }, target);
   }
 
   QUnit.test('create active selection fires selection:created', function(assert) {
@@ -384,7 +392,7 @@
     assert.equal(activeSelection[1], rect1, 'then rect1');
   });
 
-  QUnit.test('start multiselection: preserve', function (assert) {
+  QUnit.test('start multiselection: canvas-stacking', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
@@ -426,7 +434,6 @@
     updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
-
 
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
@@ -512,6 +519,19 @@
     assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
 
+  QUnit.test('multiselection: selecting a target behind active selection', assert => {
+    const rect1 = new fabric.Rect({ left: 10, width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ width: 10, height: 10 });
+    const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
+    canvas.add(rect1, rect2, rect3);
+    initActiveSelection(canvas, rect1, rect3);
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'selected');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'created');
+    canvas.__onMouseDown({ clientX: 7, clientY: 7, [canvas.selectionKey]: true });
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'added from behind active selection');
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+  });
+
   QUnit.test('setActiveObject fires deselected', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
@@ -544,7 +564,7 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(fired, 3, 'event fired for each of 3 rects');
   });
 
@@ -561,9 +581,9 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection created fired');
-    assert.equal(canvas.getActiveObject().constructor.name, 'ActiveSelection', 'an active selection is created');
+    assert.equal(canvas.getActiveObject().constructor.type, 'ActiveSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
     assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
@@ -581,7 +601,7 @@
       deltaX: 5,
       deltaY: 5
     });
-    canvas.__onMouseUp({});
+    canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection:created fired');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
@@ -737,11 +757,11 @@
     var rect = makeRect({ left: 0, top: 0 }), target;
     canvas.add(rect);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, rect, 'Should return the rect');
     target = canvas.findTarget({
-      clientX: 30, clientY: 30
+      clientX: 30, clientY: 30, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should not find target');
     canvas.remove(rect);
@@ -752,12 +772,12 @@
     var rect = makeRect({ left: 0, top: 0 }),
         rectOver = makeRect({ left: 0, top: 0 }),
         target,
-        pointer = { clientX: 5, clientY: 5 };
+        e = { clientX: 5, clientY: 5, target: canvas.upperCanvasEl };
     canvas.add(rect);
     canvas.add(rectOver);
     canvas.setActiveObject(rect);
     canvas.renderAll();
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e);
     assert.equal(target, rect, 'Should return the rect');
   });
 
@@ -767,19 +787,19 @@
     var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
         target,
-        pointer = { clientX: 15, clientY: 15, shiftKey: true },
-        pointer2 = { clientX: 4, clientY: 4 };
+        e1 = { clientX: 15, clientY: 15, shiftKey: true, target: canvas.upperCanvasEl },
+        e2 = { clientX: 4, clientY: 4, target: canvas.upperCanvasEl };
     canvas.add(rect);
     canvas.add(rectOver);
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rectOver, 'Should return the rectOver, rect is not considered');
     canvas.setActiveObject(rect);
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rectOver, 'Should still return rectOver because is above active object');
-    target = canvas.findTarget(pointer2);
+    target = canvas.findTarget(e2);
     assert.equal(target, rect, 'Should rect because a corner of the activeObject has been hit');
     canvas.altSelectionKey = 'shiftKey';
-    target = canvas.findTarget(pointer);
+    target = canvas.findTarget(e1);
     assert.equal(target, rect, 'Should rect because active and altSelectionKey is pressed');
     canvas.preserveObjectStacking = false;
   });
@@ -792,31 +812,31 @@
     canvas.add(group);
 
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
     target = canvas.findTarget({
-      clientX: 30, clientY: 30
+      clientX: 30, clientY: 30, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     group.subTargetCheck = true;
     group.setCoords();
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
 
     target = canvas.findTarget({
-      clientX: 32, clientY: 32
+      clientX: 32, clientY: 32, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect2, 'should return the rect2');
@@ -859,42 +879,42 @@
     canvas.add(g);
 
     var target = canvas.findTarget({
-      clientX: 96, clientY: 186
+      clientX: 96, clientY: 186, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 96');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 96');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 98, clientY: 188
+      clientX: 98, clientY: 188, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 98');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 98');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 100, clientY: 190
+      clientX: 100, clientY: 190, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 100');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect1 100');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 102, clientY: 192
+      clientX: 102, clientY: 192, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 102');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 102');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 104, clientY: 194
+      clientX: 104, clientY: 194, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 104');
     assert.equal(canvas.targets[0], rect1, 'should find the target rect 104');
     canvas.targets = [];
 
     target = canvas.findTarget({
-      clientX: 106, clientY: 196
+      clientX: 106, clientY: 196, target: canvas.upperCanvasEl
     });
     assert.equal(target, g, 'Should return the group 106');
     assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
@@ -911,21 +931,21 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
@@ -942,21 +962,21 @@
     canvas.add(group);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the group');
     assert.equal(canvas.targets[0], rect, 'should return the rect');
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     target = canvas.findTarget({
-      clientX: 9, clientY: 9
+      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
     });
 
     assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
@@ -969,17 +989,17 @@
     var triangle = makeTriangle({ left: 0, top: 0 }), target;
     canvas.add(triangle);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, triangle, 'Should return the triangle by bounding box');
     //TODO find out why this stops the tests
     canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks');
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, triangle, 'Should return the triangle now');
     canvas.perPixelTargetFind = false;
@@ -1002,65 +1022,65 @@
     canvas.add(group3);
     canvas.perPixelTargetFind = true;
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 1');
     target = canvas.findTarget({
-      clientX: 21, clientY: 9
+      clientX: 21, clientY: 9, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 2');
     target = canvas.findTarget({
-      clientX: 37, clientY: 7
+      clientX: 37, clientY: 7, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 3');
     target = canvas.findTarget({
-      clientX: 89, clientY: 47
+      clientX: 89, clientY: 47, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 4');
     target = canvas.findTarget({
-      clientX: 16, clientY: 122
+      clientX: 16, clientY: 122, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 5');
     target = canvas.findTarget({
-      clientX: 127, clientY: 37
+      clientX: 127, clientY: 37, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 6');
     target = canvas.findTarget({
-      clientX: 87, clientY: 139
+      clientX: 87, clientY: 139, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should return null because of transparency checks case 7');
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
     assert.equal(canvas.targets[0], triangle, 'The deepest target should be triangle');
     target = canvas.findTarget({
-      clientX: 50, clientY: 20
+      clientX: 50, clientY: 20, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
     assert.equal(canvas.targets[0], circle, 'The deepest target should be circle');
     target = canvas.findTarget({
-      clientX: 117, clientY: 16
+      clientX: 117, clientY: 16, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 3, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], rect2, 'The deepest target should be rect2');
     target = canvas.findTarget({
-      clientX: 100, clientY: 90
+      clientX: 100, clientY: 90, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], rect, 'The deepest target should be rect');
     target = canvas.findTarget({
-      clientX: 9, clientY: 145
+      clientX: 9, clientY: 145, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
     assert.equal(canvas.targets[0], circle2, 'The deepest target should be circle2');
     target = canvas.findTarget({
-      clientX: 66, clientY: 143
+      clientX: 66, clientY: 143, target: canvas.upperCanvasEl
     });
     assert.equal(target, group3, 'Should return the group3 now');
     assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
@@ -1082,32 +1102,32 @@
     group.setCoords();
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the activegroup');
     target = canvas.findTarget({
-      clientX: 40, clientY: 15
+      clientX: 40, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should miss the activegroup');
     assert.ok(!group.__corner, 'not over control');
     target = canvas.findTarget({
-      clientX: 0, clientY: 0
+      clientX: 0, clientY: 0, target: canvas.upperCanvasEl
     });
     assert.equal(group.__corner, 'tl', 'over control');
     assert.ok(target, group, 'should return active selection if over control');
     target = canvas.findTarget({
-      clientX: 5, clientY: 5
+      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.ok(target, group, 'should return active selection');
     assert.equal(canvas.targets[0], rect1, 'Should return the rect inside active selection');
     target = canvas.findTarget({
-      clientX: 25, clientY: 5
+      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the active selection');
     assert.deepEqual(canvas.targets, [], 'Should not return the rect behind active selection');
     canvas.discardActiveObject();
     target = canvas.findTarget({
-      clientX: 25, clientY: 5
+      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
     });
     assert.equal(target, rect3, 'Should return the rect3 now that active selection has been cleared');
   });
@@ -1123,12 +1143,12 @@
     group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
-      clientX: 8, clientY: 8
+      clientX: 8, clientY: 8, target: canvas.upperCanvasEl
     });
     assert.equal(target, group, 'Should return the activegroup');
 
     target = canvas.findTarget({
-      clientX: 15, clientY: 15
+      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
     });
     assert.equal(target, null, 'Should miss the activegroup');
   });
@@ -1245,7 +1265,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
   });
 
 
@@ -1298,7 +1318,7 @@
     var rect = makeRect();
     canvasWithClipPath.add(rect);
 
-    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.type);
   });
 
   QUnit.test('toDatalessObject', function(assert) {
@@ -1313,7 +1333,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1331,7 +1351,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1359,7 +1379,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1387,7 +1407,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1415,7 +1435,7 @@
     function reviver(obj, instance) {
       assert.deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
-      if (instance.constructor.name === 'Path') {
+      if (instance.constructor.type === 'Path') {
         instance.customID = 'fabric_1';
       }
     }
@@ -1424,7 +1444,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1449,8 +1469,8 @@
 
   QUnit.test('loadFromJSON with no objects', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1468,8 +1488,8 @@
 
   QUnit.test('loadFromJSON without "objects" property', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1, { backgroundColor: 'green', overlayColor: 'yellow' }),
         c2 = new fabric.Canvas(canvas2, { backgroundColor: 'red', overlayColor: 'orange' });
 
@@ -1490,8 +1510,8 @@
 
   QUnit.test('loadFromJSON with empty fabric.Group', function(assert) {
     var done = assert.async();
-    var canvas1 = fabric.getDocument().createElement('canvas'),
-        canvas2 = fabric.getDocument().createElement('canvas'),
+    var canvas1 = fabric.getFabricDocument().createElement('canvas'),
+        canvas2 = fabric.getFabricDocument().createElement('canvas'),
         c1 = new fabric.Canvas(canvas1),
         c2 = new fabric.Canvas(canvas2),
         group = new fabric.Group();
@@ -1888,8 +1908,8 @@
 
   [true, false].forEach(enableRetinaScaling => {
     QUnit.test(`set dimensions, enableRetinaScaling ${enableRetinaScaling}`, async function (assert) {
-      var el = fabric.getDocument().createElement('canvas'),
-        parentEl = fabric.getDocument().createElement('div');
+      var el = fabric.getFabricDocument().createElement('canvas'),
+        parentEl = fabric.getFabricDocument().createElement('div');
       el.width = 200; el.height = 200;
       parentEl.className = 'rootNode';
       parentEl.appendChild(el);
@@ -1907,15 +1927,15 @@
       var canvas = new fabric.Canvas(el, { enableRetinaScaling, renderOnAddRemove: false });
 
       canvas.setDimensions({ width: 500, height: 500 });
-      assert.equal(canvas._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-      assert.notEqual(el.style.cssText, canvas._originalCanvasStyle, 'canvas el style has been changed');
+      assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
+      assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
       assert.equal(el.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(el.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
       assert.equal(canvas.upperCanvasEl.width, 500 * (enableRetinaScaling ? dpr : 1), 'expected width');
       assert.equal(canvas.upperCanvasEl.height, 500 * (enableRetinaScaling ? dpr : 1), 'expected height');
 
       await canvas.dispose();
-      assert.equal(canvas._originalCanvasStyle, undefined, 'removed original canvas style');
+      assert.equal(canvas.elements._originalCanvasStyle, undefined, 'removed original canvas style');
       assert.equal(el.style.cssText, elStyle, 'restored original canvas style');
       assert.equal(el.width, 500, 'restored width');
       assert.equal(el.height, 500, 'restored height');
@@ -2021,12 +2041,11 @@
 
     var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
     canvas.add(rect);
-    var canvasEl = canvas.getElement(),
-        canvasOffset = fabric.util.getElementOffset(canvasEl);
+    var canvasOffset = canvas.calcOffset();
     var eventStub = {
       clientX: canvasOffset.left + 100,
       clientY: canvasOffset.top + 100,
-      target: rect
+      target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
     rect.__corner = rect._findTargetCorner(
@@ -2043,7 +2062,7 @@
     eventStub = {
       clientX: canvasOffset.left + rect.controlCoords.tl.corner.tl.x + 1,
       clientY: canvasOffset.top + rect.controlCoords.tl.corner.tl.y + 1,
-      target: rect
+      target: canvas.upperCanvasEl
     };
     rect.__corner = rect._findTargetCorner(
       canvas.getPointer(eventStub, true)
@@ -2071,7 +2090,7 @@
     eventStub = {
       clientX: canvasOffset.left + rect.left - 2,
       clientY: canvasOffset.top + rect.top + rect.height / 2,
-      target: rect,
+      target: canvas.upperCanvasEl,
       shiftKey: true
     };
     rect.__corner = rect._findTargetCorner(
@@ -2089,7 +2108,7 @@
     // eventStub = {
     //   clientX: canvasOffset.left + rect.controlCoords.mtr.position.x,
     //   clientY: canvasOffset.top + rect.controlCoords.mtr.position.y,
-    //   target: rect,
+    //   target: canvas.upperCanvasEl,
     // };
     // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     // t = canvas._currentTransform;
@@ -2110,7 +2129,7 @@
   //   var eventStub = {
   //     clientX: canvasOffset.left + rect.controlCoords.mtr.position.x,
   //     clientY: canvasOffset.top + rect.controlCoords.mtr.position.y,
-  //     target: rect,
+  //     target: canvas.upperCanvasEl,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);
   //   var rotated = canvas._rotateObject(30, 30, 'equally');
@@ -2128,7 +2147,7 @@
   //   var eventStub = {
   //     clientX: canvasOffset.left + rect.controlCoords.mtr.position.x,
   //     clientY: canvasOffset.top + rect.controlCoords.mtr.position.y,
-  //     target: rect,
+  //     target: canvas.upperCanvasEl,
   //   };
   //   canvas._setupCurrentTransform(eventStub, rect);
   //   assert.equal(rect.originX, 'right');
@@ -2170,12 +2189,12 @@
   //     assert.deepEqual(canvas.toJSON(), {
   //       "objects": [],
   //       "background": "rgba(0, 0, 0, 0)",
-  //       "backgroundImage": (fabric.getDocument().location.protocol +
+  //       "backgroundImage": (fabric.getFabricDocument().location.protocol +
   //                           '//' +
-  //                           fabric.getDocument().location.hostname +
-  //                           ((fabric.getDocument().location.port === '' || parseInt(fabric.getDocument().location.port, 10) === 80)
+  //                           fabric.getFabricDocument().location.hostname +
+  //                           ((fabric.getFabricDocument().location.port === '' || parseInt(fabric.getFabricDocument().location.port, 10) === 80)
   //                               ? ''
-  //                               : (':' + fabric.getDocument().location.port)) +
+  //                               : (':' + fabric.getFabricDocument().location.port)) +
   //                           '/assets/pug.jpg'),
   //       "backgroundImageOpacity": 1,
   //       "backgroundImageStretch": true

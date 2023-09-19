@@ -1,28 +1,19 @@
-import { halfPI } from '../../../constants';
-import { IPoint, Point } from '../../../Point';
+import type { XY } from '../../../Point';
+import { Point } from '../../../Point';
 import { degreesToRadians } from '../radiansDegreesConversion';
-import {
-  calcAngleBetweenVectors,
-  calcVectorRotation,
-  createVector,
-} from '../vectors';
-import { TProjectStrokeOnPointsOptions, TProjection } from './types';
+import { createVector } from '../vectors';
+import type { TProjectStrokeOnPointsOptions, TProjection } from './types';
 
 /**
  * @see https://github.com/fabricjs/fabric.js/pull/8344
+ * @todo consider removing skewing from points before calculating stroke projection,
+ * see https://github.com/fabricjs/fabric.js/commit/494a10ee2f8c2278ae9a55b20bf50cf6ee25b064#commitcomment-94751537
  */
 export abstract class StrokeProjectionsBase {
   declare options: TProjectStrokeOnPointsOptions;
   declare scale: Point;
   declare strokeUniformScalar: Point;
   declare strokeProjectionMagnitude: number;
-
-  static getAcuteAngleFactor(vector1: Point, vector2?: Point) {
-    const angle = vector2
-      ? calcAngleBetweenVectors(vector1, vector2)
-      : calcVectorRotation(vector1);
-    return Math.abs(angle) < halfPI ? -1 : 1;
-  }
 
   constructor(options: TProjectStrokeOnPointsOptions) {
     this.options = options;
@@ -36,7 +27,7 @@ export abstract class StrokeProjectionsBase {
   /**
    * When the stroke is uniform, scaling affects the arrangement of points. So we must take it into account.
    */
-  protected createSideVector(from: IPoint, to: IPoint) {
+  protected createSideVector(from: XY, to: XY) {
     const v = createVector(from, to);
     return this.options.strokeUniform ? v.multiply(this.scale) : v;
   }
