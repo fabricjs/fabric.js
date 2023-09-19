@@ -222,12 +222,6 @@ export class Group
     object.fire('added', { target: this });
   }
 
-  _onRelativeObjectAdded(object: FabricObject) {
-    this.enterGroup(object, false);
-    this.fire('object:added', { target: object });
-    object.fire('added', { target: this });
-  }
-
   /**
    * @private
    * @param {FabricObject} object
